@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { iconCalendar, iconChevronLeft, iconChevronRight, iconX } from '../icons';
+import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import styles from './app-date-input.css';
 
 @customElement('app-date-input')
@@ -24,6 +25,7 @@ export class AppDateInput extends LitElement {
   @state() private popoverLeft: number = 0;
 
   private unsubscribe?: () => void;
+  private portalHandle: PortalHandle | null = null;
 
   static styles = styles;
 
@@ -33,28 +35,69 @@ export class AppDateInput extends LitElement {
     this.unsubscribe = store.subscribe(() => {
       this.currentLang = store.customization.language;
     });
-    document.addEventListener('click', this.handleOutsideClick);
-    document.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('resize', this.handleReposition);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this.unsubscribe) this.unsubscribe();
-    document.removeEventListener('click', this.handleOutsideClick);
-    document.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('resize', this.handleReposition);
+    this.closePortal();
   }
 
-  private handleOutsideClick = (e: MouseEvent) => {
-    if (this.isOpen && !e.composedPath().includes(this)) {
-      this.isOpen = false;
+  private handleReposition = () => {
+    if (this.isOpen) {
+      this.updatePopoverPosition();
     }
   };
 
-  private handleKeyDown = (e: KeyboardEvent) => {
-    if (this.isOpen && e.key === 'Escape') {
-      this.isOpen = false;
+  private updatePopoverPosition() {
+    const triggerEl = this.shadowRoot?.querySelector('.date-trigger') as HTMLElement | null;
+    if (!triggerEl) return;
+
+    const rect = triggerEl.getBoundingClientRect();
+    const popoverHeight = 328;
+    const popoverWidth = 286;
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const top =
+      spaceBelow >= popoverHeight || rect.top < popoverHeight
+        ? Math.min(rect.bottom + 6, window.innerHeight - popoverHeight - 8)
+        : Math.max(8, rect.top - popoverHeight - 6);
+    const left = Math.max(8, Math.min(rect.left, window.innerWidth - popoverWidth - 8));
+    this.popoverTop = top;
+    this.popoverLeft = left;
+  }
+
+  private closePortal() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
     }
-  };
+  }
+
+  protected updated() {
+    if (this.isOpen && !this.disabled) {
+      const t = getTranslation(this.currentLang);
+      const monthName = t.calendar.months[this.viewMonth] || '';
+      const template = this.renderPopover(t, monthName);
+      if (!this.portalHandle) {
+        this.portalHandle = portalManager.mountTemplate({
+          kind: 'popup',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: true,
+          onClose: () => {
+            this.isOpen = false;
+          },
+        });
+      } else {
+        this.portalHandle.update(template);
+      }
+    } else {
+      this.closePortal();
+    }
+  }
 
   private syncViewFromValue() {
     if (this.value && /^\d{4}-\d{2}-\d{2}$/.test(this.value)) {
@@ -75,9 +118,6 @@ export class AppDateInput extends LitElement {
   }
 
   render() {
-    const t = getTranslation(this.currentLang);
-    const monthName = t.calendar.months[this.viewMonth] || '';
-
     return html`
       <div class="form-group">
         ${this.label
@@ -123,7 +163,6 @@ export class AppDateInput extends LitElement {
             : ''}
         </div>
 
-        ${this.isOpen ? this.renderPopover(t, monthName) : ''}
         ${this.error ? html`<div class="error-text">${this.error}</div>` : ''}
       </div>
     `;
@@ -242,20 +281,7 @@ export class AppDateInput extends LitElement {
     if (this.disabled) return;
     if (!this.isOpen) {
       this.syncViewFromValue();
-      const triggerEl = this.shadowRoot?.querySelector('.date-trigger') as HTMLElement | null;
-      if (triggerEl) {
-        const rect = triggerEl.getBoundingClientRect();
-        const popoverHeight = 328;
-        const popoverWidth = 286;
-        const spaceBelow = window.innerHeight - rect.bottom;
-        const top =
-          spaceBelow >= popoverHeight || rect.top < popoverHeight
-            ? Math.min(rect.bottom + 6, window.innerHeight - popoverHeight - 8)
-            : Math.max(8, rect.top - popoverHeight - 6);
-        const left = Math.max(8, Math.min(rect.left, window.innerWidth - popoverWidth - 8));
-        this.popoverTop = top;
-        this.popoverLeft = left;
-      }
+      this.updatePopoverPosition();
     }
     this.isOpen = !this.isOpen;
   }

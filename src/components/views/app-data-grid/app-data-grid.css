@@ -525,9 +525,7 @@ td {
 }
 
 .column-menu-popover {
-  position: absolute;
-  top: calc(100% + 4px);
-  right: 0;
+  position: fixed;
   background: var(--bg-surface-elevated, #162032);
   border: 1px solid var(--border-subtle, #334155);
   border-radius: var(--radius-md, 8px);
@@ -536,8 +534,12 @@ td {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  z-index: 50;
+  z-index: 1;
+  pointer-events: auto;
   min-width: 190px;
+  max-width: calc(100vw - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .grid-footer {

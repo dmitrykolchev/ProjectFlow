@@ -119,11 +119,13 @@
 }
 
 .popover-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 60;
+  position: fixed;
+  z-index: 1;
+  pointer-events: auto;
   min-width: 200px;
+  max-width: calc(100vw - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   animation: popIn 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 

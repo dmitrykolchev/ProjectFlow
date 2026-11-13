@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import styles from './app-select.css';
 
 export interface SelectOption {
@@ -24,27 +25,20 @@ export class AppSelect extends LitElement {
   @state() private panelBottom: number | null = null;
   @state() private panelMaxHeight: number = 220;
 
+  private portalHandle: PortalHandle | null = null;
+
   static styles = styles;
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('pointerdown', this.handleOutsidePointerDown);
-    window.addEventListener('scroll', this.handleReposition, true);
     window.addEventListener('resize', this.handleReposition);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('pointerdown', this.handleOutsidePointerDown);
-    window.removeEventListener('scroll', this.handleReposition, true);
     window.removeEventListener('resize', this.handleReposition);
+    this.closePortal();
   }
-
-  private handleOutsidePointerDown = (e: PointerEvent) => {
-    if (this.isOpen && !e.composedPath().includes(this)) {
-      this.isOpen = false;
-    }
-  };
 
   private handleReposition = () => {
     if (this.isOpen) {
@@ -76,12 +70,63 @@ export class AppSelect extends LitElement {
     }
   }
 
-  render() {
-    const selectedOpt = this.options.find((o) => o.value === this.value);
+  protected updated() {
+    if (this.isOpen && !this.disabled) {
+      const template = this.renderDropdownPanel();
+      if (!this.portalHandle) {
+        this.portalHandle = portalManager.mountTemplate({
+          kind: 'popup',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: true,
+          onClose: () => this.closeDropdown(),
+        });
+      } else {
+        this.portalHandle.update(template);
+      }
+    } else {
+      this.closePortal();
+    }
+  }
+
+  private closePortal() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
+  private renderDropdownPanel() {
     const panelStyle =
       this.panelBottom !== null
         ? `left: ${this.panelLeft}px; width: ${this.panelWidth}px; bottom: ${this.panelBottom}px; top: auto; max-height: ${this.panelMaxHeight}px;`
         : `left: ${this.panelLeft}px; width: ${this.panelWidth}px; top: ${this.panelTop ?? 0}px; bottom: auto; max-height: ${this.panelMaxHeight}px;`;
+
+    return html`
+      <div class="dropdown-panel" style="${panelStyle}">
+        ${this.options.map(
+          (opt) => html`
+            <div
+              class="option-item ${opt.value === this.value ? 'is-selected' : ''}"
+              @click="${() => this.selectOption(opt.value)}"
+            >
+              <div class="option-left">
+                ${opt.color
+                  ? html`<span class="dot-indicator" style="background-color: ${opt.color}"></span>`
+                  : ''}
+                <span>${opt.label}</span>
+              </div>
+              ${opt.value === this.value ? html`<span class="check-mark">✓</span>` : ''}
+            </div>
+          `
+        )}
+      </div>
+    `;
+  }
+
+  render() {
+    const selectedOpt = this.options.find((o) => o.value === this.value);
 
     return html`
       <div class="form-group">
@@ -100,29 +145,6 @@ export class AppSelect extends LitElement {
           </div>
           <span class="chevron">▼</span>
         </div>
-
-        ${this.isOpen && !this.disabled
-          ? html`
-              <div class="dropdown-panel" style="${panelStyle}">
-                ${this.options.map(
-                  (opt) => html`
-                    <div
-                      class="option-item ${opt.value === this.value ? 'is-selected' : ''}"
-                      @click="${() => this.selectOption(opt.value)}"
-                    >
-                      <div class="option-left">
-                        ${opt.color
-                          ? html`<span class="dot-indicator" style="background-color: ${opt.color}"></span>`
-                          : ''}
-                        <span>${opt.label}</span>
-                      </div>
-                      ${opt.value === this.value ? html`<span class="check-mark">✓</span>` : ''}
-                    </div>
-                  `
-                )}
-              </div>
-            `
-          : ''}
       </div>
     `;
   }

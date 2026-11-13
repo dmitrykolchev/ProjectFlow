@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { ActivityLogItem } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import styles from './app-activity-panel.css';
 
 @customElement('app-activity-panel')
@@ -12,6 +13,7 @@ export class AppActivityPanel extends LitElement {
   @state() private currentLang = store.customization.language;
 
   private unsubscribe?: () => void;
+  private portalHandle: PortalHandle | null = null;
 
   static styles = styles;
 
@@ -26,6 +28,7 @@ export class AppActivityPanel extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this.unsubscribe) this.unsubscribe();
+    this.closePortal();
   }
 
   private updateState() {
@@ -34,11 +37,44 @@ export class AppActivityPanel extends LitElement {
     this.currentLang = store.customization.language;
   }
 
+  protected updated() {
+    if (this.isOpen) {
+      const template = this.renderDrawer();
+      if (!this.portalHandle) {
+        this.portalHandle = portalManager.mountTemplate({
+          kind: 'modal',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: false,
+          onClose: () => {
+            if (this.isOpen) store.toggleActivityPanel();
+          },
+        });
+      } else {
+        this.portalHandle.update(template);
+      }
+    } else {
+      this.closePortal();
+    }
+  }
+
+  private closePortal() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
   render() {
+    return html``;
+  }
+
+  private renderDrawer() {
     const t = getTranslation(this.currentLang);
 
     return html`
-      <div class="drawer-backdrop ${this.isOpen ? 'is-open' : ''}" @click="${() => store.toggleActivityPanel()}">
+      <div class="drawer-backdrop" @click="${() => store.toggleActivityPanel()}">
         <div class="drawer-panel" @click="${(e: MouseEvent) => e.stopPropagation()}">
           <div class="drawer-header">
             <div class="drawer-title">

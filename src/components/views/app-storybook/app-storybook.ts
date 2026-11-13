@@ -22,6 +22,7 @@ import comboboxMeta from '../../common/app-combobox/app-combobox.story';
 import checkboxMeta from '../../common/app-checkbox/app-checkbox.story';
 import switchMeta from '../../common/app-switch/app-switch.story';
 import modalMeta from '../../common/app-modal/app-modal.story';
+import modalPortalMeta from '../../common/app-modal-portal/app-modal-portal.story';
 import toastMeta from '../../common/app-toast/app-toast.story';
 import activityMeta from '../../common/app-activity-panel/app-activity-panel.story';
 import taskModalMeta from '../../common/app-task-modal/app-task-modal.story';
@@ -63,6 +64,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   selectMeta,
   comboboxMeta,
   modalMeta,
+  modalPortalMeta,
   taskModalMeta,
   toastMeta,
   activityMeta,

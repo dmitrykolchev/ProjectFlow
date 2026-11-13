@@ -38,6 +38,14 @@ export { AppCombobox } from './app-combobox/app-combobox';
 export { AppModal } from './app-modal/app-modal';
 export type { ModalSize } from './app-modal/app-modal';
 
+export { AppModalPortal, getModalPortal, portalManager } from './app-modal-portal/app-modal-portal';
+export type {
+  PortalLayerKind,
+  PortalTemplateOptions,
+  PortalElementOptions,
+  PortalHandle,
+} from './app-modal-portal/app-modal-portal';
+
 export { AppToast } from './app-toast/app-toast';
 export { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 export { AppTaskModal } from './app-task-modal/app-task-modal';
@@ -62,6 +70,7 @@ import { AppDateInput } from './app-date-input/app-date-input';
 import { AppSelect } from './app-select/app-select';
 import { AppCombobox } from './app-combobox/app-combobox';
 import { AppModal } from './app-modal/app-modal';
+import { AppModalPortal } from './app-modal-portal/app-modal-portal';
 import { AppToast } from './app-toast/app-toast';
 import { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 import { AppTaskModal } from './app-task-modal/app-task-modal';
@@ -85,6 +94,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-select': AppSelect,
   'app-combobox': AppCombobox,
   'app-modal': AppModal,
+  'app-modal-portal': AppModalPortal,
   'app-toast': AppToast,
   'app-activity-panel': AppActivityPanel,
   'app-task-modal': AppTaskModal,

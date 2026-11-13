@@ -88,13 +88,15 @@ input::placeholder {
 
 .dropdown-panel {
   position: fixed;
-  z-index: 2200;
+  z-index: 1;
   background: var(--bg-surface-elevated, #162032);
   border: 1px solid var(--border-strong, #334155);
   border-radius: var(--radius-md, 8px);
   box-shadow: var(--shadow-xl, 0 20px 25px -5px rgba(0, 0, 0, 0.5));
   max-height: 180px;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  pointer-events: auto;
   padding: 0.25rem;
 }
 

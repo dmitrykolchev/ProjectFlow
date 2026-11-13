@@ -5,7 +5,7 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1000;
+  z-index: 1;
   background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(4px);
   display: flex;
@@ -14,6 +14,8 @@
   padding: 1rem;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
+  overscroll-behavior: contain;
   transition: opacity var(--transition-normal, 200ms ease),
               visibility var(--transition-normal, 200ms ease);
 }
@@ -21,6 +23,7 @@
 .modal-backdrop.is-open {
   opacity: 1;
   visibility: visible;
+  pointer-events: auto;
 }
 
 .modal-card {
@@ -86,6 +89,7 @@
 .modal-body {
   padding: 1.5rem;
   overflow-y: auto;
+  overscroll-behavior: contain;
   flex: 1;
   display: flex;
   flex-direction: column;

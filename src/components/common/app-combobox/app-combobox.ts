@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import styles from './app-combobox.css';
 
 @customElement('app-combobox')
@@ -18,27 +19,20 @@ export class AppCombobox extends LitElement {
   @state() private panelBottom: number | null = null;
   @state() private panelMaxHeight: number = 180;
 
+  private portalHandle: PortalHandle | null = null;
+
   static styles = styles;
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('pointerdown', this.handleOutsidePointerDown);
-    window.addEventListener('scroll', this.handleReposition, true);
     window.addEventListener('resize', this.handleReposition);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('pointerdown', this.handleOutsidePointerDown);
-    window.removeEventListener('scroll', this.handleReposition, true);
     window.removeEventListener('resize', this.handleReposition);
+    this.closePortal();
   }
-
-  private handleOutsidePointerDown = (e: PointerEvent) => {
-    if (this.isOpen && !e.composedPath().includes(this)) {
-      this.isOpen = false;
-    }
-  };
 
   private handleReposition = () => {
     if (this.isOpen) {
@@ -75,19 +69,85 @@ export class AppCombobox extends LitElement {
     this.isOpen = true;
   }
 
-  render() {
+  private closePortal() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
+  private getDropdownData() {
     const query = this.inputValue.toLowerCase().trim();
     const filteredSuggestions = this.items.filter(
       (item) => !this.selected.includes(item) && item.toLowerCase().includes(query)
     );
-    const hasDropdownContent =
-      filteredSuggestions.length > 0 || (this.allowCustom && Boolean(query));
+    const canAddCustom =
+      this.allowCustom &&
+      Boolean(query) &&
+      !this.items.map((i) => i.toLowerCase()).includes(query);
+    const hasDropdownContent = filteredSuggestions.length > 0 || canAddCustom;
+    return { query, filteredSuggestions, canAddCustom, hasDropdownContent };
+  }
 
+  protected updated() {
+    const { filteredSuggestions, canAddCustom, hasDropdownContent } = this.getDropdownData();
+
+    if (this.isOpen && hasDropdownContent) {
+      const template = this.renderDropdownPanel(filteredSuggestions, canAddCustom);
+      if (!this.portalHandle) {
+        this.portalHandle = portalManager.mountTemplate({
+          kind: 'popup',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: true,
+          onClose: () => {
+            this.isOpen = false;
+          },
+        });
+      } else {
+        this.portalHandle.update(template);
+      }
+    } else {
+      this.closePortal();
+    }
+  }
+
+  private renderDropdownPanel(filteredSuggestions: string[], canAddCustom: boolean) {
     const panelStyle =
       this.panelBottom !== null
         ? `left: ${this.panelLeft}px; width: ${this.panelWidth}px; bottom: ${this.panelBottom}px; top: auto; max-height: ${this.panelMaxHeight}px;`
         : `left: ${this.panelLeft}px; width: ${this.panelWidth}px; top: ${this.panelTop ?? 0}px; bottom: auto; max-height: ${this.panelMaxHeight}px;`;
 
+    return html`
+      <div class="dropdown-panel" style="${panelStyle}">
+        ${filteredSuggestions.map(
+          (sug) => html`
+            <div
+              class="suggestion-item"
+              @mousedown="${(e: MouseEvent) => e.preventDefault()}"
+              @click="${() => this.addTag(sug)}"
+            >
+              ${sug}
+            </div>
+          `
+        )}
+        ${canAddCustom
+          ? html`
+              <div
+                class="suggestion-item"
+                @mousedown="${(e: MouseEvent) => e.preventDefault()}"
+                @click="${() => this.addTag(this.inputValue.trim())}"
+              >
+                + Добавить "${this.inputValue.trim()}"
+              </div>
+            `
+          : ''}
+      </div>
+    `;
+  }
+
+  render() {
     return html`
       <div class="form-group">
         ${this.label ? html`<label>${this.label}</label>` : ''}
@@ -120,35 +180,6 @@ export class AppCombobox extends LitElement {
             @keydown="${this.handleKeydown}"
           />
         </div>
-
-        ${this.isOpen && hasDropdownContent
-          ? html`
-              <div class="dropdown-panel" style="${panelStyle}">
-                ${filteredSuggestions.map(
-                  (sug) => html`
-                    <div
-                      class="suggestion-item"
-                      @mousedown="${(e: MouseEvent) => e.preventDefault()}"
-                      @click="${() => this.addTag(sug)}"
-                    >
-                      ${sug}
-                    </div>
-                  `
-                )}
-                ${this.allowCustom && query && !this.items.map((i) => i.toLowerCase()).includes(query)
-                  ? html`
-                      <div
-                        class="suggestion-item"
-                        @mousedown="${(e: MouseEvent) => e.preventDefault()}"
-                        @click="${() => this.addTag(this.inputValue.trim())}"
-                      >
-                        + Добавить "${this.inputValue.trim()}"
-                      </div>
-                    `
-                  : ''}
-              </div>
-            `
-          : ''}
       </div>
     `;
   }

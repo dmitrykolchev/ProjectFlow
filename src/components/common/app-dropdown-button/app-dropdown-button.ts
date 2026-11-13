@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ButtonSize, ButtonVariant } from '../app-button/app-button';
 import { MenuItem } from '../app-menu/app-menu';
+import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import { iconChevronDown } from '../icons';
 import '../app-button/app-button';
 import '../app-menu/app-menu';
@@ -17,32 +18,113 @@ export class AppDropdownButton extends LitElement {
   @property({ type: Array }) items: MenuItem[] = [];
 
   @state() private isOpen: boolean = false;
+  @state() private menuMinWidth: number = 180;
+  @state() private menuLeft: number | null = 0;
+  @state() private menuRight: number | null = null;
+  @state() private menuTop: number | null = null;
+  @state() private menuBottom: number | null = null;
+  @state() private menuMaxHeight: number = 280;
+
+  private portalHandle: PortalHandle | null = null;
 
   static styles = styles;
 
   connectedCallback() {
     super.connectedCallback();
-    document.addEventListener('click', this.handleOutsideClick);
-    document.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('resize', this.handleReposition);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    document.removeEventListener('click', this.handleOutsideClick);
-    document.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('resize', this.handleReposition);
+    this.closePortal();
   }
 
-  private handleOutsideClick = (e: MouseEvent) => {
-    if (this.isOpen && !e.composedPath().includes(this)) {
-      this.isOpen = false;
+  private handleReposition = () => {
+    if (this.isOpen) {
+      this.updateMenuPosition();
     }
   };
 
-  private handleKeyDown = (e: KeyboardEvent) => {
-    if (this.isOpen && e.key === 'Escape') {
-      this.isOpen = false;
+  private updateMenuPosition() {
+    const wrapper = this.shadowRoot?.querySelector('.dropdown-wrapper') as HTMLElement | null;
+    if (!wrapper) return;
+
+    const rect = wrapper.getBoundingClientRect();
+    const minW = Math.max(180, Math.round(rect.width));
+    this.menuMinWidth = minW;
+
+    if (this.placement === 'bottom-end') {
+      this.menuLeft = null;
+      this.menuRight = Math.max(8, Math.round(window.innerWidth - rect.right));
+    } else {
+      this.menuRight = null;
+      this.menuLeft = Math.max(8, Math.min(Math.round(rect.left), window.innerWidth - minW - 8));
     }
-  };
+
+    const spaceBelow = window.innerHeight - rect.bottom - 12;
+    const spaceAbove = rect.top - 12;
+
+    if (spaceBelow >= 160 || spaceBelow >= spaceAbove) {
+      this.menuTop = Math.round(rect.bottom + 6);
+      this.menuBottom = null;
+      this.menuMaxHeight = Math.max(100, Math.min(320, spaceBelow));
+    } else {
+      this.menuTop = null;
+      this.menuBottom = Math.round(window.innerHeight - rect.top + 6);
+      this.menuMaxHeight = Math.max(100, Math.min(320, spaceAbove));
+    }
+  }
+
+  protected updated() {
+    if (this.isOpen && !this.disabled) {
+      const template = this.renderMenuPopover();
+      if (!this.portalHandle) {
+        this.portalHandle = portalManager.mountTemplate({
+          kind: 'popup',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: true,
+          onClose: () => {
+            this.isOpen = false;
+          },
+        });
+      } else {
+        this.portalHandle.update(template);
+      }
+    } else {
+      this.closePortal();
+    }
+  }
+
+  private closePortal() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
+  private renderMenuPopover() {
+    const horizStyle =
+      this.menuRight !== null
+        ? `right: ${this.menuRight}px; left: auto;`
+        : `left: ${this.menuLeft ?? 8}px; right: auto;`;
+    const vertStyle =
+      this.menuBottom !== null
+        ? `bottom: ${this.menuBottom}px; top: auto;`
+        : `top: ${this.menuTop ?? 0}px; bottom: auto;`;
+    const popoverStyle = `${horizStyle} ${vertStyle} min-width: ${this.menuMinWidth}px; max-height: ${this.menuMaxHeight}px;`;
+
+    return html`
+      <div class="popover-menu" style="${popoverStyle}">
+        <app-menu
+          .items="${this.items}"
+          @select="${this.handleMenuSelect}"
+        ></app-menu>
+      </div>
+    `;
+  }
 
   render() {
     return html`
@@ -59,17 +141,6 @@ export class AppDropdownButton extends LitElement {
             ${iconChevronDown(14)}
           </span>
         </app-button>
-
-        ${this.isOpen
-          ? html`
-              <div class="popover-menu ${this.placement}">
-                <app-menu
-                  .items="${this.items}"
-                  @select="${this.handleMenuSelect}"
-                ></app-menu>
-              </div>
-            `
-          : ''}
       </div>
     `;
   }
@@ -77,7 +148,12 @@ export class AppDropdownButton extends LitElement {
   private toggleMenu(e: MouseEvent) {
     e.stopPropagation();
     if (this.disabled) return;
-    this.isOpen = !this.isOpen;
+    if (!this.isOpen) {
+      this.updateMenuPosition();
+      this.isOpen = true;
+    } else {
+      this.isOpen = false;
+    }
   }
 
   private handleMenuSelect(e: CustomEvent) {

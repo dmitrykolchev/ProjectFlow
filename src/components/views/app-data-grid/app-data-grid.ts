@@ -17,6 +17,7 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
 import { DataGridColumn } from '../data-grid-column/data-grid-column';
 import '../data-grid-column/data-grid-column';
+import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
 
 export interface GridSortRule {
   field: string;
@@ -100,6 +101,10 @@ export class AppDataGrid extends LitElement {
   @state() private currentPage: number = 1;
   @state() private rowsPerPage: number = 15;
   @state() private showColumnMenu: boolean = false;
+  @state() private columnMenuRight: number = 12;
+  @state() private columnMenuTop: number | null = null;
+  @state() private columnMenuBottom: number | null = null;
+  @state() private columnMenuMaxHeight: number = 280;
   @state() private currentLang = store.customization.language;
   @state() private currentDensity = store.customization.density;
 
@@ -124,6 +129,7 @@ export class AppDataGrid extends LitElement {
   private scrollRafId: number | null = null;
   private currentScrollTop = 0;
   private viewportHeight = 520;
+  private columnMenuPortal: PortalHandle | null = null;
 
   static styles = styles;
 
@@ -134,6 +140,7 @@ export class AppDataGrid extends LitElement {
       this.syncState();
     });
     this.addEventListener('column-change', () => this.readSlottedColumns());
+    window.addEventListener('resize', this.handleWindowResize);
   }
 
   disconnectedCallback() {
@@ -149,6 +156,72 @@ export class AppDataGrid extends LitElement {
     }
     window.removeEventListener('pointermove', this.handleResizeMove);
     window.removeEventListener('pointerup', this.handleResizeEnd);
+    window.removeEventListener('resize', this.handleWindowResize);
+    this.closeColumnMenuPortal();
+  }
+
+  private handleWindowResize = () => {
+    if (this.showColumnMenu) {
+      this.updateColumnMenuPosition();
+    }
+  };
+
+  private closeColumnMenuPortal() {
+    if (this.columnMenuPortal) {
+      this.columnMenuPortal.close();
+      this.columnMenuPortal = null;
+    }
+  }
+
+  private updateColumnMenuPosition() {
+    const trigger = this.shadowRoot?.querySelector('.column-visibility-btn') as HTMLElement | null;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    this.columnMenuRight = Math.max(8, Math.round(window.innerWidth - rect.right));
+    const spaceBelow = window.innerHeight - rect.bottom - 12;
+    const spaceAbove = rect.top - 12;
+
+    if (spaceBelow >= 160 || spaceBelow >= spaceAbove) {
+      this.columnMenuTop = Math.round(rect.bottom + 4);
+      this.columnMenuBottom = null;
+      this.columnMenuMaxHeight = Math.max(120, Math.min(300, spaceBelow));
+    } else {
+      this.columnMenuTop = null;
+      this.columnMenuBottom = Math.round(window.innerHeight - rect.top + 4);
+      this.columnMenuMaxHeight = Math.max(120, Math.min(300, spaceAbove));
+    }
+  }
+
+  private toggleColumnMenu() {
+    if (!this.showColumnMenu) {
+      this.updateColumnMenuPosition();
+      this.showColumnMenu = true;
+    } else {
+      this.showColumnMenu = false;
+    }
+  }
+
+  private renderColumnMenuPopover(): TemplateResult {
+    const vertStyle =
+      this.columnMenuBottom !== null
+        ? `bottom: ${this.columnMenuBottom}px; top: auto;`
+        : `top: ${this.columnMenuTop ?? 0}px; bottom: auto;`;
+    const popoverStyle = `right: ${this.columnMenuRight}px; left: auto; ${vertStyle} max-height: ${this.columnMenuMaxHeight}px;`;
+
+    return html`
+      <div class="column-menu-popover" style="${popoverStyle}">
+        ${this.columns.map((col) => {
+          const isVisible = !this.hiddenColumns.has(col.field);
+          return html`
+            <app-checkbox
+              ?checked="${isVisible}"
+              label="${col.header}"
+              @change="${() => this.toggleColumnVisibility(col.field)}"
+            ></app-checkbox>
+          `;
+        })}
+      </div>
+    `;
   }
 
   willUpdate(changed: Map<PropertyKey, unknown>) {
@@ -213,6 +286,26 @@ export class AppDataGrid extends LitElement {
         this.currentScrollTop = 0;
       }
       this.recomputeVirtualWindow();
+    }
+
+    if (this.showColumnMenu) {
+      const template = this.renderColumnMenuPopover();
+      if (!this.columnMenuPortal) {
+        this.columnMenuPortal = portalManager.mountTemplate({
+          kind: 'popup',
+          styles,
+          template,
+          host: this,
+          closeOnBackdrop: true,
+          onClose: () => {
+            this.showColumnMenu = false;
+          },
+        });
+      } else {
+        this.columnMenuPortal.update(template);
+      }
+    } else {
+      this.closeColumnMenuPortal();
     }
   }
 
@@ -513,29 +606,13 @@ export class AppDataGrid extends LitElement {
           </app-toggle-button>
 
           <app-button
+            class="column-visibility-btn"
             size="sm"
             variant="outline"
-            @click="${() => (this.showColumnMenu = !this.showColumnMenu)}"
+            @click="${this.toggleColumnMenu}"
           >
             ${t.grid.columnVisibility}
           </app-button>
-
-          ${this.showColumnMenu
-            ? html`
-                <div class="column-menu-popover">
-                  ${this.columns.map((col) => {
-                    const isVisible = !this.hiddenColumns.has(col.field);
-                    return html`
-                      <app-checkbox
-                        ?checked="${isVisible}"
-                        label="${col.header}"
-                        @change="${() => this.toggleColumnVisibility(col.field)}"
-                      ></app-checkbox>
-                    `;
-                  })}
-                </div>
-              `
-            : ''}
 
           <app-button size="sm" variant="secondary" @click="${this.exportCsv}">
             <span slot="icon-start">${iconDownload(14)}</span>
