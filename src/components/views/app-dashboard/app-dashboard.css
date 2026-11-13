@@ -1,8 +1,16 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :host {
   display: flex;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   overflow-y: auto;
+  overflow-x: hidden;
   background: var(--bg-canvas, #090d16);
   padding: 1.5rem;
 }
@@ -28,6 +36,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  min-width: 0;
 }
 
 .dash-title {
@@ -52,33 +61,34 @@
 /* 4-column KPI strip */
 .kpi-strip {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1rem;
+  align-items: stretch;
 }
 
 @media (max-width: 1100px) {
   .kpi-strip {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 600px) {
   .kpi-strip {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
 /* Main split layout */
 .main-grid {
   display: grid;
-  grid-template-columns: 1.55fr 1fr;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
   gap: 1.25rem;
   align-items: start;
 }
 
 @media (max-width: 1024px) {
   .main-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -86,6 +96,8 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  min-width: 0;
+  width: 100%;
 }
 
 /* Deadlines & Activity Surface */
@@ -97,6 +109,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .panel-header {

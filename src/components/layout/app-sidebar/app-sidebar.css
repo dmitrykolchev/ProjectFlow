@@ -1,4 +1,5 @@
 :host {
+  position: relative;
   display: block;
   height: 100%;
   background: var(--bg-surface, #111827);
@@ -6,7 +7,7 @@
   transition: width var(--transition-normal, 200ms ease);
   width: var(--sidebar-width, 260px);
   flex-shrink: 0;
-  z-index: 50;
+  z-index: 60;
 }
 
 :host([collapsed]) {
@@ -23,22 +24,23 @@
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   height: var(--density-header-height, 60px);
   padding: 0 1.25rem;
   border-bottom: 1px solid var(--border-subtle, #1e293b);
+  flex-shrink: 0;
 }
 
 :host([collapsed]) .sidebar-header {
-  padding: 0 0.75rem;
+  padding: 0;
   justify-content: center;
-  gap: 0.25rem;
 }
 
 .brand {
   display: flex;
   align-items: center;
   gap: 0.65rem;
+  min-width: 0;
   text-decoration: none;
   color: var(--text-primary, #f8fafc);
   font-weight: 700;
@@ -48,15 +50,25 @@
   overflow: hidden;
 }
 
+:host([collapsed]) .brand {
+  justify-content: center;
+  overflow: visible;
+}
+
+.brand-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .brand-mark {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   border-radius: var(--radius-md, 8px);
   background: var(--accent-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
+  color: var(--text-on-accent, #ffffff);
   font-weight: 800;
   font-size: 0.85rem;
   flex-shrink: 0;
@@ -64,22 +76,34 @@
 }
 
 .collapse-btn {
-  background: transparent;
-  border: none;
+  position: absolute;
+  top: calc(var(--density-header-height, 60px) / 2);
+  right: -13px;
+  transform: translateY(-50%);
+  z-index: 65;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated, #162032);
+  border: 1px solid var(--border-strong, #334155);
   color: var(--text-secondary, #94a3b8);
+  box-shadow: var(--shadow-sm, 0 2px 6px rgba(0, 0, 0, 0.25));
   cursor: pointer;
-  padding: 0.35rem;
-  border-radius: var(--radius-sm, 6px);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
+              border-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease),
+              transform var(--transition-fast, 150ms ease);
 }
 
 .collapse-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+  background: var(--accent-primary, #6366f1);
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--text-on-accent, #ffffff);
+  transform: translateY(-50%) scale(1.06);
 }
 
 .project-selector {

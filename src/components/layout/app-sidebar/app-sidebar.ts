@@ -69,20 +69,22 @@ export class AppSidebar extends LitElement {
     const t = getTranslation(this.currentLang);
 
     return html`
+      <button
+        type="button"
+        class="collapse-btn"
+        @click="${() => store.toggleSidebar()}"
+        title="${this.collapsed ? 'Expand' : 'Collapse'}"
+        aria-label="Toggle Sidebar"
+      >
+        ${this.collapsed ? iconChevronRight(14) : iconChevronLeft(14)}
+      </button>
+
       <div class="sidebar-wrapper">
         <div class="sidebar-header">
           <div class="brand">
             <div class="brand-mark">PF</div>
-            ${!this.collapsed ? html`<span>${t.common.appName}</span>` : ''}
+            ${!this.collapsed ? html`<span class="brand-text">${t.common.appName}</span>` : ''}
           </div>
-          <button
-            class="collapse-btn"
-            @click="${() => store.toggleSidebar()}"
-            title="${this.collapsed ? 'Expand' : 'Collapse'}"
-            aria-label="Toggle Sidebar"
-          >
-            ${this.collapsed ? iconChevronRight(16) : iconChevronLeft(16)}
-          </button>
         </div>
 
         ${!this.collapsed
