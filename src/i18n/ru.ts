@@ -170,6 +170,10 @@ export const ru = {
     subtasksLabel: 'Подзадачи',
     addSubtask: 'Добавить подзадачу',
     subtaskPlaceholder: 'Название подзадачи...',
+    moveSubtaskUp: 'Переместить выше',
+    moveSubtaskDown: 'Переместить ниже',
+    dragSubtask: 'Перетащите, чтобы изменить порядок',
+    removeSubtask: 'Удалить подзадачу',
   },
   analytics: {
     title: 'Обзор и аналитика проектов',

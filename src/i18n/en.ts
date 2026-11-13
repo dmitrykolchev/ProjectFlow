@@ -170,6 +170,10 @@ export const en = {
     subtasksLabel: 'Subtasks',
     addSubtask: 'Add Subtask',
     subtaskPlaceholder: 'Subtask description...',
+    moveSubtaskUp: 'Move up',
+    moveSubtaskDown: 'Move down',
+    dragSubtask: 'Drag to reorder',
+    removeSubtask: 'Remove subtask',
   },
   analytics: {
     title: 'Project Analytics & Overview',

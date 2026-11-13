@@ -1,11 +1,21 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :host {
   display: contents;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.form-grid > div {
+  min-width: 0;
 }
 
 .col-span-2 {
@@ -28,8 +38,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  max-height: 160px;
+  max-height: 210px;
   overflow-y: auto;
+  padding: 2px 0;
 }
 
 .subtask-item {
@@ -38,18 +49,65 @@
   gap: 0.5rem;
   padding: 0.35rem 0.5rem;
   background: var(--bg-subtle, #1a2438);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm, 6px);
   font-size: 0.8125rem;
+  transition: background-color var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              opacity var(--transition-fast, 150ms ease);
 }
 
-.subtask-item input[type='checkbox'] {
-  accent-color: var(--accent-primary, #6366f1);
-  cursor: pointer;
+.subtask-item.is-dragging {
+  opacity: 0.45;
+  border-style: dashed;
+  border-color: var(--accent-primary, #6366f1);
+}
+
+.subtask-item.is-drop-before {
+  box-shadow: inset 0 2px 0 0 var(--accent-primary, #6366f1);
+  background: var(--bg-hover, #223049);
+}
+
+.subtask-item.is-drop-after {
+  box-shadow: inset 0 -2px 0 0 var(--accent-primary, #6366f1);
+  background: var(--bg-hover, #223049);
+}
+
+.subtask-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted, #64748b);
+  cursor: grab;
+  flex-shrink: 0;
+  padding: 0.1rem 0;
+  transition: color var(--transition-fast, 150ms ease);
+}
+
+.subtask-item:hover .subtask-drag-handle {
+  color: var(--text-secondary, #94a3b8);
+}
+
+.subtask-drag-handle:active {
+  cursor: grabbing;
+}
+
+.subtask-order {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+  min-width: 1.25rem;
+  text-align: right;
+  flex-shrink: 0;
+  user-select: none;
 }
 
 .subtask-title {
   flex: 1;
+  min-width: 0;
   color: var(--text-primary, #f8fafc);
+  word-break: break-word;
 }
 
 .subtask-title.is-done {
@@ -57,16 +115,42 @@
   color: var(--text-muted, #64748b);
 }
 
-.subtask-remove {
-  background: transparent;
-  border: none;
-  color: var(--text-muted, #64748b);
-  cursor: pointer;
-  padding: 0 0.25rem;
+.subtask-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
 }
 
-.subtask-remove:hover {
+.subtask-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease);
+}
+
+.subtask-action-btn:hover:not(:disabled) {
+  background: var(--bg-hover, #223049);
+  color: var(--text-primary, #f8fafc);
+}
+
+.subtask-action-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.subtask-remove:hover:not(:disabled) {
   color: var(--color-danger, #ef4444);
+  background: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .add-subtask-row {
@@ -75,21 +159,9 @@
   align-items: center;
 }
 
-.add-subtask-input {
-  box-sizing: border-box;
+.add-subtask-input-field {
   flex: 1;
-  height: var(--control-height-sm, 30px);
-  padding: 0 0.65rem;
-  background: var(--bg-surface, #111827);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-sm, 6px);
-  color: var(--text-primary, #f8fafc);
-  font-size: 0.8125rem;
-  outline: none;
-}
-
-.add-subtask-input:focus {
-  border-color: var(--accent-primary, #6366f1);
+  min-width: 0;
 }
 
 @media (max-width: 640px) {

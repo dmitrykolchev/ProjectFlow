@@ -311,16 +311,36 @@ export class AppModalPortal extends LitElement {
       options.onClose
     );
 
-    const slotName = `slot-${entry.id}`;
-    const slotEl = document.createElement('slot');
-    slotEl.name = slotName;
-    entry.contentEl.appendChild(slotEl);
+    const originRoot = options.element.getRootNode();
+    if (originRoot instanceof ShadowRoot) {
+      const shadowHost = document.createElement('div');
+      shadowHost.className = 'portal-shadow-host';
+      const shadowRootRef = shadowHost.attachShadow({ mode: 'open' });
 
-    options.element.setAttribute('slot', slotName);
-    this.appendChild(options.element);
+      if ('adoptedStyleSheets' in shadowRootRef && originRoot.adoptedStyleSheets?.length) {
+        shadowRootRef.adoptedStyleSheets = [...originRoot.adoptedStyleSheets];
+      }
+      originRoot.querySelectorAll('style').forEach((styleNode) => {
+        shadowRootRef.appendChild(styleNode.cloneNode(true));
+      });
 
-    entry.mountedElement = options.element;
-    entry.slotEl = slotEl;
+      shadowRootRef.appendChild(options.element);
+      entry.contentEl.appendChild(shadowHost);
+      entry.shadowHost = shadowHost;
+      entry.shadowRootRef = shadowRootRef;
+      entry.mountedElement = options.element;
+    } else {
+      const slotName = `slot-${entry.id}`;
+      const slotEl = document.createElement('slot');
+      slotEl.name = slotName;
+      entry.contentEl.appendChild(slotEl);
+
+      options.element.setAttribute('slot', slotName);
+      this.appendChild(options.element);
+
+      entry.mountedElement = options.element;
+      entry.slotEl = slotEl;
+    }
 
     return {
       id: entry.id,
@@ -342,14 +362,17 @@ export class AppModalPortal extends LitElement {
     if (idx === -1) return;
     const [entry] = this.entries.splice(idx, 1);
 
-    if (entry.shadowRootRef) {
+    if (entry.shadowRootRef && !entry.mountedElement) {
       render(html``, entry.shadowRootRef, { host: entry.host });
     }
-    if (entry.mountedElement && entry.mountedElement.parentNode === this) {
+    if (entry.mountedElement) {
       entry.mountedElement.removeAttribute('slot');
-      this.removeChild(entry.mountedElement);
-    } else if (entry.mountedElement) {
-      entry.mountedElement.removeAttribute('slot');
+      if (
+        entry.mountedElement.parentNode === this ||
+        entry.mountedElement.parentNode === entry.shadowRootRef
+      ) {
+        entry.mountedElement.remove();
+      }
     }
     entry.layerEl.remove();
     this.syncPortalState();

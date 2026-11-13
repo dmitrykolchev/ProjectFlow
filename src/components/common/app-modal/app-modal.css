@@ -87,7 +87,9 @@
 }
 
 .modal-body {
+  box-sizing: border-box;
   padding: 1.5rem;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   flex: 1;

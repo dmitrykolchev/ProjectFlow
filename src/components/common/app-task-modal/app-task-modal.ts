@@ -1,8 +1,10 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { Task, TaskPriority, TaskStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { iconChevronDown, iconChevronUp, iconGripVertical, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
 import '../app-button/app-button';
@@ -12,6 +14,7 @@ import '../app-select/app-select';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
+import '../app-checkbox/app-checkbox';
 
 @customElement('app-task-modal')
 export class AppTaskModal extends LitElement {
@@ -34,6 +37,9 @@ export class AppTaskModal extends LitElement {
   @state() private subtasks: { id: string; title: string; completed: boolean }[] = [];
   @state() private newSubtaskText: string = '';
   @state() private errors: Record<string, string> = {};
+  @state() private draggedSubtaskId: string | null = null;
+  @state() private dropTargetSubtaskId: string | null = null;
+  @state() private dropSubtaskPosition: 'before' | 'after' = 'before';
 
   private unsubscribe?: () => void;
 
@@ -90,6 +96,8 @@ export class AppTaskModal extends LitElement {
         this.subtasks = [];
       }
       this.errors = {};
+      this.draggedSubtaskId = null;
+      this.dropTargetSubtaskId = null;
     }
   }
 
@@ -242,41 +250,88 @@ export class AppTaskModal extends LitElement {
           <div class="col-span-2 subtasks-section">
             <div class="section-title">${t.taskModal.subtasksLabel} (${this.subtasks.filter((s) => s.completed).length}/${this.subtasks.length})</div>
             <div class="subtask-list">
-              ${this.subtasks.map(
-                (sub) => html`
-                  <div class="subtask-item">
-                    <input
-                      type="checkbox"
-                      ?checked="${sub.completed}"
-                      @change="${() => this.toggleSubtask(sub.id)}"
-                    />
-                    <span class="subtask-title ${sub.completed ? 'is-done' : ''}">${sub.title}</span>
-                    <button
-                      type="button"
-                      class="subtask-remove"
-                      @click="${() => this.removeSubtask(sub.id)}"
+              ${repeat(
+                this.subtasks,
+                (sub) => sub.id,
+                (sub, index) => {
+                  const isDragging = this.draggedSubtaskId === sub.id;
+                  const isDropTarget =
+                    this.dropTargetSubtaskId === sub.id && this.draggedSubtaskId !== sub.id;
+                  const dropClass = isDropTarget
+                    ? this.dropSubtaskPosition === 'after'
+                      ? 'is-drop-after'
+                      : 'is-drop-before'
+                    : '';
+
+                  return html`
+                    <div
+                      class="subtask-item ${isDragging ? 'is-dragging' : ''} ${dropClass}"
+                      draggable="true"
+                      @dragstart="${(e: DragEvent) => this.handleSubtaskDragStart(e, sub.id)}"
+                      @dragover="${(e: DragEvent) => this.handleSubtaskDragOver(e, sub.id)}"
+                      @dragleave="${() => this.handleSubtaskDragLeave(sub.id)}"
+                      @drop="${(e: DragEvent) => this.handleSubtaskDrop(e, sub.id)}"
+                      @dragend="${this.handleSubtaskDragEnd}"
                     >
-                      &times;
-                    </button>
-                  </div>
-                `
+                      <span class="subtask-drag-handle" title="${t.taskModal.dragSubtask}">
+                        ${iconGripVertical(14)}
+                      </span>
+                      <span class="subtask-order">${index + 1}.</span>
+                      <app-checkbox
+                        ?checked="${sub.completed}"
+                        @change="${() => this.toggleSubtask(sub.id)}"
+                      ></app-checkbox>
+                      <span class="subtask-title ${sub.completed ? 'is-done' : ''}">${sub.title}</span>
+                      <div class="subtask-actions">
+                        <button
+                          type="button"
+                          class="subtask-action-btn"
+                          ?disabled="${index === 0}"
+                          @click="${() => this.moveSubtask(index, -1)}"
+                          title="${t.taskModal.moveSubtaskUp}"
+                          aria-label="${t.taskModal.moveSubtaskUp}"
+                        >
+                          ${iconChevronUp(14)}
+                        </button>
+                        <button
+                          type="button"
+                          class="subtask-action-btn"
+                          ?disabled="${index === this.subtasks.length - 1}"
+                          @click="${() => this.moveSubtask(index, 1)}"
+                          title="${t.taskModal.moveSubtaskDown}"
+                          aria-label="${t.taskModal.moveSubtaskDown}"
+                        >
+                          ${iconChevronDown(14)}
+                        </button>
+                        <button
+                          type="button"
+                          class="subtask-action-btn subtask-remove"
+                          @click="${() => this.removeSubtask(sub.id)}"
+                          title="${t.taskModal.removeSubtask}"
+                          aria-label="${t.taskModal.removeSubtask}"
+                        >
+                          ${iconX(14)}
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                }
               )}
             </div>
             <div class="add-subtask-row">
-              <input
-                type="text"
-                class="add-subtask-input"
+              <app-input
+                class="add-subtask-input-field"
                 placeholder="${t.taskModal.subtaskPlaceholder}"
                 .value="${this.newSubtaskText}"
-                @input="${(e: Event) => (this.newSubtaskText = (e.target as HTMLInputElement).value)}"
+                @input="${(e: CustomEvent<{ value: string }>) => (this.newSubtaskText = e.detail.value)}"
                 @keydown="${(e: KeyboardEvent) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
                     this.addSubtask();
                   }
                 }}"
-              />
-              <app-button size="sm" variant="secondary" @click="${this.addSubtask}">
+              ></app-input>
+              <app-button size="md" variant="secondary" @click="${this.addSubtask}">
                 ${t.taskModal.addSubtask}
               </app-button>
             </div>
@@ -325,6 +380,75 @@ export class AppTaskModal extends LitElement {
 
   private removeSubtask(id: string) {
     this.subtasks = this.subtasks.filter((s) => s.id !== id);
+  }
+
+  private moveSubtask(index: number, delta: -1 | 1) {
+    const targetIndex = index + delta;
+    if (targetIndex < 0 || targetIndex >= this.subtasks.length) return;
+    const next = [...this.subtasks];
+    const [moved] = next.splice(index, 1);
+    next.splice(targetIndex, 0, moved);
+    this.subtasks = next;
+  }
+
+  private handleSubtaskDragStart(e: DragEvent, id: string) {
+    this.draggedSubtaskId = id;
+    if (e.dataTransfer) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', id);
+    }
+  }
+
+  private handleSubtaskDragOver(e: DragEvent, targetId: string) {
+    if (!this.draggedSubtaskId) return;
+    e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'move';
+    }
+    if (this.draggedSubtaskId === targetId) {
+      this.dropTargetSubtaskId = null;
+      return;
+    }
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    const pos: 'before' | 'after' = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
+    this.dropTargetSubtaskId = targetId;
+    this.dropSubtaskPosition = pos;
+  }
+
+  private handleSubtaskDragLeave(targetId: string) {
+    if (this.dropTargetSubtaskId === targetId) {
+      this.dropTargetSubtaskId = null;
+    }
+  }
+
+  private handleSubtaskDrop(e: DragEvent, targetId: string) {
+    e.preventDefault();
+    const sourceId = this.draggedSubtaskId || e.dataTransfer?.getData('text/plain') || null;
+    const position = this.dropSubtaskPosition;
+    this.draggedSubtaskId = null;
+    this.dropTargetSubtaskId = null;
+
+    if (!sourceId || sourceId === targetId) return;
+
+    const next = [...this.subtasks];
+    const fromIndex = next.findIndex((s) => s.id === sourceId);
+    if (fromIndex === -1) return;
+    const [moved] = next.splice(fromIndex, 1);
+    let insertIndex = next.findIndex((s) => s.id === targetId);
+    if (insertIndex === -1) {
+      next.push(moved);
+    } else {
+      if (position === 'after') {
+        insertIndex += 1;
+      }
+      next.splice(insertIndex, 0, moved);
+    }
+    this.subtasks = next;
+  }
+
+  private handleSubtaskDragEnd() {
+    this.draggedSubtaskId = null;
+    this.dropTargetSubtaskId = null;
   }
 
   private handleSave() {

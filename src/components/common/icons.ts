@@ -258,3 +258,25 @@ export function iconZap(size = 18): TemplateResult {
   `;
 }
 
+export function iconChevronUp(size = 16): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"/>
+    </svg>
+  `;
+}
+
+export function iconGripVertical(size = 14): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor">
+      <circle cx="9" cy="5" r="1.75"/>
+      <circle cx="15" cy="5" r="1.75"/>
+      <circle cx="9" cy="12" r="1.75"/>
+      <circle cx="15" cy="12" r="1.75"/>
+      <circle cx="9" cy="19" r="1.75"/>
+      <circle cx="15" cy="19" r="1.75"/>
+    </svg>
+  `;
+}
+
+
