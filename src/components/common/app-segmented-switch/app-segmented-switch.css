@@ -3,8 +3,11 @@
 }
 
 :host {
+  box-sizing: border-box;
   display: inline-flex;
   vertical-align: middle;
+  max-width: 100%;
+  min-width: 0;
 }
 
 :host([full-width]) {
@@ -21,6 +24,8 @@
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-md, 8px);
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .segmented-track.size-sm {

@@ -85,9 +85,17 @@ export class AppRoot extends LitElement {
   }
 
   static styles = css`
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
     :host {
+      box-sizing: border-box;
       display: flex;
-      width: 100vw;
+      width: 100%;
+      max-width: 100vw;
       height: 100vh;
       overflow: hidden;
       background: var(--bg-canvas, #090d16);
@@ -100,6 +108,7 @@ export class AppRoot extends LitElement {
       flex-direction: column;
       height: 100%;
       min-width: 0;
+      max-width: 100%;
       overflow: hidden;
     }
 
@@ -109,6 +118,8 @@ export class AppRoot extends LitElement {
       overflow: hidden;
       display: flex;
       flex-direction: column;
+      min-width: 0;
+      width: 100%;
     }
 
     .view-loader {
