@@ -1,0 +1,128 @@
+:host {
+  display: block;
+  font-family: var(--font-sans, inherit);
+}
+
+.radio-group-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.group-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.options-list.horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.options-list.variant-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+}
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+}
+
+.radio-option.is-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.radio-option:focus-visible .radio-circle {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--accent-primary);
+}
+
+.variant-card .radio-option {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  border: 1.5px solid var(--border-subtle);
+  background: var(--bg-subtle);
+  transition: border-color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease);
+}
+
+.variant-card .radio-option:hover:not(.is-disabled) {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+}
+
+.variant-card .radio-option.is-selected {
+  border-color: var(--accent-primary);
+  background: var(--accent-soft);
+}
+
+.radio-circle {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: border-color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+.radio-option:hover:not(.is-disabled) .radio-circle {
+  border-color: var(--accent-primary);
+}
+
+.radio-option.is-selected .radio-circle {
+  border-color: var(--accent-primary);
+  background: var(--accent-primary);
+}
+
+.radio-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-on-accent);
+  transform: scale(0);
+  transition: transform var(--transition-fast, 150ms ease);
+}
+
+.radio-option.is-selected .radio-dot {
+  transform: scale(1);
+}
+
+.option-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.option-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.option-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}

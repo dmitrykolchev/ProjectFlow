@@ -1,0 +1,403 @@
+/* ==========================================================================
+   ProjectFlow - Pure CSS Theme System & Foundations
+   No Tailwind CSS. Custom Scrollbars for Dark & Light Themes.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Common typography & spacing */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 200ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Light Theme Palette (Default) */
+  --bg-canvas: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #f1f5f9;
+  --bg-hover: #e2e8f0;
+  --bg-active: #cbd5e1;
+
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+  --text-on-accent: #ffffff;
+
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus: #6366f1;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
+
+  /* Scrollbars in Light Mode */
+  --scrollbar-track: #f1f5f9;
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+
+  /* Status Colors */
+  --color-success: #059669;
+  --color-success-solid: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.12);
+  --color-success-border: rgba(16, 185, 129, 0.28);
+  --color-warning: #d97706;
+  --color-warning-solid: #d97706;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-border: rgba(245, 158, 11, 0.28);
+  --color-danger: #dc2626;
+  --color-danger-solid: #ef4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-danger-border: rgba(239, 68, 68, 0.28);
+  --color-info: #0284c7;
+  --color-info-solid: #0284c7;
+  --color-info-bg: rgba(2, 132, 199, 0.12);
+  --color-info-border: rgba(2, 132, 199, 0.28);
+
+  /* Density Tokens (default comfortable) */
+  --control-height-sm: 30px;
+  --control-height-md: 38px;
+  --control-height-lg: 44px;
+  --density-padding-base: 0.75rem;
+  --density-padding-compact: 0.5rem;
+  --density-row-height: 44px;
+  --density-header-height: 60px;
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 68px;
+
+  /* Default Accent: Indigo */
+  --accent-primary: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-soft: rgba(99, 102, 241, 0.15);
+  --accent-border: rgba(99, 102, 241, 0.3);
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+}
+
+/* Light Background Presets */
+[data-theme='light'][data-bg='midnight'] {
+  --bg-canvas: #eef2f9;
+  --bg-surface: #ffffff;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #e4eaf5;
+  --bg-hover: #d8e1f0;
+  --border-subtle: #d5dfef;
+  --scrollbar-track: #e4eaf5;
+  --scrollbar-thumb: #b9c7df;
+  --scrollbar-thumb-hover: #94a8ca;
+}
+
+[data-theme='light'][data-bg='obsidian'] {
+  --bg-canvas: #f5f4f1;
+  --bg-surface: #fafaf8;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #ebe9e4;
+  --bg-hover: #dfdcd5;
+  --border-subtle: #e0ddd5;
+  --border-strong: #c8c3b8;
+  --scrollbar-track: #ebe9e4;
+  --scrollbar-thumb: #c8c3b8;
+  --scrollbar-thumb-hover: #a6a094;
+}
+
+[data-theme='light'][data-bg='nordic'] {
+  --bg-canvas: #edf2f6;
+  --bg-surface: #f8fbfd;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #e2eaf0;
+  --bg-hover: #d3e0ea;
+  --border-subtle: #d4e0e9;
+  --scrollbar-track: #e2eaf0;
+  --scrollbar-thumb: #b6c8d6;
+  --scrollbar-thumb-hover: #8ea7bb;
+}
+
+[data-theme='light'][data-bg='forest'] {
+  --bg-canvas: #f0f5f2;
+  --bg-surface: #f8fbf9;
+  --bg-surface-elevated: #ffffff;
+  --bg-subtle: #e3ede7;
+  --bg-hover: #d4e3da;
+  --border-subtle: #d3e2d9;
+  --scrollbar-track: #e3ede7;
+  --scrollbar-thumb: #b4cabe;
+  --scrollbar-thumb-hover: #8ca89a;
+}
+
+/* ==========================================================================
+   Dark Theme (Default)
+   ========================================================================== */
+:root.dark,
+[data-theme='dark'] {
+  --bg-canvas: #090d16;
+  --bg-surface: #111827;
+  --bg-surface-elevated: #162032;
+  --bg-subtle: #1a2438;
+  --bg-hover: #223049;
+  --bg-active: #2b3d5c;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-inverse: #0f172a;
+
+  --border-subtle: #1e293b;
+  --border-strong: #334155;
+  --border-focus: #818cf8;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.6);
+
+  /* Scrollbars in Dark Mode */
+  --scrollbar-track: #0e1524;
+  --scrollbar-thumb: #28374d;
+  --scrollbar-thumb-hover: #3d5170;
+
+  /* Status Colors in Dark Mode */
+  --color-success: #34d399;
+  --color-success-solid: #10b981;
+  --color-success-bg: rgba(52, 211, 153, 0.15);
+  --color-success-border: rgba(52, 211, 153, 0.28);
+  --color-warning: #fbbf24;
+  --color-warning-solid: #d97706;
+  --color-warning-bg: rgba(251, 191, 36, 0.15);
+  --color-warning-border: rgba(251, 191, 36, 0.28);
+  --color-danger: #f87171;
+  --color-danger-solid: #ef4444;
+  --color-danger-bg: rgba(248, 113, 113, 0.15);
+  --color-danger-border: rgba(248, 113, 113, 0.28);
+  --color-info: #38bdf8;
+  --color-info-solid: #0284c7;
+  --color-info-bg: rgba(56, 189, 248, 0.15);
+  --color-info-border: rgba(56, 189, 248, 0.28);
+}
+
+/* Dark Background Presets */
+[data-theme='dark'][data-bg='midnight'] {
+  --bg-canvas: #030712;
+  --bg-surface: #0a101f;
+  --bg-surface-elevated: #11192e;
+  --bg-subtle: #15203b;
+  --bg-hover: #1d2b4d;
+  --bg-active: #273966;
+  --border-subtle: #172136;
+  --border-strong: #2a3a5c;
+  --scrollbar-track: #060a14;
+  --scrollbar-thumb: #1f2d4a;
+  --scrollbar-thumb-hover: #32466e;
+}
+
+[data-theme='dark'][data-bg='obsidian'] {
+  --bg-canvas: #121110;
+  --bg-surface: #1b1917;
+  --bg-surface-elevated: #23201d;
+  --bg-subtle: #292522;
+  --bg-hover: #36302c;
+  --bg-active: #443d38;
+  --border-subtle: #2b2724;
+  --border-strong: #443e39;
+  --scrollbar-track: #161412;
+  --scrollbar-thumb: #3b3530;
+  --scrollbar-thumb-hover: #524a43;
+}
+
+[data-theme='dark'][data-bg='nordic'] {
+  --bg-canvas: #0f172a;
+  --bg-surface: #162033;
+  --bg-surface-elevated: #1e293b;
+  --bg-subtle: #233146;
+  --bg-hover: #2c3d57;
+  --bg-active: #374b6b;
+  --border-subtle: #243247;
+  --border-strong: #394d6b;
+  --scrollbar-track: #121b2d;
+  --scrollbar-thumb: #2d3e59;
+  --scrollbar-thumb-hover: #42597c;
+}
+
+[data-theme='dark'][data-bg='forest'] {
+  --bg-canvas: #071310;
+  --bg-surface: #0d1d19;
+  --bg-surface-elevated: #132823;
+  --bg-subtle: #18322c;
+  --bg-hover: #20423a;
+  --bg-active: #295449;
+  --border-subtle: #1a352f;
+  --border-strong: #2c5249;
+  --scrollbar-track: #091713;
+  --scrollbar-thumb: #214038;
+  --scrollbar-thumb-hover: #325e53;
+}
+
+/* ==========================================================================
+   Accent Variations
+   ========================================================================== */
+[data-accent='emerald'] {
+  --accent-primary: #10b981;
+  --accent-hover: #059669;
+  --accent-soft: rgba(16, 185, 129, 0.16);
+  --accent-border: rgba(16, 185, 129, 0.32);
+  --accent-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+[data-accent='cyan'] {
+  --accent-primary: #06b6d4;
+  --accent-hover: #0891b2;
+  --accent-soft: rgba(6, 182, 212, 0.16);
+  --accent-border: rgba(6, 182, 212, 0.32);
+  --accent-gradient: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+}
+[data-accent='violet'] {
+  --accent-primary: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-soft: rgba(139, 92, 246, 0.16);
+  --accent-border: rgba(139, 92, 246, 0.32);
+  --accent-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+[data-accent='amber'] {
+  --accent-primary: #f59e0b;
+  --accent-hover: #d97706;
+  --accent-soft: rgba(245, 158, 11, 0.16);
+  --accent-border: rgba(245, 158, 11, 0.32);
+  --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+/* ==========================================================================
+   Density Modes
+   ========================================================================== */
+[data-density='compact'] {
+  --density-padding-base: 0.5rem;
+  --density-row-height: 36px;
+  --density-header-height: 52px;
+}
+
+/* ==========================================================================
+   Global Reset & Base Styles
+   ========================================================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  background-color: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   MANDATORY CUSTOM SCROLLBARS (Matching Application Theme)
+   ========================================================================== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 4px;
+  border: 2px solid var(--scrollbar-track);
+  transition: background-color var(--transition-fast);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
+}
+
+/* ==========================================================================
+   Tabular Numerals
+   ========================================================================== */
+.tabular-nums,
+[tabular-nums] {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+}
+
+/* ==========================================================================
+   Responsive Grid System (Pure CSS)
+   ========================================================================== */
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+  width: 100%;
+}
+
+.col-12 { grid-column: span 12; }
+.col-10 { grid-column: span 10; }
+.col-8  { grid-column: span 8; }
+.col-6  { grid-column: span 6; }
+.col-4  { grid-column: span 4; }
+.col-3  { grid-column: span 3; }
+.col-2  { grid-column: span 2; }
+
+@media (max-width: 1024px) {
+  .col-lg-12 { grid-column: span 12; }
+  .col-lg-6  { grid-column: span 6; }
+}
+
+@media (max-width: 768px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+  .col-12, .col-10, .col-8, .col-6, .col-4, .col-3, .col-2 {
+    grid-column: span 1;
+  }
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}

@@ -1,0 +1,76 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.char-count {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+}
+
+.required-star {
+  color: var(--color-danger, #ef4444);
+}
+
+textarea {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary, #f8fafc);
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+textarea:focus {
+  border-color: var(--accent-primary, #6366f1);
+  box-shadow: 0 0 0 1px var(--accent-primary, #6366f1);
+}
+
+textarea.has-error {
+  border-color: var(--color-danger, #ef4444);
+}
+
+textarea:disabled {
+  opacity: 0.5;
+  background: var(--bg-subtle, #1a2438);
+  cursor: not-allowed;
+}
+
+textarea::placeholder {
+  color: var(--text-muted, #64748b);
+}
+
+.error-text {
+  font-size: 0.75rem;
+  color: var(--color-danger, #ef4444);
+}

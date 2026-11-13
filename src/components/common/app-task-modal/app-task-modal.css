@@ -1,0 +1,102 @@
+:host {
+  display: contents;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.subtasks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.subtask-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 160px;
+  overflow-y: auto;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  background: var(--bg-subtle, #1a2438);
+  border-radius: var(--radius-sm, 6px);
+  font-size: 0.8125rem;
+}
+
+.subtask-item input[type='checkbox'] {
+  accent-color: var(--accent-primary, #6366f1);
+  cursor: pointer;
+}
+
+.subtask-title {
+  flex: 1;
+  color: var(--text-primary, #f8fafc);
+}
+
+.subtask-title.is-done {
+  text-decoration: line-through;
+  color: var(--text-muted, #64748b);
+}
+
+.subtask-remove {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0 0.25rem;
+}
+
+.subtask-remove:hover {
+  color: var(--color-danger, #ef4444);
+}
+
+.add-subtask-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.add-subtask-input {
+  box-sizing: border-box;
+  flex: 1;
+  height: var(--control-height-sm, 30px);
+  padding: 0 0.65rem;
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-sm, 6px);
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.8125rem;
+  outline: none;
+}
+
+.add-subtask-input:focus {
+  border-color: var(--accent-primary, #6366f1);
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,91 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.stepper-wrapper {
+  display: flex;
+  align-items: center;
+  height: var(--control-height-md, 38px);
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.stepper-wrapper:focus-within {
+  border-color: var(--accent-primary, #6366f1);
+}
+
+input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  padding: 0 0.5rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary, #f8fafc);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.875rem;
+  line-height: 1.25;
+  text-align: center;
+  -moz-appearance: textfield;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.step-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 100%;
+  background: var(--bg-subtle, #1a2438);
+  border: none;
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  font-size: 1.1rem;
+  user-select: none;
+  transition: background-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease);
+}
+
+.step-btn:hover:not(:disabled) {
+  background: var(--bg-hover, #223049);
+  color: var(--text-primary, #f8fafc);
+}
+
+.step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.unit-tag {
+  padding-right: 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted, #64748b);
+  user-select: none;
+}

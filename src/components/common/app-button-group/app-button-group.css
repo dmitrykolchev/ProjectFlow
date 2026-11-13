@@ -1,0 +1,36 @@
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.group {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.group.vertical {
+  flex-direction: column;
+}
+
+.group.attached {
+  gap: 0;
+}
+
+.group.attached ::slotted(*) {
+  position: relative;
+}
+
+.group.attached ::slotted(*:hover),
+.group.attached ::slotted(*:focus-within) {
+  z-index: 2;
+}
+
+.group.attached.horizontal ::slotted(*:not(:first-child)) {
+  margin-left: -1px;
+}
+
+.group.attached.vertical ::slotted(*:not(:first-child)) {
+  margin-top: -1px;
+}

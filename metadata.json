@@ -1,0 +1,6 @@
+{
+  "name": "ProjectFlow Lit - Enterprise PM Dashboard",
+  "description": "High-performance project management web application built with Lit web components, TypeScript, pure CSS, customizable themes, Kanban, Gantt chart, Data Grid, and Calendar.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

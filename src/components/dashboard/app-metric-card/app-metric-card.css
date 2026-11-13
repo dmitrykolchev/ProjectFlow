@@ -1,0 +1,87 @@
+:host {
+  display: block;
+}
+
+.metric-card {
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  height: 100%;
+  transition: border-color var(--transition-fast, 150ms ease);
+}
+
+.metric-card.is-clickable {
+  cursor: pointer;
+}
+
+.metric-card.is-clickable:hover {
+  border-color: var(--border-strong, #334155);
+}
+
+.metric-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.metric-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.metric-icon {
+  color: var(--text-muted, #64748b);
+  display: inline-flex;
+  align-items: center;
+}
+
+.metric-body {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.metric-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary, #f8fafc);
+  letter-spacing: -0.02em;
+}
+
+.sparkline {
+  width: 72px;
+  height: 28px;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.metric-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
+.delta {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.delta-up { color: var(--color-success, #34d399); }
+.delta-down { color: var(--color-danger, #f87171); }
+.delta-neutral { color: var(--text-secondary, #94a3b8); }

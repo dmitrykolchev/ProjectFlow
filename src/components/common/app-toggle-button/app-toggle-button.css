@@ -1,0 +1,77 @@
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  font-family: var(--font-sans, inherit);
+  font-weight: 500;
+  border: 1px solid var(--border-strong, #334155);
+  background: var(--bg-surface, #111827);
+  color: var(--text-secondary, #94a3b8);
+  border-top-left-radius: var(--btn-radius-tl, var(--radius-md, 8px));
+  border-top-right-radius: var(--btn-radius-tr, var(--radius-md, 8px));
+  border-bottom-left-radius: var(--btn-radius-bl, var(--radius-md, 8px));
+  border-bottom-right-radius: var(--btn-radius-br, var(--radius-md, 8px));
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  transition: background-color var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+button:hover:not(:disabled) {
+  background: var(--bg-hover, #223049);
+  color: var(--text-primary, #f8fafc);
+}
+
+button.is-pressed {
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #818cf8);
+  font-weight: 600;
+}
+
+button.variant-solid.is-pressed {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-surface, #111827), 0 0 0 4px var(--accent-primary, #6366f1);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.size-sm {
+  font-size: 0.8125rem;
+  padding: 0 0.65rem;
+  height: var(--control-height-sm, 30px);
+}
+
+.size-md {
+  font-size: 0.875rem;
+  padding: 0 0.875rem;
+  height: var(--control-height-md, 38px);
+}
+
+.size-lg {
+  font-size: 1rem;
+  padding: 0 1.15rem;
+  height: var(--control-height-lg, 44px);
+}
+
+.icon-only.size-sm { width: var(--control-height-sm, 30px); padding: 0; }
+.icon-only.size-md { width: var(--control-height-md, 38px); padding: 0; }
+.icon-only.size-lg { width: var(--control-height-lg, 44px); padding: 0; }
