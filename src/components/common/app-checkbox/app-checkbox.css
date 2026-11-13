@@ -1,3 +1,9 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :host {
   display: inline-flex;
   align-items: center;
@@ -5,6 +11,7 @@
   font-family: var(--font-sans, inherit);
   cursor: pointer;
   user-select: none;
+  flex-shrink: 0;
 }
 
 :host([disabled]) {
@@ -17,6 +24,7 @@
   align-items: center;
   gap: 0.5rem;
   outline: none;
+  overflow: visible;
 }
 
 .checkbox-container:focus-visible .box {

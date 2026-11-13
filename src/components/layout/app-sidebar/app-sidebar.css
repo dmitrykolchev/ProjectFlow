@@ -65,6 +65,7 @@
   height: 30px;
   border-radius: var(--radius-md, 8px);
   background: var(--accent-gradient);
+  background-size: 200% 200%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -72,7 +73,8 @@
   font-weight: 800;
   font-size: 0.85rem;
   flex-shrink: 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--accent-glow, 0 2px 4px rgba(0, 0, 0, 0.2));
+  animation: var(--cyber-gradient-anim, none);
 }
 
 .collapse-btn {

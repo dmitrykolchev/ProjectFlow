@@ -674,7 +674,7 @@ export class AppDataGrid extends LitElement {
       <div class="table-container" @scroll="${this.handleTableScroll}">
         <table>
           <colgroup>
-            ${this.selectable ? html`<col style="width: 44px;" />` : ''}
+            ${this.selectable ? html`<col style="width: 46px;" />` : ''}
             ${activeCols.map((col) => {
               const width = this.columnWidths[col.field] || col.width;
               return html`<col style="width: ${width}px;" />`;
@@ -684,7 +684,7 @@ export class AppDataGrid extends LitElement {
             <tr>
               ${this.selectable
                 ? html`
-                    <th style="width: 44px; text-align: center;">
+                    <th class="select-col" style="width: 46px;">
                       <app-checkbox
                         ?checked="${allCurrentSelected}"
                         ?indeterminate="${!allCurrentSelected && someCurrentSelected}"
@@ -946,7 +946,7 @@ export class AppDataGrid extends LitElement {
       <tr class="data-row ${isChecked ? 'is-selected' : ''}">
         ${this.selectable
           ? html`
-              <td style="text-align: center;">
+              <td class="select-col">
                 <app-checkbox
                   ?checked="${isChecked}"
                   @change="${() => this.toggleRowSelect(rowId)}"

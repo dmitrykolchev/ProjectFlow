@@ -31,6 +31,19 @@ function litCssPlugin(): Plugin {
 *::-webkit-scrollbar-thumb { background-color: var(--scrollbar-thumb); border-radius: 4px; border: 2px solid var(--scrollbar-track); }
 *::-webkit-scrollbar-thumb:hover { background-color: var(--scrollbar-thumb-hover); }
 *::-webkit-scrollbar-corner { background: var(--scrollbar-track); }
+@keyframes cyberGlowPulse {
+  0%, 100% { box-shadow: var(--accent-glow, var(--shadow-sm)); }
+  50% { box-shadow: var(--accent-glow-hover, var(--shadow-md)); }
+}
+@keyframes cyberSurfaceBreath {
+  0%, 100% { box-shadow: var(--surface-glow, var(--shadow-sm)); }
+  50% { box-shadow: var(--shadow-md); }
+}
+@keyframes cyberGradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
 `;
           return {
             code: `import { unsafeCSS } from 'lit';\nconst styles = unsafeCSS(${JSON.stringify(cssCode + shadowScrollbars)});\nexport default styles;\n`,

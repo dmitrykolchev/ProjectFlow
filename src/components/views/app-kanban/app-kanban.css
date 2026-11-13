@@ -57,8 +57,10 @@
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-lg, 12px);
   max-height: 100%;
+  box-shadow: var(--surface-glow, var(--shadow-sm));
   transition: border-color var(--transition-fast, 150ms ease),
-              background-color var(--transition-fast, 150ms ease);
+              background-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
 }
 
 .column.drag-over {

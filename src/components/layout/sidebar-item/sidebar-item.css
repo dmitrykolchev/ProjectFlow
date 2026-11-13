@@ -28,6 +28,9 @@
   background: var(--accent-soft, rgba(99, 102, 241, 0.15));
   color: var(--accent-primary, #818cf8);
   font-weight: 600;
+  border: 1px solid var(--accent-border, transparent);
+  box-shadow: var(--surface-glow, none);
+  text-shadow: var(--cyber-text-shadow, none);
 }
 
 .nav-item.is-collapsed {

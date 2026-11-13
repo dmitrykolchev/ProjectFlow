@@ -8,6 +8,7 @@ import {
   iconSun,
   iconChevronLeft,
   iconChevronRight,
+  iconZap,
 } from '../../common/icons';
 import { SidebarItem } from '../sidebar-item/sidebar-item';
 import '../sidebar-item/sidebar-item';
@@ -118,10 +119,12 @@ export class AppSidebar extends LitElement {
             <button
               class="quick-btn"
               @click="${() => store.toggleTheme()}"
-              title="Переключить тему (Dark / Light)"
+              title="Переключить тему (Dark / Light / Cyberpunk)"
             >
-              ${this.theme === 'dark' ? iconSun(14) : iconMoon(14)}
-              ${!this.collapsed ? html`<span>${this.theme === 'dark' ? 'Light' : 'Dark'}</span>` : ''}
+              ${this.theme === 'cyberpunk' ? iconZap(14) : this.theme === 'dark' ? iconSun(14) : iconMoon(14)}
+              ${!this.collapsed
+                ? html`<span>${this.theme === 'cyberpunk' ? 'Cyber' : this.theme === 'dark' ? 'Dark' : 'Light'}</span>`
+                : ''}
             </button>
             <button
               class="quick-btn"

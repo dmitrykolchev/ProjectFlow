@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
-import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu } from '../../common/icons';
+import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconZap } from '../../common/icons';
 import '../../common/app-button/app-button';
 
 @customElement('app-header')
@@ -91,10 +91,10 @@ export class AppHeader extends LitElement {
           <button
             class="icon-action-btn"
             @click="${() => store.toggleTheme()}"
-            title="Theme"
+            title="${this.theme === 'cyberpunk' ? 'Cyberpunk → Dark' : this.theme === 'dark' ? 'Dark → Light' : 'Light → Cyberpunk'}"
             aria-label="Toggle Theme"
           >
-            ${this.theme === 'dark' ? iconSun(16) : iconMoon(16)}
+            ${this.theme === 'cyberpunk' ? iconZap(16) : this.theme === 'dark' ? iconSun(16) : iconMoon(16)}
           </button>
 
           <button

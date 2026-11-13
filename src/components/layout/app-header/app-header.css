@@ -124,7 +124,9 @@
 
 .icon-action-btn:hover {
   background: var(--bg-hover, #223049);
+  border-color: var(--accent-border, var(--border-strong, #475569));
   color: var(--text-primary, #f8fafc);
+  box-shadow: var(--surface-glow, none);
 }
 
 .badge-dot {
@@ -135,6 +137,7 @@
   height: 7px;
   background: var(--accent-primary, #6366f1);
   border-radius: 50%;
+  box-shadow: var(--accent-glow, none);
 }
 
 @media (max-width: 768px) {

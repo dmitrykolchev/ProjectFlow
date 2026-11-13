@@ -1,4 +1,5 @@
 import {
+  AccentColor,
   ActiveView,
   ActivityLogItem,
   BackgroundPreset,
@@ -6,6 +7,8 @@ import {
   Project,
   Task,
   TaskStatus,
+  ThemeBaseColors,
+  ThemeMode,
   User,
   UserCustomization,
 } from '../types';
@@ -22,6 +25,7 @@ const defaultCustomization: UserCustomization = {
   accentColor: 'indigo',
   backgroundPreset: 'default',
   customBgColor: '#0c101d',
+  themeOverrides: {},
   language: 'ru',
   sidebarCollapsed: false,
   defaultView: 'dashboard',
@@ -38,12 +42,65 @@ const defaultCustomization: UserCustomization = {
   },
 };
 
+export const THEME_DEFAULT_BASE_COLORS: Record<ThemeMode, ThemeBaseColors> = {
+  dark: {
+    bgCanvas: '#090d16',
+    bgSurface: '#111827',
+    textPrimary: '#f8fafc',
+    accentPrimary: '#6366f1',
+    borderSubtle: '#1e293b',
+  },
+  light: {
+    bgCanvas: '#f8fafc',
+    bgSurface: '#ffffff',
+    textPrimary: '#0f172a',
+    accentPrimary: '#6366f1',
+    borderSubtle: '#e2e8f0',
+  },
+  cyberpunk: {
+    bgCanvas: '#06040f',
+    bgSurface: '#0d0a1f',
+    textPrimary: '#f4f6ff',
+    accentPrimary: '#ff2a85',
+    borderSubtle: '#1e2d5e',
+  },
+};
+
+const ACCENT_HEX_MAP: Record<AccentColor, string> = {
+  indigo: '#6366f1',
+  emerald: '#10b981',
+  cyan: '#06b6d4',
+  violet: '#8b5cf6',
+  amber: '#f59e0b',
+};
+
+const BG_PRESET_BASE_MAP: Record<'dark' | 'light', Record<Exclude<BackgroundPreset, 'default' | 'custom'>, Partial<ThemeBaseColors>>> = {
+  dark: {
+    midnight: { bgCanvas: '#030712', bgSurface: '#0a101f', borderSubtle: '#172136' },
+    obsidian: { bgCanvas: '#121110', bgSurface: '#1b1917', borderSubtle: '#2b2724' },
+    nordic: { bgCanvas: '#0f172a', bgSurface: '#162033', borderSubtle: '#243247' },
+    forest: { bgCanvas: '#071310', bgSurface: '#0d1d19', borderSubtle: '#1a352f' },
+  },
+  light: {
+    midnight: { bgCanvas: '#eef2f9', bgSurface: '#ffffff', borderSubtle: '#d5dfef' },
+    obsidian: { bgCanvas: '#f5f4f1', bgSurface: '#fafaf8', borderSubtle: '#e0ddd5' },
+    nordic: { bgCanvas: '#edf2f6', bgSurface: '#f8fbfd', borderSubtle: '#d4e0e9' },
+    forest: { bgCanvas: '#f0f5f2', bgSurface: '#f8fbf9', borderSubtle: '#d3e2d9' },
+  },
+};
+
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
   const clean = hex.replace('#', '');
   if (clean.length !== 6) return null;
   const num = parseInt(clean, 16);
   if (isNaN(num)) return null;
   return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+}
+
+function getLuminance(hex: string): number {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return 0.1;
+  return (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
 }
 
 function adjustHex(hex: string, amount: number): string {
@@ -56,15 +113,46 @@ function adjustHex(hex: string, amount: number): string {
   return `#${r}${g}${b}`;
 }
 
-const CUSTOM_BG_VARS = [
+function mixHex(hexA: string, hexB: string, weightB: number): string {
+  const a = hexToRgb(hexA);
+  const b = hexToRgb(hexB);
+  if (!a || !b) return hexA;
+  const w = Math.max(0, Math.min(1, weightB));
+  const clamp = (v: number) => Math.max(0, Math.min(255, Math.round(v)));
+  const r = clamp(a.r * (1 - w) + b.r * w).toString(16).padStart(2, '0');
+  const g = clamp(a.g * (1 - w) + b.g * w).toString(16).padStart(2, '0');
+  const bl = clamp(a.b * (1 - w) + b.b * w).toString(16).padStart(2, '0');
+  return `#${r}${g}${bl}`;
+}
+
+function hexToRgba(hex: string, alpha: number): string {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return hex;
+  return `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
+}
+
+const DYNAMIC_THEME_VARS = [
   '--bg-canvas',
   '--bg-surface',
   '--bg-surface-elevated',
   '--bg-subtle',
   '--bg-hover',
   '--bg-active',
+  '--text-primary',
+  '--text-secondary',
+  '--text-muted',
+  '--text-inverse',
+  '--text-on-accent',
   '--border-subtle',
   '--border-strong',
+  '--border-focus',
+  '--accent-primary',
+  '--accent-hover',
+  '--accent-soft',
+  '--accent-border',
+  '--accent-gradient',
+  '--accent-glow',
+  '--accent-glow-hover',
   '--scrollbar-track',
   '--scrollbar-thumb',
   '--scrollbar-thumb-hover',
@@ -198,10 +286,50 @@ export class AppStore {
     }
   }
 
+  public getEffectiveBaseColors(theme: ThemeMode = this.customization.theme): ThemeBaseColors {
+    const base = { ...THEME_DEFAULT_BASE_COLORS[theme] };
+
+    if (theme !== 'cyberpunk') {
+      const preset = this.customization.backgroundPreset;
+      if (preset && preset !== 'default') {
+        if (preset === 'custom' && this.customization.customBgColor) {
+          const customBase = this.customization.customBgColor;
+          const isDarkBg = getLuminance(customBase) < 0.5;
+          base.bgCanvas = customBase;
+          base.bgSurface = adjustHex(customBase, isDarkBg ? 10 : 12);
+          base.borderSubtle = adjustHex(customBase, isDarkBg ? 24 : -18);
+        } else if (preset !== 'custom') {
+          const presetColors = BG_PRESET_BASE_MAP[theme][preset];
+          if (presetColors) {
+            Object.assign(base, presetColors);
+          }
+        }
+      }
+      base.accentPrimary = ACCENT_HEX_MAP[this.customization.accentColor] || base.accentPrimary;
+    }
+
+    const overrides = this.customization.themeOverrides?.[theme];
+    if (overrides) {
+      if (overrides.bgCanvas) base.bgCanvas = overrides.bgCanvas;
+      if (overrides.bgSurface) base.bgSurface = overrides.bgSurface;
+      if (overrides.textPrimary) base.textPrimary = overrides.textPrimary;
+      if (overrides.accentPrimary) base.accentPrimary = overrides.accentPrimary;
+      if (overrides.borderSubtle) base.borderSubtle = overrides.borderSubtle;
+    }
+
+    return base;
+  }
+
+  public hasThemeOverrides(theme: ThemeMode = this.customization.theme): boolean {
+    const overrides = this.customization.themeOverrides?.[theme];
+    return Boolean(overrides && Object.values(overrides).some(Boolean));
+  }
+
   public applyThemeAndCustomization(): void {
     const root = document.documentElement;
     const body = document.body;
-    const isDark = this.customization.theme === 'dark';
+    const theme = this.customization.theme;
+    const isDarkFamily = theme === 'dark' || theme === 'cyberpunk';
 
     // Keep theme attributes strictly on <html> so <body> never shadows :root presets or inline custom vars
     if (body) {
@@ -212,24 +340,95 @@ export class AppStore {
       body.removeAttribute('data-density');
     }
 
-    if (isDark) {
+    if (isDarkFamily) {
       root.classList.add('dark');
-      root.setAttribute('data-theme', 'dark');
     } else {
       root.classList.remove('dark');
-      root.setAttribute('data-theme', 'light');
     }
 
+    root.setAttribute('data-theme', theme);
     root.setAttribute('data-density', this.customization.density);
     root.setAttribute('data-accent', this.customization.accentColor);
     root.setAttribute('data-bg', this.customization.backgroundPreset || 'default');
     root.setAttribute('lang', this.customization.language);
 
-    if (this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
+    // Clear previously injected dynamic theme vars cleanly
+    for (const v of DYNAMIC_THEME_VARS) {
+      root.style.removeProperty(v);
+    }
+
+    const overrides = this.customization.themeOverrides?.[theme] || {};
+    const hasCustomBase = Object.values(overrides).some(Boolean);
+
+    if (hasCustomBase) {
+      const effective = this.getEffectiveBaseColors(theme);
+      const isDarkSurface = getLuminance(effective.bgSurface) < 0.5;
+      const step = isDarkSurface ? 10 : -9;
+
+      if (overrides.bgCanvas || overrides.bgSurface || overrides.borderSubtle) {
+        const bgCanvas = effective.bgCanvas;
+        const bgSurface = effective.bgSurface;
+        const borderSubtle = effective.borderSubtle;
+
+        root.style.setProperty('--bg-canvas', bgCanvas);
+        root.style.setProperty('--bg-surface', bgSurface);
+        root.style.setProperty(
+          '--bg-surface-elevated',
+          mixHex(bgSurface, isDarkSurface ? '#ffffff' : '#ffffff', isDarkSurface ? 0.05 : 0.65)
+        );
+        root.style.setProperty('--bg-subtle', mixHex(bgSurface, bgCanvas, isDarkSurface ? 0.35 : 0.6));
+        root.style.setProperty('--bg-hover', adjustHex(bgSurface, step * 2));
+        root.style.setProperty('--bg-active', adjustHex(bgSurface, step * 3));
+        root.style.setProperty('--border-subtle', borderSubtle);
+        root.style.setProperty('--border-strong', adjustHex(borderSubtle, isDarkSurface ? 22 : -20));
+        root.style.setProperty('--scrollbar-track', mixHex(bgCanvas, bgSurface, 0.35));
+        root.style.setProperty('--scrollbar-thumb', mixHex(borderSubtle, effective.textPrimary, 0.25));
+        root.style.setProperty(
+          '--scrollbar-thumb-hover',
+          mixHex(borderSubtle, effective.accentPrimary, 0.55)
+        );
+      }
+
+      if (overrides.textPrimary || overrides.bgSurface) {
+        const textPrimary = effective.textPrimary;
+        const bgSurface = effective.bgSurface;
+        root.style.setProperty('--text-primary', textPrimary);
+        root.style.setProperty('--text-secondary', mixHex(textPrimary, bgSurface, 0.35));
+        root.style.setProperty('--text-muted', mixHex(textPrimary, bgSurface, 0.58));
+        root.style.setProperty('--text-inverse', isDarkSurface ? '#090d16' : '#ffffff');
+      }
+
+      if (overrides.accentPrimary) {
+        const accent = effective.accentPrimary;
+        const hover = adjustHex(accent, isDarkSurface ? 18 : -18);
+        const onAccent = getLuminance(accent) > 0.6 ? '#090d16' : '#ffffff';
+        root.style.setProperty('--accent-primary', accent);
+        root.style.setProperty('--accent-hover', hover);
+        root.style.setProperty('--accent-soft', hexToRgba(accent, 0.16));
+        root.style.setProperty('--accent-border', hexToRgba(accent, 0.38));
+        root.style.setProperty(
+          '--accent-gradient',
+          theme === 'cyberpunk'
+            ? `linear-gradient(135deg, ${accent} 0%, ${mixHex(accent, '#00e5ff', 0.45)} 52%, #00e5ff 100%)`
+            : `linear-gradient(135deg, ${accent} 0%, ${adjustHex(accent, -24)} 100%)`
+        );
+        root.style.setProperty('--border-focus', accent);
+        root.style.setProperty('--text-on-accent', onAccent);
+
+        if (theme === 'cyberpunk') {
+          root.style.setProperty(
+            '--accent-glow',
+            `0 0 14px ${hexToRgba(accent, 0.5)}, 0 0 26px rgba(0, 240, 255, 0.22)`
+          );
+          root.style.setProperty(
+            '--accent-glow-hover',
+            `0 0 22px rgba(0, 240, 255, 0.65), 0 0 36px ${hexToRgba(accent, 0.42)}`
+          );
+        }
+      }
+    } else if (theme !== 'cyberpunk' && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
       const base = this.customization.customBgColor;
-      const rgb = hexToRgb(base);
-      const luminance = rgb ? (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255 : 0.1;
-      const isDarkBg = luminance < 0.5;
+      const isDarkBg = getLuminance(base) < 0.5;
       const step = isDarkBg ? 10 : -8;
 
       root.style.setProperty('--bg-canvas', base);
@@ -243,37 +442,92 @@ export class AppStore {
       root.style.setProperty('--scrollbar-track', adjustHex(base, isDarkBg ? 5 : -6));
       root.style.setProperty('--scrollbar-thumb', adjustHex(base, step * 3));
       root.style.setProperty('--scrollbar-thumb-hover', adjustHex(base, step * 4.5));
-    } else {
-      for (const v of CUSTOM_BG_VARS) {
-        root.style.removeProperty(v);
-      }
     }
   }
 
-  public setTheme(theme: 'dark' | 'light'): void {
+  public setTheme(theme: ThemeMode): void {
     this.customization.theme = theme;
-    if (this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
-      const rgb = hexToRgb(this.customization.customBgColor);
-      const lum = rgb ? (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255 : 0.1;
-      const customIsDark = lum < 0.5;
+    if (theme !== 'cyberpunk' && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
+      const customIsDark = getLuminance(this.customization.customBgColor) < 0.5;
       if ((theme === 'dark' && !customIsDark) || (theme === 'light' && customIsDark)) {
         this.customization.backgroundPreset = 'default';
       }
     }
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.logActivity('update', 'settings', 'Тема интерфейса', `Переключено на ${theme === 'dark' ? 'тёмную' : 'светлую'} тему`);
+    const themeLabel =
+      theme === 'cyberpunk' ? 'тему Киберпанк' : theme === 'dark' ? 'тёмную тему' : 'светлую тему';
+    this.logActivity('update', 'settings', 'Тема интерфейса', `Переключено на ${themeLabel}`);
     this.notify();
   }
 
   public toggleTheme(): void {
-    this.setTheme(this.customization.theme === 'dark' ? 'light' : 'dark');
+    const order: ThemeMode[] = ['dark', 'light', 'cyberpunk'];
+    const idx = order.indexOf(this.customization.theme);
+    const next = order[(idx + 1) % order.length];
+    this.setTheme(next);
+  }
+
+  public setThemeBaseColor(key: keyof ThemeBaseColors, hex: string): void {
+    const theme = this.customization.theme;
+    const prevAll = this.customization.themeOverrides || {};
+    const prevTheme = prevAll[theme] || {};
+    this.customization.themeOverrides = {
+      ...prevAll,
+      [theme]: {
+        ...prevTheme,
+        [key]: hex,
+      },
+    };
+    this.applyThemeAndCustomization();
+    this.saveCustomization();
+    this.notify();
+  }
+
+  public applyThemeBasePreset(colors: Partial<ThemeBaseColors>): void {
+    const theme = this.customization.theme;
+    const prevAll = this.customization.themeOverrides || {};
+    this.customization.themeOverrides = {
+      ...prevAll,
+      [theme]: {
+        ...(prevAll[theme] || {}),
+        ...colors,
+      },
+    };
+    this.applyThemeAndCustomization();
+    this.saveCustomization();
+    this.logActivity('update', 'settings', 'Цвета темы', `Применена базовая палитра для темы ${theme}`);
+    this.notify();
+  }
+
+  public resetThemeBaseColors(theme: ThemeMode = this.customization.theme): void {
+    const prevAll = { ...(this.customization.themeOverrides || {}) };
+    delete prevAll[theme];
+    this.customization.themeOverrides = prevAll;
+    if (this.customization.backgroundPreset === 'custom') {
+      this.customization.backgroundPreset = 'default';
+    }
+    this.applyThemeAndCustomization();
+    this.saveCustomization();
+    this.logActivity('update', 'settings', 'Цвета темы', `Сброшены базовые цвета для темы ${theme}`);
+    this.notify();
   }
 
   public setBackgroundPreset(preset: BackgroundPreset, customColor?: string): void {
     this.customization.backgroundPreset = preset;
     if (customColor) {
       this.customization.customBgColor = customColor;
+    }
+    const theme = this.customization.theme;
+    if (this.customization.themeOverrides?.[theme]) {
+      const nextTheme = { ...this.customization.themeOverrides[theme] };
+      delete nextTheme.bgCanvas;
+      delete nextTheme.bgSurface;
+      delete nextTheme.borderSubtle;
+      this.customization.themeOverrides = {
+        ...this.customization.themeOverrides,
+        [theme]: nextTheme,
+      };
     }
     this.applyThemeAndCustomization();
     this.saveCustomization();
@@ -284,11 +538,19 @@ export class AppStore {
   public setCustomBackgroundColor(hex: string): void {
     this.customization.backgroundPreset = 'custom';
     this.customization.customBgColor = hex;
-    // Automatically align theme polarity if user picks a very light or dark custom color
-    const rgb = hexToRgb(hex);
-    if (rgb) {
-      const lum = (0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b) / 255;
-      this.customization.theme = lum < 0.5 ? 'dark' : 'light';
+    if (this.customization.theme !== 'cyberpunk') {
+      this.customization.theme = getLuminance(hex) < 0.5 ? 'dark' : 'light';
+    }
+    const theme = this.customization.theme;
+    if (this.customization.themeOverrides?.[theme]) {
+      const nextTheme = { ...this.customization.themeOverrides[theme] };
+      delete nextTheme.bgCanvas;
+      delete nextTheme.bgSurface;
+      delete nextTheme.borderSubtle;
+      this.customization.themeOverrides = {
+        ...this.customization.themeOverrides,
+        [theme]: nextTheme,
+      };
     }
     this.applyThemeAndCustomization();
     this.saveCustomization();
@@ -310,8 +572,17 @@ export class AppStore {
     this.notify();
   }
 
-  public setAccentColor(accent: 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber'): void {
+  public setAccentColor(accent: AccentColor): void {
     this.customization.accentColor = accent;
+    const theme = this.customization.theme;
+    if (this.customization.themeOverrides?.[theme]?.accentPrimary) {
+      const nextTheme = { ...this.customization.themeOverrides[theme] };
+      delete nextTheme.accentPrimary;
+      this.customization.themeOverrides = {
+        ...this.customization.themeOverrides,
+        [theme]: nextTheme,
+      };
+    }
     this.applyThemeAndCustomization();
     this.saveCustomization();
     this.notify();

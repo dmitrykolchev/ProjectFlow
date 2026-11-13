@@ -79,6 +79,15 @@
   --accent-soft: rgba(99, 102, 241, 0.15);
   --accent-border: rgba(99, 102, 241, 0.3);
   --accent-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+
+  /* Theme Glow & Animation Hooks (neutral in Light/Dark, active in Cyberpunk) */
+  --surface-glow: none;
+  --accent-glow: none;
+  --accent-glow-hover: none;
+  --cyber-text-shadow: none;
+  --cyber-pulse-anim: none;
+  --cyber-surface-anim: none;
+  --cyber-gradient-anim: none;
 }
 
 /* Light Background Presets */
@@ -239,6 +248,71 @@
 }
 
 /* ==========================================================================
+   Cyberpunk Neon Theme
+   ========================================================================== */
+[data-theme='cyberpunk'] {
+  --bg-canvas: #06040f;
+  --bg-surface: #0d0a1f;
+  --bg-surface-elevated: #141030;
+  --bg-subtle: #1a143d;
+  --bg-hover: #241b52;
+  --bg-active: #32246e;
+
+  --text-primary: #f4f6ff;
+  --text-secondary: #b8c4f0;
+  --text-muted: #7c88bf;
+  --text-inverse: #06040f;
+  --text-on-accent: #ffffff;
+
+  --border-subtle: #1e2d5e;
+  --border-strong: #8b2870;
+  --border-focus: #00f0ff;
+
+  --shadow-sm: 0 0 12px rgba(0, 240, 255, 0.12), 0 2px 6px rgba(0, 0, 0, 0.7);
+  --shadow-md: 0 0 20px rgba(0, 240, 255, 0.2), 0 4px 14px rgba(0, 0, 0, 0.75);
+  --shadow-lg: 0 0 30px rgba(255, 42, 133, 0.24), 0 10px 26px rgba(0, 0, 0, 0.8);
+  --shadow-xl: 0 0 42px rgba(0, 240, 255, 0.24), 0 20px 30px rgba(0, 0, 0, 0.85);
+
+  --surface-glow: 0 0 18px rgba(0, 240, 255, 0.12), inset 0 1px 0 rgba(0, 240, 255, 0.16);
+  --accent-glow: 0 0 14px rgba(255, 42, 133, 0.45), 0 0 26px rgba(0, 240, 255, 0.24);
+  --accent-glow-hover: 0 0 22px rgba(0, 240, 255, 0.65), 0 0 36px rgba(255, 42, 133, 0.4);
+  --cyber-text-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
+  --cyber-pulse-anim: cyberGlowPulse 3.6s ease-in-out infinite;
+  --cyber-surface-anim: cyberSurfaceBreath 5.5s ease-in-out infinite;
+  --cyber-gradient-anim: cyberGradientFlow 6s ease infinite;
+
+  /* Scrollbars in Cyberpunk Mode */
+  --scrollbar-track: #09061a;
+  --scrollbar-thumb: rgba(0, 240, 255, 0.42);
+  --scrollbar-thumb-hover: #ff2a85;
+
+  /* Default Cyberpunk Neon Accent */
+  --accent-primary: #ff2a85;
+  --accent-hover: #ff4fa0;
+  --accent-soft: rgba(255, 42, 133, 0.18);
+  --accent-border: rgba(0, 240, 255, 0.48);
+  --accent-gradient: linear-gradient(135deg, #ff2a85 0%, #8b5cf6 52%, #00e5ff 100%);
+
+  /* Neon Status Colors */
+  --color-success: #00ffa3;
+  --color-success-solid: #00d98b;
+  --color-success-bg: rgba(0, 255, 163, 0.14);
+  --color-success-border: rgba(0, 255, 163, 0.36);
+  --color-warning: #ffe600;
+  --color-warning-solid: #eab308;
+  --color-warning-bg: rgba(255, 230, 0, 0.14);
+  --color-warning-border: rgba(255, 230, 0, 0.34);
+  --color-danger: #ff3864;
+  --color-danger-solid: #ff1f52;
+  --color-danger-bg: rgba(255, 56, 100, 0.16);
+  --color-danger-border: rgba(255, 56, 100, 0.38);
+  --color-info: #00f0ff;
+  --color-info-solid: #00c4d6;
+  --color-info-bg: rgba(0, 240, 255, 0.14);
+  --color-info-border: rgba(0, 240, 255, 0.36);
+}
+
+/* ==========================================================================
    Accent Variations
    ========================================================================== */
 [data-accent='emerald'] {
@@ -299,6 +373,34 @@ html, body {
   background-color: var(--bg-canvas);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html[data-theme='cyberpunk'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 42, 133, 0.11), transparent 42%),
+    radial-gradient(circle at 88% 82%, rgba(0, 240, 255, 0.11), transparent 45%),
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 240, 255, 0.025) 0px,
+      rgba(0, 240, 255, 0.025) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+  animation: cyberAmbientShift 10s ease-in-out infinite alternate;
+}
+
+@keyframes cyberAmbientShift {
+  0% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0.95;
+  }
 }
 
 /* ==========================================================================

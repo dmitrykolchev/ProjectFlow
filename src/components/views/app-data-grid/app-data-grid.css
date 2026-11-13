@@ -253,6 +253,14 @@ th {
               background-color var(--transition-fast, 150ms ease);
 }
 
+th.select-col,
+td.select-col {
+  width: 46px;
+  padding: 0 8px;
+  text-align: center;
+  text-overflow: clip;
+}
+
 th.is-sortable {
   cursor: pointer;
 }

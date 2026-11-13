@@ -38,11 +38,19 @@ export interface Task {
   updatedAt: string;
 }
 
-export type ThemeMode = 'dark' | 'light';
+export type ThemeMode = 'dark' | 'light' | 'cyberpunk';
 export type DensityMode = 'comfortable' | 'compact';
 export type AccentColor = 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber';
 export type BackgroundPreset = 'default' | 'midnight' | 'obsidian' | 'nordic' | 'forest' | 'custom';
 export type SupportedLang = 'ru' | 'en';
+
+export interface ThemeBaseColors {
+  bgCanvas: string;
+  bgSurface: string;
+  textPrimary: string;
+  accentPrimary: string;
+  borderSubtle: string;
+}
 
 export type ActiveView =
   | 'dashboard'
@@ -79,6 +87,7 @@ export interface UserCustomization {
   accentColor: AccentColor;
   backgroundPreset: BackgroundPreset;
   customBgColor: string;
+  themeOverrides?: Partial<Record<ThemeMode, Partial<ThemeBaseColors>>>;
   language: SupportedLang;
   sidebarCollapsed: boolean;
   defaultView: ActiveView;
