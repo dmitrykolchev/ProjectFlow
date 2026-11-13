@@ -43,6 +43,11 @@ import dataGridMeta from '../app-data-grid/app-data-grid.story';
 import dataGridColumnMeta from '../data-grid-column/data-grid-column.story';
 import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
+import projectsMeta from '../app-projects/app-projects.story';
+import companiesMeta from '../app-companies/app-companies.story';
+import employeesMeta from '../app-employees/app-employees.story';
+import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
+import contractsMeta from '../app-contracts/app-contracts.story';
 import settingsMeta from '../app-settings/app-settings.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
@@ -82,6 +87,11 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   dataGridColumnMeta,
   calendarMeta,
   analyticsMeta,
+  projectsMeta,
+  companiesMeta,
+  employeesMeta,
+  counterpartiesMeta,
+  contractsMeta,
   settingsMeta,
 ];
 

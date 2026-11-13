@@ -1,12 +1,97 @@
 export type TaskStatus = 'backlog' | 'todo' | 'in_progress' | 'review' | 'done';
 export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
+export type EmployeeStatus = 'active' | 'remote' | 'vacation' | 'onboarding';
+
 export interface User {
   id: string;
   name: string;
   email: string;
   avatar: string;
   role: string;
+  department?: string;
+  companyId?: string;
+  phone?: string;
+  location?: string;
+  status?: EmployeeStatus;
+  hireDate?: string;
+  hourlyRate?: number;
+}
+
+export type CompanyStatus = 'active' | 'inactive';
+
+export interface Company {
+  id: string;
+  name: string;
+  legalName: string;
+  inn: string;
+  kpp?: string;
+  industry: string;
+  city: string;
+  phone: string;
+  email: string;
+  website?: string;
+  directorId?: string;
+  status: CompanyStatus;
+  description: string;
+}
+
+export type CounterpartyType = 'client' | 'vendor' | 'partner' | 'contractor';
+export type CounterpartyStatus = 'active' | 'pending' | 'blocked';
+
+export interface Counterparty {
+  id: string;
+  name: string;
+  legalName: string;
+  type: CounterpartyType;
+  inn: string;
+  kpp?: string;
+  city: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  status: CounterpartyStatus;
+  rating: number;
+  notes: string;
+}
+
+export type ContractStatus = 'draft' | 'on_approval' | 'active' | 'completed' | 'terminated';
+export type ContractType = 'service' | 'supply' | 'license' | 'nda' | 'sla';
+
+export interface Contract {
+  id: string;
+  number: string;
+  title: string;
+  type: ContractType;
+  companyId: string;
+  counterpartyId: string;
+  projectId?: string;
+  ownerId?: string;
+  amount: number;
+  currency: 'RUB' | 'USD' | 'EUR';
+  startDate: string;
+  endDate: string;
+  status: ContractStatus;
+  description: string;
+}
+
+export type ProjectRole =
+  | 'pm'
+  | 'tech_lead'
+  | 'architect'
+  | 'developer'
+  | 'designer'
+  | 'qa'
+  | 'analyst'
+  | 'devops';
+
+export type ProjectStatus = 'planning' | 'active' | 'on_hold' | 'completed';
+
+export interface ProjectMember {
+  userId: string;
+  role: ProjectRole;
+  allocation: number;
+  joinedAt: string;
 }
 
 export interface Project {
@@ -17,6 +102,11 @@ export interface Project {
   color: string;
   dueDate: string;
   progress: number;
+  status?: ProjectStatus;
+  companyId?: string;
+  counterpartyId?: string;
+  budget?: number;
+  members?: ProjectMember[];
 }
 
 export interface Task {
@@ -60,6 +150,11 @@ export type ActiveView =
   | 'grid'
   | 'calendar'
   | 'analytics'
+  | 'companies'
+  | 'employees'
+  | 'counterparties'
+  | 'contracts'
+  | 'projects'
   | 'settings'
   | 'storybook';
 
@@ -69,7 +164,7 @@ export interface ActivityLogItem {
   userId: string;
   userName: string;
   action: 'create' | 'update' | 'delete' | 'status_change' | 'priority_change';
-  targetType: 'task' | 'project' | 'settings';
+  targetType: 'task' | 'project' | 'company' | 'employee' | 'counterparty' | 'contract' | 'settings';
   targetTitle: string;
   details: string;
 }

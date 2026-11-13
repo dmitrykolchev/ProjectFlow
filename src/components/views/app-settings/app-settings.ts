@@ -134,11 +134,16 @@ export class AppSettings extends LitElement {
 
     const viewsList: { id: ActiveView; label: string }[] = [
       { id: 'dashboard', label: t.navigation.dashboard },
+      { id: 'projects', label: t.navigation.projects },
       { id: 'kanban', label: t.navigation.kanban },
       { id: 'gantt', label: t.navigation.gantt },
       { id: 'grid', label: t.navigation.grid },
       { id: 'calendar', label: t.navigation.calendar },
       { id: 'analytics', label: t.navigation.analytics },
+      { id: 'companies', label: t.navigation.companies },
+      { id: 'employees', label: t.navigation.employees },
+      { id: 'counterparties', label: t.navigation.counterparties },
+      { id: 'contracts', label: t.navigation.contracts },
     ];
 
     const curatedPalettes = CURATED_BASE_PALETTES[activeTheme];

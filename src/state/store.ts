@@ -3,8 +3,13 @@ import {
   ActiveView,
   ActivityLogItem,
   BackgroundPreset,
+  Company,
+  Contract,
+  Counterparty,
   NotificationItem,
   Project,
+  ProjectMember,
+  ProjectRole,
   SidebarGroupMode,
   Task,
   TaskStatus,
@@ -13,12 +18,23 @@ import {
   User,
   UserCustomization,
 } from '../types';
-import { initialProjects, initialTasks, initialUsers } from './mock-data';
+import {
+  initialCompanies,
+  initialContracts,
+  initialCounterparties,
+  initialProjects,
+  initialTasks,
+  initialUsers,
+} from './mock-data';
 
 const STORAGE_KEY_CUSTOMIZATION = 'projectflow_customization_v1';
 const STORAGE_KEY_TASKS = 'projectflow_tasks_v2';
 const STORAGE_KEY_PROJECTS = 'projectflow_projects_v2';
 const STORAGE_KEY_LOGS = 'projectflow_activity_v1';
+const STORAGE_KEY_COMPANIES = 'projectflow_companies_v1';
+const STORAGE_KEY_EMPLOYEES = 'projectflow_employees_v1';
+const STORAGE_KEY_COUNTERPARTIES = 'projectflow_counterparties_v1';
+const STORAGE_KEY_CONTRACTS = 'projectflow_contracts_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -30,7 +46,7 @@ const defaultCustomization: UserCustomization = {
   language: 'ru',
   sidebarCollapsed: false,
   sidebarGroupMode: 'multiple',
-  sidebarExpandedGroups: ['workspace', 'views', 'system'],
+  sidebarExpandedGroups: ['workspace', 'views', 'directory', 'system'],
   defaultView: 'dashboard',
   showActivityPanel: false,
   gridColumns: {
@@ -167,6 +183,9 @@ export class AppStore {
   public tasks: Task[] = [];
   public projects: Project[] = [];
   public users: User[] = initialUsers;
+  public companies: Company[] = [];
+  public counterparties: Counterparty[] = [];
+  public contracts: Contract[] = [];
   public selectedProjectId: string = 'all';
   public activeView: ActiveView = 'dashboard';
 
@@ -232,10 +251,46 @@ export class AppStore {
 
       const storedProjects = localStorage.getItem(STORAGE_KEY_PROJECTS);
       if (storedProjects) {
-        this.projects = JSON.parse(storedProjects);
+        const parsed: Project[] = JSON.parse(storedProjects);
+        this.projects = parsed.map((proj) => {
+          const fallback = initialProjects.find((p) => p.id === proj.id);
+          return {
+            status: fallback?.status || 'active',
+            companyId: fallback?.companyId,
+            counterpartyId: fallback?.counterpartyId,
+            budget: fallback?.budget,
+            members: fallback?.members ? [...fallback.members] : [],
+            ...proj,
+          };
+        });
       } else {
-        this.projects = [...initialProjects];
+        this.projects = initialProjects.map((p) => ({
+          ...p,
+          members: p.members ? [...p.members] : [],
+        }));
       }
+
+      const storedCompanies = localStorage.getItem(STORAGE_KEY_COMPANIES);
+      this.companies = storedCompanies ? JSON.parse(storedCompanies) : [...initialCompanies];
+
+      const storedEmployees = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
+      if (storedEmployees) {
+        const parsedUsers: User[] = JSON.parse(storedEmployees);
+        this.users = parsedUsers.map((u) => {
+          const fallback = initialUsers.find((iu) => iu.id === u.id);
+          return { ...(fallback || {}), ...u };
+        });
+      } else {
+        this.users = [...initialUsers];
+      }
+
+      const storedCounterparties = localStorage.getItem(STORAGE_KEY_COUNTERPARTIES);
+      this.counterparties = storedCounterparties
+        ? JSON.parse(storedCounterparties)
+        : [...initialCounterparties];
+
+      const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
+      this.contracts = storedContracts ? JSON.parse(storedContracts) : [...initialContracts];
 
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
@@ -267,13 +322,60 @@ export class AppStore {
     } catch (e) {
       console.warn('Error loading state from localStorage:', e);
       this.tasks = [...initialTasks];
-      this.projects = [...initialProjects];
+      this.projects = initialProjects.map((p) => ({
+        ...p,
+        members: p.members ? [...p.members] : [],
+      }));
+      this.companies = [...initialCompanies];
+      this.users = [...initialUsers];
+      this.counterparties = [...initialCounterparties];
+      this.contracts = [...initialContracts];
     }
   }
 
   private saveTasks(): void {
     try {
       localStorage.setItem(STORAGE_KEY_TASKS, JSON.stringify(this.tasks));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveProjects(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_PROJECTS, JSON.stringify(this.projects));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveCompanies(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_COMPANIES, JSON.stringify(this.companies));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveEmployees(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_EMPLOYEES, JSON.stringify(this.users));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveCounterparties(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_COUNTERPARTIES, JSON.stringify(this.counterparties));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveContracts(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(this.contracts));
     } catch (e) {
       console.error(e);
     }
@@ -604,8 +706,16 @@ export class AppStore {
   }
 
   private getGroupForView(view: ActiveView): string {
-    if (view === 'dashboard' || view === 'kanban' || view === 'gantt') return 'workspace';
+    if (view === 'dashboard' || view === 'projects' || view === 'kanban' || view === 'gantt') return 'workspace';
     if (view === 'grid' || view === 'calendar' || view === 'analytics') return 'views';
+    if (
+      view === 'companies' ||
+      view === 'employees' ||
+      view === 'counterparties' ||
+      view === 'contracts'
+    ) {
+      return 'directory';
+    }
     return 'system';
   }
 
@@ -830,10 +940,252 @@ export class AppStore {
     this.notify();
   }
 
+  // --- Company CRUD ---
+  public addCompany(data: Omit<Company, 'id'>): Company {
+    const company: Company = {
+      ...data,
+      id: `comp-${Date.now()}`,
+    };
+    this.companies = [company, ...this.companies];
+    this.saveCompanies();
+    this.logActivity('create', 'company', company.name, 'Добавлена компания');
+    this.addNotification('success', 'Компания добавлена', company.name);
+    this.notify();
+    return company;
+  }
+
+  public updateCompany(updated: Company): void {
+    this.companies = this.companies.map((c) => (c.id === updated.id ? { ...updated } : c));
+    this.saveCompanies();
+    this.logActivity('update', 'company', updated.name, 'Обновлены реквизиты компании');
+    this.addNotification('info', 'Компания обновлена', updated.name);
+    this.notify();
+  }
+
+  public deleteCompany(id: string): void {
+    const target = this.companies.find((c) => c.id === id);
+    if (!target) return;
+    this.companies = this.companies.filter((c) => c.id !== id);
+    this.saveCompanies();
+    this.logActivity('delete', 'company', target.name, 'Компания удалена');
+    this.addNotification('warning', 'Удалено', `Компания "${target.name}" удалена`);
+    this.notify();
+  }
+
+  // --- Employee CRUD ---
+  public addEmployee(data: Omit<User, 'id' | 'avatar'> & { avatar?: string }): User {
+    const initials = data.name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() || '')
+      .join('') || 'EM';
+    const employee: User = {
+      ...data,
+      id: `user-${Date.now()}`,
+      avatar: data.avatar || initials,
+    };
+    this.users = [employee, ...this.users];
+    this.saveEmployees();
+    this.logActivity('create', 'employee', employee.name, `Должность: ${employee.role}`);
+    this.addNotification('success', 'Сотрудник добавлен', employee.name);
+    this.notify();
+    return employee;
+  }
+
+  public updateEmployee(updated: User): void {
+    const initials = updated.name
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() || '')
+      .join('') || updated.avatar;
+    this.users = this.users.map((u) =>
+      u.id === updated.id ? { ...updated, avatar: updated.avatar || initials } : u
+    );
+    this.saveEmployees();
+    this.logActivity('update', 'employee', updated.name, 'Обновлён профиль сотрудника');
+    this.addNotification('info', 'Сотрудник обновлён', updated.name);
+    this.notify();
+  }
+
+  public deleteEmployee(id: string): void {
+    const target = this.users.find((u) => u.id === id);
+    if (!target) return;
+    this.users = this.users.filter((u) => u.id !== id);
+    this.projects = this.projects.map((p) => ({
+      ...p,
+      members: (p.members || []).filter((m) => m.userId !== id),
+    }));
+    this.saveEmployees();
+    this.saveProjects();
+    this.logActivity('delete', 'employee', target.name, 'Сотрудник удалён');
+    this.addNotification('warning', 'Удалено', `Сотрудник "${target.name}" удалён`);
+    this.notify();
+  }
+
+  // --- Counterparty CRUD ---
+  public addCounterparty(data: Omit<Counterparty, 'id'>): Counterparty {
+    const cp: Counterparty = {
+      ...data,
+      id: `cp-${Date.now()}`,
+    };
+    this.counterparties = [cp, ...this.counterparties];
+    this.saveCounterparties();
+    this.logActivity('create', 'counterparty', cp.name, 'Добавлен контрагент');
+    this.addNotification('success', 'Контрагент добавлен', cp.name);
+    this.notify();
+    return cp;
+  }
+
+  public updateCounterparty(updated: Counterparty): void {
+    this.counterparties = this.counterparties.map((c) => (c.id === updated.id ? { ...updated } : c));
+    this.saveCounterparties();
+    this.logActivity('update', 'counterparty', updated.name, 'Обновлена карточка контрагента');
+    this.addNotification('info', 'Контрагент обновлён', updated.name);
+    this.notify();
+  }
+
+  public deleteCounterparty(id: string): void {
+    const target = this.counterparties.find((c) => c.id === id);
+    if (!target) return;
+    this.counterparties = this.counterparties.filter((c) => c.id !== id);
+    this.saveCounterparties();
+    this.logActivity('delete', 'counterparty', target.name, 'Контрагент удалён');
+    this.addNotification('warning', 'Удалено', `Контрагент "${target.name}" удалён`);
+    this.notify();
+  }
+
+  // --- Contract CRUD ---
+  public addContract(data: Omit<Contract, 'id'>): Contract {
+    const contract: Contract = {
+      ...data,
+      id: `ctr-${Date.now()}`,
+    };
+    this.contracts = [contract, ...this.contracts];
+    this.saveContracts();
+    this.logActivity('create', 'contract', `${contract.number} — ${contract.title}`, 'Создан договор');
+    this.addNotification('success', 'Договор создан', contract.number);
+    this.notify();
+    return contract;
+  }
+
+  public updateContract(updated: Contract): void {
+    this.contracts = this.contracts.map((c) => (c.id === updated.id ? { ...updated } : c));
+    this.saveContracts();
+    this.logActivity('update', 'contract', `${updated.number} — ${updated.title}`, 'Обновлён договор');
+    this.addNotification('info', 'Договор обновлён', updated.number);
+    this.notify();
+  }
+
+  public deleteContract(id: string): void {
+    const target = this.contracts.find((c) => c.id === id);
+    if (!target) return;
+    this.contracts = this.contracts.filter((c) => c.id !== id);
+    this.saveContracts();
+    this.logActivity('delete', 'contract', `${target.number} — ${target.title}`, 'Договор удалён');
+    this.addNotification('warning', 'Удалено', `Договор ${target.number} удалён`);
+    this.notify();
+  }
+
+  // --- Project & Project Members CRUD ---
+  public addProject(data: Omit<Project, 'id'>): Project {
+    const project: Project = {
+      ...data,
+      id: `proj-${Date.now()}`,
+      members: data.members ? [...data.members] : [],
+    };
+    this.projects = [project, ...this.projects];
+    this.saveProjects();
+    this.logActivity('create', 'project', project.name, `Ключ: ${project.key}`);
+    this.addNotification('success', 'Проект создан', project.name);
+    this.notify();
+    return project;
+  }
+
+  public updateProject(updated: Project): void {
+    this.projects = this.projects.map((p) => (p.id === updated.id ? { ...updated } : p));
+    this.saveProjects();
+    this.logActivity('update', 'project', updated.name, 'Обновлены параметры проекта');
+    this.addNotification('info', 'Проект обновлён', updated.name);
+    this.notify();
+  }
+
+  public deleteProject(id: string): void {
+    const target = this.projects.find((p) => p.id === id);
+    if (!target) return;
+    this.projects = this.projects.filter((p) => p.id !== id);
+    if (this.selectedProjectId === id) {
+      this.selectedProjectId = 'all';
+    }
+    this.saveProjects();
+    this.logActivity('delete', 'project', target.name, 'Проект удалён');
+    this.addNotification('warning', 'Удалено', `Проект "${target.name}" удалён`);
+    this.notify();
+  }
+
+  public addProjectMember(projectId: string, member: ProjectMember): void {
+    const project = this.projects.find((p) => p.id === projectId);
+    if (!project) return;
+    const existing = project.members || [];
+    const filtered = existing.filter((m) => !(m.userId === member.userId && m.role === member.role));
+    const nextMembers = [...filtered, member];
+    this.projects = this.projects.map((p) =>
+      p.id === projectId ? { ...p, members: nextMembers } : p
+    );
+    this.saveProjects();
+    const user = this.users.find((u) => u.id === member.userId);
+    this.logActivity(
+      'update',
+      'project',
+      project.name,
+      `Назначен участник ${user?.name || member.userId} (${member.role})`
+    );
+    this.addNotification('success', 'Участник добавлен', `${user?.name || ''} добавлен в проект`);
+    this.notify();
+  }
+
+  public updateProjectMemberRole(
+    projectId: string,
+    userId: string,
+    oldRole: ProjectRole,
+    newRole: ProjectRole,
+    allocation?: number
+  ): void {
+    const project = this.projects.find((p) => p.id === projectId);
+    if (!project) return;
+    const nextMembers = (project.members || []).map((m) =>
+      m.userId === userId && m.role === oldRole
+        ? { ...m, role: newRole, allocation: allocation ?? m.allocation }
+        : m
+    );
+    this.projects = this.projects.map((p) =>
+      p.id === projectId ? { ...p, members: nextMembers } : p
+    );
+    this.saveProjects();
+    this.logActivity('update', 'project', project.name, `Изменена роль участника на ${newRole}`);
+    this.notify();
+  }
+
+  public removeProjectMember(projectId: string, userId: string, role: ProjectRole): void {
+    const project = this.projects.find((p) => p.id === projectId);
+    if (!project) return;
+    const nextMembers = (project.members || []).filter(
+      (m) => !(m.userId === userId && m.role === role)
+    );
+    this.projects = this.projects.map((p) =>
+      p.id === projectId ? { ...p, members: nextMembers } : p
+    );
+    this.saveProjects();
+    const user = this.users.find((u) => u.id === userId);
+    this.logActivity('update', 'project', project.name, `Удалён участник ${user?.name || userId}`);
+    this.notify();
+  }
+
   // --- Activity Log ---
   public logActivity(
     action: 'create' | 'update' | 'delete' | 'status_change' | 'priority_change',
-    targetType: 'task' | 'project' | 'settings',
+    targetType: ActivityLogItem['targetType'],
     targetTitle: string,
     details: string
   ): void {

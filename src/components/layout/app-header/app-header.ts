@@ -48,11 +48,16 @@ export class AppHeader extends LitElement {
 
     const viewNames: Record<string, string> = {
       dashboard: t.navigation.dashboard,
+      projects: t.navigation.projects,
       kanban: t.navigation.kanban,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,
       calendar: t.navigation.calendar,
       analytics: t.navigation.analytics,
+      companies: t.navigation.companies,
+      employees: t.navigation.employees,
+      counterparties: t.navigation.counterparties,
+      contracts: t.navigation.contracts,
       settings: t.navigation.settings,
       storybook: t.navigation.storybook,
     };

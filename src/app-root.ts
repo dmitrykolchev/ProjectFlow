@@ -13,6 +13,11 @@ import {
   iconActivity,
   iconStorybook,
   iconSettings,
+  iconFolder,
+  iconBuilding,
+  iconUsers,
+  iconHandshake,
+  iconFileText,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -33,6 +38,11 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
     ]),
   calendar: () => import('./components/views/app-calendar/app-calendar'),
   analytics: () => import('./components/views/app-analytics/app-analytics'),
+  projects: () => import('./components/views/app-projects/app-projects'),
+  companies: () => import('./components/views/app-companies/app-companies'),
+  employees: () => import('./components/views/app-employees/app-employees'),
+  counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
+  contracts: () => import('./components/views/app-contracts/app-contracts'),
   settings: () => import('./components/views/app-settings/app-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
 };
@@ -168,6 +178,12 @@ export class AppRoot extends LitElement {
           ></sidebar-item>
 
           <sidebar-item
+            value="projects"
+            label="${t.navigation.projects}"
+            .icon="${iconFolder()}"
+          ></sidebar-item>
+
+          <sidebar-item
             value="kanban"
             label="${t.navigation.kanban}"
             badge="${String(this.taskCount)}"
@@ -198,6 +214,32 @@ export class AppRoot extends LitElement {
             value="analytics"
             label="${t.navigation.analytics}"
             .icon="${iconAnalytics()}"
+          ></sidebar-item>
+        </sidebar-group>
+
+        <sidebar-group group-id="directory" label="${t.navigation.groupDirectory}">
+          <sidebar-item
+            value="companies"
+            label="${t.navigation.companies}"
+            .icon="${iconBuilding()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="employees"
+            label="${t.navigation.employees}"
+            .icon="${iconUsers()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="counterparties"
+            label="${t.navigation.counterparties}"
+            .icon="${iconHandshake()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="contracts"
+            label="${t.navigation.contracts}"
+            .icon="${iconFileText()}"
           ></sidebar-item>
         </sidebar-group>
 
@@ -269,6 +311,16 @@ export class AppRoot extends LitElement {
         return html`<app-calendar></app-calendar>`;
       case 'analytics':
         return html`<app-analytics></app-analytics>`;
+      case 'projects':
+        return html`<app-projects></app-projects>`;
+      case 'companies':
+        return html`<app-companies></app-companies>`;
+      case 'employees':
+        return html`<app-employees></app-employees>`;
+      case 'counterparties':
+        return html`<app-counterparties></app-counterparties>`;
+      case 'contracts':
+        return html`<app-contracts></app-contracts>`;
       case 'settings':
         return html`<app-settings></app-settings>`;
       case 'storybook':
