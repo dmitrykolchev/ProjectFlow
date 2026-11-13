@@ -12,8 +12,8 @@ import {
 import { initialProjects, initialTasks, initialUsers } from './mock-data';
 
 const STORAGE_KEY_CUSTOMIZATION = 'projectflow_customization_v1';
-const STORAGE_KEY_TASKS = 'projectflow_tasks_v1';
-const STORAGE_KEY_PROJECTS = 'projectflow_projects_v1';
+const STORAGE_KEY_TASKS = 'projectflow_tasks_v2';
+const STORAGE_KEY_PROJECTS = 'projectflow_projects_v2';
 const STORAGE_KEY_LOGS = 'projectflow_activity_v1';
 
 const defaultCustomization: UserCustomization = {

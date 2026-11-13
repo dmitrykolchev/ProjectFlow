@@ -1,4 +1,4 @@
-import { Project, Task, User } from '../types';
+import { Project, Task, TaskPriority, TaskStatus, User } from '../types';
 
 export const initialUsers: User[] = [
   {
@@ -66,10 +66,18 @@ export const initialProjects: Project[] = [
     dueDate: '2026-12-31',
     progress: 85,
   },
+  {
+    id: 'proj-4',
+    name: 'Data & Analytics Engine',
+    key: 'DATA',
+    description: 'Потоковая аналитика в реальном времени, ClickHouse витрины и прогнозирование SLA',
+    color: '#06b6d4',
+    dueDate: '2027-03-31',
+    progress: 54,
+  },
 ];
 
-// Helper to generate dynamic dates around current date (2026-11-11)
-export const initialTasks: Task[] = [
+const featuredTasks: Task[] = [
   {
     id: 'CORE-101',
     projectId: 'proj-1',
@@ -287,3 +295,213 @@ export const initialTasks: Task[] = [
     updatedAt: '2026-11-11T13:10:00Z',
   },
 ];
+
+const DAY_MS = 1000 * 60 * 60 * 24;
+
+function formatUtcDate(ms: number): string {
+  const d = new Date(ms);
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(d.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function generateMockTasks(count: number): Task[] {
+  const statuses: TaskStatus[] = ['backlog', 'todo', 'in_progress', 'review', 'done'];
+  const priorities: TaskPriority[] = ['low', 'medium', 'high', 'urgent'];
+  const assignees = ['user-1', 'user-2', 'user-3', 'user-4', 'user-5'];
+  const projects = [
+    { id: 'proj-1', key: 'CORE', name: 'Core Platform 3.0', baseNum: 107 },
+    { id: 'proj-2', key: 'MOB', name: 'Mobile Client NextGen', baseNum: 203 },
+    { id: 'proj-3', key: 'SEC', name: 'Security & Compliance 2026', baseNum: 303 },
+    { id: 'proj-4', key: 'DATA', name: 'Data & Analytics Engine', baseNum: 401 },
+  ];
+
+  const actions = [
+    'Оптимизация',
+    'Рефакторинг',
+    'Внедрение',
+    'Миграция',
+    'Проектирование',
+    'Автоматизация',
+    'Настройка',
+    'Тестирование',
+    'Масштабирование',
+    'Аудит',
+    'Интеграция',
+    'Стабилизация',
+  ];
+
+  const subjectsByProject: Record<string, string[]> = {
+    'proj-1': [
+      'пула воркеров WebAssembly',
+      'маршрутизатора HTTP/3',
+      'движка виртуального скроллинга',
+      'балансировщика gRPC потоков',
+      'локального LRU-кэша',
+      'библиотеки Lit-компонентов',
+      'системы трассировки OpenTelemetry',
+      'очереди фоновых джобов',
+      'реестра дизайн-токенов',
+      'сборщика Rollup & esbuild',
+    ],
+    'proj-2': [
+      'оффлайн-режима в IndexedDB',
+      'биометрической авторизации WebAuthn',
+      'жестов навигации для карточек',
+      'push-уведомлений Service Worker',
+      'адаптивного календаря спринтов',
+      'сжатия медиа-вложений',
+      'фоновой синхронизации дельт',
+      'темной темы для OLED экранов',
+      'компонентов быстрого ввода',
+      'профилирования расхода батареи',
+    ],
+    'proj-3': [
+      'политик CSP и CORS',
+      'ротации JWT и refresh токенов',
+      'матрицы прав доступа RBAC',
+      'шифрования персональных данных PII',
+      'журнала аудита безопасности',
+      'SAST сканирования в CI/CD',
+      'изоляции тенантов в PostgreSQL',
+      'контроля утечек секретов',
+      'соответствия требованиям SOC2',
+      'защиты от CSRF и rate-limiting',
+    ],
+    'proj-4': [
+      'витрин аналитики в ClickHouse',
+      'пайплайна ETL событий',
+      'дашборда прогнозирования сроков',
+      'агрегатора метрик SLA команды',
+      'экспорта отчетов в CSV и PDF',
+      'потоковой обработки Kafka-топиков',
+      'детектора аномалий загрузки',
+      'индексации полнотекстового поиска',
+      'кластеризации тегов задач',
+      'архивации исторических логов',
+    ],
+  };
+
+  const tagPools: Record<string, string[][]> = {
+    'proj-1': [
+      ['Architecture', 'Performance'],
+      ['Frontend', 'Lit'],
+      ['Backend', 'gRPC'],
+      ['Rollup', 'Build'],
+      ['DataGrid', 'UI/UX'],
+    ],
+    'proj-2': [
+      ['Mobile', 'Offline'],
+      ['PWA', 'Sync'],
+      ['UI/UX', 'Design'],
+      ['Auth', 'Mobile'],
+      ['Performance', 'Storage'],
+    ],
+    'proj-3': [
+      ['Security', 'RBAC'],
+      ['Audit', 'Compliance'],
+      ['DevSecOps', 'CI/CD'],
+      ['Auth', 'Crypto'],
+      ['Security', 'API'],
+    ],
+    'proj-4': [
+      ['Analytics', 'ETL'],
+      ['Data', 'ClickHouse'],
+      ['Export', 'Reporting'],
+      ['Search', 'Indexing'],
+      ['Metrics', 'SLA'],
+    ],
+  };
+
+  // Deliberately include shared dates & hour buckets so multi-column sorting / grouping creates rich ties
+  const anchorStartMs = Date.UTC(2026, 0, 5); // 2026-01-05
+  const horizonDays = 520; // spans Jan 2026 -> Jun 2027 (including dense coverage around Nov 2026)
+  const counters: Record<string, number> = {};
+  const tasks: Task[] = [];
+
+  for (let i = 0; i < count; i++) {
+    const proj = projects[(i * 7 + (i >> 2)) % projects.length];
+    const seq = counters[proj.id] ?? 0;
+    counters[proj.id] = seq + 1;
+    const id = `${proj.key}-${proj.baseNum + seq}`;
+
+    // Deterministic pseudo-random distribution with deliberate ties
+    const status = statuses[(i * 3 + Math.floor(i / 7)) % statuses.length];
+    const priority = priorities[(i * 5 + Math.floor(i / 11)) % priorities.length];
+    const assigneeId = assignees[(i * 2 + Math.floor(i / 5)) % assignees.length];
+
+    const action = actions[(i * 3 + seq) % actions.length];
+    const subjects = subjectsByProject[proj.id];
+    const subject = subjects[(i + seq * 3) % subjects.length];
+    const title = `${action} ${subject} (#${seq + 1})`;
+
+    // Cluster ~25% of tasks around Oct-Dec 2026 for rich default Calendar/Gantt view, rest across 2026-2027
+    let startOffsetDays: number;
+    if (i % 4 === 0) {
+      // Oct 20 - Dec 10, 2026 (days ~288 to ~340 from 2026-01-05)
+      startOffsetDays = 288 + ((i * 3) % 50);
+    } else {
+      startOffsetDays = ((i * 29) % horizonDays);
+      // Align some start dates onto 7-day buckets to create intentional date ties for multi-sort
+      if (i % 3 === 0) {
+        startOffsetDays = Math.floor(startOffsetDays / 7) * 7;
+      }
+    }
+
+    const durationDays = 3 + ((i * 11) % 36);
+    const startMs = anchorStartMs + startOffsetDays * DAY_MS;
+    const dueMs = startMs + durationDays * DAY_MS;
+    const startDate = formatUtcDate(startMs);
+    const dueDate = formatUtcDate(dueMs);
+
+    const subtaskCount = 2 + (i % 4);
+    const completedCount =
+      status === 'done'
+        ? subtaskCount
+        : status === 'review'
+        ? Math.max(1, subtaskCount - 1)
+        : status === 'in_progress'
+        ? Math.max(1, Math.floor(subtaskCount / 2))
+        : status === 'todo' && i % 3 === 0
+        ? 1
+        : 0;
+
+    const subtasks: Task['subtasks'] = Array.from({ length: subtaskCount }, (_, sIdx) => ({
+      id: `sub-gen-${i}-${sIdx}`,
+      title: `Этап ${sIdx + 1}: ${sIdx === 0 ? 'Анализ требований' : sIdx === 1 ? 'Реализация' : sIdx === 2 ? 'Ревью и тесты' : 'Релиз'}`,
+      completed: sIdx < completedCount,
+    }));
+
+    const estimatedHours = [8, 12, 16, 24, 32, 40, 48][(i + seq) % 7];
+    const progressRatio = subtaskCount > 0 ? completedCount / subtaskCount : 0;
+    const loggedHours = Math.round(estimatedHours * progressRatio);
+
+    const tags = tagPools[proj.id][(i + seq) % tagPools[proj.id].length];
+    const createdIso = new Date(startMs - 2 * DAY_MS).toISOString();
+    const updatedIso = new Date(Math.min(Date.UTC(2026, 10, 13), startMs + 3 * DAY_MS)).toISOString();
+
+    tasks.push({
+      id,
+      projectId: proj.id,
+      title,
+      description: `Рабочий пакет ${id} в рамках проекта ${proj.name}. Включает проектирование, реализацию и верификацию интеграционных сценариев.`,
+      status,
+      priority,
+      assigneeId,
+      startDate,
+      dueDate,
+      estimatedHours,
+      loggedHours,
+      tags,
+      subtasks,
+      order: i + 10,
+      createdAt: createdIso,
+      updatedAt: updatedIso,
+    });
+  }
+
+  return tasks;
+}
+
+export const initialTasks: Task[] = [...featuredTasks, ...generateMockTasks(270)];

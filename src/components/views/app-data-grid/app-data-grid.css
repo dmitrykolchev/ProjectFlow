@@ -1,9 +1,16 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 :host {
   display: flex;
   flex-direction: column;
   height: 100%;
   overflow: hidden;
   background: var(--bg-canvas, #090d16);
+  --grid-row-height: 42px;
 }
 
 .columns-slot-hidden {
@@ -320,12 +327,33 @@ th.drop-after {
   background: var(--accent-primary, #6366f1);
 }
 
+tbody tr.data-row,
+tbody tr.group-row {
+  height: var(--grid-row-height, 42px);
+}
+
 tbody tr {
   border-bottom: 1px solid var(--border-subtle, #1e293b);
   transition: background-color var(--transition-fast, 150ms ease);
 }
 
-tbody tr:hover:not(.group-row) {
+tbody tr.virtual-spacer-row {
+  border-bottom: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+tbody tr.virtual-spacer-row:hover {
+  background: transparent;
+}
+
+tbody tr.virtual-spacer-row td {
+  padding: 0;
+  border: none;
+  line-height: 0;
+}
+
+tbody tr:hover:not(.group-row):not(.virtual-spacer-row) {
   background: var(--bg-hover, #223049);
 }
 
@@ -353,7 +381,8 @@ tbody tr.group-row:hover {
 }
 
 td {
-  padding: 0.6rem 0.9rem;
+  padding: 0 0.9rem;
+  height: var(--grid-row-height, 42px);
   color: var(--text-primary, #f8fafc);
   vertical-align: middle;
   overflow: hidden;
@@ -362,7 +391,7 @@ td {
 }
 
 .group-cell {
-  padding: 0.55rem 0.9rem;
+  padding: 0 0.9rem;
   font-weight: 600;
   color: var(--text-primary, #f8fafc);
 }

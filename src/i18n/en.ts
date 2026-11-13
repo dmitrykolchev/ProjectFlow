@@ -113,6 +113,9 @@ export const en = {
     sortHint: 'Shift+Click headers or enable Multi-sort to sort by multiple columns',
     expandAll: 'Expand all',
     collapseAll: 'Collapse all',
+    virtualMode: 'Virtual scroll',
+    paginatedMode: 'Paginated',
+    showingRows: 'Rendered rows',
     columns: {
       id: 'Key',
       title: 'Task',

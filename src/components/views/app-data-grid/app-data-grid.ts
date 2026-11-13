@@ -54,10 +54,32 @@ const STATUS_ORDER: Record<string, number> = {
   done: 5,
 };
 
+const ROW_HEIGHT_COMFORTABLE = 42;
+const ROW_HEIGHT_COMPACT = 36;
+const ROW_OVERSCAN = 8;
+
+type VirtualRowItem =
+  | {
+      kind: 'group';
+      key: string;
+      level: number;
+      groupPath: string;
+      fieldLabel: string;
+      displayLabel: string;
+      count: number;
+      isCollapsed: boolean;
+    }
+  | {
+      kind: 'data';
+      key: string;
+      row: Record<string, unknown>;
+    };
+
 @customElement('app-data-grid')
 export class AppDataGrid extends LitElement {
   @property({ type: Array }) rows?: Record<string, unknown>[];
   @property({ type: Boolean }) selectable: boolean = true;
+  @property({ type: Boolean }) virtual: boolean = true;
   /** Comma-separated fields for multi-level grouping, e.g. "status,priority" */
   @property({ type: String, attribute: 'group-by' }) groupBy: string = '';
   /** Comma-separated rules for multi-column sorting, e.g. "priority:desc,dates:asc" */
@@ -79,6 +101,11 @@ export class AppDataGrid extends LitElement {
   @state() private rowsPerPage: number = 15;
   @state() private showColumnMenu: boolean = false;
   @state() private currentLang = store.customization.language;
+  @state() private currentDensity = store.customization.density;
+
+  // Virtual scroll window state
+  @state() private visStartRow: number = 0;
+  @state() private visEndRow: number = 30;
 
   // Drag reorder state
   @state() private draggingField: string | null = null;
@@ -93,6 +120,10 @@ export class AppDataGrid extends LitElement {
   private resizeStartWidth = 0;
 
   private unsubscribe?: () => void;
+  private tableResizeObserver?: ResizeObserver;
+  private scrollRafId: number | null = null;
+  private currentScrollTop = 0;
+  private viewportHeight = 520;
 
   static styles = styles;
 
@@ -108,6 +139,14 @@ export class AppDataGrid extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this.unsubscribe) this.unsubscribe();
+    if (this.tableResizeObserver) {
+      this.tableResizeObserver.disconnect();
+      this.tableResizeObserver = undefined;
+    }
+    if (this.scrollRafId !== null) {
+      cancelAnimationFrame(this.scrollRafId);
+      this.scrollRafId = null;
+    }
     window.removeEventListener('pointermove', this.handleResizeMove);
     window.removeEventListener('pointerup', this.handleResizeEnd);
   }
@@ -142,11 +181,50 @@ export class AppDataGrid extends LitElement {
 
   firstUpdated() {
     this.readSlottedColumns();
+    const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
+    if (container) {
+      this.viewportHeight = container.clientHeight || 520;
+      this.tableResizeObserver = new ResizeObserver((entries) => {
+        for (const entry of entries) {
+          this.viewportHeight = entry.contentRect.height || 520;
+          this.recomputeVirtualWindow();
+        }
+      });
+      this.tableResizeObserver.observe(container);
+      this.recomputeVirtualWindow();
+    }
+  }
+
+  updated(changed: Map<PropertyKey, unknown>) {
+    if (
+      changed.has('sortRules') ||
+      changed.has('groupByFields') ||
+      changed.has('virtual') ||
+      changed.has('rows') ||
+      changed.has('storeTasks') ||
+      changed.has('collapsedGroups') ||
+      changed.has('currentDensity')
+    ) {
+      if (changed.has('sortRules') || changed.has('groupByFields') || changed.has('virtual')) {
+        const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
+        if (container) {
+          container.scrollTop = 0;
+        }
+        this.currentScrollTop = 0;
+      }
+      this.recomputeVirtualWindow();
+    }
+  }
+
+  private get rowHeightPx(): number {
+    return this.currentDensity === 'compact' ? ROW_HEIGHT_COMPACT : ROW_HEIGHT_COMFORTABLE;
   }
 
   private syncState() {
     this.storeTasks = store.getFilteredTasks();
     this.currentLang = store.customization.language;
+    this.currentDensity = store.customization.density;
+    this.style.setProperty('--grid-row-height', `${this.rowHeightPx}px`);
   }
 
   private readSlottedColumns() {
@@ -202,38 +280,154 @@ export class AppDataGrid extends LitElement {
     return this.rows ?? (this.storeTasks as unknown as Record<string, unknown>[]);
   }
 
+  private getSortedRows(): Record<string, unknown>[] {
+    const allRows = this.activeRows;
+    if (this.sortRules.length === 0) return [...allRows];
+    return [...allRows].sort((a, b) => {
+      for (const rule of this.sortRules) {
+        const cmp = this.compareByField(a, b, rule.field);
+        if (cmp !== 0) {
+          return rule.direction === 'asc' ? cmp : -cmp;
+        }
+      }
+      return 0;
+    });
+  }
+
+  private buildVirtualItems(
+    sortedRows: Record<string, unknown>[],
+    t: ReturnType<typeof getTranslation>
+  ): VirtualRowItem[] {
+    if (this.groupByFields.length === 0) {
+      return sortedRows.map((row, idx) => ({
+        kind: 'data',
+        key: String(row.id || `row-${idx}`),
+        row,
+      }));
+    }
+
+    const items: VirtualRowItem[] = [];
+    const appendGroupLevel = (subset: Record<string, unknown>[], level: number, parentPath: string) => {
+      const field = this.groupByFields[level];
+      const groupCol = this.columns.find((c) => c.field === field);
+      const groups = new Map<string, Record<string, unknown>[]>();
+
+      for (const row of subset) {
+        const key = String(row[field] ?? '—');
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key)!.push(row);
+      }
+
+      let entries = Array.from(groups.entries());
+      const fieldSort = this.sortRules.find((r) => r.field === field);
+      if (fieldSort) {
+        entries = entries.sort(([, rowsA], [, rowsB]) => {
+          const cmp = this.compareByField(rowsA[0], rowsB[0], field);
+          return fieldSort.direction === 'asc' ? cmp : -cmp;
+        });
+      }
+
+      const hasChildLevel = level + 1 < this.groupByFields.length;
+
+      for (const [groupKey, groupRows] of entries) {
+        const groupPath = parentPath ? `${parentPath}|${field}=${groupKey}` : `${field}=${groupKey}`;
+        const isCollapsed = this.collapsedGroups.has(groupPath);
+        const displayLabel = groupCol?.groupFormatter
+          ? groupCol.groupFormatter(groupKey)
+          : this.formatGroupValue(field, groupKey, t);
+
+        items.push({
+          kind: 'group',
+          key: `grp:${groupPath}`,
+          level,
+          groupPath,
+          fieldLabel: groupCol?.header || field,
+          displayLabel,
+          count: groupRows.length,
+          isCollapsed,
+        });
+
+        if (!isCollapsed) {
+          if (hasChildLevel) {
+            appendGroupLevel(groupRows, level + 1, groupPath);
+          } else {
+            for (let i = 0; i < groupRows.length; i++) {
+              const row = groupRows[i];
+              items.push({
+                kind: 'data',
+                key: `${groupPath}|${String(row.id || i)}`,
+                row,
+              });
+            }
+          }
+        }
+      }
+    };
+
+    appendGroupLevel(sortedRows, 0, '');
+    return items;
+  }
+
+  private recomputeVirtualWindow() {
+    if (!this.virtual) return;
+    const t = getTranslation(this.currentLang);
+    const totalCount = this.buildVirtualItems(this.getSortedRows(), t).length;
+    const rowH = this.rowHeightPx;
+    const maxScrollTop = Math.max(0, totalCount * rowH - this.viewportHeight);
+    if (this.currentScrollTop > maxScrollTop) {
+      this.currentScrollTop = maxScrollTop;
+      const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
+      if (container && container.scrollTop > maxScrollTop) {
+        container.scrollTop = maxScrollTop;
+      }
+    }
+    const effectiveScrollTop = Math.max(0, this.currentScrollTop - rowH);
+    const rawStart = Math.floor(effectiveScrollTop / rowH);
+    const rawEnd = Math.ceil((this.currentScrollTop + this.viewportHeight) / rowH);
+    const nextStart = Math.max(0, Math.min(Math.max(0, totalCount - 1), rawStart - ROW_OVERSCAN));
+    const nextEnd = Math.min(totalCount, Math.max(nextStart + 10, rawEnd + ROW_OVERSCAN));
+
+    if (nextStart !== this.visStartRow || nextEnd !== this.visEndRow) {
+      this.visStartRow = nextStart;
+      this.visEndRow = nextEnd;
+    }
+  }
+
+  private handleTableScroll = (e: Event) => {
+    if (!this.virtual) return;
+    const target = e.target as HTMLElement;
+    this.currentScrollTop = target.scrollTop;
+
+    if (this.scrollRafId === null) {
+      this.scrollRafId = requestAnimationFrame(() => {
+        this.scrollRafId = null;
+        this.recomputeVirtualWindow();
+      });
+    }
+  };
+
   render() {
     const t = getTranslation(this.currentLang);
     const activeCols = this.orderedVisibleColumns;
     const allRows = this.activeRows;
+    const sortedRows = this.getSortedRows();
 
-    // Multi-column sorting
-    const sortedRows =
-      this.sortRules.length === 0
-        ? [...allRows]
-        : [...allRows].sort((a, b) => {
-            for (const rule of this.sortRules) {
-              const cmp = this.compareByField(a, b, rule.field);
-              if (cmp !== 0) {
-                return rule.direction === 'asc' ? cmp : -cmp;
-              }
-            }
-            return 0;
-          });
-
-    // Grouping or Pagination
     const isGrouped = this.groupByFields.length > 0;
+    const virtualItems = this.virtual ? this.buildVirtualItems(sortedRows, t) : [];
+    const totalVirtualCount = virtualItems.length;
+
     const totalPages = Math.max(1, Math.ceil(sortedRows.length / this.rowsPerPage));
     const safePage = Math.min(this.currentPage, totalPages);
     const startIndex = (safePage - 1) * this.rowsPerPage;
-    const displayRows = isGrouped
+    const paginatedRows = isGrouped
       ? sortedRows
       : sortedRows.slice(startIndex, startIndex + this.rowsPerPage);
 
+    const selectionScope = this.virtual || isGrouped ? sortedRows : paginatedRows;
     const allCurrentSelected =
-      displayRows.length > 0 &&
-      displayRows.every((r) => this.selectedIds.has(String(r.id || '')));
-    const someCurrentSelected = displayRows.some((r) =>
+      selectionScope.length > 0 &&
+      selectionScope.every((r) => this.selectedIds.has(String(r.id || '')));
+    const someCurrentSelected = selectionScope.some((r) =>
       this.selectedIds.has(String(r.id || ''))
     );
 
@@ -296,6 +490,17 @@ export class AppDataGrid extends LitElement {
                 </div>
               `
             : ''}
+
+          <app-toggle-button
+            size="sm"
+            ?pressed="${this.virtual}"
+            @change="${(e: CustomEvent<{ pressed: boolean }>) => {
+              this.virtual = e.detail.pressed;
+              this.currentPage = 1;
+            }}"
+          >
+            ${t.grid.virtualMode}
+          </app-toggle-button>
 
           <app-toggle-button
             size="sm"
@@ -466,8 +671,15 @@ export class AppDataGrid extends LitElement {
           `
         : ''}
 
-      <div class="table-container">
+      <div class="table-container" @scroll="${this.handleTableScroll}">
         <table>
+          <colgroup>
+            ${this.selectable ? html`<col style="width: 44px;" />` : ''}
+            ${activeCols.map((col) => {
+              const width = this.columnWidths[col.field] || col.width;
+              return html`<col style="width: ${width}px;" />`;
+            })}
+          </colgroup>
           <thead>
             <tr>
               ${this.selectable
@@ -476,7 +688,7 @@ export class AppDataGrid extends LitElement {
                       <app-checkbox
                         ?checked="${allCurrentSelected}"
                         ?indeterminate="${!allCurrentSelected && someCurrentSelected}"
-                        @change="${() => this.toggleSelectAll(displayRows)}"
+                        @change="${() => this.toggleSelectAll(selectionScope)}"
                       ></app-checkbox>
                     </th>
                   `
@@ -533,7 +745,7 @@ export class AppDataGrid extends LitElement {
           </thead>
 
           <tbody>
-            ${displayRows.length === 0
+            ${sortedRows.length === 0
               ? html`
                   <tr>
                     <td
@@ -544,14 +756,16 @@ export class AppDataGrid extends LitElement {
                     </td>
                   </tr>
                 `
+              : this.virtual
+              ? this.renderVirtualizedBody(virtualItems, activeCols, t)
               : isGrouped
-              ? this.renderGroupLevel(displayRows, 0, '', activeCols, t)
-              : displayRows.map((row) => this.renderDataRow(row, activeCols, t))}
+              ? this.renderGroupLevel(sortedRows, 0, '', activeCols, t)
+              : paginatedRows.map((row) => this.renderDataRow(row, activeCols, t))}
           </tbody>
         </table>
       </div>
 
-      ${!isGrouped
+      ${!this.virtual && !isGrouped
         ? html`
             <div class="grid-footer">
               <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -595,6 +809,65 @@ export class AppDataGrid extends LitElement {
               </div>
             </div>
           `
+        : this.virtual && totalVirtualCount > 0
+        ? html`
+            <div class="grid-footer">
+              <span class="page-info">
+                ${t.grid.virtualMode} · ${t.grid.showingRows}:
+                <strong class="tabular-nums">${Math.min(this.visStartRow + 1, totalVirtualCount)}–${Math.min(this.visEndRow, totalVirtualCount)}</strong>
+                ${t.grid.pageOf}
+                <strong class="tabular-nums">${totalVirtualCount}</strong>
+              </span>
+              <span class="page-info">
+                ${t.common.total}: <strong class="tabular-nums">${sortedRows.length}</strong>
+              </span>
+            </div>
+          `
+        : ''}
+    `;
+  }
+
+  private renderVirtualizedBody(
+    virtualItems: VirtualRowItem[],
+    activeCols: ColumnConfig[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    const total = virtualItems.length;
+    const start = Math.min(this.visStartRow, total);
+    const end = Math.min(Math.max(start, this.visEndRow), total);
+    const slice = virtualItems.slice(start, end);
+    const rowH = this.rowHeightPx;
+    const topPx = start * rowH;
+    const bottomPx = Math.max(0, (total - end) * rowH);
+    const colSpan = activeCols.length + (this.selectable ? 1 : 0);
+
+    return html`
+      ${topPx > 0
+        ? html`<tr class="virtual-spacer-row" aria-hidden="true" style="height: ${topPx}px;"><td colspan="${colSpan}"></td></tr>`
+        : ''}
+      ${slice.map((item) => {
+        if (item.kind === 'group') {
+          const levelClass = `level-${Math.min(item.level, 3)}`;
+          const indentPx = 14 + item.level * 22;
+          return html`
+            <tr class="group-row ${levelClass}" @click="${() => this.toggleGroupCollapse(item.groupPath)}">
+              <td colspan="${colSpan}" class="group-cell" style="padding-left: ${indentPx}px;">
+                <div class="group-header-inner">
+                  <span class="group-chevron ${!item.isCollapsed ? 'is-expanded' : ''}">
+                    ${iconChevronRight(14)}
+                  </span>
+                  <span class="group-field-label">${item.fieldLabel}:</span>
+                  <span>${item.displayLabel}</span>
+                  <app-badge size="sm" variant="neutral">${item.count}</app-badge>
+                </div>
+              </td>
+            </tr>
+          `;
+        }
+        return this.renderDataRow(item.row, activeCols, t);
+      })}
+      ${bottomPx > 0
+        ? html`<tr class="virtual-spacer-row" aria-hidden="true" style="height: ${bottomPx}px;"><td colspan="${colSpan}"></td></tr>`
         : ''}
     `;
   }
@@ -670,7 +943,7 @@ export class AppDataGrid extends LitElement {
     const isChecked = this.selectable && this.selectedIds.has(rowId);
 
     return html`
-      <tr class="${isChecked ? 'is-selected' : ''}">
+      <tr class="data-row ${isChecked ? 'is-selected' : ''}">
         ${this.selectable
           ? html`
               <td style="text-align: center;">

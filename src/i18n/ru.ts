@@ -113,6 +113,9 @@ export const ru = {
     sortHint: 'Shift+клик или «Мультисортировка» для сортировки по нескольким колонкам',
     expandAll: 'Развернуть',
     collapseAll: 'Свернуть',
+    virtualMode: 'Виртуальный скролл',
+    paginatedMode: 'Постранично',
+    showingRows: 'Отображено строк',
     columns: {
       id: 'Код',
       title: 'Задача',
