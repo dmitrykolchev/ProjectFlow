@@ -5,6 +5,7 @@ import {
   BackgroundPreset,
   NotificationItem,
   Project,
+  SidebarGroupMode,
   Task,
   TaskStatus,
   ThemeBaseColors,
@@ -28,6 +29,8 @@ const defaultCustomization: UserCustomization = {
   themeOverrides: {},
   language: 'ru',
   sidebarCollapsed: false,
+  sidebarGroupMode: 'multiple',
+  sidebarExpandedGroups: ['workspace', 'views', 'system'],
   defaultView: 'dashboard',
   showActivityPanel: false,
   gridColumns: {
@@ -211,6 +214,12 @@ export class AppStore {
       const storedCustom = localStorage.getItem(STORAGE_KEY_CUSTOMIZATION);
       if (storedCustom) {
         this.customization = { ...defaultCustomization, ...JSON.parse(storedCustom) };
+        if (!Array.isArray(this.customization.sidebarExpandedGroups)) {
+          this.customization.sidebarExpandedGroups = [...defaultCustomization.sidebarExpandedGroups];
+        }
+        if (this.customization.sidebarGroupMode !== 'single' && this.customization.sidebarGroupMode !== 'multiple') {
+          this.customization.sidebarGroupMode = 'multiple';
+        }
         this.activeView = this.customization.defaultView || 'dashboard';
       }
 
@@ -594,6 +603,49 @@ export class AppStore {
     this.notify();
   }
 
+  private getGroupForView(view: ActiveView): string {
+    if (view === 'dashboard' || view === 'kanban' || view === 'gantt') return 'workspace';
+    if (view === 'grid' || view === 'calendar' || view === 'analytics') return 'views';
+    return 'system';
+  }
+
+  public setSidebarGroupMode(mode: SidebarGroupMode): void {
+    this.customization.sidebarGroupMode = mode;
+    if (mode === 'single') {
+      const currentExpanded = this.customization.sidebarExpandedGroups || [];
+      const activeGroup = this.getGroupForView(this.activeView);
+      if (currentExpanded.includes(activeGroup)) {
+        this.customization.sidebarExpandedGroups = [activeGroup];
+      } else if (currentExpanded.length > 0) {
+        this.customization.sidebarExpandedGroups = [currentExpanded[0]];
+      } else {
+        this.customization.sidebarExpandedGroups = [activeGroup];
+      }
+    }
+    this.saveCustomization();
+    this.notify();
+  }
+
+  public toggleSidebarGroup(groupId: string, expanded?: boolean): void {
+    const current = this.customization.sidebarExpandedGroups || [];
+    const nextExpanded = expanded !== undefined ? expanded : !current.includes(groupId);
+
+    if (this.customization.sidebarGroupMode === 'single') {
+      this.customization.sidebarExpandedGroups = nextExpanded ? [groupId] : [];
+    } else {
+      const set = new Set(current);
+      if (nextExpanded) {
+        set.add(groupId);
+      } else {
+        set.delete(groupId);
+      }
+      this.customization.sidebarExpandedGroups = Array.from(set);
+    }
+
+    this.saveCustomization();
+    this.notify();
+  }
+
   public toggleActivityPanel(): void {
     this.customization.showActivityPanel = !this.customization.showActivityPanel;
     this.notify();
@@ -601,6 +653,16 @@ export class AppStore {
 
   public setActiveView(view: ActiveView): void {
     this.activeView = view;
+    const targetGroup = this.getGroupForView(view);
+    const expanded = this.customization.sidebarExpandedGroups || [];
+    if (!expanded.includes(targetGroup)) {
+      if (this.customization.sidebarGroupMode === 'single') {
+        this.customization.sidebarExpandedGroups = [targetGroup];
+      } else {
+        this.customization.sidebarExpandedGroups = [...expanded, targetGroup];
+      }
+      this.saveCustomization();
+    }
     this.notify();
   }
 

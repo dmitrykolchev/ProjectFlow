@@ -43,6 +43,7 @@ export type DensityMode = 'comfortable' | 'compact';
 export type AccentColor = 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber';
 export type BackgroundPreset = 'default' | 'midnight' | 'obsidian' | 'nordic' | 'forest' | 'custom';
 export type SupportedLang = 'ru' | 'en';
+export type SidebarGroupMode = 'single' | 'multiple';
 
 export interface ThemeBaseColors {
   bgCanvas: string;
@@ -90,6 +91,8 @@ export interface UserCustomization {
   themeOverrides?: Partial<Record<ThemeMode, Partial<ThemeBaseColors>>>;
   language: SupportedLang;
   sidebarCollapsed: boolean;
+  sidebarGroupMode: SidebarGroupMode;
+  sidebarExpandedGroups: string[];
   defaultView: ActiveView;
   showActivityPanel: boolean;
   gridColumns: {

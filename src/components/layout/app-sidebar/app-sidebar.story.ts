@@ -1,28 +1,70 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-sidebar';
+import '../sidebar-group/sidebar-group';
 import '../sidebar-item/sidebar-item';
-import { iconDashboard, iconKanban, iconTable, iconCalendar, iconSettings } from '../../common/icons';
+import {
+  iconActivity,
+  iconAnalytics,
+  iconCalendar,
+  iconDashboard,
+  iconGantt,
+  iconKanban,
+  iconSettings,
+  iconTable,
+} from '../../common/icons';
 
 export const meta: ComponentStoryMeta = {
   title: 'Layout/Sidebar',
   component: 'app-sidebar',
-  description: 'Collapsible navigation sidebar composed declaratively using <sidebar-item> child elements.',
+  description: 'Collapsible navigation sidebar composed declaratively with <sidebar-group> and <sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.',
   category: 'Layout',
   stories: [
     {
-      name: 'Declarative Sidebar Composition',
-      description: 'Sidebar populated declaratively with <sidebar-item> nodes',
+      name: 'Multiple Groups Mode',
+      description: 'Multiple collapsible groups can stay open simultaneously; mode can also be switched directly via the sidebar toggle.',
       render: () => html`
-        <div style="height: 520px; display: flex; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
-          <app-sidebar activeValue="dashboard">
-            <div class="nav-section-title">Проекты</div>
-            <sidebar-item value="dashboard" label="Дашборд" .icon="${iconDashboard()}"></sidebar-item>
-            <sidebar-item value="kanban" label="Канбан-доска" badge="12" .icon="${iconKanban()}"></sidebar-item>
-            <sidebar-item value="grid" label="Таблица задач" .icon="${iconTable()}"></sidebar-item>
-            <sidebar-item value="calendar" label="Календарь" .icon="${iconCalendar()}"></sidebar-item>
-            <div class="nav-section-title" style="margin-top: 0.75rem;">Система</div>
-            <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+        <div style="height: 540px; display: flex; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
+          <app-sidebar standalone group-mode="multiple" activeValue="dashboard">
+            <sidebar-group group-id="workspace" label="Рабочая область" expanded>
+              <sidebar-item value="dashboard" label="Дашборд" .icon="${iconDashboard()}"></sidebar-item>
+              <sidebar-item value="kanban" label="Канбан-доска" badge="12" .icon="${iconKanban()}"></sidebar-item>
+              <sidebar-item value="gantt" label="Диаграмма Ганта" .icon="${iconGantt()}"></sidebar-item>
+            </sidebar-group>
+
+            <sidebar-group group-id="views" label="Данные и аналитика" expanded>
+              <sidebar-item value="grid" label="Таблица задач" .icon="${iconTable()}"></sidebar-item>
+              <sidebar-item value="calendar" label="Календарь" .icon="${iconCalendar()}"></sidebar-item>
+              <sidebar-item value="analytics" label="Аналитика" .icon="${iconAnalytics()}"></sidebar-item>
+            </sidebar-group>
+
+            <sidebar-group group-id="system" label="Система" .expanded="${false}">
+              <sidebar-item value="activity" label="Активность" .icon="${iconActivity()}"></sidebar-item>
+              <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+            </sidebar-group>
+          </app-sidebar>
+        </div>
+      `,
+    },
+    {
+      name: 'Single Group Mode (Accordion)',
+      description: 'Expanding one group automatically collapses all other groups.',
+      render: () => html`
+        <div style="height: 540px; display: flex; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
+          <app-sidebar standalone group-mode="single" activeValue="grid">
+            <sidebar-group group-id="workspace" label="Рабочая область" .expanded="${false}">
+              <sidebar-item value="dashboard" label="Дашборд" .icon="${iconDashboard()}"></sidebar-item>
+              <sidebar-item value="kanban" label="Канбан-доска" badge="12" .icon="${iconKanban()}"></sidebar-item>
+            </sidebar-group>
+
+            <sidebar-group group-id="views" label="Данные и аналитика" expanded>
+              <sidebar-item value="grid" label="Таблица задач" .icon="${iconTable()}"></sidebar-item>
+              <sidebar-item value="calendar" label="Календарь" .icon="${iconCalendar()}"></sidebar-item>
+            </sidebar-group>
+
+            <sidebar-group group-id="system" label="Система" .expanded="${false}">
+              <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+            </sidebar-group>
           </app-sidebar>
         </div>
       `,

@@ -15,6 +15,7 @@ import {
   iconSettings,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
+import './components/layout/sidebar-group/sidebar-group';
 import './components/layout/sidebar-item/sidebar-item';
 import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
@@ -159,64 +160,66 @@ export class AppRoot extends LitElement {
         .activeValue="${this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
-        <div class="nav-section-title">${t.navigation.projects}</div>
+        <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
+          <sidebar-item
+            value="dashboard"
+            label="${t.navigation.dashboard}"
+            .icon="${iconDashboard()}"
+          ></sidebar-item>
 
-        <sidebar-item
-          value="dashboard"
-          label="${t.navigation.dashboard}"
-          .icon="${iconDashboard()}"
-        ></sidebar-item>
+          <sidebar-item
+            value="kanban"
+            label="${t.navigation.kanban}"
+            badge="${String(this.taskCount)}"
+            .icon="${iconKanban()}"
+          ></sidebar-item>
 
-        <sidebar-item
-          value="kanban"
-          label="${t.navigation.kanban}"
-          badge="${String(this.taskCount)}"
-          .icon="${iconKanban()}"
-        ></sidebar-item>
+          <sidebar-item
+            value="gantt"
+            label="${t.navigation.gantt}"
+            .icon="${iconGantt()}"
+          ></sidebar-item>
+        </sidebar-group>
 
-        <sidebar-item
-          value="gantt"
-          label="${t.navigation.gantt}"
-          .icon="${iconGantt()}"
-        ></sidebar-item>
+        <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
+          <sidebar-item
+            value="grid"
+            label="${t.navigation.grid}"
+            .icon="${iconTable()}"
+          ></sidebar-item>
 
-        <sidebar-item
-          value="grid"
-          label="${t.navigation.grid}"
-          .icon="${iconTable()}"
-        ></sidebar-item>
+          <sidebar-item
+            value="calendar"
+            label="${t.navigation.calendar}"
+            .icon="${iconCalendar()}"
+          ></sidebar-item>
 
-        <sidebar-item
-          value="calendar"
-          label="${t.navigation.calendar}"
-          .icon="${iconCalendar()}"
-        ></sidebar-item>
+          <sidebar-item
+            value="analytics"
+            label="${t.navigation.analytics}"
+            .icon="${iconAnalytics()}"
+          ></sidebar-item>
+        </sidebar-group>
 
-        <sidebar-item
-          value="analytics"
-          label="${t.navigation.analytics}"
-          .icon="${iconAnalytics()}"
-        ></sidebar-item>
+        <sidebar-group group-id="system" label="${t.navigation.groupSystem}">
+          <sidebar-item
+            value="activity"
+            label="${t.navigation.activity}"
+            .icon="${iconActivity()}"
+          ></sidebar-item>
 
-        <div class="nav-section-title" style="margin-top: 0.75rem;">${t.common.actions}</div>
+          <sidebar-item
+            value="storybook"
+            label="${t.navigation.storybook}"
+            .icon="${iconStorybook()}"
+          ></sidebar-item>
 
-        <sidebar-item
-          value="activity"
-          label="${t.navigation.activity}"
-          .icon="${iconActivity()}"
-        ></sidebar-item>
-
-        <sidebar-item
-          value="storybook"
-          label="${t.navigation.storybook}"
-          .icon="${iconStorybook()}"
-        ></sidebar-item>
-
-        <sidebar-item
-          value="settings"
-          label="${t.navigation.settings}"
-          .icon="${iconSettings()}"
-        ></sidebar-item>
+          <sidebar-item
+            value="settings"
+            label="${t.navigation.settings}"
+            .icon="${iconSettings()}"
+          ></sidebar-item>
+        </sidebar-group>
       </app-sidebar>
 
       <div class="main-layout">

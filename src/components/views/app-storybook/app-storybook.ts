@@ -28,6 +28,7 @@ import taskModalMeta from '../../common/app-task-modal/app-task-modal.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
+import sidebarGroupMeta from '../../layout/sidebar-group/sidebar-group.story';
 import sidebarItemMeta from '../../layout/sidebar-item/sidebar-item.story';
 
 import metricCardMeta from '../../dashboard/app-metric-card/app-metric-card.story';
@@ -67,6 +68,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   activityMeta,
   headerMeta,
   sidebarMeta,
+  sidebarGroupMeta,
   sidebarItemMeta,
   metricCardMeta,
   chartCardMeta,

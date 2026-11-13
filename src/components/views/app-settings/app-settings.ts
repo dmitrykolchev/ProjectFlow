@@ -442,6 +442,34 @@ export class AppSettings extends LitElement {
           </div>
         </div>
 
+        <!-- Sidebar Group Expand Mode -->
+        <div class="section-card">
+          <div class="section-title">${t.settings.sidebarGroupMode}</div>
+          <div class="options-grid">
+            <div
+              class="option-card ${this.custom.sidebarGroupMode === 'single' ? 'is-active' : ''}"
+              @click="${() => store.setSidebarGroupMode('single')}"
+            >
+              <div class="option-card-header">
+                <span>${t.settings.sidebarGroupSingle}</span>
+                ${this.custom.sidebarGroupMode === 'single' ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.settings.sidebarGroupSingleDesc}</p>
+            </div>
+
+            <div
+              class="option-card ${this.custom.sidebarGroupMode === 'multiple' ? 'is-active' : ''}"
+              @click="${() => store.setSidebarGroupMode('multiple')}"
+            >
+              <div class="option-card-header">
+                <span>${t.settings.sidebarGroupMultiple}</span>
+                ${this.custom.sidebarGroupMode === 'multiple' ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.settings.sidebarGroupMultipleDesc}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Reset Actions -->
         <div class="actions-footer">
           <app-button variant="outline" @click="${() => store.resetCustomization()}">
