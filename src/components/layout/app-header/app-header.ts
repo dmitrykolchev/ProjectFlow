@@ -10,6 +10,7 @@ import '../../common/app-button/app-button';
 export class AppHeader extends LitElement {
   @state() private activeView = store.activeView;
   @state() private selectedProjectId = store.selectedProjectId;
+  @state() private detailProjectId = store.detailProjectId;
   @state() private searchQuery = store.searchQuery;
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
@@ -35,6 +36,7 @@ export class AppHeader extends LitElement {
   private syncState() {
     this.activeView = store.activeView;
     this.selectedProjectId = store.selectedProjectId;
+    this.detailProjectId = store.detailProjectId;
     this.searchQuery = store.searchQuery;
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
@@ -45,10 +47,15 @@ export class AppHeader extends LitElement {
     const t = getTranslation(this.currentLang);
     const activeProject = store.projects.find((p) => p.id === this.selectedProjectId);
     const projectName = activeProject ? activeProject.name : t.common.all;
+    const detailProject =
+      this.activeView === 'project-detail'
+        ? store.projects.find((p) => p.id === this.detailProjectId)
+        : undefined;
 
     const viewNames: Record<string, string> = {
       dashboard: t.navigation.dashboard,
       projects: t.navigation.projects,
+      'project-detail': detailProject ? `${detailProject.key} · ${detailProject.name}` : t.navigation.projects,
       kanban: t.navigation.kanban,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,

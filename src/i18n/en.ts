@@ -275,4 +275,13 @@ export const en = {
     on_hold: 'On Hold',
     completed: 'Completed',
   },
+  projectDetail: {
+    backToProjects: 'All Projects',
+    openProject: 'Open Project',
+    switchProject: 'Switch Project',
+    teamByRoles: 'Project Team by Roles',
+    linkedContracts: 'Linked Contracts',
+    tasksSummary: 'Tasks Overview',
+    noContracts: 'No contracts linked to this project yet',
+  },
 };

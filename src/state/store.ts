@@ -187,6 +187,7 @@ export class AppStore {
   public counterparties: Counterparty[] = [];
   public contracts: Contract[] = [];
   public selectedProjectId: string = 'all';
+  public detailProjectId: string = '';
   public activeView: ActiveView = 'dashboard';
 
   public searchQuery: string = '';
@@ -706,7 +707,15 @@ export class AppStore {
   }
 
   private getGroupForView(view: ActiveView): string {
-    if (view === 'dashboard' || view === 'projects' || view === 'kanban' || view === 'gantt') return 'workspace';
+    if (
+      view === 'dashboard' ||
+      view === 'projects' ||
+      view === 'project-detail' ||
+      view === 'kanban' ||
+      view === 'gantt'
+    ) {
+      return 'workspace';
+    }
     if (view === 'grid' || view === 'calendar' || view === 'analytics') return 'views';
     if (
       view === 'companies' ||
@@ -779,6 +788,11 @@ export class AppStore {
   public selectProject(projectId: string): void {
     this.selectedProjectId = projectId;
     this.notify();
+  }
+
+  public openProjectDetail(projectId: string): void {
+    this.detailProjectId = projectId;
+    this.setActiveView('project-detail');
   }
 
   public setSearchQuery(query: string): void {
@@ -1117,6 +1131,12 @@ export class AppStore {
     this.projects = this.projects.filter((p) => p.id !== id);
     if (this.selectedProjectId === id) {
       this.selectedProjectId = 'all';
+    }
+    if (this.detailProjectId === id) {
+      this.detailProjectId = this.projects[0]?.id || '';
+      if (this.activeView === 'project-detail') {
+        this.activeView = 'projects';
+      }
     }
     this.saveProjects();
     this.logActivity('delete', 'project', target.name, 'Проект удалён');

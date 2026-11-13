@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { Project, ProjectRole, ProjectStatus } from '../../../types';
-import { iconEdit, iconKanban, iconPlus, iconSearch, iconTrash, iconUsers } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconKanban, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -26,17 +26,6 @@ const ALL_PROJECT_ROLES: ProjectRole[] = [
   'devops',
 ];
 
-const ROLE_COLORS: Record<ProjectRole, string> = {
-  pm: '#f59e0b',
-  tech_lead: '#8b5cf6',
-  architect: '#ec4899',
-  developer: '#6366f1',
-  designer: '#06b6d4',
-  qa: '#10b981',
-  analyst: '#3b82f6',
-  devops: '#f97316',
-};
-
 const PROJECT_COLOR_SWATCHES = [
   '#6366f1',
   '#10b981',
@@ -55,14 +44,7 @@ export class AppProjects extends LitElement {
   @state() private localSearch = '';
   @state() private statusFilter: 'all' | ProjectStatus = 'all';
   @state() private companyFilter = 'all';
-
-  @state() private selectedProjectId: string = store.projects[0]?.id || '';
-  @state() private roleFilterMode: 'assigned' | 'all' = 'all';
-
-  // Add member inline state
-  @state() private addMemberUserId: string = store.users[0]?.id || '';
-  @state() private addMemberRole: ProjectRole = 'developer';
-  @state() private addMemberAllocation: number = 50;
+  @state() private displayMode: 'cards' | 'table' = 'cards';
 
   // Create / edit modal
   @state() private modalOpen = false;
@@ -100,12 +82,6 @@ export class AppProjects extends LitElement {
     this.projects = store.projects;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
-    if (!this.projects.some((p) => p.id === this.selectedProjectId)) {
-      this.selectedProjectId = this.projects[0]?.id || '';
-    }
-    if (!store.users.some((u) => u.id === this.addMemberUserId)) {
-      this.addMemberUserId = store.users[0]?.id || '';
-    }
   }
 
   private getStatusVariant(status: ProjectStatus | undefined): 'info' | 'success' | 'warning' | 'primary' {
@@ -140,12 +116,6 @@ export class AppProjects extends LitElement {
     const isRu = this.currentLang === 'ru';
     const filtered = this.getFilteredProjects();
 
-    const activeProject =
-      filtered.find((p) => p.id === this.selectedProjectId) ||
-      filtered[0] ||
-      this.projects.find((p) => p.id === this.selectedProjectId) ||
-      null;
-
     const activeCount = this.projects.filter((p) => (p.status || 'active') === 'active').length;
     const totalAssignments = this.projects.reduce((sum, p) => sum + (p.members?.length || 0), 0);
     const avgProgress = this.projects.length
@@ -171,8 +141,8 @@ export class AppProjects extends LitElement {
           <h1 class="view-title">${t.navigation.projects}</h1>
           <p class="view-subtitle">
             ${isRu
-              ? 'Портфель проектов, бюджеты, сроки и управление командой с распределением по проектным ролям'
-              : 'Project portfolio, budgets, timelines, and team staffing grouped by project roles'}
+              ? 'Список проектов портфеля. Выберите проект, чтобы открыть его страницу с командой по ролям, задачами и договорами'
+              : 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts'}
           </p>
         </div>
         <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
@@ -228,383 +198,236 @@ export class AppProjects extends LitElement {
             ></app-select>
           </div>
         </div>
+
+        <app-segmented-switch
+          size="sm"
+          .value="${this.displayMode}"
+          .options="${[
+            { value: 'cards', label: isRu ? 'Карточки' : 'Cards' },
+            { value: 'table', label: isRu ? 'Таблица' : 'Table' },
+          ]}"
+          @change="${(e: CustomEvent<{ value: string }>) =>
+            (this.displayMode = e.detail.value as 'cards' | 'table')}"
+        ></app-segmented-switch>
       </div>
 
       ${filtered.length === 0
         ? html`<div class="empty-state">${isRu ? 'Проекты не найдены' : 'No projects found'}</div>`
-        : html`
-            <div class="projects-workspace">
-              <div class="projects-list">
-                ${filtered.map((proj) => this.renderProjectCard(proj, activeProject?.id === proj.id, t, isRu))}
-              </div>
-              ${activeProject
-                ? this.renderDetailPanel(activeProject, t, isRu)
-                : ''}
-            </div>
-          `}
+        : this.displayMode === 'cards'
+        ? this.renderCards(filtered, t, isRu)
+        : this.renderTable(filtered, t, isRu)}
 
       ${this.renderProjectModal(t, isRu, statusOptions)}
       ${this.renderDeleteModal(isRu)}
     `;
   }
 
-  private renderProjectCard(
-    proj: Project,
-    isSelected: boolean,
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
-  ) {
-    const company = store.companies.find((c) => c.id === proj.companyId);
-    const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
-    const tasksCount = store.tasks.filter((task) => task.projectId === proj.id).length;
-    const members = proj.members || [];
-    const statusKey = (proj.status || 'active') as ProjectStatus;
-
-    const roleCounts = ALL_PROJECT_ROLES.map((role) => ({
-      role,
-      count: members.filter((m) => m.role === role).length,
-    })).filter((item) => item.count > 0);
-
+  private renderCards(list: Project[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
-      <article
-        class="project-card ${isSelected ? 'is-selected' : ''}"
-        style="--proj-color: ${proj.color};"
-        @click="${() => (this.selectedProjectId = proj.id)}"
-      >
-        <div class="proj-card-head">
-          <div class="proj-title-row">
-            <span class="proj-key">${proj.key}</span>
-            <h3 class="proj-name">${proj.name}</h3>
-          </div>
-          <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft" size="sm">
-            ${t.projectStatuses[statusKey]}
-          </app-badge>
-        </div>
+      <div class="cards-grid">
+        ${list.map((proj) => {
+          const company = store.companies.find((c) => c.id === proj.companyId);
+          const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
+          const tasksCount = store.tasks.filter((task) => task.projectId === proj.id).length;
+          const members = proj.members || [];
+          const uniqueMembers = new Set(members.map((m) => m.userId)).size;
+          const statusKey = (proj.status || 'active') as ProjectStatus;
 
-        <p class="proj-desc">${proj.description}</p>
+          const roleCounts = ALL_PROJECT_ROLES.map((role) => ({
+            role,
+            count: members.filter((m) => m.role === role).length,
+          })).filter((item) => item.count > 0);
 
-        <div class="progress-row">
-          <div class="progress-track">
-            <div class="progress-fill" style="width: ${proj.progress}%; background: ${proj.color};"></div>
-          </div>
-          <span class="progress-pct">${proj.progress}%</span>
-        </div>
+          return html`
+            <article class="project-card" @click="${() => store.openProjectDetail(proj.id)}">
+              <div class="proj-card-head">
+                <div class="proj-title-row">
+                  <span class="color-dot" style="background: ${proj.color};"></span>
+                  <span class="proj-key">${proj.key}</span>
+                  <h3 class="proj-name">${proj.name}</h3>
+                </div>
+                <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft" size="sm">
+                  ${t.projectStatuses[statusKey]}
+                </app-badge>
+              </div>
 
-        <div class="proj-meta-inline">
-          <span>${isRu ? 'Компания' : 'Company'}: <strong>${company?.name || '—'}</strong></span>
-          <span>${isRu ? 'Заказчик' : 'Client'}: <strong>${counterparty?.name || '—'}</strong></span>
-          <span>${isRu ? 'Задач' : 'Tasks'}: <strong>${tasksCount}</strong></span>
-          ${proj.budget
-            ? html`<span>${isRu ? 'Бюджет' : 'Budget'}: <strong>${(proj.budget / 1_000_000).toFixed(1)}M ₽</strong></span>`
-            : ''}
-        </div>
+              <p class="proj-desc">${proj.description}</p>
 
-        <div class="role-pills">
-          ${roleCounts.length === 0
-            ? html`<span class="role-pill">${isRu ? 'Команда не назначена' : 'No team assigned'}</span>`
-            : roleCounts.map(
-                (rc) => html`
-                  <span class="role-pill">
-                    <span>${t.projectRoles[rc.role]}</span>
-                    <strong>${rc.count}</strong>
+              <div class="progress-row">
+                <div class="progress-track">
+                  <div class="progress-fill" style="width: ${proj.progress}%; background: ${proj.color};"></div>
+                </div>
+                <span class="progress-pct">${proj.progress}%</span>
+              </div>
+
+              <div class="proj-meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">${isRu ? 'Компания' : 'Company'}</span>
+                  <span class="meta-val">${company?.name || '—'}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${isRu ? 'Контрагент' : 'Client'}</span>
+                  <span class="meta-val">${counterparty?.name || '—'}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${isRu ? 'Бюджет' : 'Budget'}</span>
+                  <span class="meta-val mono">
+                    ${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}
                   </span>
-                `
-              )}
-        </div>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${isRu ? 'Срок / Задач' : 'Due / Tasks'}</span>
+                  <span class="meta-val mono">${proj.dueDate} · ${tasksCount}</span>
+                </div>
+              </div>
 
-        <div class="proj-card-footer" @click="${(e: Event) => e.stopPropagation()}">
-          <app-button
-            size="sm"
-            variant="outline"
-            @click="${() => {
-              store.selectProject(proj.id);
-              store.setActiveView('kanban');
-            }}"
-          >
-            <span slot="icon-start">${iconKanban()}</span>
-            <span>${isRu ? 'Задачи проекта' : 'Project Tasks'}</span>
-          </app-button>
+              <div class="team-summary-line">
+                ${roleCounts.length === 0
+                  ? html`<span>${isRu ? 'Команда по ролям не назначена' : 'No team roles assigned'}</span>`
+                  : html`
+                      <span>${isRu ? 'Участников' : 'Team'}: <strong>${uniqueMembers}</strong></span>
+                      ${roleCounts.map(
+                        (rc) => html`
+                          <span class="sep">·</span>
+                          <span>${t.projectRoles[rc.role]}: <strong>${rc.count}</strong></span>
+                        `
+                      )}
+                    `}
+              </div>
 
-          <div class="actions-row">
-            <button
-              type="button"
-              class="icon-btn"
-              title="${isRu ? 'Редактировать' : 'Edit'}"
-              @click="${() => this.openEditModal(proj)}"
-            >
-              ${iconEdit(14)}
-            </button>
-            <button
-              type="button"
-              class="icon-btn danger"
-              title="${isRu ? 'Удалить' : 'Delete'}"
-              @click="${() => (this.deletingProject = proj)}"
-            >
-              ${iconTrash(14)}
-            </button>
-          </div>
-        </div>
-      </article>
+              <div class="proj-card-footer" @click="${(e: Event) => e.stopPropagation()}">
+                <div class="footer-left-actions">
+                  <app-button
+                    size="sm"
+                    variant="primary"
+                    @click="${() => store.openProjectDetail(proj.id)}"
+                  >
+                    <span>${t.projectDetail.openProject}</span>
+                    <span slot="icon-end">${iconChevronRight(14)}</span>
+                  </app-button>
+
+                  <app-button
+                    size="sm"
+                    variant="outline"
+                    @click="${() => {
+                      store.selectProject(proj.id);
+                      store.setActiveView('kanban');
+                    }}"
+                  >
+                    <span slot="icon-start">${iconKanban()}</span>
+                    <span>${isRu ? 'Задачи' : 'Tasks'}</span>
+                  </app-button>
+                </div>
+
+                <div class="actions-row">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="${isRu ? 'Редактировать' : 'Edit'}"
+                    @click="${() => this.openEditModal(proj)}"
+                  >
+                    ${iconEdit(14)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn danger"
+                    title="${isRu ? 'Удалить' : 'Delete'}"
+                    @click="${() => (this.deletingProject = proj)}"
+                  >
+                    ${iconTrash(14)}
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        })}
+      </div>
     `;
   }
 
-  private renderDetailPanel(
-    proj: Project,
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
-  ) {
-    const company = store.companies.find((c) => c.id === proj.companyId);
-    const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
-    const linkedContracts = store.contracts.filter((c) => c.projectId === proj.id);
-    const members = proj.members || [];
-    const uniqueUsersCount = new Set(members.map((m) => m.userId)).size;
-
-    const userOptions = store.users.map((u) => ({
-      value: u.id,
-      label: `${u.name} (${u.role})`,
-    }));
-
-    const roleOptions = ALL_PROJECT_ROLES.map((role) => ({
-      value: role,
-      label: t.projectRoles[role],
-      color: ROLE_COLORS[role],
-    }));
-
-    const visibleRoles =
-      this.roleFilterMode === 'assigned'
-        ? ALL_PROJECT_ROLES.filter((role) => members.some((m) => m.role === role))
-        : ALL_PROJECT_ROLES;
-
+  private renderTable(list: Project[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
-      <section class="detail-panel">
-        <div class="detail-header">
-          <div class="detail-title-wrap">
-            <h2 class="detail-title">
-              <span class="color-dot-lg" style="background: ${proj.color};"></span>
-              <span class="proj-key">${proj.key}</span>
-              <span>${proj.name}</span>
-            </h2>
-            <p class="proj-desc">${proj.description}</p>
-          </div>
-          <div class="actions-row">
-            <app-button
-              size="sm"
-              variant="outline"
-              @click="${() => {
-                store.selectProject(proj.id);
-                store.setActiveView('kanban');
-              }}"
-            >
-              <span>${isRu ? 'В Канбан' : 'Open Kanban'}</span>
-            </app-button>
-            <app-button size="sm" variant="secondary" @click="${() => this.openEditModal(proj)}">
-              <span>${isRu ? 'Изменить' : 'Edit'}</span>
-            </app-button>
-          </div>
-        </div>
+      <div class="table-card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>${isRu ? 'Проект' : 'Project'}</th>
+              <th>${isRu ? 'Компания / Заказчик' : 'Company / Client'}</th>
+              <th>${isRu ? 'Команда' : 'Team'}</th>
+              <th>${isRu ? 'Задачи' : 'Tasks'}</th>
+              <th>${isRu ? 'Прогресс' : 'Progress'}</th>
+              <th>${isRu ? 'Бюджет' : 'Budget'}</th>
+              <th>${isRu ? 'Срок' : 'Due Date'}</th>
+              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            ${list.map((proj) => {
+              const company = store.companies.find((c) => c.id === proj.companyId);
+              const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
+              const tasksCount = store.tasks.filter((tk) => tk.projectId === proj.id).length;
+              const members = proj.members || [];
+              const uniqueMembers = new Set(members.map((m) => m.userId)).size;
+              const statusKey = (proj.status || 'active') as ProjectStatus;
 
-        <div class="detail-meta-grid">
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Компания' : 'Company'}</span>
-            <span class="meta-val">${company?.name || '—'}</span>
-          </div>
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Контрагент' : 'Counterparty'}</span>
-            <span class="meta-val">${counterparty?.name || '—'}</span>
-          </div>
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Бюджет' : 'Budget'}</span>
-            <span class="meta-val mono">
-              ${proj.budget ? `${proj.budget.toLocaleString('ru-RU')} ₽` : '—'}
-            </span>
-          </div>
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Срок сдачи' : 'Due Date'}</span>
-            <span class="meta-val mono">${proj.dueDate}</span>
-          </div>
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Договоры' : 'Contracts'}</span>
-            <span class="meta-val mono">${linkedContracts.length}</span>
-          </div>
-          <div class="detail-meta-box">
-            <span class="meta-label">${isRu ? 'Участников' : 'Members'}</span>
-            <span class="meta-val mono">${uniqueUsersCount} (${members.length} ${isRu ? 'ролей' : 'roles'})</span>
-          </div>
-        </div>
-
-        <div class="team-header">
-          <h3 class="team-heading">
-            ${iconUsers(18)}
-            <span>${isRu ? 'Участники проекта по ролям' : 'Project Team by Roles'}</span>
-          </h3>
-          <app-segmented-switch
-            size="sm"
-            .value="${this.roleFilterMode}"
-            .options="${[
-              { value: 'all', label: isRu ? 'Все роли' : 'All Roles' },
-              { value: 'assigned', label: isRu ? 'Заполненные' : 'Assigned' },
-            ]}"
-            @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.roleFilterMode = e.detail.value as 'assigned' | 'all')}"
-          ></app-segmented-switch>
-        </div>
-
-        <div class="add-member-bar">
-          <div>
-            <app-select
-              label="${isRu ? 'Сотрудник' : 'Employee'}"
-              size="sm"
-              .value="${this.addMemberUserId}"
-              .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.addMemberUserId = e.detail.value)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${isRu ? 'Роль в проекте' : 'Project Role'}"
-              size="sm"
-              .value="${this.addMemberRole}"
-              .options="${roleOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.addMemberRole = e.detail.value as ProjectRole)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${isRu ? 'Загрузка %' : 'Allocation %'}"
-              size="sm"
-              .value="${this.addMemberAllocation}"
-              min="5"
-              max="100"
-              step="5"
-              unit="%"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.addMemberAllocation = e.detail.value)}"
-            ></app-number-input>
-          </div>
-          <app-button
-            variant="primary"
-            size="sm"
-            @click="${() => this.handleAddMember(proj.id)}"
-          >
-            <span slot="icon-start">${iconPlus(14)}</span>
-            <span>${isRu ? 'Назначить' : 'Assign'}</span>
-          </app-button>
-        </div>
-
-        <div class="roles-groups">
-          ${visibleRoles.length === 0
-            ? html`<div class="empty-state">${isRu ? 'В этом проекте ещё нет участников' : 'No team members assigned yet'}</div>`
-            : visibleRoles.map((role) => {
-                const roleMembers = members.filter((m) => m.role === role);
-                const totalRoleAlloc = roleMembers.reduce((s, m) => s + m.allocation, 0);
-
-                return html`
-                  <div class="role-group ${roleMembers.length === 0 ? 'is-empty' : ''}">
-                    <div class="role-group-head">
-                      <div class="role-group-title">
-                        <span class="role-dot" style="background: ${ROLE_COLORS[role]};"></span>
-                        <span>${t.projectRoles[role]}</span>
-                        <app-badge
-                          variant="${roleMembers.length > 0 ? 'primary' : 'default'}"
-                          appearance="soft"
-                          size="sm"
-                        >
-                          ${roleMembers.length}
-                        </app-badge>
-                      </div>
-                      <div class="role-group-meta">
-                        ${roleMembers.length > 0
-                          ? html`<span class="mono">${isRu ? 'Суммарно' : 'Total'}: ${totalRoleAlloc}%</span>`
-                          : html`
-                              <app-button
-                                size="sm"
-                                variant="ghost"
-                                @click="${() => (this.addMemberRole = role)}"
-                              >
-                                ${isRu ? '+ Выбрать роль' : '+ Select role'}
-                              </app-button>
-                            `}
-                      </div>
+              return html`
+                <tr @click="${() => store.openProjectDetail(proj.id)}">
+                  <td>
+                    <div class="proj-title-row">
+                      <span class="color-dot" style="background: ${proj.color};"></span>
+                      <span class="proj-key">${proj.key}</span>
+                      <span style="font-weight: 600;">${proj.name}</span>
                     </div>
-
-                    ${roleMembers.length > 0
-                      ? html`
-                          <div class="members-list">
-                            ${roleMembers.map((member) => {
-                              const user = store.users.find((u) => u.id === member.userId);
-                              if (!user) return '';
-                              return html`
-                                <div class="member-row">
-                                  <div class="member-person">
-                                    <div class="avatar">${user.avatar}</div>
-                                    <div class="member-info">
-                                      <div class="member-name">${user.name}</div>
-                                      <div class="member-sub">
-                                        ${user.role} · ${isRu ? 'с' : 'since'} ${member.joinedAt}
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  <div>
-                                    <app-select
-                                      size="sm"
-                                      .value="${member.role}"
-                                      .options="${roleOptions}"
-                                      @change="${(e: CustomEvent<{ value: string }>) => {
-                                        const nextRole = e.detail.value as ProjectRole;
-                                        if (nextRole !== member.role) {
-                                          store.updateProjectMemberRole(
-                                            proj.id,
-                                            member.userId,
-                                            member.role,
-                                            nextRole,
-                                            member.allocation
-                                          );
-                                        }
-                                      }}"
-                                    ></app-select>
-                                  </div>
-
-                                  <div>
-                                    <app-number-input
-                                      size="sm"
-                                      .value="${member.allocation}"
-                                      min="5"
-                                      max="100"
-                                      step="5"
-                                      unit="%"
-                                      @change="${(e: CustomEvent<{ value: number }>) => {
-                                        store.updateProjectMemberRole(
-                                          proj.id,
-                                          member.userId,
-                                          member.role,
-                                          member.role,
-                                          e.detail.value
-                                        );
-                                      }}"
-                                    ></app-number-input>
-                                  </div>
-
-                                  <button
-                                    type="button"
-                                    class="icon-btn danger"
-                                    title="${isRu ? 'Удалить из роли' : 'Remove from role'}"
-                                    @click="${() =>
-                                      store.removeProjectMember(proj.id, member.userId, member.role)}"
-                                  >
-                                    ${iconTrash(14)}
-                                  </button>
-                                </div>
-                              `;
-                            })}
-                          </div>
-                        `
-                      : ''}
-                  </div>
-                `;
-              })}
-        </div>
-      </section>
+                  </td>
+                  <td>
+                    <div>${company?.name || '—'}</div>
+                    <div style="font-size: 0.74rem; color: var(--text-muted);">${counterparty?.name || '—'}</div>
+                  </td>
+                  <td class="mono">${uniqueMembers} (${members.length})</td>
+                  <td class="mono">${tasksCount}</td>
+                  <td class="mono">${proj.progress}%</td>
+                  <td class="mono">${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}</td>
+                  <td class="mono">${proj.dueDate}</td>
+                  <td>
+                    <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft" size="sm">
+                      ${t.projectStatuses[statusKey]}
+                    </app-badge>
+                  </td>
+                  <td @click="${(e: Event) => e.stopPropagation()}">
+                    <div class="actions-row">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        title="${t.projectDetail.openProject}"
+                        @click="${() => store.openProjectDetail(proj.id)}"
+                      >
+                        ${iconChevronRight(14)}
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        title="${isRu ? 'Редактировать' : 'Edit'}"
+                        @click="${() => this.openEditModal(proj)}"
+                      >
+                        ${iconEdit(14)}
+                      </button>
+                      <button
+                        type="button"
+                        class="icon-btn danger"
+                        title="${isRu ? 'Удалить' : 'Delete'}"
+                        @click="${() => (this.deletingProject = proj)}"
+                      >
+                        ${iconTrash(14)}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            })}
+          </tbody>
+        </table>
+      </div>
     `;
   }
 
@@ -780,16 +603,6 @@ export class AppProjects extends LitElement {
     `;
   }
 
-  private handleAddMember(projectId: string) {
-    if (!this.addMemberUserId) return;
-    store.addProjectMember(projectId, {
-      userId: this.addMemberUserId,
-      role: this.addMemberRole,
-      allocation: Math.max(5, Math.min(100, Number(this.addMemberAllocation) || 50)),
-      joinedAt: new Date().toISOString().slice(0, 10),
-    });
-  }
-
   private openCreateModal() {
     this.editingId = null;
     this.formName = '';
@@ -854,7 +667,7 @@ export class AppProjects extends LitElement {
         members: existing?.members || [],
       });
     } else {
-      const created = store.addProject({
+      store.addProject({
         name: this.formName.trim(),
         key: derivedKey,
         description: this.formDescription.trim(),
@@ -867,7 +680,6 @@ export class AppProjects extends LitElement {
         progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
         members: [],
       });
-      this.selectedProjectId = created.id;
     }
 
     this.modalOpen = false;

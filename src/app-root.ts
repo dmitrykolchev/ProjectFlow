@@ -39,6 +39,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   calendar: () => import('./components/views/app-calendar/app-calendar'),
   analytics: () => import('./components/views/app-analytics/app-analytics'),
   projects: () => import('./components/views/app-projects/app-projects'),
+  'project-detail': () => import('./components/views/app-project-detail/app-project-detail'),
   companies: () => import('./components/views/app-companies/app-companies'),
   employees: () => import('./components/views/app-employees/app-employees'),
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
@@ -167,7 +168,7 @@ export class AppRoot extends LitElement {
     return html`
       <app-sidebar
         ?collapsed="${this.sidebarCollapsed}"
-        .activeValue="${this.activeView}"
+        .activeValue="${this.activeView === 'project-detail' ? 'projects' : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
         <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
@@ -313,6 +314,8 @@ export class AppRoot extends LitElement {
         return html`<app-analytics></app-analytics>`;
       case 'projects':
         return html`<app-projects></app-projects>`;
+      case 'project-detail':
+        return html`<app-project-detail></app-project-detail>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
       case 'employees':

@@ -44,6 +44,7 @@ import dataGridColumnMeta from '../data-grid-column/data-grid-column.story';
 import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
+import projectDetailMeta from '../app-project-detail/app-project-detail.story';
 import companiesMeta from '../app-companies/app-companies.story';
 import employeesMeta from '../app-employees/app-employees.story';
 import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
@@ -88,6 +89,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   calendarMeta,
   analyticsMeta,
   projectsMeta,
+  projectDetailMeta,
   companiesMeta,
   employeesMeta,
   counterpartiesMeta,

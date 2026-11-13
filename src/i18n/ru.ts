@@ -275,4 +275,13 @@ export const ru = {
     on_hold: 'На паузе',
     completed: 'Завершён',
   },
+  projectDetail: {
+    backToProjects: 'Все проекты',
+    openProject: 'Открыть проект',
+    switchProject: 'Переключить проект',
+    teamByRoles: 'Участники проекта по ролям',
+    linkedContracts: 'Связанные договоры',
+    tasksSummary: 'Сводка по задачам',
+    noContracts: 'К проекту пока не привязаны договоры',
+  },
 };

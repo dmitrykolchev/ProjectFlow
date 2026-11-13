@@ -155,6 +155,7 @@ export type ActiveView =
   | 'counterparties'
   | 'contracts'
   | 'projects'
+  | 'project-detail'
   | 'settings'
   | 'storybook';
 
