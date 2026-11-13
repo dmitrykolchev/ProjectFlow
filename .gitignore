@@ -6,3 +6,7 @@ coverage/
 *.log
 .env*
 !.env.example
+/obj/Debug
+/.vscode
+/frontend.esproj.user
+/package-lock.json
