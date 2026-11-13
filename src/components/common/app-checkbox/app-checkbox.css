@@ -21,7 +21,7 @@
 
 .checkbox-container {
   display: inline-flex;
-  align-items: center;
+  /*align-items: center;*/
   gap: 0.5rem;
   outline: none;
   overflow: visible;

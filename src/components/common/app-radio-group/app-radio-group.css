@@ -81,7 +81,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: 1px;
   transition: border-color var(--transition-fast, 150ms ease),
               background-color var(--transition-fast, 150ms ease),
               box-shadow var(--transition-fast, 150ms ease);
@@ -97,8 +96,8 @@
 }
 
 .radio-dot {
-  width: 7px;
-  height: 7px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--text-on-accent);
   transform: scale(0);

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.VisualStudio.JavaScript.Sdk/1.0.6537497">
+  <PropertyGroup>
+    <BuildCommand>npx vite build</BuildCommand>
+    <StartupCommand>npx vite --port=3000 --host=127.0.0.1</StartupCommand>
+    <CleanCommand>rd /q /s .\dist</CleanCommand>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include=".vscode\tasks.json" />
+  </ItemGroup>
+</Project>
