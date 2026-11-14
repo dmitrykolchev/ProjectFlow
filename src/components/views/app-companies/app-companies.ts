@@ -2,9 +2,10 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Company, CompanyStatus } from '../../../types';
-import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
@@ -117,28 +118,17 @@ export class AppCompanies extends LitElement {
         <app-metric-card size="compact" label="${isRu ? 'Действующих договоров' : 'Active Contracts'}" value="${activeContracts}"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu ? 'Поиск по названию, ИНН, городу...' : 'Search by name, INN, city...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | CompanyStatus)}"
-            ></app-select>
-          </div>
-        </div>
-      </div>
+      <app-filter-bar
+        style="--filter-search-max: 340px;"
+        placeholder="${isRu ? 'Поиск по названию, ИНН, городу...' : 'Search by name, INN, city...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[{ key: 'status', options: statusOptions }]}"
+        .values="${{ status: this.statusFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | CompanyStatus;
+        }}"
+      ></app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Компании не найдены' : 'No companies found'}"></app-empty-state>`
