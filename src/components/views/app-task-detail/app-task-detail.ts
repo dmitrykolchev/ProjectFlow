@@ -593,8 +593,8 @@ export class AppTaskDetail extends LitElement {
         <div class="detail-grid">
           <!-- Primary Column: History, Time, Expenses, Discussions -->
           <div class="main-column">
-            <section class="section-card">
-              <div class="section-head">
+            <app-section-card variant="tabbed">
+              <div slot="header-left">
                 <app-segmented-switch
                   size="sm"
                   .value="${this.activeTab}"
@@ -610,16 +610,14 @@ export class AppTaskDetail extends LitElement {
                 ></app-segmented-switch>
               </div>
 
-              <div class="section-body">
-                ${this.activeTab === 'timeline'
-                  ? this.renderTimelineTab(t, timeline)
-                  : this.activeTab === 'time'
-                  ? this.renderTimeTab(t, task, timeEntries)
-                  : this.activeTab === 'expenses'
-                  ? this.renderExpensesTab(t, task, expenses)
-                  : this.renderDiscussionsTab(t, task, discussions)}
-              </div>
-            </section>
+              ${this.activeTab === 'timeline'
+                ? this.renderTimelineTab(t, timeline)
+                : this.activeTab === 'time'
+                ? this.renderTimeTab(t, task, timeEntries)
+                : this.activeTab === 'expenses'
+                ? this.renderExpensesTab(t, task, expenses)
+                : this.renderDiscussionsTab(t, task, discussions)}
+            </app-section-card>
           </div>
 
           <!-- Right Sidebar: Subtasks & Cost Summary -->
