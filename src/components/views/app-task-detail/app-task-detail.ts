@@ -168,7 +168,6 @@ export class AppTaskDetail extends LitElement {
     activityItems: ActivityLogItem[]
   ): HistoryEvent[] {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const usersMap = new Map(store.users.map((u) => [u.id, u]));
     const events: HistoryEvent[] = [];
 
@@ -179,7 +178,7 @@ export class AppTaskDetail extends LitElement {
       kind: 'audit',
       timestampMs: createdMs,
       timestampLabel: this.formatDateTime(new Date(createdMs).toISOString()),
-      actorName: usersMap.get(task.assigneeId)?.name || (isRu ? 'Система' : 'System'),
+      actorName: usersMap.get(task.assigneeId)?.name || (t.viewTexts.taskDetail.systemActor),
       actorId: task.assigneeId,
       kindLabel: t.taskDetail.createdEvent,
       body: `${task.id} · ${task.title}`,
@@ -207,7 +206,7 @@ export class AppTaskDetail extends LitElement {
         metaParts: [
           { label: `+${te.hours.toFixed(1)} ${t.common.hours}`, highlight: true },
           { label: t.timeTracking.categories[te.category] },
-          { label: te.billable ? (isRu ? 'Оплачиваемое' : 'Billable') : (isRu ? 'Внутреннее' : 'Non-billable') },
+          { label: te.billable ? (t.viewTexts.timeTracking.billableSwitch) : (t.viewTexts.taskDetail.nonBillableLabel) },
           { label: `${cost.toLocaleString('ru-RU')} ₽` },
           { label: t.timeTracking.statuses[te.status] },
         ],
@@ -251,7 +250,7 @@ export class AppTaskDetail extends LitElement {
         kindLabel: t.taskDetail.discussionEvent,
         body: msg.text,
         metaParts: [
-          ...(msg.pinned ? [{ label: isRu ? 'Закреплено' : 'Pinned', highlight: true }] : []),
+          ...(msg.pinned ? [{ label: t.viewTexts.taskDetail.pinnedLabel, highlight: true }] : []),
           ...(msg.editedAt ? [{ label: t.projectChat.edited }] : []),
         ],
       });
@@ -302,13 +301,12 @@ export class AppTaskDetail extends LitElement {
   render() {
     void this.storeVersion;
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const task = this.tasks.find((tk) => tk.id === this.detailTaskId) || null;
 
     if (!task) {
       return html`
         <div class="page-shell">
-          <app-empty-state title="${isRu ? 'Задача не найдена или была удалена' : 'Task not found'}">
+          <app-empty-state title="${t.viewTexts.taskDetail.emptyNotFound}">
             <app-button slot="action" variant="primary" @click="${() => store.setActiveView('kanban')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.taskDetail.backToBoard}</span>
@@ -558,7 +556,7 @@ export class AppTaskDetail extends LitElement {
               <span class="kpi-label">${t.taskDetail.subtasksTitle}</span>
               <div class="kpi-value-row">
                 <span class="kpi-val">${subtaskPct}%</span>
-                <span class="kpi-sub">${doneSubtasks}/${task.subtasks.length} ${isRu ? 'шагов' : 'steps'}</span>
+                <span class="kpi-sub">${doneSubtasks}/${task.subtasks.length} ${t.viewTexts.taskDetail.stepsSuffix}</span>
               </div>
             </div>
 
@@ -567,7 +565,7 @@ export class AppTaskDetail extends LitElement {
               <div class="kpi-value-row">
                 <span class="kpi-val">${totalHours.toFixed(1)} ${t.common.hours}</span>
                 <span class="kpi-sub">
-                  ${isRu ? 'план' : 'est.'} ${task.estimatedHours} ${t.common.hours} · ${Math.round(laborCostRub).toLocaleString('ru-RU')} ₽
+                  ${t.viewTexts.dashboard.planSuffix} ${task.estimatedHours} ${t.common.hours} · ${Math.round(laborCostRub).toLocaleString('ru-RU')} ₽
                 </span>
               </div>
             </div>
@@ -576,7 +574,7 @@ export class AppTaskDetail extends LitElement {
               <span class="kpi-label">${t.taskDetail.tabExpenses}</span>
               <div class="kpi-value-row">
                 <span class="kpi-val">${Math.round(directExpensesRub).toLocaleString('ru-RU')} ₽</span>
-                <span class="kpi-sub">${expenses.length} ${isRu ? 'записей' : 'items'}</span>
+                <span class="kpi-sub">${expenses.length} ${t.viewTexts.taskDetail.recordsSuffix}</span>
               </div>
             </div>
 
@@ -584,7 +582,7 @@ export class AppTaskDetail extends LitElement {
               <span class="kpi-label">${t.taskDetail.tabDiscussions}</span>
               <div class="kpi-value-row">
                 <span class="kpi-val">${discussions.length}</span>
-                <span class="kpi-sub">${timeline.length} ${isRu ? 'событий всего' : 'total events'}</span>
+                <span class="kpi-sub">${timeline.length} ${t.viewTexts.taskDetail.eventsSuffix}</span>
               </div>
             </div>
           </div>
@@ -859,7 +857,6 @@ export class AppTaskDetail extends LitElement {
   }
 
   private renderTimeTab(t: ReturnType<typeof getTranslation>, task: Task, timeEntries: TimeEntry[]) {
-    const isRu = this.currentLang === 'ru';
     const userOptions = store.users.map((u) => ({ value: u.id, label: `${u.name}` }));
     const catOptions = (Object.keys(t.timeTracking.categories) as TimeEntryCategory[]).map((cat) => ({
       value: cat,
@@ -911,7 +908,7 @@ export class AppTaskDetail extends LitElement {
           <app-input
             size="sm"
             label="${t.taskDetail.fieldDescription}"
-            placeholder="${isRu ? 'Что было выполнено...' : 'Describe work performed...'}"
+            placeholder="${t.viewTexts.taskDetail.workPlaceholder}"
             .value="${this.timeDesc}"
             @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
           ></app-input>
@@ -947,7 +944,7 @@ export class AppTaskDetail extends LitElement {
                     <th>${t.taskDetail.fieldEmployee}</th>
                     <th>${t.taskDetail.fieldDescription}</th>
                     <th class="num-col">${t.taskDetail.fieldHours}</th>
-                    <th class="num-col">${isRu ? 'Стоимость' : 'Cost'}</th>
+                    <th class="num-col">${t.viewTexts.taskDetail.thCost}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -1002,7 +999,6 @@ export class AppTaskDetail extends LitElement {
   }
 
   private renderExpensesTab(t: ReturnType<typeof getTranslation>, task: Task, expenses: Expense[]) {
-    const isRu = this.currentLang === 'ru';
     const catOptions = (Object.keys(t.expenses.categories) as ExpenseCategory[]).map((cat) => ({
       value: cat,
       label: t.expenses.categories[cat],
@@ -1021,7 +1017,7 @@ export class AppTaskDetail extends LitElement {
           <app-input
             size="sm"
             label="${t.taskDetail.fieldExpenseTitle}"
-            placeholder="${isRu ? 'Сервер, лицензия, подрядчик...' : 'Cloud server, license, contractor...'}"
+            placeholder="${t.viewTexts.taskDetail.expensePlaceholder}"
             .value="${this.expTitle}"
             @input="${(e: CustomEvent<{ value: string }>) => (this.expTitle = eventValue(e))}"
           ></app-input>
@@ -1369,7 +1365,7 @@ export class AppTaskDetail extends LitElement {
       billable: this.expBillable,
       status: 'pending',
       vendor: this.expVendor.trim() || undefined,
-      notes: this.expNotes.trim() || `Расход по задаче ${task.id}`,
+      notes: this.expNotes.trim() || getTranslation(this.currentLang).viewTexts.taskDetail.taskExpenseNote(task.id),
     });
     this.expTitle = '';
     this.expVendor = '';
