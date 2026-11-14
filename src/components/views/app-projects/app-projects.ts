@@ -7,6 +7,8 @@ import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconTrash
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -415,7 +417,7 @@ export class AppProjects extends LitElement {
           : 'New Project'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Название проекта' : 'Project Name'}"
@@ -513,7 +515,7 @@ export class AppProjects extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -529,34 +531,23 @@ export class AppProjects extends LitElement {
 
   private renderDeleteModal(isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingProject)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingProject)}"
         size="sm"
         title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        @close="${() => (this.deletingProject = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить проект «${this.deletingProject?.name || ''}»?`
-            : `Are you sure you want to delete "${this.deletingProject?.name || ''}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingProject = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingProject) {
-                store.deleteProject(this.deletingProject.id);
-                this.deletingProject = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить проект «${this.deletingProject?.name || ''}»?`
+          : `Are you sure you want to delete "${this.deletingProject?.name || ''}"?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingProject = null)}"
+        @confirm="${() => {
+          if (this.deletingProject) {
+            store.deleteProject(this.deletingProject.id);
+            this.deletingProject = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 

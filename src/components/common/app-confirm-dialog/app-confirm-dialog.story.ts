@@ -17,8 +17,8 @@ export const meta: ComponentStoryMeta = {
           open
           title="Удалить проект?"
           message="Вы уверены, что хотите удалить проект «Core Platform 3.0»?"
-          cancel-label="Отмена"
-          confirm-label="Удалить"
+          .cancelLabel="${'Отмена'}"
+          .confirmLabel="${'Удалить'}"
         ></app-confirm-dialog>
       `,
     },
@@ -30,8 +30,8 @@ export const meta: ComponentStoryMeta = {
           open
           title="Отправить калькуляцию?"
           message="Калькуляция будет отправлена на согласование заказчику."
-          cancel-label="Cancel"
-          confirm-label="Send"
+          .cancelLabel="${'Cancel'}"
+          .confirmLabel="${'Send'}"
           .danger="${false}"
         ></app-confirm-dialog>
       `,
