@@ -679,11 +679,7 @@ export class AppTaskDetail extends LitElement {
                 </div>
             </app-section-card>
 
-            <section class="section-card">
-              <div class="section-head">
-                <h2 class="section-title">${t.taskDetail.costSummaryTitle}</h2>
-              </div>
-              <div class="section-body">
+            <app-section-card title="${t.taskDetail.costSummaryTitle}">
                 <div class="cost-list">
                   <div class="cost-row">
                     <span class="cost-label">${t.taskModal.estimatedHours}</span>
@@ -710,21 +706,17 @@ export class AppTaskDetail extends LitElement {
                     <span class="cost-val">${Math.round(totalCostRub).toLocaleString('ru-RU')} ₽</span>
                   </div>
                 </div>
-              </div>
-            </section>
+            </app-section-card>
 
-            <section class="section-card">
-              <div class="section-head">
-                <h2 class="section-title">${t.navigation.knowledgeBase}</h2>
-                <button
-                  type="button"
-                  class="link-btn"
-                  @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
-                >
-                  ${iconBookOpen(14)}
-                </button>
-              </div>
-              <div class="section-body">
+            <app-section-card title="${t.navigation.knowledgeBase}">
+              <button
+                slot="actions"
+                type="button"
+                class="link-btn"
+                @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
+              >
+                ${iconBookOpen(14)}
+              </button>
                 ${(() => {
                   const linkedDocs = store.knowledgeArticles.filter(
                     (a) =>
@@ -757,8 +749,7 @@ export class AppTaskDetail extends LitElement {
                     </div>
                   `;
                 })()}
-              </div>
-            </section>
+            </app-section-card>
           </aside>
         </div>
       </div>
