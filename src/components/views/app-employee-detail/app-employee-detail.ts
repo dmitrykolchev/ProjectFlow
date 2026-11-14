@@ -18,6 +18,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
@@ -511,7 +513,7 @@ export class AppEmployeeDetail extends LitElement {
         title="${isRu ? 'Редактирование профиля' : 'Edit Employee'}"
         @close="${() => (this.editModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'ФИО' : 'Full Name'}"
@@ -598,7 +600,7 @@ export class AppEmployeeDetail extends LitElement {
               @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = e.detail.value)}"
             ></app-number-input>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
             ${t.common.cancel}
@@ -613,32 +615,21 @@ export class AppEmployeeDetail extends LitElement {
 
   private renderDeleteModal(emp: User, isRu: boolean, t: ReturnType<typeof getTranslation>) {
     return html`
-      <app-modal
-        ?open="${this.confirmDeleteOpen}"
+      <app-confirm-dialog
+        .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        @close="${() => (this.confirmDeleteOpen = false)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Удалить сотрудника «${emp.name}» из справочника и проектных команд?`
-            : `Remove "${emp.name}" from directory and project teams?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.confirmDeleteOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              this.confirmDeleteOpen = false;
-              store.deleteEmployee(emp.id);
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Удалить сотрудника «${emp.name}» из справочника и проектных команд?`
+          : `Remove "${emp.name}" from directory and project teams?`}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmDeleteOpen = false)}"
+        @confirm="${() => {
+          this.confirmDeleteOpen = false;
+          store.deleteEmployee(emp.id);
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -670,7 +661,7 @@ export class AppEmployeeDetail extends LitElement {
         title="${isRu ? `Списание времени · ${emp.name}` : `Log Time · ${emp.name}`}"
         @close="${() => (this.timeModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-select
               label="${isRu ? 'Задача' : 'Task'}"
@@ -714,7 +705,7 @@ export class AppEmployeeDetail extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.timeModalOpen = false)}">
             ${t.common.cancel}
