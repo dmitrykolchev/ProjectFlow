@@ -23,6 +23,7 @@ export class AppTaskModal extends LitElement {
   @state() private isOpen: boolean = false;
   @state() private editingTask: Task | null = null;
   @state() private confirmDeleteOpen = false;
+  @state() private confirmRemoveSubtaskId: string | null = null;
   @state() private currentLang = store.customization.language;
 
   // Form fields
@@ -334,7 +335,7 @@ export class AppTaskModal extends LitElement {
                         <button
                           type="button"
                           class="subtask-action-btn subtask-remove"
-                          @click="${() => this.removeSubtask(sub.id)}"
+                          @click="${() => this.requestRemoveSubtask(sub.id)}"
                           title="${t.taskModal.removeSubtask}"
                           aria-label="${t.taskModal.removeSubtask}"
                         >
@@ -417,6 +418,23 @@ export class AppTaskModal extends LitElement {
         @cancel="${() => (this.confirmDeleteOpen = false)}"
         @confirm="${() => this.doDelete()}"
       ></app-confirm-dialog>
+      <app-confirm-dialog
+        .open="${Boolean(this.confirmRemoveSubtaskId)}"
+        size="sm"
+        title="${this.currentLang === 'ru' ? 'Удалить подзадачу?' : 'Delete subtask?'}"
+        action="${this.currentLang === 'ru'
+          ? `Подзадача «${(this.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title}» будет удалена.`
+          : `Subtask "${(this.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title}" will be deleted.`}"
+        result="${this.currentLang === 'ru'
+          ? 'Список подзадач и прогресс задачи будут пересчитаны.'
+          : 'The subtask list and task progress will be recalculated.'}"
+        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmRemoveSubtaskId = null)}"
+        @confirm="${() => this.doRemoveSubtask()}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -437,8 +455,16 @@ export class AppTaskModal extends LitElement {
     this.subtasks = this.subtasks.map((s) => (s.id === id ? { ...s, completed: !s.completed } : s));
   }
 
-  private removeSubtask(id: string) {
-    this.subtasks = this.subtasks.filter((s) => s.id !== id);
+  private requestRemoveSubtask(id: string) {
+    this.confirmRemoveSubtaskId = id;
+  }
+
+  private doRemoveSubtask() {
+    const id = this.confirmRemoveSubtaskId;
+    if (id) {
+      this.subtasks = this.subtasks.filter((s) => s.id !== id);
+    }
+    this.confirmRemoveSubtaskId = null;
   }
 
   private moveSubtask(index: number, delta: -1 | 1) {

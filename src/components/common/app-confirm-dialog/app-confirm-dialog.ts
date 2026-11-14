@@ -47,7 +47,7 @@ export class AppConfirmDialog extends LitElement {
     }
 
     .result-box {
-      border-left: 3px solid var(--accent-primary, #3b82f6);
+      border-left: 3px solid var(--confirm-color, var(--accent-primary, #6366f1));
       background: var(--bg-subtle, #1a2438);
       border-radius: var(--radius-sm, 6px);
       padding: 0.75rem 1rem;
@@ -67,6 +67,13 @@ export class AppConfirmDialog extends LitElement {
 
   render() {
     const hasSections = Boolean(this.action || this.result);
+    const variantColors: Record<ConfirmVariant, string> = {
+      info: 'var(--accent-primary, #6366f1)',
+      success: '#22c55e',
+      warning: '#f59e0b',
+      danger: '#ef4444',
+    };
+    const confirmColor = variantColors[this.variant] || variantColors.danger;
     return html`
       <app-modal
         ?open="${this.open}"
@@ -88,7 +95,7 @@ export class AppConfirmDialog extends LitElement {
                 : ''}
               ${this.result
                 ? html`
-                    <div>
+                    <div style="--confirm-color: ${confirmColor};">
                       <p class="section-label">${this.resultLabel}</p>
                       <div class="result-box">${this.result}</div>
                     </div>
