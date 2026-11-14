@@ -1401,6 +1401,11 @@ export const en = {
         action: (name: string) => `Employee "${name}" will be removed from the directory.`,
         result: 'Time entries and project team memberships will be lost.',
       },
+      memberRemove: {
+        title: 'Remove team member?',
+        action: (name: string, role: string) => `Employee "${name}" will be removed from the project team in role "${role}".`,
+        result: 'The employee time entries are preserved, project participation stops.',
+      },
       expenseDelete: {
         title: 'Delete expense?',
         action: (title: string) => `Expense "${title}" will be deleted.`,

@@ -101,6 +101,7 @@ export class AppProjectDetail extends LitElement {
   @state() private formError = '';
 
   @state() private confirmDeleteOpen = false;
+  @state() private pendingRemoveMember: { userId: string; role: ProjectRole } | null = null;
 
   // Quick Project Expense Modal
   @state() private expenseModalOpen = false;
@@ -540,7 +541,7 @@ export class AppProjectDetail extends LitElement {
                                       class="icon-btn danger"
                                       title="${t.viewTexts.projectDetail.removeFromRoleTitle}"
                                       @click="${() =>
-                                        store.removeProjectMember(proj.id, member.userId, member.role)}"
+                                        (this.pendingRemoveMember = { userId: member.userId, role: member.role })}"
                                     >
                                       ${iconTrash(14)}
                                     </button>
@@ -753,6 +754,7 @@ export class AppProjectDetail extends LitElement {
 
       ${this.renderEditModal(t)}
       ${this.renderDeleteModal(proj, t)}
+      ${this.renderMemberRemoveDialog(proj, t)}
       ${this.renderQuickTimeModal(proj, projectTasks, t)}
       ${this.renderQuickExpenseModal(proj, projectTasks, t)}
     `;
@@ -908,6 +910,30 @@ export class AppProjectDetail extends LitElement {
         @confirm="${() => {
           this.confirmDeleteOpen = false;
           store.deleteProject(proj.id);
+        }}"
+      ></app-confirm-dialog>
+    `;
+  }
+
+  private renderMemberRemoveDialog(proj: Project, t: ReturnType<typeof getTranslation>) {
+    const pending = this.pendingRemoveMember;
+    const user = pending ? store.users.find((u) => u.id === pending.userId) : undefined;
+    return html`
+      <app-confirm-dialog
+        .open="${pending !== null}"
+        size="sm"
+        variant="danger"
+        title="${t.viewTexts.confirmDialogs.memberRemove.title}"
+        action="${pending && user ? t.viewTexts.confirmDialogs.memberRemove.action(user.name, t.projectRoles[pending.role]) : ''}"
+        result="${t.viewTexts.confirmDialogs.memberRemove.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.pendingRemoveMember = null)}"
+        @confirm="${() => {
+          if (pending) store.removeProjectMember(proj.id, pending.userId, pending.role);
+          this.pendingRemoveMember = null;
         }}"
       ></app-confirm-dialog>
     `;
