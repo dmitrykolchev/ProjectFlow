@@ -42,6 +42,7 @@ import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-task-detail.css';
 
 type DetailTab = 'timeline' | 'time' | 'expenses' | 'discussions';
@@ -623,14 +624,7 @@ export class AppTaskDetail extends LitElement {
 
           <!-- Right Sidebar: Subtasks & Cost Summary -->
           <aside class="side-column">
-            <section class="section-card">
-              <div class="section-head">
-                <h2 class="section-title">${t.taskDetail.subtasksTitle}</h2>
-                <span class="mono-num" style="font-size: 0.8rem; color: var(--text-secondary);">
-                  ${doneSubtasks}/${task.subtasks.length} (${subtaskPct}%)
-                </span>
-              </div>
-              <div class="section-body">
+            <app-section-card title="${t.taskDetail.subtasksTitle}" subtitle="${doneSubtasks}/${task.subtasks.length} (${subtaskPct}%)">
                 <app-progress-bar value="${subtaskPct}"></app-progress-bar>
 
                 ${task.subtasks.length === 0
@@ -683,8 +677,7 @@ export class AppTaskDetail extends LitElement {
                     <span>${t.common.add}</span>
                   </app-button>
                 </div>
-              </div>
-            </section>
+            </app-section-card>
 
             <section class="section-card">
               <div class="section-head">
