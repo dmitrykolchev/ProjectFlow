@@ -32,6 +32,7 @@ export class AppFilterBar extends LitElement {
     return html`
       <div class="bar ${this.variant}">
         <div class="filters">
+          <slot name="prefix"></slot>
           ${this.searchEnabled
             ? html`
                 <div class="search">
