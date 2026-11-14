@@ -5,6 +5,7 @@ import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode }
 import { getTranslation } from '../../../i18n';
 import '../../common/app-button/app-button';
 import '../../common/app-page-header/app-page-header';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-settings.css';
 
 interface BasePaletteOption {
@@ -158,8 +159,7 @@ export class AppSettings extends LitElement {
         <app-page-header title="${t.settings.title}" subtitle="${t.settings.subtitle}"></app-page-header>
 
         <!-- Theme Mode -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.theme}</div>
+        <app-section-card variant="panel" title="${t.settings.theme}">
           <div class="options-grid">
             <div
               class="option-card ${isDark ? 'is-active' : ''}"
@@ -217,14 +217,13 @@ export class AppSettings extends LitElement {
               <p class="option-card-desc">${t.settings.themeCyberpunkDesc}</p>
             </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Customize Active Theme via Base Colors -->
-        <div class="section-card">
-          <div class="section-header-row">
-            <div class="section-title">${t.settings.baseColorsTitle}</div>
-            ${hasOverrides
-              ? html`
+        <app-section-card variant="panel" title="${t.settings.baseColorsTitle}">
+          ${hasOverrides
+            ? html`
+                <div slot="actions">
                   <app-button
                     size="sm"
                     variant="outline"
@@ -232,9 +231,9 @@ export class AppSettings extends LitElement {
                   >
                     ${t.settings.resetThemeColors}
                   </app-button>
-                `
-              : ''}
-          </div>
+                </div>
+              `
+            : ''}
           <p class="section-desc">${t.settings.baseColorsDesc}</p>
 
           <div class="base-colors-grid">
@@ -283,13 +282,12 @@ export class AppSettings extends LitElement {
               )}
             </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Background Theme Palette & Custom Color (Dark / Light) -->
         ${!isCyberpunk
           ? html`
-              <div class="section-card">
-                <div class="section-title">${t.settings.background}</div>
+              <app-section-card variant="panel" title="${t.settings.background}">
                 <p class="section-desc">${t.settings.backgroundDesc}</p>
 
                 <div class="bg-presets-grid">
@@ -342,13 +340,12 @@ export class AppSettings extends LitElement {
                     )}
                   </div>
                 </div>
-              </div>
+              </app-section-card>
             `
           : ''}
 
         <!-- Accent Colors -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.accentColor}</div>
+        <app-section-card variant="panel" title="${t.settings.accentColor}">
           <div class="accent-swatches">
             ${accentOptions.map(
               (acc) => html`
@@ -363,11 +360,10 @@ export class AppSettings extends LitElement {
               `
             )}
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Density Mode -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.density}</div>
+        <app-section-card variant="panel" title="${t.settings.density}">
           <div class="options-grid">
             <div
               class="option-card ${this.custom.density === 'comfortable' ? 'is-active' : ''}"
@@ -399,11 +395,10 @@ export class AppSettings extends LitElement {
               </p>
             </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Language -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.language}</div>
+        <app-section-card variant="panel" title="${t.settings.language}">
           <div class="options-grid">
             <div
               class="option-card ${this.custom.language === 'ru' ? 'is-active' : ''}"
@@ -427,11 +422,10 @@ export class AppSettings extends LitElement {
               <p class="option-card-desc">Global English interface translation</p>
             </div>
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Default View -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.defaultView}</div>
+        <app-section-card variant="panel" title="${t.settings.defaultView}">
           <div class="options-grid">
             ${viewsList.map(
               (v) => html`
@@ -447,11 +441,10 @@ export class AppSettings extends LitElement {
               `
             )}
           </div>
-        </div>
+        </app-section-card>
 
         <!-- Sidebar Group Expand Mode -->
-        <div class="section-card">
-          <div class="section-title">${t.settings.sidebarGroupMode}</div>
+        <app-section-card variant="panel" title="${t.settings.sidebarGroupMode}">
           <div class="options-grid">
             <div
               class="option-card ${this.custom.sidebarGroupMode === 'single' ? 'is-active' : ''}"
