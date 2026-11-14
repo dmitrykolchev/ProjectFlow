@@ -81,29 +81,28 @@ export class AppDashboard extends LitElement {
       { label: t.priority.low, value: this.tasks.filter((x) => x.priority === 'low').length, color: '#64748b' },
     ];
 
-    const isRu = this.currentLang === 'ru';
     const velocityData =
       this.timeframe === '7d'
         ? [
-            { label: isRu ? 'Пн' : 'Mon', value: 2 },
-            { label: isRu ? 'Вт' : 'Tue', value: 4 },
-            { label: isRu ? 'Ср' : 'Wed', value: 3 },
-            { label: isRu ? 'Чт' : 'Thu', value: 6 },
-            { label: isRu ? 'Пт' : 'Fri', value: 5 },
-            { label: isRu ? 'Сб' : 'Sat', value: 3 },
-            { label: isRu ? 'Вс' : 'Sun', value: 7 },
+            { label: t.viewTexts.dashboard.dayMon, value: 2 },
+            { label: t.viewTexts.dashboard.dayTue, value: 4 },
+            { label: t.viewTexts.dashboard.dayWed, value: 3 },
+            { label: t.viewTexts.dashboard.dayThu, value: 6 },
+            { label: t.viewTexts.dashboard.dayFri, value: 5 },
+            { label: t.viewTexts.dashboard.daySat, value: 3 },
+            { label: t.viewTexts.dashboard.daySun, value: 7 },
           ]
         : this.timeframe === '30d'
         ? [
-            { label: isRu ? 'Н1' : 'W1', value: 12 },
-            { label: isRu ? 'Н2' : 'W2', value: 18 },
-            { label: isRu ? 'Н3' : 'W3', value: 15 },
-            { label: isRu ? 'Н4' : 'W4', value: 22 },
+            { label: t.viewTexts.dashboard.week1, value: 12 },
+            { label: t.viewTexts.dashboard.week2, value: 18 },
+            { label: t.viewTexts.dashboard.week3, value: 15 },
+            { label: t.viewTexts.dashboard.week4, value: 22 },
           ]
         : [
-            { label: isRu ? 'Сен' : 'Sep', value: 42 },
-            { label: isRu ? 'Окт' : 'Oct', value: 58 },
-            { label: isRu ? 'Ноя' : 'Nov', value: 64 },
+            { label: t.viewTexts.dashboard.monthSep, value: 42 },
+            { label: t.viewTexts.dashboard.monthOct, value: 58 },
+            { label: t.viewTexts.dashboard.monthNov, value: 64 },
           ];
 
     const upcoming = [...this.tasks]
@@ -185,9 +184,9 @@ export class AppDashboard extends LitElement {
           <app-metric-card
             label="${t.dashboard.hoursLogged}"
             value="${loggedHours} ${t.common.hours}"
-            delta="${estimatedHours} ${t.common.hours} ${isRu ? 'план' : 'est.'}"
+            delta="${estimatedHours} ${t.common.hours} ${t.viewTexts.dashboard.planSuffix}"
             trend="neutral"
-            subtitle="${isRu ? 'ёмкость спринта' : 'sprint capacity'}"
+            subtitle="${t.viewTexts.dashboard.sprintCapacitySubtitle}"
             accentColor="#06b6d4"
             .sparkline="${[30, 44, 60, 75, 90, loggedHours]}"
           >
@@ -197,7 +196,7 @@ export class AppDashboard extends LitElement {
           <app-metric-card
             label="${t.dashboard.urgentItems}"
             value="${String(urgentCount)}"
-            delta="${urgentCount > 0 ? (isRu ? 'Внимание' : 'Focus') : (isRu ? 'Чисто' : 'Clear')}"
+            delta="${urgentCount > 0 ? (t.viewTexts.dashboard.focusWord) : (t.viewTexts.dashboard.clearWord)}"
             trend="${urgentCount > 2 ? 'down' : 'neutral'}"
             subtitle="${t.analytics.urgentTasks}"
             accentColor="#ef4444"
@@ -216,7 +215,7 @@ export class AppDashboard extends LitElement {
         <div class="main-grid">
           <div class="column-stack">
             <app-chart-card
-              title="${isRu ? 'Темп команды' : 'Team Velocity'} · ${t.dashboard.statusOverview}"
+              title="${t.viewTexts.dashboard.teamVelocity} · ${t.dashboard.statusOverview}"
               subtitle="${t.dashboard.subtitle}"
               type="line"
               .data="${velocityData}"
