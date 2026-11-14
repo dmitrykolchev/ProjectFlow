@@ -70,16 +70,20 @@ export class AppEmployees extends LitElement {
     this.globalSearch = store.searchQuery;
   }
 
-  private getStatusLabel(status: EmployeeStatus | undefined, isRu: boolean): { text: string; variant: 'success' | 'info' | 'warning' | 'primary' } {
+  private getStatusLabel(
+    status: EmployeeStatus | undefined,
+    t: ReturnType<typeof getTranslation>
+  ): { text: string; variant: 'success' | 'info' | 'warning' | 'primary' } {
+    const tx = t.viewTexts.employees;
     switch (status || 'active') {
       case 'remote':
-        return { text: isRu ? 'Удалённо' : 'Remote', variant: 'info' };
+        return { text: tx.statusRemote, variant: 'info' };
       case 'vacation':
-        return { text: isRu ? 'Отпуск' : 'Vacation', variant: 'warning' };
+        return { text: tx.statusVacation, variant: 'warning' };
       case 'onboarding':
-        return { text: isRu ? 'Адаптация' : 'Onboarding', variant: 'primary' };
+        return { text: tx.statusOnboarding, variant: 'primary' };
       default:
-        return { text: isRu ? 'В штате' : 'Active', variant: 'success' };
+        return { text: tx.statusActive, variant: 'success' };
     }
   }
 
@@ -101,7 +105,6 @@ export class AppEmployees extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const filtered = this.getFilteredEmployees();
     const activeOnline = this.employees.filter((e) => (e.status || 'active') !== 'vacation').length;
     const departments = new Set(this.employees.map((e) => e.department).filter(Boolean)).size;
@@ -112,42 +115,40 @@ export class AppEmployees extends LitElement {
       : 0;
 
     const companyOptions = [
-      { value: 'all', label: isRu ? 'Все компании' : 'All companies' },
+      { value: 'all', label: t.viewTexts.employees.filterAllCompanies },
       ...store.companies.map((c) => ({ value: c.id, label: c.name })),
     ];
 
     const statusOptions = [
-      { value: 'all', label: isRu ? 'Все статусы' : 'All statuses' },
-      { value: 'active', label: isRu ? 'В штате' : 'Active', color: '#10b981' },
-      { value: 'remote', label: isRu ? 'Удалённо' : 'Remote', color: '#0284c7' },
-      { value: 'vacation', label: isRu ? 'Отпуск' : 'Vacation', color: '#f59e0b' },
-      { value: 'onboarding', label: isRu ? 'Адаптация' : 'Onboarding', color: '#6366f1' },
+      { value: 'all', label: t.viewTexts.employees.filterAllStatuses },
+      { value: 'active', label: t.viewTexts.employees.statusActive, color: '#10b981' },
+      { value: 'remote', label: t.viewTexts.employees.statusRemote, color: '#0284c7' },
+      { value: 'vacation', label: t.viewTexts.employees.statusVacation, color: '#f59e0b' },
+      { value: 'onboarding', label: t.viewTexts.employees.statusOnboarding, color: '#6366f1' },
     ];
 
     return html`
       <app-page-header
-        title="${isRu ? 'Сотрудники' : 'Employees'}"
-        subtitle="${isRu
-          ? 'Штат компании, специализации, ставки, текущие проекты и загрузка по задачам'
-          : 'Team directory, roles, hourly rates, project assignments, and task workload'}"
+        title="${t.viewTexts.employees.pageTitle}"
+        subtitle="${t.viewTexts.pageSubtitles.employees}"
       >
         <span slot="icon">${iconUsers(28)}</span>
         <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
-          <span>${isRu ? 'Добавить сотрудника' : 'Add Employee'}</span>
+          <span>${t.viewTexts.employees.addEmployeeButton}</span>
         </app-button>
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${isRu ? 'Всего сотрудников' : 'Total Employees'}" value="${this.employees.length}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Доступны к работе' : 'Available'}" value="${activeOnline}" valueColor="var(--color-success, #10b981)"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Отделов' : 'Departments'}" value="${departments}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Средняя ставка' : 'Avg Rate'}" value="${avgRate.toLocaleString('ru-RU')} ₽/ч"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiTotalEmployees}" value="${this.employees.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvailable}" value="${activeOnline}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiDepartments}" value="${departments}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvgRate}" value="${avgRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${isRu ? 'Поиск по ФИО, должности, отделу...' : 'Search name, role, dept...'}"
+        placeholder="${t.viewTexts.employees.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'company', options: companyOptions },
@@ -164,8 +165,8 @@ export class AppEmployees extends LitElement {
           size="sm"
           .value="${this.displayMode}"
           .options="${[
-            { value: 'cards', label: isRu ? 'Карточки' : 'Cards' },
-            { value: 'table', label: isRu ? 'Таблица' : 'Table' },
+            { value: 'cards', label: t.viewTexts.employees.viewCards },
+            { value: 'table', label: t.viewTexts.employees.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.displayMode = eventValue(e) as 'cards' | 'table')}"
@@ -173,27 +174,21 @@ export class AppEmployees extends LitElement {
       </app-filter-bar>
 
       ${filtered.length === 0
-        ? html`<app-empty-state title="${isRu ? 'Сотрудники не найдены' : 'No employees found'}"></app-empty-state>`
+        ? html`<app-empty-state title="${t.viewTexts.employees.emptyNoEmployees}"></app-empty-state>`
         : this.displayMode === 'cards'
-        ? this.renderCards(filtered, t, isRu)
-        : this.renderTable(filtered, t, isRu)}
+        ? this.renderCards(filtered, t)
+        : this.renderTable(filtered, t)}
 
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${this.editingId
-          ? isRu
-            ? 'Профиль сотрудника'
-            : 'Edit Employee'
-          : isRu
-          ? 'Новый сотрудник'
-          : 'New Employee'}"
+        title="${this.editingId ? t.viewTexts.employees.modalTitleEdit : t.viewTexts.employees.modalTitleCreate}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'ФИО' : 'Full Name'}"
+              label="${t.viewTexts.employees.labelFullName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -205,24 +200,24 @@ export class AppEmployees extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Должность' : 'Position / Role'}"
+              label="${t.viewTexts.employees.labelPosition}"
               .value="${this.formRole}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Отдел' : 'Department'}"
+              label="${t.viewTexts.employees.labelDepartment}"
               .value="${this.formDepartment}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Компания' : 'Company'}"
+              label="${t.viewTexts.employees.labelCompany}"
               .value="${this.formCompanyId}"
               .options="${[
-                { value: '', label: isRu ? 'Не указана' : 'None' },
+                { value: '', label: t.viewTexts.employees.optionNoCompany },
                 ...store.companies.map((c) => ({ value: c.id, label: c.name })),
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
@@ -238,21 +233,21 @@ export class AppEmployees extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Телефон' : 'Phone'}"
+              label="${t.viewTexts.employees.labelPhone}"
               .value="${this.formPhone}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Город / Локация' : 'Location'}"
+              label="${t.viewTexts.employees.labelLocation}"
               .value="${this.formLocation}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.employees.labelStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -261,14 +256,14 @@ export class AppEmployees extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата найма' : 'Hire Date'}"
+              label="${t.viewTexts.employees.labelHireDate}"
               .value="${this.formHireDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Ставка (₽/ч)' : 'Hourly Rate (₽/h)'}"
+              label="${t.viewTexts.employees.labelRate}"
               .value="${this.formHourlyRate}"
               min="500"
               max="25000"
@@ -281,10 +276,10 @@ export class AppEmployees extends LitElement {
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
+            ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${this.handleSave}">
-            ${isRu ? 'Сохранить' : 'Save'}
+            ${t.common.save}
           </app-button>
         </div>
       </app-modal>
@@ -310,7 +305,7 @@ export class AppEmployees extends LitElement {
     `;
   }
 
-  private renderCards(list: User[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderCards(list: User[], t: ReturnType<typeof getTranslation>) {
     return html`
       <div class="cards-grid">
         ${list.map((emp) => {
@@ -319,7 +314,7 @@ export class AppEmployees extends LitElement {
           const projCount = store.projects.filter((p) =>
             (p.members || []).some((m) => m.userId === emp.id)
           ).length;
-          const badge = this.getStatusLabel(emp.status, isRu);
+          const badge = this.getStatusLabel(emp.status, t);
 
           return html`
             <article class="employee-card">
@@ -344,11 +339,11 @@ export class AppEmployees extends LitElement {
 
               <div class="details-list">
                 <div class="detail-row">
-                  <span class="detail-label">${isRu ? 'Отдел' : 'Dept'}</span>
+                  <span class="detail-label">${t.viewTexts.employees.detailDept}</span>
                   <span class="detail-val">${emp.department || '—'}</span>
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">${isRu ? 'Компания' : 'Company'}</span>
+                  <span class="detail-label">${t.viewTexts.employees.detailCompany}</span>
                   <span class="detail-val">${company?.name || '—'}</span>
                 </div>
                 <div class="detail-row">
@@ -356,25 +351,25 @@ export class AppEmployees extends LitElement {
                   <span class="detail-val">${emp.email}</span>
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">${isRu ? 'Телефон / Город' : 'Phone / City'}</span>
+                  <span class="detail-label">${t.viewTexts.employees.detailPhoneCity}</span>
                   <span class="detail-val">${emp.phone || '—'} · ${emp.location || '—'}</span>
                 </div>
                 <div class="detail-row">
-                  <span class="detail-label">${isRu ? 'Ставка' : 'Rate'}</span>
+                  <span class="detail-label">${t.viewTexts.employees.detailRate}</span>
                   <span class="detail-val mono">${(emp.hourlyRate || 3500).toLocaleString('ru-RU')} ₽/ч</span>
                 </div>
               </div>
 
               <div class="card-footer">
                 <div class="stats-row">
-                  <span>${isRu ? 'Проекты' : 'Projects'}: <strong>${projCount}</strong></span>
-                  <span>${isRu ? 'Задачи' : 'Tasks'}: <strong>${taskCount}</strong></span>
+                  <span>${t.viewTexts.employees.projectsCountLabel}: <strong>${projCount}</strong></span>
+                  <span>${t.viewTexts.employees.tasksCountLabel}: <strong>${taskCount}</strong></span>
                 </div>
                 <div class="actions-row">
                   <button
                     type="button"
                     class="icon-btn"
-                    title="${isRu ? 'Профиль сотрудника' : 'Open Profile'}"
+                    title="${t.viewTexts.employees.openProfileButton}"
                     @click="${() => store.openEmployeeDetail(emp.id)}"
                   >
                     ${iconChevronRight(15)}
@@ -382,7 +377,7 @@ export class AppEmployees extends LitElement {
                   <button
                     type="button"
                     class="icon-btn"
-                    title="${isRu ? 'Редактировать' : 'Edit'}"
+                    title="${t.common.edit}"
                     @click="${() => this.openEditModal(emp)}"
                   >
                     ${iconEdit(14)}
@@ -404,19 +399,19 @@ export class AppEmployees extends LitElement {
     `;
   }
 
-  private renderTable(list: User[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderTable(list: User[], t: ReturnType<typeof getTranslation>) {
     return html`
       <div class="table-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>${isRu ? 'Сотрудник' : 'Employee'}</th>
-              <th>${isRu ? 'Отдел' : 'Department'}</th>
-              <th>${isRu ? 'Компания' : 'Company'}</th>
-              <th>${isRu ? 'Контакты' : 'Contacts'}</th>
-              <th>${isRu ? 'Проектов / Задач' : 'Projects / Tasks'}</th>
-              <th>${isRu ? 'Ставка' : 'Rate'}</th>
-              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th>${t.viewTexts.employees.thEmployee}</th>
+              <th>${t.viewTexts.employees.thDepartment}</th>
+              <th>${t.viewTexts.employees.thCompany}</th>
+              <th>${t.viewTexts.employees.thContacts}</th>
+              <th>${t.viewTexts.employees.thProjectsTasks}</th>
+              <th>${t.viewTexts.employees.thRate}</th>
+              <th>${t.viewTexts.employees.thStatus}</th>
               <th></th>
             </tr>
           </thead>
@@ -427,7 +422,7 @@ export class AppEmployees extends LitElement {
               const projCount = store.projects.filter((p) =>
                 (p.members || []).some((m) => m.userId === emp.id)
               ).length;
-              const badge = this.getStatusLabel(emp.status, isRu);
+              const badge = this.getStatusLabel(emp.status, t);
 
               return html`
                 <tr>
@@ -464,7 +459,7 @@ export class AppEmployees extends LitElement {
                       <button
                         type="button"
                         class="icon-btn"
-                        title="${isRu ? 'Профиль сотрудника' : 'Open Profile'}"
+                        title="${t.viewTexts.employees.openProfileButton}"
                         @click="${() => store.openEmployeeDetail(emp.id)}"
                       >
                         ${iconChevronRight(15)}
