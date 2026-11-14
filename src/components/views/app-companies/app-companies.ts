@@ -6,6 +6,8 @@ import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconTrash } from '../..
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
@@ -241,7 +243,7 @@ export class AppCompanies extends LitElement {
           : 'New Company'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Краткое название' : 'Short Name'}"
@@ -329,7 +331,7 @@ export class AppCompanies extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -341,34 +343,23 @@ export class AppCompanies extends LitElement {
         </div>
       </app-modal>
 
-      <app-modal
-        ?open="${Boolean(this.deletingCompany)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingCompany)}"
         size="sm"
         title="${isRu ? 'Удалить компанию?' : 'Delete company?'}"
-        @close="${() => (this.deletingCompany = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить компанию «${this.deletingCompany?.name || ''}»?`
-            : `Are you sure you want to delete "${this.deletingCompany?.name || ''}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingCompany = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingCompany) {
-                store.deleteCompany(this.deletingCompany.id);
-                this.deletingCompany = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить компанию «${this.deletingCompany?.name || ''}»?`
+          : `Are you sure you want to delete "${this.deletingCompany?.name || ''}"?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingCompany = null)}"
+        @confirm="${() => {
+          if (this.deletingCompany) {
+            store.deleteCompany(this.deletingCompany.id);
+            this.deletingCompany = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
