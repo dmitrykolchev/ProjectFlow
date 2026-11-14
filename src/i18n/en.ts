@@ -1335,6 +1335,8 @@ export const en = {
       lightDesc: 'Crisp high-contrast light surfaces for daytime clarity',
       comfortableDesc: 'Standard balanced spacing for comfortable reading',
       compactDesc: 'Tighter spacing and rows for high-density workflows',
+      langRuDesc: 'Full Russian interface localization',
+      langEnDesc: 'Global English interface translation',
     },
     calendar: {
       sevenDays: '7 days',

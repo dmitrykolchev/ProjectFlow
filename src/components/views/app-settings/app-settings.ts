@@ -9,60 +9,59 @@ import '../../common/app-section-card/app-section-card';
 import styles from './app-settings.css';
 
 interface BasePaletteOption {
-  nameRu: string;
-  nameEn: string;
+  nameKey:
+    | 'deepIndigo'
+    | 'emeraldNight'
+    | 'amberGraphite'
+    | 'crystalSlate'
+    | 'warmIvory'
+    | 'arcticTeal'
+    | 'nightCityNeon'
+    | 'acidLime'
+    | 'laserCyan';
   colors: ThemeBaseColors;
 }
 
 const CURATED_BASE_PALETTES: Record<ThemeMode, BasePaletteOption[]> = {
   dark: [
     {
-      nameRu: 'Глубокий индиго',
-      nameEn: 'Deep Indigo',
+      nameKey: 'deepIndigo',
       colors: { bgCanvas: '#090d16', bgSurface: '#111827', textPrimary: '#f8fafc', accentPrimary: '#6366f1', borderSubtle: '#1e293b' },
     },
     {
-      nameRu: 'Изумрудная ночь',
-      nameEn: 'Emerald Night',
+      nameKey: 'emeraldNight',
       colors: { bgCanvas: '#06120f', bgSurface: '#0c1c18', textPrimary: '#ecfdf5', accentPrimary: '#10b981', borderSubtle: '#193830' },
     },
     {
-      nameRu: 'Янтарный графит',
-      nameEn: 'Amber Graphite',
+      nameKey: 'amberGraphite',
       colors: { bgCanvas: '#111014', bgSurface: '#1b181f', textPrimary: '#faf8f5', accentPrimary: '#f59e0b', borderSubtle: '#2f2936' },
     },
   ],
   light: [
     {
-      nameRu: 'Кристальный сланец',
-      nameEn: 'Crystal Slate',
+      nameKey: 'crystalSlate',
       colors: { bgCanvas: '#f8fafc', bgSurface: '#ffffff', textPrimary: '#0f172a', accentPrimary: '#6366f1', borderSubtle: '#e2e8f0' },
     },
     {
-      nameRu: 'Тёплый пергамент',
-      nameEn: 'Warm Ivory',
+      nameKey: 'warmIvory',
       colors: { bgCanvas: '#f6f3ec', bgSurface: '#fdfcf9', textPrimary: '#241f18', accentPrimary: '#d97706', borderSubtle: '#e3dccf' },
     },
     {
-      nameRu: 'Ледяная бирюза',
-      nameEn: 'Arctic Teal',
+      nameKey: 'arcticTeal',
       colors: { bgCanvas: '#eef7f9', bgSurface: '#ffffff', textPrimary: '#0b2530', accentPrimary: '#0891b2', borderSubtle: '#cde3ea' },
     },
   ],
   cyberpunk: [
     {
-      nameRu: 'Night City Неон',
-      nameEn: 'Night City Neon',
+      nameKey: 'nightCityNeon',
       colors: { bgCanvas: '#06040f', bgSurface: '#0d0a1f', textPrimary: '#f4f6ff', accentPrimary: '#ff2a85', borderSubtle: '#1e2d5e' },
     },
     {
-      nameRu: 'Кислотный лайм',
-      nameEn: 'Acid Matrix',
+      nameKey: 'acidLime',
       colors: { bgCanvas: '#040d09', bgSurface: '#081812', textPrimary: '#eafff3', accentPrimary: '#00ffa3', borderSubtle: '#144734' },
     },
     {
-      nameRu: 'Лазерный циан',
-      nameEn: 'Laser Cyan',
+      nameKey: 'laserCyan',
       colors: { bgCanvas: '#030816', bgSurface: '#081129', textPrimary: '#eefaff', accentPrimary: '#00d9ff', borderSubtle: '#173866' },
     },
   ],
@@ -101,7 +100,6 @@ export class AppSettings extends LitElement {
     const isDark = activeTheme === 'dark';
     const isLight = activeTheme === 'light';
     const isCyberpunk = activeTheme === 'cyberpunk';
-    const isRu = this.currentLang === 'ru';
 
     const effectiveBase = store.getEffectiveBaseColors(activeTheme);
     const hasOverrides = store.hasThemeOverrides(activeTheme) || this.custom.backgroundPreset === 'custom';
@@ -175,9 +173,7 @@ export class AppSettings extends LitElement {
                 ${isDark ? '✓' : ''}
               </div>
               <p class="option-card-desc">
-                ${isRu
-                  ? 'Глубокие темные тона для комфортной работы при слабом освещении'
-                  : 'Deep dark tones for comfortable low-light focus'}
+                ${t.viewTexts.settings.darkDesc}
               </p>
             </div>
 
@@ -195,9 +191,7 @@ export class AppSettings extends LitElement {
                 ${isLight ? '✓' : ''}
               </div>
               <p class="option-card-desc">
-                ${isRu
-                  ? 'Чистые контрастные светлые поверхности для дневной работы'
-                  : 'Crisp high-contrast light surfaces for daytime clarity'}
+                ${t.viewTexts.settings.lightDesc}
               </p>
             </div>
 
@@ -276,7 +270,7 @@ export class AppSettings extends LitElement {
                       <span class="palette-dot" style="background: ${pal.colors.accentPrimary};"></span>
                       <span class="palette-dot" style="background: ${pal.colors.textPrimary};"></span>
                     </span>
-                    <span>${isRu ? pal.nameRu : pal.nameEn}</span>
+                    <span>${t.viewTexts.settings.accentNames[pal.nameKey]}</span>
                   </button>
                 `
               )}
@@ -374,9 +368,7 @@ export class AppSettings extends LitElement {
                 ${this.custom.density === 'comfortable' ? '✓' : ''}
               </div>
               <p class="option-card-desc">
-                ${isRu
-                  ? 'Стандартные просторные отступы для максимальной читаемости'
-                  : 'Standard balanced spacing for comfortable reading'}
+                ${t.viewTexts.settings.comfortableDesc}
               </p>
             </div>
 
@@ -389,9 +381,7 @@ export class AppSettings extends LitElement {
                 ${this.custom.density === 'compact' ? '✓' : ''}
               </div>
               <p class="option-card-desc">
-                ${isRu
-                  ? 'Уменьшенные отступы и строки для профессионалов и плотных таблиц'
-                  : 'Tighter spacing and rows for high-density workflows'}
+                ${t.viewTexts.settings.compactDesc}
               </p>
             </div>
           </div>
@@ -408,7 +398,7 @@ export class AppSettings extends LitElement {
                 <span>${t.settings.langRu}</span>
                 ${this.custom.language === 'ru' ? '✓' : ''}
               </div>
-              <p class="option-card-desc">Полная русскоязычная локализация интерфейса</p>
+              <p class="option-card-desc">${t.viewTexts.settings.langRuDesc}</p>
             </div>
 
             <div
@@ -419,7 +409,7 @@ export class AppSettings extends LitElement {
                 <span>${t.settings.langEn}</span>
                 ${this.custom.language === 'en' ? '✓' : ''}
               </div>
-              <p class="option-card-desc">Global English interface translation</p>
+              <p class="option-card-desc">${t.viewTexts.settings.langEnDesc}</p>
             </div>
           </div>
         </app-section-card>
