@@ -49,6 +49,8 @@ import companiesMeta from '../app-companies/app-companies.story';
 import employeesMeta from '../app-employees/app-employees.story';
 import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
 import contractsMeta from '../app-contracts/app-contracts.story';
+import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
+import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
@@ -94,6 +96,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   employeesMeta,
   counterpartiesMeta,
   contractsMeta,
+  timeTrackingMeta,
+  expensesMeta,
   settingsMeta,
 ];
 

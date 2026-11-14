@@ -2,15 +2,17 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
+import { ExpenseCategory, Project, ProjectRole, ProjectStatus, TaskStatus, TimeEntryCategory } from '../../../types';
 import {
   iconChevronLeft,
+  iconClock,
   iconEdit,
   iconFileText,
   iconKanban,
   iconPlus,
   iconTrash,
   iconUsers,
+  iconWallet,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
@@ -90,6 +92,26 @@ export class AppProjectDetail extends LitElement {
 
   @state() private confirmDeleteOpen = false;
 
+  // Quick Project Expense Modal
+  @state() private expenseModalOpen = false;
+  @state() private expTitle = '';
+  @state() private expTaskId = '';
+  @state() private expCategory: ExpenseCategory = 'infrastructure';
+  @state() private expAmount = 25000;
+  @state() private expVendor = '';
+  @state() private expError = '';
+
+  // Quick Project Time Modal
+  @state() private timeModalOpen = false;
+  @state() private timeTaskId = '';
+  @state() private timeUserId = '';
+  @state() private timeHours = 2;
+  @state() private timeCategory: TimeEntryCategory = 'development';
+  @state() private timeDesc = '';
+
+  @state() private timeEntriesVersion = store.timeEntries.length;
+  @state() private expensesVersion = store.expenses.length;
+
   private unsubscribe?: () => void;
 
   static styles = styles;
@@ -117,6 +139,8 @@ export class AppProjectDetail extends LitElement {
     if (!store.users.some((u) => u.id === this.addMemberUserId)) {
       this.addMemberUserId = store.users[0]?.id || '';
     }
+    this.timeEntriesVersion = store.timeEntries.length;
+    this.expensesVersion = store.expenses.length;
   }
 
   private getStatusVariant(status: ProjectStatus | undefined): 'info' | 'success' | 'warning' | 'primary' {
@@ -155,9 +179,19 @@ export class AppProjectDetail extends LitElement {
     const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
     const linkedContracts = store.contracts.filter((c) => c.projectId === proj.id);
     const projectTasks = store.tasks.filter((task) => task.projectId === proj.id);
+    const projectTimeEntries = store.timeEntries.filter((te) => te.projectId === proj.id);
+    const projectExpenses = store.expenses.filter((ex) => ex.projectId === proj.id);
+    const projectHoursTotal = projectTimeEntries.reduce((s, e) => s + e.hours, 0);
+    const projectDirectExpensesRub = Math.round(
+      projectExpenses
+        .filter((e) => e.status !== 'rejected')
+        .reduce((s, e) => s + (e.currency === 'USD' ? e.amount * 96 : e.currency === 'EUR' ? e.amount * 104 : e.amount), 0)
+    );
     const members = proj.members || [];
     const uniqueUsersCount = new Set(members.map((m) => m.userId)).size;
     const statusKey = (proj.status || 'active') as ProjectStatus;
+    void this.timeEntriesVersion;
+    void this.expensesVersion;
 
     const projectSwitchOptions = this.projects.map((p) => ({
       value: p.id,
@@ -298,6 +332,14 @@ export class AppProjectDetail extends LitElement {
               <span class="meta-val mono">
                 ${uniqueUsersCount} ${isRu ? 'чел.' : 'ppl'} · ${members.length} ${isRu ? 'назнач.' : 'roles'}
               </span>
+            </div>
+            <div class="meta-box">
+              <span class="meta-label">${isRu ? 'Трудозатраты' : 'Logged Time'}</span>
+              <span class="meta-val mono">${projectHoursTotal.toFixed(1)} ч</span>
+            </div>
+            <div class="meta-box">
+              <span class="meta-label">${isRu ? 'Прямые расходы' : 'Direct Expenses'}</span>
+              <span class="meta-val mono">${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽</span>
             </div>
           </div>
         </section>
@@ -570,10 +612,132 @@ export class AppProjectDetail extends LitElement {
                 `}
           </section>
         </div>
+
+        <!-- Time Tracking & Expenses Panels for Project -->
+        <div class="secondary-grid">
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">
+                ${iconClock(18)}
+                <span>${isRu ? 'Учёт времени по проекту' : 'Project Time Tracking'}</span>
+                <span class="section-sub">(${projectHoursTotal.toFixed(1)} ч)</span>
+              </h2>
+              <div class="section-actions-inline">
+                <app-button
+                  size="sm"
+                  variant="secondary"
+                  @click="${() => this.openQuickTimeModal(proj.id)}"
+                >
+                  <span slot="icon-start">${iconPlus(13)}</span>
+                  <span>${isRu ? 'Списать' : 'Log'}</span>
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="ghost"
+                  @click="${() => store.setActiveView('time-tracking')}"
+                >
+                  ${isRu ? 'Журнал' : 'All'}
+                </app-button>
+              </div>
+            </div>
+
+            ${projectTimeEntries.length === 0
+              ? html`<div class="empty-state">${isRu ? 'Записи о времени по проекту ещё не добавлены' : 'No time entries yet'}</div>`
+              : html`
+                  <div class="contracts-list">
+                    ${projectTimeEntries.slice(0, 5).map((te) => {
+                      const user = store.users.find((u) => u.id === te.userId);
+                      return html`
+                        <div class="contract-row">
+                          <div class="contract-main">
+                            <div class="contract-num-title">
+                              <span class="mono" style="color: var(--accent-primary);">${te.taskId}</span>
+                              · ${te.description || t.timeTracking.categories[te.category]}
+                            </div>
+                            <div class="contract-sub">${te.date} · ${user?.name || te.userId}</div>
+                          </div>
+                          <div class="contract-right">
+                            <span class="mono" style="font-weight: 700; font-size: 0.85rem;">${te.hours.toFixed(1)} ч</span>
+                            <app-badge
+                              variant="${te.status === 'approved' ? 'success' : te.status === 'submitted' ? 'warning' : 'default'}"
+                              appearance="soft"
+                              size="sm"
+                            >
+                              ${t.timeTracking.statuses[te.status]}
+                            </app-badge>
+                          </div>
+                        </div>
+                      `;
+                    })}
+                  </div>
+                `}
+          </section>
+
+          <section class="section-card">
+            <div class="section-header">
+              <h2 class="section-title">
+                ${iconWallet(18)}
+                <span>${isRu ? 'Расходы по проекту' : 'Project Expenses'}</span>
+                <span class="section-sub">(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)</span>
+              </h2>
+              <div class="section-actions-inline">
+                <app-button
+                  size="sm"
+                  variant="secondary"
+                  @click="${() => this.openQuickExpenseModal()}"
+                >
+                  <span slot="icon-start">${iconPlus(13)}</span>
+                  <span>${isRu ? 'Расход' : 'Expense'}</span>
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="ghost"
+                  @click="${() => store.setActiveView('expenses')}"
+                >
+                  ${isRu ? 'Реестр' : 'All'}
+                </app-button>
+              </div>
+            </div>
+
+            ${projectExpenses.length === 0
+              ? html`<div class="empty-state">${isRu ? 'Прямые расходы по проекту отсутствуют' : 'No project expenses yet'}</div>`
+              : html`
+                  <div class="contracts-list">
+                    ${projectExpenses.slice(0, 5).map((exp) => {
+                      const sym = exp.currency === 'USD' ? '$' : exp.currency === 'EUR' ? '€' : '₽';
+                      return html`
+                        <div class="contract-row">
+                          <div class="contract-main">
+                            <div class="contract-num-title">${exp.title}</div>
+                            <div class="contract-sub">
+                              ${exp.date}${exp.taskId ? ` · ${exp.taskId}` : ''}${exp.vendor ? ` · ${exp.vendor}` : ''}
+                            </div>
+                          </div>
+                          <div class="contract-right">
+                            <span class="mono" style="font-weight: 700; font-size: 0.85rem;">
+                              ${exp.amount.toLocaleString('ru-RU')} ${sym}
+                            </span>
+                            <app-badge
+                              variant="${exp.status === 'approved' ? 'success' : exp.status === 'pending' ? 'warning' : exp.status === 'rejected' ? 'danger' : 'info'}"
+                              appearance="soft"
+                              size="sm"
+                            >
+                              ${t.expenses.statuses[exp.status]}
+                            </app-badge>
+                          </div>
+                        </div>
+                      `;
+                    })}
+                  </div>
+                `}
+          </section>
+        </div>
       </div>
 
       ${this.renderEditModal(t, isRu)}
       ${this.renderDeleteModal(proj, isRu)}
+      ${this.renderQuickTimeModal(proj, projectTasks, t, isRu)}
+      ${this.renderQuickExpenseModal(proj, projectTasks, t, isRu)}
     `;
   }
 
@@ -800,5 +964,235 @@ export class AppProjectDetail extends LitElement {
     });
 
     this.modalOpen = false;
+  }
+
+  private openQuickTimeModal(projectId: string) {
+    const firstTask = store.tasks.find((tk) => tk.projectId === projectId);
+    this.timeTaskId = firstTask?.id || '';
+    this.timeUserId = store.users[0]?.id || '';
+    this.timeHours = 2;
+    this.timeCategory = 'development';
+    this.timeDesc = '';
+    this.timeModalOpen = true;
+  }
+
+  private openQuickExpenseModal() {
+    this.expTitle = '';
+    this.expTaskId = '';
+    this.expCategory = 'infrastructure';
+    this.expAmount = 25000;
+    this.expVendor = '';
+    this.expError = '';
+    this.expenseModalOpen = true;
+  }
+
+  private renderQuickTimeModal(
+    proj: Project,
+    projectTasks: typeof store.tasks,
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    const taskOpts = projectTasks.slice(0, 60).map((tk) => ({
+      value: tk.id,
+      label: `${tk.id} · ${tk.title}`,
+    }));
+    const userOpts = store.users.map((u) => ({ value: u.id, label: u.name }));
+    const catOpts = [
+      { value: 'development', label: t.timeTracking.categories.development },
+      { value: 'design', label: t.timeTracking.categories.design },
+      { value: 'testing', label: t.timeTracking.categories.testing },
+      { value: 'research', label: t.timeTracking.categories.research },
+      { value: 'devops', label: t.timeTracking.categories.devops },
+      { value: 'meeting', label: t.timeTracking.categories.meeting },
+      { value: 'management', label: t.timeTracking.categories.management },
+    ];
+
+    return html`
+      <app-modal
+        ?open="${this.timeModalOpen}"
+        size="md"
+        title="${isRu ? `Списание времени · ${proj.key}` : `Log Time · ${proj.key}`}"
+        @close="${() => (this.timeModalOpen = false)}"
+      >
+        <div class="form-grid">
+          <div class="col-span-2">
+            <app-select
+              label="${isRu ? 'Задача проекта' : 'Task'}"
+              .value="${this.timeTaskId}"
+              .options="${taskOpts}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = e.detail.value)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-select
+              label="${isRu ? 'Исполнитель' : 'Employee'}"
+              .value="${this.timeUserId}"
+              .options="${userOpts}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = e.detail.value)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-number-input
+              label="${isRu ? 'Часы' : 'Hours'}"
+              .value="${this.timeHours}"
+              min="0.25"
+              max="24"
+              step="0.5"
+              unit="ч"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = e.detail.value)}"
+            ></app-number-input>
+          </div>
+          <div class="col-span-2">
+            <app-select
+              label="${isRu ? 'Категория работ' : 'Category'}"
+              .value="${this.timeCategory}"
+              .options="${catOpts}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.timeCategory = e.detail.value as TimeEntryCategory)}"
+            ></app-select>
+          </div>
+          <div class="col-span-2">
+            <app-textarea
+              label="${isRu ? 'Комментарий к отчёту' : 'Notes'}"
+              .value="${this.timeDesc}"
+              rows="2"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = e.detail.value)}"
+            ></app-textarea>
+          </div>
+        </div>
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.timeModalOpen = false)}">${t.common.cancel}</app-button>
+          <app-button
+            variant="primary"
+            ?disabled="${!this.timeTaskId || this.timeHours <= 0}"
+            @click="${() => {
+              if (!this.timeTaskId) return;
+              store.addTimeEntry({
+                projectId: proj.id,
+                taskId: this.timeTaskId,
+                userId: this.timeUserId || store.users[0]?.id || '',
+                date: new Date().toISOString().slice(0, 10),
+                hours: this.timeHours,
+                billable: true,
+                category: this.timeCategory,
+                status: 'logged',
+                description: this.timeDesc.trim(),
+              });
+              this.timeModalOpen = false;
+            }}"
+          >
+            ${t.common.save}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
+  }
+
+  private renderQuickExpenseModal(
+    proj: Project,
+    projectTasks: typeof store.tasks,
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    const taskOpts = [
+      { value: '', label: isRu ? 'На весь проект' : 'Project-wide' },
+      ...projectTasks.slice(0, 60).map((tk) => ({ value: tk.id, label: `${tk.id} · ${tk.title}` })),
+    ];
+    const catOpts = [
+      { value: 'infrastructure', label: t.expenses.categories.infrastructure },
+      { value: 'software', label: t.expenses.categories.software },
+      { value: 'contractors', label: t.expenses.categories.contractors },
+      { value: 'equipment', label: t.expenses.categories.equipment },
+      { value: 'travel', label: t.expenses.categories.travel },
+      { value: 'marketing', label: t.expenses.categories.marketing },
+      { value: 'other', label: t.expenses.categories.other },
+    ];
+
+    return html`
+      <app-modal
+        ?open="${this.expenseModalOpen}"
+        size="md"
+        title="${isRu ? `Новый расход · ${proj.key}` : `New Expense · ${proj.key}`}"
+        @close="${() => (this.expenseModalOpen = false)}"
+      >
+        <div class="form-grid">
+          <div class="col-span-2">
+            <app-input
+              label="${isRu ? 'Наименование расхода' : 'Title'}"
+              .value="${this.expTitle}"
+              required
+              error="${this.expError}"
+              @input="${(e: CustomEvent<{ value: string }>) => {
+                this.expTitle = e.detail.value;
+                this.expError = '';
+              }}"
+            ></app-input>
+          </div>
+          <div>
+            <app-select
+              label="${isRu ? 'Категория' : 'Category'}"
+              .value="${this.expCategory}"
+              .options="${catOpts}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.expCategory = e.detail.value as ExpenseCategory)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-number-input
+              label="${isRu ? 'Сумма (₽)' : 'Amount (₽)'}"
+              .value="${this.expAmount}"
+              min="0"
+              step="1000"
+              unit="₽"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.expAmount = e.detail.value)}"
+            ></app-number-input>
+          </div>
+          <div>
+            <app-select
+              label="${isRu ? 'Задача (опционально)' : 'Task (optional)'}"
+              .value="${this.expTaskId}"
+              .options="${taskOpts}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.expTaskId = e.detail.value)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-input
+              label="${isRu ? 'Поставщик' : 'Vendor'}"
+              .value="${this.expVendor}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = e.detail.value)}"
+            ></app-input>
+          </div>
+        </div>
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.expenseModalOpen = false)}">${t.common.cancel}</app-button>
+          <app-button
+            variant="primary"
+            @click="${() => {
+              if (!this.expTitle.trim()) {
+                this.expError = isRu ? 'Обязательное поле' : 'Required';
+                return;
+              }
+              store.addExpense({
+                projectId: proj.id,
+                taskId: this.expTaskId || undefined,
+                userId: store.users[0]?.id || '',
+                date: new Date().toISOString().slice(0, 10),
+                title: this.expTitle.trim(),
+                category: this.expCategory,
+                amount: Math.max(0, Number(this.expAmount) || 0),
+                currency: 'RUB',
+                billable: true,
+                status: 'pending',
+                vendor: this.expVendor.trim() || undefined,
+                notes: '',
+              });
+              this.expenseModalOpen = false;
+            }}"
+          >
+            ${t.common.save}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
   }
 }

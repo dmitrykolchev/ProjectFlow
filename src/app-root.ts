@@ -18,6 +18,8 @@ import {
   iconUsers,
   iconHandshake,
   iconFileText,
+  iconClock,
+  iconWallet,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -44,6 +46,8 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   employees: () => import('./components/views/app-employees/app-employees'),
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
   contracts: () => import('./components/views/app-contracts/app-contracts'),
+  'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
+  expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
 };
@@ -196,6 +200,18 @@ export class AppRoot extends LitElement {
             label="${t.navigation.gantt}"
             .icon="${iconGantt()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="time-tracking"
+            label="${t.navigation.timeTracking}"
+            .icon="${iconClock()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="expenses"
+            label="${t.navigation.expenses}"
+            .icon="${iconWallet()}"
+          ></sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
@@ -324,6 +340,10 @@ export class AppRoot extends LitElement {
         return html`<app-counterparties></app-counterparties>`;
       case 'contracts':
         return html`<app-contracts></app-contracts>`;
+      case 'time-tracking':
+        return html`<app-time-tracking></app-time-tracking>`;
+      case 'expenses':
+        return html`<app-expenses></app-expenses>`;
       case 'settings':
         return html`<app-settings></app-settings>`;
       case 'storybook':

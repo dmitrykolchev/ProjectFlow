@@ -65,6 +65,8 @@ export class AppHeader extends LitElement {
       employees: t.navigation.employees,
       counterparties: t.navigation.counterparties,
       contracts: t.navigation.contracts,
+      'time-tracking': t.navigation.timeTracking,
+      expenses: t.navigation.expenses,
       settings: t.navigation.settings,
       storybook: t.navigation.storybook,
     };

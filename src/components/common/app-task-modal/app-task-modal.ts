@@ -2,11 +2,12 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
-import { Task, TaskPriority, TaskStatus } from '../../../types';
+import { Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronDown, iconChevronUp, iconGripVertical, iconX } from '../icons';
+import { iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
+import '../app-badge/app-badge';
 import '../app-button/app-button';
 import '../app-input/app-input';
 import '../app-textarea/app-textarea';
@@ -40,6 +41,16 @@ export class AppTaskModal extends LitElement {
   @state() private draggedSubtaskId: string | null = null;
   @state() private dropTargetSubtaskId: string | null = null;
   @state() private dropSubtaskPosition: 'before' | 'after' = 'before';
+
+  // Quick Time Entry & Task Expense inline state
+  @state() private taskTimeEntries: TimeEntry[] = [];
+  @state() private taskExpenses: Expense[] = [];
+  @state() private quickTimeHours: number = 1.5;
+  @state() private quickTimeCategory: TimeEntryCategory = 'development';
+  @state() private quickTimeDesc: string = '';
+  @state() private quickExpenseTitle: string = '';
+  @state() private quickExpenseAmount: number = 5000;
+  @state() private quickExpenseCategory: ExpenseCategory = 'software';
 
   private unsubscribe?: () => void;
 
@@ -98,6 +109,21 @@ export class AppTaskModal extends LitElement {
       this.errors = {};
       this.draggedSubtaskId = null;
       this.dropTargetSubtaskId = null;
+      this.quickTimeHours = 1.5;
+      this.quickTimeCategory = 'development';
+      this.quickTimeDesc = '';
+      this.quickExpenseTitle = '';
+      this.quickExpenseAmount = 5000;
+      this.quickExpenseCategory = 'software';
+    }
+
+    if (this.isOpen && this.editingTask) {
+      const taskId = this.editingTask.id;
+      this.taskTimeEntries = store.timeEntries.filter((te) => te.taskId === taskId);
+      this.taskExpenses = store.expenses.filter((ex) => ex.taskId === taskId);
+    } else if (!this.isOpen) {
+      this.taskTimeEntries = [];
+      this.taskExpenses = [];
     }
   }
 
@@ -336,6 +362,8 @@ export class AppTaskModal extends LitElement {
               </app-button>
             </div>
           </div>
+
+          ${this.editingTask ? this.renderTaskReportsAndExpenses(t) : ''}
         </div>
 
         <div slot="footer">
@@ -499,5 +527,244 @@ export class AppTaskModal extends LitElement {
       store.deleteTask(this.editingTask.id);
       store.closeTaskModal();
     }
+  }
+
+  private renderTaskReportsAndExpenses(t: ReturnType<typeof getTranslation>) {
+    const isRu = this.currentLang === 'ru';
+    const totalEntryHours = this.taskTimeEntries.reduce((s, e) => s + e.hours, 0);
+    const totalExpenseRub = this.taskExpenses
+      .filter((e) => e.status !== 'rejected')
+      .reduce((s, e) => s + (e.currency === 'USD' ? e.amount * 96 : e.currency === 'EUR' ? e.amount * 104 : e.amount), 0);
+
+    const timeCatOptions = [
+      { value: 'development', label: t.timeTracking.categories.development },
+      { value: 'design', label: t.timeTracking.categories.design },
+      { value: 'testing', label: t.timeTracking.categories.testing },
+      { value: 'research', label: t.timeTracking.categories.research },
+      { value: 'devops', label: t.timeTracking.categories.devops },
+      { value: 'meeting', label: t.timeTracking.categories.meeting },
+      { value: 'management', label: t.timeTracking.categories.management },
+    ];
+
+    const expenseCatOptions = [
+      { value: 'infrastructure', label: t.expenses.categories.infrastructure },
+      { value: 'software', label: t.expenses.categories.software },
+      { value: 'contractors', label: t.expenses.categories.contractors },
+      { value: 'equipment', label: t.expenses.categories.equipment },
+      { value: 'travel', label: t.expenses.categories.travel },
+      { value: 'marketing', label: t.expenses.categories.marketing },
+      { value: 'other', label: t.expenses.categories.other },
+    ];
+
+    return html`
+      <!-- Time Entries Section -->
+      <div class="col-span-2 task-records-section">
+        <div class="records-head">
+          <span class="records-title">
+            ${iconClock(14)}
+            <span>${isRu ? 'Отчёты о времени по задаче' : 'Task Time Reports'} (${this.taskTimeEntries.length})</span>
+          </span>
+          <span class="records-total">${totalEntryHours.toFixed(1)} ч</span>
+        </div>
+
+        ${this.taskTimeEntries.length === 0
+          ? html`<div class="records-empty">${isRu ? 'Записи о времени ещё не добавлены' : 'No time entries yet'}</div>`
+          : html`
+              <div class="record-list">
+                ${this.taskTimeEntries.map((entry) => {
+                  const user = store.users.find((u) => u.id === entry.userId);
+                  return html`
+                    <div class="record-row">
+                      <div class="record-main">
+                        <div class="record-primary">${entry.description || t.timeTracking.categories[entry.category]}</div>
+                        <div class="record-meta">
+                          ${entry.date} · ${user?.name || entry.userId} · ${t.timeTracking.categories[entry.category]}
+                        </div>
+                      </div>
+                      <div class="record-right">
+                        <span class="record-val">${entry.hours.toFixed(1)} ч</span>
+                        <button
+                          type="button"
+                          class="subtask-action-btn subtask-remove"
+                          title="${t.common.delete}"
+                          @click="${() => this.handleDeleteQuickTime(entry)}"
+                        >
+                          ${iconTrash(13)}
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                })}
+              </div>
+            `}
+
+        <div class="inline-mini-form">
+          <div>
+            <app-number-input
+              size="sm"
+              label="${isRu ? 'Часы' : 'Hours'}"
+              .value="${this.quickTimeHours}"
+              min="0.25"
+              max="24"
+              step="0.5"
+              unit="ч"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.quickTimeHours = e.detail.value)}"
+            ></app-number-input>
+          </div>
+          <div>
+            <app-select
+              size="sm"
+              label="${isRu ? 'Категория' : 'Category'}"
+              .value="${this.quickTimeCategory}"
+              .options="${timeCatOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.quickTimeCategory = e.detail.value as TimeEntryCategory)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-input
+              size="sm"
+              label="${isRu ? 'Комментарий' : 'Notes'}"
+              placeholder="${isRu ? 'Выполненные работы...' : 'Work done...'}"
+              .value="${this.quickTimeDesc}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.quickTimeDesc = e.detail.value)}"
+            ></app-input>
+          </div>
+          <app-button
+            size="sm"
+            variant="secondary"
+            ?disabled="${this.quickTimeHours <= 0}"
+            @click="${this.handleAddQuickTime}"
+          >
+            <span slot="icon-start">${iconPlus(13)}</span>
+            <span>${isRu ? 'Время' : 'Log'}</span>
+          </app-button>
+        </div>
+      </div>
+
+      <!-- Task Expenses Section -->
+      <div class="col-span-2 task-records-section">
+        <div class="records-head">
+          <span class="records-title">
+            ${iconWallet(14)}
+            <span>${isRu ? 'Расходы по задаче' : 'Task Expenses'} (${this.taskExpenses.length})</span>
+          </span>
+          <span class="records-total">${Math.round(totalExpenseRub).toLocaleString('ru-RU')} ₽</span>
+        </div>
+
+        ${this.taskExpenses.length === 0
+          ? html`<div class="records-empty">${isRu ? 'Расходы к этой задаче не привязаны' : 'No expenses linked to this task'}</div>`
+          : html`
+              <div class="record-list">
+                ${this.taskExpenses.map((exp) => {
+                  const sym = exp.currency === 'USD' ? '$' : exp.currency === 'EUR' ? '€' : '₽';
+                  return html`
+                    <div class="record-row">
+                      <div class="record-main">
+                        <div class="record-primary">${exp.title}</div>
+                        <div class="record-meta">
+                          ${exp.date} · ${t.expenses.categories[exp.category]} · ${t.expenses.statuses[exp.status]}
+                        </div>
+                      </div>
+                      <div class="record-right">
+                        <span class="record-val">${exp.amount.toLocaleString('ru-RU')} ${sym}</span>
+                        <button
+                          type="button"
+                          class="subtask-action-btn subtask-remove"
+                          title="${t.common.delete}"
+                          @click="${() => store.deleteExpense(exp.id)}"
+                        >
+                          ${iconTrash(13)}
+                        </button>
+                      </div>
+                    </div>
+                  `;
+                })}
+              </div>
+            `}
+
+        <div class="inline-mini-form expense-mini">
+          <div>
+            <app-input
+              size="sm"
+              label="${isRu ? 'Статья расхода' : 'Expense title'}"
+              placeholder="${isRu ? 'Лицензия, сервер, подрядчик...' : 'License, server...'}"
+              .value="${this.quickExpenseTitle}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.quickExpenseTitle = e.detail.value)}"
+            ></app-input>
+          </div>
+          <div>
+            <app-number-input
+              size="sm"
+              label="${isRu ? 'Сумма (₽)' : 'Amount (₽)'}"
+              .value="${this.quickExpenseAmount}"
+              min="0"
+              step="500"
+              unit="₽"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.quickExpenseAmount = e.detail.value)}"
+            ></app-number-input>
+          </div>
+          <div>
+            <app-select
+              size="sm"
+              label="${isRu ? 'Категория' : 'Category'}"
+              .value="${this.quickExpenseCategory}"
+              .options="${expenseCatOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.quickExpenseCategory = e.detail.value as ExpenseCategory)}"
+            ></app-select>
+          </div>
+          <app-button
+            size="sm"
+            variant="secondary"
+            ?disabled="${!this.quickExpenseTitle.trim()}"
+            @click="${this.handleAddQuickExpense}"
+          >
+            <span slot="icon-start">${iconPlus(13)}</span>
+            <span>${isRu ? 'Расход' : 'Expense'}</span>
+          </app-button>
+        </div>
+      </div>
+    `;
+  }
+
+  private handleAddQuickTime() {
+    if (!this.editingTask || this.quickTimeHours <= 0) return;
+    const entry = store.addTimeEntry({
+      taskId: this.editingTask.id,
+      projectId: this.projectId || this.editingTask.projectId,
+      userId: this.assigneeId || store.users[0]?.id || 'user-1',
+      date: new Date().toISOString().slice(0, 10),
+      hours: this.quickTimeHours,
+      billable: true,
+      category: this.quickTimeCategory,
+      status: 'logged',
+      description: this.quickTimeDesc.trim(),
+    });
+    this.loggedHours = Math.max(0, Math.round((this.loggedHours + entry.hours) * 100) / 100);
+    this.quickTimeDesc = '';
+  }
+
+  private handleDeleteQuickTime(entry: TimeEntry) {
+    store.deleteTimeEntry(entry.id);
+    this.loggedHours = Math.max(0, Math.round((this.loggedHours - entry.hours) * 100) / 100);
+  }
+
+  private handleAddQuickExpense() {
+    if (!this.editingTask || !this.quickExpenseTitle.trim()) return;
+    store.addExpense({
+      projectId: this.projectId || this.editingTask.projectId,
+      taskId: this.editingTask.id,
+      userId: this.assigneeId || store.users[0]?.id || 'user-1',
+      date: new Date().toISOString().slice(0, 10),
+      title: this.quickExpenseTitle.trim(),
+      category: this.quickExpenseCategory,
+      amount: Math.max(0, Number(this.quickExpenseAmount) || 0),
+      currency: 'RUB',
+      billable: true,
+      status: 'pending',
+      notes: `Привязано к задаче ${this.editingTask.id}`,
+    });
+    this.quickExpenseTitle = '';
   }
 }

@@ -144,6 +144,8 @@ export class AppSettings extends LitElement {
       { id: 'employees', label: t.navigation.employees },
       { id: 'counterparties', label: t.navigation.counterparties },
       { id: 'contracts', label: t.navigation.contracts },
+      { id: 'time-tracking', label: t.navigation.timeTracking },
+      { id: 'expenses', label: t.navigation.expenses },
     ];
 
     const curatedPalettes = CURATED_BASE_PALETTES[activeTheme];

@@ -6,6 +6,7 @@ import {
   Company,
   Contract,
   Counterparty,
+  Expense,
   NotificationItem,
   Project,
   ProjectMember,
@@ -15,6 +16,7 @@ import {
   TaskStatus,
   ThemeBaseColors,
   ThemeMode,
+  TimeEntry,
   User,
   UserCustomization,
 } from '../types';
@@ -22,8 +24,10 @@ import {
   initialCompanies,
   initialContracts,
   initialCounterparties,
+  initialExpenses,
   initialProjects,
   initialTasks,
+  initialTimeEntries,
   initialUsers,
 } from './mock-data';
 
@@ -35,6 +39,8 @@ const STORAGE_KEY_COMPANIES = 'projectflow_companies_v1';
 const STORAGE_KEY_EMPLOYEES = 'projectflow_employees_v1';
 const STORAGE_KEY_COUNTERPARTIES = 'projectflow_counterparties_v1';
 const STORAGE_KEY_CONTRACTS = 'projectflow_contracts_v1';
+const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
+const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -186,6 +192,8 @@ export class AppStore {
   public companies: Company[] = [];
   public counterparties: Counterparty[] = [];
   public contracts: Contract[] = [];
+  public timeEntries: TimeEntry[] = [];
+  public expenses: Expense[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
   public activeView: ActiveView = 'dashboard';
@@ -293,6 +301,12 @@ export class AppStore {
       const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
       this.contracts = storedContracts ? JSON.parse(storedContracts) : [...initialContracts];
 
+      const storedTimeEntries = localStorage.getItem(STORAGE_KEY_TIME_ENTRIES);
+      this.timeEntries = storedTimeEntries ? JSON.parse(storedTimeEntries) : [...initialTimeEntries];
+
+      const storedExpenses = localStorage.getItem(STORAGE_KEY_EXPENSES);
+      this.expenses = storedExpenses ? JSON.parse(storedExpenses) : [...initialExpenses];
+
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
         this.activityLog = JSON.parse(storedLogs);
@@ -331,6 +345,8 @@ export class AppStore {
       this.users = [...initialUsers];
       this.counterparties = [...initialCounterparties];
       this.contracts = [...initialContracts];
+      this.timeEntries = [...initialTimeEntries];
+      this.expenses = [...initialExpenses];
     }
   }
 
@@ -377,6 +393,22 @@ export class AppStore {
   private saveContracts(): void {
     try {
       localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(this.contracts));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveTimeEntries(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_TIME_ENTRIES, JSON.stringify(this.timeEntries));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveExpenses(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(this.expenses));
     } catch (e) {
       console.error(e);
     }
@@ -712,7 +744,9 @@ export class AppStore {
       view === 'projects' ||
       view === 'project-detail' ||
       view === 'kanban' ||
-      view === 'gantt'
+      view === 'gantt' ||
+      view === 'time-tracking' ||
+      view === 'expenses'
     ) {
       return 'workspace';
     }
@@ -1199,6 +1233,154 @@ export class AppStore {
     this.saveProjects();
     const user = this.users.find((u) => u.id === userId);
     this.logActivity('update', 'project', project.name, `Удалён участник ${user?.name || userId}`);
+    this.notify();
+  }
+
+  // --- Time Entries CRUD ---
+  private adjustTaskLoggedHours(taskId: string, deltaHours: number): void {
+    if (!taskId || !deltaHours) return;
+    let changed = false;
+    this.tasks = this.tasks.map((t) => {
+      if (t.id !== taskId) return t;
+      changed = true;
+      const nextHours = Math.max(0, Math.round(((t.loggedHours || 0) + deltaHours) * 100) / 100);
+      return {
+        ...t,
+        loggedHours: nextHours,
+        updatedAt: new Date().toISOString(),
+      };
+    });
+    if (changed) {
+      this.saveTasks();
+    }
+  }
+
+  public addTimeEntry(data: Omit<TimeEntry, 'id' | 'createdAt'>): TimeEntry {
+    const hours = Math.max(0.25, Math.round((Number(data.hours) || 0) * 100) / 100);
+    const entry: TimeEntry = {
+      ...data,
+      hours,
+      id: `te-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.timeEntries = [entry, ...this.timeEntries];
+    this.saveTimeEntries();
+    this.adjustTaskLoggedHours(entry.taskId, entry.hours);
+
+    const task = this.tasks.find((t) => t.id === entry.taskId);
+    const user = this.users.find((u) => u.id === entry.userId);
+    const targetTitle = task ? `${task.id} · ${task.title}` : entry.taskId;
+    this.logActivity(
+      'create',
+      'time_entry',
+      targetTitle,
+      `Списано ${entry.hours} ч (${user?.name || entry.userId})`
+    );
+    this.addNotification('success', 'Время списано', `${entry.hours} ч по задаче ${entry.taskId}`);
+    this.notify();
+    return entry;
+  }
+
+  public updateTimeEntry(updated: TimeEntry): void {
+    const old = this.timeEntries.find((e) => e.id === updated.id);
+    const nextHours = Math.max(0.25, Math.round((Number(updated.hours) || 0) * 100) / 100);
+    const normalized: TimeEntry = { ...updated, hours: nextHours };
+
+    this.timeEntries = this.timeEntries.map((e) => (e.id === normalized.id ? normalized : e));
+    this.saveTimeEntries();
+
+    if (old) {
+      if (old.taskId === normalized.taskId) {
+        const delta = normalized.hours - old.hours;
+        if (delta !== 0) {
+          this.adjustTaskLoggedHours(normalized.taskId, delta);
+        }
+      } else {
+        this.adjustTaskLoggedHours(old.taskId, -old.hours);
+        this.adjustTaskLoggedHours(normalized.taskId, normalized.hours);
+      }
+    }
+
+    const task = this.tasks.find((t) => t.id === normalized.taskId);
+    this.logActivity(
+      'update',
+      'time_entry',
+      task ? `${task.id} · ${task.title}` : normalized.taskId,
+      `Обновлена запись: ${normalized.hours} ч (${normalized.status})`
+    );
+    this.addNotification('info', 'Запись обновлена', `${normalized.hours} ч по ${normalized.taskId}`);
+    this.notify();
+  }
+
+  public deleteTimeEntry(id: string): void {
+    const target = this.timeEntries.find((e) => e.id === id);
+    if (!target) return;
+    this.timeEntries = this.timeEntries.filter((e) => e.id !== id);
+    this.saveTimeEntries();
+    this.adjustTaskLoggedHours(target.taskId, -target.hours);
+
+    const task = this.tasks.find((t) => t.id === target.taskId);
+    this.logActivity(
+      'delete',
+      'time_entry',
+      task ? `${task.id} · ${task.title}` : target.taskId,
+      `Удалена запись о времени (${target.hours} ч)`
+    );
+    this.addNotification('warning', 'Запись удалена', `Удалено ${target.hours} ч по ${target.taskId}`);
+    this.notify();
+  }
+
+  // --- Expenses CRUD ---
+  public addExpense(data: Omit<Expense, 'id' | 'createdAt'>): Expense {
+    const amount = Math.max(0, Math.round((Number(data.amount) || 0) * 100) / 100);
+    const expense: Expense = {
+      ...data,
+      amount,
+      id: `exp-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.expenses = [expense, ...this.expenses];
+    this.saveExpenses();
+
+    const proj = this.projects.find((p) => p.id === expense.projectId);
+    const symbol = expense.currency === 'USD' ? '$' : expense.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'create',
+      'expense',
+      expense.title,
+      `${expense.amount.toLocaleString('ru-RU')} ${symbol} · ${proj?.key || expense.projectId}${
+        expense.taskId ? ` (${expense.taskId})` : ''
+      }`
+    );
+    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString('ru-RU')} ${symbol}`);
+    this.notify();
+    return expense;
+  }
+
+  public updateExpense(updated: Expense): void {
+    const amount = Math.max(0, Math.round((Number(updated.amount) || 0) * 100) / 100);
+    const normalized: Expense = { ...updated, amount };
+    this.expenses = this.expenses.map((e) => (e.id === normalized.id ? normalized : e));
+    this.saveExpenses();
+
+    const symbol = normalized.currency === 'USD' ? '$' : normalized.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'update',
+      'expense',
+      normalized.title,
+      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString('ru-RU')} ${symbol}`
+    );
+    this.addNotification('info', 'Расход обновлён', normalized.title);
+    this.notify();
+  }
+
+  public deleteExpense(id: string): void {
+    const target = this.expenses.find((e) => e.id === id);
+    if (!target) return;
+    this.expenses = this.expenses.filter((e) => e.id !== id);
+    this.saveExpenses();
+    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена');
+    this.addNotification('warning', 'Расход удалён', target.title);
     this.notify();
   }
 

@@ -164,8 +164,123 @@
   min-width: 0;
 }
 
+.task-records-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
+.records-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.records-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.records-total {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent-primary, #6366f1);
+}
+
+.record-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 165px;
+  overflow-y: auto;
+}
+
+.record-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+  font-size: 0.78rem;
+}
+
+.record-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.record-primary {
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.record-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.record-val {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+  white-space: nowrap;
+}
+
+.records-empty {
+  font-size: 0.76rem;
+  color: var(--text-muted, #64748b);
+  padding: 0.4rem 0;
+}
+
+.inline-mini-form {
+  display: grid;
+  grid-template-columns: minmax(105px, 0.75fr) minmax(130px, 0.9fr) minmax(150px, 1.35fr) auto;
+  gap: 0.5rem;
+  align-items: end;
+}
+
+.inline-mini-form.expense-mini {
+  grid-template-columns: minmax(170px, 1.5fr) minmax(115px, 0.85fr) minmax(145px, 1fr) auto;
+}
+
+.inline-mini-form > div {
+  min-width: 0;
+}
+
 @media (max-width: 640px) {
-  .form-grid {
+  .form-grid,
+  .inline-mini-form,
+  .inline-mini-form.expense-mini {
     grid-template-columns: 1fr;
   }
   .col-span-2 {

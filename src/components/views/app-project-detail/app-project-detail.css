@@ -237,6 +237,12 @@
   font-weight: 400;
 }
 
+.section-actions-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
 .add-member-bar {
   display: grid;
   grid-template-columns: minmax(220px, 1.45fr) minmax(200px, 1.1fr) 140px auto;

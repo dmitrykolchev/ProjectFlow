@@ -128,6 +128,59 @@ export interface Task {
   updatedAt: string;
 }
 
+export type TimeEntryCategory =
+  | 'development'
+  | 'design'
+  | 'testing'
+  | 'meeting'
+  | 'research'
+  | 'devops'
+  | 'management';
+
+export type TimeEntryStatus = 'logged' | 'submitted' | 'approved';
+
+export interface TimeEntry {
+  id: string;
+  taskId: string;
+  projectId: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  hours: number;
+  billable: boolean;
+  category: TimeEntryCategory;
+  status: TimeEntryStatus;
+  description: string;
+  createdAt: string;
+}
+
+export type ExpenseCategory =
+  | 'infrastructure'
+  | 'software'
+  | 'contractors'
+  | 'travel'
+  | 'equipment'
+  | 'marketing'
+  | 'other';
+
+export type ExpenseStatus = 'draft' | 'pending' | 'approved' | 'reimbursed' | 'rejected';
+
+export interface Expense {
+  id: string;
+  projectId: string;
+  taskId?: string;
+  userId: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  category: ExpenseCategory;
+  amount: number;
+  currency: 'RUB' | 'USD' | 'EUR';
+  billable: boolean;
+  status: ExpenseStatus;
+  vendor?: string;
+  notes: string;
+  createdAt: string;
+}
+
 export type ThemeMode = 'dark' | 'light' | 'cyberpunk';
 export type DensityMode = 'comfortable' | 'compact';
 export type AccentColor = 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber';
@@ -156,6 +209,8 @@ export type ActiveView =
   | 'contracts'
   | 'projects'
   | 'project-detail'
+  | 'time-tracking'
+  | 'expenses'
   | 'settings'
   | 'storybook';
 
@@ -165,7 +220,16 @@ export interface ActivityLogItem {
   userId: string;
   userName: string;
   action: 'create' | 'update' | 'delete' | 'status_change' | 'priority_change';
-  targetType: 'task' | 'project' | 'company' | 'employee' | 'counterparty' | 'contract' | 'settings';
+  targetType:
+    | 'task'
+    | 'project'
+    | 'company'
+    | 'employee'
+    | 'counterparty'
+    | 'contract'
+    | 'time_entry'
+    | 'expense'
+    | 'settings';
   targetTitle: string;
   details: string;
 }
