@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { Company, CompanyStatus } from '../../../types';
 import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
@@ -159,18 +160,7 @@ export class AppCompanies extends LitElement {
                           <div class="company-legal" title="${company.legalName}">${company.legalName}</div>
                         </div>
                       </div>
-                      <app-badge
-                        variant="${company.status === 'active' ? 'success' : 'default'}"
-                        appearance="soft"
-                      >
-                        ${company.status === 'active'
-                          ? isRu
-                            ? 'Активна'
-                            : 'Active'
-                          : isRu
-                          ? 'Архив'
-                          : 'Inactive'}
-                      </app-badge>
+                      <app-status-chip domain="company" status="${company.status}"></app-status-chip>
                     </div>
 
                     <p class="company-desc">${company.description}</p>

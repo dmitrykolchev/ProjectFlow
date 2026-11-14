@@ -14,6 +14,7 @@ import {
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -88,23 +89,6 @@ export class AppExpenses extends LitElement {
     return amount;
   }
 
-
-  private getStatusVariant(
-    status: ExpenseStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'approved':
-        return 'success';
-      case 'reimbursed':
-        return 'info';
-      case 'pending':
-        return 'warning';
-      case 'rejected':
-        return 'danger';
-      default:
-        return 'default';
-    }
-  }
 
   private getFiltered(): Expense[] {
     const query = (this.localSearch || this.globalSearch).trim().toLowerCase();
@@ -335,13 +319,12 @@ export class AppExpenses extends LitElement {
                       : ''}
                   </td>
                   <td>
-                    <app-badge
-                      variant="${this.getStatusVariant(exp.status)}"
+                    <app-status-chip
+                      domain="expense"
+                      status="${exp.status}"
                       appearance="soft"
                       size="sm"
-                    >
-                      ${t.expenses.statuses[exp.status]}
-                    </app-badge>
+                    ></app-status-chip>
                   </td>
                   <td>
                     <div class="actions-row">

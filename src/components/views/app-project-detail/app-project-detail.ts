@@ -17,6 +17,7 @@ import {
   iconWallet,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -147,19 +148,6 @@ export class AppProjectDetail extends LitElement {
     }
     this.timeEntriesVersion = store.timeEntries.length;
     this.expensesVersion = store.expenses.length;
-  }
-
-  private getStatusVariant(status: ProjectStatus | undefined): 'info' | 'success' | 'warning' | 'primary' {
-    switch (status || 'active') {
-      case 'planning':
-        return 'info';
-      case 'on_hold':
-        return 'warning';
-      case 'completed':
-        return 'primary';
-      default:
-        return 'success';
-    }
   }
 
   render() {
@@ -308,9 +296,7 @@ export class AppProjectDetail extends LitElement {
                 <span class="color-dot-lg" style="background: ${proj.color};"></span>
                 <span class="proj-key">${proj.key}</span>
                 <h1 class="proj-title">${proj.name}</h1>
-                <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft">
-                  ${t.projectStatuses[statusKey]}
-                </app-badge>
+                <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft"></app-status-chip>
               </div>
               <p class="proj-desc">${proj.description || '—'}</p>
             </div>
@@ -695,13 +681,12 @@ export class AppProjectDetail extends LitElement {
                           </div>
                           <div class="contract-right">
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">${te.hours.toFixed(1)} ч</span>
-                            <app-badge
-                              variant="${te.status === 'approved' ? 'success' : te.status === 'submitted' ? 'warning' : 'default'}"
+                            <app-status-chip
+                              domain="timeEntry"
+                              status="${te.status}"
                               appearance="soft"
                               size="sm"
-                            >
-                              ${t.timeTracking.statuses[te.status]}
-                            </app-badge>
+                            ></app-status-chip>
                           </div>
                         </div>
                       `;
@@ -748,13 +733,12 @@ export class AppProjectDetail extends LitElement {
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">
                               ${exp.amount.toLocaleString('ru-RU')} ${sym}
                             </span>
-                            <app-badge
-                              variant="${exp.status === 'approved' ? 'success' : exp.status === 'pending' ? 'warning' : exp.status === 'rejected' ? 'danger' : 'info'}"
+                            <app-status-chip
+                              domain="expense"
+                              status="${exp.status}"
                               appearance="soft"
                               size="sm"
-                            >
-                              ${t.expenses.statuses[exp.status]}
-                            </app-badge>
+                            ></app-status-chip>
                           </div>
                         </div>
                       `;

@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
 import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -64,30 +65,6 @@ export class AppCounterparties extends LitElement {
     this.counterparties = store.counterparties;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
-  }
-
-  private getTypeMeta(type: CounterpartyType, isRu: boolean): { label: string; variant: 'primary' | 'info' | 'warning' | 'default' } {
-    switch (type) {
-      case 'client':
-        return { label: isRu ? 'Заказчик' : 'Client', variant: 'primary' };
-      case 'vendor':
-        return { label: isRu ? 'Поставщик' : 'Vendor', variant: 'info' };
-      case 'partner':
-        return { label: isRu ? 'Партнёр' : 'Partner', variant: 'warning' };
-      case 'contractor':
-        return { label: isRu ? 'Подрядчик' : 'Contractor', variant: 'default' };
-    }
-  }
-
-  private getStatusMeta(status: CounterpartyStatus, isRu: boolean): { label: string; variant: 'success' | 'warning' | 'danger' } {
-    switch (status) {
-      case 'active':
-        return { label: isRu ? 'Активный' : 'Active', variant: 'success' };
-      case 'pending':
-        return { label: isRu ? 'На проверке' : 'Pending', variant: 'warning' };
-      case 'blocked':
-        return { label: isRu ? 'Заблокирован' : 'Blocked', variant: 'danger' };
-    }
   }
 
   private getFiltered(): Counterparty[] {
@@ -365,8 +342,6 @@ export class AppCounterparties extends LitElement {
     return html`
       <div class="cards-grid">
         ${list.map((cp) => {
-          const typeMeta = this.getTypeMeta(cp.type, isRu);
-          const statusMeta = this.getStatusMeta(cp.status, isRu);
           const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
           const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
           const cpProjects = store.projects.filter((p) => p.counterpartyId === cp.id).length;
@@ -390,12 +365,8 @@ export class AppCounterparties extends LitElement {
                   </div>
                 </div>
                 <div class="badges-col">
-                  <app-badge variant="${typeMeta.variant}" appearance="soft" size="sm">
-                    ${typeMeta.label}
-                  </app-badge>
-                  <app-badge variant="${statusMeta.variant}" appearance="outline" size="sm">
-                    ${statusMeta.label}
-                  </app-badge>
+                  <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
+                  <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
                 </div>
               </div>
 
@@ -492,8 +463,6 @@ export class AppCounterparties extends LitElement {
           </thead>
           <tbody>
             ${list.map((cp) => {
-              const typeMeta = this.getTypeMeta(cp.type, isRu);
-              const statusMeta = this.getStatusMeta(cp.status, isRu);
               const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
               const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
 
@@ -512,9 +481,7 @@ export class AppCounterparties extends LitElement {
                     <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.legalName} · ${cp.city}</div>
                   </td>
                   <td>
-                    <app-badge variant="${typeMeta.variant}" appearance="soft" size="sm">
-                      ${typeMeta.label}
-                    </app-badge>
+                    <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
                   </td>
                   <td class="mono">${cp.inn}</td>
                   <td>
@@ -524,9 +491,7 @@ export class AppCounterparties extends LitElement {
                   <td><span class="rating-stars">${this.renderStars(cp.rating)}</span></td>
                   <td class="mono">${cpContracts.length} (${(cpSum / 1_000_000).toFixed(1)}M ₽)</td>
                   <td>
-                    <app-badge variant="${statusMeta.variant}" appearance="outline" size="sm">
-                      ${statusMeta.label}
-                    </app-badge>
+                    <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
                   </td>
                   <td>
                     <div class="card-actions">

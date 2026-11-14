@@ -5,6 +5,7 @@ import { getTranslation } from '../../../i18n';
 import { Project, ProjectRole, ProjectStatus } from '../../../types';
 import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -87,19 +88,6 @@ export class AppProjects extends LitElement {
     this.projects = store.projects;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
-  }
-
-  private getStatusVariant(status: ProjectStatus | undefined): 'info' | 'success' | 'warning' | 'primary' {
-    switch (status || 'active') {
-      case 'planning':
-        return 'info';
-      case 'on_hold':
-        return 'warning';
-      case 'completed':
-        return 'primary';
-      default:
-        return 'success';
-    }
   }
 
   private getFilteredProjects(): Project[] {
@@ -237,9 +225,7 @@ export class AppProjects extends LitElement {
                   <span class="proj-key">${proj.key}</span>
                   <h3 class="proj-name">${proj.name}</h3>
                 </div>
-                <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft" size="sm">
-                  ${t.projectStatuses[statusKey]}
-                </app-badge>
+                <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
               </div>
 
               <p class="proj-desc">${proj.description}</p>
@@ -376,9 +362,7 @@ export class AppProjects extends LitElement {
                   <td class="mono">${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}</td>
                   <td class="mono">${proj.dueDate}</td>
                   <td>
-                    <app-badge variant="${this.getStatusVariant(proj.status)}" appearance="soft" size="sm">
-                      ${t.projectStatuses[statusKey]}
-                    </app-badge>
+                    <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
                   </td>
                   <td @click="${(e: Event) => e.stopPropagation()}">
                     <div class="actions-row">

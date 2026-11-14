@@ -22,6 +22,7 @@ import {
   iconWallet,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
@@ -95,25 +96,6 @@ export class AppPayments extends LitElement {
     if (currency === 'USD') return amount * 96;
     if (currency === 'EUR') return amount * 104;
     return amount;
-  }
-
-  private getInvoiceStatusVariant(
-    status: InvoiceStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'draft':
-        return 'default';
-      case 'issued':
-        return 'info';
-      case 'sent':
-      case 'partially_paid':
-        return 'warning';
-      case 'paid':
-        return 'success';
-      case 'overdue':
-      case 'cancelled':
-        return 'danger';
-    }
   }
 
   private renderDueControlTag(inv: Invoice, t: ReturnType<typeof getTranslation>) {
@@ -521,13 +503,12 @@ export class AppPayments extends LitElement {
                   </td>
                   <td class="amount-cell">${formatMoney(inv.totalAmount, inv.currency)}</td>
                   <td>
-                    <app-badge
-                      variant="${this.getInvoiceStatusVariant(inv.status)}"
+                    <app-status-chip
+                      domain="invoice"
+                      status="${inv.status}"
                       appearance="soft"
                       size="sm"
-                    >
-                      ${t.invoices.statuses[inv.status]}
-                    </app-badge>
+                    ></app-status-chip>
                   </td>
                   <td>
                     <div class="actions-row">

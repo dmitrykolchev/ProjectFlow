@@ -28,6 +28,7 @@ import {
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -104,36 +105,6 @@ export class AppCounterpartyDetail extends LitElement {
       this.detailCounterpartyId = candidate;
     } else {
       this.detailCounterpartyId = this.counterparties[0]?.id || '';
-    }
-  }
-
-  private getTypeMeta(
-    type: CounterpartyType,
-    isRu: boolean
-  ): { label: string; variant: 'primary' | 'info' | 'warning' | 'default' } {
-    switch (type) {
-      case 'client':
-        return { label: isRu ? 'Заказчик' : 'Client', variant: 'primary' };
-      case 'vendor':
-        return { label: isRu ? 'Поставщик' : 'Vendor', variant: 'info' };
-      case 'partner':
-        return { label: isRu ? 'Партнёр' : 'Partner', variant: 'warning' };
-      case 'contractor':
-        return { label: isRu ? 'Подрядчик' : 'Contractor', variant: 'default' };
-    }
-  }
-
-  private getStatusMeta(
-    status: CounterpartyStatus,
-    isRu: boolean
-  ): { label: string; variant: 'success' | 'warning' | 'danger' } {
-    switch (status) {
-      case 'active':
-        return { label: isRu ? 'Активный' : 'Active', variant: 'success' };
-      case 'pending':
-        return { label: isRu ? 'На проверке' : 'Pending', variant: 'warning' };
-      case 'blocked':
-        return { label: isRu ? 'Заблокирован' : 'Blocked', variant: 'danger' };
     }
   }
 
@@ -215,9 +186,6 @@ export class AppCounterpartyDetail extends LitElement {
         </div>
       `;
     }
-
-    const typeMeta = this.getTypeMeta(cp.type, isRu);
-    const statusMeta = this.getStatusMeta(cp.status, isRu);
 
     const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
     const cpProjects = store.projects.filter(
@@ -301,12 +269,8 @@ export class AppCounterpartyDetail extends LitElement {
               <div class="title-block">
                 <div class="title-row">
                   <h1 class="cp-title">${cp.name}</h1>
-                  <app-badge variant="${typeMeta.variant}" appearance="soft" size="sm">
-                    ${typeMeta.label}
-                  </app-badge>
-                  <app-badge variant="${statusMeta.variant}" appearance="outline" size="sm">
-                    ${statusMeta.label}
-                  </app-badge>
+                  <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
+                  <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
                 </div>
                 <div class="cp-legal-sub">
                   <span>${cp.legalName}</span>

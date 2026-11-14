@@ -12,6 +12,7 @@ import {
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -100,17 +101,6 @@ export class AppTimeTracking extends LitElement {
     }
     if (!projectTasks.some((t) => t.id === this.quickTaskId)) {
       this.quickTaskId = projectTasks[0].id;
-    }
-  }
-
-  private getStatusBadgeVariant(status: TimeEntryStatus): 'default' | 'warning' | 'success' {
-    switch (status) {
-      case 'approved':
-        return 'success';
-      case 'submitted':
-        return 'warning';
-      default:
-        return 'default';
     }
   }
 
@@ -441,13 +431,12 @@ export class AppTimeTracking extends LitElement {
                     </app-badge>
                   </td>
                   <td>
-                    <app-badge
-                      variant="${this.getStatusBadgeVariant(entry.status)}"
+                    <app-status-chip
+                      domain="timeEntry"
+                      status="${entry.status}"
                       appearance="soft"
                       size="sm"
-                    >
-                      ${t.timeTracking.statuses[entry.status]}
-                    </app-badge>
+                    ></app-status-chip>
                   </td>
                   <td>
                     <div class="actions-row">
@@ -576,13 +565,12 @@ export class AppTimeTracking extends LitElement {
                       <span class="desc-cell" style="max-width: none;">${entry.description || '—'}</span>
                       <span class="hours-cell">${entry.hours.toFixed(1)} ч</span>
                       <span>
-                        <app-badge
-                          variant="${this.getStatusBadgeVariant(entry.status)}"
+                        <app-status-chip
+                          domain="timeEntry"
+                          status="${entry.status}"
                           appearance="soft"
                           size="sm"
-                        >
-                          ${t.timeTracking.statuses[entry.status]}
-                        </app-badge>
+                        ></app-status-chip>
                       </span>
                       <div class="actions-row">
                         <button

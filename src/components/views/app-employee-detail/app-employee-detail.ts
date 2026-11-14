@@ -88,22 +88,6 @@ export class AppEmployeeDetail extends LitElement {
     }
   }
 
-  private getStatusMeta(
-    status: EmployeeStatus | undefined,
-    isRu: boolean
-  ): { text: string; variant: 'success' | 'info' | 'warning' | 'primary' } {
-    switch (status || 'active') {
-      case 'remote':
-        return { text: isRu ? 'Удалённо' : 'Remote', variant: 'info' };
-      case 'vacation':
-        return { text: isRu ? 'Отпуск' : 'Vacation', variant: 'warning' };
-      case 'onboarding':
-        return { text: isRu ? 'Адаптация' : 'Onboarding', variant: 'primary' };
-      default:
-        return { text: isRu ? 'В штате' : 'Active', variant: 'success' };
-    }
-  }
-
   render() {
     const t = getTranslation(this.currentLang);
     const isRu = this.currentLang === 'ru';
@@ -123,7 +107,6 @@ export class AppEmployeeDetail extends LitElement {
     }
 
     const company = store.companies.find((c) => c.id === emp.companyId);
-    const statusMeta = this.getStatusMeta(emp.status, isRu);
 
     const empProjects = store.projects
       .map((p) => {
@@ -227,9 +210,7 @@ export class AppEmployeeDetail extends LitElement {
               <div class="title-block">
                 <div class="title-row">
                   <h1 class="emp-title">${emp.name}</h1>
-                  <app-badge variant="${statusMeta.variant}" appearance="soft" size="sm">
-                    ${statusMeta.text}
-                  </app-badge>
+                  <app-status-chip domain="employee" status="${emp.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
                 </div>
                 <div class="emp-sub">
                   <span>${emp.role}</span>
