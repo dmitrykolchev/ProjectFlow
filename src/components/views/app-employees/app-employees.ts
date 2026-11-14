@@ -523,7 +523,7 @@ export class AppEmployees extends LitElement {
 
   private handleSave() {
     if (!this.formName.trim()) {
-      this.formError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.formError = getTranslation(this.currentLang).common.required;
       return;
     }
 

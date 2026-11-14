@@ -143,7 +143,7 @@ export class AppKnowledgeBase extends LitElement {
   private formatDate(iso: string): string {
     const ms = Date.parse(iso);
     if (Number.isNaN(ms)) return iso;
-    return new Date(ms).toLocaleDateString(this.currentLang === 'ru' ? 'ru-RU' : 'en-US', {
+    return new Date(ms).toLocaleDateString(getTranslation(this.currentLang).common.locale, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

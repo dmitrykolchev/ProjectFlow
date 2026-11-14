@@ -151,7 +151,7 @@ export class AppTaskDetail extends LitElement {
     const ms = Date.parse(iso);
     if (Number.isNaN(ms)) return iso;
     const d = new Date(ms);
-    return d.toLocaleString(this.currentLang === 'ru' ? 'ru-RU' : 'en-US', {
+    return d.toLocaleString(getTranslation(this.currentLang).common.locale, {
       day: '2-digit',
       month: 'short',
       year: 'numeric',

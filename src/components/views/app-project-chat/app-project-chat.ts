@@ -119,7 +119,7 @@ export class AppProjectChat extends LitElement {
   private formatMessageTime(iso: string): string {
     const d = new Date(iso);
     if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleTimeString(this.currentLang === 'ru' ? 'ru-RU' : 'en-US', {
+    return d.toLocaleTimeString(getTranslation(this.currentLang).common.locale, {
       hour: '2-digit',
       minute: '2-digit',
     });
@@ -140,7 +140,7 @@ export class AppProjectChat extends LitElement {
     const t = getTranslation(this.currentLang);
     if (sameDay(d, today)) return t.projectChat.today;
     if (sameDay(d, yesterday)) return t.projectChat.yesterday;
-    return d.toLocaleDateString(this.currentLang === 'ru' ? 'ru-RU' : 'en-US', {
+    return d.toLocaleDateString(getTranslation(this.currentLang).common.locale, {
       day: 'numeric',
       month: 'long',
     });

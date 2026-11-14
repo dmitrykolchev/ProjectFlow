@@ -907,15 +907,11 @@ export class AppDataGrid extends LitElement {
       <app-confirm-dialog
         .open="${this.confirmBulkDeleteOpen}"
         size="sm"
-        title="${this.currentLang === 'ru' ? 'Массовое удаление задач?' : 'Bulk delete tasks?'}"
-        action="${this.currentLang === 'ru'
-          ? `${this.selectedIds.size} выбранных задач будут удалены.`
-          : `${this.selectedIds.size} selected tasks will be deleted.`}"
-        result="${this.currentLang === 'ru'
-          ? 'Подзадачи, отчёты по времени и расходы выбранных задач будут потеряны.'
-          : 'Subtasks, time reports and expenses of the selected tasks will be lost.'}"
-        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.bulkTaskDelete.title}"
+        action="${t.viewTexts.confirmDialogs.bulkTaskDelete.action(this.selectedIds.size)}"
+        result="${t.viewTexts.confirmDialogs.bulkTaskDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmBulkDeleteOpen = false)}"

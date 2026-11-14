@@ -271,7 +271,8 @@ export class AppSidebar extends LitElement {
             </button>
             <button
               class="quick-btn"
-              @click="${() => store.setLanguage(this.currentLang === 'ru' ? 'en' : 'ru')}"
+              @click="${() =>
+                store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
               title="Сменить язык (RU / EN)"
             >
               ${!this.collapsed ? html`<span>${this.currentLang.toUpperCase()}</span>` : html`<span>${this.currentLang.toUpperCase()}</span>`}

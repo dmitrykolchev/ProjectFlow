@@ -1,6 +1,8 @@
 export const en = {
   common: {
     appName: 'ProjectFlow',
+    locale: 'en-US',
+    otherLang: 'ru',
     appTagline: 'Project Management',
     save: 'Save',
     cancel: 'Cancel',
