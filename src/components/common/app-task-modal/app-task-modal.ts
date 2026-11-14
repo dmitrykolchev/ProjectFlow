@@ -824,7 +824,7 @@ export class AppTaskModal extends LitElement {
       currency: 'RUB',
       billable: true,
       status: 'pending',
-      notes: `Привязано к задаче ${this.editingTask.id}`,
+      notes: getTranslation(this.currentLang).viewTexts.taskModal.taskLinkedNote(this.editingTask.id),
     });
     this.quickExpenseTitle = '';
   }

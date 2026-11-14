@@ -1406,6 +1406,7 @@ export const en = {
       expenseTitlePlaceholder: 'License, server...',
       amountLabel: 'Amount (₽)',
       expenseButton: 'Expense',
+      taskLinkedNote: (id: string) => `Linked to task ${id}`,
     },
   },
 };

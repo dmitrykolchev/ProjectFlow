@@ -1406,6 +1406,7 @@ export const ru = {
       expenseTitlePlaceholder: 'Лицензия, сервер, подрядчик...',
       amountLabel: 'Сумма (₽)',
       expenseButton: 'Расход',
+      taskLinkedNote: (id: string) => `Привязано к задаче ${id}`,
     },
   },
 };
