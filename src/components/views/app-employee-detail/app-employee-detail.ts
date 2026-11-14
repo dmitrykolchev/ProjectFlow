@@ -93,13 +93,12 @@ export class AppEmployeeDetail extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const emp = this.employees.find((u) => u.id === this.detailEmployeeId) || null;
 
     if (!emp) {
       return html`
         <div class="page-shell">
-          <app-empty-state title="${isRu ? 'Сотрудник не найден' : 'Employee not found'}">
+          <app-empty-state title="${t.viewTexts.employeeDetail.emptyNotFound}">
             <app-button slot="action" variant="primary" @click="${() => store.setActiveView('employees')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.employeeDetail.backToEmployees}</span>
@@ -229,24 +228,24 @@ export class AppEmployeeDetail extends LitElement {
             <div class="kpi-cell">
               <span class="kpi-label">${t.employeeDetail.totalAllocation}</span>
               <span class="kpi-val ${totalAllocation > 100 ? 'warn' : 'accent'}">${totalAllocation}%</span>
-              <span class="kpi-hint">${empProjects.length} ${isRu ? 'проектов' : 'projects'}</span>
+              <span class="kpi-hint">${empProjects.length} ${t.viewTexts.employeeDetail.projectsSuffix}</span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.employeeDetail.assignedTasks}</span>
               <span class="kpi-val">${activeTasksCount} / ${empTasks.length}</span>
-              <span class="kpi-hint">${isRu ? 'в работе / всего' : 'active / total'}</span>
+              <span class="kpi-hint">${t.viewTexts.employeeDetail.activeTotalHint}</span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.employeeDetail.loggedHours}</span>
-              <span class="kpi-val">${totalHours.toFixed(1)} ${isRu ? 'ч' : 'h'}</span>
+              <span class="kpi-val">${totalHours.toFixed(1)} ${t.viewTexts.calculations.hoursUnitShort}</span>
               <span class="kpi-hint">
-                ${billableHours.toFixed(1)} ${isRu ? 'ч billable' : 'h billable'}
+                ${billableHours.toFixed(1)} ${t.viewTexts.employeeDetail.billableSuffix}
               </span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.employeeDetail.estimatedValue}</span>
               <span class="kpi-val success">${estimatedValue.toLocaleString('ru-RU')} ₽</span>
-              <span class="kpi-hint mono">${hourlyRate.toLocaleString('ru-RU')} ₽/ч</span>
+              <span class="kpi-hint mono">${hourlyRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}</span>
             </div>
           </div>
 
@@ -254,11 +253,11 @@ export class AppEmployeeDetail extends LitElement {
             columns="3"
             .items="${[
               { label: 'Email', value: emp.email || '—' },
-              { label: isRu ? 'Телефон' : 'Phone', value: emp.phone || '—', mono: true },
-              { label: isRu ? 'Отдел' : 'Department', value: emp.department || '—' },
-              { label: isRu ? 'Компания' : 'Company', value: company?.name || '—' },
-              { label: isRu ? 'Дата найма' : 'Hire Date', value: emp.hireDate || '—', mono: true },
-              { label: isRu ? 'Ставка' : 'Hourly Rate', value: `${hourlyRate.toLocaleString('ru-RU')} ₽/ч`, mono: true },
+              { label: t.viewTexts.counterparties.labelPhone, value: emp.phone || '—', mono: true },
+              { label: t.viewTexts.employees.labelDepartment, value: emp.department || '—' },
+              { label: t.viewTexts.employees.labelCompany, value: company?.name || '—' },
+              { label: t.viewTexts.employees.labelHireDate, value: emp.hireDate || '—', mono: true },
+              { label: t.viewTexts.employeeDetail.rateLabel, value: `${hourlyRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}`, mono: true },
             ]}"
           ></app-meta-grid>
         </section>
@@ -284,7 +283,7 @@ export class AppEmployeeDetail extends LitElement {
                             </div>
                             <div class="row-sub">
                               <span>${roleNames}</span>
-                              <span>· ${isRu ? 'Прогресс' : 'Progress'}: ${project.progress}%</span>
+                              <span>· ${t.viewTexts.projects.thProgress}: ${project.progress}%</span>
                             </div>
                           </div>
                           <div class="row-right" @click="${(e: Event) => e.stopPropagation()}">
@@ -320,8 +319,8 @@ export class AppEmployeeDetail extends LitElement {
                 size="sm"
                 .value="${this.taskFilter}"
                 .options="${[
-                  { value: 'active', label: isRu ? 'Активные' : 'Active' },
-                  { value: 'done', label: isRu ? 'Готовые' : 'Done' },
+                  { value: 'active', label: t.viewTexts.employeeDetail.filterActive },
+                  { value: 'done', label: t.viewTexts.employeeDetail.filterDone },
                   { value: 'all', label: t.common.all },
                 ]}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
@@ -343,7 +342,7 @@ export class AppEmployeeDetail extends LitElement {
                             <div class="row-sub">
                               <span>${t.priority[task.priority]}</span>
                               <span class="mono">· ${task.dueDate}</span>
-                              <span class="mono">· ${task.loggedHours}/${task.estimatedHours} ${isRu ? 'ч' : 'h'}</span>
+                              <span class="mono">· ${task.loggedHours}/${task.estimatedHours} ${t.viewTexts.calculations.hoursUnitShort}</span>
                             </div>
                           </div>
                           <div class="row-right">
@@ -395,12 +394,12 @@ export class AppEmployeeDetail extends LitElement {
                     <table class="data-table">
                       <thead>
                         <tr>
-                          <th>${isRu ? 'Дата' : 'Date'}</th>
-                          <th>${isRu ? 'Проект / Задача' : 'Project / Task'}</th>
-                          <th>${isRu ? 'Описание' : 'Notes'}</th>
-                          <th>${isRu ? 'Часы' : 'Hours'}</th>
-                          <th>${isRu ? 'Тип' : 'Billing'}</th>
-                          <th>${isRu ? 'Статус' : 'Status'}</th>
+                          <th>${t.viewTexts.expenses.thDate}</th>
+                          <th>${t.viewTexts.employeeDetail.thProjectTask}</th>
+                          <th>${t.viewTexts.employeeDetail.thNotes}</th>
+                          <th>${t.viewTexts.timeTracking.labelHours}</th>
+                          <th>${t.viewTexts.calculations.thBillingType}</th>
+                          <th>${t.viewTexts.counterparties.thStatus}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -416,7 +415,7 @@ export class AppEmployeeDetail extends LitElement {
                                 ${proj ? html`<span style="color: var(--text-muted);"> · ${proj.key}</span>` : ''}
                               </td>
                               <td>${te.description || t.timeTracking.categories[te.category]}</td>
-                              <td class="mono" style="font-weight: 700;">${te.hours.toFixed(1)} ${isRu ? 'ч' : 'h'}</td>
+                              <td class="mono" style="font-weight: 700;">${te.hours.toFixed(1)} ${t.viewTexts.calculations.hoursUnitShort}</td>
                               <td>
                                 <app-badge variant="${te.billable ? 'success' : 'default'}" appearance="outline" size="sm">
                                   ${te.billable ? 'Billable' : 'Non-billable'}
@@ -449,11 +448,11 @@ export class AppEmployeeDetail extends LitElement {
                   <table class="data-table">
                     <thead>
                       <tr>
-                        <th>${isRu ? 'Дата' : 'Date'}</th>
-                        <th>${isRu ? 'Наименование' : 'Title'}</th>
-                        <th>${isRu ? 'Проект' : 'Project'}</th>
-                        <th>${isRu ? 'Сумма' : 'Amount'}</th>
-                        <th>${isRu ? 'Статус' : 'Status'}</th>
+                        <th>${t.viewTexts.expenses.thDate}</th>
+                        <th>${t.viewTexts.employeeDetail.thTitle}</th>
+                        <th>${t.viewTexts.timeTracking.labelProject}</th>
+                        <th>${t.viewTexts.expenses.thAmount}</th>
+                        <th>${t.viewTexts.counterparties.thStatus}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -493,31 +492,31 @@ export class AppEmployeeDetail extends LitElement {
         </app-section-card>
       </div>
 
-      ${this.renderEditModal(isRu, t)}
-      ${this.renderDeleteModal(emp, isRu, t)}
-      ${this.renderQuickTimeModal(emp, empTasks, isRu, t)}
+      ${this.renderEditModal(t)}
+      ${this.renderDeleteModal(emp, t)}
+      ${this.renderQuickTimeModal(emp, empTasks, t)}
     `;
   }
 
-  private renderEditModal(isRu: boolean, t: ReturnType<typeof getTranslation>) {
+  private renderEditModal(t: ReturnType<typeof getTranslation>) {
     const statusOptions = [
-      { value: 'active', label: isRu ? 'В штате' : 'Active', color: '#10b981' },
-      { value: 'remote', label: isRu ? 'Удалённо' : 'Remote', color: '#0284c7' },
-      { value: 'vacation', label: isRu ? 'Отпуск' : 'Vacation', color: '#f59e0b' },
-      { value: 'onboarding', label: isRu ? 'Адаптация' : 'Onboarding', color: '#6366f1' },
+      { value: 'active', label: t.viewTexts.employees.statusActive, color: '#10b981' },
+      { value: 'remote', label: t.viewTexts.employees.statusRemote, color: '#0284c7' },
+      { value: 'vacation', label: t.viewTexts.employees.statusVacation, color: '#f59e0b' },
+      { value: 'onboarding', label: t.viewTexts.employees.statusOnboarding, color: '#6366f1' },
     ];
 
     return html`
       <app-modal
         ?open="${this.editModalOpen}"
         size="lg"
-        title="${isRu ? 'Редактирование профиля' : 'Edit Employee'}"
+        title="${t.viewTexts.employeeDetail.modalTitleEdit}"
         @close="${() => (this.editModalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'ФИО' : 'Full Name'}"
+              label="${t.viewTexts.employees.labelFullName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -529,24 +528,24 @@ export class AppEmployeeDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Должность' : 'Role'}"
+              label="${t.viewTexts.employeeDetail.labelRole}"
               .value="${this.formRole}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Отдел' : 'Department'}"
+              label="${t.viewTexts.employees.labelDepartment}"
               .value="${this.formDepartment}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Компания' : 'Company'}"
+              label="${t.viewTexts.employees.labelCompany}"
               .value="${this.formCompanyId}"
               .options="${[
-                { value: '', label: isRu ? 'Не указана' : 'None' },
+                { value: '', label: t.viewTexts.employees.optionNoCompany },
                 ...store.companies.map((c) => ({ value: c.id, label: c.name })),
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
@@ -562,21 +561,21 @@ export class AppEmployeeDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Телефон' : 'Phone'}"
+              label="${t.viewTexts.counterparties.labelPhone}"
               .value="${this.formPhone}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Город' : 'Location'}"
+              label="${t.viewTexts.employeeDetail.cityLabel}"
               .value="${this.formLocation}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.counterparties.thStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -585,14 +584,14 @@ export class AppEmployeeDetail extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата найма' : 'Hire Date'}"
+              label="${t.viewTexts.employees.labelHireDate}"
               .value="${this.formHireDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Ставка (₽/ч)' : 'Hourly Rate (₽/h)'}"
+              label="${t.viewTexts.employees.labelRate}"
               .value="${this.formHourlyRate}"
               min="500"
               max="25000"
@@ -614,7 +613,7 @@ export class AppEmployeeDetail extends LitElement {
     `;
   }
 
-  private renderDeleteModal(emp: User, isRu: boolean, t: ReturnType<typeof getTranslation>) {
+  private renderDeleteModal(emp: User, t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
@@ -638,7 +637,6 @@ export class AppEmployeeDetail extends LitElement {
   private renderQuickTimeModal(
     emp: User,
     empTasks: typeof store.tasks,
-    isRu: boolean,
     t: ReturnType<typeof getTranslation>
   ) {
     const taskPool = empTasks.length > 0 ? empTasks : store.tasks;
@@ -660,13 +658,13 @@ export class AppEmployeeDetail extends LitElement {
       <app-modal
         ?open="${this.timeModalOpen}"
         size="md"
-        title="${isRu ? `Списание времени · ${emp.name}` : `Log Time · ${emp.name}`}"
+        title="${t.viewTexts.projectDetail.quickTimeTitle(emp.name)}"
         @close="${() => (this.timeModalOpen = false)}"
       >
         <app-form-grid>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Задача' : 'Task'}"
+              label="${t.viewTexts.timeTracking.labelTask}"
               .value="${this.timeTaskId}"
               .options="${taskOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = eventValue(e))}"
@@ -674,25 +672,25 @@ export class AppEmployeeDetail extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата' : 'Date'}"
+              label="${t.viewTexts.expenses.thDate}"
               .value="${this.timeDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Часы' : 'Hours'}"
+              label="${t.viewTexts.timeTracking.labelHours}"
               .value="${this.timeHours}"
               min="0.25"
               max="24"
               step="0.5"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = eventValue(e))}"
             ></app-number-input>
           </div>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Категория работ' : 'Category'}"
+              label="${t.viewTexts.timeTracking.labelCategory}"
               .value="${this.timeCategory}"
               .options="${catOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -701,7 +699,7 @@ export class AppEmployeeDetail extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Комментарий' : 'Notes'}"
+              label="${t.viewTexts.employeeDetail.commentLabel}"
               .value="${this.timeDesc}"
               rows="2"
               @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
@@ -756,7 +754,7 @@ export class AppEmployeeDetail extends LitElement {
 
   private handleSaveEdit() {
     if (!this.formName.trim()) {
-      this.formError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.formError = getTranslation(this.currentLang).common.required;
       return;
     }
     const existing = this.employees.find((u) => u.id === this.detailEmployeeId);
