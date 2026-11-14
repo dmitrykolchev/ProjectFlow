@@ -25,6 +25,7 @@ import {
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-date-input/app-date-input';
@@ -115,23 +116,6 @@ export class AppCalculations extends LitElement {
     if (toCurrency === 'USD') return Math.round(toRub / 96);
     if (toCurrency === 'EUR') return Math.round(toRub / 104);
     return Math.round(toRub);
-  }
-
-  private getStatusVariant(
-    status: CalculationStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'draft':
-        return 'default';
-      case 'sent':
-        return 'warning';
-      case 'approved':
-        return 'success';
-      case 'invoiced':
-        return 'info';
-      case 'rejected':
-        return 'danger';
-    }
   }
 
   private getFiltered(): Calculation[] {
@@ -517,13 +501,12 @@ export class AppCalculations extends LitElement {
                             : ''}
                         </td>
                         <td>
-                          <app-badge
-                            variant="${this.getStatusVariant(calc.status)}"
+                          <app-status-chip
+                            domain="calculation"
+                            status="${calc.status}"
                             appearance="soft"
                             size="sm"
-                          >
-                            ${t.calculations.statuses[calc.status]}
-                          </app-badge>
+                          ></app-status-chip>
                         </td>
                         <td>
                           <div class="actions-row">
@@ -980,9 +963,7 @@ export class AppCalculations extends LitElement {
                 · ${isRu ? 'Договор' : 'Contract'}: ${ctr?.number || '—'}
               </div>
             </div>
-            <app-badge variant="${this.getStatusVariant(calc.status)}" appearance="soft">
-              ${t.calculations.statuses[calc.status]}
-            </app-badge>
+            <app-status-chip domain="calculation" status="${calc.status}" appearance="soft"></app-status-chip>
           </div>
 
           <div class="sheet-parties">

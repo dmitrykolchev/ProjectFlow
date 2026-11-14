@@ -35,6 +35,7 @@ import {
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-input/app-input';
@@ -184,62 +185,6 @@ export class AppContractDetail extends LitElement {
     if (toCurrency === 'USD') return Math.round(toRub / 96);
     if (toCurrency === 'EUR') return Math.round(toRub / 104);
     return Math.round(toRub);
-  }
-
-  private getContractStatusMeta(
-    status: ContractStatus,
-    isRu: boolean
-  ): { label: string; variant: 'default' | 'warning' | 'success' | 'info' | 'danger' } {
-    switch (status) {
-      case 'draft':
-        return { label: isRu ? 'Черновик' : 'Draft', variant: 'default' };
-      case 'on_approval':
-        return { label: isRu ? 'Согласование' : 'Approval', variant: 'warning' };
-      case 'active':
-        return { label: isRu ? 'Действует' : 'Active', variant: 'success' };
-      case 'completed':
-        return { label: isRu ? 'Исполнен' : 'Completed', variant: 'info' };
-      case 'terminated':
-        return { label: isRu ? 'Расторгнут' : 'Terminated', variant: 'danger' };
-    }
-  }
-
-  private getCalculationStatusVariant(
-    status: CalculationStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'draft':
-        return 'default';
-      case 'sent':
-        return 'warning';
-      case 'approved':
-        return 'success';
-      case 'invoiced':
-        return 'info';
-      case 'rejected':
-        return 'danger';
-    }
-  }
-
-  private getInvoiceStatusVariant(
-    status: InvoiceStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'paid':
-        return 'success';
-      case 'partially_paid':
-        return 'warning';
-      case 'sent':
-        return 'info';
-      case 'issued':
-        return 'warning';
-      case 'overdue':
-        return 'danger';
-      case 'cancelled':
-        return 'default';
-      default:
-        return 'default';
-    }
   }
 
   private renderDueControlTag(
@@ -473,7 +418,6 @@ export class AppContractDetail extends LitElement {
     const counterparty = store.counterparties.find((c) => c.id === ctr.counterpartyId);
     const project = ctr.projectId ? store.projects.find((p) => p.id === ctr.projectId) : undefined;
     const owner = ctr.ownerId ? store.users.find((u) => u.id === ctr.ownerId) : undefined;
-    const statusMeta = this.getContractStatusMeta(ctr.status, isRu);
     const freqLabel = t.calculations.frequencies[ctr.billingFrequency || 'monthly'];
 
     const contractCalculations = this.calculations
@@ -612,9 +556,7 @@ export class AppContractDetail extends LitElement {
             <div class="title-row">
               <span class="contract-key">${ctr.number}</span>
               <h1 class="contract-title">${ctr.title}</h1>
-              <app-badge variant="${statusMeta.variant}" appearance="soft">
-                ${statusMeta.label}
-              </app-badge>
+              <app-status-chip domain="contract" status="${ctr.status}"></app-status-chip>
             </div>
             <div class="contract-meta-inline">
               <span>${this.getTypeLabel(ctr.type, isRu)}</span>
@@ -807,13 +749,12 @@ export class AppContractDetail extends LitElement {
                               ${formatMoney(calc.billableAmount, calc.currency)}
                             </td>
                             <td>
-                              <app-badge
-                                variant="${this.getCalculationStatusVariant(calc.status)}"
+                              <app-status-chip
+                                domain="calculation"
+                                status="${calc.status}"
                                 appearance="soft"
                                 size="sm"
-                              >
-                                ${t.calculations.statuses[calc.status]}
-                              </app-badge>
+                              ></app-status-chip>
                             </td>
                             <td>
                               <div class="actions-row">
@@ -1073,13 +1014,12 @@ export class AppContractDetail extends LitElement {
                               </div>
                             </td>
                             <td>
-                              <app-badge
-                                variant="${this.getInvoiceStatusVariant(inv.status)}"
+                              <app-status-chip
+                                domain="invoice"
+                                status="${inv.status}"
                                 appearance="soft"
                                 size="sm"
-                              >
-                                ${t.invoices.statuses[inv.status]}
-                              </app-badge>
+                              ></app-status-chip>
                             </td>
                             <td>
                               <div class="actions-row">
@@ -1694,9 +1634,7 @@ export class AppContractDetail extends LitElement {
                 · ${isRu ? 'Договор' : 'Contract'}: ${ctr.number}
               </div>
             </div>
-            <app-badge variant="${this.getCalculationStatusVariant(calc.status)}" appearance="soft">
-              ${t.calculations.statuses[calc.status]}
-            </app-badge>
+            <app-status-chip domain="calculation" status="${calc.status}" appearance="soft"></app-status-chip>
           </div>
 
           <div class="sheet-parties">
@@ -2187,9 +2125,7 @@ export class AppContractDetail extends LitElement {
                 ${this.renderDueControlTag(inv, t)}
               </div>
             </div>
-            <app-badge variant="${this.getInvoiceStatusVariant(inv.status)}" appearance="soft">
-              ${t.invoices.statuses[inv.status]}
-            </app-badge>
+            <app-status-chip domain="invoice" status="${inv.status}" appearance="soft"></app-status-chip>
           </div>
 
           <div class="pay-summary-card">
