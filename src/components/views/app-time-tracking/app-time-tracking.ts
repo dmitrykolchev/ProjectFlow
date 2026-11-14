@@ -131,7 +131,6 @@ export class AppTimeTracking extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const filtered = this.getFiltered();
 
     const totalHours = filtered.reduce((acc, e) => acc + e.hours, 0);
@@ -140,7 +139,7 @@ export class AppTimeTracking extends LitElement {
     const estCostRub = Math.round(billableHours * HOURLY_RATE_RUB);
 
     const projectOptions = [
-      { value: 'all', label: isRu ? 'Все проекты' : 'All projects' },
+      { value: 'all', label: t.viewTexts.timeTracking.filterAllProjects },
       ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
     ];
 
@@ -159,7 +158,7 @@ export class AppTimeTracking extends LitElement {
       }));
 
     const userFilterOptions = [
-      { value: 'all', label: isRu ? 'Все сотрудники' : 'All employees' },
+      { value: 'all', label: t.viewTexts.timeTracking.filterAllEmployees },
       ...store.users.map((u) => ({ value: u.id, label: u.name })),
     ];
 
@@ -176,7 +175,7 @@ export class AppTimeTracking extends LitElement {
     ];
 
     const categoryFilterOptions = [
-      { value: 'all', label: isRu ? 'Все категории' : 'All categories' },
+      { value: 'all', label: t.viewTexts.timeTracking.filterAllCategories },
       ...categoryOptions,
     ];
 
@@ -196,10 +195,10 @@ export class AppTimeTracking extends LitElement {
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.timeTracking.totalHours}" value="${totalHours.toFixed(1)} ч" subtitle="${isRu ? 'По текущей выборке' : 'Current filter scope'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.timeTracking.billableHours}" value="${billableHours.toFixed(1)} ч" valueColor="#10b981" subtitle="${billablePct}% ${isRu ? 'от общих часов' : 'of total hours'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.timeTracking.estimatedCost}" value="${estCostRub.toLocaleString('ru-RU')} ₽" subtitle="${isRu ? `Базовая ставка ${HOURLY_RATE_RUB.toLocaleString('ru-RU')} ₽/ч` : `Rate ${HOURLY_RATE_RUB} ₽/h`}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.timeTracking.entriesCount}" value="${filtered.length}" subtitle="${filtered.filter((e) => e.status === 'approved').length} ${isRu ? 'утверждено' : 'approved'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.totalHours}" value="${totalHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}" subtitle="${t.viewTexts.timeTracking.kpiScopeSubtitle}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.billableHours}" value="${billableHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}" valueColor="#10b981" subtitle="${billablePct}% ${t.viewTexts.timeTracking.kpiOfTotal}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.estimatedCost}" value="${estCostRub.toLocaleString('ru-RU')} ₽" subtitle="${t.viewTexts.timeTracking.kpiRateBase(HOURLY_RATE_RUB.toLocaleString('ru-RU'))}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.entriesCount}" value="${filtered.length}" subtitle="${filtered.filter((e) => e.status === 'approved').length} ${t.viewTexts.timeTracking.kpiApproved}"></app-metric-card>
       </app-kpi-strip>
 
       <!-- Quick Inline Task Report -->
@@ -214,7 +213,7 @@ export class AppTimeTracking extends LitElement {
         <div class="quick-log-grid">
           <div>
             <app-select
-              label="${isRu ? 'Проект' : 'Project'}"
+              label="${t.viewTexts.timeTracking.labelProject}"
               size="sm"
               .value="${this.quickProjectId}"
               .options="${quickProjectOptions}"
@@ -226,7 +225,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Задача' : 'Task'}"
+              label="${t.viewTexts.timeTracking.labelTask}"
               size="sm"
               .value="${this.quickTaskId}"
               .options="${quickTaskOptions}"
@@ -235,7 +234,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Исполнитель' : 'Employee'}"
+              label="${t.viewTexts.timeTracking.labelEmployee}"
               size="sm"
               .value="${this.quickUserId}"
               .options="${userSelectOptions}"
@@ -244,7 +243,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата' : 'Date'}"
+              label="${t.viewTexts.timeTracking.labelDate}"
               size="sm"
               .value="${this.quickDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.quickDate = eventValue(e))}"
@@ -252,13 +251,13 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Часы' : 'Hours'}"
+              label="${t.viewTexts.timeTracking.labelHours}"
               size="sm"
               .value="${this.quickHours}"
               min="0.25"
               max="24"
               step="0.5"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: CustomEvent<{ value: number }>) => (this.quickHours = eventValue(e))}"
             ></app-number-input>
           </div>
@@ -267,7 +266,7 @@ export class AppTimeTracking extends LitElement {
         <div class="quick-log-row2">
           <div>
             <app-select
-              label="${isRu ? 'Категория работ' : 'Category'}"
+              label="${t.viewTexts.timeTracking.labelCategory}"
               size="sm"
               .value="${this.quickCategory}"
               .options="${categoryOptions}"
@@ -277,15 +276,15 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Комментарий к отчёту' : 'Work description'}"
+              label="${t.viewTexts.timeTracking.labelComment}"
               size="sm"
-              placeholder="${isRu ? 'Что было сделано по задаче...' : 'Describe completed work...'}"
+              placeholder="${t.viewTexts.timeTracking.placeholderComment}"
               .value="${this.quickDescription}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.quickDescription = eventValue(e))}"
             ></app-input>
           </div>
           <div class="billable-toggle-wrap">
-            <span>${isRu ? 'Оплачиваемое' : 'Billable'}</span>
+            <span>${t.viewTexts.timeTracking.billableSwitch}</span>
             <app-switch
               size="sm"
               ?checked="${this.quickBillable}"
@@ -299,7 +298,7 @@ export class AppTimeTracking extends LitElement {
             @click="${this.handleQuickSubmit}"
           >
             <span slot="icon-start">${iconPlus(14)}</span>
-            <span>${isRu ? 'Списать время' : 'Log Time'}</span>
+            <span>${t.viewTexts.timeTracking.logTimeButton}</span>
           </app-button>
         </div>
       </section>
@@ -307,7 +306,7 @@ export class AppTimeTracking extends LitElement {
       <!-- Filters Toolbar -->
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${isRu ? 'Поиск по задаче, комментарию, сотруднику...' : 'Search task, notes, employee...'}"
+        placeholder="${t.viewTexts.timeTracking.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'project', options: projectOptions },
@@ -335,34 +334,33 @@ export class AppTimeTracking extends LitElement {
       </app-filter-bar>
 
       ${filtered.length === 0
-        ? html`<app-empty-state title="${isRu ? 'Записи о времени не найдены' : 'No time entries found'}"></app-empty-state>`
+        ? html`<app-empty-state title="${t.viewTexts.timeTracking.emptyNoEntries}"></app-empty-state>`
         : this.viewMode === 'journal'
-        ? this.renderJournalTable(filtered, t, isRu)
-        : this.renderByTaskView(filtered, t, isRu)}
+        ? this.renderJournalTable(filtered, t)
+        : this.renderByTaskView(filtered, t)}
 
-      ${this.renderFormModal(t, isRu, categoryOptions, statusOptions)}
+      ${this.renderFormModal(t, categoryOptions, statusOptions)}
       ${this.renderDeleteModal(t)}
     `;
   }
 
   private renderJournalTable(
     filtered: TimeEntry[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     return html`
       <div class="table-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>${isRu ? 'Дата' : 'Date'}</th>
-              <th>${isRu ? 'Задача / Проект' : 'Task / Project'}</th>
-              <th>${isRu ? 'Сотрудник' : 'Employee'}</th>
-              <th>${isRu ? 'Категория' : 'Category'}</th>
-              <th>${isRu ? 'Отчёт о работе' : 'Description'}</th>
-              <th>${isRu ? 'Часы' : 'Hours'}</th>
-              <th>${isRu ? 'Оплата' : 'Billing'}</th>
-              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th>${t.viewTexts.timeTracking.labelDate}</th>
+              <th>${t.viewTexts.timeTracking.thTaskProject}</th>
+              <th>${t.viewTexts.timeTracking.labelEmployee}</th>
+              <th>${t.viewTexts.timeTracking.thCategory}</th>
+              <th>${t.viewTexts.timeTracking.thDescription}</th>
+              <th>${t.viewTexts.timeTracking.labelHours}</th>
+              <th>${t.viewTexts.timeTracking.thBilling}</th>
+              <th>${t.viewTexts.timeTracking.statusLabel}</th>
               <th></th>
             </tr>
           </thead>
@@ -384,7 +382,7 @@ export class AppTimeTracking extends LitElement {
                       }}"
                     >
                       <span class="task-key-chip">${entry.taskId}</span>
-                      <span>${task?.title || (isRu ? 'Удалённая задача' : 'Removed task')}</span>
+                      <span>${task?.title || (t.viewTexts.timeTracking.removedTask)}</span>
                     </button>
                     <div class="project-sub">
                       ${proj
@@ -404,14 +402,14 @@ export class AppTimeTracking extends LitElement {
                     </app-badge>
                   </td>
                   <td class="desc-cell">${entry.description || '—'}</td>
-                  <td class="hours-cell">${entry.hours.toFixed(1)} ч</td>
+                  <td class="hours-cell">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</td>
                   <td>
                     <app-badge
                       variant="${entry.billable ? 'info' : 'default'}"
                       appearance="soft"
                       size="sm"
                     >
-                      ${entry.billable ? (isRu ? 'Оплачив.' : 'Billable') : isRu ? 'Внутр.' : 'Internal'}
+                      ${entry.billable ? (t.viewTexts.timeTracking.badgeBillableShort) : t.viewTexts.timeTracking.badgeInternalShort}
                     </app-badge>
                   </td>
                   <td>
@@ -429,7 +427,7 @@ export class AppTimeTracking extends LitElement {
                             <button
                               type="button"
                               class="icon-btn approve"
-                              title="${isRu ? 'Утвердить запись' : 'Approve entry'}"
+                              title="${t.viewTexts.timeTracking.approveEntryTitle}"
                               @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
                             >
                               ${iconCheck(14)}
@@ -465,8 +463,7 @@ export class AppTimeTracking extends LitElement {
 
   private renderByTaskView(
     filtered: TimeEntry[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     const groupsMap = new Map<string, TimeEntry[]>();
     for (const entry of filtered) {
@@ -504,21 +501,21 @@ export class AppTimeTracking extends LitElement {
                     ${proj
                       ? html`<span class="dot" style="background: ${proj.color};"></span><span>${proj.name}</span>`
                       : ''}
-                    <span>· ${list.length} ${isRu ? 'отчёт(ов)' : 'entries'}</span>
+                    <span>· ${list.length} ${t.viewTexts.timeTracking.entriesCountSuffix}</span>
                   </div>
                 </div>
 
                 <div class="task-group-right">
                   <div class="plan-fact">
                     <span class="mono" style="font-size: 0.8rem; color: var(--text-secondary);">
-                      ${loggedTotal.toFixed(1)} / ${estHours || '—'} ч
+                      ${loggedTotal.toFixed(1)} / ${estHours || '—'}${t.viewTexts.timeTracking.hoursSuffix}
                     </span>
                     <div class="mini-track">
                       <div class="mini-fill ${isOver ? 'is-over' : ''}" style="width: ${pct}%;"></div>
                     </div>
                   </div>
 
-                  <span class="hours-cell">${groupHours.toFixed(1)} ч</span>
+                  <span class="hours-cell">${groupHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
 
                   <app-button
                     size="sm"
@@ -526,7 +523,7 @@ export class AppTimeTracking extends LitElement {
                     @click="${() => this.openCreateModal(proj?.id, taskId)}"
                   >
                     <span slot="icon-start">${iconPlus(13)}</span>
-                    <span>${isRu ? 'Списать' : 'Log'}</span>
+                    <span>${t.viewTexts.timeTracking.logButton}</span>
                   </app-button>
                 </div>
               </div>
@@ -547,7 +544,7 @@ export class AppTimeTracking extends LitElement {
                         </app-badge>
                       </span>
                       <span class="desc-cell" style="max-width: none;">${entry.description || '—'}</span>
-                      <span class="hours-cell">${entry.hours.toFixed(1)} ч</span>
+                      <span class="hours-cell">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
                       <span>
                         <app-status-chip
                           domain="timeEntry"
@@ -587,7 +584,6 @@ export class AppTimeTracking extends LitElement {
 
   private renderFormModal(
     t: ReturnType<typeof getTranslation>,
-    isRu: boolean,
     categoryOptions: { value: TimeEntryCategory; label: string }[],
     statusOptions: { value: TimeEntryStatus; label: string; color: string }[]
   ) {
@@ -611,19 +607,13 @@ export class AppTimeTracking extends LitElement {
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${this.editingId
-          ? isRu
-            ? 'Редактирование отчёта о времени'
-            : 'Edit Time Entry'
-          : isRu
-          ? 'Новая запись о времени'
-          : 'New Time Entry'}"
+        title="${this.editingId ? t.viewTexts.timeTracking.modalTitleEdit : t.viewTexts.timeTracking.modalTitleCreate}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-select
-              label="${isRu ? 'Проект' : 'Project'}"
+              label="${t.viewTexts.timeTracking.labelProject}"
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
@@ -636,7 +626,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Задача' : 'Task'}"
+              label="${t.viewTexts.timeTracking.labelTask}"
               .value="${this.formTaskId}"
               .options="${taskOptions}"
               error="${this.formError}"
@@ -648,7 +638,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Исполнитель' : 'Employee'}"
+              label="${t.viewTexts.timeTracking.labelEmployee}"
               .value="${this.formUserId}"
               .options="${userOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
@@ -656,25 +646,25 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата выполнения' : 'Date'}"
+              label="${t.viewTexts.timeTracking.labelDateDone}"
               .value="${this.formDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Затрачено часов' : 'Hours'}"
+              label="${t.viewTexts.timeTracking.labelHoursSpent}"
               .value="${this.formHours}"
               min="0.25"
               max="24"
               step="0.5"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: CustomEvent<{ value: number }>) => (this.formHours = eventValue(e))}"
             ></app-number-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Категория работ' : 'Category'}"
+              label="${t.viewTexts.timeTracking.labelCategory}"
               .value="${this.formCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -683,7 +673,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.timeTracking.statusLabel}"
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -692,7 +682,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div style="display: flex; align-items: flex-end;">
             <div class="switch-field" style="width: 100%;">
-              <span>${isRu ? 'Оплачиваемые часы (Billable)' : 'Billable hours'}</span>
+              <span>${t.viewTexts.timeTracking.billableHoursLabel}</span>
               <app-switch
                 size="sm"
                 ?checked="${this.formBillable}"
@@ -702,7 +692,7 @@ export class AppTimeTracking extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Описание выполненных работ' : 'Work description'}"
+              label="${t.viewTexts.timeTracking.labelWorkDescription}"
               .value="${this.formDescription}"
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
@@ -798,7 +788,7 @@ export class AppTimeTracking extends LitElement {
 
   private handleSaveModal() {
     if (!this.formTaskId) {
-      this.formError = this.currentLang === 'ru' ? 'Выберите задачу' : 'Select a task';
+      this.formError = getTranslation(this.currentLang).viewTexts.timeTracking.selectTaskError;
       return;
     }
 
