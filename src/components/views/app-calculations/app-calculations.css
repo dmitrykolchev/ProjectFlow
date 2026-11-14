@@ -46,33 +46,6 @@
 .calc-items-list::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-.toolbar-filters {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  flex: 1;
-}
-
-.filter-search {
-  width: 280px;
-  max-width: 100%;
-}
-
-.filter-select {
-  width: 215px;
-  max-width: 100%;
-}
-
 .table-card {
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);

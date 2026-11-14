@@ -18,7 +18,6 @@ import {
   iconEye,
   iconPlus,
   iconReceipt,
-  iconSearch,
   iconSend,
   iconTable,
   iconTrash,
@@ -26,6 +25,7 @@ import {
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-date-input/app-date-input';
@@ -351,46 +351,26 @@ export class AppCalculations extends LitElement {
         <app-metric-card size="compact" label="${isRu ? 'Часы в калькуляциях' : 'Logged Hours in Reports'}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu
-                ? 'Поиск по номеру, договору, контрагенту...'
-                : 'Search calculation, contract, client...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | CalculationStatus)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.contractFilter}"
-              .options="${contractOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.contractFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.frequencyFilter}"
-              .options="${frequencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.frequencyFilter = e.detail.value as 'all' | CalculationFrequency)}"
-            ></app-select>
-          </div>
-        </div>
-      </div>
+      <app-filter-bar
+        variant="bare"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 215px;"
+        placeholder="${isRu
+          ? 'Поиск по номеру, договору, контрагенту...'
+          : 'Search calculation, contract, client...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'status', options: statusOptions },
+          { key: 'contract', options: contractOptions },
+          { key: 'frequency', options: frequencyOptions },
+        ]}"
+        .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | CalculationStatus;
+          if (e.detail.key === 'contract') this.contractFilter = e.detail.value;
+          if (e.detail.key === 'frequency') this.frequencyFilter = e.detail.value as 'all' | CalculationFrequency;
+        }}"
+      ></app-filter-bar>
 
       ${filtered.length === 0
         ? html`
