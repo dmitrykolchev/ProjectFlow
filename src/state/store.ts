@@ -1921,6 +1921,10 @@ export class AppStore {
     taskRefId?: string;
   }): ProjectChatMessage {
     const senderId = data.senderId || this.currentUserId || this.users[0]?.id || '';
+    const latestChannelMs = this.chatMessages
+      .filter((m) => m.projectId === data.projectId)
+      .reduce((max, m) => Math.max(max, Date.parse(m.createdAt) || 0), 0);
+    const createdMs = Math.max(Date.now(), latestChannelMs + 1000);
     const msg: ProjectChatMessage = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       projectId: data.projectId,
@@ -1930,7 +1934,7 @@ export class AppStore {
       taskRefId: data.taskRefId || undefined,
       pinned: false,
       reactions: [],
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(createdMs).toISOString(),
     };
     this.chatMessages = [...this.chatMessages, msg];
     this.saveChatMessages();

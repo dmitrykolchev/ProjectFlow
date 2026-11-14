@@ -1432,7 +1432,7 @@ export class AppContractDetail extends LitElement {
     return html`
       <app-modal
         ?open="${this.calcModalOpen}"
-        size="lg"
+        size="xl"
         title="${this.editingCalcId
           ? t.calculations.editCalculation
           : `${t.calculations.newCalculation} · ${ctr.number}`}"
@@ -1567,90 +1567,104 @@ export class AppContractDetail extends LitElement {
                     ? 'Нет работ или расходов за выбранный период. Выберите другой период или добавьте позицию вручную.'
                     : 'No works or expenses found for this period.'}
                 </div>`
-              : this.calcItems.map(
-                  (item) => html`
-                    <div class="calc-editor-row ${!item.billable ? 'is-nonbillable' : ''}">
-                      <div class="calc-meta-col">
-                        <span class="calc-date-tag">${item.date || '—'}</span>
-                        ${item.isPriorPeriod
-                          ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
-                          : html`<span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
-                              ${item.itemType === 'expense'
-                                ? isRu
-                                  ? 'Расход'
-                                  : 'Expense'
-                                : item.itemType === 'time_entry'
-                                ? isRu
-                                  ? 'Работа'
-                                  : 'Work'
-                                : isRu
-                                ? 'Ручн.'
-                                : 'Manual'}
-                            </span>`}
-                      </div>
-                      <div>
-                        <app-input
-                          size="sm"
-                          label="${isRu ? 'Наименование работы / расхода' : 'Description'}"
-                          .value="${item.title}"
-                          @input="${(e: CustomEvent<{ value: string }>) =>
-                            this.updateCalcItem(item.id, { title: e.detail.value })}"
-                        ></app-input>
-                      </div>
-                      <div>
-                        <app-number-input
-                          size="sm"
-                          label="${isRu ? 'Кол-во' : 'Qty'}"
-                          .value="${item.quantity}"
-                          min="0"
-                          step="0.5"
-                          @change="${(e: CustomEvent<{ value: number }>) =>
-                            this.updateCalcItem(item.id, { quantity: e.detail.value })}"
-                        ></app-number-input>
-                      </div>
-                      <div>
-                        <app-input
-                          size="sm"
-                          label="${isRu ? 'Ед.' : 'Unit'}"
-                          .value="${item.unit}"
-                          @input="${(e: CustomEvent<{ value: string }>) =>
-                            this.updateCalcItem(item.id, { unit: e.detail.value })}"
-                        ></app-input>
-                      </div>
-                      <div class="calc-bill-cell">
-                        <app-checkbox
-                          ?checked="${item.billable}"
-                          label="Billable"
-                          @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                            this.updateCalcItem(item.id, { billable: e.detail.checked })}"
-                        ></app-checkbox>
-                      </div>
-                      <div>
-                        <app-number-input
-                          size="sm"
-                          label="${item.billable ? (isRu ? 'Ставка / Цена' : 'Rate') : isRu ? 'Цена (0 ₽)' : 'Rate (0)'}"
-                          .value="${item.billable ? item.unitPrice : 0}"
-                          min="0"
-                          step="500"
-                          ?disabled="${!item.billable}"
-                          @change="${(e: CustomEvent<{ value: number }>) =>
-                            this.updateCalcItem(item.id, { baseRate: e.detail.value, unitPrice: e.detail.value })}"
-                        ></app-number-input>
-                      </div>
-                      <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
-                        ${this.formatMoney(item.billable ? item.amount : 0, ctr.currency)}
-                      </div>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
-                        title="${t.common.delete}"
-                        @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
-                      >
-                        ${iconTrash(13)}
-                      </button>
-                    </div>
-                  `
-                )}
+              : html`
+                  <div class="calc-items-list">
+                    ${this.calcItems.map(
+                      (item) => html`
+                        <div class="calc-editor-row ${!item.billable ? 'is-nonbillable' : ''}">
+                          <div class="calc-row-top">
+                            <div class="calc-meta-col">
+                              <span class="calc-date-tag">${item.date || '—'}</span>
+                              ${item.isPriorPeriod
+                                ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
+                                : html`<span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
+                                    ${item.itemType === 'expense'
+                                      ? isRu
+                                        ? 'Расход'
+                                        : 'Expense'
+                                      : item.itemType === 'time_entry'
+                                      ? isRu
+                                        ? 'Работа'
+                                        : 'Work'
+                                      : isRu
+                                      ? 'Ручн.'
+                                      : 'Manual'}
+                                  </span>`}
+                            </div>
+                            <div>
+                              <app-input
+                                size="sm"
+                                label="${isRu ? 'Наименование работы / расхода' : 'Description'}"
+                                .value="${item.title}"
+                                @input="${(e: CustomEvent<{ value: string }>) =>
+                                  this.updateCalcItem(item.id, { title: e.detail.value })}"
+                              ></app-input>
+                            </div>
+                            <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
+                              ${this.formatMoney(item.billable ? item.amount : 0, ctr.currency)}
+                            </div>
+                            <button
+                              type="button"
+                              class="icon-btn danger"
+                              title="${t.common.delete}"
+                              @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
+                            >
+                              ${iconTrash(13)}
+                            </button>
+                          </div>
+
+                          <div class="calc-row-bottom">
+                            <div>
+                              <app-number-input
+                                size="sm"
+                                label="${isRu ? 'Кол-во' : 'Qty'}"
+                                .value="${item.quantity}"
+                                min="0"
+                                max="10000"
+                                step="0.5"
+                                @change="${(e: CustomEvent<{ value: number }>) =>
+                                  this.updateCalcItem(item.id, { quantity: e.detail.value })}"
+                              ></app-number-input>
+                            </div>
+                            <div>
+                              <app-input
+                                size="sm"
+                                label="${isRu ? 'Ед.' : 'Unit'}"
+                                .value="${item.unit}"
+                                @input="${(e: CustomEvent<{ value: string }>) =>
+                                  this.updateCalcItem(item.id, { unit: e.detail.value })}"
+                              ></app-input>
+                            </div>
+                            <div>
+                              <app-number-input
+                                size="sm"
+                                label="${item.billable ? (isRu ? 'Ставка / Цена' : 'Rate') : isRu ? 'Цена (0 ₽)' : 'Rate (0)'}"
+                                .value="${item.billable ? item.unitPrice : 0}"
+                                min="0"
+                                max="100000000"
+                                step="500"
+                                ?disabled="${!item.billable}"
+                                @change="${(e: CustomEvent<{ value: number }>) =>
+                                  this.updateCalcItem(item.id, { baseRate: e.detail.value, unitPrice: e.detail.value })}"
+                              ></app-number-input>
+                            </div>
+                            <div class="calc-bill-cell">
+                              <app-checkbox
+                                ?checked="${item.billable}"
+                                label="${isRu ? 'Оплачиваемая позиция (Billable)' : 'Billable'}"
+                                @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                                  this.updateCalcItem(item.id, { billable: e.detail.checked })}"
+                              ></app-checkbox>
+                              ${!item.billable
+                                ? html`<span class="calc-zero-hint">${isRu ? 'В отчёте с ценой 0 ₽' : 'Shown at 0 rate'}</span>`
+                                : ''}
+                            </div>
+                          </div>
+                        </div>
+                      `
+                    )}
+                  </div>
+                `}
           </div>
 
           <div>
@@ -1662,7 +1676,7 @@ export class AppContractDetail extends LitElement {
                 (this.calcStatus = e.detail.value as CalculationStatus)}"
             ></app-select>
           </div>
-          <div>
+          <div class="col-span-2">
             <app-textarea
               label="${isRu ? 'Комментарий к отчёту для клиента' : 'Report Notes'}"
               .value="${this.calcNotes}"
@@ -1937,7 +1951,7 @@ export class AppContractDetail extends LitElement {
     return html`
       <app-modal
         ?open="${this.invoiceModalOpen}"
-        size="lg"
+        size="xl"
         title="${this.editingInvoiceId ? t.invoices.editInvoice : `${t.invoices.newInvoice} · ${ctr.number}`}"
         @close="${() => (this.invoiceModalOpen = false)}"
       >
@@ -2078,6 +2092,7 @@ export class AppContractDetail extends LitElement {
                       label="${isRu ? 'Кол-во' : 'Qty'}"
                       .value="${item.quantity}"
                       min="0.25"
+                      max="10000"
                       step="0.5"
                       @change="${(e: CustomEvent<{ value: number }>) =>
                         this.updateLineItem(item.id, { quantity: e.detail.value })}"
@@ -2098,6 +2113,7 @@ export class AppContractDetail extends LitElement {
                       label="${isRu ? 'Цена' : 'Unit Price'}"
                       .value="${item.unitPrice}"
                       min="0"
+                      max="100000000"
                       step="1000"
                       @change="${(e: CustomEvent<{ value: number }>) =>
                         this.updateLineItem(item.id, { unitPrice: e.detail.value })}"

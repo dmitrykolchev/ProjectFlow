@@ -1787,6 +1787,9 @@ export const initialCalculations: Calculation[] = [
   },
 ];
 
+const recentChatIso = (minutesAgo: number): string =>
+  new Date(Date.now() - minutesAgo * 60_000).toISOString();
+
 export const initialChatMessages: ProjectChatMessage[] = [
   {
     id: 'msg-1',
@@ -1799,7 +1802,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
       { emoji: '👍', userIds: ['user-2', 'user-3', 'user-6'] },
       { emoji: '✅', userIds: ['user-3'] },
     ],
-    createdAt: '2026-11-13T10:15:00Z',
+    createdAt: recentChatIso(1620),
   },
   {
     id: 'msg-2',
@@ -1809,7 +1812,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     replyToId: 'msg-1',
     taskRefId: 'CORE-101',
     reactions: [{ emoji: '🔥', userIds: ['user-1', 'user-2'] }],
-    createdAt: '2026-11-13T11:42:00Z',
+    createdAt: recentChatIso(1530),
   },
   {
     id: 'msg-3',
@@ -1818,7 +1821,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     text: 'После tree-shaking в Rollup размер основного бандла Lit-компонентов уменьшился на 28%. Проверила Safari и Chrome — регрессий нет.',
     taskRefId: 'CORE-102',
     reactions: [{ emoji: '👏', userIds: ['user-1', 'user-4'] }],
-    createdAt: '2026-11-14T09:10:00Z',
+    createdAt: recentChatIso(45),
   },
   {
     id: 'msg-4',
@@ -1826,7 +1829,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     senderId: 'user-4',
     text: 'Залила финальные токены контрастности для тёмной и киберпанк-темы в общие стили.',
     taskRefId: 'CORE-106',
-    createdAt: '2026-11-14T10:05:00Z',
+    createdAt: recentChatIso(18),
   },
   {
     id: 'msg-5',
@@ -1836,7 +1839,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     taskRefId: 'MOB-202',
     pinned: true,
     reactions: [{ emoji: '👍', userIds: ['user-3', 'user-8'] }],
-    createdAt: '2026-11-13T15:20:00Z',
+    createdAt: recentChatIso(1500),
   },
   {
     id: 'msg-6',
@@ -1845,7 +1848,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     text: 'Отлично, синхронизацию IndexedDB и очередь оффлайн-мутаций подключаю к этим карточкам сегодня после обеда.',
     replyToId: 'msg-5',
     taskRefId: 'MOB-201',
-    createdAt: '2026-11-14T09:45:00Z',
+    createdAt: recentChatIso(30),
   },
   {
     id: 'msg-7',
@@ -1855,7 +1858,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     taskRefId: 'SEC-301',
     pinned: true,
     reactions: [{ emoji: '✅', userIds: ['user-1', 'user-6'] }],
-    createdAt: '2026-11-13T14:00:00Z',
+    createdAt: recentChatIso(1480),
   },
   {
     id: 'msg-8',
@@ -1863,7 +1866,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     senderId: 'user-6',
     text: 'Проверил отчёт внешнего пентеста — критических замечаний нет, можно включать работы в текущую калькуляцию.',
     taskRefId: 'SEC-301',
-    createdAt: '2026-11-14T08:30:00Z',
+    createdAt: recentChatIso(25),
   },
   {
     id: 'msg-9',
@@ -1871,7 +1874,7 @@ export const initialChatMessages: ProjectChatMessage[] = [
     senderId: 'user-7',
     text: 'Витрина ClickHouse для SLA-метрик пересчитана за ноябрь, расхождение с первичным логом 0%.',
     reactions: [{ emoji: '👍', userIds: ['user-1'] }],
-    createdAt: '2026-11-13T16:50:00Z',
+    createdAt: recentChatIso(1440),
   },
 ];
 

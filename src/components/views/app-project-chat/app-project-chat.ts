@@ -89,6 +89,10 @@ export class AppProjectChat extends LitElement {
     }
   }
 
+  firstUpdated() {
+    this.scrollToBottom();
+  }
+
   private selectChannel(projectId: string) {
     this.activeProjectId = projectId;
     store.chatProjectId = projectId;
@@ -100,10 +104,12 @@ export class AppProjectChat extends LitElement {
 
   private scrollToBottom() {
     this.updateComplete.then(() => {
-      const container = this.shadowRoot?.querySelector('.messages-scroll');
-      if (container) {
-        container.scrollTop = container.scrollHeight;
-      }
+      requestAnimationFrame(() => {
+        const container = this.shadowRoot?.querySelector('.messages-scroll');
+        if (container) {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
     });
   }
 
@@ -138,7 +144,12 @@ export class AppProjectChat extends LitElement {
   }
 
   private getDateKey(iso: string): string {
-    return iso.slice(0, 10);
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return iso.slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
   }
 
   private getMemberRoleLabel(project: Project, userId: string): string | null {
@@ -179,7 +190,7 @@ export class AppProjectChat extends LitElement {
 
     const projectMessages = this.messages
       .filter((m) => m.projectId === activeProject.id)
-      .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+      .sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0));
 
     const msgQuery = this.messageSearch.trim().toLowerCase();
     const filteredMessages = msgQuery
@@ -281,7 +292,7 @@ export class AppProjectChat extends LitElement {
             ${visibleProjects.map((proj) => {
               const msgs = this.messages
                 .filter((m) => m.projectId === proj.id)
-                .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+                .sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0));
               const lastMsg = msgs[msgs.length - 1];
               const lastSender = lastMsg
                 ? this.users.find((u) => u.id === lastMsg.senderId)
