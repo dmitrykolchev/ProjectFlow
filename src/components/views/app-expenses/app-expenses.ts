@@ -15,6 +15,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -482,7 +484,7 @@ export class AppExpenses extends LitElement {
           : 'New Expense'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-input
               label="${isRu ? 'Наименование расхода' : 'Expense Title'}"
@@ -592,7 +594,7 @@ export class AppExpenses extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -608,34 +610,23 @@ export class AppExpenses extends LitElement {
 
   private renderDeleteModal(isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingExpense)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingExpense)}"
         size="sm"
         title="${isRu ? 'Удалить запись о расходе?' : 'Delete expense?'}"
-        @close="${() => (this.deletingExpense = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить расход «${this.deletingExpense?.title || ''}»?`
-            : `Are you sure you want to delete "${this.deletingExpense?.title || ''}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingExpense = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingExpense) {
-                store.deleteExpense(this.deletingExpense.id);
-                this.deletingExpense = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить расход «${this.deletingExpense?.title || ''}»?`
+          : `Are you sure you want to delete "${this.deletingExpense?.title || ''}"?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingExpense = null)}"
+        @confirm="${() => {
+          if (this.deletingExpense) {
+            store.deleteExpense(this.deletingExpense.id);
+            this.deletingExpense = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
