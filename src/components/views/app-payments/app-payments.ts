@@ -218,7 +218,6 @@ export class AppPayments extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
 
     const activeInvoices = this.invoices.filter(
       (i) => i.status !== 'draft' && i.status !== 'cancelled'
@@ -262,16 +261,16 @@ export class AppPayments extends LitElement {
     ];
 
     const dueFilterOptions = [
-      { value: 'all', label: isRu ? 'Все счета' : 'All invoices' },
-      { value: 'unpaid', label: isRu ? 'Ожидают оплаты' : 'Unpaid / Open' },
+      { value: 'all', label: t.viewTexts.payments.filterAllInvoices },
+      { value: 'unpaid', label: t.viewTexts.payments.filterUnpaid },
       { value: 'overdue', label: t.invoices.statuses.overdue, color: '#ef4444' },
-      { value: 'due_soon', label: isRu ? 'Срок ≤ 5 дн.' : 'Due ≤ 5d', color: '#f59e0b' },
+      { value: 'due_soon', label: t.viewTexts.payments.filterDueSoon, color: '#f59e0b' },
       { value: 'partially_paid', label: t.invoices.statuses.partially_paid, color: '#f59e0b' },
       { value: 'paid', label: t.invoices.statuses.paid, color: '#10b981' },
     ];
 
     const methodFilterOptions = [
-      { value: 'all', label: isRu ? 'Все способы оплаты' : 'All payment methods' },
+      { value: 'all', label: t.viewTexts.payments.filterAllMethods },
       { value: 'bank_transfer', label: t.payments.methods.bank_transfer },
       { value: 'card', label: t.payments.methods.card },
       { value: 'cash', label: t.payments.methods.cash },
@@ -279,21 +278,19 @@ export class AppPayments extends LitElement {
     ];
 
     const counterpartyOptions = [
-      { value: 'all', label: isRu ? 'Все контрагенты' : 'All counterparties' },
+      { value: 'all', label: t.viewTexts.payments.filterAllCounterparties },
       ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
     ];
 
     const contractOptions = [
-      { value: 'all', label: isRu ? 'Все договоры' : 'All contracts' },
+      { value: 'all', label: t.viewTexts.payments.filterAllContracts },
       ...this.contracts.map((c) => ({ value: c.id, label: `${c.number} · ${c.title}` })),
     ];
 
     return html`
       <app-page-header
         title="${t.navigation.payments}"
-        subtitle="${isRu
-          ? 'Контроль сроков оплаты счетов, частичные и полные транши, реестр платёжных поручений и остатков задолженности'
-          : 'Invoice due-date monitoring, partial & full payment settlements, and transaction ledger'}"
+        subtitle="${t.viewTexts.pageSubtitles.payments}"
       >
         <span slot="icon">${iconCreditCard(28)}</span>
         ${payableInvoices.length > 0
@@ -312,22 +309,16 @@ export class AppPayments extends LitElement {
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.payments.paidAmount} (RUB)" value="${formatMoney(totalPaidRub, 'RUB')}" valueColor="#10b981" subtitle="${this.payments.length} ${isRu ? 'проведённ. платёж(ей)' : 'recorded payment(s)'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.payments.remainingDue} (RUB)" value="${formatMoney(totalRemainingRub, 'RUB')}" valueColor="var(--accent-primary, #6366f1)" subtitle="${payableInvoices.length} ${isRu ? 'неоплач./частичных счетов' : 'open invoice(s)'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.payments.overdueAlert}" value="${formatMoney(overdueRub, 'RUB')}" valueColor="${overdueRub > 0 ? '#ef4444' : ''}" subtitle="${overdueInvoices.length} ${isRu ? 'просроченн. счёт(ов)' : 'overdue invoice(s)'}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Ближайшие сроки (≤ 5 дн.)' : 'Due Within 5 Days'}" value="${formatMoney(dueSoonRub, 'RUB')}" valueColor="${dueSoonRub > 0 ? '#f59e0b' : ''}" subtitle="${dueSoonInvoices.length} ${isRu ? 'счёт(ов) к оплате' : 'invoice(s) due soon'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.paidAmount} (RUB)" value="${formatMoney(totalPaidRub, 'RUB')}" valueColor="#10b981" subtitle="${this.payments.length} ${t.viewTexts.payments.kpiRecordedPayments}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.remainingDue} (RUB)" value="${formatMoney(totalRemainingRub, 'RUB')}" valueColor="var(--accent-primary, #6366f1)" subtitle="${payableInvoices.length} ${t.viewTexts.payments.kpiOpenInvoices}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.overdueAlert}" value="${formatMoney(overdueRub, 'RUB')}" valueColor="${overdueRub > 0 ? '#ef4444' : ''}" subtitle="${overdueInvoices.length} ${t.viewTexts.payments.kpiOverdueInvoices}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.payments.kpiDueWithin5}" value="${formatMoney(dueSoonRub, 'RUB')}" valueColor="${dueSoonRub > 0 ? '#f59e0b' : ''}" subtitle="${dueSoonInvoices.length} ${t.viewTexts.payments.kpiDueSoonInvoices}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         variant="bare"
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 210px;"
-        placeholder="${this.viewTab === 'due_control'
-          ? isRu
-            ? 'Поиск по номеру счёта, договору, клиенту...'
-            : 'Search invoice, contract, client...'
-          : isRu
-          ? 'Поиск по ПП, счёту, контрагенту...'
-          : 'Search payment doc, invoice, client...'}"
+        placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'first', options: this.viewTab === 'due_control' ? dueFilterOptions : methodFilterOptions },
@@ -362,22 +353,21 @@ export class AppPayments extends LitElement {
       </app-filter-bar>
 
       ${this.viewTab === 'due_control'
-        ? this.renderDueControlTable(filteredDueInvoices, t, isRu)
-        : this.renderLedgerTable(filteredLedger, t, isRu)}
+        ? this.renderDueControlTable(filteredDueInvoices, t)
+        : this.renderLedgerTable(filteredLedger, t)}
 
-      ${this.renderPaymentModal(t, isRu)}
-      ${this.renderDeletePaymentModal(t, isRu)}
+      ${this.renderPaymentModal(t)}
+      ${this.renderDeletePaymentModal(t)}
     `;
   }
 
   private renderDueControlTable(
     invoices: Invoice[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     if (invoices.length === 0) {
       return html`
-        <app-empty-state compact title="${isRu ? 'Счета по выбранным фильтрам не найдены' : 'No invoices match filters'}"></app-empty-state>
+        <app-empty-state compact title="${t.viewTexts.payments.emptyNoInvoices}"></app-empty-state>
       `;
     }
 
@@ -386,13 +376,13 @@ export class AppPayments extends LitElement {
         <table class="data-table">
           <thead>
             <tr>
-              <th>${isRu ? 'Счёт' : 'Invoice'}</th>
-              <th>${isRu ? 'Договор' : 'Contract'}</th>
-              <th>${isRu ? 'Контрагент' : 'Counterparty'}</th>
-              <th>${isRu ? 'Сроки и контроль' : 'Dates & Due Control'}</th>
-              <th>${isRu ? 'Оплата и остаток' : 'Paid / Balance'}</th>
-              <th>${isRu ? 'Сумма счёта' : 'Total'}</th>
-              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th>${t.viewTexts.payments.thInvoice}</th>
+              <th>${t.viewTexts.payments.thContract}</th>
+              <th>${t.viewTexts.payments.thCounterparty}</th>
+              <th>${t.viewTexts.payments.thDatesControl}</th>
+              <th>${t.viewTexts.payments.thPaidBalance}</th>
+              <th>${t.viewTexts.payments.thInvoiceTotal}</th>
+              <th>${t.viewTexts.payments.thStatus}</th>
               <th></th>
             </tr>
           </thead>
@@ -421,7 +411,7 @@ export class AppPayments extends LitElement {
                       <span>${inv.number}</span>
                     </button>
                     <div class="cell-sub">
-                      ${store.getInvoicePayments(inv.id).length} ${isRu ? 'платеж(а)' : 'payment(s)'}
+                      ${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
                     </div>
                   </td>
                   <td>
@@ -478,7 +468,7 @@ export class AppPayments extends LitElement {
                       ${invRemaining > 0
                         ? html`
                             <div class="inv-pay-meta mono">
-                              <span>${isRu ? 'Остаток' : 'Due'}:</span>
+                              <span>${t.viewTexts.payments.dueLabel}:</span>
                               <span style="color: ${dueCtrl.state === 'overdue' ? '#ef4444' : 'var(--text-primary)'}; font-weight: 600;">
                                 ${formatMoney(invRemaining, inv.currency)}
                               </span>
@@ -543,8 +533,7 @@ export class AppPayments extends LitElement {
 
   private renderLedgerTable(
     payments: InvoicePayment[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     if (payments.length === 0) {
       return html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`;
@@ -557,12 +546,12 @@ export class AppPayments extends LitElement {
             <tr>
               <th>${t.payments.paymentDate}</th>
               <th>${t.payments.documentNumber}</th>
-              <th>${isRu ? 'Счёт' : 'Invoice'}</th>
-              <th>${isRu ? 'Договор' : 'Contract'}</th>
-              <th>${isRu ? 'Контрагент' : 'Counterparty'}</th>
+              <th>${t.viewTexts.payments.thInvoice}</th>
+              <th>${t.viewTexts.payments.thContract}</th>
+              <th>${t.viewTexts.payments.thCounterparty}</th>
               <th>${t.payments.paymentMethod}</th>
               <th>${t.payments.notes}</th>
-              <th>${isRu ? 'Сумма' : 'Amount'}</th>
+              <th>${t.viewTexts.payments.thAmount}</th>
               <th></th>
             </tr>
           </thead>
@@ -666,7 +655,7 @@ export class AppPayments extends LitElement {
     `;
   }
 
-  private renderPaymentModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderPaymentModal(t: ReturnType<typeof getTranslation>) {
     const payableInvoices = this.invoices.filter(
       (i) => i.status !== 'draft' && i.status !== 'cancelled' && store.getInvoiceRemainingAmount(i) > 0
     );
@@ -692,7 +681,7 @@ export class AppPayments extends LitElement {
       const cp = store.counterparties.find((c) => c.id === i.counterpartyId);
       return {
         value: i.id,
-        label: `${i.number} (${cp?.name || '—'}) · ${isRu ? 'Ост.' : 'Due'} ${formatMoney(
+        label: `${i.number} (${cp?.name || '—'}) · ${t.viewTexts.payments.shortDue} ${formatMoney(
           store.getInvoiceRemainingAmount(i),
           i.currency
         )}`,
@@ -716,7 +705,7 @@ export class AppPayments extends LitElement {
         <app-form-grid>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Счёт к оплате' : 'Target Invoice'}"
+              label="${t.viewTexts.payments.labelTargetInvoice}"
               .value="${inv.id}"
               .options="${invoiceOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
@@ -728,7 +717,7 @@ export class AppPayments extends LitElement {
 
           <div class="col-span-2 pay-summary-card">
             <div class="billing-stat">
-              <span class="billing-stat-label">${isRu ? 'Итого по счёту' : 'Invoice Total'}</span>
+              <span class="billing-stat-label">${t.viewTexts.payments.invoiceTotalLabel}</span>
               <span class="billing-stat-val">${formatMoney(inv.totalAmount, inv.currency)}</span>
             </div>
             <div class="billing-stat">
@@ -747,7 +736,7 @@ export class AppPayments extends LitElement {
 
           <div>
             <app-number-input
-              label="${isRu ? `Сумма платежа (${inv.currency})` : `Payment Amount (${inv.currency})`}"
+              label="${t.viewTexts.payments.paymentAmountLabel(inv.currency)}"
               .value="${this.payAmount}"
               min="1"
               max="100000000"
@@ -787,7 +776,7 @@ export class AppPayments extends LitElement {
                   this.payError = '';
                 }}"
               >
-                ${isRu ? '100% остатка' : '100% due'}
+                ${t.viewTexts.payments.fullDueButton}
               </button>
             </div>
           </div>
@@ -813,7 +802,7 @@ export class AppPayments extends LitElement {
           <div>
             <app-input
               label="${t.payments.documentNumber}"
-              placeholder="ПП-2026/0850"
+              placeholder="${t.viewTexts.payments.payDocPlaceholder}"
               .value="${this.payDocNumber}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.payDocNumber = eventValue(e))}"
             ></app-input>
@@ -821,7 +810,7 @@ export class AppPayments extends LitElement {
 
           <div class="col-span-2 pay-preview-result">
             <span>
-              ${isRu ? 'После платежа:' : 'After payment:'}
+              ${t.viewTexts.payments.afterPaymentLabel}
               <strong class="mono">${formatMoney(paidAfter, inv.currency)}</strong>
               · ${t.payments.remainingDue}:
               <strong class="mono">${formatMoney(remainingAfter, inv.currency)}</strong>
@@ -857,7 +846,7 @@ export class AppPayments extends LitElement {
     `;
   }
 
-  private renderDeletePaymentModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderDeletePaymentModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingPayment)}"
@@ -889,8 +878,9 @@ export class AppPayments extends LitElement {
     this.payAmount = remaining > 0 ? remaining : inv.totalAmount;
     this.payDate = today;
     this.payMethod = 'bank_transfer';
-    this.payDocNumber = `ПП-${today.slice(0, 4)}/${String(840 + seq).padStart(4, '0')}`;
-    this.payNotes = `Оплата по счёту ${inv.number}`;
+    const tx = getTranslation(this.currentLang).viewTexts.payments;
+    this.payDocNumber = `${tx.payDocPrefix}${today.slice(0, 4)}/${String(840 + seq).padStart(4, '0')}`;
+    this.payNotes = tx.payNotesTemplate(inv.number);
     this.payError = '';
     this.paymentModalOpen = true;
   }
@@ -898,7 +888,7 @@ export class AppPayments extends LitElement {
   private handleSavePayment(inv: Invoice) {
     const amount = Number(this.payAmount) || 0;
     if (amount <= 0) {
-      this.payError = this.currentLang === 'ru' ? 'Введите сумму больше 0' : 'Enter amount > 0';
+      this.payError = getTranslation(this.currentLang).viewTexts.payments.amountError;
       return;
     }
 
