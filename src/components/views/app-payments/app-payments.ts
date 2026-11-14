@@ -17,12 +17,12 @@ import {
   iconClock,
   iconCreditCard,
   iconReceipt,
-  iconSearch,
   iconTrash,
   iconWallet,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
@@ -315,65 +315,48 @@ export class AppPayments extends LitElement {
         <app-metric-card size="compact" label="${isRu ? 'Ближайшие сроки (≤ 5 дн.)' : 'Due Within 5 Days'}" value="${formatMoney(dueSoonRub, 'RUB')}" valueColor="${dueSoonRub > 0 ? '#f59e0b' : ''}" subtitle="${dueSoonInvoices.length} ${isRu ? 'счёт(ов) к оплате' : 'invoice(s) due soon'}"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <app-segmented-switch
-            .value="${this.viewTab}"
-            .options="${tabOptions}"
-            @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.viewTab = e.detail.value as 'due_control' | 'ledger')}"
-          ></app-segmented-switch>
-
-          <div class="filter-search">
-            <app-input
-              placeholder="${this.viewTab === 'due_control'
-                ? isRu
-                  ? 'Поиск по номеру счёта, договору, клиенту...'
-                  : 'Search invoice, contract, client...'
-                : isRu
-                ? 'Поиск по ПП, счёту, контрагенту...'
-                : 'Search payment doc, invoice, client...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-
-          <div class="filter-select">
-            <app-select
-              .value="${this.viewTab === 'due_control' ? this.dueFilter : this.methodFilter}"
-              .options="${this.viewTab === 'due_control' ? dueFilterOptions : methodFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                if (this.viewTab === 'due_control') {
-                  this.dueFilter = e.detail.value as typeof this.dueFilter;
-                } else {
-                  this.methodFilter = e.detail.value as 'all' | PaymentMethod;
-                }
-              }}"
-            ></app-select>
-          </div>
-
-          <div class="filter-select">
-            <app-select
-              .value="${this.counterpartyFilter}"
-              .options="${counterpartyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.counterpartyFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-
-          <div class="filter-select">
-            <app-select
-              .value="${this.contractFilter}"
-              .options="${contractOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.contractFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-        </div>
-      </div>
+      <app-filter-bar
+        variant="bare"
+        style="--filter-search-min: 270px; --filter-search-max: 270px; --filter-select-width: 210px;"
+        placeholder="${this.viewTab === 'due_control'
+          ? isRu
+            ? 'Поиск по номеру счёта, договору, клиенту...'
+            : 'Search invoice, contract, client...'
+          : isRu
+          ? 'Поиск по ПП, счёту, контрагенту...'
+          : 'Search payment doc, invoice, client...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'first', options: this.viewTab === 'due_control' ? dueFilterOptions : methodFilterOptions },
+          { key: 'counterparty', options: counterpartyOptions },
+          { key: 'contract', options: contractOptions },
+        ]}"
+        .values="${{
+          first: this.viewTab === 'due_control' ? this.dueFilter : this.methodFilter,
+          counterparty: this.counterpartyFilter,
+          contract: this.contractFilter,
+        }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'first') {
+            if (this.viewTab === 'due_control') {
+              this.dueFilter = e.detail.value as typeof this.dueFilter;
+            } else {
+              this.methodFilter = e.detail.value as 'all' | PaymentMethod;
+            }
+          }
+          if (e.detail.key === 'counterparty') this.counterpartyFilter = e.detail.value;
+          if (e.detail.key === 'contract') this.contractFilter = e.detail.value;
+        }}"
+      >
+        <app-segmented-switch
+          slot="prefix"
+          .value="${this.viewTab}"
+          .options="${tabOptions}"
+          @change="${(e: CustomEvent<{ value: string }>) =>
+            (this.viewTab = e.detail.value as 'due_control' | 'ledger')}"
+        ></app-segmented-switch>
+      </app-filter-bar>
 
       ${this.viewTab === 'due_control'
         ? this.renderDueControlTable(filteredDueInvoices, t, isRu)
