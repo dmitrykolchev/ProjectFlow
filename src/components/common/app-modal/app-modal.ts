@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import styles from './app-modal.css';
@@ -10,6 +10,9 @@ export class AppModal extends LitElement {
   @property({ type: Boolean }) open: boolean = false;
   @property({ type: String }) title: string = '';
   @property({ type: String }) size: ModalSize = 'md';
+  @property({ type: Boolean }) hideClose: boolean = false;
+  /** Optional header icon rendered before the title */
+  @property({ type: Object, attribute: false }) headerIcon: TemplateResult | null = null;
 
   @state() private isVisualOpen: boolean = false;
 
@@ -118,10 +121,17 @@ export class AppModal extends LitElement {
       <div class="modal-backdrop ${this.isVisualOpen ? 'is-open' : ''}" @click="${this.handleBackdropClick}">
         <div class="modal-card size-${this.size}" @click="${(e: MouseEvent) => e.stopPropagation()}">
           <div class="modal-header">
-            <h3 class="modal-title">${this.title || html`<slot name="title"></slot>`}</h3>
-            <button type="button" class="close-btn" @click="${this.close}" aria-label="Close">
-              ✕
-            </button>
+            <h3 class="modal-title">
+              ${this.headerIcon ? html`<span class="title-icon">${this.headerIcon}</span>` : ''}
+              ${this.title || html`<slot name="title"></slot>`}
+            </h3>
+            ${this.hideClose
+              ? ''
+              : html`
+                  <button type="button" class="close-btn" @click="${this.close}" aria-label="Close">
+                    ✕
+                  </button>
+                `}
           </div>
           <div class="modal-body">
             <slot></slot>

@@ -2,6 +2,7 @@ import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-modal';
 import '../app-button/app-button';
+import { iconAlertTriangle, iconTrash } from '../icons';
 
 export const meta: ComponentStoryMeta = {
   title: 'Overlays/Modal',
@@ -47,6 +48,33 @@ export const meta: ComponentStoryMeta = {
               >
                 Понятно
               </app-button>
+            </div>
+          </app-modal>
+        </div>
+      `,
+    },
+    {
+      name: 'Header Icon',
+      description: 'Modal header with icon before the title (headerIcon property)',
+      render: () => html`
+        <div>
+          <app-button
+            variant="danger"
+            @click="${(e: Event) => {
+              const modal = (e.target as HTMLElement).nextElementSibling as any;
+              if (modal) modal.open = true;
+            }}"
+          >
+            Удалить запись
+          </app-button>
+
+          <app-modal size="sm" title="Удаление задачи" .headerIcon="${iconTrash(18)}">
+            <p style="color: var(--text-secondary, #94a3b8); margin: 0; line-height: 1.5;">
+              Иконка заголовка задаётся свойством headerIcon и отображается перед текстом title.
+            </p>
+            <div slot="footer">
+              <app-button variant="ghost" @click="${(e: Event) => { (e.target as HTMLElement).closest('app-modal')!.open = false; }}">Отмена</app-button>
+              <app-button variant="danger" @click="${(e: Event) => { (e.target as HTMLElement).closest('app-modal')!.open = false; }}">Удалить</app-button>
             </div>
           </app-modal>
         </div>
