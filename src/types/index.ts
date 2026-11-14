@@ -75,6 +75,40 @@ export interface Contract {
   description: string;
 }
 
+export type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+
+export interface InvoiceLineItem {
+  id: string;
+  title: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  amount: number;
+  sourceType?: 'manual' | 'time_entry' | 'expense';
+  sourceId?: string;
+}
+
+export interface Invoice {
+  id: string;
+  number: string;
+  contractId: string;
+  projectId?: string;
+  companyId: string;
+  counterpartyId: string;
+  issueDate: string; // YYYY-MM-DD
+  dueDate: string; // YYYY-MM-DD
+  paidDate?: string; // YYYY-MM-DD
+  currency: 'RUB' | 'USD' | 'EUR';
+  vatRate: 0 | 10 | 20;
+  subtotal: number;
+  vatAmount: number;
+  totalAmount: number;
+  status: InvoiceStatus;
+  items: InvoiceLineItem[];
+  notes: string;
+  createdAt: string;
+}
+
 export type ProjectRole =
   | 'pm'
   | 'tech_lead'
@@ -207,6 +241,7 @@ export type ActiveView =
   | 'employees'
   | 'counterparties'
   | 'contracts'
+  | 'contract-detail'
   | 'projects'
   | 'project-detail'
   | 'time-tracking'
@@ -227,6 +262,7 @@ export interface ActivityLogItem {
     | 'employee'
     | 'counterparty'
     | 'contract'
+    | 'invoice'
     | 'time_entry'
     | 'expense'
     | 'settings';

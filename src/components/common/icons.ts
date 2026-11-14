@@ -350,6 +350,27 @@ export function iconWallet(size = 18): TemplateResult {
   `;
 }
 
+export function iconReceipt(size = 18): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/>
+      <path d="M14 8H8"/>
+      <path d="M16 12H8"/>
+      <path d="M13 16H8"/>
+    </svg>
+  `;
+}
+
+export function iconSend(size = 16): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="22" y1="2" x2="11" y2="13"/>
+      <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+    </svg>
+  `;
+}
+
+
 
 
 

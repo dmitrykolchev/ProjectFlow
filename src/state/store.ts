@@ -7,6 +7,8 @@ import {
   Contract,
   Counterparty,
   Expense,
+  Invoice,
+  InvoiceStatus,
   NotificationItem,
   Project,
   ProjectMember,
@@ -25,6 +27,7 @@ import {
   initialContracts,
   initialCounterparties,
   initialExpenses,
+  initialInvoices,
   initialProjects,
   initialTasks,
   initialTimeEntries,
@@ -39,6 +42,7 @@ const STORAGE_KEY_COMPANIES = 'projectflow_companies_v1';
 const STORAGE_KEY_EMPLOYEES = 'projectflow_employees_v1';
 const STORAGE_KEY_COUNTERPARTIES = 'projectflow_counterparties_v1';
 const STORAGE_KEY_CONTRACTS = 'projectflow_contracts_v1';
+const STORAGE_KEY_INVOICES = 'projectflow_invoices_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 
@@ -192,10 +196,13 @@ export class AppStore {
   public companies: Company[] = [];
   public counterparties: Counterparty[] = [];
   public contracts: Contract[] = [];
+  public invoices: Invoice[] = [];
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
+  public detailContractId: string = '';
+  public pendingInvoiceForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
 
   public searchQuery: string = '';
@@ -301,6 +308,9 @@ export class AppStore {
       const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
       this.contracts = storedContracts ? JSON.parse(storedContracts) : [...initialContracts];
 
+      const storedInvoices = localStorage.getItem(STORAGE_KEY_INVOICES);
+      this.invoices = storedInvoices ? JSON.parse(storedInvoices) : [...initialInvoices];
+
       const storedTimeEntries = localStorage.getItem(STORAGE_KEY_TIME_ENTRIES);
       this.timeEntries = storedTimeEntries ? JSON.parse(storedTimeEntries) : [...initialTimeEntries];
 
@@ -345,6 +355,7 @@ export class AppStore {
       this.users = [...initialUsers];
       this.counterparties = [...initialCounterparties];
       this.contracts = [...initialContracts];
+      this.invoices = [...initialInvoices];
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
     }
@@ -393,6 +404,14 @@ export class AppStore {
   private saveContracts(): void {
     try {
       localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(this.contracts));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveInvoices(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify(this.invoices));
     } catch (e) {
       console.error(e);
     }
@@ -755,7 +774,8 @@ export class AppStore {
       view === 'companies' ||
       view === 'employees' ||
       view === 'counterparties' ||
-      view === 'contracts'
+      view === 'contracts' ||
+      view === 'contract-detail'
     ) {
       return 'directory';
     }
@@ -827,6 +847,20 @@ export class AppStore {
   public openProjectDetail(projectId: string): void {
     this.detailProjectId = projectId;
     this.setActiveView('project-detail');
+  }
+
+  public openContractDetail(contractId: string, openInvoiceModal = false): void {
+    this.detailContractId = contractId;
+    this.pendingInvoiceForContractId = openInvoiceModal ? contractId : null;
+    this.setActiveView('contract-detail');
+  }
+
+  public consumePendingInvoiceModal(contractId: string): boolean {
+    if (this.pendingInvoiceForContractId === contractId) {
+      this.pendingInvoiceForContractId = null;
+      return true;
+    }
+    return false;
   }
 
   public setSearchQuery(query: string): void {
@@ -1130,9 +1164,85 @@ export class AppStore {
     const target = this.contracts.find((c) => c.id === id);
     if (!target) return;
     this.contracts = this.contracts.filter((c) => c.id !== id);
+    if (this.detailContractId === id) {
+      this.detailContractId = this.contracts[0]?.id || '';
+      if (this.activeView === 'contract-detail') {
+        this.activeView = 'contracts';
+      }
+    }
     this.saveContracts();
     this.logActivity('delete', 'contract', `${target.number} — ${target.title}`, 'Договор удалён');
     this.addNotification('warning', 'Удалено', `Договор ${target.number} удалён`);
+    this.notify();
+  }
+
+  // --- Invoice CRUD ---
+  public addInvoice(data: Omit<Invoice, 'id' | 'createdAt'>): Invoice {
+    const invoice: Invoice = {
+      ...data,
+      id: `inv-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.invoices = [invoice, ...this.invoices];
+    this.saveInvoices();
+    const sym = invoice.currency === 'USD' ? '$' : invoice.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'create',
+      'invoice',
+      `${invoice.number}`,
+      `Выставлен счёт на сумму ${invoice.totalAmount.toLocaleString('ru-RU')} ${sym}`
+    );
+    this.addNotification(
+      'success',
+      'Счёт создан',
+      `${invoice.number} на ${invoice.totalAmount.toLocaleString('ru-RU')} ${sym}`
+    );
+    this.notify();
+    return invoice;
+  }
+
+  public updateInvoice(updated: Invoice): void {
+    this.invoices = this.invoices.map((inv) => (inv.id === updated.id ? { ...updated } : inv));
+    this.saveInvoices();
+    const sym = updated.currency === 'USD' ? '$' : updated.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'update',
+      'invoice',
+      updated.number,
+      `Обновлён счёт (${updated.status}, ${updated.totalAmount.toLocaleString('ru-RU')} ${sym})`
+    );
+    this.addNotification('info', 'Счёт обновлён', updated.number);
+    this.notify();
+  }
+
+  public updateInvoiceStatus(id: string, status: InvoiceStatus): void {
+    const existing = this.invoices.find((inv) => inv.id === id);
+    if (!existing) return;
+    const paidDate =
+      status === 'paid'
+        ? existing.paidDate || new Date().toISOString().slice(0, 10)
+        : status === 'cancelled' || status === 'draft'
+        ? undefined
+        : existing.paidDate;
+    const updated: Invoice = { ...existing, status, paidDate };
+    this.invoices = this.invoices.map((inv) => (inv.id === id ? updated : inv));
+    this.saveInvoices();
+    this.logActivity('status_change', 'invoice', updated.number, `Статус счёта изменён на ${status}`);
+    this.addNotification(
+      status === 'paid' ? 'success' : 'info',
+      'Статус счёта обновлён',
+      `${updated.number} → ${status}`
+    );
+    this.notify();
+  }
+
+  public deleteInvoice(id: string): void {
+    const target = this.invoices.find((inv) => inv.id === id);
+    if (!target) return;
+    this.invoices = this.invoices.filter((inv) => inv.id !== id);
+    this.saveInvoices();
+    this.logActivity('delete', 'invoice', target.number, 'Счёт удалён');
+    this.addNotification('warning', 'Счёт удалён', target.number);
     this.notify();
   }
 

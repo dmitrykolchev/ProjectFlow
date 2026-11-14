@@ -1,8 +1,19 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { Contract, ContractStatus, ContractType } from '../../../types';
-import { iconEdit, iconFileText, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { getTranslation } from '../../../i18n';
+import { Contract, ContractStatus, ContractType, Invoice, InvoiceStatus } from '../../../types';
+import {
+  iconCheck,
+  iconChevronRight,
+  iconEdit,
+  iconFileText,
+  iconPlus,
+  iconReceipt,
+  iconSearch,
+  iconSend,
+  iconTrash,
+} from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -10,17 +21,21 @@ import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import styles from './app-contracts.css';
 
 @customElement('app-contracts')
 export class AppContracts extends LitElement {
   @state() private contracts: Contract[] = store.contracts;
+  @state() private invoices: Invoice[] = store.invoices;
   @state() private currentLang = store.customization.language;
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
+  @state() private viewTab: 'contracts' | 'invoices' = 'contracts';
   @state() private statusFilter: 'all' | ContractStatus = 'all';
   @state() private typeFilter: 'all' | ContractType = 'all';
+  @state() private invoiceStatusFilter: 'all' | InvoiceStatus = 'all';
 
   @state() private modalOpen = false;
   @state() private editingId: string | null = null;
@@ -58,6 +73,7 @@ export class AppContracts extends LitElement {
 
   private syncState() {
     this.contracts = store.contracts;
+    this.invoices = store.invoices;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
   }
@@ -125,14 +141,65 @@ export class AppContracts extends LitElement {
     });
   }
 
+  private getInvoiceStatusVariant(
+    status: InvoiceStatus
+  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'issued':
+        return 'info';
+      case 'sent':
+        return 'warning';
+      case 'paid':
+        return 'success';
+      case 'overdue':
+      case 'cancelled':
+        return 'danger';
+    }
+  }
+
+  private getFilteredInvoices(): Invoice[] {
+    const query = (this.localSearch || this.globalSearch).trim().toLowerCase();
+    return this.invoices.filter((inv) => {
+      if (this.invoiceStatusFilter !== 'all' && inv.status !== this.invoiceStatusFilter) return false;
+      if (!query) return true;
+      const ctr = this.contracts.find((c) => c.id === inv.contractId);
+      const cp = store.counterparties.find((c) => c.id === ctr?.counterpartyId)?.name.toLowerCase() || '';
+      return (
+        inv.number.toLowerCase().includes(query) ||
+        (ctr?.number.toLowerCase().includes(query) ?? false) ||
+        (ctr?.title.toLowerCase().includes(query) ?? false) ||
+        cp.includes(query)
+      );
+    });
+  }
+
+  private getContractBillingStats(contractId: string): { invoiced: number; paid: number; count: number } {
+    const related = this.invoices.filter((i) => i.contractId === contractId && i.status !== 'cancelled');
+    return {
+      count: related.length,
+      invoiced: related.reduce((sum, i) => sum + i.totalAmount, 0),
+      paid: related.filter((i) => i.status === 'paid').reduce((sum, i) => sum + i.totalAmount, 0),
+    };
+  }
+
   render() {
     const isRu = this.currentLang === 'ru';
+    const t = getTranslation(this.currentLang);
     const filtered = this.getFiltered();
+    const filteredInvoices = this.getFilteredInvoices();
 
     const activeList = this.contracts.filter((c) => c.status === 'active');
     const rubTotal = activeList
       .filter((c) => c.currency === 'RUB')
       .reduce((acc, c) => acc + c.amount, 0);
+
+    const rubInvoices = this.invoices.filter((i) => i.currency === 'RUB' && i.status !== 'cancelled');
+    const rubInvoicedTotal = rubInvoices.reduce((acc, i) => acc + i.totalAmount, 0);
+    const rubPaidTotal = rubInvoices
+      .filter((i) => i.status === 'paid')
+      .reduce((acc, i) => acc + i.totalAmount, 0);
     const expiringSoon = activeList.filter((c) => {
       const days = this.getDaysRemaining(c.endDate);
       return days !== null && days >= 0 && days <= 45;
@@ -172,14 +239,29 @@ export class AppContracts extends LitElement {
       { value: 'EUR', label: 'EUR (€)' },
     ];
 
+    const tabOptions = [
+      { value: 'contracts', label: `${t.invoices.tabContracts} (${this.contracts.length})` },
+      { value: 'invoices', label: `${t.invoices.tabInvoices} (${this.invoices.length})` },
+    ];
+
+    const invoiceStatusOptions = [
+      { value: 'all', label: isRu ? 'Все статусы счетов' : 'All invoice statuses' },
+      { value: 'draft', label: t.invoices.statuses.draft, color: '#64748b' },
+      { value: 'issued', label: t.invoices.statuses.issued, color: '#0284c7' },
+      { value: 'sent', label: t.invoices.statuses.sent, color: '#f59e0b' },
+      { value: 'paid', label: t.invoices.statuses.paid, color: '#10b981' },
+      { value: 'overdue', label: t.invoices.statuses.overdue, color: '#ef4444' },
+      { value: 'cancelled', label: t.invoices.statuses.cancelled, color: '#64748b' },
+    ];
+
     return html`
       <div class="view-header">
         <div class="header-titles">
           <h1 class="view-title">${isRu ? 'Договоры' : 'Contracts'}</h1>
           <p class="view-subtitle">
             ${isRu
-              ? 'Реестр контрактов с заказчиками и подрядчиками, суммы, сроки и привязка к проектам'
-              : 'Contract registry with clients and vendors, amounts, validity dates, and project links'}
+              ? 'Реестр контрактов с заказчиками и подрядчиками, суммы, сроки, привязка к проектам и выставление счетов'
+              : 'Contract registry with clients and vendors, amounts, validity dates, project links, and invoicing'}
           </p>
         </div>
         <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
@@ -194,12 +276,20 @@ export class AppContracts extends LitElement {
           <span class="kpi-value">${this.contracts.length}</span>
         </div>
         <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Действующих' : 'Active'}</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">${activeList.length}</span>
-        </div>
-        <div class="kpi-card">
           <span class="kpi-label">${isRu ? 'Активная сумма (RUB)' : 'Active Volume (RUB)'}</span>
           <span class="kpi-value">${(rubTotal / 1_000_000).toFixed(2)}M ₽</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">${t.contractDetail.invoicedTotal} (RUB)</span>
+          <span class="kpi-value" style="color: var(--accent-primary, #6366f1);">
+            ${(rubInvoicedTotal / 1_000_000).toFixed(2)}M ₽
+          </span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-label">${t.contractDetail.paidTotal} (RUB)</span>
+          <span class="kpi-value" style="color: var(--color-success, #10b981);">
+            ${(rubPaidTotal / 1_000_000).toFixed(2)}M ₽
+          </span>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">${isRu ? 'Истекают ≤ 45 дн.' : 'Expiring ≤ 45d'}</span>
@@ -211,9 +301,21 @@ export class AppContracts extends LitElement {
 
       <div class="toolbar">
         <div class="toolbar-filters">
+          <app-segmented-switch
+            .value="${this.viewTab}"
+            .options="${tabOptions}"
+            @change="${(e: CustomEvent<{ value: string }>) =>
+              (this.viewTab = e.detail.value as 'contracts' | 'invoices')}"
+          ></app-segmented-switch>
           <div class="filter-search">
             <app-input
-              placeholder="${isRu ? 'Поиск по номеру, предмету, контрагенту...' : 'Search number, title, counterparty...'}"
+              placeholder="${this.viewTab === 'contracts'
+                ? isRu
+                  ? 'Поиск по номеру, предмету, контрагенту...'
+                  : 'Search number, title, counterparty...'
+                : isRu
+                ? 'Поиск по номеру счёта, договору, контрагенту...'
+                : 'Search invoice, contract, counterparty...'}"
               .value="${this.localSearch}"
               clearable
               @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
@@ -221,112 +323,291 @@ export class AppContracts extends LitElement {
               <span slot="icon">${iconSearch(15)}</span>
             </app-input>
           </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | ContractStatus)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.typeFilter}"
-              .options="${typeOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.typeFilter = e.detail.value as 'all' | ContractType)}"
-            ></app-select>
-          </div>
+          ${this.viewTab === 'contracts'
+            ? html`
+                <div class="filter-select">
+                  <app-select
+                    .value="${this.statusFilter}"
+                    .options="${statusOptions}"
+                    @change="${(e: CustomEvent<{ value: string }>) =>
+                      (this.statusFilter = e.detail.value as 'all' | ContractStatus)}"
+                  ></app-select>
+                </div>
+                <div class="filter-select">
+                  <app-select
+                    .value="${this.typeFilter}"
+                    .options="${typeOptions}"
+                    @change="${(e: CustomEvent<{ value: string }>) =>
+                      (this.typeFilter = e.detail.value as 'all' | ContractType)}"
+                  ></app-select>
+                </div>
+              `
+            : html`
+                <div class="filter-select">
+                  <app-select
+                    .value="${this.invoiceStatusFilter}"
+                    .options="${invoiceStatusOptions}"
+                    @change="${(e: CustomEvent<{ value: string }>) =>
+                      (this.invoiceStatusFilter = e.detail.value as 'all' | InvoiceStatus)}"
+                  ></app-select>
+                </div>
+              `}
         </div>
       </div>
 
-      ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Договоры не найдены' : 'No contracts found'}</div>`
+      ${this.viewTab === 'contracts'
+        ? filtered.length === 0
+          ? html`<div class="empty-state">${isRu ? 'Договоры не найдены' : 'No contracts found'}</div>`
+          : html`
+              <div class="table-card">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>${isRu ? 'Номер' : 'Number'}</th>
+                      <th>${isRu ? 'Предмет договора' : 'Subject'}</th>
+                      <th>${isRu ? 'Стороны' : 'Parties'}</th>
+                      <th>${isRu ? 'Проект' : 'Project'}</th>
+                      <th>${isRu ? 'Сумма / Счета' : 'Amount / Billed'}</th>
+                      <th>${isRu ? 'Срок действия' : 'Term'}</th>
+                      <th>${isRu ? 'Статус' : 'Status'}</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${filtered.map((ctr) => {
+                      const company = store.companies.find((c) => c.id === ctr.companyId);
+                      const cp = store.counterparties.find((c) => c.id === ctr.counterpartyId);
+                      const proj = store.projects.find((p) => p.id === ctr.projectId);
+                      const owner = store.users.find((u) => u.id === ctr.ownerId);
+                      const statusMeta = this.getStatusMeta(ctr.status, isRu);
+                      const daysLeft = ctr.status === 'active' ? this.getDaysRemaining(ctr.endDate) : null;
+                      const billing = this.getContractBillingStats(ctr.id);
+
+                      return html`
+                        <tr>
+                          <td>
+                            <button
+                              type="button"
+                              class="contract-link-btn"
+                              title="${t.contractDetail.openContract}"
+                              @click="${() => store.openContractDetail(ctr.id)}"
+                            >
+                              ${iconFileText(15)}
+                              <span>${ctr.number}</span>
+                            </button>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
+                              ${this.getTypeLabel(ctr.type, isRu)}
+                            </div>
+                          </td>
+                          <td>
+                            <div
+                              class="contract-title"
+                              style="cursor: pointer;"
+                              @click="${() => store.openContractDetail(ctr.id)}"
+                            >
+                              ${ctr.title}
+                            </div>
+                            <div class="contract-desc" title="${ctr.description}">${ctr.description || '—'}</div>
+                          </td>
+                          <td>
+                            <div style="font-weight: 500;">${cp?.name || '—'}</div>
+                            <div style="font-size: 0.74rem; color: var(--text-muted);">
+                              ${company?.name || '—'}${owner ? ` · ${owner.name}` : ''}
+                            </div>
+                          </td>
+                          <td>
+                            ${proj
+                              ? html`
+                                  <span class="project-pill">
+                                    <span class="project-dot" style="background: ${proj.color};"></span>
+                                    <span>${proj.key}</span>
+                                  </span>
+                                `
+                              : '—'}
+                          </td>
+                          <td class="amount-cell">
+                            <div>${this.formatMoney(ctr.amount, ctr.currency)}</div>
+                            ${billing.count > 0
+                              ? html`
+                                  <div class="billing-sub">
+                                    <span>${isRu ? 'Счетов' : 'Inv'}: ${this.formatMoney(billing.invoiced, ctr.currency)}</span>
+                                    ${billing.paid > 0
+                                      ? html`<span class="paid-val">· ${isRu ? 'Опл' : 'Paid'}: ${this.formatMoney(billing.paid, ctr.currency)}</span>`
+                                      : ''}
+                                  </div>
+                                `
+                              : ''}
+                          </td>
+                          <td class="dates-cell">
+                            <div>${ctr.startDate} → ${ctr.endDate}</div>
+                            ${daysLeft !== null && daysLeft >= 0 && daysLeft <= 45
+                              ? html`<span class="expiry-warn">${isRu ? `Осталось ${daysLeft} дн.` : `${daysLeft}d left`}</span>`
+                              : ''}
+                          </td>
+                          <td>
+                            <app-badge variant="${statusMeta.variant}" appearance="soft" size="sm">
+                              ${statusMeta.label}
+                            </app-badge>
+                          </td>
+                          <td>
+                            <div class="actions-row">
+                              <button
+                                type="button"
+                                class="icon-btn accent"
+                                title="${t.contractDetail.openContract}"
+                                @click="${() => store.openContractDetail(ctr.id)}"
+                              >
+                                ${iconChevronRight(15)}
+                              </button>
+                              <button
+                                type="button"
+                                class="icon-btn success"
+                                title="${t.contractDetail.issueInvoice}"
+                                @click="${() => store.openContractDetail(ctr.id, true)}"
+                              >
+                                ${iconReceipt(15)}
+                              </button>
+                              <button
+                                type="button"
+                                class="icon-btn"
+                                title="${isRu ? 'Редактировать' : 'Edit'}"
+                                @click="${() => this.openEditModal(ctr)}"
+                              >
+                                ${iconEdit(14)}
+                              </button>
+                              <button
+                                type="button"
+                                class="icon-btn danger"
+                                title="${isRu ? 'Удалить' : 'Delete'}"
+                                @click="${() => (this.deletingContract = ctr)}"
+                              >
+                                ${iconTrash(14)}
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      `;
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            `
+        : filteredInvoices.length === 0
+        ? html`<div class="empty-state">${isRu ? 'Счета не найдены' : 'No invoices found'}</div>`
         : html`
             <div class="table-card">
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>${isRu ? 'Номер' : 'Number'}</th>
-                    <th>${isRu ? 'Предмет договора' : 'Subject'}</th>
-                    <th>${isRu ? 'Стороны' : 'Parties'}</th>
-                    <th>${isRu ? 'Проект' : 'Project'}</th>
-                    <th>${isRu ? 'Сумма' : 'Amount'}</th>
-                    <th>${isRu ? 'Срок действия' : 'Term'}</th>
+                    <th>${isRu ? 'Счёт' : 'Invoice'}</th>
+                    <th>${isRu ? 'Договор' : 'Contract'}</th>
+                    <th>${isRu ? 'Контрагент' : 'Counterparty'}</th>
+                    <th>${isRu ? 'Дата / Срок' : 'Issued / Due'}</th>
+                    <th>${isRu ? 'Сумма без НДС' : 'Subtotal'}</th>
+                    <th>${isRu ? 'Итого с НДС' : 'Total'}</th>
                     <th>${isRu ? 'Статус' : 'Status'}</th>
                     <th></th>
                   </tr>
                 </thead>
                 <tbody>
-                  ${filtered.map((ctr) => {
-                    const company = store.companies.find((c) => c.id === ctr.companyId);
-                    const cp = store.counterparties.find((c) => c.id === ctr.counterpartyId);
-                    const proj = store.projects.find((p) => p.id === ctr.projectId);
-                    const owner = store.users.find((u) => u.id === ctr.ownerId);
-                    const statusMeta = this.getStatusMeta(ctr.status, isRu);
-                    const daysLeft = ctr.status === 'active' ? this.getDaysRemaining(ctr.endDate) : null;
-
+                  ${filteredInvoices.map((inv) => {
+                    const ctr = this.contracts.find((c) => c.id === inv.contractId);
+                    const cp = store.counterparties.find((c) => c.id === ctr?.counterpartyId);
                     return html`
                       <tr>
                         <td>
-                          <div class="contract-num">
-                            ${iconFileText(15)}
-                            <span>${ctr.number}</span>
+                          <div class="contract-link-btn" @click="${() => ctr && store.openContractDetail(ctr.id)}">
+                            ${iconReceipt(15)}
+                            <span>${inv.number}</span>
                           </div>
                           <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
-                            ${this.getTypeLabel(ctr.type, isRu)}
+                            ${inv.items.length} ${isRu ? 'поз.' : 'items'} · ${inv.vatRate > 0 ? `${isRu ? 'НДС' : 'VAT'} ${inv.vatRate}%` : isRu ? 'Без НДС' : 'No VAT'}
                           </div>
                         </td>
                         <td>
-                          <div class="contract-title">${ctr.title}</div>
-                          <div class="contract-desc" title="${ctr.description}">${ctr.description || '—'}</div>
-                        </td>
-                        <td>
-                          <div style="font-weight: 500;">${cp?.name || '—'}</div>
-                          <div style="font-size: 0.74rem; color: var(--text-muted);">
-                            ${company?.name || '—'}${owner ? ` · ${owner.name}` : ''}
-                          </div>
-                        </td>
-                        <td>
-                          ${proj
+                          ${ctr
                             ? html`
-                                <span class="project-pill">
-                                  <span class="project-dot" style="background: ${proj.color};"></span>
-                                  <span>${proj.key}</span>
-                                </span>
+                                <button
+                                  type="button"
+                                  class="contract-link-btn"
+                                  @click="${() => store.openContractDetail(ctr.id)}"
+                                >
+                                  <span>${ctr.number}</span>
+                                </button>
+                                <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                               `
                             : '—'}
                         </td>
-                        <td class="amount-cell">${this.formatMoney(ctr.amount, ctr.currency)}</td>
+                        <td>${cp?.name || '—'}</td>
                         <td class="dates-cell">
-                          <div>${ctr.startDate} → ${ctr.endDate}</div>
-                          ${daysLeft !== null && daysLeft >= 0 && daysLeft <= 45
-                            ? html`<span class="expiry-warn">${isRu ? `Осталось ${daysLeft} дн.` : `${daysLeft}d left`}</span>`
+                          <div>${inv.issueDate} → ${inv.dueDate}</div>
+                          ${inv.paidDate
+                            ? html`<div style="color: var(--color-success, #10b981); font-size: 0.72rem;">
+                                ${isRu ? 'Оплачен' : 'Paid'}: ${inv.paidDate}
+                              </div>`
                             : ''}
                         </td>
+                        <td class="mono">${this.formatMoney(inv.subtotal, inv.currency)}</td>
+                        <td class="amount-cell">${this.formatMoney(inv.totalAmount, inv.currency)}</td>
                         <td>
-                          <app-badge variant="${statusMeta.variant}" appearance="soft" size="sm">
-                            ${statusMeta.label}
+                          <app-badge
+                            variant="${this.getInvoiceStatusVariant(inv.status)}"
+                            appearance="soft"
+                            size="sm"
+                          >
+                            ${t.invoices.statuses[inv.status]}
                           </app-badge>
                         </td>
                         <td>
                           <div class="actions-row">
-                            <button
-                              type="button"
-                              class="icon-btn"
-                              title="${isRu ? 'Редактировать' : 'Edit'}"
-                              @click="${() => this.openEditModal(ctr)}"
-                            >
-                              ${iconEdit(14)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-btn danger"
-                              title="${isRu ? 'Удалить' : 'Delete'}"
-                              @click="${() => (this.deletingContract = ctr)}"
-                            >
-                              ${iconTrash(14)}
-                            </button>
+                            ${inv.status === 'draft'
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="icon-btn accent"
+                                    title="${t.invoices.markIssued}"
+                                    @click="${() => store.updateInvoiceStatus(inv.id, 'issued')}"
+                                  >
+                                    ${iconFileText(14)}
+                                  </button>
+                                `
+                              : ''}
+                            ${inv.status === 'issued'
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="icon-btn accent"
+                                    title="${t.invoices.markSent}"
+                                    @click="${() => store.updateInvoiceStatus(inv.id, 'sent')}"
+                                  >
+                                    ${iconSend(14)}
+                                  </button>
+                                `
+                              : ''}
+                            ${inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue'
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="icon-btn success"
+                                    title="${t.invoices.markPaid}"
+                                    @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
+                                  >
+                                    ${iconCheck(14)}
+                                  </button>
+                                `
+                              : ''}
+                            ${ctr
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="icon-btn"
+                                    title="${t.contractDetail.openContract}"
+                                    @click="${() => store.openContractDetail(ctr.id)}"
+                                  >
+                                    ${iconChevronRight(15)}
+                                  </button>
+                                `
+                              : ''}
                           </div>
                         </td>
                       </tr>

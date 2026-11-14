@@ -46,6 +46,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   employees: () => import('./components/views/app-employees/app-employees'),
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
   contracts: () => import('./components/views/app-contracts/app-contracts'),
+  'contract-detail': () => import('./components/views/app-contract-detail/app-contract-detail'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
@@ -172,7 +173,7 @@ export class AppRoot extends LitElement {
     return html`
       <app-sidebar
         ?collapsed="${this.sidebarCollapsed}"
-        .activeValue="${this.activeView === 'project-detail' ? 'projects' : this.activeView}"
+        .activeValue="${this.activeView === 'project-detail' ? 'projects' : this.activeView === 'contract-detail' ? 'contracts' : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
         <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
@@ -340,6 +341,8 @@ export class AppRoot extends LitElement {
         return html`<app-counterparties></app-counterparties>`;
       case 'contracts':
         return html`<app-contracts></app-contracts>`;
+      case 'contract-detail':
+        return html`<app-contract-detail></app-contract-detail>`;
       case 'time-tracking':
         return html`<app-time-tracking></app-time-tracking>`;
       case 'expenses':

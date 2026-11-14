@@ -11,6 +11,7 @@ export class AppHeader extends LitElement {
   @state() private activeView = store.activeView;
   @state() private selectedProjectId = store.selectedProjectId;
   @state() private detailProjectId = store.detailProjectId;
+  @state() private detailContractId = store.detailContractId;
   @state() private searchQuery = store.searchQuery;
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
@@ -37,6 +38,7 @@ export class AppHeader extends LitElement {
     this.activeView = store.activeView;
     this.selectedProjectId = store.selectedProjectId;
     this.detailProjectId = store.detailProjectId;
+    this.detailContractId = store.detailContractId;
     this.searchQuery = store.searchQuery;
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
@@ -50,6 +52,10 @@ export class AppHeader extends LitElement {
     const detailProject =
       this.activeView === 'project-detail'
         ? store.projects.find((p) => p.id === this.detailProjectId)
+        : undefined;
+    const detailContract =
+      this.activeView === 'contract-detail'
+        ? store.contracts.find((c) => c.id === this.detailContractId)
         : undefined;
 
     const viewNames: Record<string, string> = {
@@ -65,6 +71,7 @@ export class AppHeader extends LitElement {
       employees: t.navigation.employees,
       counterparties: t.navigation.counterparties,
       contracts: t.navigation.contracts,
+      'contract-detail': detailContract ? `${detailContract.number} · ${detailContract.title}` : t.navigation.contracts,
       'time-tracking': t.navigation.timeTracking,
       expenses: t.navigation.expenses,
       settings: t.navigation.settings,

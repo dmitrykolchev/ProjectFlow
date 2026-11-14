@@ -158,6 +158,29 @@
   white-space: nowrap;
 }
 
+.contract-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary, #6366f1);
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+
+.contract-link-btn:hover {
+  background: var(--bg-hover, rgba(99, 102, 241, 0.12));
+  color: var(--text-primary, #f8fafc);
+}
+
 .contract-title {
   font-weight: 600;
   color: var(--text-primary, #f8fafc);
@@ -175,16 +198,34 @@
 
 .mono {
   font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
 }
 
 .amount-cell {
   font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
   font-weight: 700;
   white-space: nowrap;
 }
 
+.billing-sub {
+  margin-top: 0.22rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.billing-sub .paid-val {
+  color: var(--color-success, #10b981);
+}
+
 .dates-cell {
   font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
   font-size: 0.78rem;
   white-space: nowrap;
 }
@@ -245,6 +286,18 @@
 .icon-btn:hover {
   background: var(--bg-hover, #223049);
   color: var(--text-primary, #f8fafc);
+}
+
+.icon-btn.accent:hover {
+  color: var(--accent-primary, #6366f1);
+  border-color: var(--accent-primary, #6366f1);
+  background: rgba(99, 102, 241, 0.12);
+}
+
+.icon-btn.success:hover {
+  color: var(--color-success, #10b981);
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.12);
 }
 
 .icon-btn.danger:hover {

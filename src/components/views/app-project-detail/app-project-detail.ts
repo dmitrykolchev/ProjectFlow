@@ -586,7 +586,11 @@ export class AppProjectDetail extends LitElement {
                       const cp = store.counterparties.find((c) => c.id === ctr.counterpartyId);
                       const symbol = ctr.currency === 'USD' ? '$' : ctr.currency === 'EUR' ? '€' : '₽';
                       return html`
-                        <div class="contract-row">
+                        <div
+                          class="contract-row"
+                          style="cursor: pointer;"
+                          @click="${() => store.openContractDetail(ctr.id)}"
+                        >
                           <div class="contract-main">
                             <div class="contract-num-title">${ctr.number} — ${ctr.title}</div>
                             <div class="contract-sub">
