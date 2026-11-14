@@ -20,6 +20,7 @@ import {
   iconFileText,
   iconClock,
   iconWallet,
+  iconMessageSquare,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -42,9 +43,13 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   analytics: () => import('./components/views/app-analytics/app-analytics'),
   projects: () => import('./components/views/app-projects/app-projects'),
   'project-detail': () => import('./components/views/app-project-detail/app-project-detail'),
+  'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
   companies: () => import('./components/views/app-companies/app-companies'),
   employees: () => import('./components/views/app-employees/app-employees'),
+  'employee-detail': () => import('./components/views/app-employee-detail/app-employee-detail'),
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
+  'counterparty-detail': () =>
+    import('./components/views/app-counterparty-detail/app-counterparty-detail'),
   contracts: () => import('./components/views/app-contracts/app-contracts'),
   'contract-detail': () => import('./components/views/app-contract-detail/app-contract-detail'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
@@ -59,6 +64,7 @@ export class AppRoot extends LitElement {
   @state() private sidebarCollapsed: boolean = store.customization.sidebarCollapsed;
   @state() private currentLang = store.customization.language;
   @state() private taskCount = store.tasks.length;
+  @state() private chatCount = store.chatMessages.length;
   @state() private loadedViews: Set<ActiveView> = new Set();
 
   private loadingViews: Set<ActiveView> = new Set();
@@ -83,6 +89,7 @@ export class AppRoot extends LitElement {
     this.sidebarCollapsed = store.customization.sidebarCollapsed;
     this.currentLang = store.customization.language;
     this.taskCount = store.tasks.length;
+    this.chatCount = store.chatMessages.length;
     this.ensureViewLoaded(this.activeView);
   }
 
@@ -173,7 +180,15 @@ export class AppRoot extends LitElement {
     return html`
       <app-sidebar
         ?collapsed="${this.sidebarCollapsed}"
-        .activeValue="${this.activeView === 'project-detail' ? 'projects' : this.activeView === 'contract-detail' ? 'contracts' : this.activeView}"
+        .activeValue="${this.activeView === 'project-detail'
+          ? 'projects'
+          : this.activeView === 'contract-detail'
+          ? 'contracts'
+          : this.activeView === 'counterparty-detail'
+          ? 'counterparties'
+          : this.activeView === 'employee-detail'
+          ? 'employees'
+          : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
         <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
@@ -212,6 +227,13 @@ export class AppRoot extends LitElement {
             value="expenses"
             label="${t.navigation.expenses}"
             .icon="${iconWallet()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="project-chat"
+            label="${t.navigation.projectChat}"
+            badge="${String(this.chatCount)}"
+            .icon="${iconMessageSquare()}"
           ></sidebar-item>
         </sidebar-group>
 
@@ -333,12 +355,18 @@ export class AppRoot extends LitElement {
         return html`<app-projects></app-projects>`;
       case 'project-detail':
         return html`<app-project-detail></app-project-detail>`;
+      case 'project-chat':
+        return html`<app-project-chat></app-project-chat>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
       case 'employees':
         return html`<app-employees></app-employees>`;
+      case 'employee-detail':
+        return html`<app-employee-detail></app-employee-detail>`;
       case 'counterparties':
         return html`<app-counterparties></app-counterparties>`;
+      case 'counterparty-detail':
+        return html`<app-counterparty-detail></app-counterparty-detail>`;
       case 'contracts':
         return html`<app-contracts></app-contracts>`;
       case 'contract-detail':

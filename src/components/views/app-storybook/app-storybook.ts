@@ -45,9 +45,12 @@ import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
 import projectDetailMeta from '../app-project-detail/app-project-detail.story';
+import projectChatMeta from '../app-project-chat/app-project-chat.story';
 import companiesMeta from '../app-companies/app-companies.story';
 import employeesMeta from '../app-employees/app-employees.story';
+import employeeDetailMeta from '../app-employee-detail/app-employee-detail.story';
 import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
+import counterpartyDetailMeta from '../app-counterparty-detail/app-counterparty-detail.story';
 import contractsMeta from '../app-contracts/app-contracts.story';
 import contractDetailMeta from '../app-contract-detail/app-contract-detail.story';
 import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
@@ -93,9 +96,12 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   analyticsMeta,
   projectsMeta,
   projectDetailMeta,
+  projectChatMeta,
   companiesMeta,
   employeesMeta,
+  employeeDetailMeta,
   counterpartiesMeta,
+  counterpartyDetailMeta,
   contractsMeta,
   contractDetailMeta,
   timeTrackingMeta,

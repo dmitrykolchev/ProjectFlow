@@ -13,6 +13,7 @@ import {
   InvoiceStatus,
   NotificationItem,
   Project,
+  ProjectChatMessage,
   ProjectMember,
   ProjectRole,
   SidebarGroupMode,
@@ -26,6 +27,7 @@ import {
 } from '../types';
 import {
   initialCalculations,
+  initialChatMessages,
   initialCompanies,
   initialContracts,
   initialCounterparties,
@@ -49,6 +51,7 @@ const STORAGE_KEY_CALCULATIONS = 'projectflow_calculations_v1';
 const STORAGE_KEY_INVOICES = 'projectflow_invoices_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
+const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -204,9 +207,14 @@ export class AppStore {
   public invoices: Invoice[] = [];
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
+  public chatMessages: ProjectChatMessage[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
   public detailContractId: string = '';
+  public detailCounterpartyId: string = '';
+  public detailEmployeeId: string = '';
+  public chatProjectId: string = '';
+  public currentUserId: string = 'user-1';
   public pendingInvoiceForContractId: string | null = null;
   public pendingCalculationForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
@@ -326,6 +334,9 @@ export class AppStore {
       const storedExpenses = localStorage.getItem(STORAGE_KEY_EXPENSES);
       this.expenses = storedExpenses ? JSON.parse(storedExpenses) : [...initialExpenses];
 
+      const storedChat = localStorage.getItem(STORAGE_KEY_CHAT);
+      this.chatMessages = storedChat ? JSON.parse(storedChat) : [...initialChatMessages];
+
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
         this.activityLog = JSON.parse(storedLogs);
@@ -368,6 +379,7 @@ export class AppStore {
       this.invoices = [...initialInvoices];
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
+      this.chatMessages = [...initialChatMessages];
     }
   }
 
@@ -446,6 +458,14 @@ export class AppStore {
   private saveExpenses(): void {
     try {
       localStorage.setItem(STORAGE_KEY_EXPENSES, JSON.stringify(this.expenses));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveChatMessages(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(this.chatMessages));
     } catch (e) {
       console.error(e);
     }
@@ -780,6 +800,7 @@ export class AppStore {
       view === 'dashboard' ||
       view === 'projects' ||
       view === 'project-detail' ||
+      view === 'project-chat' ||
       view === 'kanban' ||
       view === 'gantt' ||
       view === 'time-tracking' ||
@@ -791,7 +812,9 @@ export class AppStore {
     if (
       view === 'companies' ||
       view === 'employees' ||
+      view === 'employee-detail' ||
       view === 'counterparties' ||
+      view === 'counterparty-detail' ||
       view === 'contracts' ||
       view === 'contract-detail'
     ) {
@@ -865,6 +888,34 @@ export class AppStore {
   public openProjectDetail(projectId: string): void {
     this.detailProjectId = projectId;
     this.setActiveView('project-detail');
+  }
+
+  public openCounterpartyDetail(counterpartyId: string): void {
+    this.detailCounterpartyId = counterpartyId;
+    this.setActiveView('counterparty-detail');
+  }
+
+  public openEmployeeDetail(employeeId: string): void {
+    this.detailEmployeeId = employeeId;
+    this.setActiveView('employee-detail');
+  }
+
+  public openProjectChat(projectId?: string): void {
+    if (projectId) {
+      this.chatProjectId = projectId;
+    } else if (!this.chatProjectId) {
+      this.chatProjectId =
+        this.selectedProjectId !== 'all'
+          ? this.selectedProjectId
+          : this.projects[0]?.id || '';
+    }
+    this.setActiveView('project-chat');
+  }
+
+  public setCurrentUser(userId: string): void {
+    if (!this.users.some((u) => u.id === userId)) return;
+    this.currentUserId = userId;
+    this.notify();
   }
 
   public openContractDetail(
@@ -1130,6 +1181,15 @@ export class AppStore {
       ...p,
       members: (p.members || []).filter((m) => m.userId !== id),
     }));
+    if (this.detailEmployeeId === id) {
+      this.detailEmployeeId = this.users[0]?.id || '';
+      if (this.activeView === 'employee-detail') {
+        this.activeView = 'employees';
+      }
+    }
+    if (this.currentUserId === id) {
+      this.currentUserId = this.users[0]?.id || '';
+    }
     this.saveEmployees();
     this.saveProjects();
     this.logActivity('delete', 'employee', target.name, 'Сотрудник удалён');
@@ -1163,6 +1223,12 @@ export class AppStore {
     const target = this.counterparties.find((c) => c.id === id);
     if (!target) return;
     this.counterparties = this.counterparties.filter((c) => c.id !== id);
+    if (this.detailCounterpartyId === id) {
+      this.detailCounterpartyId = this.counterparties[0]?.id || '';
+      if (this.activeView === 'counterparty-detail') {
+        this.activeView = 'counterparties';
+      }
+    }
     this.saveCounterparties();
     this.logActivity('delete', 'counterparty', target.name, 'Контрагент удалён');
     this.addNotification('warning', 'Удалено', `Контрагент "${target.name}" удалён`);
@@ -1639,6 +1705,92 @@ export class AppStore {
     this.saveExpenses();
     this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена');
     this.addNotification('warning', 'Расход удалён', target.title);
+    this.notify();
+  }
+
+  // --- Project Chat CRUD ---
+  public addChatMessage(data: {
+    projectId: string;
+    senderId?: string;
+    text: string;
+    replyToId?: string;
+    taskRefId?: string;
+  }): ProjectChatMessage {
+    const senderId = data.senderId || this.currentUserId || this.users[0]?.id || '';
+    const msg: ProjectChatMessage = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      projectId: data.projectId,
+      senderId,
+      text: data.text.trim(),
+      replyToId: data.replyToId || undefined,
+      taskRefId: data.taskRefId || undefined,
+      pinned: false,
+      reactions: [],
+      createdAt: new Date().toISOString(),
+    };
+    this.chatMessages = [...this.chatMessages, msg];
+    this.saveChatMessages();
+
+    const proj = this.projects.find((p) => p.id === msg.projectId);
+    const sender = this.users.find((u) => u.id === senderId);
+    this.logActivity(
+      'create',
+      'chat',
+      proj ? `[${proj.key}] ${proj.name}` : msg.projectId,
+      `${sender?.name || senderId}: ${msg.text.slice(0, 60)}`
+    );
+    this.notify();
+    return msg;
+  }
+
+  public updateChatMessage(id: string, text: string): void {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    this.chatMessages = this.chatMessages.map((m) =>
+      m.id === id ? { ...m, text: trimmed, editedAt: new Date().toISOString() } : m
+    );
+    this.saveChatMessages();
+    this.notify();
+  }
+
+  public togglePinChatMessage(id: string): void {
+    this.chatMessages = this.chatMessages.map((m) =>
+      m.id === id ? { ...m, pinned: !m.pinned } : m
+    );
+    this.saveChatMessages();
+    this.notify();
+  }
+
+  public toggleChatReaction(messageId: string, emoji: string, userId?: string): void {
+    const uid = userId || this.currentUserId || this.users[0]?.id || '';
+    if (!uid) return;
+    this.chatMessages = this.chatMessages.map((m) => {
+      if (m.id !== messageId) return m;
+      const list = [...(m.reactions || [])];
+      const idx = list.findIndex((r) => r.emoji === emoji);
+      if (idx === -1) {
+        list.push({ emoji, userIds: [uid] });
+      } else {
+        const entry = list[idx];
+        const has = entry.userIds.includes(uid);
+        const nextUserIds = has ? entry.userIds.filter((u) => u !== uid) : [...entry.userIds, uid];
+        if (nextUserIds.length === 0) {
+          list.splice(idx, 1);
+        } else {
+          list[idx] = { ...entry, userIds: nextUserIds };
+        }
+      }
+      return { ...m, reactions: list };
+    });
+    this.saveChatMessages();
+    this.notify();
+  }
+
+  public deleteChatMessage(id: string): void {
+    const target = this.chatMessages.find((m) => m.id === id);
+    if (!target) return;
+    this.chatMessages = this.chatMessages.filter((m) => m.id !== id);
+    this.saveChatMessages();
     this.notify();
   }
 

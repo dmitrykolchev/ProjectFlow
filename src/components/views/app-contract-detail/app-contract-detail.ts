@@ -560,7 +560,17 @@ export class AppContractDetail extends LitElement {
             </div>
             <div class="meta-box">
               <span class="meta-label">${isRu ? 'Заказчик (контрагент)' : 'Counterparty'}</span>
-              <span class="meta-val">${counterparty?.name || '—'}</span>
+              ${counterparty
+                ? html`
+                    <button
+                      type="button"
+                      class="link-btn"
+                      @click="${() => store.openCounterpartyDetail(counterparty.id)}"
+                    >
+                      ${counterparty.name}
+                    </button>
+                  `
+                : html`<span class="meta-val">—</span>`}
             </div>
             <div class="meta-box">
               <span class="meta-label">${isRu ? 'Связанный проект' : 'Linked Project'}</span>
@@ -1029,7 +1039,17 @@ export class AppContractDetail extends LitElement {
 
               <div class="party-block">
                 <span class="party-role">${isRu ? 'Заказчик / Плательщик' : 'Client / Counterparty'}</span>
-                <span class="party-name">${counterparty?.legalName || counterparty?.name || '—'}</span>
+                ${counterparty
+                  ? html`
+                      <button
+                        type="button"
+                        class="link-btn"
+                        @click="${() => store.openCounterpartyDetail(counterparty.id)}"
+                      >
+                        ${counterparty.legalName || counterparty.name}
+                      </button>
+                    `
+                  : html`<span class="party-name">—</span>`}
                 <span class="party-sub mono">
                   ${isRu ? 'ИНН' : 'INN'}: ${counterparty?.inn || '—'}
                   ${counterparty?.kpp ? ` · ${isRu ? 'КПП' : 'KPP'}: ${counterparty.kpp}` : ''}

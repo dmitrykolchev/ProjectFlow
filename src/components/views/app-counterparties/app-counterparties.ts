@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
-import { iconEdit, iconHandshake, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -387,7 +387,15 @@ export class AppCounterparties extends LitElement {
                 <div class="cp-identity">
                   <div class="cp-icon">${iconHandshake(20)}</div>
                   <div class="cp-names">
-                    <div class="cp-name">${cp.name}</div>
+                    <div class="cp-name">
+                      <button
+                        type="button"
+                        class="cp-link-btn"
+                        @click="${() => store.openCounterpartyDetail(cp.id)}"
+                      >
+                        ${cp.name}
+                      </button>
+                    </div>
                     <div class="cp-legal" title="${cp.legalName}">${cp.legalName}</div>
                   </div>
                 </div>
@@ -446,6 +454,14 @@ export class AppCounterparties extends LitElement {
                   <button
                     type="button"
                     class="icon-btn"
+                    title="${isRu ? 'Открыть карточку' : 'Open Detail'}"
+                    @click="${() => store.openCounterpartyDetail(cp.id)}"
+                  >
+                    ${iconChevronRight(15)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
                     title="${isRu ? 'Редактировать' : 'Edit'}"
                     @click="${() => this.openEditModal(cp)}"
                   >
@@ -494,7 +510,15 @@ export class AppCounterparties extends LitElement {
               return html`
                 <tr>
                   <td>
-                    <div style="font-weight: 600;">${cp.name}</div>
+                    <div style="font-weight: 600;">
+                      <button
+                        type="button"
+                        class="cp-link-btn"
+                        @click="${() => store.openCounterpartyDetail(cp.id)}"
+                      >
+                        ${cp.name}
+                      </button>
+                    </div>
                     <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.legalName} · ${cp.city}</div>
                   </td>
                   <td>
@@ -516,6 +540,14 @@ export class AppCounterparties extends LitElement {
                   </td>
                   <td>
                     <div class="card-actions">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        title="${isRu ? 'Открыть карточку' : 'Open Detail'}"
+                        @click="${() => store.openCounterpartyDetail(cp.id)}"
+                      >
+                        ${iconChevronRight(15)}
+                      </button>
                       <button
                         type="button"
                         class="icon-btn"

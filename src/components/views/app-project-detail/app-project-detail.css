@@ -195,6 +195,25 @@
   white-space: nowrap;
 }
 
+.link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--accent-primary, #6366f1);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
 .mono {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;

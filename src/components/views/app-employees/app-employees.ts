@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
-import { iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -352,9 +352,17 @@ export class AppEmployees extends LitElement {
             <article class="employee-card">
               <div class="card-head">
                 <div class="person-box">
-                  <div class="avatar">${emp.avatar}</div>
+                  <div class="avatar" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}">${emp.avatar}</div>
                   <div class="person-info">
-                    <div class="person-name">${emp.name}</div>
+                    <div class="person-name">
+                      <button
+                        type="button"
+                        class="person-link-btn"
+                        @click="${() => store.openEmployeeDetail(emp.id)}"
+                      >
+                        ${emp.name}
+                      </button>
+                    </div>
                     <div class="person-role">${emp.role}</div>
                   </div>
                 </div>
@@ -390,6 +398,14 @@ export class AppEmployees extends LitElement {
                   <span>${isRu ? 'Задачи' : 'Tasks'}: <strong>${taskCount}</strong></span>
                 </div>
                 <div class="actions-row">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="${isRu ? 'Профиль сотрудника' : 'Open Profile'}"
+                    @click="${() => store.openEmployeeDetail(emp.id)}"
+                  >
+                    ${iconChevronRight(15)}
+                  </button>
                   <button
                     type="button"
                     class="icon-btn"
@@ -444,9 +460,17 @@ export class AppEmployees extends LitElement {
                 <tr>
                   <td>
                     <div class="person-box">
-                      <div class="avatar sm">${emp.avatar}</div>
+                      <div class="avatar sm" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}">${emp.avatar}</div>
                       <div class="person-info">
-                        <div class="person-name" style="font-size: 0.85rem;">${emp.name}</div>
+                        <div class="person-name" style="font-size: 0.85rem;">
+                          <button
+                            type="button"
+                            class="person-link-btn"
+                            @click="${() => store.openEmployeeDetail(emp.id)}"
+                          >
+                            ${emp.name}
+                          </button>
+                        </div>
                         <div class="person-role">${emp.role}</div>
                       </div>
                     </div>
@@ -464,6 +488,14 @@ export class AppEmployees extends LitElement {
                   </td>
                   <td>
                     <div class="actions-row">
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        title="${isRu ? 'Профиль сотрудника' : 'Open Profile'}"
+                        @click="${() => store.openEmployeeDetail(emp.id)}"
+                      >
+                        ${iconChevronRight(15)}
+                      </button>
                       <button
                         type="button"
                         class="icon-btn"

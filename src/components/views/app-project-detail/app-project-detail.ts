@@ -9,6 +9,7 @@ import {
   iconEdit,
   iconFileText,
   iconKanban,
+  iconMessageSquare,
   iconPlus,
   iconTrash,
   iconUsers,
@@ -246,6 +247,15 @@ export class AppProjectDetail extends LitElement {
             <app-button
               size="sm"
               variant="outline"
+              @click="${() => store.openProjectChat(proj.id)}"
+            >
+              <span slot="icon-start">${iconMessageSquare(15)}</span>
+              <span>${isRu ? 'Чат проекта' : 'Project Chat'}</span>
+            </app-button>
+
+            <app-button
+              size="sm"
+              variant="outline"
               @click="${() => {
                 store.selectProject(proj.id);
                 store.setActiveView('kanban');
@@ -311,7 +321,17 @@ export class AppProjectDetail extends LitElement {
             </div>
             <div class="meta-box">
               <span class="meta-label">${isRu ? 'Контрагент / Заказчик' : 'Counterparty'}</span>
-              <span class="meta-val">${counterparty?.name || (isRu ? 'Внутренний проект' : 'Internal')}</span>
+              ${counterparty
+                ? html`
+                    <button
+                      type="button"
+                      class="link-btn"
+                      @click="${() => store.openCounterpartyDetail(counterparty.id)}"
+                    >
+                      ${counterparty.name}
+                    </button>
+                  `
+                : html`<span class="meta-val">${isRu ? 'Внутренний проект' : 'Internal'}</span>`}
             </div>
             <div class="meta-box">
               <span class="meta-label">${isRu ? 'Бюджет проекта' : 'Budget'}</span>
@@ -451,9 +471,24 @@ export class AppProjectDetail extends LitElement {
                                 return html`
                                   <div class="member-row">
                                     <div class="member-person">
-                                      <div class="avatar">${user.avatar}</div>
+                                      <div
+                                        class="avatar"
+                                        style="cursor: pointer;"
+                                        @click="${() => store.openEmployeeDetail(user.id)}"
+                                      >
+                                        ${user.avatar}
+                                      </div>
                                       <div class="member-info">
-                                        <div class="member-name">${user.name}</div>
+                                        <div class="member-name">
+                                          <button
+                                            type="button"
+                                            class="link-btn"
+                                            style="color: inherit;"
+                                            @click="${() => store.openEmployeeDetail(user.id)}"
+                                          >
+                                            ${user.name}
+                                          </button>
+                                        </div>
                                         <div class="member-sub">
                                           ${user.role}${user.department ? ` · ${user.department}` : ''} · ${isRu ? 'с' : 'since'} ${member.joinedAt}
                                         </div>

@@ -275,6 +275,24 @@ export interface ThemeBaseColors {
   borderSubtle: string;
 }
 
+export interface ProjectChatReaction {
+  emoji: string;
+  userIds: string[];
+}
+
+export interface ProjectChatMessage {
+  id: string;
+  projectId: string;
+  senderId: string;
+  text: string;
+  replyToId?: string;
+  taskRefId?: string;
+  pinned?: boolean;
+  reactions?: ProjectChatReaction[];
+  createdAt: string;
+  editedAt?: string;
+}
+
 export type ActiveView =
   | 'dashboard'
   | 'kanban'
@@ -284,11 +302,14 @@ export type ActiveView =
   | 'analytics'
   | 'companies'
   | 'employees'
+  | 'employee-detail'
   | 'counterparties'
+  | 'counterparty-detail'
   | 'contracts'
   | 'contract-detail'
   | 'projects'
   | 'project-detail'
+  | 'project-chat'
   | 'time-tracking'
   | 'expenses'
   | 'settings'
@@ -311,6 +332,7 @@ export interface ActivityLogItem {
     | 'invoice'
     | 'time_entry'
     | 'expense'
+    | 'chat'
     | 'settings';
   targetTitle: string;
   details: string;
