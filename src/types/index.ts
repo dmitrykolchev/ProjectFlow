@@ -341,7 +341,8 @@ export type ActiveView =
   | 'time-tracking'
   | 'expenses'
   | 'settings'
-  | 'storybook';
+  | 'storybook'
+  | 'design-tokens';
 
 export interface ActivityLogItem {
   id: string;

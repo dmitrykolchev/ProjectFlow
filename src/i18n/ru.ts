@@ -50,6 +50,7 @@ export const ru = {
     settings: 'Кастомизация',
     activity: 'Журнал активности',
     storybook: 'Storybook компонентов',
+    designTokens: 'Design Tokens',
     groupWorkspace: 'Рабочая область',
     groupPlanning: 'Данные и аналитика',
     groupDirectory: 'Справочники и CRM',

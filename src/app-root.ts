@@ -12,6 +12,7 @@ import {
   iconAnalytics,
   iconActivity,
   iconStorybook,
+  iconLayers,
   iconSettings,
   iconFolder,
   iconBuilding,
@@ -63,6 +64,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
+  'design-tokens': () => import('./components/views/app-design-tokens/app-design-tokens'),
 };
 
 @customElement('app-root')
@@ -327,6 +329,12 @@ export class AppRoot extends LitElement {
           ></sidebar-item>
 
           <sidebar-item
+            value="design-tokens"
+            label="${t.navigation.designTokens}"
+            .icon="${iconLayers()}"
+          ></sidebar-item>
+
+          <sidebar-item
             value="settings"
             label="${t.navigation.settings}"
             .icon="${iconSettings()}"
@@ -417,6 +425,8 @@ export class AppRoot extends LitElement {
         return html`<app-settings></app-settings>`;
       case 'storybook':
         return html`<app-storybook></app-storybook>`;
+      case 'design-tokens':
+        return html`<app-design-tokens></app-design-tokens>`;
       default:
         return html`<app-dashboard></app-dashboard>`;
     }

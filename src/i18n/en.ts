@@ -50,6 +50,7 @@ export const en = {
     settings: 'Customization',
     activity: 'Activity Log',
     storybook: 'Component Storybook',
+    designTokens: 'Design Tokens',
     groupWorkspace: 'Workspace',
     groupPlanning: 'Data & Analytics',
     groupDirectory: 'Directory & CRM',
