@@ -27,6 +27,7 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-avatar/app-avatar';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-employee-detail.css';
 
 @customElement('app-employee-detail')
@@ -280,15 +281,8 @@ export class AppEmployeeDetail extends LitElement {
 
         <!-- Projects & Assigned Tasks -->
         <div class="two-col-grid">
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFolder(18)}
-                <span>${t.employeeDetail.projectsTitle}</span>
-                <span class="section-sub">(${empProjects.length})</span>
-              </h2>
-            </div>
-
+          <app-section-card title="${t.employeeDetail.projectsTitle}" subtitle="(${empProjects.length})">
+            <span slot="icon">${iconFolder(18)}</span>
             ${empProjects.length === 0
               ? html`<app-empty-state compact title="${t.employeeDetail.noProjects}"></app-empty-state>`
               : html`
@@ -333,16 +327,12 @@ export class AppEmployeeDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
 
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconKanban()}
-                <span>${t.employeeDetail.tasksTitle}</span>
-                <span class="section-sub">(${filteredTasks.length})</span>
-              </h2>
+          <app-section-card title="${t.employeeDetail.tasksTitle}" subtitle="(${filteredTasks.length})">
+            <span slot="icon">${iconKanban()}</span>
               <app-segmented-switch
+                slot="actions"
                 size="sm"
                 .value="${this.taskFilter}"
                 .options="${[
@@ -353,7 +343,6 @@ export class AppEmployeeDetail extends LitElement {
                 @change="${(e: CustomEvent<{ value: string }>) =>
                   (this.taskFilter = e.detail.value as 'all' | 'active' | 'done')}"
               ></app-segmented-switch>
-            </div>
 
             ${filteredTasks.length === 0
               ? html`<app-empty-state compact title="${t.employeeDetail.noTasks}"></app-empty-state>`
@@ -393,24 +382,17 @@ export class AppEmployeeDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
         </div>
 
         <!-- Time Entries & Expenses -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${this.activityTab === 'time' ? iconClock(18) : iconWallet(18)}
-              <span>
-                ${this.activityTab === 'time'
-                  ? t.employeeDetail.timeTitle
-                  : t.employeeDetail.expensesTitle}
-              </span>
-              <span class="section-sub">
-                (${this.activityTab === 'time' ? empTimeEntries.length : empExpenses.length})
-              </span>
-            </h2>
+        <app-section-card
+          title="${this.activityTab === 'time' ? t.employeeDetail.timeTitle : t.employeeDetail.expensesTitle}"
+          subtitle="(${this.activityTab === 'time' ? empTimeEntries.length : empExpenses.length})"
+        >
+          <span slot="icon">${this.activityTab === 'time' ? iconClock(18) : iconWallet(18)}</span>
             <app-segmented-switch
+              slot="actions"
               size="sm"
               .value="${this.activityTab}"
               .options="${[
@@ -420,7 +402,6 @@ export class AppEmployeeDetail extends LitElement {
               @change="${(e: CustomEvent<{ value: string }>) =>
                 (this.activityTab = e.detail.value as 'time' | 'expenses')}"
             ></app-segmented-switch>
-          </div>
 
           ${this.activityTab === 'time'
             ? empTimeEntries.length === 0
@@ -525,7 +506,7 @@ export class AppEmployeeDetail extends LitElement {
                   </table>
                 </div>
               `}
-        </section>
+        </app-section-card>
       </div>
 
       ${this.renderEditModal(isRu, t)}

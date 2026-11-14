@@ -29,6 +29,7 @@ export class AppSectionCard extends LitElement {
           }}"
         >
           <div class="header-titles">
+            <slot name="icon"></slot>
             ${this.title ? html`<span class="section-title">${this.title}</span>` : ''}
             ${this.subtitle ? html`<span class="section-subtitle">${this.subtitle}</span>` : ''}
             <slot name="header-left"></slot>
