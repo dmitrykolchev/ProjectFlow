@@ -423,7 +423,7 @@ export class AppTimeTracking extends LitElement {
                       type="button"
                       class="task-link-btn"
                       @click="${() => {
-                        if (task) store.openEditTaskModal(task);
+                        if (task) store.openTaskDetail(task.id);
                       }}"
                     >
                       <span class="task-key-chip">${entry.taskId}</span>
@@ -538,7 +538,7 @@ export class AppTimeTracking extends LitElement {
                     type="button"
                     class="task-link-btn"
                     @click="${() => {
-                      if (task) store.openEditTaskModal(task);
+                      if (task) store.openTaskDetail(task.id);
                     }}"
                   >
                     <span class="task-key-chip">${taskId}</span>

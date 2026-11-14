@@ -335,7 +335,7 @@ export class AppExpenses extends LitElement {
                             class="task-chip-btn"
                             title="${task?.title || exp.taskId}"
                             @click="${() => {
-                              if (task) store.openEditTaskModal(task);
+                              if (task) store.openTaskDetail(task.id);
                             }}"
                           >
                             ${exp.taskId}

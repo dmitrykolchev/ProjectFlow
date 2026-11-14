@@ -217,6 +217,7 @@ export class AppStore {
   public detailContractId: string = '';
   public detailCounterpartyId: string = '';
   public detailEmployeeId: string = '';
+  public detailTaskId: string = '';
   public chatProjectId: string = '';
   public currentUserId: string = 'user-1';
   public pendingInvoiceForContractId: string | null = null;
@@ -358,6 +359,7 @@ export class AppStore {
             userName: 'Елена Смирнова',
             action: 'status_change',
             targetType: 'task',
+            targetId: 'CORE-102',
             targetTitle: 'Оптимизация бандла Web-компонентов Lit',
             details: 'Переведено в статус Review',
           },
@@ -368,6 +370,7 @@ export class AppStore {
             userName: 'Александр Морозов',
             action: 'create',
             targetType: 'task',
+            targetId: 'CORE-101',
             targetTitle: 'Архитектура распределенного кэширования L2',
             details: 'Создана задача с приоритетом Urgent',
           },
@@ -819,6 +822,7 @@ export class AppStore {
       view === 'projects' ||
       view === 'project-detail' ||
       view === 'project-chat' ||
+      view === 'task-detail' ||
       view === 'kanban' ||
       view === 'gantt' ||
       view === 'time-tracking' ||
@@ -918,6 +922,11 @@ export class AppStore {
   public openEmployeeDetail(employeeId: string): void {
     this.detailEmployeeId = employeeId;
     this.setActiveView('employee-detail');
+  }
+
+  public openTaskDetail(taskId: string): void {
+    this.detailTaskId = taskId;
+    this.setActiveView('task-detail');
   }
 
   public openProjectChat(projectId?: string): void {
@@ -1025,7 +1034,7 @@ export class AppStore {
 
     this.tasks = [newTask, ...this.tasks];
     this.saveTasks();
-    this.logActivity('create', 'task', newTask.title, `Создана в проекте ${project?.name || ''}`);
+    this.logActivity('create', 'task', newTask.title, `Создана в проекте ${project?.name || ''}`, newTask.id);
     this.addNotification('success', 'Успешно', `Задача "${newTask.title}" создана`);
     this.notify();
     return newTask;
@@ -1037,9 +1046,11 @@ export class AppStore {
     this.saveTasks();
 
     if (old && old.status !== updated.status) {
-      this.logActivity('status_change', 'task', updated.title, `Статус изменен с ${old.status} на ${updated.status}`);
+      this.logActivity('status_change', 'task', updated.title, `Статус изменен с ${old.status} на ${updated.status}`, updated.id);
+    } else if (old && old.priority !== updated.priority) {
+      this.logActivity('priority_change', 'task', updated.title, `Приоритет изменен с ${old.priority} на ${updated.priority}`, updated.id);
     } else {
-      this.logActivity('update', 'task', updated.title, 'Обновлены данные задачи');
+      this.logActivity('update', 'task', updated.title, 'Обновлены данные задачи', updated.id);
     }
 
     this.addNotification('info', 'Обновлено', `Задача "${updated.title}" сохранена`);
@@ -1052,7 +1063,7 @@ export class AppStore {
 
     this.tasks = this.tasks.filter((t) => t.id !== taskId);
     this.saveTasks();
-    this.logActivity('delete', 'task', task.title, 'Удалена пользователем');
+    this.logActivity('delete', 'task', task.title, 'Удалена пользователем', task.id);
     this.addNotification('warning', 'Удалено', `Задача "${task.title}" удалена`);
     this.notify();
   }
@@ -1066,7 +1077,7 @@ export class AppStore {
     task.updatedAt = new Date().toISOString();
     this.saveTasks();
 
-    this.logActivity('status_change', 'task', task.title, `Перемещено: ${oldStatus} → ${newStatus}`);
+    this.logActivity('status_change', 'task', task.title, `Перемещено: ${oldStatus} → ${newStatus}`, task.id);
     this.notify();
   }
 
@@ -1804,7 +1815,8 @@ export class AppStore {
       'create',
       'time_entry',
       targetTitle,
-      `Списано ${entry.hours} ч (${user?.name || entry.userId})`
+      `Списано ${entry.hours} ч (${user?.name || entry.userId})`,
+      entry.taskId
     );
     this.addNotification('success', 'Время списано', `${entry.hours} ч по задаче ${entry.taskId}`);
     this.notify();
@@ -1836,7 +1848,8 @@ export class AppStore {
       'update',
       'time_entry',
       task ? `${task.id} · ${task.title}` : normalized.taskId,
-      `Обновлена запись: ${normalized.hours} ч (${normalized.status})`
+      `Обновлена запись: ${normalized.hours} ч (${normalized.status})`,
+      normalized.taskId
     );
     this.addNotification('info', 'Запись обновлена', `${normalized.hours} ч по ${normalized.taskId}`);
     this.notify();
@@ -1854,7 +1867,8 @@ export class AppStore {
       'delete',
       'time_entry',
       task ? `${task.id} · ${task.title}` : target.taskId,
-      `Удалена запись о времени (${target.hours} ч)`
+      `Удалена запись о времени (${target.hours} ч)`,
+      target.taskId
     );
     this.addNotification('warning', 'Запись удалена', `Удалено ${target.hours} ч по ${target.taskId}`);
     this.notify();
@@ -1880,7 +1894,8 @@ export class AppStore {
       expense.title,
       `${expense.amount.toLocaleString('ru-RU')} ${symbol} · ${proj?.key || expense.projectId}${
         expense.taskId ? ` (${expense.taskId})` : ''
-      }`
+      }`,
+      expense.taskId
     );
     this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString('ru-RU')} ${symbol}`);
     this.notify();
@@ -1898,7 +1913,8 @@ export class AppStore {
       'update',
       'expense',
       normalized.title,
-      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString('ru-RU')} ${symbol}`
+      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString('ru-RU')} ${symbol}`,
+      normalized.taskId
     );
     this.addNotification('info', 'Расход обновлён', normalized.title);
     this.notify();
@@ -1909,7 +1925,7 @@ export class AppStore {
     if (!target) return;
     this.expenses = this.expenses.filter((e) => e.id !== id);
     this.saveExpenses();
-    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена');
+    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена', target.taskId);
     this.addNotification('warning', 'Расход удалён', target.title);
     this.notify();
   }
@@ -1947,7 +1963,8 @@ export class AppStore {
       'create',
       'chat',
       proj ? `[${proj.key}] ${proj.name}` : msg.projectId,
-      `${sender?.name || senderId}: ${msg.text.slice(0, 60)}`
+      `${sender?.name || senderId}: ${msg.text.slice(0, 60)}`,
+      msg.taskRefId
     );
     this.notify();
     return msg;
@@ -2009,16 +2026,19 @@ export class AppStore {
     action: 'create' | 'update' | 'delete' | 'status_change' | 'priority_change',
     targetType: ActivityLogItem['targetType'],
     targetTitle: string,
-    details: string
+    details: string,
+    targetId?: string
   ): void {
-    const currentUserName = 'Текущий пользователь';
+    const currentUser = this.users.find((u) => u.id === this.currentUserId);
+    const currentUserName = currentUser?.name || 'Текущий пользователь';
     const logItem: ActivityLogItem = {
       id: `act-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       timestamp: new Date().toISOString(),
-      userId: 'current-user',
+      userId: currentUser?.id || 'current-user',
       userName: currentUserName,
       action,
       targetType,
+      targetId,
       targetTitle,
       details,
     };

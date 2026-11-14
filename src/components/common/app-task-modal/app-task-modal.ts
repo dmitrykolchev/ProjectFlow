@@ -4,7 +4,7 @@ import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
+import { iconArrowUpRight, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
 import '../app-badge/app-badge';
@@ -372,9 +372,21 @@ export class AppTaskModal extends LitElement {
                 <app-button
                   variant="danger"
                   @click="${this.handleDelete}"
-                  style="margin-right: auto;"
                 >
                   ${t.common.delete}
+                </app-button>
+                <app-button
+                  variant="outline"
+                  style="margin-right: auto;"
+                  @click="${() => {
+                    const id = this.editingTask?.id;
+                    if (!id) return;
+                    store.closeTaskModal();
+                    store.openTaskDetail(id);
+                  }}"
+                >
+                  <span slot="icon-start">${iconArrowUpRight(14)}</span>
+                  <span>${t.taskDetail.openFullPage}</span>
                 </app-button>
               `
             : ''}

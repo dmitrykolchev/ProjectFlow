@@ -336,6 +336,7 @@ export type ActiveView =
   | 'projects'
   | 'project-detail'
   | 'project-chat'
+  | 'task-detail'
   | 'time-tracking'
   | 'expenses'
   | 'settings'
@@ -361,6 +362,7 @@ export interface ActivityLogItem {
     | 'expense'
     | 'chat'
     | 'settings';
+  targetId?: string;
   targetTitle: string;
   details: string;
 }

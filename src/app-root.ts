@@ -34,6 +34,7 @@ import './components/common/app-task-modal/app-task-modal';
 const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   dashboard: () => import('./components/views/app-dashboard/app-dashboard'),
   kanban: () => import('./components/views/app-kanban/app-kanban'),
+  'task-detail': () => import('./components/views/app-task-detail/app-task-detail'),
   gantt: () => import('./components/views/app-gantt/app-gantt'),
   grid: () =>
     Promise.all([
@@ -185,6 +186,8 @@ export class AppRoot extends LitElement {
         ?collapsed="${this.sidebarCollapsed}"
         .activeValue="${this.activeView === 'project-detail'
           ? 'projects'
+          : this.activeView === 'task-detail'
+          ? 'kanban'
           : this.activeView === 'contract-detail'
           ? 'contracts'
           : this.activeView === 'counterparty-detail'
@@ -347,6 +350,8 @@ export class AppRoot extends LitElement {
         return html`<app-dashboard></app-dashboard>`;
       case 'kanban':
         return html`<app-kanban></app-kanban>`;
+      case 'task-detail':
+        return html`<app-task-detail></app-task-detail>`;
       case 'gantt':
         return html`<app-gantt></app-gantt>`;
       case 'grid':

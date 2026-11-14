@@ -1403,7 +1403,7 @@ export class AppDataGrid extends LitElement {
   // --- Selection & Actions ---
   private handleRowTitleClick(task: Task) {
     if (this.rows === undefined && task.id) {
-      store.openEditTaskModal(task);
+      store.openTaskDetail(task.id);
     } else {
       this.dispatchEvent(
         new CustomEvent('row-click', { detail: { row: task }, bubbles: true, composed: true })

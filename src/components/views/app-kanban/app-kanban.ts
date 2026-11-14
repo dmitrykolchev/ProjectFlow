@@ -133,7 +133,7 @@ export class AppKanban extends LitElement {
                           draggable="true"
                           @dragstart="${(e: DragEvent) => this.handleDragStart(e, task.id)}"
                           @dragend="${this.handleDragEnd}"
-                          @click="${() => store.openEditTaskModal(task)}"
+                          @click="${() => store.openTaskDetail(task.id)}"
                         >
                           <div class="card-header">
                             <span class="card-key">${task.id}</span>

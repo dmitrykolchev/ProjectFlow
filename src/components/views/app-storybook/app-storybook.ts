@@ -39,6 +39,7 @@ import projectOverviewMeta from '../../dashboard/app-project-overview/app-projec
 
 import dashboardMeta from '../app-dashboard/app-dashboard.story';
 import kanbanMeta from '../app-kanban/app-kanban.story';
+import taskDetailMeta from '../app-task-detail/app-task-detail.story';
 import ganttMeta from '../app-gantt/app-gantt.story';
 import dataGridMeta from '../app-data-grid/app-data-grid.story';
 import dataGridColumnMeta from '../data-grid-column/data-grid-column.story';
@@ -93,6 +94,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   projectOverviewMeta,
   dashboardMeta,
   kanbanMeta,
+  taskDetailMeta,
   ganttMeta,
   dataGridMeta,
   dataGridColumnMeta,

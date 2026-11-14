@@ -732,7 +732,7 @@ export class AppProjectChat extends LitElement {
                 <button
                   type="button"
                   class="task-ref-btn"
-                  @click="${() => store.openEditTaskModal(taskRef)}"
+                  @click="${() => store.openTaskDetail(taskRef.id)}"
                 >
                   <span class="task-ref-key">${taskRef.id}</span>
                   <span>${taskRef.title}</span>

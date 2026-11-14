@@ -12,6 +12,7 @@ export class AppHeader extends LitElement {
   @state() private selectedProjectId = store.selectedProjectId;
   @state() private detailProjectId = store.detailProjectId;
   @state() private detailContractId = store.detailContractId;
+  @state() private detailTaskId = store.detailTaskId;
   @state() private searchQuery = store.searchQuery;
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
@@ -39,6 +40,7 @@ export class AppHeader extends LitElement {
     this.selectedProjectId = store.selectedProjectId;
     this.detailProjectId = store.detailProjectId;
     this.detailContractId = store.detailContractId;
+    this.detailTaskId = store.detailTaskId;
     this.searchQuery = store.searchQuery;
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
@@ -57,12 +59,17 @@ export class AppHeader extends LitElement {
       this.activeView === 'contract-detail'
         ? store.contracts.find((c) => c.id === this.detailContractId)
         : undefined;
+    const detailTask =
+      this.activeView === 'task-detail'
+        ? store.tasks.find((tk) => tk.id === this.detailTaskId)
+        : undefined;
 
     const viewNames: Record<string, string> = {
       dashboard: t.navigation.dashboard,
       projects: t.navigation.projects,
       'project-detail': detailProject ? `${detailProject.key} · ${detailProject.name}` : t.navigation.projects,
       kanban: t.navigation.kanban,
+      'task-detail': detailTask ? `${detailTask.id} · ${detailTask.title}` : t.navigation.kanban,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,
       calendar: t.navigation.calendar,

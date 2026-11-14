@@ -374,7 +374,7 @@ export class AppEmployeeDetail extends LitElement {
                   <div class="rows-list">
                     ${filteredTasks.slice(0, 12).map((task) => {
                       return html`
-                        <div class="list-row clickable" @click="${() => store.openEditTaskModal(task)}">
+                        <div class="list-row clickable" @click="${() => store.openTaskDetail(task.id)}">
                           <div class="row-main">
                             <div class="row-title">
                               <span class="row-key">${task.id}</span>

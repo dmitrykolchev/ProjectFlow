@@ -264,7 +264,7 @@ export class AppDashboard extends LitElement {
                             ? 'warning'
                             : 'neutral';
                         return html`
-                          <div class="deadline-item" @click="${() => store.openEditTaskModal(task)}">
+                          <div class="deadline-item" @click="${() => store.openTaskDetail(task.id)}">
                             <div class="deadline-left">
                               <span class="deadline-title">${task.title}</span>
                               <div class="deadline-meta">
