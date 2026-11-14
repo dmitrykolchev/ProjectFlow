@@ -24,6 +24,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../dashboard/app-project-overview/app-project-overview';
 import styles from './app-project-detail.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -363,6 +364,12 @@ export class AppProjectDetail extends LitElement {
             </div>
           </div>
         </section>
+
+        <!-- D3 Project Overview Charts (Progress, Hours Logged, Budget Utilization) -->
+        <app-project-overview
+          projectId="${proj.id}"
+          ?hideProjectSelector="${true}"
+        ></app-project-overview>
 
         <!-- Full-Width Spacious Team by Roles Section -->
         <section class="section-card">

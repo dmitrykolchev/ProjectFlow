@@ -35,6 +35,7 @@ import sidebarItemMeta from '../../layout/sidebar-item/sidebar-item.story';
 import metricCardMeta from '../../dashboard/app-metric-card/app-metric-card.story';
 import chartCardMeta from '../../dashboard/app-chart-card/app-chart-card.story';
 import projectProgressMeta from '../../dashboard/app-project-progress/app-project-progress.story';
+import projectOverviewMeta from '../../dashboard/app-project-overview/app-project-overview.story';
 
 import dashboardMeta from '../app-dashboard/app-dashboard.story';
 import kanbanMeta from '../app-kanban/app-kanban.story';
@@ -89,6 +90,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   metricCardMeta,
   chartCardMeta,
   projectProgressMeta,
+  projectOverviewMeta,
   dashboardMeta,
   kanbanMeta,
   ganttMeta,

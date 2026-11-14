@@ -16,6 +16,7 @@ import {
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../dashboard/app-chart-card/app-chart-card';
 import '../../dashboard/app-project-progress/app-project-progress';
+import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-split-button/app-split-button';
 import '../../common/app-badge/app-badge';
@@ -27,6 +28,7 @@ export class AppDashboard extends LitElement {
   @state() private activityLog: ActivityLogItem[] = [];
   @state() private currentLang = store.customization.language;
   @state() private timeframe: '7d' | '30d' | 'quarter' = '30d';
+  @state() private overviewProjectId: string = 'all';
 
   private unsubscribe?: () => void;
 
@@ -202,6 +204,14 @@ export class AppDashboard extends LitElement {
             accentColor="#ef4444"
           ></app-metric-card>
         </div>
+
+        <!-- D3 Project Overview Section -->
+        <app-project-overview
+          projectId="${this.overviewProjectId}"
+          @project-change="${(e: CustomEvent<{ projectId: string }>) => {
+            this.overviewProjectId = e.detail.projectId;
+          }}"
+        ></app-project-overview>
 
         <!-- Main Content Grid -->
         <div class="main-grid">
