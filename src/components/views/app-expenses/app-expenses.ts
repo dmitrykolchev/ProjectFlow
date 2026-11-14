@@ -119,7 +119,6 @@ export class AppExpenses extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const filtered = this.getFiltered();
 
     const nonRejected = filtered.filter((e) => e.status !== 'rejected');
@@ -140,7 +139,7 @@ export class AppExpenses extends LitElement {
     );
 
     const projectFilterOptions = [
-      { value: 'all', label: isRu ? 'Все проекты' : 'All projects' },
+      { value: 'all', label: t.viewTexts.expenses.filterAllProjects },
       ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
     ];
 
@@ -155,7 +154,7 @@ export class AppExpenses extends LitElement {
     ];
 
     const categoryFilterOptions = [
-      { value: 'all', label: isRu ? 'Все категории' : 'All categories' },
+      { value: 'all', label: t.viewTexts.expenses.filterAllCategories },
       ...categoryOptions,
     ];
 
@@ -168,7 +167,7 @@ export class AppExpenses extends LitElement {
     ];
 
     const statusFilterOptions = [
-      { value: 'all', label: isRu ? 'Все статусы' : 'All statuses' },
+      { value: 'all', label: t.viewTexts.expenses.filterAllStatuses },
       ...statusOptions,
     ];
 
@@ -182,15 +181,15 @@ export class AppExpenses extends LitElement {
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.expenses.totalExpenses}" value="${totalRub.toLocaleString('ru-RU')} ₽" subtitle="${nonRejected.length} ${isRu ? 'активных записей' : 'active entries'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.approvedAmount}" value="${approvedRub.toLocaleString('ru-RU')} ₽" valueColor="#10b981" subtitle="${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${isRu ? 'от суммы расходов' : 'of expenses'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.pendingCount}" value="${pendingList.length}" valueColor="${pendingList.length > 0 ? '#f59e0b' : ''}" subtitle="${pendingRub.toLocaleString('ru-RU')} ₽ ${isRu ? 'к согласованию' : 'awaiting'}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString('ru-RU')} ₽" subtitle="${isRu ? 'Покрывается заказчиками' : 'Client billable'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.totalExpenses}" value="${totalRub.toLocaleString('ru-RU')} ₽" subtitle="${nonRejected.length} ${t.viewTexts.expenses.kpiActiveEntries}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.approvedAmount}" value="${approvedRub.toLocaleString('ru-RU')} ₽" valueColor="#10b981" subtitle="${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${t.viewTexts.expenses.kpiOfExpenses}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.pendingCount}" value="${pendingList.length}" valueColor="${pendingList.length > 0 ? '#f59e0b' : ''}" subtitle="${pendingRub.toLocaleString('ru-RU')} ₽ ${t.viewTexts.expenses.kpiAwaiting}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString('ru-RU')} ₽" subtitle="${t.viewTexts.expenses.kpiClientBillable}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${isRu ? 'Поиск по статье, поставщику, задаче...' : 'Search item, vendor, task...'}"
+        placeholder="${t.viewTexts.expenses.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'project', options: projectFilterOptions },
@@ -218,33 +217,32 @@ export class AppExpenses extends LitElement {
       </app-filter-bar>
 
       ${this.viewMode === 'budgets'
-        ? this.renderBudgetsView(isRu)
+        ? this.renderBudgetsView(t)
         : filtered.length === 0
-        ? html`<app-empty-state title="${isRu ? 'Расходы не найдены' : 'No expenses found'}"></app-empty-state>`
-        : this.renderRegistryTable(filtered, t, isRu)}
+        ? html`<app-empty-state title="${t.viewTexts.expenses.emptyNoExpenses}"></app-empty-state>`
+        : this.renderRegistryTable(filtered, t)}
 
-      ${this.renderFormModal(t, isRu, categoryOptions, statusOptions)}
+      ${this.renderFormModal(t, categoryOptions, statusOptions)}
       ${this.renderDeleteModal(t)}
     `;
   }
 
   private renderRegistryTable(
     filtered: Expense[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     return html`
       <div class="table-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>${isRu ? 'Дата' : 'Date'}</th>
-              <th>${isRu ? 'Статья расхода / Поставщик' : 'Expense / Vendor'}</th>
-              <th>${isRu ? 'Проект и задача' : 'Project & Task'}</th>
-              <th>${isRu ? 'Категория' : 'Category'}</th>
-              <th>${isRu ? 'Инициатор' : 'Owner'}</th>
-              <th>${isRu ? 'Сумма' : 'Amount'}</th>
-              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th>${t.viewTexts.expenses.thDate}</th>
+              <th>${t.viewTexts.expenses.thExpenseVendor}</th>
+              <th>${t.viewTexts.expenses.thProjectTask}</th>
+              <th>${t.viewTexts.expenses.thCategory}</th>
+              <th>${t.viewTexts.expenses.thOwner}</th>
+              <th>${t.viewTexts.expenses.thAmount}</th>
+              <th>${t.viewTexts.expenses.thStatus}</th>
               <th></th>
             </tr>
           </thead>
@@ -298,7 +296,7 @@ export class AppExpenses extends LitElement {
                   <td class="amount-cell">
                     <div>${formatMoney(exp.amount, exp.currency)}</div>
                     ${exp.billable
-                      ? html`<div class="billable-sub">${isRu ? 'Перевыставляется' : 'Billable'}</div>`
+                      ? html`<div class="billable-sub">${t.viewTexts.expenses.billableSub}</div>`
                       : ''}
                   </td>
                   <td>
@@ -316,7 +314,7 @@ export class AppExpenses extends LitElement {
                             <button
                               type="button"
                               class="icon-btn approve"
-                              title="${isRu ? 'Утвердить' : 'Approve'}"
+                              title="${t.viewTexts.expenses.approveTitle}"
                               @click="${() => store.updateExpense({ ...exp, status: 'approved' })}"
                             >
                               ${iconCheck(14)}
@@ -324,7 +322,7 @@ export class AppExpenses extends LitElement {
                             <button
                               type="button"
                               class="icon-btn danger"
-                              title="${isRu ? 'Отклонить' : 'Reject'}"
+                              title="${t.viewTexts.expenses.rejectTitle}"
                               @click="${() => store.updateExpense({ ...exp, status: 'rejected' })}"
                             >
                               ${iconX(14)}
@@ -358,7 +356,7 @@ export class AppExpenses extends LitElement {
     `;
   }
 
-  private renderBudgetsView(isRu: boolean) {
+  private renderBudgetsView(t: ReturnType<typeof getTranslation>) {
     const visibleProjects =
       this.projectFilter === 'all'
         ? store.projects
@@ -394,28 +392,28 @@ export class AppExpenses extends LitElement {
                   variant="ghost"
                   @click="${() => store.openProjectDetail(proj.id)}"
                 >
-                  ${isRu ? 'Карточка' : 'Open'}
+                  ${t.viewTexts.expenses.openCardButton}
                 </app-button>
               </div>
 
               <div class="budget-metrics">
                 <div class="bm-item">
-                  <span class="bm-label">${isRu ? 'Прямые расходы' : 'Direct Expenses'}</span>
+                  <span class="bm-label">${t.viewTexts.expenses.bmDirect}</span>
                   <span class="bm-val">${directRub.toLocaleString('ru-RU')} ₽</span>
                 </div>
                 <div class="bm-item">
-                  <span class="bm-label">${isRu ? `Трудозатраты (${projHours.toFixed(0)} ч)` : `Labor (${projHours.toFixed(0)}h)`}</span>
+                  <span class="bm-label">${t.viewTexts.expenses.laborLabel(projHours.toFixed(0))}</span>
                   <span class="bm-val">${laborRub.toLocaleString('ru-RU')} ₽</span>
                 </div>
                 <div class="bm-item">
-                  <span class="bm-label">${isRu ? 'Бюджет проекта' : 'Project Budget'}</span>
+                  <span class="bm-label">${t.viewTexts.expenses.bmProjectBudget}</span>
                   <span class="bm-val">${budget ? `${budget.toLocaleString('ru-RU')} ₽` : '—'}</span>
                 </div>
               </div>
 
               <div class="budget-progress-wrap">
                 <div class="budget-progress-head">
-                  <span>${isRu ? 'Освоение бюджета (ФОТ + расходы)' : 'Budget utilization'}</span>
+                  <span>${t.viewTexts.expenses.bmUtilization}</span>
                   <span class="mono" style="font-weight: 700;">
                     ${totalSpend.toLocaleString('ru-RU')} ₽ (${usedPct}%)
                   </span>
@@ -427,7 +425,7 @@ export class AppExpenses extends LitElement {
 
               <div class="budget-footer">
                 <span style="font-size: 0.76rem; color: var(--text-muted);">
-                  ${projExpenses.length} ${isRu ? 'статей расхода' : 'expense items'}
+                  ${projExpenses.length} ${t.viewTexts.expenses.expenseItemsCount}
                 </span>
                 <app-button
                   size="sm"
@@ -435,7 +433,7 @@ export class AppExpenses extends LitElement {
                   @click="${() => this.openCreateModal(proj.id)}"
                 >
                   <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${isRu ? 'Добавить расход' : 'Add Expense'}</span>
+                  <span>${t.viewTexts.expenses.addExpenseButton}</span>
                 </app-button>
               </div>
             </div>
@@ -447,7 +445,6 @@ export class AppExpenses extends LitElement {
 
   private renderFormModal(
     t: ReturnType<typeof getTranslation>,
-    isRu: boolean,
     categoryOptions: { value: ExpenseCategory; label: string }[],
     statusOptions: { value: ExpenseStatus; label: string; color: string }[]
   ) {
@@ -458,7 +455,7 @@ export class AppExpenses extends LitElement {
     }));
 
     const taskOptions = [
-      { value: '', label: isRu ? 'Без привязки к задаче (на проект)' : 'Project-level expense' },
+      { value: '', label: t.viewTexts.expenses.optionNoTask },
       ...store.tasks
         .filter((tk) => tk.projectId === this.formProjectId)
         .slice(0, 80)
@@ -476,20 +473,14 @@ export class AppExpenses extends LitElement {
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${this.editingId
-          ? isRu
-            ? 'Редактирование расхода'
-            : 'Edit Expense'
-          : isRu
-          ? 'Новый расход'
-          : 'New Expense'}"
+        title="${this.editingId ? t.viewTexts.expenses.modalTitleEdit : t.viewTexts.expenses.modalTitleCreate}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div class="col-span-2">
             <app-input
-              label="${isRu ? 'Наименование расхода' : 'Expense Title'}"
-              placeholder="${isRu ? 'Например: Облачный кластер Kubernetes (Staging)' : 'e.g. Cloud staging cluster'}"
+              label="${t.viewTexts.expenses.labelExpenseTitle}"
+              placeholder="${t.viewTexts.expenses.placeholderExpenseTitle}"
               .value="${this.formTitle}"
               required
               error="${this.formError}"
@@ -501,7 +492,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Проект' : 'Project'}"
+              label="${t.viewTexts.expenses.labelProject}"
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
@@ -512,7 +503,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Задача (опционально)' : 'Linked Task (optional)'}"
+              label="${t.viewTexts.expenses.labelLinkedTask}"
               .value="${this.formTaskId}"
               .options="${taskOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
@@ -520,7 +511,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Категория' : 'Category'}"
+              label="${t.viewTexts.expenses.thCategory}"
               .value="${this.formCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -529,7 +520,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Сотрудник / Инициатор' : 'Submitted By'}"
+              label="${t.viewTexts.expenses.labelSubmittedBy}"
               .value="${this.formUserId}"
               .options="${userOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
@@ -537,7 +528,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Сумма' : 'Amount'}"
+              label="${t.viewTexts.expenses.thAmount}"
               .value="${this.formAmount}"
               min="0"
               step="500"
@@ -546,7 +537,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Валюта' : 'Currency'}"
+              label="${t.viewTexts.expenses.labelCurrency}"
               .value="${this.formCurrency}"
               .options="${currencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -555,14 +546,14 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата расхода' : 'Date'}"
+              label="${t.viewTexts.expenses.labelDate}"
               .value="${this.formDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.expenses.thStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -571,7 +562,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Поставщик / Контрагент' : 'Vendor'}"
+              label="${t.viewTexts.expenses.labelVendor}"
               placeholder="Yandex Cloud, JetBrains..."
               .value="${this.formVendor}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = eventValue(e))}"
@@ -579,7 +570,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div style="display: flex; align-items: flex-end;">
             <div class="switch-field" style="width: 100%;">
-              <span>${isRu ? 'Перевыставить заказчику' : 'Billable to client'}</span>
+              <span>${t.viewTexts.expenses.billableSwitch}</span>
               <app-switch
                 size="sm"
                 ?checked="${this.formBillable}"
@@ -589,7 +580,7 @@ export class AppExpenses extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Обоснование и комментарии' : 'Notes'}"
+              label="${t.viewTexts.expenses.labelNotes}"
               .value="${this.formNotes}"
               rows="2"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
@@ -670,7 +661,7 @@ export class AppExpenses extends LitElement {
 
   private handleSaveModal() {
     if (!this.formTitle.trim()) {
-      this.formError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.formError = getTranslation(this.currentLang).common.required;
       return;
     }
 
