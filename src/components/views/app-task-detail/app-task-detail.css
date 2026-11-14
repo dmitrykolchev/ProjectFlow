@@ -668,21 +668,6 @@
 }
 
 /* Subtasks Sidebar */
-.progress-track {
-  height: 8px;
-  width: 100%;
-  border-radius: 999px;
-  background: var(--bg-subtle, #1a2438);
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: var(--accent-primary, #6366f1);
-  transition: width 200ms ease;
-}
-
 .subtask-list {
   display: flex;
   flex-direction: column;

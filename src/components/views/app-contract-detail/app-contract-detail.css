@@ -155,35 +155,6 @@
   color: var(--text-secondary, #94a3b8);
 }
 
-.progress-track {
-  position: relative;
-  height: 10px;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.progress-invoiced {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: var(--accent-primary, #6366f1);
-  opacity: 0.45;
-  border-radius: 999px;
-  transition: width 250ms ease;
-}
-
-.progress-paid {
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  background: #10b981;
-  border-radius: 999px;
-  transition: width 250ms ease;
-}
-
 .meta-strip {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));

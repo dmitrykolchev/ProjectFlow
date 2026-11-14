@@ -1124,14 +1124,7 @@ export class AppDataGrid extends LitElement {
             ? val
             : 0;
         return html`
-          <div class="progress-wrap">
-            <div class="progress-track">
-              <div class="progress-fill" style="width: ${pct}%"></div>
-            </div>
-            <span class="tabular-nums" style="font-size: 0.75rem; color: var(--text-muted, #64748b);">
-              ${pct}%
-            </span>
-          </div>
+          <app-progress-bar size="sm" show-label value="${pct}"></app-progress-bar>
         `;
       }
 

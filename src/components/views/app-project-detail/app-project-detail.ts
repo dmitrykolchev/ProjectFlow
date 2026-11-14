@@ -27,6 +27,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-project-detail.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -319,12 +320,7 @@ export class AppProjectDetail extends LitElement {
               <span>${isRu ? 'Общий прогресс выполнения проекта' : 'Overall Project Progress'}</span>
               <span>${projectTasks.filter((tk) => tk.status === 'done').length} / ${projectTasks.length} ${isRu ? 'задач готово' : 'tasks done'}</span>
             </div>
-            <div class="progress-row">
-              <div class="progress-track">
-                <div class="progress-fill" style="width: ${proj.progress}%; background: ${proj.color};"></div>
-              </div>
-              <span class="progress-pct">${proj.progress}%</span>
-            </div>
+            <app-progress-bar show-label color="${proj.color}" value="${proj.progress}"></app-progress-bar>
           </div>
 
           <div class="meta-strip">

@@ -41,6 +41,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-task-detail.css';
 
 type DetailTab = 'timeline' | 'time' | 'expenses' | 'discussions';
@@ -630,9 +631,7 @@ export class AppTaskDetail extends LitElement {
                 </span>
               </div>
               <div class="section-body">
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: ${subtaskPct}%;"></div>
-                </div>
+                <app-progress-bar value="${subtaskPct}"></app-progress-bar>
 
                 ${task.subtasks.length === 0
                   ? html`<div style="font-size: 0.8125rem; color: var(--text-muted);">${t.common.empty}</div>`

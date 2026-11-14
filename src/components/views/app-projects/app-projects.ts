@@ -17,6 +17,7 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-projects.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -243,12 +244,7 @@ export class AppProjects extends LitElement {
 
               <p class="proj-desc">${proj.description}</p>
 
-              <div class="progress-row">
-                <div class="progress-track">
-                  <div class="progress-fill" style="width: ${proj.progress}%; background: ${proj.color};"></div>
-                </div>
-                <span class="progress-pct">${proj.progress}%</span>
-              </div>
+              <app-progress-bar show-label color="${proj.color}" value="${proj.progress}"></app-progress-bar>
 
               <div class="proj-meta-grid">
                 <div class="meta-item">

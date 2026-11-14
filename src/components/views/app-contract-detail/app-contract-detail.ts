@@ -45,6 +45,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-contract-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -635,10 +636,12 @@ export class AppContractDetail extends LitElement {
                 ${formatMoney(paidTotal, ctr.currency)} / ${formatMoney(ctr.amount, ctr.currency)}
               </span>
             </div>
-            <div class="progress-track">
-              <div class="progress-invoiced" style="width: ${invoicedPct}%;"></div>
-              <div class="progress-paid" style="width: ${paidPct}%;"></div>
-            </div>
+            <app-progress-bar
+              .segments="${[
+                { value: invoicedPct, color: 'var(--accent-primary, #6366f1)', label: 'Invoiced' },
+                { value: paidPct, color: '#10b981', label: 'Paid' },
+              ]}"
+            ></app-progress-bar>
           </div>
 
           <div class="meta-strip">

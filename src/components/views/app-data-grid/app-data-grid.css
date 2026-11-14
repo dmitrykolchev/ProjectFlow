@@ -478,27 +478,6 @@ td {
   gap: 0.45rem;
 }
 
-.progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.progress-track {
-  flex: 1;
-  min-width: 50px;
-  max-width: 90px;
-  height: 5px;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: 9999px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--accent-primary, #6366f1);
-}
-
 .tags-container {
   display: flex;
   gap: 0.25rem;
