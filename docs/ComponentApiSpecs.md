@@ -156,6 +156,38 @@ export class AppSectionCard extends LitElement {
 
 **Миграция:** contracts/calculations/payments/expenses/time-tracking получают колонки через slots (как grid уже делает для задач); удаляются их локальные `.data-table/.th/.td/.amount-cell/.actions-row` CSS. `app-data-grid` остаётся единственным носителем сортировки/группировки/пагинации.
 
+### A6 — статус: ОТЛОЖЕНО (решение 2026-11-14)
+
+Миграция `.data-table` → `app-data-grid` не выполняется. Причины:
+1. Для малых списков (несколько записей) plain-таблица уместнее грида — грид создан для больших/сортируемых/группируемых наборов.
+2. Форматирование клеток в гриде ограничено switch'ем `renderCell` + `renderer`; свободная HTML-разметка таблицы (composite-клетки: link+sub, project-pill+task-chip, rating-stars, billable-sub) гибче.
+
+Зафиксированный план (инвентаризация 2026-11-14, готов к исполнению при снятии паузы):
+
+**Инвентарь — 20 таблиц в 11 view** (13 интерактивных + 7 статичных в модалок/секций; локальный CSS ~57 правил):
+
+| View | Таблиц | Колонки | Особенности клеток |
+|---|---|---|---|
+| app-counterparties | 1 | 8 | link+sub, chip, mono, 2-строчная, рейтинг-звёзды, count+млн, chip, actions |
+| app-employees | 1 | 8 | avatar+link+role, текст, 2-строчная, mono, rate, badge, actions |
+| app-projects | 1 | 9 | color-dot+key+name, 2-строчная, mono×3 (progress %), short-money, date, chip, actions; row-click |
+| app-expenses | 1 | 8 | mono-date, title+vendor, project-pill+task-chip, badge, owner, money+billable-sub, chip, actions |
+| app-time-tracking | 1 | 9 | mono-date, task-link+project-sub, avatar+name, badge, desc, hours, badge, chip, actions |
+| app-calculations | 1+1 (preview-модалка) | 8+6 | link+micro-tags, link+desc, text-link, period, labor, billable, chip |
+| app-payments | 2 | 8+9 | invoice-control (paid/balance, progress) + ledger (money) |
+| app-contracts | 4 (tabs) | 8+8+9+8 | contracts, calculations, payments, invoices (payment-progress, total+VAT) |
+| app-contract-detail | 4+2 (preview-модалки) | 7×3+6+5+6 | calc/invoice/payment/expenses секции + item-таблицы модалок |
+| app-counterparty-detail | 2 | 6+6 | invoices, calculations |
+| app-employee-detail | 2 | 6+5 | time-журнал, expenses |
+
+**Шаг 0 — расширение движка (2 коммита):** cell-type'ы `money/link/status-pill/progress-inline/avatar/date-range/actions` (на A7/A8/A9 + event `row-action → { row, action }`, prop `rowActions`); режим «простой таблицы» (`grouping=false`, `pagination=false`, `virtual=false`, `selectable=false`) для модалок и малых списков; композитные клетки — через `renderer` колонки, без новых cell-type'ов. Предварительно C2 `app-rating-stars` (нужен для counterparties).
+
+**Порядок миграции (по коммиту на view):** 1a — counterparties, employees, projects, expenses, time-tracking; 1b — payments, calculations, contracts; 1c — contract-detail, counterparty-detail, employee-detail. Таблицы модалок-превью — тоже на грид в простом режиме, тогда `.data-table` CSS исчезает из всех view.
+
+**Pixel-identical-решения:** при миграции `sortable=false`, пагинация/bulk-select/virtualizация выключены (в оригиналах их нет); включение — отдельный осознанный шаг после миграции.
+
+**Оценка:** +150–200 строк грида, ~1500–2000 строк view'ов заменяются slot-колонками, удаляется ~57 CSS-правил; ~15 коммитов (rating-stars 1 + грид 2 + view'ы 11 + финальный grep/story 1).
+
 ## A7. `app-meta-grid`
 
 Заменяет: `.meta-strip/.meta-box/.meta-label/.meta-val` (4 detail-view) и `.meta-grid/.meta-item/.meta-label/.meta-value` (3 list-view) — один компонент в двух режимах.
@@ -427,7 +459,7 @@ export function createEntitySlice<T extends { id: string }>(
 2. A2 kpi-strip + metric-card compact; A5 section-card; A7 meta-grid; A9 progress-bar; A10 avatar; A11 money.
 3. A3 filter-bar (нужен контракт FilterDef) → list-view.
 4. A8 status-tokens + app-status-chip → все чипы.
-5. A6 новые cell-type'ы грида → миграция финансовых таблиц (крупнейший кусок).
+5. A6 новые cell-type'ы грида → миграция финансовых таблиц (крупнейший кусок). **Отложено** — см. статус A6.
 6. B1–B5 → detail-view; C1–C7 по мере необходимости.
 7. StoreMixin, фабрика CRUD, регрессия через app-storybook + smoke-тесты.
 

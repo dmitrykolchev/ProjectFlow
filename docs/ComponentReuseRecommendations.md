@@ -116,6 +116,7 @@
 6. **`app-data-table`** — самый крупный компонент.
    - Уже есть `data-grid-column` (slot-дефиниции колонок: field/header/width/sortable/groupable/cell-type/renderer) и зрелый `app-data-grid` (сортировка, группировка, ресайз, пагинация, bulk).
    - **Рекомендация:** развивать `app-data-grid` как единый грид-движок: добавить режим «простой таблицы» (без группировки) и cell-type'ы для финансового контура (`money`, `link`, `status-pill`, `progress-inline`, `actions`). Все 11 инлайновых `.data-table` (contracts, calculations, payments, expenses, time-tracking…) мигрировать на него. Это снимет ~110 КБ дублей и даст единое поведение (сортировка, ресайз, пустое состояние, «столбцы» через slots).
+- **Решение (2026-11-14): миграция ОТЛОЖЕНА.** Таблицы уместнее грида при малом числе записей; форматирование клеток в гриде ограничено (`renderCell` switch + `renderer`), свободная табличная разметка гибче (composite-клетки: link+sub, project-pill+task-chip, rating-stars, billable-sub). Зафиксированный план миграции (инвентарь 20 таблиц, Шаг 0 расширения движка, порядок view'ов, pixel-identical-условия) — в `ComponentApiSpecs.md`, раздел A6. Инлайновые `.data-table` остаются; критерий пересмотра: список интерактивный (сортировка/фильтрация/пагинация) или >15 записей.
 
 ### Приоритет B — паттерны детальных страниц (5 detail-view)
 
@@ -174,7 +175,7 @@
 **Фаза 1 (низкий риск, высокая отдача):**
 `app-page-header`, `app-empty-state`, `app-section-card`, `app-filter-bar`, `app-meta-grid`, `app-avatar`, `app-progress-bar`, `app-money`, `app-status-chip` → миграция list-view (companies, counterparties, employees, projects, contracts, calculations, payments, expenses, time-tracking).
 
-**Фаза 2:** расширение `app-metric-card` (compact KPI) и `app-data-grid` (режим простой таблицы + cell-type'ы money/link/actions) → миграция финансовых таблиц; удаление инлайновых `.data-table`.
+**Фаза 2:** расширение `app-metric-card` (compact KPI) и `app-data-grid` (режим простой таблицы + cell-type'ы money/link/actions) → миграция финансовых таблиц; удаление инлайновых `.data-table`. **Часть с таблицами отложена (2026-11-14, см. A6/п.6); compact KPI выполнен.**
 
 **Фаза 3:** `app-detail-page` + `app-entity-switcher` + `app-entity-hero` + `app-timeline` → миграция 5 detail-view.
 
