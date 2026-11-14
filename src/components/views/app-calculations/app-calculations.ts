@@ -1089,9 +1089,14 @@ export class AppCalculations extends LitElement {
         .open="${Boolean(this.deletingCalculation)}"
         size="sm"
         title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
-        message="${isRu
-          ? `Удалить калькуляцию ${this.deletingCalculation?.number || ''}?`
-          : `Delete calculation ${this.deletingCalculation?.number || ''}?`}"
+        action="${isRu
+          ? `Калькуляция ${this.deletingCalculation?.number || ''} будет удалена.`
+          : `Calculation ${this.deletingCalculation?.number || ''} will be deleted.`}"
+        result="${isRu
+          ? 'Суммы калькуляции перестанут учитываться в финансах договора.'
+          : 'The calculation amounts will no longer count in contract finances.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingCalculation = null)}"

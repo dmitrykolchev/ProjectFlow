@@ -614,9 +614,14 @@ export class AppExpenses extends LitElement {
         .open="${Boolean(this.deletingExpense)}"
         size="sm"
         title="${isRu ? 'Удалить запись о расходе?' : 'Delete expense?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить расход «${this.deletingExpense?.title || ''}»?`
-          : `Are you sure you want to delete "${this.deletingExpense?.title || ''}"?`}"
+        action="${isRu
+          ? `Расход «${this.deletingExpense?.title || ''}» будет удалён.`
+          : `Expense "${this.deletingExpense?.title || ''}" will be deleted.`}"
+        result="${isRu
+          ? 'Сумма перестанет учитываться в бюджете проекта.'
+          : 'The amount will no longer count in the project budget.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingExpense = null)}"

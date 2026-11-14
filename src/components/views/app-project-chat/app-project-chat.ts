@@ -577,9 +577,14 @@ export class AppProjectChat extends LitElement {
         .open="${Boolean(this.deletingMessage)}"
         size="sm"
         title="${isRu ? 'Удалить сообщение?' : 'Delete message?'}"
-        message="${isRu
-          ? 'Вы уверены, что хотите удалить это сообщение из истории проектного чата?'
-          : 'Are you sure you want to delete this message?'}"
+        action="${isRu
+          ? 'Сообщение будет удалено из истории чата.'
+          : 'The message will be deleted from the chat history.'}"
+        result="${isRu
+          ? 'Сообщение исчезнет у всех участников чата.'
+          : 'The message will disappear for all chat participants.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingMessage = null)}"

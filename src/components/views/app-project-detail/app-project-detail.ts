@@ -898,9 +898,14 @@ export class AppProjectDetail extends LitElement {
         .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить проект «${proj.name}»?`
-          : `Are you sure you want to delete "${proj.name}"?`}"
+        action="${isRu
+          ? `Проект «${proj.name}» будет удалён из системы.`
+          : `Project "${proj.name}" will be deleted from the system.`}"
+        result="${isRu
+          ? 'Все задачи, участники и финансовые связи проекта будут безвозвратно потеряны.'
+          : 'All tasks, members and financial links of the project will be permanently lost.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"

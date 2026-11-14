@@ -290,9 +290,14 @@ export class AppEmployees extends LitElement {
         .open="${Boolean(this.deletingEmployee)}"
         size="sm"
         title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        message="${isRu
-          ? `Удалить сотрудника «${this.deletingEmployee?.name || ''}» из справочника и проектных команд?`
-          : `Remove "${this.deletingEmployee?.name || ''}" from directory and project teams?`}"
+        action="${isRu
+          ? `Сотрудник «${this.deletingEmployee?.name || ''}» будет удалён из справочника.`
+          : `Employee "${this.deletingEmployee?.name || ''}" will be removed from the directory.`}"
+        result="${isRu
+          ? 'Записи времени и участие в проектных командах будут потеряны.'
+          : 'Time entries and project team memberships will be lost.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingEmployee = null)}"

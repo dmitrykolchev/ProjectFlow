@@ -1780,9 +1780,14 @@ export class AppContractDetail extends LitElement {
         .open="${Boolean(this.deletingCalculation)}"
         size="sm"
         title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
-        message="${isRu
-          ? `Удалить калькуляцию ${this.deletingCalculation?.number || ''}?`
-          : `Delete calculation ${this.deletingCalculation?.number || ''}?`}"
+        action="${isRu
+          ? `Калькуляция ${this.deletingCalculation?.number || ''} будет удалена.`
+          : `Calculation ${this.deletingCalculation?.number || ''} will be deleted.`}"
+        result="${isRu
+          ? 'Суммы калькуляции перестанут учитываться в финансах договора.'
+          : 'The calculation amounts will no longer count in contract finances.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingCalculation = null)}"
@@ -2321,9 +2326,14 @@ export class AppContractDetail extends LitElement {
         .open="${Boolean(this.deletingInvoice)}"
         size="sm"
         title="${isRu ? 'Удалить счёт?' : 'Delete invoice?'}"
-        message="${isRu
-          ? `Удалить счёт ${this.deletingInvoice?.number || ''}?`
-          : `Delete invoice ${this.deletingInvoice?.number || ''}?`}"
+        action="${isRu
+          ? `Счёт ${this.deletingInvoice?.number || ''} будет удалён.`
+          : `Invoice ${this.deletingInvoice?.number || ''} will be deleted.`}"
+        result="${isRu
+          ? 'Платежи по счёту будут потеряны, сумма договора пересчитается.'
+          : 'Payments of the invoice will be lost and the contract totals will be recalculated.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingInvoice = null)}"
@@ -2537,7 +2547,14 @@ export class AppContractDetail extends LitElement {
         .open="${Boolean(this.deletingPayment)}"
         size="sm"
         title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        message="${t.payments.deleteConfirm}"
+        action="${isRu
+          ? 'Платёж будет удалён из счёта.'
+          : 'The payment will be removed from the invoice.'}"
+        result="${isRu
+          ? 'Сумма платежа будет вычтена из оплаченного счёта.'
+          : 'The payment amount will be subtracted from the paid invoice.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingPayment = null)}"
@@ -2773,9 +2790,14 @@ export class AppContractDetail extends LitElement {
         .open="${this.confirmDeleteContractOpen}"
         size="sm"
         title="${isRu ? 'Удалить договор?' : 'Delete contract?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить договор ${ctr.number}?`
-          : `Are you sure you want to delete contract ${ctr.number}?`}"
+        action="${isRu
+          ? `Договор ${ctr.number} будет удалён.`
+          : `Contract ${ctr.number} will be deleted.`}"
+        result="${isRu
+          ? 'Счета, платежи и калькуляции договора будут безвозвратно потеряны.'
+          : 'Invoices, payments and calculations of the contract will be permanently lost.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.confirmDeleteContractOpen = false)}"

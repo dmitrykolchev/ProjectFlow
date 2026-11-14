@@ -619,9 +619,14 @@ export class AppEmployeeDetail extends LitElement {
         .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        message="${isRu
-          ? `Удалить сотрудника «${emp.name}» из справочника и проектных команд?`
-          : `Remove "${emp.name}" from directory and project teams?`}"
+        action="${isRu
+          ? `Сотрудник «${emp.name}» будет удалён из справочника.`
+          : `Employee "${emp.name}" will be removed from the directory.`}"
+        result="${isRu
+          ? 'Записи времени и участие в проектных командах будут потеряны.'
+          : 'Time entries and project team memberships will be lost.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"

@@ -758,9 +758,14 @@ export class AppCounterpartyDetail extends LitElement {
         .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить контрагента «${cp.name}»?`
-          : `Are you sure you want to delete "${cp.name}"?`}"
+        action="${isRu
+          ? `Контрагент «${cp.name}» будет удалён из справочника.`
+          : `Counterparty "${cp.name}" will be removed from the directory.`}"
+        result="${isRu
+          ? 'Договоры и счета контрагента останутся без привязки к нему.'
+          : 'Contracts and invoices of the counterparty will lose their link to it.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"

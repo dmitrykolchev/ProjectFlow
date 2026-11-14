@@ -299,9 +299,14 @@ export class AppCounterparties extends LitElement {
         .open="${Boolean(this.deletingItem)}"
         size="sm"
         title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить контрагента «${this.deletingItem?.name || ''}»?`
-          : `Are you sure you want to delete "${this.deletingItem?.name || ''}"?`}"
+        action="${isRu
+          ? `Контрагент «${this.deletingItem?.name || ''}» будет удалён из справочника.`
+          : `Counterparty "${this.deletingItem?.name || ''}" will be removed from the directory.`}"
+        result="${isRu
+          ? 'Договоры и счета контрагента останутся без привязки к нему.'
+          : 'Contracts and invoices of the counterparty will lose their link to it.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingItem = null)}"

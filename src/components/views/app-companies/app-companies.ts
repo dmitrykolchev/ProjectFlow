@@ -347,9 +347,14 @@ export class AppCompanies extends LitElement {
         .open="${Boolean(this.deletingCompany)}"
         size="sm"
         title="${isRu ? 'Удалить компанию?' : 'Delete company?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить компанию «${this.deletingCompany?.name || ''}»?`
-          : `Are you sure you want to delete "${this.deletingCompany?.name || ''}"?`}"
+        action="${isRu
+          ? `Компания «${this.deletingCompany?.name || ''}» будет удалена из справочника.`
+          : `Company "${this.deletingCompany?.name || ''}" will be removed from the directory.`}"
+        result="${isRu
+          ? 'Договоры и проекты компании останутся без привязки к компании.'
+          : 'Contracts and projects of the company will lose their company link.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingCompany = null)}"

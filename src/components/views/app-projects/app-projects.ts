@@ -535,9 +535,14 @@ export class AppProjects extends LitElement {
         .open="${Boolean(this.deletingProject)}"
         size="sm"
         title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        message="${isRu
-          ? `Вы уверены, что хотите удалить проект «${this.deletingProject?.name || ''}»?`
-          : `Are you sure you want to delete "${this.deletingProject?.name || ''}"?`}"
+        action="${isRu
+          ? `Проект «${this.deletingProject?.name || ''}» будет удалён из системы.`
+          : `Project "${this.deletingProject?.name || ''}" will be deleted from the system.`}"
+        result="${isRu
+          ? 'Все задачи, участники и финансовые связи проекта будут безвозвратно потеряны.'
+          : 'All tasks, members and financial links of the project will be permanently lost.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingProject = null)}"

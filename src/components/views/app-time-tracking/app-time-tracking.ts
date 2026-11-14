@@ -727,9 +727,14 @@ export class AppTimeTracking extends LitElement {
         .open="${Boolean(this.deletingEntry)}"
         size="sm"
         title="${isRu ? 'Удалить запись о времени?' : 'Delete time entry?'}"
-        message="${isRu
-          ? `Удалить отчёт (${this.deletingEntry?.hours || 0} ч по задаче ${this.deletingEntry?.taskId || ''})? Часы будут вычтены из задачи.`
-          : `Delete time entry (${this.deletingEntry?.hours || 0}h for ${this.deletingEntry?.taskId || ''})?`}"
+        action="${isRu
+          ? `Запись (${this.deletingEntry?.hours || 0} ч по задаче ${this.deletingEntry?.taskId || ''}) будет удалена.`
+          : `The entry (${this.deletingEntry?.hours || 0}h for task ${this.deletingEntry?.taskId || ''}) will be deleted.`}"
+        result="${isRu
+          ? 'Часы будут вычтены из задачи.'
+          : 'Hours will be subtracted from the task.'}"
+        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
         .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
         .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
         @cancel="${() => (this.deletingEntry = null)}"
