@@ -221,13 +221,6 @@
 .data-table tr:hover td {
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
-.confirm-text {
-  margin: 0;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.5;
-  font-size: 0.9rem;
-}
-
 @media (max-width: 640px) {
   .cards-grid {
     grid-template-columns: 1fr;

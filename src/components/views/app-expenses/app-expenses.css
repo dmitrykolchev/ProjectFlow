@@ -293,14 +293,6 @@
   font-size: 0.85rem;
   color: var(--text-primary, #f8fafc);
 }
-
-.confirm-text {
-  margin: 0;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.5;
-  font-size: 0.9rem;
-}
-
 @media (max-width: 640px) {
   :host {
     padding: 1rem;

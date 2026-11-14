@@ -18,6 +18,7 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-select/app-select';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
@@ -572,34 +573,23 @@ export class AppProjectChat extends LitElement {
           : ''}
       </div>
 
-      <app-modal
-        ?open="${Boolean(this.deletingMessage)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingMessage)}"
         size="sm"
         title="${isRu ? 'Удалить сообщение?' : 'Delete message?'}"
-        @close="${() => (this.deletingMessage = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? 'Вы уверены, что хотите удалить это сообщение из истории проектного чата?'
-            : 'Are you sure you want to delete this message?'}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingMessage = null)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingMessage) {
-                store.deleteChatMessage(this.deletingMessage.id);
-                this.deletingMessage = null;
-              }
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? 'Вы уверены, что хотите удалить это сообщение из истории проектного чата?'
+          : 'Are you sure you want to delete this message?'}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingMessage = null)}"
+        @confirm="${() => {
+          if (this.deletingMessage) {
+            store.deleteChatMessage(this.deletingMessage.id);
+            this.deletingMessage = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 

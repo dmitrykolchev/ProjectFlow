@@ -474,14 +474,6 @@
   border-color: var(--text-primary, #ffffff);
   box-shadow: 0 0 0 2px var(--accent-primary, #6366f1);
 }
-
-.confirm-text {
-  margin: 0;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.5;
-  font-size: 0.9rem;
-}
-
 @media (max-width: 900px) {
   .add-member-bar {
     grid-template-columns: 1fr 1fr;

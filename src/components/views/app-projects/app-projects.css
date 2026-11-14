@@ -237,18 +237,6 @@
 .data-table tbody tr:hover td {
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .col-span-2 {
   grid-column: span 2;
 }
@@ -278,22 +266,11 @@
   border-color: var(--text-primary, #ffffff);
   box-shadow: 0 0 0 2px var(--accent-primary, #6366f1);
 }
-
-.confirm-text {
-  margin: 0;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.5;
-  font-size: 0.9rem;
-}
-
 @media (max-width: 640px) {
   .cards-grid {
     grid-template-columns: 1fr;
   }
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .col-span-2 {
+.col-span-2 {
     grid-column: span 1;
   }
 }
