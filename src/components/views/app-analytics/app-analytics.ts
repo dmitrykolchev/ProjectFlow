@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import '../../common/app-avatar/app-avatar';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-analytics.css';
 
 @customElement('app-analytics')
@@ -98,8 +99,7 @@ export class AppAnalytics extends LitElement {
       </div>
 
       <div class="charts-grid">
-        <div class="section-card">
-          <div class="section-header">${t.analytics.statusDistribution}</div>
+        <app-section-card variant="plain" title="${t.analytics.statusDistribution}">
           ${Object.entries(statusCounts).map(([statusKey, count]) => {
             const pct = total > 0 ? Math.round((count / total) * 100) : 0;
             const label = (t.status as Record<string, string>)[statusKey] || statusKey;
@@ -117,10 +117,9 @@ export class AppAnalytics extends LitElement {
               </div>
             `;
           })}
-        </div>
+        </app-section-card>
 
-        <div class="section-card">
-          <div class="section-header">${t.analytics.priorityBreakdown}</div>
+        <app-section-card variant="plain" title="${t.analytics.priorityBreakdown}">
           ${Object.entries(priorityCounts).map(([priKey, count]) => {
             const pct = total > 0 ? Math.round((count / total) * 100) : 0;
             const label = (t.priority as Record<string, string>)[priKey] || priKey;
@@ -138,11 +137,10 @@ export class AppAnalytics extends LitElement {
               </div>
             `;
           })}
-        </div>
+        </app-section-card>
       </div>
 
-      <div class="section-card">
-        <div class="section-header">${t.analytics.teamWorkload}</div>
+      <app-section-card variant="plain" title="${t.analytics.teamWorkload}">
         <table class="team-table">
           <thead>
             <tr>
@@ -176,7 +174,7 @@ export class AppAnalytics extends LitElement {
             })}
           </tbody>
         </table>
-      </div>
+      </app-section-card>
     `;
   }
 }

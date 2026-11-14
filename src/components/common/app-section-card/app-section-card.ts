@@ -7,6 +7,7 @@ import styles from './app-section-card.css';
 export class AppSectionCard extends LitElement {
   @property({ type: String }) title: string = '';
   @property({ type: String }) subtitle: string = '';
+  @property({ type: String }) variant: 'default' | 'plain' | 'panel' | 'tabbed' = 'default';
   @property({ type: Boolean, attribute: 'collapsible' }) collapsible: boolean = false;
   @property({ type: Boolean, reflect: true }) collapsed: boolean = false;
 
@@ -14,7 +15,7 @@ export class AppSectionCard extends LitElement {
 
   render() {
     return html`
-      <section class="section-card">
+      <section class="section-card ${this.variant}">
         <div
           class="section-header ${this.collapsible ? 'is-collapsible' : ''}"
           role="${this.collapsible ? 'button' : 'presentation'}"
