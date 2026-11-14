@@ -8,11 +8,11 @@ import {
   iconClock,
   iconEdit,
   iconPlus,
-  iconSearch,
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -302,42 +302,23 @@ export class AppTimeTracking extends LitElement {
       </section>
 
       <!-- Filters Toolbar -->
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu ? 'Поиск по задаче, комментарию, сотруднику...' : 'Search task, notes, employee...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.projectFilter}"
-              .options="${projectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.projectFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.userFilter}"
-              .options="${userFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.userFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.categoryFilter}"
-              .options="${categoryFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.categoryFilter = e.detail.value as 'all' | TimeEntryCategory)}"
-            ></app-select>
-          </div>
-        </div>
-
+      <app-filter-bar
+        style="--filter-select-width: 185px;"
+        placeholder="${isRu ? 'Поиск по задаче, комментарию, сотруднику...' : 'Search task, notes, employee...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'project', options: projectOptions },
+          { key: 'user', options: userFilterOptions },
+          { key: 'category', options: categoryFilterOptions },
+        ]}"
+        .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'project') this.projectFilter = e.detail.value;
+          if (e.detail.key === 'user') this.userFilter = e.detail.value;
+          if (e.detail.key === 'category') this.categoryFilter = e.detail.value as 'all' | TimeEntryCategory;
+        }}"
+      >
         <app-segmented-switch
           size="sm"
           .value="${this.viewMode}"
@@ -348,7 +329,7 @@ export class AppTimeTracking extends LitElement {
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.viewMode = e.detail.value as 'journal' | 'by-task')}"
         ></app-segmented-switch>
-      </div>
+      </app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Записи о времени не найдены' : 'No time entries found'}"></app-empty-state>`
