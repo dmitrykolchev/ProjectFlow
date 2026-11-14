@@ -1,0 +1,50 @@
+import { html } from 'lit';
+import { ComponentStoryMeta } from '../../../types/storybook';
+import '../app-button/app-button';
+import { iconBuilding, iconUsers } from '../icons';
+import './app-page-header';
+
+export const meta: ComponentStoryMeta = {
+  title: 'Layout/Page Header',
+  component: 'app-page-header',
+  description:
+    'Standard page header with title, subtitle, optional leading icon, and an actions zone on the right.',
+  category: 'Layout',
+  stories: [
+    {
+      name: 'Default with Actions',
+      description: 'Title, subtitle, icon slot, and primary action button',
+      render: () => html`
+        <app-page-header
+          title="Companies"
+          subtitle="Directory of organizations and legal entities"
+        >
+          <span slot="icon">${iconBuilding(28)}</span>
+          <app-button slot="actions" variant="primary">+ Create</app-button>
+        </app-page-header>
+      `,
+    },
+    {
+      name: 'Multiple Actions',
+      description: 'Segmented actions and secondary buttons in the right zone',
+      render: () => html`
+        <app-page-header title="Employees" subtitle="Team roster and workload">
+          <span slot="icon">${iconUsers(28)}</span>
+          <div slot="actions" style="display: flex; gap: 0.5rem;">
+            <app-button variant="outline">Export</app-button>
+            <app-button variant="primary">+ Add Employee</app-button>
+          </div>
+        </app-page-header>
+      `,
+    },
+    {
+      name: 'Title Only',
+      description: 'Minimal header without subtitle and actions',
+      render: () => html`
+        <app-page-header title="Contracts"></app-page-header>
+      `,
+    },
+  ],
+};
+
+export default meta;

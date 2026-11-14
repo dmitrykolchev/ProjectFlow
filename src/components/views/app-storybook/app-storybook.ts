@@ -26,11 +26,13 @@ import modalPortalMeta from '../../common/app-modal-portal/app-modal-portal.stor
 import toastMeta from '../../common/app-toast/app-toast.story';
 import activityMeta from '../../common/app-activity-panel/app-activity-panel.story';
 import taskModalMeta from '../../common/app-task-modal/app-task-modal.story';
+import emptyStateMeta from '../../common/app-empty-state/app-empty-state.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
 import sidebarGroupMeta from '../../layout/sidebar-group/sidebar-group.story';
 import sidebarItemMeta from '../../layout/sidebar-item/sidebar-item.story';
+import pageHeaderMeta from '../../common/app-page-header/app-page-header.story';
 
 import metricCardMeta from '../../dashboard/app-metric-card/app-metric-card.story';
 import chartCardMeta from '../../dashboard/app-chart-card/app-chart-card.story';
@@ -83,12 +85,14 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   modalMeta,
   modalPortalMeta,
   taskModalMeta,
+  emptyStateMeta,
   toastMeta,
   activityMeta,
   headerMeta,
   sidebarMeta,
   sidebarGroupMeta,
   sidebarItemMeta,
+  pageHeaderMeta,
   metricCardMeta,
   chartCardMeta,
   projectProgressMeta,

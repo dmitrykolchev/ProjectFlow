@@ -9,6 +9,8 @@ import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-companies.css';
 
 @customElement('app-companies')
@@ -92,20 +94,18 @@ export class AppCompanies extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${isRu ? 'Компании' : 'Companies'}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Юридические лица, подразделения группы и привязка к проектам и договорам'
-              : 'Legal entities, group divisions, and links to projects and contracts'}
-          </p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header
+        title="${isRu ? 'Компании' : 'Companies'}"
+        subtitle="${isRu
+          ? 'Юридические лица, подразделения группы и привязка к проектам и договорам'
+          : 'Legal entities, group divisions, and links to projects and contracts'}"
+      >
+        <span slot="icon">${iconBuilding(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${isRu ? 'Добавить компанию' : 'Add Company'}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -150,7 +150,7 @@ export class AppCompanies extends LitElement {
       </div>
 
       ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Компании не найдены' : 'No companies found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Компании не найдены' : 'No companies found'}"></app-empty-state>`
         : html`
             <div class="cards-grid">
               ${filtered.map((company) => {

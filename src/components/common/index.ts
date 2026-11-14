@@ -49,6 +49,8 @@ export type {
 export { AppToast } from './app-toast/app-toast';
 export { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 export { AppTaskModal } from './app-task-modal/app-task-modal';
+export { AppEmptyState } from './app-empty-state/app-empty-state';
+export { AppPageHeader } from './app-page-header/app-page-header';
 
 export * as icons from './icons';
 
@@ -74,6 +76,8 @@ import { AppModalPortal } from './app-modal-portal/app-modal-portal';
 import { AppToast } from './app-toast/app-toast';
 import { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 import { AppTaskModal } from './app-task-modal/app-task-modal';
+import { AppEmptyState } from './app-empty-state/app-empty-state';
+import { AppPageHeader } from './app-page-header/app-page-header';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -98,6 +102,8 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-toast': AppToast,
   'app-activity-panel': AppActivityPanel,
   'app-task-modal': AppTaskModal,
+  'app-empty-state': AppEmptyState,
+  'app-page-header': AppPageHeader,
 } as const;
 
 export function getRegisteredUiElements(): string[] {
