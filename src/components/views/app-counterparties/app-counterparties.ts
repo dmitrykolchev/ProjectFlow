@@ -2,9 +2,10 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
-import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -136,36 +137,21 @@ export class AppCounterparties extends LitElement {
         <app-metric-card size="compact" label="${isRu ? 'Портфель активных договоров' : 'Active Contract Portfolio'}" value="${(activePortfolioRub / 1_000_000).toFixed(1)}M ₽"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu ? 'Поиск по названию, ИНН, контакту...' : 'Search name, INN, contact...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.typeFilter}"
-              .options="${typeOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.typeFilter = e.detail.value as 'all' | CounterpartyType)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | CounterpartyStatus)}"
-            ></app-select>
-          </div>
-        </div>
-
+      <app-filter-bar
+        style="--filter-select-width: 185px;"
+        placeholder="${isRu ? 'Поиск по названию, ИНН, контакту...' : 'Search name, INN, contact...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'type', options: typeOptions },
+          { key: 'status', options: statusOptions },
+        ]}"
+        .values="${{ type: this.typeFilter, status: this.statusFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'type') this.typeFilter = e.detail.value as 'all' | CounterpartyType;
+          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | CounterpartyStatus;
+        }}"
+      >
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -176,7 +162,7 @@ export class AppCounterparties extends LitElement {
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.displayMode = e.detail.value as 'cards' | 'table')}"
         ></app-segmented-switch>
-      </div>
+      </app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Контрагенты не найдены' : 'No counterparties found'}"></app-empty-state>`
