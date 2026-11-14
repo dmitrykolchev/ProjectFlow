@@ -22,24 +22,6 @@
   gap: 1.75rem;
 }
 
-.page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  text-shadow: var(--cyber-text-shadow, none);
-}
-
-.page-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-secondary, #94a3b8);
-}
-
 .section-card {
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);

@@ -30,6 +30,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-page-header/app-page-header';
 import styles from './app-knowledge-base.css';
 
 interface ParsedBlock {
@@ -429,16 +430,12 @@ export class AppKnowledgeBase extends LitElement {
 
     return html`
       <div class="kb-shell">
-        <div class="kb-header">
-          <div class="kb-titles">
-            <h1 class="kb-title">${kb.title}</h1>
-            <p class="kb-subtitle">${kb.subtitle}</p>
-          </div>
-          <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+        <app-page-header title="${kb.title}" subtitle="${kb.subtitle}">
+          <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
             <span slot="icon-start">${iconPlus(16)}</span>
             <span>${kb.newArticle}</span>
           </app-button>
-        </div>
+        </app-page-header>
 
         <!-- 4-Cell Summary Strip -->
         <div class="kpi-strip">

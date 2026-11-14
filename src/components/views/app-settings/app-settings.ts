@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import '../../common/app-button/app-button';
+import '../../common/app-page-header/app-page-header';
 import styles from './app-settings.css';
 
 interface BasePaletteOption {
@@ -154,10 +155,7 @@ export class AppSettings extends LitElement {
 
     return html`
       <div class="settings-container">
-        <div class="page-header">
-          <h1 class="page-title">${t.settings.title}</h1>
-          <p class="page-subtitle">${t.settings.subtitle}</p>
-        </div>
+        <app-page-header title="${t.settings.title}" subtitle="${t.settings.subtitle}"></app-page-header>
 
         <!-- Theme Mode -->
         <div class="section-card">

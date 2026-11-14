@@ -20,6 +20,7 @@ import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-split-button/app-split-button';
 import '../../common/app-badge/app-badge';
+import '../../common/app-page-header/app-page-header';
 
 @customElement('app-dashboard')
 export class AppDashboard extends LitElement {
@@ -112,15 +113,10 @@ export class AppDashboard extends LitElement {
 
     return html`
       <div class="dashboard-container">
-        <div class="dashboard-header">
-          <div class="header-copy">
-            <h1 class="dash-title">${t.dashboard.title}</h1>
-            <p class="dash-subtitle">${t.dashboard.subtitle}</p>
-          </div>
-
-          <div class="header-controls">
-            <app-segmented-switch
-              size="sm"
+        <app-page-header title="${t.dashboard.title}" subtitle="${t.dashboard.subtitle}">
+          <app-segmented-switch
+            slot="actions"
+            size="sm"
               .value="${this.timeframe}"
               .options="${[
                 { value: '7d', label: t.dashboard.period7d },
@@ -133,6 +129,7 @@ export class AppDashboard extends LitElement {
             ></app-segmented-switch>
 
             <app-split-button
+              slot="actions"
               label="${t.common.create}"
               variant="primary"
               size="sm"
@@ -151,8 +148,7 @@ export class AppDashboard extends LitElement {
             >
               <span slot="icon-start">${iconPlus(14)}</span>
             </app-split-button>
-          </div>
-        </div>
+        </app-page-header>
 
         <!-- 4-Column KPI Strip -->
         <div class="kpi-strip">

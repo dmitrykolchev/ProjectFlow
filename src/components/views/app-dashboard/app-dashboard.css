@@ -29,47 +29,6 @@
   container-type: inline-size;
 }
 
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  min-width: 0;
-  width: 100%;
-}
-
-.header-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  min-width: 0;
-  flex: 1 1 260px;
-}
-
-.dash-title {
-  font-size: 1.35rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  letter-spacing: -0.02em;
-  overflow-wrap: anywhere;
-}
-
-.dash-subtitle {
-  font-size: 0.85rem;
-  color: var(--text-secondary, #94a3b8);
-  overflow-wrap: anywhere;
-}
-
-.header-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  min-width: 0;
-  max-width: 100%;
-}
-
 /* 4-column KPI strip */
 .kpi-strip {
   display: grid;
