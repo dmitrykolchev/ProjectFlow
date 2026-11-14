@@ -40,6 +40,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-task-detail.css';
 
 type DetailTab = 'timeline' | 'time' | 'expenses' | 'discussions';
@@ -304,13 +305,12 @@ export class AppTaskDetail extends LitElement {
     if (!task) {
       return html`
         <div class="page-shell">
-          <div class="empty-state">
-            <span>${isRu ? 'Задача не найдена или была удалена' : 'Task not found'}</span>
-            <app-button variant="primary" @click="${() => store.setActiveView('kanban')}">
+          <app-empty-state title="${isRu ? 'Задача не найдена или была удалена' : 'Task not found'}">
+            <app-button slot="action" variant="primary" @click="${() => store.setActiveView('kanban')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.taskDetail.backToBoard}</span>
             </app-button>
-          </div>
+          </app-empty-state>
         </div>
       `;
     }
@@ -831,7 +831,7 @@ export class AppTaskDetail extends LitElement {
       </div>
 
       ${timeline.length === 0
-        ? html`<div class="empty-state">${t.taskDetail.noHistory}</div>`
+        ? html`<app-empty-state compact title="${t.taskDetail.noHistory}"></app-empty-state>`
         : html`
             <div class="timeline-list">
               ${timeline.map(
@@ -950,7 +950,7 @@ export class AppTaskDetail extends LitElement {
       </div>
 
       ${timeEntries.length === 0
-        ? html`<div class="empty-state">${t.taskDetail.noTimeEntries}</div>`
+        ? html`<app-empty-state compact title="${t.taskDetail.noTimeEntries}"></app-empty-state>`
         : html`
             <div class="records-table-wrap">
               <table class="records-table">
@@ -1098,7 +1098,7 @@ export class AppTaskDetail extends LitElement {
       </div>
 
       ${expenses.length === 0
-        ? html`<div class="empty-state">${t.taskDetail.noExpenses}</div>`
+        ? html`<app-empty-state compact title="${t.taskDetail.noExpenses}"></app-empty-state>`
         : html`
             <div class="records-table-wrap">
               <table class="records-table">
@@ -1161,7 +1161,7 @@ export class AppTaskDetail extends LitElement {
 
     return html`
       ${discussions.length === 0
-        ? html`<div class="empty-state">${t.taskDetail.noDiscussions}</div>`
+        ? html`<app-empty-state compact title="${t.taskDetail.noDiscussions}"></app-empty-state>`
         : html`
             <div class="discussion-feed">
               ${discussions.map((msg) => {

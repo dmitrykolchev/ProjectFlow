@@ -35,6 +35,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-counterparty-detail.css';
 
 @customElement('app-counterparty-detail')
@@ -206,13 +207,12 @@ export class AppCounterpartyDetail extends LitElement {
     if (!cp) {
       return html`
         <div class="page-shell">
-          <div class="empty-state">
-            <span>${isRu ? 'Контрагент не найден' : 'Counterparty not found'}</span>
-            <app-button variant="primary" @click="${() => store.setActiveView('counterparties')}">
+          <app-empty-state title="${isRu ? 'Контрагент не найден' : 'Counterparty not found'}">
+            <app-button slot="action" variant="primary" @click="${() => store.setActiveView('counterparties')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.counterpartyDetail.backToCounterparties}</span>
             </app-button>
-          </div>
+          </app-empty-state>
         </div>
       `;
     }
@@ -387,7 +387,7 @@ export class AppCounterpartyDetail extends LitElement {
             </div>
 
             ${cpContracts.length === 0
-              ? html`<div class="empty-state">${t.counterpartyDetail.noContracts}</div>`
+              ? html`<app-empty-state compact title="${t.counterpartyDetail.noContracts}"></app-empty-state>`
               : html`
                   <div class="rows-list">
                     ${cpContracts.map((ctr) => {
@@ -447,7 +447,7 @@ export class AppCounterpartyDetail extends LitElement {
             </div>
 
             ${cpProjects.length === 0
-              ? html`<div class="empty-state">${t.counterpartyDetail.noProjects}</div>`
+              ? html`<app-empty-state compact title="${t.counterpartyDetail.noProjects}"></app-empty-state>`
               : html`
                   <div class="rows-list">
                     ${cpProjects.map((proj) => {
@@ -523,7 +523,7 @@ export class AppCounterpartyDetail extends LitElement {
 
           ${this.financeTab === 'invoices'
             ? cpInvoices.length === 0
-              ? html`<div class="empty-state">${t.counterpartyDetail.noInvoices}</div>`
+              ? html`<app-empty-state compact title="${t.counterpartyDetail.noInvoices}"></app-empty-state>`
               : html`
                   <div class="table-scroll">
                     <table class="data-table">
@@ -613,7 +613,7 @@ export class AppCounterpartyDetail extends LitElement {
                   </div>
                 `
             : cpCalculations.length === 0
-            ? html`<div class="empty-state">${t.counterpartyDetail.noCalculations}</div>`
+            ? html`<app-empty-state compact title="${t.counterpartyDetail.noCalculations}"></app-empty-state>`
             : html`
                 <div class="table-scroll">
                   <table class="data-table">

@@ -29,6 +29,7 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-knowledge-base.css';
 
 interface ParsedBlock {
@@ -552,13 +553,12 @@ export class AppKnowledgeBase extends LitElement {
 
             ${filtered.length === 0
               ? html`
-                  <div class="empty-state">
-                    ${iconBookOpen(28)}
-                    <span>${kb.emptyCatalog}</span>
-                    <app-button size="sm" variant="outline" @click="${() => this.clearAllFilters()}">
+                  <app-empty-state title="${kb.emptyCatalog}">
+                    <span slot="icon">${iconBookOpen(48)}</span>
+                    <app-button slot="action" size="sm" variant="outline" @click="${() => this.clearAllFilters()}">
                       ${kb.clearFilters}
                     </app-button>
-                  </div>
+                  </app-empty-state>
                 `
               : html`
                   <div class="index-list">
@@ -619,14 +619,13 @@ export class AppKnowledgeBase extends LitElement {
           <section class="kb-reader">
             ${!selectedArticle
               ? html`
-                  <div class="empty-state">
-                    ${iconBookOpen(36)}
-                    <span>${filtered.length === 0 ? kb.emptyPrompt : kb.noArticleSelected}</span>
-                    <app-button variant="primary" size="sm" @click="${() => this.openCreateModal()}">
+                  <app-empty-state title="${filtered.length === 0 ? kb.emptyPrompt : kb.noArticleSelected}">
+                    <span slot="icon">${iconBookOpen(48)}</span>
+                    <app-button slot="action" variant="primary" size="sm" @click="${() => this.openCreateModal()}">
                       <span slot="icon-start">${iconPlus(14)}</span>
                       <span>${kb.newArticle}</span>
                     </app-button>
-                  </div>
+                  </app-empty-state>
                 `
               : this.renderArticleReader(selectedArticle)}
           </section>

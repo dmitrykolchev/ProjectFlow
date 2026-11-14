@@ -24,6 +24,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-employee-detail.css';
 
 @customElement('app-employee-detail')
@@ -108,13 +109,12 @@ export class AppEmployeeDetail extends LitElement {
     if (!emp) {
       return html`
         <div class="page-shell">
-          <div class="empty-state">
-            <span>${isRu ? 'Сотрудник не найден' : 'Employee not found'}</span>
-            <app-button variant="primary" @click="${() => store.setActiveView('employees')}">
+          <app-empty-state title="${isRu ? 'Сотрудник не найден' : 'Employee not found'}">
+            <app-button slot="action" variant="primary" @click="${() => store.setActiveView('employees')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.employeeDetail.backToEmployees}</span>
             </app-button>
-          </div>
+          </app-empty-state>
         </div>
       `;
     }
@@ -303,7 +303,7 @@ export class AppEmployeeDetail extends LitElement {
             </div>
 
             ${empProjects.length === 0
-              ? html`<div class="empty-state">${t.employeeDetail.noProjects}</div>`
+              ? html`<app-empty-state compact title="${t.employeeDetail.noProjects}"></app-empty-state>`
               : html`
                   <div class="rows-list">
                     ${empProjects.map(({ project, roles }) => {
@@ -369,7 +369,7 @@ export class AppEmployeeDetail extends LitElement {
             </div>
 
             ${filteredTasks.length === 0
-              ? html`<div class="empty-state">${t.employeeDetail.noTasks}</div>`
+              ? html`<app-empty-state compact title="${t.employeeDetail.noTasks}"></app-empty-state>`
               : html`
                   <div class="rows-list">
                     ${filteredTasks.slice(0, 12).map((task) => {
@@ -437,7 +437,7 @@ export class AppEmployeeDetail extends LitElement {
 
           ${this.activityTab === 'time'
             ? empTimeEntries.length === 0
-              ? html`<div class="empty-state">${t.employeeDetail.noTimeEntries}</div>`
+              ? html`<app-empty-state compact title="${t.employeeDetail.noTimeEntries}"></app-empty-state>`
               : html`
                   <div class="table-scroll">
                     <table class="data-table">
@@ -491,7 +491,7 @@ export class AppEmployeeDetail extends LitElement {
                   </div>
                 `
             : empExpenses.length === 0
-            ? html`<div class="empty-state">${t.employeeDetail.noExpenses}</div>`
+            ? html`<app-empty-state compact title="${t.employeeDetail.noExpenses}"></app-empty-state>`
             : html`
                 <div class="table-scroll">
                   <table class="data-table">

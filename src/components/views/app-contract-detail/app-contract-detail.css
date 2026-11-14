@@ -446,20 +446,6 @@
   color: var(--text-secondary, #94a3b8);
 }
 
-.empty-state {
-  background: var(--bg-surface, #111827);
-  border: 1px dashed var(--border-strong, #334155);
-  border-radius: var(--radius-lg, 12px);
-  padding: 2.25rem 1.5rem;
-  text-align: center;
-  color: var(--text-muted, #64748b);
-  font-size: 0.9rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.9rem;
-}
-
 /* Modal Forms & Invoice Line Items Editor */
 .form-grid {
   display: grid;

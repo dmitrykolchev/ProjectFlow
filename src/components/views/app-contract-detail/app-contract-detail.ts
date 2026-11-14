@@ -43,6 +43,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-contract-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -459,13 +460,12 @@ export class AppContractDetail extends LitElement {
     if (!ctr) {
       return html`
         <div class="page-shell">
-          <div class="empty-state">
-            <span>${isRu ? 'Договор не найден' : 'Contract not found'}</span>
-            <app-button variant="primary" @click="${() => store.setActiveView('contracts')}">
+          <app-empty-state title="${isRu ? 'Договор не найден' : 'Contract not found'}">
+            <app-button slot="action" variant="primary" @click="${() => store.setActiveView('contracts')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.contractDetail.backToContracts}</span>
             </app-button>
-          </div>
+          </app-empty-state>
         </div>
       `;
     }
@@ -728,17 +728,12 @@ export class AppContractDetail extends LitElement {
 
           ${visibleCalculations.length === 0
             ? html`
-                <div class="empty-state">
-                  <span>${t.contractDetail.noCalculations}</span>
-                  <app-button
-                    size="sm"
-                    variant="secondary"
-                    @click="${() => this.openCreateCalculationModal(ctr)}"
-                  >
+                <app-empty-state compact title="${t.contractDetail.noCalculations}">
+                  <app-button slot="action" size="sm" variant="secondary" @click="${() => this.openCreateCalculationModal(ctr)}">
                     <span slot="icon-start">${iconPlus(14)}</span>
                     <span>${t.contractDetail.createCalculation}</span>
                   </app-button>
-                </div>
+                </app-empty-state>
               `
             : html`
                 <div class="table-wrap">
@@ -972,17 +967,12 @@ export class AppContractDetail extends LitElement {
 
           ${visibleInvoices.length === 0
             ? html`
-                <div class="empty-state">
-                  <span>${t.contractDetail.noInvoices}</span>
-                  <app-button
-                    size="sm"
-                    variant="secondary"
-                    @click="${() => this.openCreateInvoiceModal(ctr)}"
-                  >
+                <app-empty-state compact title="${t.contractDetail.noInvoices}">
+                  <app-button slot="action" size="sm" variant="secondary" @click="${() => this.openCreateInvoiceModal(ctr)}">
                     <span slot="icon-start">${iconPlus(14)}</span>
                     <span>${t.contractDetail.issueInvoice}</span>
                   </app-button>
-                </div>
+                </app-empty-state>
               `
             : html`
                 <div class="table-wrap">
@@ -1199,7 +1189,7 @@ export class AppContractDetail extends LitElement {
           </div>
 
           ${contractPayments.length === 0
-            ? html`<div class="empty-state">${t.payments.noContractPayments}</div>`
+            ? html`<app-empty-state compact title="${t.payments.noContractPayments}"></app-empty-state>`
             : html`
                 <div class="table-wrap">
                   <table class="data-table">
@@ -1332,9 +1322,7 @@ export class AppContractDetail extends LitElement {
 
             ${!project
               ? html`
-                  <div class="empty-state">
-                    <span>${isRu ? 'К договору не привязан проект' : 'No project linked to this contract'}</span>
-                  </div>
+                  <app-empty-state compact title="${isRu ? 'К договору не привязан проект' : 'No project linked to this contract'}"></app-empty-state>
                 `
               : html`
                   <div class="party-list">
@@ -1562,11 +1550,12 @@ export class AppContractDetail extends LitElement {
             </div>
 
             ${this.calcItems.length === 0
-              ? html`<div class="empty-state" style="padding: 1.4rem;">
-                  ${isRu
+              ? html`<app-empty-state
+                  compact
+                  title="${isRu
                     ? 'Нет работ или расходов за выбранный период. Выберите другой период или добавьте позицию вручную.'
-                    : 'No works or expenses found for this period.'}
-                </div>`
+                    : 'No works or expenses found for this period.'}"
+                ></app-empty-state>`
               : html`
                   <div class="calc-items-list">
                     ${this.calcItems.map(
@@ -2327,7 +2316,7 @@ export class AppContractDetail extends LitElement {
             </div>
 
             ${invPayments.length === 0
-              ? html`<div class="empty-state" style="padding: 1.25rem;">${t.payments.noPayments}</div>`
+              ? html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`
               : html`
                   <div class="table-wrap">
                     <table class="data-table">

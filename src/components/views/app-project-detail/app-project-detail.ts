@@ -26,6 +26,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../dashboard/app-project-overview/app-project-overview';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-project-detail.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -167,13 +168,12 @@ export class AppProjectDetail extends LitElement {
     if (!proj) {
       return html`
         <div class="page-shell">
-          <div class="empty-state">
-            <span>${isRu ? 'Проект не найден или список проектов пуст' : 'Project not found'}</span>
-            <app-button variant="primary" @click="${() => store.setActiveView('projects')}">
+          <app-empty-state title="${isRu ? 'Проект не найден или список проектов пуст' : 'Project not found'}">
+            <app-button slot="action" variant="primary" @click="${() => store.setActiveView('projects')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.projectDetail.backToProjects}</span>
             </app-button>
-          </div>
+          </app-empty-state>
         </div>
       `;
     }
@@ -447,7 +447,7 @@ export class AppProjectDetail extends LitElement {
 
           <div class="roles-groups">
             ${visibleRoles.length === 0
-              ? html`<div class="empty-state">${isRu ? 'В этом проекте ещё нет участников' : 'No team members assigned yet'}</div>`
+              ? html`<app-empty-state compact title="${isRu ? 'В этом проекте ещё нет участников' : 'No team members assigned yet'}"></app-empty-state>`
               : visibleRoles.map((role) => {
                   const roleMembers = members.filter((m) => m.role === role);
                   const totalRoleAlloc = roleMembers.reduce((s, m) => s + m.allocation, 0);
@@ -633,7 +633,7 @@ export class AppProjectDetail extends LitElement {
             </div>
 
             ${linkedContracts.length === 0
-              ? html`<div class="empty-state">${t.projectDetail.noContracts}</div>`
+              ? html`<app-empty-state compact title="${t.projectDetail.noContracts}"></app-empty-state>`
               : html`
                   <div class="contracts-list">
                     ${linkedContracts.map((ctr) => {
@@ -700,7 +700,7 @@ export class AppProjectDetail extends LitElement {
             </div>
 
             ${projectTimeEntries.length === 0
-              ? html`<div class="empty-state">${isRu ? 'Записи о времени по проекту ещё не добавлены' : 'No time entries yet'}</div>`
+              ? html`<app-empty-state compact title="${isRu ? 'Записи о времени по проекту ещё не добавлены' : 'No time entries yet'}"></app-empty-state>`
               : html`
                   <div class="contracts-list">
                     ${projectTimeEntries.slice(0, 5).map((te) => {
@@ -758,7 +758,7 @@ export class AppProjectDetail extends LitElement {
             </div>
 
             ${projectExpenses.length === 0
-              ? html`<div class="empty-state">${isRu ? 'Прямые расходы по проекту отсутствуют' : 'No project expenses yet'}</div>`
+              ? html`<app-empty-state compact title="${isRu ? 'Прямые расходы по проекту отсутствуют' : 'No project expenses yet'}"></app-empty-state>`
               : html`
                   <div class="contracts-list">
                     ${projectExpenses.slice(0, 5).map((exp) => {

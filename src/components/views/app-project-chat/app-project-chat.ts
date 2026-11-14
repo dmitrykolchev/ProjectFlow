@@ -20,6 +20,7 @@ import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
 import '../../common/app-modal/app-modal';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-project-chat.css';
 
 const QUICK_REACTIONS = ['👍', '✅', '🔥', '👏', '👀'];
@@ -172,10 +173,9 @@ export class AppProjectChat extends LitElement {
 
     if (!activeProject) {
       return html`
-        <div class="empty-state">
-          ${iconMessageSquare(32)}
-          <span>${isRu ? 'Создайте хотя бы один проект, чтобы начать переписку' : 'Create a project to start chatting'}</span>
-        </div>
+        <app-empty-state title="${isRu ? 'Создайте хотя бы один проект, чтобы начать переписку' : 'Create a project to start chatting'}">
+          <span slot="icon">${iconMessageSquare(48)}</span>
+        </app-empty-state>
       `;
     }
 
@@ -448,10 +448,9 @@ export class AppProjectChat extends LitElement {
           <div class="messages-scroll">
             ${groupedByDate.length === 0
               ? html`
-                  <div class="empty-state">
-                    ${iconMessageSquare(30)}
-                    <span>${t.projectChat.emptyChannel}</span>
-                  </div>
+                  <app-empty-state title="${t.projectChat.emptyChannel}">
+                    <span slot="icon">${iconMessageSquare(48)}</span>
+                  </app-empty-state>
                 `
               : groupedByDate.map(
                   (group) => html`
@@ -543,9 +542,7 @@ export class AppProjectChat extends LitElement {
                 <div class="members-scroll">
                   ${participantList.length === 0
                     ? html`
-                        <div class="empty-state" style="padding: 1.5rem 0.75rem;">
-                          ${isRu ? 'Участники не назначены' : 'No assigned members'}
-                        </div>
+                        <app-empty-state compact title="${isRu ? 'Участники не назначены' : 'No assigned members'}"></app-empty-state>
                       `
                     : participantList.map((entry) => {
                         const statusClass = entry.user.status || 'active';
