@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Company, CompanyStatus } from '../../../types';
+import { getTranslation } from '../../../i18n';
 import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
@@ -83,47 +84,45 @@ export class AppCompanies extends LitElement {
   }
 
   render() {
-    const isRu = this.currentLang === 'ru';
+    const t = getTranslation(this.currentLang);
     const filtered = this.getFilteredCompanies();
     const activeCount = this.companies.filter((c) => c.status === 'active').length;
     const totalEmployees = store.users.filter((u) => Boolean(u.companyId)).length;
     const activeContracts = store.contracts.filter((c) => c.status === 'active').length;
 
     const statusOptions = [
-      { value: 'all', label: isRu ? 'Все статусы' : 'All statuses' },
-      { value: 'active', label: isRu ? 'Активная' : 'Active', color: '#10b981' },
-      { value: 'inactive', label: isRu ? 'Архив' : 'Inactive', color: '#64748b' },
+      { value: 'all', label: t.viewTexts.companies.filterAllStatuses },
+      { value: 'active', label: t.viewTexts.companies.filterActive, color: '#10b981' },
+      { value: 'inactive', label: t.viewTexts.companies.filterInactive, color: '#64748b' },
     ];
 
     const directorOptions = [
-      { value: '', label: isRu ? 'Не указан' : 'Unassigned' },
+      { value: '', label: t.viewTexts.companies.optionUnassignedDirector },
       ...store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
     ];
 
     return html`
       <app-page-header
-        title="${isRu ? 'Компании' : 'Companies'}"
-        subtitle="${isRu
-          ? 'Юридические лица, подразделения группы и привязка к проектам и договорам'
-          : 'Legal entities, group divisions, and links to projects and contracts'}"
+        title="${t.viewTexts.companies.pageTitle}"
+        subtitle="${t.viewTexts.pageSubtitles.companies}"
       >
         <span slot="icon">${iconBuilding(28)}</span>
         <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
-          <span>${isRu ? 'Добавить компанию' : 'Add Company'}</span>
+          <span>${t.viewTexts.companies.addCompanyButton}</span>
         </app-button>
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${isRu ? 'Всего компаний' : 'Total Companies'}" value="${this.companies.length}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Действующих' : 'Active'}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Сотрудников в группе' : 'Group Employees'}" value="${totalEmployees}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Действующих договоров' : 'Active Contracts'}" value="${activeContracts}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.companies.kpiTotalCompanies}" value="${this.companies.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.companies.kpiActive}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.companies.kpiGroupEmployees}" value="${totalEmployees}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.companies.kpiActiveContracts}" value="${activeContracts}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${isRu ? 'Поиск по названию, ИНН, городу...' : 'Search by name, INN, city...'}"
+        placeholder="${t.viewTexts.companies.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[{ key: 'status', options: statusOptions }]}"
         .values="${{ status: this.statusFilter }}"
@@ -134,7 +133,7 @@ export class AppCompanies extends LitElement {
       ></app-filter-bar>
 
       ${filtered.length === 0
-        ? html`<app-empty-state title="${isRu ? 'Компании не найдены' : 'No companies found'}"></app-empty-state>`
+        ? html`<app-empty-state title="${t.viewTexts.companies.emptyNoCompanies}"></app-empty-state>`
         : html`
             <div class="cards-grid">
               ${filtered.map((company) => {
@@ -160,25 +159,25 @@ export class AppCompanies extends LitElement {
 
                     <div class="meta-grid">
                       <div class="meta-item">
-                        <span class="meta-label">${isRu ? 'ИНН / КПП' : 'Tax ID'}</span>
+                        <span class="meta-label">${t.viewTexts.companies.metaTaxId}</span>
                         <span class="meta-value mono">
                           ${company.inn}${company.kpp ? ` / ${company.kpp}` : ''}
                         </span>
                       </div>
                       <div class="meta-item">
-                        <span class="meta-label">${isRu ? 'Город' : 'City'}</span>
+                        <span class="meta-label">${t.viewTexts.companies.metaCity}</span>
                         <span class="meta-value">${company.city}</span>
                       </div>
                       <div class="meta-item">
-                        <span class="meta-label">${isRu ? 'Руководитель' : 'Director'}</span>
+                        <span class="meta-label">${t.viewTexts.companies.metaDirector}</span>
                         <span class="meta-value">${director?.name || '—'}</span>
                       </div>
                       <div class="meta-item">
-                        <span class="meta-label">${isRu ? 'Отрасль' : 'Industry'}</span>
+                        <span class="meta-label">${t.viewTexts.companies.metaIndustry}</span>
                         <span class="meta-value" title="${company.industry}">${company.industry}</span>
                       </div>
                       <div class="meta-item">
-                        <span class="meta-label">${isRu ? 'Телефон' : 'Phone'}</span>
+                        <span class="meta-label">${t.viewTexts.companies.metaPhone}</span>
                         <span class="meta-value mono">${company.phone}</span>
                       </div>
                       <div class="meta-item">
@@ -190,20 +189,20 @@ export class AppCompanies extends LitElement {
                     <div class="card-footer">
                       <div class="stats-row">
                         <span class="stat-pill">
-                          ${isRu ? 'Сотр.' : 'Staff'}: <strong>${empCount}</strong>
+                          ${t.viewTexts.companies.staffCountLabel}: <strong>${empCount}</strong>
                         </span>
                         <span class="stat-pill">
-                          ${isRu ? 'Проектов' : 'Projects'}: <strong>${projCount}</strong>
+                          ${t.viewTexts.companies.projectsCountLabel}: <strong>${projCount}</strong>
                         </span>
                         <span class="stat-pill">
-                          ${isRu ? 'Договоров' : 'Contracts'}: <strong>${ctrCount}</strong>
+                          ${t.viewTexts.companies.contractsCountLabel}: <strong>${ctrCount}</strong>
                         </span>
                       </div>
                       <div class="card-actions">
                         <button
                           type="button"
                           class="icon-btn"
-                          title="${isRu ? 'База знаний компании' : 'Company Knowledge Base'}"
+                          title="${t.viewTexts.companies.knowledgeBaseTitle}"
                           @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
                         >
                           ${iconBookOpen(14)}
@@ -211,7 +210,7 @@ export class AppCompanies extends LitElement {
                         <button
                           type="button"
                           class="icon-btn"
-                          title="${isRu ? 'Редактировать' : 'Edit'}"
+                          title="${t.common.edit}"
                           @click="${() => this.openEditModal(company)}"
                         >
                           ${iconEdit(14)}
@@ -219,7 +218,7 @@ export class AppCompanies extends LitElement {
                         <button
                           type="button"
                           class="icon-btn danger"
-                          title="${isRu ? 'Удалить' : 'Delete'}"
+                          title="${t.common.delete}"
                           @click="${() => (this.deletingCompany = company)}"
                         >
                           ${iconTrash(14)}
@@ -235,19 +234,13 @@ export class AppCompanies extends LitElement {
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${this.editingId
-          ? isRu
-            ? 'Редактирование компании'
-            : 'Edit Company'
-          : isRu
-          ? 'Новая компания'
-          : 'New Company'}"
+        title="${this.editingId ? t.viewTexts.companies.modalTitleEdit : t.viewTexts.companies.modalTitleCreate}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'Краткое название' : 'Short Name'}"
+              label="${t.viewTexts.companies.labelShortName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -259,42 +252,42 @@ export class AppCompanies extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Юридическое наименование' : 'Legal Name'}"
+              label="${t.viewTexts.companies.labelLegalName}"
               .value="${this.formLegalName}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'ИНН' : 'Tax ID (INN)'}"
+              label="${t.viewTexts.companies.labelInn}"
               .value="${this.formInn}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'КПП' : 'KPP'}"
+              label="${t.viewTexts.companies.labelKpp}"
               .value="${this.formKpp}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Отрасль' : 'Industry'}"
+              label="${t.viewTexts.companies.metaIndustry}"
               .value="${this.formIndustry}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formIndustry = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Город' : 'City'}"
+              label="${t.viewTexts.companies.metaCity}"
               .value="${this.formCity}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Телефон' : 'Phone'}"
+              label="${t.viewTexts.companies.metaPhone}"
               .value="${this.formPhone}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
@@ -309,7 +302,7 @@ export class AppCompanies extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Руководитель' : 'Director'}"
+              label="${t.viewTexts.companies.metaDirector}"
               .value="${this.formDirectorId}"
               .options="${directorOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formDirectorId = eventValue(e))}"
@@ -317,7 +310,7 @@ export class AppCompanies extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.companies.labelStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -326,7 +319,7 @@ export class AppCompanies extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Описание деятельности' : 'Description'}"
+              label="${t.viewTexts.companies.labelDescription}"
               .value="${this.formDescription}"
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
@@ -336,10 +329,10 @@ export class AppCompanies extends LitElement {
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
+            ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${this.handleSave}">
-            ${isRu ? 'Сохранить' : 'Save'}
+            ${t.common.save}
           </app-button>
         </div>
       </app-modal>
@@ -347,17 +340,13 @@ export class AppCompanies extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingCompany)}"
         size="sm"
-        title="${isRu ? 'Удалить компанию?' : 'Delete company?'}"
-        action="${isRu
-          ? `Компания «${this.deletingCompany?.name || ''}» будет удалена из справочника.`
-          : `Company "${this.deletingCompany?.name || ''}" will be removed from the directory.`}"
-        result="${isRu
-          ? 'Договоры и проекты компании останутся без привязки к компании.'
-          : 'Contracts and projects of the company will lose their company link.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.companyDelete.title}"
+        action="${t.viewTexts.confirmDialogs.companyDelete.action(this.deletingCompany?.name || '')}"
+        result="${t.viewTexts.confirmDialogs.companyDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingCompany = null)}"
         @confirm="${() => {
           if (this.deletingCompany) {
