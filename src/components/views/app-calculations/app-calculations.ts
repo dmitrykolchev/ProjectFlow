@@ -286,7 +286,6 @@ export class AppCalculations extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const filtered = this.getFiltered();
 
     const sentCalcs = this.calculations.filter((c) => c.status === 'sent');
@@ -303,7 +302,7 @@ export class AppCalculations extends LitElement {
     const totalNonBillableHours = this.calculations.reduce((s, c) => s + c.nonBillableHours, 0);
 
     const statusOptions = [
-      { value: 'all', label: isRu ? 'Все статусы' : 'All statuses' },
+      { value: 'all', label: t.viewTexts.calculations.filterAllStatuses },
       { value: 'draft', label: t.calculations.statuses.draft, color: '#64748b' },
       { value: 'sent', label: t.calculations.statuses.sent, color: '#f59e0b' },
       { value: 'approved', label: t.calculations.statuses.approved, color: '#10b981' },
@@ -312,12 +311,12 @@ export class AppCalculations extends LitElement {
     ];
 
     const contractOptions = [
-      { value: 'all', label: isRu ? 'Все договоры' : 'All contracts' },
+      { value: 'all', label: t.viewTexts.calculations.filterAllContracts },
       ...this.contracts.map((c) => ({ value: c.id, label: `${c.number} · ${c.title}` })),
     ];
 
     const frequencyOptions = [
-      { value: 'all', label: isRu ? 'Любая периодичность' : 'All frequencies' },
+      { value: 'all', label: t.viewTexts.calculations.filterAllFrequencies },
       { value: 'weekly', label: t.calculations.frequencies.weekly },
       { value: 'biweekly', label: t.calculations.frequencies.biweekly },
       { value: 'monthly', label: t.calculations.frequencies.monthly },
@@ -325,14 +324,12 @@ export class AppCalculations extends LitElement {
       { value: 'custom', label: t.calculations.frequencies.custom },
     ];
 
-    const hUnit = isRu ? 'ч' : 'h';
+    const hUnit = t.viewTexts.calculations.hoursUnitShort;
 
     return html`
       <app-page-header
         title="${t.navigation.calculations}"
-        subtitle="${isRu
-          ? 'Периодические отчёты-калькуляции перед заказчиками (billable и non-billable по 0 ₽), согласование и передача в выставление счетов'
-          : 'Periodic client cost & work calculations (billable + non-billable at 0), approval workflow, and invoice handoff'}"
+        subtitle="${t.viewTexts.pageSubtitles.calculations}"
       >
         <span slot="icon">${iconTable(28)}</span>
         <app-button
@@ -348,18 +345,16 @@ export class AppCalculations extends LitElement {
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${isRu ? 'Всего калькуляций' : 'Total Calculations'}" value="${this.calculations.length}" subtitle="${isRu ? 'В том числе выставлено в счета:' : 'Invoiced:'} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'На согласовании у клиента' : 'Pending Client Approval'}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Согласовано (к счетам)' : 'Approved (Ready to Bill)'}" value="${formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${isRu ? 'соглас. отчёт(ов)' : 'approved report(s)'}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Часы в калькуляциях' : 'Logged Hours in Reports'}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiTotalCalcs}" value="${this.calculations.length}" subtitle="${t.viewTexts.calculations.kpiInvoicedPrefix} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiPendingApproval}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiApprovedReady}" value="${formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${t.viewTexts.calculations.kpiApprovedSuffix}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiLoggedHours}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         variant="bare"
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 215px;"
-        placeholder="${isRu
-          ? 'Поиск по номеру, договору, контрагенту...'
-          : 'Search calculation, contract, client...'}"
+        placeholder="${t.viewTexts.calculations.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'status', options: statusOptions },
@@ -393,13 +388,13 @@ export class AppCalculations extends LitElement {
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>${isRu ? 'Калькуляция' : 'Calculation'}</th>
-                    <th>${isRu ? 'Договор' : 'Contract'}</th>
-                    <th>${isRu ? 'Контрагент' : 'Counterparty'}</th>
-                    <th>${isRu ? 'Период / Цикл' : 'Period / Cycle'}</th>
-                    <th>${isRu ? 'Трудозатраты' : 'Hours'}</th>
-                    <th>${isRu ? 'К оплате' : 'Billable'}</th>
-                    <th>${isRu ? 'Статус' : 'Status'}</th>
+                    <th>${t.viewTexts.calculations.thCalculation}</th>
+                    <th>${t.viewTexts.calculations.thContract}</th>
+                    <th>${t.viewTexts.calculations.thCounterparty}</th>
+                    <th>${t.viewTexts.calculations.thPeriodCycle}</th>
+                    <th>${t.viewTexts.calculations.thLabor}</th>
+                    <th>${t.viewTexts.calculations.thBillableCol}</th>
+                    <th>${t.viewTexts.calculations.thStatus}</th>
                     <th></th>
                   </tr>
                 </thead>
@@ -425,7 +420,7 @@ export class AppCalculations extends LitElement {
                             <span>${calc.number}</span>
                           </button>
                           <div class="cell-sub">
-                            <span>${calc.items.length} ${isRu ? 'поз.' : 'items'}</span>
+                            <span>${calc.items.length} ${t.viewTexts.calculations.itemsSuffix}</span>
                             ${nonBillableItems > 0
                               ? html`<span class="micro-tag zero">0 ₽: ${nonBillableItems}</span>`
                               : ''}
@@ -583,13 +578,13 @@ export class AppCalculations extends LitElement {
             </div>
           `}
 
-      ${this.renderFormModal(t, isRu)}
-      ${this.renderPreviewModal(t, isRu)}
-      ${this.renderDeleteModal(t, isRu)}
+      ${this.renderFormModal(t)}
+      ${this.renderPreviewModal(t)}
+      ${this.renderDeleteModal(t)}
     `;
   }
 
-  private renderFormModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderFormModal(t: ReturnType<typeof getTranslation>) {
     const ctr = this.contracts.find((c) => c.id === this.calcContractId) || this.contracts[0];
     if (!this.calcModalOpen || !ctr) return '';
 
@@ -640,7 +635,7 @@ export class AppCalculations extends LitElement {
         <app-form-grid>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Договор' : 'Contract'}"
+              label="${t.viewTexts.calculations.thContract}"
               .value="${ctr.id}"
               .options="${contractOptions}"
               ?disabled="${Boolean(this.editingCalcId)}"
@@ -660,7 +655,7 @@ export class AppCalculations extends LitElement {
 
           <div>
             <app-input
-              label="${isRu ? 'Номер калькуляции' : 'Calculation Number'}"
+              label="${t.viewTexts.calculations.labelCalcNumber}"
               .value="${this.calcNumber}"
               required
               error="${this.calcError}"
@@ -673,7 +668,7 @@ export class AppCalculations extends LitElement {
 
           <div>
             <app-select
-              label="${isRu ? 'Периодичность' : 'Frequency'}"
+              label="${t.viewTexts.calculations.labelFrequency}"
               .value="${this.calcFrequency}"
               .options="${frequencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -683,7 +678,7 @@ export class AppCalculations extends LitElement {
 
           <div>
             <app-date-input
-              label="${isRu ? 'Начало периода' : 'Period Start'}"
+              label="${t.viewTexts.calculations.labelPeriodStart}"
               .value="${this.calcPeriodStart}"
               @change="${(e: CustomEvent<{ value: string }>) => {
                 this.calcPeriodStart = eventValue(e);
@@ -694,7 +689,7 @@ export class AppCalculations extends LitElement {
 
           <div>
             <app-date-input
-              label="${isRu ? 'Окончание периода' : 'Period End'}"
+              label="${t.viewTexts.calculations.labelPeriodEnd}"
               .value="${this.calcPeriodEnd}"
               @change="${(e: CustomEvent<{ value: string }>) => {
                 this.calcPeriodEnd = eventValue(e);
@@ -705,19 +700,19 @@ export class AppCalculations extends LitElement {
 
           <div class="col-span-2 quick-term-row">
             <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_week')}">
-              ${isRu ? 'Текущая неделя' : 'This Week'}
+              ${t.viewTexts.calculations.quickThisWeek}
             </button>
             <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'prev_week')}">
-              ${isRu ? 'Прошлая неделя' : 'Last Week'}
+              ${t.viewTexts.calculations.quickLastWeek}
             </button>
             <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_month')}">
-              ${isRu ? 'Текущий месяц' : 'This Month'}
+              ${t.viewTexts.calculations.quickThisMonth}
             </button>
             <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'prev_month')}">
-              ${isRu ? 'Прошлый месяц' : 'Last Month'}
+              ${t.viewTexts.calculations.quickLastMonth}
             </button>
             <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_quarter')}">
-              ${isRu ? 'Текущий квартал' : 'This Quarter'}
+              ${t.viewTexts.calculations.quickThisQuarter}
             </button>
           </div>
 
@@ -742,21 +737,21 @@ export class AppCalculations extends LitElement {
 
           <div class="col-span-2 calc-summary-strip">
             <div class="calc-summary-item">
-              <span class="calc-summary-label">${isRu ? 'Позиций (из прошлых)' : 'Items (prior)'}</span>
+              <span class="calc-summary-label">${t.viewTexts.calculations.summaryItemsPrior}</span>
               <span class="calc-summary-val">${this.calcItems.length} (${priorItemsCount})</span>
             </div>
             <div class="calc-summary-item">
-              <span class="calc-summary-label">${isRu ? 'Billable часы' : 'Billable Hours'}</span>
-              <span class="calc-summary-val" style="color: #10b981;">${billableHours.toFixed(1)} ч</span>
+              <span class="calc-summary-label">${t.viewTexts.calculations.summaryBillableHours}</span>
+              <span class="calc-summary-val" style="color: #10b981;">${billableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort}</span>
             </div>
             <div class="calc-summary-item">
-              <span class="calc-summary-label">${isRu ? 'Non-billable (0 ₽)' : 'Non-billable (0)'}</span>
+              <span class="calc-summary-label">${t.viewTexts.calculations.summaryNonBillable}</span>
               <span class="calc-summary-val" style="color: var(--text-secondary);">
-                ${nonBillableHours.toFixed(1)} ч / ${zeroPriceCount} ${isRu ? 'поз.' : 'items'}
+                ${nonBillableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort} / ${zeroPriceCount} ${t.viewTexts.calculations.itemsSuffix}
               </span>
             </div>
             <div class="calc-summary-item">
-              <span class="calc-summary-label">${isRu ? 'Итого по калькуляции' : 'Billable Total'}</span>
+              <span class="calc-summary-label">${t.viewTexts.calculations.summaryTotal}</span>
               <span class="calc-summary-val">${formatMoney(billableAmount, ctr.currency)}</span>
             </div>
           </div>
@@ -764,16 +759,16 @@ export class AppCalculations extends LitElement {
           <div class="col-span-2 items-editor">
             <div class="items-editor-head">
               <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-                ${isRu ? 'Работы и расходы в отчёте перед клиентом' : 'Works & Expenses in Client Report'} (${this.calcItems.length})
+                ${t.viewTexts.calculations.worksExpensesTitle} (${this.calcItems.length})
               </span>
               <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
                 <app-button size="sm" variant="secondary" @click="${() => this.addEmptyCalcItem(true)}">
                   <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${isRu ? 'Доп. позиция' : 'Add Billable'}</span>
+                  <span>${t.viewTexts.calculations.addBillableButton}</span>
                 </app-button>
                 <app-button size="sm" variant="ghost" @click="${() => this.addEmptyCalcItem(false)}">
                   <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${isRu ? '+ Non-billable (0 ₽)' : '+ Non-billable (0)'}</span>
+                  <span>${t.viewTexts.calculations.addNonBillableButton}</span>
                 </app-button>
               </div>
             </div>
@@ -781,9 +776,7 @@ export class AppCalculations extends LitElement {
             ${this.calcItems.length === 0
               ? html`<app-empty-state
                   compact
-                  title="${isRu
-                    ? 'Нет работ или расходов за выбранный период. Выберите другой период или добавьте позицию вручную.'
-                    : 'No works or expenses found for this period.'}"
+                  title="${t.viewTexts.calculations.emptyEditorItems}"
                 ></app-empty-state>`
               : html`
                   <div class="calc-items-list">
@@ -797,22 +790,16 @@ export class AppCalculations extends LitElement {
                                 ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
                                 : html`<span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
                                     ${item.itemType === 'expense'
-                                      ? isRu
-                                        ? 'Расход'
-                                        : 'Expense'
+                                      ? t.viewTexts.calculations.typeExpense
                                       : item.itemType === 'time_entry'
-                                      ? isRu
-                                        ? 'Работа'
-                                        : 'Work'
-                                      : isRu
-                                      ? 'Ручн.'
-                                      : 'Manual'}
+                                      ? t.viewTexts.calculations.typeWork
+                                      : t.viewTexts.calculations.typeManual}
                                   </span>`}
                             </div>
                             <div>
                               <app-input
                                 size="sm"
-                                label="${isRu ? 'Наименование работы / расхода' : 'Description'}"
+                                label="${t.viewTexts.calculations.labelWorkDesc}"
                                 .value="${item.title}"
                                 @input="${(e: CustomEvent<{ value: string }>) =>
                                   this.updateCalcItem(item.id, { title: eventValue(e) })}"
@@ -835,7 +822,7 @@ export class AppCalculations extends LitElement {
                             <div>
                               <app-number-input
                                 size="sm"
-                                label="${isRu ? 'Кол-во' : 'Qty'}"
+                                label="${t.viewTexts.calculations.labelQty}"
                                 .value="${item.quantity}"
                                 min="0"
                                 max="10000"
@@ -847,7 +834,7 @@ export class AppCalculations extends LitElement {
                             <div>
                               <app-input
                                 size="sm"
-                                label="${isRu ? 'Ед.' : 'Unit'}"
+                                label="${t.viewTexts.calculations.labelUnit}"
                                 .value="${item.unit}"
                                 @input="${(e: CustomEvent<{ value: string }>) =>
                                   this.updateCalcItem(item.id, { unit: eventValue(e) })}"
@@ -856,7 +843,7 @@ export class AppCalculations extends LitElement {
                             <div>
                               <app-number-input
                                 size="sm"
-                                label="${item.billable ? (isRu ? 'Ставка / Цена' : 'Rate') : isRu ? 'Цена (0 ₽)' : 'Rate (0)'}"
+                                label="${item.billable ? (t.viewTexts.calculations.rateLabelBillable) : t.viewTexts.calculations.rateLabelZero}"
                                 .value="${item.billable ? item.unitPrice : 0}"
                                 min="0"
                                 max="100000000"
@@ -869,12 +856,12 @@ export class AppCalculations extends LitElement {
                             <div class="calc-bill-cell">
                               <app-checkbox
                                 ?checked="${item.billable}"
-                                label="${isRu ? 'Оплачиваемая позиция (Billable)' : 'Billable'}"
+                                label="${t.viewTexts.calculations.labelBillableItem}"
                                 @change="${(e: CustomEvent<{ checked: boolean }>) =>
                                   this.updateCalcItem(item.id, { billable: e.detail.checked })}"
                               ></app-checkbox>
                               ${!item.billable
-                                ? html`<span class="calc-zero-hint">${isRu ? 'В отчёте с ценой 0 ₽' : 'Shown at 0 rate'}</span>`
+                                ? html`<span class="calc-zero-hint">${t.viewTexts.calculations.zeroHint}</span>`
                                 : ''}
                             </div>
                           </div>
@@ -887,7 +874,7 @@ export class AppCalculations extends LitElement {
 
           <div>
             <app-select
-              label="${isRu ? 'Статус калькуляции' : 'Calculation Status'}"
+              label="${t.viewTexts.calculations.labelCalcStatus}"
               .value="${this.calcStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -896,7 +883,7 @@ export class AppCalculations extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Комментарий к отчёту для клиента' : 'Report Notes'}"
+              label="${t.viewTexts.calculations.labelReportNotes}"
               .value="${this.calcNotes}"
               rows="2"
               @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = eventValue(e))}"
@@ -916,7 +903,7 @@ export class AppCalculations extends LitElement {
     `;
   }
 
-  private renderPreviewModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderPreviewModal(t: ReturnType<typeof getTranslation>) {
     const calc = this.previewCalculation;
     if (!calc) return '';
     const ctr = this.contracts.find((c) => c.id === calc.contractId);
@@ -937,13 +924,13 @@ export class AppCalculations extends LitElement {
           <div class="sheet-top">
             <div>
               <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
-                ${isRu ? 'Калькуляция работ и расходов' : 'Cost & Work Calculation'} № ${calc.number}
+                ${t.viewTexts.calculations.previewTitle} № ${calc.number}
               </div>
               <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                ${isRu ? 'Период' : 'Period'}:
+                ${t.viewTexts.calculations.previewPeriod}:
                 <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
                 · ${t.calculations.frequencies[calc.frequency]}
-                · ${isRu ? 'Договор' : 'Contract'}: ${ctr?.number || '—'}
+                · ${t.viewTexts.calculations.thContract}: ${ctr?.number || '—'}
               </div>
             </div>
             <app-status-chip domain="calculation" status="${calc.status}" appearance="soft"></app-status-chip>
@@ -951,14 +938,14 @@ export class AppCalculations extends LitElement {
 
           <div class="sheet-parties">
             <div class="party-block">
-              <span class="party-role">${isRu ? 'Исполнитель' : 'Supplier'}</span>
+              <span class="party-role">${t.viewTexts.calculations.partySupplier}</span>
               <span class="party-name">${company?.legalName || company?.name || '—'}</span>
-              <span class="party-sub mono">${isRu ? 'ИНН' : 'INN'}: ${company?.inn || '—'}</span>
+              <span class="party-sub mono">${t.viewTexts.calculations.innLabel}: ${company?.inn || '—'}</span>
             </div>
             <div class="party-block">
-              <span class="party-role">${isRu ? 'Заказчик (на согласование)' : 'Client (For Approval)'}</span>
+              <span class="party-role">${t.viewTexts.calculations.partyClientApproval}</span>
               <span class="party-name">${cp?.legalName || cp?.name || '—'}</span>
-              <span class="party-sub mono">${isRu ? 'ИНН' : 'INN'}: ${cp?.inn || '—'}</span>
+              <span class="party-sub mono">${t.viewTexts.calculations.innLabel}: ${cp?.inn || '—'}</span>
             </div>
           </div>
 
@@ -966,12 +953,12 @@ export class AppCalculations extends LitElement {
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>${isRu ? 'Дата' : 'Date'}</th>
-                  <th>${isRu ? 'Содержание работы / расхода' : 'Work / Expense'}</th>
-                  <th>${isRu ? 'Кол-во' : 'Qty'}</th>
-                  <th>${isRu ? 'Тип биллинга' : 'Billing'}</th>
-                  <th>${isRu ? 'Цена' : 'Price'}</th>
-                  <th>${isRu ? 'Сумма' : 'Amount'}</th>
+                  <th>${t.viewTexts.calculations.thDate}</th>
+                  <th>${t.viewTexts.calculations.thWorkExpense}</th>
+                  <th>${t.viewTexts.calculations.labelQty}</th>
+                  <th>${t.viewTexts.calculations.thBillingType}</th>
+                  <th>${t.viewTexts.calculations.thPrice}</th>
+                  <th>${t.viewTexts.calculations.thAmount}</th>
                 </tr>
               </thead>
               <tbody>
@@ -1006,13 +993,13 @@ export class AppCalculations extends LitElement {
 
           <div class="totals-box">
             <div class="total-line">
-              <span>${isRu ? 'Всего трудозатрат (billable / non-billable)' : 'Total Hours (billable / non-billable)'}:</span>
+              <span>${t.viewTexts.calculations.totalHoursLabel}:</span>
               <span class="mono">
-                ${calc.totalHours.toFixed(1)} ч (${calc.billableHours.toFixed(1)} ч / ${calc.nonBillableHours.toFixed(1)} ч)
+                ${calc.totalHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort} (${calc.billableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort} / ${calc.nonBillableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort})
               </span>
             </div>
             <div class="total-line grand">
-              <span>${isRu ? 'Итого к выставлению в счёт (без НДС)' : 'Subtotal to Invoice'}:</span>
+              <span>${t.viewTexts.calculations.subtotalLabel}:</span>
               <span class="mono">${formatMoney(calc.billableAmount, calc.currency)}</span>
             </div>
           </div>
@@ -1084,7 +1071,7 @@ export class AppCalculations extends LitElement {
     `;
   }
 
-  private renderDeleteModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderDeleteModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingCalculation)}"
@@ -1120,16 +1107,17 @@ export class AppCalculations extends LitElement {
     const { start, end } = this.getDefaultPeriodForFrequency(freq);
     const seq = this.calculations.length + 1;
 
+    const tx = getTranslation(this.currentLang).viewTexts.calculations;
     this.editingCalcId = null;
     this.calcContractId = defaultContract.id;
-    this.calcNumber = `КАЛК-${new Date().getFullYear()}/${String(seq).padStart(3, '0')}`;
+    this.calcNumber = `${tx.calcNumberPrefix}${new Date().getFullYear()}/${String(seq).padStart(3, '0')}`;
     this.calcFrequency = freq;
     this.calcPeriodStart = start;
     this.calcPeriodEnd = end;
     this.calcIncludePrior = true;
     this.calcStatus = 'draft';
     this.calcError = '';
-    this.calcNotes = `Отчёт-калькуляция работ и расходов по договору ${defaultContract.number} за период ${start} — ${end}.`;
+    this.calcNotes = tx.calcNotesTemplate(defaultContract.number, start, end);
     this.calcItems = this.collectItemsForPeriod(defaultContract, start, end, true, null);
     this.calcModalOpen = true;
   }
@@ -1241,7 +1229,7 @@ export class AppCalculations extends LitElement {
 
   private handleSave(ctr: Contract) {
     if (!this.calcNumber.trim()) {
-      this.calcError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.calcError = getTranslation(this.currentLang).common.required;
       return;
     }
 
@@ -1255,8 +1243,7 @@ export class AppCalculations extends LitElement {
       }));
 
     if (cleanItems.length === 0) {
-      this.calcError =
-        this.currentLang === 'ru' ? 'Добавьте хотя бы одну позицию' : 'Add at least one item';
+      this.calcError = getTranslation(this.currentLang).viewTexts.calculations.addOneItemError;
       return;
     }
 
