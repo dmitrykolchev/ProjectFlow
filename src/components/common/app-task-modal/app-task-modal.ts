@@ -251,7 +251,7 @@ export class AppTaskModal extends LitElement {
               .value="${this.estimatedHours}"
               min="1"
               max="200"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.estimatedHours = Number(v); }}"
             ></app-number-input>
           </div>
@@ -262,7 +262,7 @@ export class AppTaskModal extends LitElement {
               .value="${this.loggedHours}"
               min="0"
               max="200"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.loggedHours = Number(v); }}"
             ></app-number-input>
           </div>
@@ -404,15 +404,11 @@ export class AppTaskModal extends LitElement {
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
         size="sm"
-        title="${this.currentLang === 'ru' ? 'Удалить задачу?' : 'Delete task?'}"
-        action="${this.currentLang === 'ru'
-          ? `Задача «${this.editingTask?.title || ''}» будет удалена.`
-          : `Task "${this.editingTask?.title || ''}" will be deleted.`}"
-        result="${this.currentLang === 'ru'
-          ? 'Подзадачи, отчёты по времени, расходы и комментарии будут потеряны.'
-          : 'Subtasks, time reports, expenses and comments will be lost.'}"
-        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.taskDelete.title}"
+        action="${t.viewTexts.confirmDialogs.taskDelete.action(this.editingTask?.title || '')}"
+        result="${t.viewTexts.confirmDialogs.taskDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"
@@ -421,15 +417,13 @@ export class AppTaskModal extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.confirmRemoveSubtaskId)}"
         size="sm"
-        title="${this.currentLang === 'ru' ? 'Удалить подзадачу?' : 'Delete subtask?'}"
-        action="${this.currentLang === 'ru'
-          ? `Подзадача «${(this.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title}» будет удалена.`
-          : `Subtask "${(this.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title}" will be deleted.`}"
-        result="${this.currentLang === 'ru'
-          ? 'Список подзадач и прогресс задачи будут пересчитаны.'
-          : 'The subtask list and task progress will be recalculated.'}"
-        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.subtaskDelete.title}"
+        action="${t.viewTexts.confirmDialogs.subtaskDelete.action(
+          (this.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title
+        )}"
+        result="${t.viewTexts.confirmDialogs.subtaskDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmRemoveSubtaskId = null)}"
@@ -600,7 +594,6 @@ export class AppTaskModal extends LitElement {
   }
 
   private renderTaskReportsAndExpenses(t: ReturnType<typeof getTranslation>) {
-    const isRu = this.currentLang === 'ru';
     const totalEntryHours = this.taskTimeEntries.reduce((s, e) => s + e.hours, 0);
     const totalExpenseRub = this.taskExpenses
       .filter((e) => e.status !== 'rejected')
@@ -632,13 +625,13 @@ export class AppTaskModal extends LitElement {
         <div class="records-head">
           <span class="records-title">
             ${iconClock(14)}
-            <span>${isRu ? 'Отчёты о времени по задаче' : 'Task Time Reports'} (${this.taskTimeEntries.length})</span>
+            <span>${t.viewTexts.taskModal.timeReportsSection} (${this.taskTimeEntries.length})</span>
           </span>
-          <span class="records-total">${totalEntryHours.toFixed(1)} ч</span>
+          <span class="records-total">${totalEntryHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
         </div>
 
         ${this.taskTimeEntries.length === 0
-          ? html`<div class="records-empty">${isRu ? 'Записи о времени ещё не добавлены' : 'No time entries yet'}</div>`
+          ? html`<div class="records-empty">${t.viewTexts.taskModal.noTimeEntries}</div>`
           : html`
               <div class="record-list">
                 ${this.taskTimeEntries.map((entry) => {
@@ -652,7 +645,7 @@ export class AppTaskModal extends LitElement {
                         </div>
                       </div>
                       <div class="record-right">
-                        <span class="record-val">${entry.hours.toFixed(1)} ч</span>
+                        <span class="record-val">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
                         <button
                           type="button"
                           class="subtask-action-btn subtask-remove"
@@ -672,19 +665,19 @@ export class AppTaskModal extends LitElement {
           <div>
             <app-number-input
               size="sm"
-              label="${isRu ? 'Часы' : 'Hours'}"
+              label="${t.viewTexts.taskModal.hoursLabel}"
               .value="${this.quickTimeHours}"
               min="0.25"
               max="24"
               step="0.5"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeHours = Number(v); }}"
             ></app-number-input>
           </div>
           <div>
             <app-select
               size="sm"
-              label="${isRu ? 'Категория' : 'Category'}"
+              label="${t.viewTexts.taskModal.categoryLabel}"
               .value="${this.quickTimeCategory}"
               .options="${timeCatOptions}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeCategory = String(v) as TimeEntryCategory; }}"
@@ -693,8 +686,8 @@ export class AppTaskModal extends LitElement {
           <div>
             <app-input
               size="sm"
-              label="${isRu ? 'Комментарий' : 'Notes'}"
-              placeholder="${isRu ? 'Выполненные работы...' : 'Work done...'}"
+              label="${t.viewTexts.taskModal.commentLabel}"
+              placeholder="${t.viewTexts.taskModal.commentPlaceholder}"
               .value="${this.quickTimeDesc}"
               @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeDesc = String(v); }}"
             ></app-input>
@@ -706,7 +699,7 @@ export class AppTaskModal extends LitElement {
             @click="${this.handleAddQuickTime}"
           >
             <span slot="icon-start">${iconPlus(13)}</span>
-            <span>${isRu ? 'Время' : 'Log'}</span>
+            <span>${t.viewTexts.taskModal.logButton}</span>
           </app-button>
         </div>
       </div>
@@ -716,13 +709,13 @@ export class AppTaskModal extends LitElement {
         <div class="records-head">
           <span class="records-title">
             ${iconWallet(14)}
-            <span>${isRu ? 'Расходы по задаче' : 'Task Expenses'} (${this.taskExpenses.length})</span>
+            <span>${t.viewTexts.taskModal.expensesSection} (${this.taskExpenses.length})</span>
           </span>
           <span class="records-total">${Math.round(totalExpenseRub).toLocaleString('ru-RU')} ₽</span>
         </div>
 
         ${this.taskExpenses.length === 0
-          ? html`<div class="records-empty">${isRu ? 'Расходы к этой задаче не привязаны' : 'No expenses linked to this task'}</div>`
+          ? html`<div class="records-empty">${t.viewTexts.taskModal.noExpenses}</div>`
           : html`
               <div class="record-list">
                 ${this.taskExpenses.map((exp) => {
@@ -756,8 +749,8 @@ export class AppTaskModal extends LitElement {
           <div>
             <app-input
               size="sm"
-              label="${isRu ? 'Статья расхода' : 'Expense title'}"
-              placeholder="${isRu ? 'Лицензия, сервер, подрядчик...' : 'License, server...'}"
+              label="${t.viewTexts.taskModal.expenseTitleLabel}"
+              placeholder="${t.viewTexts.taskModal.expenseTitlePlaceholder}"
               .value="${this.quickExpenseTitle}"
               @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickExpenseTitle = String(v); }}"
             ></app-input>
@@ -765,7 +758,7 @@ export class AppTaskModal extends LitElement {
           <div>
             <app-number-input
               size="sm"
-              label="${isRu ? 'Сумма (₽)' : 'Amount (₽)'}"
+              label="${t.viewTexts.taskModal.amountLabel}"
               .value="${this.quickExpenseAmount}"
               min="0"
               step="500"
@@ -776,7 +769,7 @@ export class AppTaskModal extends LitElement {
           <div>
             <app-select
               size="sm"
-              label="${isRu ? 'Категория' : 'Category'}"
+              label="${t.viewTexts.taskModal.categoryLabel}"
               .value="${this.quickExpenseCategory}"
               .options="${expenseCatOptions}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickExpenseCategory = String(v) as ExpenseCategory; }}"
@@ -789,7 +782,7 @@ export class AppTaskModal extends LitElement {
             @click="${this.handleAddQuickExpense}"
           >
             <span slot="icon-start">${iconPlus(13)}</span>
-            <span>${isRu ? 'Расход' : 'Expense'}</span>
+            <span>${t.viewTexts.taskModal.expenseButton}</span>
           </app-button>
         </div>
       </div>
