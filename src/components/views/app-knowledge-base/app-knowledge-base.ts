@@ -431,6 +431,7 @@ export class AppKnowledgeBase extends LitElement {
     return html`
       <div class="kb-shell">
         <app-page-header title="${kb.title}" subtitle="${kb.subtitle}">
+          <span slot="icon">${iconBookOpen(28)}</span>
           <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
             <span slot="icon-start">${iconPlus(16)}</span>
             <span>${kb.newArticle}</span>
