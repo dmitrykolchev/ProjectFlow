@@ -3,9 +3,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { Project, ProjectRole, ProjectStatus } from '../../../types';
-import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -149,35 +150,20 @@ export class AppProjects extends LitElement {
         <app-metric-card size="compact" label="${isRu ? 'Средний прогресс' : 'Avg Progress'}" value="${avgProgress}%"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu ? 'Поиск по коду или названию...' : 'Search by key or name...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | ProjectStatus)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.companyFilter}"
-              .options="${companyFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.companyFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-        </div>
-
+      <app-filter-bar
+        placeholder="${isRu ? 'Поиск по коду или названию...' : 'Search by key or name...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'status', options: statusOptions },
+          { key: 'company', options: companyFilterOptions },
+        ]}"
+        .values="${{ status: this.statusFilter, company: this.companyFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | ProjectStatus;
+          if (e.detail.key === 'company') this.companyFilter = e.detail.value;
+        }}"
+      >
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -188,7 +174,7 @@ export class AppProjects extends LitElement {
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.displayMode = e.detail.value as 'cards' | 'table')}"
         ></app-segmented-switch>
-      </div>
+      </app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Проекты не найдены' : 'No projects found'}"></app-empty-state>`
