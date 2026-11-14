@@ -223,6 +223,34 @@
   color: var(--color-success, #10b981);
 }
 
+.billing-sub .calc-val {
+  color: var(--accent-primary, #6366f1);
+}
+
+.micro-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.micro-pill.prior {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.micro-pill.zero {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: var(--text-muted, #94a3b8);
+}
+
 .dates-cell {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;

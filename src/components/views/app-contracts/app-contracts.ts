@@ -2,7 +2,16 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { Contract, ContractStatus, ContractType, Invoice, InvoiceStatus } from '../../../types';
+import {
+  Calculation,
+  CalculationFrequency,
+  CalculationStatus,
+  Contract,
+  ContractStatus,
+  ContractType,
+  Invoice,
+  InvoiceStatus,
+} from '../../../types';
 import {
   iconCheck,
   iconChevronRight,
@@ -12,7 +21,9 @@ import {
   iconReceipt,
   iconSearch,
   iconSend,
+  iconTable,
   iconTrash,
+  iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
@@ -28,13 +39,15 @@ import styles from './app-contracts.css';
 @customElement('app-contracts')
 export class AppContracts extends LitElement {
   @state() private contracts: Contract[] = store.contracts;
+  @state() private calculations: Calculation[] = store.calculations;
   @state() private invoices: Invoice[] = store.invoices;
   @state() private currentLang = store.customization.language;
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
-  @state() private viewTab: 'contracts' | 'invoices' = 'contracts';
+  @state() private viewTab: 'contracts' | 'calculations' | 'invoices' = 'contracts';
   @state() private statusFilter: 'all' | ContractStatus = 'all';
   @state() private typeFilter: 'all' | ContractType = 'all';
+  @state() private calcStatusFilter: 'all' | CalculationStatus = 'all';
   @state() private invoiceStatusFilter: 'all' | InvoiceStatus = 'all';
 
   @state() private modalOpen = false;
@@ -51,6 +64,7 @@ export class AppContracts extends LitElement {
   @state() private formStartDate = '';
   @state() private formEndDate = '';
   @state() private formStatus: ContractStatus = 'draft';
+  @state() private formBillingFrequency: CalculationFrequency = 'monthly';
   @state() private formDescription = '';
   @state() private formError = '';
 
@@ -73,6 +87,7 @@ export class AppContracts extends LitElement {
 
   private syncState() {
     this.contracts = store.contracts;
+    this.calculations = store.calculations;
     this.invoices = store.invoices;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -159,6 +174,39 @@ export class AppContracts extends LitElement {
     }
   }
 
+  private getCalculationStatusVariant(
+    status: CalculationStatus
+  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'sent':
+        return 'warning';
+      case 'approved':
+        return 'success';
+      case 'invoiced':
+        return 'info';
+      case 'rejected':
+        return 'danger';
+    }
+  }
+
+  private getFilteredCalculations(): Calculation[] {
+    const query = (this.localSearch || this.globalSearch).trim().toLowerCase();
+    return this.calculations.filter((calc) => {
+      if (this.calcStatusFilter !== 'all' && calc.status !== this.calcStatusFilter) return false;
+      if (!query) return true;
+      const ctr = this.contracts.find((c) => c.id === calc.contractId);
+      const cp = store.counterparties.find((c) => c.id === ctr?.counterpartyId)?.name.toLowerCase() || '';
+      return (
+        calc.number.toLowerCase().includes(query) ||
+        (ctr?.number.toLowerCase().includes(query) ?? false) ||
+        (ctr?.title.toLowerCase().includes(query) ?? false) ||
+        cp.includes(query)
+      );
+    });
+  }
+
   private getFilteredInvoices(): Invoice[] {
     const query = (this.localSearch || this.globalSearch).trim().toLowerCase();
     return this.invoices.filter((inv) => {
@@ -175,12 +223,21 @@ export class AppContracts extends LitElement {
     });
   }
 
-  private getContractBillingStats(contractId: string): { invoiced: number; paid: number; count: number } {
+  private getContractBillingStats(contractId: string): {
+    invoiced: number;
+    paid: number;
+    count: number;
+    calcCount: number;
+    approvedCalcs: number;
+  } {
     const related = this.invoices.filter((i) => i.contractId === contractId && i.status !== 'cancelled');
+    const calcs = this.calculations.filter((c) => c.contractId === contractId);
     return {
       count: related.length,
       invoiced: related.reduce((sum, i) => sum + i.totalAmount, 0),
       paid: related.filter((i) => i.status === 'paid').reduce((sum, i) => sum + i.totalAmount, 0),
+      calcCount: calcs.length,
+      approvedCalcs: calcs.filter((c) => c.status === 'approved').length,
     };
   }
 
@@ -188,6 +245,7 @@ export class AppContracts extends LitElement {
     const isRu = this.currentLang === 'ru';
     const t = getTranslation(this.currentLang);
     const filtered = this.getFiltered();
+    const filteredCalculations = this.getFilteredCalculations();
     const filteredInvoices = this.getFilteredInvoices();
 
     const activeList = this.contracts.filter((c) => c.status === 'active');
@@ -241,7 +299,25 @@ export class AppContracts extends LitElement {
 
     const tabOptions = [
       { value: 'contracts', label: `${t.invoices.tabContracts} (${this.contracts.length})` },
+      { value: 'calculations', label: `${t.calculations.tabCalculations} (${this.calculations.length})` },
       { value: 'invoices', label: `${t.invoices.tabInvoices} (${this.invoices.length})` },
+    ];
+
+    const frequencyOptions = [
+      { value: 'weekly', label: t.calculations.frequencies.weekly },
+      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
+      { value: 'monthly', label: t.calculations.frequencies.monthly },
+      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
+      { value: 'custom', label: t.calculations.frequencies.custom },
+    ];
+
+    const calcStatusOptions = [
+      { value: 'all', label: isRu ? 'Все статусы калькуляций' : 'All calculation statuses' },
+      { value: 'draft', label: t.calculations.statuses.draft, color: '#64748b' },
+      { value: 'sent', label: t.calculations.statuses.sent, color: '#f59e0b' },
+      { value: 'approved', label: t.calculations.statuses.approved, color: '#10b981' },
+      { value: 'rejected', label: t.calculations.statuses.rejected, color: '#ef4444' },
+      { value: 'invoiced', label: t.calculations.statuses.invoiced, color: '#0284c7' },
     ];
 
     const invoiceStatusOptions = [
@@ -305,7 +381,7 @@ export class AppContracts extends LitElement {
             .value="${this.viewTab}"
             .options="${tabOptions}"
             @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.viewTab = e.detail.value as 'contracts' | 'invoices')}"
+              (this.viewTab = e.detail.value as 'contracts' | 'calculations' | 'invoices')}"
           ></app-segmented-switch>
           <div class="filter-search">
             <app-input
@@ -313,6 +389,10 @@ export class AppContracts extends LitElement {
                 ? isRu
                   ? 'Поиск по номеру, предмету, контрагенту...'
                   : 'Search number, title, counterparty...'
+                : this.viewTab === 'calculations'
+                ? isRu
+                  ? 'Поиск по номеру калькуляции, договору, контрагенту...'
+                  : 'Search calculation, contract, counterparty...'
                 : isRu
                 ? 'Поиск по номеру счёта, договору, контрагенту...'
                 : 'Search invoice, contract, counterparty...'}"
@@ -339,6 +419,17 @@ export class AppContracts extends LitElement {
                     .options="${typeOptions}"
                     @change="${(e: CustomEvent<{ value: string }>) =>
                       (this.typeFilter = e.detail.value as 'all' | ContractType)}"
+                  ></app-select>
+                </div>
+              `
+            : this.viewTab === 'calculations'
+            ? html`
+                <div class="filter-select">
+                  <app-select
+                    .value="${this.calcStatusFilter}"
+                    .options="${calcStatusOptions}"
+                    @change="${(e: CustomEvent<{ value: string }>) =>
+                      (this.calcStatusFilter = e.detail.value as 'all' | CalculationStatus)}"
                   ></app-select>
                 </div>
               `
@@ -396,7 +487,9 @@ export class AppContracts extends LitElement {
                               <span>${ctr.number}</span>
                             </button>
                             <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
-                              ${this.getTypeLabel(ctr.type, isRu)}
+                              ${this.getTypeLabel(ctr.type, isRu)}${ctr.billingFrequency
+                                ? ` · ${t.calculations.frequencies[ctr.billingFrequency]}`
+                                : ''}
                             </div>
                           </td>
                           <td>
@@ -427,10 +520,19 @@ export class AppContracts extends LitElement {
                           </td>
                           <td class="amount-cell">
                             <div>${this.formatMoney(ctr.amount, ctr.currency)}</div>
-                            ${billing.count > 0
+                            ${billing.count > 0 || billing.calcCount > 0
                               ? html`
                                   <div class="billing-sub">
-                                    <span>${isRu ? 'Счетов' : 'Inv'}: ${this.formatMoney(billing.invoiced, ctr.currency)}</span>
+                                    ${billing.calcCount > 0
+                                      ? html`<span class="calc-val">
+                                          ${isRu ? 'Кальк' : 'Calc'}: ${billing.calcCount}${billing.approvedCalcs > 0 ? ` (${billing.approvedCalcs} ✓)` : ''}
+                                        </span>`
+                                      : ''}
+                                    ${billing.count > 0
+                                      ? html`<span>
+                                          ${billing.calcCount > 0 ? '· ' : ''}${isRu ? 'Счетов' : 'Inv'}: ${this.formatMoney(billing.invoiced, ctr.currency)}
+                                        </span>`
+                                      : ''}
                                     ${billing.paid > 0
                                       ? html`<span class="paid-val">· ${isRu ? 'Опл' : 'Paid'}: ${this.formatMoney(billing.paid, ctr.currency)}</span>`
                                       : ''}
@@ -461,9 +563,17 @@ export class AppContracts extends LitElement {
                               </button>
                               <button
                                 type="button"
+                                class="icon-btn accent"
+                                title="${t.contractDetail.createCalculation}"
+                                @click="${() => store.openContractDetail(ctr.id, 'calculation')}"
+                              >
+                                ${iconTable()}
+                              </button>
+                              <button
+                                type="button"
                                 class="icon-btn success"
                                 title="${t.contractDetail.issueInvoice}"
-                                @click="${() => store.openContractDetail(ctr.id, true)}"
+                                @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
                               >
                                 ${iconReceipt(15)}
                               </button>
@@ -483,6 +593,167 @@ export class AppContracts extends LitElement {
                               >
                                 ${iconTrash(14)}
                               </button>
+                            </div>
+                          </td>
+                        </tr>
+                      `;
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            `
+        : this.viewTab === 'calculations'
+        ? filteredCalculations.length === 0
+          ? html`<div class="empty-state">${t.contractDetail.noCalculations}</div>`
+          : html`
+              <div class="table-card">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>${isRu ? 'Калькуляция' : 'Calculation'}</th>
+                      <th>${isRu ? 'Договор' : 'Contract'}</th>
+                      <th>${isRu ? 'Контрагент' : 'Counterparty'}</th>
+                      <th>${isRu ? 'Период / Цикл' : 'Period / Cycle'}</th>
+                      <th>${isRu ? 'Трудозатраты' : 'Hours'}</th>
+                      <th>${isRu ? 'К оплате' : 'Billable'}</th>
+                      <th>${isRu ? 'Статус' : 'Status'}</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${filteredCalculations.map((calc) => {
+                      const ctr = this.contracts.find((c) => c.id === calc.contractId);
+                      const cp = store.counterparties.find((c) => c.id === ctr?.counterpartyId);
+                      const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
+                      const linkedInv = calc.invoiceId
+                        ? this.invoices.find((i) => i.id === calc.invoiceId)
+                        : undefined;
+                      const hUnit = isRu ? 'ч' : 'h';
+                      return html`
+                        <tr>
+                          <td>
+                            <button
+                              type="button"
+                              class="contract-link-btn"
+                              @click="${() => ctr && store.openContractDetail(ctr.id)}"
+                            >
+                              ${iconTable()}
+                              <span>${calc.number}</span>
+                            </button>
+                            <div class="billing-sub">
+                              <span>${calc.items.length} ${isRu ? 'поз.' : 'items'}</span>
+                              ${calc.nonBillableHours > 0
+                                ? html`<span class="micro-pill zero">0 ₽: ${calc.nonBillableHours} ${hUnit}</span>`
+                                : ''}
+                              ${priorCount > 0
+                                ? html`<span class="micro-pill prior">+${priorCount} ${t.calculations.priorBadge}</span>`
+                                : ''}
+                            </div>
+                          </td>
+                          <td>
+                            ${ctr
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="contract-link-btn"
+                                    @click="${() => store.openContractDetail(ctr.id)}"
+                                  >
+                                    <span>${ctr.number}</span>
+                                  </button>
+                                  <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
+                                `
+                              : '—'}
+                          </td>
+                          <td>${cp?.name || '—'}</td>
+                          <td class="dates-cell">
+                            <div>${calc.periodStart} → ${calc.periodEnd}</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted); font-family: inherit;">
+                              ${t.calculations.frequencies[calc.frequency]}
+                            </div>
+                          </td>
+                          <td class="mono">
+                            <div>${calc.billableHours} ${hUnit}</div>
+                            ${calc.nonBillableHours > 0
+                              ? html`<div style="font-size: 0.72rem; color: var(--text-muted);">
+                                  +${calc.nonBillableHours} ${hUnit} non-billable
+                                </div>`
+                              : ''}
+                          </td>
+                          <td class="amount-cell">
+                            <div>${this.formatMoney(calc.billableAmount, calc.currency)}</div>
+                            ${linkedInv
+                              ? html`<div class="billing-sub">
+                                  <span class="paid-val">${linkedInv.number}</span>
+                                </div>`
+                              : ''}
+                          </td>
+                          <td>
+                            <app-badge
+                              variant="${this.getCalculationStatusVariant(calc.status)}"
+                              appearance="soft"
+                              size="sm"
+                            >
+                              ${t.calculations.statuses[calc.status]}
+                            </app-badge>
+                          </td>
+                          <td>
+                            <div class="actions-row">
+                              ${calc.status === 'draft' || calc.status === 'rejected'
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="icon-btn accent"
+                                      title="${t.calculations.sendForApproval}"
+                                      @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
+                                    >
+                                      ${iconSend(14)}
+                                    </button>
+                                  `
+                                : ''}
+                              ${calc.status === 'sent'
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="icon-btn success"
+                                      title="${t.calculations.approveCalc}"
+                                      @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
+                                    >
+                                      ${iconCheck(14)}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      class="icon-btn danger"
+                                      title="${t.calculations.rejectCalc}"
+                                      @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
+                                    >
+                                      ${iconX(14)}
+                                    </button>
+                                  `
+                                : ''}
+                              ${calc.status === 'approved' && ctr
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="icon-btn success"
+                                      title="${t.calculations.createInvoiceFromCalc}"
+                                      @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
+                                    >
+                                      ${iconReceipt(15)}
+                                    </button>
+                                  `
+                                : ''}
+                              ${ctr
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="icon-btn"
+                                      title="${t.contractDetail.openContract}"
+                                      @click="${() => store.openContractDetail(ctr.id)}"
+                                    >
+                                      ${iconChevronRight(15)}
+                                    </button>
+                                  `
+                                : ''}
                             </div>
                           </td>
                         </tr>
@@ -733,6 +1004,15 @@ export class AppContracts extends LitElement {
                 (this.formStatus = e.detail.value as ContractStatus)}"
             ></app-select>
           </div>
+          <div>
+            <app-select
+              label="${isRu ? 'Периодичность калькуляций' : 'Calculation Cycle'}"
+              .value="${this.formBillingFrequency}"
+              .options="${frequencyOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.formBillingFrequency = e.detail.value as CalculationFrequency)}"
+            ></app-select>
+          </div>
           <div class="col-span-2">
             <app-textarea
               label="${isRu ? 'Условия и комментарии' : 'Description'}"
@@ -800,6 +1080,7 @@ export class AppContracts extends LitElement {
     this.formStartDate = today;
     this.formEndDate = yearEnd;
     this.formStatus = 'draft';
+    this.formBillingFrequency = 'monthly';
     this.formDescription = '';
     this.formError = '';
     this.modalOpen = true;
@@ -819,6 +1100,7 @@ export class AppContracts extends LitElement {
     this.formStartDate = ctr.startDate;
     this.formEndDate = ctr.endDate;
     this.formStatus = ctr.status;
+    this.formBillingFrequency = ctr.billingFrequency || 'monthly';
     this.formDescription = ctr.description;
     this.formError = '';
     this.modalOpen = true;
@@ -843,6 +1125,7 @@ export class AppContracts extends LitElement {
       startDate: this.formStartDate || new Date().toISOString().slice(0, 10),
       endDate: this.formEndDate || new Date().toISOString().slice(0, 10),
       status: this.formStatus,
+      billingFrequency: this.formBillingFrequency,
       description: this.formDescription.trim(),
     };
 

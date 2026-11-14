@@ -522,6 +522,102 @@
   min-width: 0;
 }
 
+.calc-editor-row {
+  display: grid;
+  grid-template-columns: 94px minmax(180px, 2fr) 76px 72px 102px 112px 104px 32px;
+  gap: 0.45rem;
+  align-items: end;
+  padding: 0.65rem 0.7rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.calc-editor-row.is-nonbillable {
+  border-color: var(--border-subtle, #273449);
+  opacity: 0.92;
+}
+
+.calc-editor-row > div {
+  min-width: 0;
+}
+
+.calc-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  justify-content: center;
+  min-height: 34px;
+}
+
+.calc-date-tag {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #94a3b8);
+  white-space: nowrap;
+}
+
+.micro-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.micro-tag.bill {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+}
+
+.calc-bill-cell {
+  height: 34px;
+  display: flex;
+  align-items: center;
+}
+
+.calc-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.65rem;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+}
+
+.calc-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.calc-summary-label {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+}
+
+.calc-summary-val {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
 .item-amount-preview {
   height: 34px;
   display: flex;
@@ -533,6 +629,11 @@
   font-weight: 700;
   color: var(--text-primary, #f8fafc);
   white-space: nowrap;
+}
+
+.item-amount-preview.is-zero {
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
 }
 
 .totals-box {
@@ -571,7 +672,7 @@
   background: rgba(245, 158, 11, 0.12);
 }
 
-/* Invoice Preview Sheet */
+/* Invoice & Calculation Preview Sheet */
 .invoice-sheet {
   display: flex;
   flex-direction: column;
@@ -594,11 +695,33 @@
   gap: 1rem;
 }
 
+.inline-ref-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--accent-primary, #6366f1);
+  cursor: pointer;
+}
+
+.inline-ref-btn:hover {
+  text-decoration: underline;
+}
+
 .confirm-text {
   margin: 0;
   color: var(--text-secondary, #94a3b8);
   line-height: 1.5;
   font-size: 0.9rem;
+}
+
+@media (max-width: 1020px) {
+  .calc-editor-row {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 900px) {
@@ -616,7 +739,8 @@
     padding: 1rem;
   }
   .form-grid,
-  .item-editor-row {
+  .item-editor-row,
+  .calc-editor-row {
     grid-template-columns: 1fr;
   }
   .col-span-2 {

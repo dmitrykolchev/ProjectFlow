@@ -3,6 +3,8 @@ import {
   ActiveView,
   ActivityLogItem,
   BackgroundPreset,
+  Calculation,
+  CalculationStatus,
   Company,
   Contract,
   Counterparty,
@@ -23,6 +25,7 @@ import {
   UserCustomization,
 } from '../types';
 import {
+  initialCalculations,
   initialCompanies,
   initialContracts,
   initialCounterparties,
@@ -42,6 +45,7 @@ const STORAGE_KEY_COMPANIES = 'projectflow_companies_v1';
 const STORAGE_KEY_EMPLOYEES = 'projectflow_employees_v1';
 const STORAGE_KEY_COUNTERPARTIES = 'projectflow_counterparties_v1';
 const STORAGE_KEY_CONTRACTS = 'projectflow_contracts_v1';
+const STORAGE_KEY_CALCULATIONS = 'projectflow_calculations_v1';
 const STORAGE_KEY_INVOICES = 'projectflow_invoices_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
@@ -196,6 +200,7 @@ export class AppStore {
   public companies: Company[] = [];
   public counterparties: Counterparty[] = [];
   public contracts: Contract[] = [];
+  public calculations: Calculation[] = [];
   public invoices: Invoice[] = [];
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
@@ -203,6 +208,7 @@ export class AppStore {
   public detailProjectId: string = '';
   public detailContractId: string = '';
   public pendingInvoiceForContractId: string | null = null;
+  public pendingCalculationForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
 
   public searchQuery: string = '';
@@ -308,6 +314,9 @@ export class AppStore {
       const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
       this.contracts = storedContracts ? JSON.parse(storedContracts) : [...initialContracts];
 
+      const storedCalculations = localStorage.getItem(STORAGE_KEY_CALCULATIONS);
+      this.calculations = storedCalculations ? JSON.parse(storedCalculations) : [...initialCalculations];
+
       const storedInvoices = localStorage.getItem(STORAGE_KEY_INVOICES);
       this.invoices = storedInvoices ? JSON.parse(storedInvoices) : [...initialInvoices];
 
@@ -355,6 +364,7 @@ export class AppStore {
       this.users = [...initialUsers];
       this.counterparties = [...initialCounterparties];
       this.contracts = [...initialContracts];
+      this.calculations = [...initialCalculations];
       this.invoices = [...initialInvoices];
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
@@ -404,6 +414,14 @@ export class AppStore {
   private saveContracts(): void {
     try {
       localStorage.setItem(STORAGE_KEY_CONTRACTS, JSON.stringify(this.contracts));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveCalculations(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_CALCULATIONS, JSON.stringify(this.calculations));
     } catch (e) {
       console.error(e);
     }
@@ -849,15 +867,28 @@ export class AppStore {
     this.setActiveView('project-detail');
   }
 
-  public openContractDetail(contractId: string, openInvoiceModal = false): void {
+  public openContractDetail(
+    contractId: string,
+    initialModal: boolean | 'invoice' | 'calculation' = false
+  ): void {
     this.detailContractId = contractId;
-    this.pendingInvoiceForContractId = openInvoiceModal ? contractId : null;
+    this.pendingInvoiceForContractId =
+      initialModal === true || initialModal === 'invoice' ? contractId : null;
+    this.pendingCalculationForContractId = initialModal === 'calculation' ? contractId : null;
     this.setActiveView('contract-detail');
   }
 
   public consumePendingInvoiceModal(contractId: string): boolean {
     if (this.pendingInvoiceForContractId === contractId) {
       this.pendingInvoiceForContractId = null;
+      return true;
+    }
+    return false;
+  }
+
+  public consumePendingCalculationModal(contractId: string): boolean {
+    if (this.pendingCalculationForContractId === contractId) {
+      this.pendingCalculationForContractId = null;
       return true;
     }
     return false;
@@ -1176,6 +1207,77 @@ export class AppStore {
     this.notify();
   }
 
+  // --- Calculation CRUD ---
+  public addCalculation(data: Omit<Calculation, 'id' | 'createdAt'>): Calculation {
+    const calc: Calculation = {
+      ...data,
+      id: `calc-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.calculations = [calc, ...this.calculations];
+    this.saveCalculations();
+    const sym = calc.currency === 'USD' ? '$' : calc.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'create',
+      'calculation',
+      calc.number,
+      `Сформирована калькуляция (${calc.periodStart} → ${calc.periodEnd}, ${calc.billableAmount.toLocaleString('ru-RU')} ${sym})`
+    );
+    this.addNotification('success', 'Калькуляция сформирована', calc.number);
+    this.notify();
+    return calc;
+  }
+
+  public updateCalculation(updated: Calculation): void {
+    this.calculations = this.calculations.map((c) => (c.id === updated.id ? { ...updated } : c));
+    this.saveCalculations();
+    const sym = updated.currency === 'USD' ? '$' : updated.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'update',
+      'calculation',
+      updated.number,
+      `Обновлена калькуляция (${updated.status}, ${updated.billableAmount.toLocaleString('ru-RU')} ${sym})`
+    );
+    this.addNotification('info', 'Калькуляция обновлена', updated.number);
+    this.notify();
+  }
+
+  public updateCalculationStatus(id: string, status: CalculationStatus): void {
+    const existing = this.calculations.find((c) => c.id === id);
+    if (!existing) return;
+    const approvedDate =
+      status === 'approved'
+        ? existing.approvedDate || new Date().toISOString().slice(0, 10)
+        : status === 'draft' || status === 'rejected'
+        ? undefined
+        : existing.approvedDate;
+    const updated: Calculation = { ...existing, status, approvedDate };
+    this.calculations = this.calculations.map((c) => (c.id === id ? updated : c));
+    this.saveCalculations();
+    this.logActivity(
+      'status_change',
+      'calculation',
+      updated.number,
+      `Статус калькуляции изменён на ${status}`
+    );
+    this.addNotification(
+      status === 'approved' ? 'success' : status === 'rejected' ? 'warning' : 'info',
+      'Статус калькуляции обновлён',
+      `${updated.number} → ${status}`
+    );
+    this.notify();
+  }
+
+  public deleteCalculation(id: string): void {
+    const target = this.calculations.find((c) => c.id === id);
+    if (!target) return;
+    this.calculations = this.calculations.filter((c) => c.id !== id);
+    this.saveCalculations();
+    this.logActivity('delete', 'calculation', target.number, 'Калькуляция удалена');
+    this.addNotification('warning', 'Калькуляция удалена', target.number);
+    this.notify();
+  }
+
   // --- Invoice CRUD ---
   public addInvoice(data: Omit<Invoice, 'id' | 'createdAt'>): Invoice {
     const invoice: Invoice = {
@@ -1185,6 +1287,24 @@ export class AppStore {
     };
     this.invoices = [invoice, ...this.invoices];
     this.saveInvoices();
+
+    if (invoice.calculationId) {
+      let linkedChanged = false;
+      this.calculations = this.calculations.map((c) => {
+        if (c.id !== invoice.calculationId) return c;
+        linkedChanged = true;
+        return {
+          ...c,
+          status: 'invoiced',
+          invoiceId: invoice.id,
+          approvedDate: c.approvedDate || new Date().toISOString().slice(0, 10),
+        };
+      });
+      if (linkedChanged) {
+        this.saveCalculations();
+      }
+    }
+
     const sym = invoice.currency === 'USD' ? '$' : invoice.currency === 'EUR' ? '€' : '₽';
     this.logActivity(
       'create',
@@ -1204,6 +1324,17 @@ export class AppStore {
   public updateInvoice(updated: Invoice): void {
     this.invoices = this.invoices.map((inv) => (inv.id === updated.id ? { ...updated } : inv));
     this.saveInvoices();
+    if (updated.calculationId) {
+      let linkedChanged = false;
+      this.calculations = this.calculations.map((c) => {
+        if (c.id !== updated.calculationId) return c;
+        linkedChanged = true;
+        return { ...c, status: 'invoiced', invoiceId: updated.id };
+      });
+      if (linkedChanged) {
+        this.saveCalculations();
+      }
+    }
     const sym = updated.currency === 'USD' ? '$' : updated.currency === 'EUR' ? '€' : '₽';
     this.logActivity(
       'update',
@@ -1241,6 +1372,23 @@ export class AppStore {
     if (!target) return;
     this.invoices = this.invoices.filter((inv) => inv.id !== id);
     this.saveInvoices();
+
+    if (target.calculationId) {
+      let linkedChanged = false;
+      this.calculations = this.calculations.map((c) => {
+        if (c.id !== target.calculationId) return c;
+        linkedChanged = true;
+        return {
+          ...c,
+          invoiceId: undefined,
+          status: c.status === 'invoiced' ? 'approved' : c.status,
+        };
+      });
+      if (linkedChanged) {
+        this.saveCalculations();
+      }
+    }
+
     this.logActivity('delete', 'invoice', target.number, 'Счёт удалён');
     this.addNotification('warning', 'Счёт удалён', target.number);
     this.notify();

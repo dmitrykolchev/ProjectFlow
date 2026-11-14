@@ -3,6 +3,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import {
+  Calculation,
+  CalculationFrequency,
+  CalculationItem,
+  CalculationStatus,
   Contract,
   ContractStatus,
   ContractType,
@@ -19,10 +23,13 @@ import {
   iconPlus,
   iconReceipt,
   iconSend,
+  iconTable,
   iconTrash,
+  iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -37,9 +44,11 @@ const HOURLY_RATE_RUB = 3200;
 @customElement('app-contract-detail')
 export class AppContractDetail extends LitElement {
   @state() private contracts: Contract[] = store.contracts;
+  @state() private calculations: Calculation[] = store.calculations;
   @state() private invoices: Invoice[] = store.invoices;
   @state() private detailContractId: string = store.detailContractId || store.contracts[0]?.id || '';
   @state() private currentLang = store.customization.language;
+  @state() private calcFilter: 'all' | 'pending' | 'approved' | 'invoiced' = 'all';
   @state() private invoiceFilter: 'all' | 'unpaid' | 'paid' | 'draft' = 'all';
 
   // Edit Contract modal
@@ -56,14 +65,33 @@ export class AppContractDetail extends LitElement {
   @state() private ctrStartDate = '';
   @state() private ctrEndDate = '';
   @state() private ctrStatus: ContractStatus = 'active';
+  @state() private ctrBillingFrequency: CalculationFrequency = 'monthly';
   @state() private ctrDescription = '';
   @state() private ctrError = '';
   @state() private confirmDeleteContractOpen = false;
+
+  // Calculation Create / Edit modal
+  @state() private calcModalOpen = false;
+  @state() private editingCalcId: string | null = null;
+  @state() private calcNumber = '';
+  @state() private calcFrequency: CalculationFrequency = 'monthly';
+  @state() private calcPeriodStart = '';
+  @state() private calcPeriodEnd = '';
+  @state() private calcIncludePrior = true;
+  @state() private calcStatus: CalculationStatus = 'draft';
+  @state() private calcItems: CalculationItem[] = [];
+  @state() private calcNotes = '';
+  @state() private calcError = '';
+
+  // Preview & Delete Calculation modals
+  @state() private previewCalculation: Calculation | null = null;
+  @state() private deletingCalculation: Calculation | null = null;
 
   // Invoice Create / Edit modal
   @state() private invoiceModalOpen = false;
   @state() private editingInvoiceId: string | null = null;
   @state() private invNumber = '';
+  @state() private invCalculationId = '';
   @state() private invIssueDate = '';
   @state() private invDueDate = '';
   @state() private invStatus: InvoiceStatus = 'issued';
@@ -93,6 +121,7 @@ export class AppContractDetail extends LitElement {
 
   private syncState() {
     this.contracts = store.contracts;
+    this.calculations = store.calculations;
     this.invoices = store.invoices;
     this.currentLang = store.customization.language;
 
@@ -103,19 +132,39 @@ export class AppContractDetail extends LitElement {
       this.detailContractId = this.contracts[0]?.id || '';
     }
 
+    if (this.previewCalculation) {
+      this.previewCalculation =
+        this.calculations.find((c) => c.id === this.previewCalculation!.id) || null;
+    }
     if (this.previewInvoice) {
       this.previewInvoice = this.invoices.find((i) => i.id === this.previewInvoice!.id) || null;
     }
 
     const activeCtr = this.contracts.find((c) => c.id === this.detailContractId);
-    if (activeCtr && store.consumePendingInvoiceModal(activeCtr.id)) {
-      this.openCreateInvoiceModal(activeCtr);
+    if (activeCtr) {
+      if (store.consumePendingCalculationModal(activeCtr.id)) {
+        this.openCreateCalculationModal(activeCtr);
+      } else if (store.consumePendingInvoiceModal(activeCtr.id)) {
+        this.openCreateInvoiceModal(activeCtr);
+      }
     }
   }
 
   private formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR'): string {
     const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₽';
     return `${Math.round(amount).toLocaleString('ru-RU')} ${symbol}`;
+  }
+
+  private convertAmountToCurrency(
+    amount: number,
+    fromCurrency: 'RUB' | 'USD' | 'EUR',
+    toCurrency: 'RUB' | 'USD' | 'EUR'
+  ): number {
+    if (fromCurrency === toCurrency) return Math.round(amount);
+    const toRub = fromCurrency === 'USD' ? amount * 96 : fromCurrency === 'EUR' ? amount * 104 : amount;
+    if (toCurrency === 'USD') return Math.round(toRub / 96);
+    if (toCurrency === 'EUR') return Math.round(toRub / 104);
+    return Math.round(toRub);
   }
 
   private getContractStatusMeta(
@@ -133,6 +182,23 @@ export class AppContractDetail extends LitElement {
         return { label: isRu ? 'Исполнен' : 'Completed', variant: 'info' };
       case 'terminated':
         return { label: isRu ? 'Расторгнут' : 'Terminated', variant: 'danger' };
+    }
+  }
+
+  private getCalculationStatusVariant(
+    status: CalculationStatus
+  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
+    switch (status) {
+      case 'draft':
+        return 'default';
+      case 'sent':
+        return 'warning';
+      case 'approved':
+        return 'success';
+      case 'invoiced':
+        return 'info';
+      case 'rejected':
+        return 'danger';
     }
   }
 
@@ -170,6 +236,120 @@ export class AppContractDetail extends LitElement {
     }
   }
 
+  private getAccountedSourceIds(contract: Contract, excludeCalcId?: string | null): Set<string> {
+    const used = new Set<string>();
+    for (const calc of this.calculations) {
+      if (calc.contractId !== contract.id) continue;
+      if (calc.status === 'rejected') continue;
+      if (excludeCalcId && calc.id === excludeCalcId) continue;
+      for (const item of calc.items) {
+        if (item.sourceId) used.add(item.sourceId);
+      }
+    }
+    for (const inv of this.invoices) {
+      if (inv.contractId !== contract.id || inv.status === 'cancelled') continue;
+      if (this.editingInvoiceId && inv.id === this.editingInvoiceId) continue;
+      for (const item of inv.items) {
+        if (item.sourceId) used.add(item.sourceId);
+      }
+    }
+    return used;
+  }
+
+  private getUnaccountedProjectSources(contract: Contract, excludeCalcId?: string | null) {
+    if (!contract.projectId) {
+      return {
+        timeEntries: [] as typeof store.timeEntries,
+        expenses: [] as typeof store.expenses,
+      };
+    }
+    const accounted = this.getAccountedSourceIds(contract, excludeCalcId);
+    const timeEntries = store.timeEntries
+      .filter((te) => te.projectId === contract.projectId && !accounted.has(te.id))
+      .sort((a, b) => a.date.localeCompare(b.date));
+    const expenses = store.expenses
+      .filter(
+        (ex) =>
+          ex.projectId === contract.projectId &&
+          ex.status !== 'rejected' &&
+          !accounted.has(ex.id)
+      )
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    return { timeEntries, expenses };
+  }
+
+  private collectItemsForPeriod(
+    contract: Contract,
+    periodStart: string,
+    periodEnd: string,
+    includePrior: boolean,
+    excludeCalcId?: string | null
+  ): CalculationItem[] {
+    if (!contract.projectId) return [];
+    const { timeEntries, expenses } = this.getUnaccountedProjectSources(contract, excludeCalcId);
+    const items: CalculationItem[] = [];
+
+    for (const te of timeEntries) {
+      const inRange = (!periodStart || te.date >= periodStart) && (!periodEnd || te.date <= periodEnd);
+      const isPrior = Boolean(periodStart && te.date < periodStart && (!periodEnd || te.date <= periodEnd));
+      if (!inRange && !(includePrior && isPrior)) continue;
+
+      const task = store.tasks.find((tk) => tk.id === te.taskId);
+      const user = store.users.find((u) => u.id === te.userId);
+      const rawRate = user?.hourlyRate || HOURLY_RATE_RUB;
+      const baseRate = this.convertAmountToCurrency(rawRate, 'RUB', contract.currency);
+      const unitPrice = te.billable ? baseRate : 0;
+      const amount = te.billable ? Math.round(te.hours * unitPrice) : 0;
+
+      items.push({
+        id: `ci-te-${te.id}`,
+        itemType: 'time_entry',
+        sourceId: te.id,
+        date: te.date,
+        taskId: te.taskId,
+        userId: te.userId,
+        title: `${te.taskId}${task ? ` · ${task.title}` : ''}${te.description ? ` — ${te.description}` : ''}`,
+        quantity: te.hours,
+        unit: 'ч',
+        billable: te.billable,
+        baseRate,
+        unitPrice,
+        amount,
+        isPriorPeriod: isPrior,
+      });
+    }
+
+    for (const ex of expenses) {
+      const inRange = (!periodStart || ex.date >= periodStart) && (!periodEnd || ex.date <= periodEnd);
+      const isPrior = Boolean(periodStart && ex.date < periodStart && (!periodEnd || ex.date <= periodEnd));
+      if (!inRange && !(includePrior && isPrior)) continue;
+
+      const baseRate = this.convertAmountToCurrency(ex.amount, ex.currency, contract.currency);
+      const unitPrice = ex.billable ? baseRate : 0;
+      const amount = ex.billable ? baseRate : 0;
+
+      items.push({
+        id: `ci-ex-${ex.id}`,
+        itemType: 'expense',
+        sourceId: ex.id,
+        date: ex.date,
+        taskId: ex.taskId,
+        userId: ex.userId,
+        title: `${ex.title}${ex.vendor ? ` (${ex.vendor})` : ''}`,
+        quantity: 1,
+        unit: 'усл.',
+        billable: ex.billable,
+        baseRate,
+        unitPrice,
+        amount,
+        isPriorPeriod: isPrior,
+      });
+    }
+
+    return items.sort((a, b) => a.date.localeCompare(b.date));
+  }
+
   private getUnbilledProjectSources(contract: Contract) {
     if (!contract.projectId) {
       return { timeEntries: [] as typeof store.timeEntries, expenses: [] as typeof store.expenses };
@@ -187,10 +367,7 @@ export class AppContractDetail extends LitElement {
     }
 
     const timeEntries = store.timeEntries.filter(
-      (te) =>
-        te.projectId === contract.projectId &&
-        te.billable &&
-        !billedSourceIds.has(te.id)
+      (te) => te.projectId === contract.projectId && te.billable && !billedSourceIds.has(te.id)
     );
     const expenses = store.expenses.filter(
       (ex) =>
@@ -227,6 +404,18 @@ export class AppContractDetail extends LitElement {
     const project = ctr.projectId ? store.projects.find((p) => p.id === ctr.projectId) : undefined;
     const owner = ctr.ownerId ? store.users.find((u) => u.id === ctr.ownerId) : undefined;
     const statusMeta = this.getContractStatusMeta(ctr.status, isRu);
+    const freqLabel = t.calculations.frequencies[ctr.billingFrequency || 'monthly'];
+
+    const contractCalculations = this.calculations
+      .filter((c) => c.contractId === ctr.id)
+      .sort((a, b) => (b.periodEnd + b.createdAt).localeCompare(a.periodEnd + a.createdAt));
+
+    const visibleCalculations = contractCalculations.filter((c) => {
+      if (this.calcFilter === 'pending') return c.status === 'draft' || c.status === 'sent' || c.status === 'rejected';
+      if (this.calcFilter === 'approved') return c.status === 'approved';
+      if (this.calcFilter === 'invoiced') return c.status === 'invoiced';
+      return true;
+    });
 
     const contractInvoices = this.invoices
       .filter((inv) => inv.contractId === ctr.id)
@@ -256,8 +445,12 @@ export class AppContractDetail extends LitElement {
       label: `${c.number} · ${c.title}`,
     }));
 
-    const unbilled = this.getUnbilledProjectSources(ctr);
-    const unbilledHours = unbilled.timeEntries.reduce((s, e) => s + e.hours, 0);
+    const unaccounted = this.getUnaccountedProjectSources(ctr);
+    const unaccountedTotalHours = unaccounted.timeEntries.reduce((s, e) => s + e.hours, 0);
+    const unaccountedBillableHours = unaccounted.timeEntries
+      .filter((e) => e.billable)
+      .reduce((s, e) => s + e.hours, 0);
+    const unaccountedNonBillableHours = Math.max(0, unaccountedTotalHours - unaccountedBillableHours);
 
     return html`
       <div class="page-shell">
@@ -287,6 +480,15 @@ export class AppContractDetail extends LitElement {
           <div class="nav-actions">
             <app-button
               size="sm"
+              variant="secondary"
+              @click="${() => this.openCreateCalculationModal(ctr)}"
+            >
+              <span slot="icon-start">${iconTable()}</span>
+              <span>${t.contractDetail.createCalculation}</span>
+            </app-button>
+
+            <app-button
+              size="sm"
               variant="primary"
               @click="${() => this.openCreateInvoiceModal(ctr)}"
             >
@@ -296,7 +498,7 @@ export class AppContractDetail extends LitElement {
 
             <app-button
               size="sm"
-              variant="secondary"
+              variant="outline"
               @click="${() => this.openEditContractModal(ctr)}"
             >
               <span slot="icon-start">${iconEdit(14)}</span>
@@ -328,9 +530,9 @@ export class AppContractDetail extends LitElement {
               <span>${this.getTypeLabel(ctr.type, isRu)}</span>
               <span aria-hidden="true">·</span>
               <span class="mono">${ctr.startDate} → ${ctr.endDate}</span>
-              ${owner
-                ? html`<span aria-hidden="true">·</span><span>${owner.name}</span>`
-                : ''}
+              <span aria-hidden="true">·</span>
+              <span>${isRu ? 'Периодичность калькуляции' : 'Billing cycle'}: <strong>${freqLabel}</strong></span>
+              ${owner ? html`<span aria-hidden="true">·</span><span>${owner.name}</span>` : ''}
             </div>
             <p class="contract-desc">${ctr.description || '—'}</p>
           </div>
@@ -389,7 +591,213 @@ export class AppContractDetail extends LitElement {
           </div>
         </section>
 
-        <!-- Contract Invoices & Invoicing Procedure -->
+        <!-- Step 1: Periodic Calculations (Client Work & Expense Reports) -->
+        <section class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              ${iconTable()}
+              <span>${t.contractDetail.calculationsTitle}</span>
+              <span class="section-sub">(${contractCalculations.length})</span>
+            </h2>
+
+            <div class="section-actions">
+              <app-segmented-switch
+                size="sm"
+                .value="${this.calcFilter}"
+                .options="${[
+                  { value: 'all', label: isRu ? 'Все' : 'All' },
+                  { value: 'pending', label: isRu ? 'В работе / На соглас.' : 'Pending' },
+                  { value: 'approved', label: isRu ? 'Согласованы' : 'Approved' },
+                  { value: 'invoiced', label: isRu ? 'Со счётом' : 'Invoiced' },
+                ]}"
+                @change="${(e: CustomEvent<{ value: string }>) =>
+                  (this.calcFilter = e.detail.value as 'all' | 'pending' | 'approved' | 'invoiced')}"
+              ></app-segmented-switch>
+
+              <app-button
+                size="sm"
+                variant="primary"
+                @click="${() => this.openCreateCalculationModal(ctr)}"
+              >
+                <span slot="icon-start">${iconPlus(14)}</span>
+                <span>${t.contractDetail.createCalculation}</span>
+              </app-button>
+            </div>
+          </div>
+
+          ${visibleCalculations.length === 0
+            ? html`
+                <div class="empty-state">
+                  <span>${t.contractDetail.noCalculations}</span>
+                  <app-button
+                    size="sm"
+                    variant="secondary"
+                    @click="${() => this.openCreateCalculationModal(ctr)}"
+                  >
+                    <span slot="icon-start">${iconPlus(14)}</span>
+                    <span>${t.contractDetail.createCalculation}</span>
+                  </app-button>
+                </div>
+              `
+            : html`
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>${isRu ? 'Калькуляция' : 'Calculation #'}</th>
+                        <th>${isRu ? 'Период / График' : 'Period / Cycle'}</th>
+                        <th>${isRu ? 'Состав отчёта' : 'Report Scope'}</th>
+                        <th>${isRu ? 'Часы (Bill / 0 ₽)' : 'Hours (Bill / 0)'}</th>
+                        <th>${isRu ? 'К оплате (без НДС)' : 'Billable Subtotal'}</th>
+                        <th>${isRu ? 'Статус' : 'Status'}</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${visibleCalculations.map((calc) => {
+                        const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
+                        const nonBillableCount = calc.items.filter((i) => !i.billable).length;
+                        const linkedInv = calc.invoiceId
+                          ? this.invoices.find((i) => i.id === calc.invoiceId)
+                          : undefined;
+
+                        return html`
+                          <tr>
+                            <td>
+                              <button
+                                type="button"
+                                class="inv-num-btn"
+                                @click="${() => (this.previewCalculation = calc)}"
+                              >
+                                ${iconFileText(14)}
+                                <span>${calc.number}</span>
+                              </button>
+                              ${linkedInv
+                                ? html`
+                                    <div style="margin-top: 0.2rem;">
+                                      <button
+                                        type="button"
+                                        class="inline-ref-btn"
+                                        @click="${() => (this.previewInvoice = linkedInv)}"
+                                      >
+                                        → ${linkedInv.number}
+                                      </button>
+                                    </div>
+                                  `
+                                : ''}
+                            </td>
+                            <td class="mono" style="white-space: nowrap; font-size: 0.78rem;">
+                              <div>${calc.periodStart} → ${calc.periodEnd}</div>
+                              <div style="color: var(--text-muted); font-family: inherit;">
+                                ${t.calculations.frequencies[calc.frequency]}
+                                ${priorCount > 0
+                                  ? html` · <span style="color: #f59e0b;">+${priorCount} ${isRu ? 'прошл.' : 'prior'}</span>`
+                                  : ''}
+                              </div>
+                            </td>
+                            <td>
+                              <div class="items-summary" title="${calc.items[0]?.title || ''}">
+                                ${calc.items[0]?.title || '—'}
+                              </div>
+                              <div style="font-size: 0.73rem; color: var(--text-muted);">
+                                ${calc.items.length} ${isRu ? 'поз.' : 'items'}
+                                ${nonBillableCount > 0
+                                  ? ` · ${nonBillableCount} ${isRu ? 'по 0 ₽' : 'zero-rate'}`
+                                  : ''}
+                              </div>
+                            </td>
+                            <td class="mono" style="white-space: nowrap;">
+                              <span>${calc.billableHours.toFixed(1)} ч</span>
+                              ${calc.nonBillableHours > 0
+                                ? html`<span style="color: var(--text-muted);"> + ${calc.nonBillableHours.toFixed(1)} ч (0 ₽)</span>`
+                                : ''}
+                            </td>
+                            <td class="mono" style="font-weight: 700; white-space: nowrap;">
+                              ${this.formatMoney(calc.billableAmount, calc.currency)}
+                            </td>
+                            <td>
+                              <app-badge
+                                variant="${this.getCalculationStatusVariant(calc.status)}"
+                                appearance="soft"
+                                size="sm"
+                              >
+                                ${t.calculations.statuses[calc.status]}
+                              </app-badge>
+                            </td>
+                            <td>
+                              <div class="actions-row">
+                                ${calc.status === 'draft' || calc.status === 'rejected'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn"
+                                        title="${t.calculations.sendForApproval}"
+                                        @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
+                                      >
+                                        ${iconSend(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                ${calc.status === 'sent'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn approve"
+                                        title="${t.calculations.approveCalc}"
+                                        @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
+                                      >
+                                        ${iconCheck(14)}
+                                      </button>
+                                      <button
+                                        type="button"
+                                        class="icon-btn danger"
+                                        title="${t.calculations.rejectCalc}"
+                                        @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
+                                      >
+                                        ${iconX(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                ${calc.status === 'approved'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn approve"
+                                        title="${t.calculations.createInvoiceFromCalc}"
+                                        @click="${() => this.openInvoiceFromCalculation(ctr, calc)}"
+                                      >
+                                        ${iconReceipt(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                <button
+                                  type="button"
+                                  class="icon-btn"
+                                  title="${t.common.edit}"
+                                  @click="${() => this.openEditCalculationModal(calc)}"
+                                >
+                                  ${iconEdit(14)}
+                                </button>
+                                <button
+                                  type="button"
+                                  class="icon-btn danger"
+                                  title="${t.common.delete}"
+                                  @click="${() => (this.deletingCalculation = calc)}"
+                                >
+                                  ${iconTrash(14)}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        `;
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+        </section>
+
+        <!-- Step 2: Contract Invoices & Invoicing Procedure -->
         <section class="section-card">
           <div class="section-header">
             <h2 class="section-title">
@@ -465,7 +873,7 @@ export class AppContractDetail extends LitElement {
                       <tr>
                         <th>${isRu ? 'Номер' : 'Invoice #'}</th>
                         <th>${isRu ? 'Выставлен / Срок' : 'Issued / Due'}</th>
-                        <th>${isRu ? 'Позиции' : 'Items'}</th>
+                        <th>${isRu ? 'Позиции и основание' : 'Items & Basis'}</th>
                         <th>${isRu ? 'Без НДС' : 'Subtotal'}</th>
                         <th>${isRu ? 'НДС' : 'VAT'}</th>
                         <th>${isRu ? 'Итого к оплате' : 'Total'}</th>
@@ -474,107 +882,124 @@ export class AppContractDetail extends LitElement {
                       </tr>
                     </thead>
                     <tbody>
-                      ${visibleInvoices.map((inv) => html`
-                        <tr>
-                          <td>
-                            <button
-                              type="button"
-                              class="inv-num-btn"
-                              @click="${() => (this.previewInvoice = inv)}"
-                            >
-                              ${iconReceipt(14)}
-                              <span>${inv.number}</span>
-                            </button>
-                          </td>
-                          <td class="mono" style="white-space: nowrap; font-size: 0.78rem;">
-                            <div>${inv.issueDate}</div>
-                            <div style="color: var(--text-muted);">→ ${inv.dueDate}</div>
-                          </td>
-                          <td>
-                            <div class="items-summary" title="${inv.items[0]?.title || ''}">
-                              ${inv.items[0]?.title || '—'}
-                            </div>
-                            <div style="font-size: 0.73rem; color: var(--text-muted);">
-                              ${inv.items.length} ${isRu ? 'поз.' : 'items'}
-                              ${inv.paidDate ? `· ${isRu ? 'оплачен' : 'paid'} ${inv.paidDate}` : ''}
-                            </div>
-                          </td>
-                          <td class="mono" style="white-space: nowrap;">
-                            ${this.formatMoney(inv.subtotal, inv.currency)}
-                          </td>
-                          <td class="mono" style="white-space: nowrap; color: var(--text-secondary);">
-                            ${inv.vatRate}% (${this.formatMoney(inv.vatAmount, inv.currency)})
-                          </td>
-                          <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                            ${this.formatMoney(inv.totalAmount, inv.currency)}
-                          </td>
-                          <td>
-                            <app-badge
-                              variant="${this.getInvoiceStatusVariant(inv.status)}"
-                              appearance="soft"
-                              size="sm"
-                            >
-                              ${t.invoices.statuses[inv.status]}
-                            </app-badge>
-                          </td>
-                          <td>
-                            <div class="actions-row">
-                              ${inv.status === 'draft'
-                                ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn approve"
-                                      title="${t.invoices.markIssued}"
-                                      @click="${() => store.updateInvoiceStatus(inv.id, 'issued')}"
-                                    >
-                                      ${iconFileText(14)}
-                                    </button>
-                                  `
-                                : ''}
-                              ${inv.status === 'issued'
-                                ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn"
-                                      title="${t.invoices.markSent}"
-                                      @click="${() => store.updateInvoiceStatus(inv.id, 'sent')}"
-                                    >
-                                      ${iconSend(14)}
-                                    </button>
-                                  `
-                                : ''}
-                              ${inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue'
-                                ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn approve"
-                                      title="${t.invoices.markPaid}"
-                                      @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
-                                    >
-                                      ${iconCheck(14)}
-                                    </button>
-                                  `
-                                : ''}
+                      ${visibleInvoices.map((inv) => {
+                        const sourceCalc = inv.calculationId
+                          ? this.calculations.find((c) => c.id === inv.calculationId)
+                          : undefined;
+                        return html`
+                          <tr>
+                            <td>
                               <button
                                 type="button"
-                                class="icon-btn"
-                                title="${t.common.edit}"
-                                @click="${() => this.openEditInvoiceModal(inv)}"
+                                class="inv-num-btn"
+                                @click="${() => (this.previewInvoice = inv)}"
                               >
-                                ${iconEdit(14)}
+                                ${iconReceipt(14)}
+                                <span>${inv.number}</span>
                               </button>
-                              <button
-                                type="button"
-                                class="icon-btn danger"
-                                title="${t.common.delete}"
-                                @click="${() => (this.deletingInvoice = inv)}"
+                            </td>
+                            <td class="mono" style="white-space: nowrap; font-size: 0.78rem;">
+                              <div>${inv.issueDate}</div>
+                              <div style="color: var(--text-muted);">→ ${inv.dueDate}</div>
+                            </td>
+                            <td>
+                              <div class="items-summary" title="${inv.items[0]?.title || ''}">
+                                ${inv.items[0]?.title || '—'}
+                              </div>
+                              <div style="font-size: 0.73rem; color: var(--text-muted); display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                                <span>${inv.items.length} ${isRu ? 'поз.' : 'items'}</span>
+                                ${sourceCalc
+                                  ? html`
+                                      <span>·</span>
+                                      <button
+                                        type="button"
+                                        class="inline-ref-btn"
+                                        @click="${() => (this.previewCalculation = sourceCalc)}"
+                                      >
+                                        ${sourceCalc.number}
+                                      </button>
+                                    `
+                                  : ''}
+                                ${inv.paidDate ? html`<span>· ${isRu ? 'оплачен' : 'paid'} ${inv.paidDate}</span>` : ''}
+                              </div>
+                            </td>
+                            <td class="mono" style="white-space: nowrap;">
+                              ${this.formatMoney(inv.subtotal, inv.currency)}
+                            </td>
+                            <td class="mono" style="white-space: nowrap; color: var(--text-secondary);">
+                              ${inv.vatRate}% (${this.formatMoney(inv.vatAmount, inv.currency)})
+                            </td>
+                            <td class="mono" style="font-weight: 700; white-space: nowrap;">
+                              ${this.formatMoney(inv.totalAmount, inv.currency)}
+                            </td>
+                            <td>
+                              <app-badge
+                                variant="${this.getInvoiceStatusVariant(inv.status)}"
+                                appearance="soft"
+                                size="sm"
                               >
-                                ${iconTrash(14)}
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      `)}
+                                ${t.invoices.statuses[inv.status]}
+                              </app-badge>
+                            </td>
+                            <td>
+                              <div class="actions-row">
+                                ${inv.status === 'draft'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn approve"
+                                        title="${t.invoices.markIssued}"
+                                        @click="${() => store.updateInvoiceStatus(inv.id, 'issued')}"
+                                      >
+                                        ${iconFileText(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                ${inv.status === 'issued'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn"
+                                        title="${t.invoices.markSent}"
+                                        @click="${() => store.updateInvoiceStatus(inv.id, 'sent')}"
+                                      >
+                                        ${iconSend(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                ${inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue'
+                                  ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn approve"
+                                        title="${t.invoices.markPaid}"
+                                        @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
+                                      >
+                                        ${iconCheck(14)}
+                                      </button>
+                                    `
+                                  : ''}
+                                <button
+                                  type="button"
+                                  class="icon-btn"
+                                  title="${t.common.edit}"
+                                  @click="${() => this.openEditInvoiceModal(inv)}"
+                                >
+                                  ${iconEdit(14)}
+                                </button>
+                                <button
+                                  type="button"
+                                  class="icon-btn danger"
+                                  title="${t.common.delete}"
+                                  @click="${() => (this.deletingInvoice = inv)}"
+                                >
+                                  ${iconTrash(14)}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        `;
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -654,29 +1079,31 @@ export class AppContractDetail extends LitElement {
 
                     <div class="party-block">
                       <span class="party-role">
-                        ${isRu ? 'Невыставленные биллингуемые данные по проекту' : 'Unbilled Billable Project Items'}
+                        ${isRu
+                          ? 'Неучтённые работы и расходы по проекту (ещё не в калькуляциях)'
+                          : 'Unaccounted Project Works & Expenses'}
                       </span>
                       <span class="party-name mono">
-                        ${unbilledHours.toFixed(1)} ч (${unbilled.timeEntries.length} ${isRu ? 'отчётов' : 'logs'})
-                        · ${unbilled.expenses.length} ${isRu ? 'расходов' : 'expenses'}
+                        ${unaccountedTotalHours.toFixed(1)} ч (${unaccountedBillableHours.toFixed(1)} billable + ${unaccountedNonBillableHours.toFixed(1)} non-billable)
+                        · ${unaccounted.expenses.length} ${isRu ? 'расходов' : 'expenses'}
                       </span>
                       <span class="party-sub">
                         ${isRu
-                          ? 'Можно автоматически включить в новый счёт при выставлении'
-                          : 'Available for automatic import when creating an invoice'}
+                          ? 'Попадают в периодическую калькуляцию (non-billable — с ценой 0 ₽)'
+                          : 'Included in periodic calculations (non-billable items at zero rate)'}
                       </span>
                     </div>
 
-                    ${(unbilled.timeEntries.length > 0 || unbilled.expenses.length > 0)
+                    ${unaccounted.timeEntries.length > 0 || unaccounted.expenses.length > 0
                       ? html`
                           <div>
                             <app-button
                               size="sm"
                               variant="secondary"
-                              @click="${() => this.openCreateInvoiceModal(ctr, true)}"
+                              @click="${() => this.openCreateCalculationModal(ctr)}"
                             >
-                              <span slot="icon-start">${iconReceipt(14)}</span>
-                              <span>${isRu ? 'Сформировать счёт из часов и расходов' : 'Invoice Unbilled Items'}</span>
+                              <span slot="icon-start">${iconTable()}</span>
+                              <span>${t.contractDetail.createCalculation}</span>
                             </app-button>
                           </div>
                         `
@@ -687,11 +1114,504 @@ export class AppContractDetail extends LitElement {
         </div>
       </div>
 
+      ${this.renderCalculationFormModal(ctr, t, isRu)}
+      ${this.renderCalculationPreviewModal(ctr, t, isRu)}
+      ${this.renderDeleteCalculationModal(isRu)}
       ${this.renderInvoiceFormModal(ctr, t, isRu)}
       ${this.renderInvoicePreviewModal(ctr, t, isRu)}
       ${this.renderDeleteInvoiceModal(isRu)}
       ${this.renderEditContractModal(isRu)}
       ${this.renderDeleteContractModal(ctr, isRu)}
+    `;
+  }
+
+  private renderCalculationFormModal(
+    ctr: Contract,
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    const frequencyOptions: { value: CalculationFrequency; label: string }[] = [
+      { value: 'weekly', label: t.calculations.frequencies.weekly },
+      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
+      { value: 'monthly', label: t.calculations.frequencies.monthly },
+      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
+      { value: 'custom', label: t.calculations.frequencies.custom },
+    ];
+
+    const statusOptions: { value: CalculationStatus; label: string }[] = [
+      { value: 'draft', label: t.calculations.statuses.draft },
+      { value: 'sent', label: t.calculations.statuses.sent },
+      { value: 'approved', label: t.calculations.statuses.approved },
+      { value: 'rejected', label: t.calculations.statuses.rejected },
+      { value: 'invoiced', label: t.calculations.statuses.invoiced },
+    ];
+
+    const hourItems = this.calcItems.filter((i) => i.unit === 'ч');
+    const billableHours = hourItems.filter((i) => i.billable).reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+    const nonBillableHours = hourItems
+      .filter((i) => !i.billable)
+      .reduce((s, i) => s + (Number(i.quantity) || 0), 0);
+    const billableAmount = this.calcItems
+      .filter((i) => i.billable)
+      .reduce((s, i) => s + (Number(i.amount) || 0), 0);
+    const priorItemsCount = this.calcItems.filter((i) => i.isPriorPeriod).length;
+    const zeroPriceCount = this.calcItems.filter((i) => !i.billable).length;
+
+    return html`
+      <app-modal
+        ?open="${this.calcModalOpen}"
+        size="lg"
+        title="${this.editingCalcId
+          ? t.calculations.editCalculation
+          : `${t.calculations.newCalculation} · ${ctr.number}`}"
+        @close="${() => (this.calcModalOpen = false)}"
+      >
+        <div class="form-grid">
+          <div>
+            <app-input
+              label="${isRu ? 'Номер калькуляции' : 'Calculation Number'}"
+              .value="${this.calcNumber}"
+              required
+              error="${this.calcError}"
+              @input="${(e: CustomEvent<{ value: string }>) => {
+                this.calcNumber = e.detail.value;
+                this.calcError = '';
+              }}"
+            ></app-input>
+          </div>
+          <div>
+            <app-select
+              label="${isRu ? 'Периодичность' : 'Frequency'}"
+              .value="${this.calcFrequency}"
+              .options="${frequencyOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.calcFrequency = e.detail.value as CalculationFrequency)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-date-input
+              label="${isRu ? 'Начало периода' : 'Period Start'}"
+              .value="${this.calcPeriodStart}"
+              @change="${(e: CustomEvent<{ value: string }>) => {
+                this.calcPeriodStart = e.detail.value;
+                this.refreshCalculationItemsForPeriod(ctr);
+              }}"
+            ></app-date-input>
+          </div>
+          <div>
+            <app-date-input
+              label="${isRu ? 'Окончание периода' : 'Period End'}"
+              .value="${this.calcPeriodEnd}"
+              @change="${(e: CustomEvent<{ value: string }>) => {
+                this.calcPeriodEnd = e.detail.value;
+                this.refreshCalculationItemsForPeriod(ctr);
+              }}"
+            ></app-date-input>
+          </div>
+
+          <div class="col-span-2 quick-term-row">
+            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_week')}">
+              ${isRu ? 'Текущая неделя' : 'This Week'}
+            </button>
+            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_week')}">
+              ${isRu ? 'Прошлая неделя' : 'Last Week'}
+            </button>
+            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_month')}">
+              ${isRu ? 'Текущий месяц' : 'This Month'}
+            </button>
+            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_month')}">
+              ${isRu ? 'Прошлый месяц' : 'Last Month'}
+            </button>
+            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_quarter')}">
+              ${isRu ? 'Текущий квартал' : 'This Quarter'}
+            </button>
+          </div>
+
+          <div class="col-span-2 autofill-bar">
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <app-checkbox
+                ?checked="${this.calcIncludePrior}"
+                label="${t.calculations.includePrior}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) => {
+                  this.calcIncludePrior = e.detail.checked;
+                  this.refreshCalculationItemsForPeriod(ctr);
+                }}"
+              ></app-checkbox>
+            </div>
+
+            <app-button
+              size="sm"
+              variant="secondary"
+              @click="${() => this.refreshCalculationItemsForPeriod(ctr)}"
+            >
+              <span slot="icon-start">${iconPlus(13)}</span>
+              <span>${t.calculations.collectPeriodItems}</span>
+            </app-button>
+          </div>
+
+          <div class="col-span-2 calc-summary-strip">
+            <div class="calc-summary-item">
+              <span class="calc-summary-label">${isRu ? 'Позиций (из прошлых)' : 'Items (prior)'}</span>
+              <span class="calc-summary-val">
+                ${this.calcItems.length} (${priorItemsCount})
+              </span>
+            </div>
+            <div class="calc-summary-item">
+              <span class="calc-summary-label">${isRu ? 'Billable часы' : 'Billable Hours'}</span>
+              <span class="calc-summary-val" style="color: #10b981;">${billableHours.toFixed(1)} ч</span>
+            </div>
+            <div class="calc-summary-item">
+              <span class="calc-summary-label">${isRu ? 'Non-billable (0 ₽)' : 'Non-billable (0)'}</span>
+              <span class="calc-summary-val" style="color: var(--text-secondary);">
+                ${nonBillableHours.toFixed(1)} ч / ${zeroPriceCount} ${isRu ? 'поз.' : 'items'}
+              </span>
+            </div>
+            <div class="calc-summary-item">
+              <span class="calc-summary-label">${isRu ? 'Итого по калькуляции' : 'Billable Total'}</span>
+              <span class="calc-summary-val">${this.formatMoney(billableAmount, ctr.currency)}</span>
+            </div>
+          </div>
+
+          <div class="col-span-2 items-editor">
+            <div class="items-editor-head">
+              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
+                ${isRu ? 'Работы и расходы в отчёте перед клиентом' : 'Works & Expenses in Client Report'} (${this.calcItems.length})
+              </span>
+              <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                <app-button size="sm" variant="secondary" @click="${() => this.addEmptyCalcItem(true)}">
+                  <span slot="icon-start">${iconPlus(13)}</span>
+                  <span>${isRu ? 'Доп. позиция' : 'Add Billable'}</span>
+                </app-button>
+                <app-button size="sm" variant="ghost" @click="${() => this.addEmptyCalcItem(false)}">
+                  <span slot="icon-start">${iconPlus(13)}</span>
+                  <span>${isRu ? '+ Non-billable (0 ₽)' : '+ Non-billable (0)'}</span>
+                </app-button>
+              </div>
+            </div>
+
+            ${this.calcItems.length === 0
+              ? html`<div class="empty-state" style="padding: 1.4rem;">
+                  ${isRu
+                    ? 'Нет работ или расходов за выбранный период. Выберите другой период или добавьте позицию вручную.'
+                    : 'No works or expenses found for this period.'}
+                </div>`
+              : this.calcItems.map(
+                  (item) => html`
+                    <div class="calc-editor-row ${!item.billable ? 'is-nonbillable' : ''}">
+                      <div class="calc-meta-col">
+                        <span class="calc-date-tag">${item.date || '—'}</span>
+                        ${item.isPriorPeriod
+                          ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
+                          : html`<span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
+                              ${item.itemType === 'expense'
+                                ? isRu
+                                  ? 'Расход'
+                                  : 'Expense'
+                                : item.itemType === 'time_entry'
+                                ? isRu
+                                  ? 'Работа'
+                                  : 'Work'
+                                : isRu
+                                ? 'Ручн.'
+                                : 'Manual'}
+                            </span>`}
+                      </div>
+                      <div>
+                        <app-input
+                          size="sm"
+                          label="${isRu ? 'Наименование работы / расхода' : 'Description'}"
+                          .value="${item.title}"
+                          @input="${(e: CustomEvent<{ value: string }>) =>
+                            this.updateCalcItem(item.id, { title: e.detail.value })}"
+                        ></app-input>
+                      </div>
+                      <div>
+                        <app-number-input
+                          size="sm"
+                          label="${isRu ? 'Кол-во' : 'Qty'}"
+                          .value="${item.quantity}"
+                          min="0"
+                          step="0.5"
+                          @change="${(e: CustomEvent<{ value: number }>) =>
+                            this.updateCalcItem(item.id, { quantity: e.detail.value })}"
+                        ></app-number-input>
+                      </div>
+                      <div>
+                        <app-input
+                          size="sm"
+                          label="${isRu ? 'Ед.' : 'Unit'}"
+                          .value="${item.unit}"
+                          @input="${(e: CustomEvent<{ value: string }>) =>
+                            this.updateCalcItem(item.id, { unit: e.detail.value })}"
+                        ></app-input>
+                      </div>
+                      <div class="calc-bill-cell">
+                        <app-checkbox
+                          ?checked="${item.billable}"
+                          label="Billable"
+                          @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                            this.updateCalcItem(item.id, { billable: e.detail.checked })}"
+                        ></app-checkbox>
+                      </div>
+                      <div>
+                        <app-number-input
+                          size="sm"
+                          label="${item.billable ? (isRu ? 'Ставка / Цена' : 'Rate') : isRu ? 'Цена (0 ₽)' : 'Rate (0)'}"
+                          .value="${item.billable ? item.unitPrice : 0}"
+                          min="0"
+                          step="500"
+                          ?disabled="${!item.billable}"
+                          @change="${(e: CustomEvent<{ value: number }>) =>
+                            this.updateCalcItem(item.id, { baseRate: e.detail.value, unitPrice: e.detail.value })}"
+                        ></app-number-input>
+                      </div>
+                      <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
+                        ${this.formatMoney(item.billable ? item.amount : 0, ctr.currency)}
+                      </div>
+                      <button
+                        type="button"
+                        class="icon-btn danger"
+                        title="${t.common.delete}"
+                        @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
+                      >
+                        ${iconTrash(13)}
+                      </button>
+                    </div>
+                  `
+                )}
+          </div>
+
+          <div>
+            <app-select
+              label="${isRu ? 'Статус калькуляции' : 'Calculation Status'}"
+              .value="${this.calcStatus}"
+              .options="${statusOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.calcStatus = e.detail.value as CalculationStatus)}"
+            ></app-select>
+          </div>
+          <div>
+            <app-textarea
+              label="${isRu ? 'Комментарий к отчёту для клиента' : 'Report Notes'}"
+              .value="${this.calcNotes}"
+              rows="2"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = e.detail.value)}"
+            ></app-textarea>
+          </div>
+        </div>
+
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.calcModalOpen = false)}">
+            ${t.common.cancel}
+          </app-button>
+          <app-button variant="primary" @click="${() => this.handleSaveCalculation(ctr)}">
+            ${t.common.save}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
+  }
+
+  private renderCalculationPreviewModal(
+    ctr: Contract,
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    const calc = this.previewCalculation;
+    if (!calc) return '';
+    const company = store.companies.find((c) => c.id === calc.companyId);
+    const cp = store.counterparties.find((c) => c.id === calc.counterpartyId);
+    const linkedInv = calc.invoiceId ? this.invoices.find((i) => i.id === calc.invoiceId) : undefined;
+
+    return html`
+      <app-modal
+        ?open="${Boolean(calc)}"
+        size="lg"
+        title="${t.calculations.previewCalculation} · ${calc.number}"
+        @close="${() => (this.previewCalculation = null)}"
+      >
+        <div class="invoice-sheet">
+          <div class="sheet-top">
+            <div>
+              <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
+                ${isRu ? 'Калькуляция работ и расходов' : 'Cost & Work Calculation'} № ${calc.number}
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                ${isRu ? 'Период' : 'Period'}: <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
+                · ${t.calculations.frequencies[calc.frequency]}
+                · ${isRu ? 'Договор' : 'Contract'}: ${ctr.number}
+              </div>
+            </div>
+            <app-badge variant="${this.getCalculationStatusVariant(calc.status)}" appearance="soft">
+              ${t.calculations.statuses[calc.status]}
+            </app-badge>
+          </div>
+
+          <div class="sheet-parties">
+            <div class="party-block">
+              <span class="party-role">${isRu ? 'Исполнитель' : 'Supplier'}</span>
+              <span class="party-name">${company?.legalName || company?.name || '—'}</span>
+              <span class="party-sub mono">${isRu ? 'ИНН' : 'INN'}: ${company?.inn || '—'}</span>
+            </div>
+            <div class="party-block">
+              <span class="party-role">${isRu ? 'Заказчик (на согласование)' : 'Client (For Approval)'}</span>
+              <span class="party-name">${cp?.legalName || cp?.name || '—'}</span>
+              <span class="party-sub mono">${isRu ? 'ИНН' : 'INN'}: ${cp?.inn || '—'}</span>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>${isRu ? 'Дата' : 'Date'}</th>
+                  <th>${isRu ? 'Содержание работы / расхода' : 'Work / Expense'}</th>
+                  <th>${isRu ? 'Кол-во' : 'Qty'}</th>
+                  <th>${isRu ? 'Тип биллинга' : 'Billing'}</th>
+                  <th>${isRu ? 'Цена' : 'Price'}</th>
+                  <th>${isRu ? 'Сумма' : 'Amount'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${calc.items.map(
+                  (item) => html`
+                    <tr>
+                      <td class="mono" style="white-space: nowrap; font-size: 0.76rem;">
+                        <div>${item.date}</div>
+                        ${item.isPriorPeriod
+                          ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
+                          : ''}
+                      </td>
+                      <td>${item.title}</td>
+                      <td class="mono" style="white-space: nowrap;">${item.quantity} ${item.unit}</td>
+                      <td>
+                        <span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
+                          ${item.billable ? t.calculations.billableLabel : t.calculations.nonBillableZero}
+                        </span>
+                      </td>
+                      <td class="mono" style="white-space: nowrap;">
+                        ${this.formatMoney(item.billable ? item.unitPrice : 0, calc.currency)}
+                      </td>
+                      <td class="mono" style="font-weight: 700; white-space: nowrap;">
+                        ${this.formatMoney(item.billable ? item.amount : 0, calc.currency)}
+                      </td>
+                    </tr>
+                  `
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="totals-box">
+            <div class="total-line">
+              <span>${isRu ? 'Всего трудозатрат (billable / non-billable)' : 'Total Hours (billable / non-billable)'}:</span>
+              <span class="mono">
+                ${calc.totalHours.toFixed(1)} ч (${calc.billableHours.toFixed(1)} ч / ${calc.nonBillableHours.toFixed(1)} ч)
+              </span>
+            </div>
+            <div class="total-line grand">
+              <span>${isRu ? 'Итого к выставлению в счёт (без НДС)' : 'Subtotal to Invoice'}:</span>
+              <span class="mono">${this.formatMoney(calc.billableAmount, calc.currency)}</span>
+            </div>
+          </div>
+
+          ${calc.notes
+            ? html`<div style="font-size: 0.82rem; color: var(--text-secondary);">${calc.notes}</div>`
+            : ''}
+        </div>
+
+        <div slot="footer">
+          ${calc.status === 'draft' || calc.status === 'rejected'
+            ? html`
+                <app-button
+                  variant="secondary"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
+                >
+                  ${t.calculations.sendForApproval}
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'sent'
+            ? html`
+                <app-button
+                  variant="ghost"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
+                >
+                  ${t.calculations.rejectCalc}
+                </app-button>
+                <app-button
+                  variant="primary"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
+                >
+                  ${t.calculations.approveCalc}
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'approved'
+            ? html`
+                <app-button
+                  variant="primary"
+                  @click="${() => {
+                    this.previewCalculation = null;
+                    this.openInvoiceFromCalculation(ctr, calc);
+                  }}"
+                >
+                  <span slot="icon-start">${iconReceipt(15)}</span>
+                  <span>${t.calculations.createInvoiceFromCalc}</span>
+                </app-button>
+              `
+            : ''}
+          ${linkedInv
+            ? html`
+                <app-button
+                  variant="secondary"
+                  @click="${() => {
+                    this.previewCalculation = null;
+                    this.previewInvoice = linkedInv;
+                  }}"
+                >
+                  ${linkedInv.number}
+                </app-button>
+              `
+            : ''}
+          <app-button variant="ghost" @click="${() => (this.previewCalculation = null)}">
+            ${t.common.close}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
+  }
+
+  private renderDeleteCalculationModal(isRu: boolean) {
+    return html`
+      <app-modal
+        ?open="${Boolean(this.deletingCalculation)}"
+        size="sm"
+        title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
+        @close="${() => (this.deletingCalculation = null)}"
+      >
+        <p class="confirm-text">
+          ${isRu
+            ? `Удалить калькуляцию ${this.deletingCalculation?.number || ''}?`
+            : `Delete calculation ${this.deletingCalculation?.number || ''}?`}
+        </p>
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.deletingCalculation = null)}">
+            ${isRu ? 'Отмена' : 'Cancel'}
+          </app-button>
+          <app-button
+            variant="danger"
+            @click="${() => {
+              if (this.deletingCalculation) {
+                store.deleteCalculation(this.deletingCalculation.id);
+                this.deletingCalculation = null;
+              }
+            }}"
+          >
+            ${isRu ? 'Удалить' : 'Delete'}
+          </app-button>
+        </div>
+      </app-modal>
     `;
   }
 
@@ -728,6 +1648,19 @@ export class AppContractDetail extends LitElement {
       { value: 'cancelled', label: t.invoices.statuses.cancelled },
     ];
 
+    const availableCalcs = this.calculations.filter(
+      (c) =>
+        c.contractId === ctr.id &&
+        (c.status === 'approved' || c.status === 'sent' || c.id === this.invCalculationId)
+    );
+    const calcBasisOptions = [
+      { value: '', label: isRu ? 'Без привязки к калькуляции' : 'Standalone invoice' },
+      ...availableCalcs.map((c) => ({
+        value: c.id,
+        label: `${c.number} (${c.periodStart} → ${c.periodEnd} · ${this.formatMoney(c.billableAmount, c.currency)})`,
+      })),
+    ];
+
     return html`
       <app-modal
         ?open="${this.invoiceModalOpen}"
@@ -755,6 +1688,20 @@ export class AppContractDetail extends LitElement {
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
                 (this.invStatus = e.detail.value as InvoiceStatus)}"
+            ></app-select>
+          </div>
+          <div class="col-span-2">
+            <app-select
+              label="${isRu ? 'Основание (согласованная калькуляция)' : 'Basis (Approved Calculation)'}"
+              .value="${this.invCalculationId}"
+              .options="${calcBasisOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) => {
+                this.invCalculationId = e.detail.value;
+                const chosen = this.calculations.find((c) => c.id === e.detail.value);
+                if (chosen) {
+                  this.populateInvoiceLinesFromCalculation(ctr, chosen);
+                }
+              }}"
             ></app-select>
           </div>
           <div>
@@ -954,6 +1901,9 @@ export class AppContractDetail extends LitElement {
     if (!inv) return '';
     const company = store.companies.find((c) => c.id === inv.companyId);
     const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
+    const sourceCalc = inv.calculationId
+      ? this.calculations.find((c) => c.id === inv.calculationId)
+      : undefined;
 
     return html`
       <app-modal
@@ -972,6 +1922,7 @@ export class AppContractDetail extends LitElement {
                 ${isRu ? 'от' : 'dated'} <span class="mono">${inv.issueDate}</span>
                 · ${isRu ? 'Оплатить до' : 'Due'} <span class="mono">${inv.dueDate}</span>
                 · ${isRu ? 'Основание' : 'Contract'}: ${ctr.number}
+                ${sourceCalc ? html` · <span class="mono">${sourceCalc.number}</span>` : ''}
               </div>
             </div>
             <app-badge variant="${this.getInvoiceStatusVariant(inv.status)}" appearance="soft">
@@ -1116,6 +2067,7 @@ export class AppContractDetail extends LitElement {
   }
 
   private renderEditContractModal(isRu: boolean) {
+    const t = getTranslation(this.currentLang);
     const statusOptions = [
       { value: 'draft', label: isRu ? 'Черновик' : 'Draft', color: '#64748b' },
       { value: 'on_approval', label: isRu ? 'На согласовании' : 'On Approval', color: '#f59e0b' },
@@ -1129,6 +2081,13 @@ export class AppContractDetail extends LitElement {
       { value: 'license', label: isRu ? 'Лицензия' : 'License' },
       { value: 'sla', label: 'SLA' },
       { value: 'nda', label: 'NDA' },
+    ];
+    const frequencyOptions = [
+      { value: 'weekly', label: t.calculations.frequencies.weekly },
+      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
+      { value: 'monthly', label: t.calculations.frequencies.monthly },
+      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
+      { value: 'custom', label: t.calculations.frequencies.custom },
     ];
     const companyOptions = store.companies.map((c) => ({ value: c.id, label: c.name }));
     const counterpartyOptions = store.counterparties.map((c) => ({ value: c.id, label: c.name }));
@@ -1246,7 +2205,16 @@ export class AppContractDetail extends LitElement {
               @change="${(e: CustomEvent<{ value: string }>) => (this.ctrEndDate = e.detail.value)}"
             ></app-date-input>
           </div>
-          <div class="col-span-2">
+          <div>
+            <app-select
+              label="${isRu ? 'Периодичность калькуляции' : 'Billing Cycle'}"
+              .value="${this.ctrBillingFrequency}"
+              .options="${frequencyOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.ctrBillingFrequency = e.detail.value as CalculationFrequency)}"
+            ></app-select>
+          </div>
+          <div>
             <app-select
               label="${isRu ? 'Статус' : 'Status'}"
               .value="${this.ctrStatus}"
@@ -1307,7 +2275,230 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private openCreateInvoiceModal(ctr: Contract, autoPullProject = false) {
+  private getDefaultPeriodForFrequency(freq: CalculationFrequency): { start: string; end: string } {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const toIso = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    if (freq === 'weekly') {
+      const day = now.getDay();
+      const diffToMon = (day + 6) % 7;
+      const mon = new Date(y, m, now.getDate() - diffToMon);
+      const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+      return { start: toIso(mon), end: toIso(sun) };
+    }
+    if (freq === 'biweekly') {
+      const end = new Date(y, m, now.getDate());
+      const start = new Date(y, m, now.getDate() - 13);
+      return { start: toIso(start), end: toIso(end) };
+    }
+    if (freq === 'quarterly') {
+      const qStartMonth = Math.floor(m / 3) * 3;
+      const start = new Date(y, qStartMonth, 1);
+      const end = new Date(y, qStartMonth + 3, 0);
+      return { start: toIso(start), end: toIso(end) };
+    }
+    const start = new Date(y, m, 1);
+    const end = new Date(y, m + 1, 0);
+    return { start: toIso(start), end: toIso(end) };
+  }
+
+  private openCreateCalculationModal(ctr: Contract) {
+    const freq = ctr.billingFrequency || 'monthly';
+    const { start, end } = this.getDefaultPeriodForFrequency(freq);
+    const seq = this.calculations.length + 1;
+
+    this.editingCalcId = null;
+    this.calcNumber = `КАЛК-${new Date().getFullYear()}/${String(seq).padStart(3, '0')}`;
+    this.calcFrequency = freq;
+    this.calcPeriodStart = start;
+    this.calcPeriodEnd = end;
+    this.calcIncludePrior = true;
+    this.calcStatus = 'draft';
+    this.calcError = '';
+    this.calcNotes = `Отчёт-калькуляция работ и расходов по договору ${ctr.number} за период ${start} — ${end}.`;
+
+    this.calcItems = this.collectItemsForPeriod(ctr, start, end, true, null);
+    this.calcModalOpen = true;
+  }
+
+  private openEditCalculationModal(calc: Calculation) {
+    this.editingCalcId = calc.id;
+    this.calcNumber = calc.number;
+    this.calcFrequency = calc.frequency;
+    this.calcPeriodStart = calc.periodStart;
+    this.calcPeriodEnd = calc.periodEnd;
+    this.calcIncludePrior = calc.includePriorUnaccounted;
+    this.calcStatus = calc.status;
+    this.calcItems = calc.items.map((item) => ({ ...item }));
+    this.calcNotes = calc.notes;
+    this.calcError = '';
+    this.calcModalOpen = true;
+  }
+
+  private applyCalculationPeriodPreset(
+    ctr: Contract,
+    preset: 'this_week' | 'prev_week' | 'this_month' | 'prev_month' | 'this_quarter'
+  ) {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const toIso = (d: Date) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+    if (preset === 'this_week' || preset === 'prev_week') {
+      const day = now.getDay();
+      const diffToMon = (day + 6) % 7;
+      const offset = preset === 'prev_week' ? -7 : 0;
+      const mon = new Date(y, m, now.getDate() - diffToMon + offset);
+      const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+      this.calcFrequency = 'weekly';
+      this.calcPeriodStart = toIso(mon);
+      this.calcPeriodEnd = toIso(sun);
+    } else if (preset === 'this_month' || preset === 'prev_month') {
+      const targetMonth = preset === 'prev_month' ? m - 1 : m;
+      const start = new Date(y, targetMonth, 1);
+      const end = new Date(y, targetMonth + 1, 0);
+      this.calcFrequency = 'monthly';
+      this.calcPeriodStart = toIso(start);
+      this.calcPeriodEnd = toIso(end);
+    } else {
+      const qStartMonth = Math.floor(m / 3) * 3;
+      const start = new Date(y, qStartMonth, 1);
+      const end = new Date(y, qStartMonth + 3, 0);
+      this.calcFrequency = 'quarterly';
+      this.calcPeriodStart = toIso(start);
+      this.calcPeriodEnd = toIso(end);
+    }
+
+    this.refreshCalculationItemsForPeriod(ctr);
+  }
+
+  private refreshCalculationItemsForPeriod(ctr: Contract) {
+    const collected = this.collectItemsForPeriod(
+      ctr,
+      this.calcPeriodStart,
+      this.calcPeriodEnd,
+      this.calcIncludePrior,
+      this.editingCalcId
+    );
+    const manualItems = this.calcItems.filter((i) => i.itemType === 'manual');
+    this.calcItems = [...collected, ...manualItems].sort((a, b) => a.date.localeCompare(b.date));
+  }
+
+  private addEmptyCalcItem(billable: boolean) {
+    const date = this.calcPeriodEnd || new Date().toISOString().slice(0, 10);
+    this.calcItems = [
+      ...this.calcItems,
+      {
+        id: `ci-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+        itemType: 'manual',
+        date,
+        title: '',
+        quantity: 1,
+        unit: 'усл.',
+        billable,
+        baseRate: 0,
+        unitPrice: 0,
+        amount: 0,
+      },
+    ];
+  }
+
+  private updateCalcItem(id: string, patch: Partial<CalculationItem>) {
+    this.calcItems = this.calcItems.map((item) => {
+      if (item.id !== id) return item;
+      const next = { ...item, ...patch };
+      const qty = Math.max(0, Number(next.quantity) || 0);
+      next.quantity = qty;
+      const baseRate = Math.max(0, Number(next.baseRate) || 0);
+      next.baseRate = baseRate;
+      if (next.billable) {
+        const rate = baseRate > 0 ? baseRate : next.unit === 'ч' ? HOURLY_RATE_RUB : 0;
+        next.baseRate = rate;
+        next.unitPrice = rate;
+        next.amount = Math.round(qty * rate);
+      } else {
+        next.unitPrice = 0;
+        next.amount = 0;
+      }
+      return next;
+    });
+  }
+
+  private handleSaveCalculation(ctr: Contract) {
+    if (!this.calcNumber.trim()) {
+      this.calcError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      return;
+    }
+
+    const cleanItems = this.calcItems
+      .filter((i) => i.title.trim())
+      .map((i) => ({
+        ...i,
+        title: i.title.trim(),
+        unitPrice: i.billable ? i.unitPrice : 0,
+        amount: i.billable ? i.amount : 0,
+      }));
+
+    if (cleanItems.length === 0) {
+      this.calcError = this.currentLang === 'ru' ? 'Добавьте хотя бы одну позицию' : 'Add at least one item';
+      return;
+    }
+
+    const hourItems = cleanItems.filter((i) => i.unit === 'ч');
+    const billableHours = Math.round(hourItems.filter((i) => i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
+    const nonBillableHours =
+      Math.round(hourItems.filter((i) => !i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
+    const totalHours = Math.round((billableHours + nonBillableHours) * 100) / 100;
+    const billableAmount = cleanItems.filter((i) => i.billable).reduce((s, i) => s + i.amount, 0);
+
+    const existing = this.editingCalcId
+      ? this.calculations.find((c) => c.id === this.editingCalcId)
+      : undefined;
+    const approvedDate =
+      this.calcStatus === 'approved' || this.calcStatus === 'invoiced'
+        ? existing?.approvedDate || new Date().toISOString().slice(0, 10)
+        : undefined;
+
+    const payload = {
+      number: this.calcNumber.trim(),
+      contractId: ctr.id,
+      projectId: ctr.projectId,
+      companyId: ctr.companyId,
+      counterpartyId: ctr.counterpartyId,
+      frequency: this.calcFrequency,
+      periodStart: this.calcPeriodStart || new Date().toISOString().slice(0, 10),
+      periodEnd: this.calcPeriodEnd || new Date().toISOString().slice(0, 10),
+      includePriorUnaccounted: this.calcIncludePrior,
+      currency: ctr.currency,
+      status: this.calcStatus,
+      totalHours,
+      billableHours,
+      nonBillableHours,
+      billableAmount,
+      items: cleanItems,
+      notes: this.calcNotes.trim(),
+      approvedDate,
+      invoiceId: existing?.invoiceId,
+    };
+
+    if (this.editingCalcId) {
+      store.updateCalculation({
+        id: this.editingCalcId,
+        createdAt: existing?.createdAt || new Date().toISOString(),
+        ...payload,
+      });
+    } else {
+      store.addCalculation(payload);
+    }
+
+    this.calcModalOpen = false;
+  }
+
+  private openInvoiceFromCalculation(ctr: Contract, calc: Calculation) {
     const today = new Date();
     const due = new Date(today);
     due.setDate(due.getDate() + 14);
@@ -1315,6 +2506,71 @@ export class AppContractDetail extends LitElement {
 
     this.editingInvoiceId = null;
     this.invNumber = `СЧ-${today.getFullYear()}/${String(seq).padStart(3, '0')}`;
+    this.invCalculationId = calc.id;
+    this.invIssueDate = today.toISOString().slice(0, 10);
+    this.invDueDate = due.toISOString().slice(0, 10);
+    this.invStatus = 'issued';
+    this.invVatRate = 20;
+    this.invError = '';
+
+    this.populateInvoiceLinesFromCalculation(ctr, calc);
+    this.invoiceModalOpen = true;
+  }
+
+  private populateInvoiceLinesFromCalculation(ctr: Contract, calc: Calculation) {
+    const billableItems = calc.items.filter((i) => i.billable && i.amount > 0);
+    const nonBillableCount = calc.items.filter((i) => !i.billable).length;
+
+    if (billableItems.length > 0) {
+      this.invItems = billableItems.map((i, idx) => ({
+        id: `ili-calc-${calc.id}-${idx}`,
+        title: i.title,
+        quantity: i.quantity,
+        unit: i.unit,
+        unitPrice: i.unitPrice,
+        amount: i.amount,
+        sourceType: i.itemType,
+        sourceId: i.sourceId,
+      }));
+    } else {
+      this.invItems = [
+        {
+          id: `ili-calc-${calc.id}-0`,
+          title: `Работы по калькуляции ${calc.number} (${calc.periodStart} — ${calc.periodEnd})`,
+          quantity: 1,
+          unit: 'этап',
+          unitPrice: calc.billableAmount,
+          amount: calc.billableAmount,
+          sourceType: 'manual',
+        },
+      ];
+    }
+
+    this.invNotes = `Оплата по договору ${ctr.number} на основании согласованной калькуляции ${calc.number} за период ${calc.periodStart} — ${calc.periodEnd}.${
+      nonBillableCount > 0
+        ? ` В отчёте также отражены ${nonBillableCount} non-billable поз. по ставке 0 ₽.`
+        : ''
+    }`;
+  }
+
+  private openCreateInvoiceModal(ctr: Contract, autoPullProject = false) {
+    const today = new Date();
+    const due = new Date(today);
+    due.setDate(due.getDate() + 14);
+    const seq = this.invoices.length + 1;
+
+    const approvedReadyCalc = this.calculations.find(
+      (c) => c.contractId === ctr.id && c.status === 'approved' && !c.invoiceId
+    );
+
+    if (approvedReadyCalc && !autoPullProject) {
+      this.openInvoiceFromCalculation(ctr, approvedReadyCalc);
+      return;
+    }
+
+    this.editingInvoiceId = null;
+    this.invNumber = `СЧ-${today.getFullYear()}/${String(seq).padStart(3, '0')}`;
+    this.invCalculationId = '';
     this.invIssueDate = today.toISOString().slice(0, 10);
     this.invDueDate = due.toISOString().slice(0, 10);
     this.invStatus = 'issued';
@@ -1364,6 +2620,7 @@ export class AppContractDetail extends LitElement {
   private openEditInvoiceModal(inv: Invoice) {
     this.editingInvoiceId = inv.id;
     this.invNumber = inv.number;
+    this.invCalculationId = inv.calculationId || '';
     this.invIssueDate = inv.issueDate;
     this.invDueDate = inv.dueDate;
     this.invStatus = inv.status;
@@ -1435,12 +2692,7 @@ export class AppContractDetail extends LitElement {
     }
 
     for (const ex of expenses) {
-      const amountRub =
-        ex.currency === 'USD'
-          ? Math.round(ex.amount * 96)
-          : ex.currency === 'EUR'
-          ? Math.round(ex.amount * 104)
-          : Math.round(ex.amount);
+      const amountRub = this.convertAmountToCurrency(ex.amount, ex.currency, ctr.currency);
       added.push({
         id: `ili-ex-${ex.id}`,
         title: `Компенсация расхода: ${ex.title}`,
@@ -1504,6 +2756,7 @@ export class AppContractDetail extends LitElement {
     const payload = {
       number: this.invNumber.trim(),
       contractId: ctr.id,
+      calculationId: this.invCalculationId || undefined,
       projectId: ctr.projectId,
       companyId: ctr.companyId,
       counterpartyId: ctr.counterpartyId,
@@ -1547,6 +2800,7 @@ export class AppContractDetail extends LitElement {
     this.ctrStartDate = ctr.startDate;
     this.ctrEndDate = ctr.endDate;
     this.ctrStatus = ctr.status;
+    this.ctrBillingFrequency = ctr.billingFrequency || 'monthly';
     this.ctrDescription = ctr.description;
     this.ctrError = '';
     this.contractModalOpen = true;
@@ -1574,6 +2828,7 @@ export class AppContractDetail extends LitElement {
       startDate: this.ctrStartDate || existing.startDate,
       endDate: this.ctrEndDate || existing.endDate,
       status: this.ctrStatus,
+      billingFrequency: this.ctrBillingFrequency,
       description: this.ctrDescription.trim(),
     });
 

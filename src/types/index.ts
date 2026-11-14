@@ -57,6 +57,8 @@ export interface Counterparty {
 
 export type ContractStatus = 'draft' | 'on_approval' | 'active' | 'completed' | 'terminated';
 export type ContractType = 'service' | 'supply' | 'license' | 'nda' | 'sla';
+export type CalculationFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly' | 'custom';
+export type CalculationStatus = 'draft' | 'sent' | 'approved' | 'rejected' | 'invoiced';
 
 export interface Contract {
   id: string;
@@ -72,7 +74,49 @@ export interface Contract {
   startDate: string;
   endDate: string;
   status: ContractStatus;
+  billingFrequency?: CalculationFrequency;
   description: string;
+}
+
+export interface CalculationItem {
+  id: string;
+  itemType: 'time_entry' | 'expense' | 'manual';
+  sourceId?: string;
+  date: string; // YYYY-MM-DD
+  taskId?: string;
+  userId?: string;
+  title: string;
+  quantity: number;
+  unit: string;
+  billable: boolean;
+  baseRate: number;
+  unitPrice: number; // 0 when !billable
+  amount: number;    // 0 when !billable
+  isPriorPeriod?: boolean;
+}
+
+export interface Calculation {
+  id: string;
+  number: string;
+  contractId: string;
+  projectId?: string;
+  companyId: string;
+  counterpartyId: string;
+  frequency: CalculationFrequency;
+  periodStart: string; // YYYY-MM-DD
+  periodEnd: string;   // YYYY-MM-DD
+  includePriorUnaccounted: boolean;
+  currency: 'RUB' | 'USD' | 'EUR';
+  status: CalculationStatus;
+  totalHours: number;
+  billableHours: number;
+  nonBillableHours: number;
+  billableAmount: number;
+  items: CalculationItem[];
+  notes: string;
+  approvedDate?: string;
+  invoiceId?: string;
+  createdAt: string;
 }
 
 export type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'cancelled';
@@ -92,6 +136,7 @@ export interface Invoice {
   id: string;
   number: string;
   contractId: string;
+  calculationId?: string;
   projectId?: string;
   companyId: string;
   counterpartyId: string;
@@ -262,6 +307,7 @@ export interface ActivityLogItem {
     | 'employee'
     | 'counterparty'
     | 'contract'
+    | 'calculation'
     | 'invoice'
     | 'time_entry'
     | 'expense'
