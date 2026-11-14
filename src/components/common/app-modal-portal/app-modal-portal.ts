@@ -281,6 +281,14 @@ export class AppModalPortal extends LitElement {
       shadowRootRef.appendChild(styleEl);
     }
 
+    // Copied styles may contain an opaque :host background (e.g. the data-grid
+    // view sheet); it would paint over the page behind the popup. Neutralize it.
+    if ('adoptedStyleSheets' in shadowRootRef) {
+      const override = new CSSStyleSheet();
+      override.replaceSync(':host { background: transparent; overflow: visible; }');
+      shadowRootRef.adoptedStyleSheets = [...shadowRootRef.adoptedStyleSheets, override];
+    }
+
     entry.contentEl.appendChild(shadowHost);
     entry.shadowHost = shadowHost;
     entry.shadowRootRef = shadowRootRef;
