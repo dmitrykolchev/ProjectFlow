@@ -711,6 +711,7 @@ export class AppTaskDetail extends LitElement {
             </app-section-card>
 
             <app-section-card variant="tabbed" title="${t.navigation.knowledgeBase}">
+              <span slot="icon">${iconBookOpen(16)}</span>
               <button
                 slot="actions"
                 type="button"
