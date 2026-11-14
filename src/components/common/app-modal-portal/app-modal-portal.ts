@@ -324,6 +324,12 @@ export class AppModalPortal extends LitElement {
         shadowRootRef.appendChild(styleNode.cloneNode(true));
       });
 
+      // The copied view stylesheet contains a :host rule with an opaque canvas
+      // background; it would paint over the page behind the portal. Neutralize it.
+      const override = new CSSStyleSheet();
+      override.replaceSync(':host { background: transparent; overflow: visible; }');
+      shadowRootRef.adoptedStyleSheets = [...shadowRootRef.adoptedStyleSheets, override];
+
       shadowRootRef.appendChild(options.element);
       entry.contentEl.appendChild(shadowHost);
       entry.shadowHost = shadowHost;
