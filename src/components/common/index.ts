@@ -54,6 +54,7 @@ export { AppPageHeader } from './app-page-header/app-page-header';
 export { AppKpiStrip } from './app-kpi-strip/app-kpi-strip';
 export { AppSectionCard } from './app-section-card/app-section-card';
 export { AppMetaGrid, type MetaItem } from './app-meta-grid/app-meta-grid';
+export { AppStatusChip } from './app-status-chip/app-status-chip';
 export { AppProgressBar, type ProgressSegment } from './app-progress-bar/app-progress-bar';
 export { AppAvatar } from './app-avatar/app-avatar';
 export { AppMoney, formatMoney, formatMoneyShort } from './app-money/app-money';
@@ -87,6 +88,7 @@ import { AppPageHeader } from './app-page-header/app-page-header';
 import { AppKpiStrip } from './app-kpi-strip/app-kpi-strip';
 import { AppSectionCard } from './app-section-card/app-section-card';
 import { AppMetaGrid } from './app-meta-grid/app-meta-grid';
+import { AppStatusChip } from './app-status-chip/app-status-chip';
 import { AppProgressBar } from './app-progress-bar/app-progress-bar';
 import { AppAvatar } from './app-avatar/app-avatar';
 import { AppMoney } from './app-money/app-money';
@@ -119,6 +121,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-kpi-strip': AppKpiStrip,
   'app-section-card': AppSectionCard,
   'app-meta-grid': AppMetaGrid,
+  'app-status-chip': AppStatusChip,
   'app-progress-bar': AppProgressBar,
   'app-avatar': AppAvatar,
   'app-money': AppMoney,
