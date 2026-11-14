@@ -382,17 +382,6 @@
 }
 
 /* Modal Forms & Invoice Line Items Editor */
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .col-span-2 {
   grid-column: span 2;
 }
@@ -854,7 +843,6 @@
   :host {
     padding: 1rem;
   }
-  .form-grid,
   .item-editor-row,
   .calc-row-top,
   .calc-row-bottom {
