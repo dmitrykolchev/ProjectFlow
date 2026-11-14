@@ -155,13 +155,12 @@ export class AppProjectDetail extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const proj = this.projects.find((p) => p.id === this.detailProjectId) || null;
 
     if (!proj) {
       return html`
         <div class="page-shell">
-          <app-empty-state title="${isRu ? 'Проект не найден или список проектов пуст' : 'Project not found'}">
+          <app-empty-state title="${t.viewTexts.projectDetail.emptyProjectNotFound}">
             <app-button slot="action" variant="primary" @click="${() => store.setActiveView('projects')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.projectDetail.backToProjects}</span>
@@ -245,7 +244,7 @@ export class AppProjectDetail extends LitElement {
               @click="${() => store.openProjectChat(proj.id)}"
             >
               <span slot="icon-start">${iconMessageSquare(15)}</span>
-              <span>${isRu ? 'Чат проекта' : 'Project Chat'}</span>
+              <span>${t.viewTexts.projectDetail.chatButton}</span>
             </app-button>
 
             <app-button
@@ -268,7 +267,7 @@ export class AppProjectDetail extends LitElement {
               }}"
             >
               <span slot="icon-start">${iconKanban()}</span>
-              <span>${isRu ? 'Задачи в Канбане' : 'Open Kanban'}</span>
+              <span>${t.viewTexts.projectDetail.kanbanButton}</span>
             </app-button>
 
             <app-button
@@ -307,19 +306,19 @@ export class AppProjectDetail extends LitElement {
 
           <div class="progress-section">
             <div class="progress-header">
-              <span>${isRu ? 'Общий прогресс выполнения проекта' : 'Overall Project Progress'}</span>
-              <span>${projectTasks.filter((tk) => tk.status === 'done').length} / ${projectTasks.length} ${isRu ? 'задач готово' : 'tasks done'}</span>
+              <span>${t.viewTexts.projectDetail.progressLabel}</span>
+              <span>${projectTasks.filter((tk) => tk.status === 'done').length} / ${projectTasks.length} ${t.viewTexts.projectDetail.tasksDoneSuffix}</span>
             </div>
             <app-progress-bar show-label color="${proj.color}" value="${proj.progress}"></app-progress-bar>
           </div>
 
           <div class="meta-strip">
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Компания-исполнитель' : 'Company'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaCompany}</span>
               <span class="meta-val">${company?.name || '—'}</span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Контрагент / Заказчик' : 'Counterparty'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaCounterparty}</span>
               ${counterparty
                 ? html`
                     <button
@@ -330,34 +329,34 @@ export class AppProjectDetail extends LitElement {
                       ${counterparty.name}
                     </button>
                   `
-                : html`<span class="meta-val">${isRu ? 'Внутренний проект' : 'Internal'}</span>`}
+                : html`<span class="meta-val">${t.viewTexts.projectDetail.internalProject}</span>`}
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Бюджет проекта' : 'Budget'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaBudget}</span>
               <span class="meta-val mono">
                 ${proj.budget ? `${proj.budget.toLocaleString('ru-RU')} ₽` : '—'}
               </span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Плановый срок' : 'Due Date'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaDueDate}</span>
               <span class="meta-val mono">${proj.dueDate}</span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Договоров' : 'Contracts'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaContracts}</span>
               <span class="meta-val mono">${linkedContracts.length}</span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Команда и роли' : 'Team & Roles'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaTeam}</span>
               <span class="meta-val mono">
-                ${uniqueUsersCount} ${isRu ? 'чел.' : 'ppl'} · ${members.length} ${isRu ? 'назнач.' : 'roles'}
+                ${uniqueUsersCount} ${t.viewTexts.projectDetail.peopleSuffix} · ${members.length} ${t.viewTexts.projectDetail.rolesSuffix}
               </span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Трудозатраты' : 'Logged Time'}</span>
-              <span class="meta-val mono">${projectHoursTotal.toFixed(1)} ч</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaLoggedTime}</span>
+              <span class="meta-val mono">${projectHoursTotal.toFixed(1)}${t.viewTexts.projectDetail.timeUnit}</span>
             </div>
             <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Прямые расходы' : 'Direct Expenses'}</span>
+              <span class="meta-label">${t.viewTexts.projectDetail.metaDirectExpenses}</span>
               <span class="meta-val mono">${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽</span>
             </div>
           </div>
@@ -377,8 +376,8 @@ export class AppProjectDetail extends LitElement {
               size="sm"
               .value="${this.roleFilterMode}"
               .options="${[
-                { value: 'all', label: isRu ? 'Все роли' : 'All Roles' },
-                { value: 'assigned', label: isRu ? 'Заполненные' : 'Assigned' },
+                { value: 'all', label: t.viewTexts.projectDetail.filterAllRoles },
+                { value: 'assigned', label: t.viewTexts.projectDetail.filterAssigned },
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) =>
                 (this.roleFilterMode = eventValue(e) as 'assigned' | 'all')}"
@@ -388,7 +387,7 @@ export class AppProjectDetail extends LitElement {
           <div class="add-member-bar">
             <div>
               <app-select
-                label="${isRu ? 'Сотрудник' : 'Employee'}"
+                label="${t.viewTexts.projectDetail.labelEmployee}"
                 size="sm"
                 .value="${this.addMemberUserId}"
                 .options="${userOptions}"
@@ -397,7 +396,7 @@ export class AppProjectDetail extends LitElement {
             </div>
             <div>
               <app-select
-                label="${isRu ? 'Роль в проекте' : 'Project Role'}"
+                label="${t.viewTexts.projectDetail.labelProjectRole}"
                 size="sm"
                 .value="${this.addMemberRole}"
                 .options="${roleOptions}"
@@ -407,7 +406,7 @@ export class AppProjectDetail extends LitElement {
             </div>
             <div>
               <app-number-input
-                label="${isRu ? 'Загрузка %' : 'Allocation %'}"
+                label="${t.viewTexts.projectDetail.labelAllocation}"
                 size="sm"
                 .value="${this.addMemberAllocation}"
                 min="5"
@@ -423,13 +422,13 @@ export class AppProjectDetail extends LitElement {
               @click="${() => this.handleAddMember(proj.id)}"
             >
               <span slot="icon-start">${iconPlus(14)}</span>
-              <span>${isRu ? 'Назначить' : 'Assign'}</span>
+              <span>${t.viewTexts.projectDetail.assignButton}</span>
             </app-button>
           </div>
 
           <div class="roles-groups">
             ${visibleRoles.length === 0
-              ? html`<app-empty-state compact title="${isRu ? 'В этом проекте ещё нет участников' : 'No team members assigned yet'}"></app-empty-state>`
+              ? html`<app-empty-state compact title="${t.viewTexts.projectDetail.emptyNoMembers}"></app-empty-state>`
               : visibleRoles.map((role) => {
                   const roleMembers = members.filter((m) => m.role === role);
                   const totalRoleAlloc = roleMembers.reduce((s, m) => s + m.allocation, 0);
@@ -450,14 +449,14 @@ export class AppProjectDetail extends LitElement {
                         </div>
                         <div class="role-group-meta">
                           ${roleMembers.length > 0
-                            ? html`<span class="mono">${isRu ? 'Суммарно' : 'Total'}: ${totalRoleAlloc}%</span>`
+                            ? html`<span class="mono">${t.viewTexts.projectDetail.totalLabel}: ${totalRoleAlloc}%</span>`
                             : html`
                                 <app-button
                                   size="sm"
                                   variant="ghost"
                                   @click="${() => (this.addMemberRole = role)}"
                                 >
-                                  ${isRu ? '+ Выбрать роль' : '+ Select role'}
+                                  ${t.viewTexts.projectDetail.selectRoleButton}
                                 </app-button>
                               `}
                         </div>
@@ -491,7 +490,7 @@ export class AppProjectDetail extends LitElement {
                                           </button>
                                         </div>
                                         <div class="member-sub">
-                                          ${user.role}${user.department ? ` · ${user.department}` : ''} · ${isRu ? 'с' : 'since'} ${member.joinedAt}
+                                          ${user.role}${user.department ? ` · ${user.department}` : ''} · ${t.viewTexts.projectDetail.sinceWord} ${member.joinedAt}
                                         </div>
                                       </div>
                                     </div>
@@ -539,7 +538,7 @@ export class AppProjectDetail extends LitElement {
                                     <button
                                       type="button"
                                       class="icon-btn danger"
-                                      title="${isRu ? 'Удалить из роли' : 'Remove from role'}"
+                                      title="${t.viewTexts.projectDetail.removeFromRoleTitle}"
                                       @click="${() =>
                                         store.removeProjectMember(proj.id, member.userId, member.role)}"
                                     >
@@ -570,7 +569,7 @@ export class AppProjectDetail extends LitElement {
                   store.setActiveView('grid');
                 }}"
               >
-                ${isRu ? 'Таблица задач' : 'Task Grid'}
+                ${t.viewTexts.projectDetail.taskGridButton}
               </app-button>
             </div>
 
@@ -602,7 +601,7 @@ export class AppProjectDetail extends LitElement {
                 variant="ghost"
                 @click="${() => store.setActiveView('contracts')}"
               >
-                ${isRu ? 'Все договоры' : 'All Contracts'}
+                ${t.viewTexts.projectDetail.allContractsLabel}
               </app-button>
             </div>
 
@@ -647,7 +646,7 @@ export class AppProjectDetail extends LitElement {
 
         <!-- Time Tracking & Expenses Panels for Project -->
         <div class="secondary-grid">
-          <app-section-card title="${isRu ? 'Учёт времени по проекту' : 'Project Time Tracking'}" subtitle="(${projectHoursTotal.toFixed(1)} ч)">
+          <app-section-card title="${t.viewTexts.projectDetail.timeSectionTitle}" subtitle="(${projectHoursTotal.toFixed(1)}${t.viewTexts.projectDetail.timeUnit})">
             <span slot="icon">${iconClock(18)}</span>
             <div slot="actions" class="section-actions-inline">
               <app-button
@@ -656,19 +655,19 @@ export class AppProjectDetail extends LitElement {
                 @click="${() => this.openQuickTimeModal(proj.id)}"
               >
                 <span slot="icon-start">${iconPlus(13)}</span>
-                <span>${isRu ? 'Списать' : 'Log'}</span>
+                <span>${t.viewTexts.projectDetail.logButton}</span>
               </app-button>
               <app-button
                 size="sm"
                 variant="ghost"
                 @click="${() => store.setActiveView('time-tracking')}"
               >
-                ${isRu ? 'Журнал' : 'All'}
+                ${t.viewTexts.projectDetail.journalButton}
               </app-button>
             </div>
 
             ${projectTimeEntries.length === 0
-              ? html`<app-empty-state compact title="${isRu ? 'Записи о времени по проекту ещё не добавлены' : 'No time entries yet'}"></app-empty-state>`
+              ? html`<app-empty-state compact title="${t.viewTexts.projectDetail.emptyNoTimeEntries}"></app-empty-state>`
               : html`
                   <div class="contracts-list">
                     ${projectTimeEntries.slice(0, 5).map((te) => {
@@ -683,7 +682,7 @@ export class AppProjectDetail extends LitElement {
                             <div class="contract-sub">${te.date} · ${user?.name || te.userId}</div>
                           </div>
                           <div class="contract-right">
-                            <span class="mono" style="font-weight: 700; font-size: 0.85rem;">${te.hours.toFixed(1)} ч</span>
+                            <span class="mono" style="font-weight: 700; font-size: 0.85rem;">${te.hours.toFixed(1)}${t.viewTexts.projectDetail.timeUnit}</span>
                             <app-status-chip
                               domain="timeEntry"
                               status="${te.status}"
@@ -698,7 +697,7 @@ export class AppProjectDetail extends LitElement {
                 `}
           </app-section-card>
 
-          <app-section-card title="${isRu ? 'Расходы по проекту' : 'Project Expenses'}" subtitle="(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)">
+          <app-section-card title="${t.viewTexts.projectDetail.expensesSectionTitle}" subtitle="(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)">
             <span slot="icon">${iconWallet(18)}</span>
             <div slot="actions" class="section-actions-inline">
               <app-button
@@ -707,19 +706,19 @@ export class AppProjectDetail extends LitElement {
                 @click="${() => this.openQuickExpenseModal()}"
               >
                 <span slot="icon-start">${iconPlus(13)}</span>
-                <span>${isRu ? 'Расход' : 'Expense'}</span>
+                <span>${t.viewTexts.projectDetail.expenseButton}</span>
               </app-button>
               <app-button
                 size="sm"
                 variant="ghost"
                 @click="${() => store.setActiveView('expenses')}"
               >
-                ${isRu ? 'Реестр' : 'All'}
+                ${t.viewTexts.projectDetail.registryButton}
               </app-button>
             </div>
 
             ${projectExpenses.length === 0
-              ? html`<app-empty-state compact title="${isRu ? 'Прямые расходы по проекту отсутствуют' : 'No project expenses yet'}"></app-empty-state>`
+              ? html`<app-empty-state compact title="${t.viewTexts.projectDetail.emptyNoExpenses}"></app-empty-state>`
               : html`
                   <div class="contracts-list">
                     ${projectExpenses.slice(0, 5).map((exp) => {
@@ -752,14 +751,14 @@ export class AppProjectDetail extends LitElement {
         </div>
       </div>
 
-      ${this.renderEditModal(t, isRu)}
+      ${this.renderEditModal(t)}
       ${this.renderDeleteModal(proj, t)}
-      ${this.renderQuickTimeModal(proj, projectTasks, t, isRu)}
-      ${this.renderQuickExpenseModal(proj, projectTasks, t, isRu)}
+      ${this.renderQuickTimeModal(proj, projectTasks, t)}
+      ${this.renderQuickExpenseModal(proj, projectTasks, t)}
     `;
   }
 
-  private renderEditModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderEditModal(t: ReturnType<typeof getTranslation>) {
     const statusOptions = [
       { value: 'planning', label: t.projectStatuses.planning, color: '#0284c7' },
       { value: 'active', label: t.projectStatuses.active, color: '#10b981' },
@@ -767,11 +766,11 @@ export class AppProjectDetail extends LitElement {
       { value: 'completed', label: t.projectStatuses.completed, color: '#6366f1' },
     ];
     const companyOptions = [
-      { value: '', label: isRu ? 'Не указана' : 'None' },
+      { value: '', label: t.viewTexts.projects.optionNoCompany },
       ...store.companies.map((c) => ({ value: c.id, label: c.name })),
     ];
     const counterpartyOptions = [
-      { value: '', label: isRu ? 'Внутренний проект' : 'Internal' },
+      { value: '', label: t.viewTexts.projectDetail.internalProject },
       ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
     ];
 
@@ -779,13 +778,13 @@ export class AppProjectDetail extends LitElement {
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${isRu ? 'Редактирование проекта' : 'Edit Project'}"
+        title="${t.viewTexts.projects.modalTitleEdit}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'Название проекта' : 'Project Name'}"
+              label="${t.viewTexts.projects.labelProjectName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -797,7 +796,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Код (ключ)' : 'Project Key'}"
+              label="${t.viewTexts.projects.labelProjectKey}"
               .value="${this.formKey}"
               @input="${(e: CustomEvent<{ value: string }>) =>
                 (this.formKey = eventValue(e).toUpperCase())}"
@@ -805,7 +804,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.projects.labelStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -814,14 +813,14 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Плановый срок' : 'Due Date'}"
+              label="${t.viewTexts.projectDetail.metaDueDate}"
               .value="${this.formDueDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formDueDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Компания-исполнитель' : 'Company'}"
+              label="${t.viewTexts.projectDetail.metaCompany}"
               .value="${this.formCompanyId}"
               .options="${companyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
@@ -829,7 +828,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Контрагент (заказчик)' : 'Counterparty'}"
+              label="${t.viewTexts.projects.labelCounterparty}"
               .value="${this.formCounterpartyId}"
               .options="${counterpartyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
@@ -837,7 +836,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Бюджет (₽)' : 'Budget (₽)'}"
+              label="${t.viewTexts.projects.labelBudgetRub}"
               .value="${this.formBudget}"
               min="0"
               step="100000"
@@ -847,7 +846,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Прогресс (%)' : 'Progress (%)'}"
+              label="${t.viewTexts.projects.labelProgressPct}"
               .value="${this.formProgress}"
               min="0"
               max="100"
@@ -857,7 +856,7 @@ export class AppProjectDetail extends LitElement {
             ></app-number-input>
           </div>
           <div class="col-span-2">
-            <span class="meta-label">${isRu ? 'Цвет проекта' : 'Project Color'}</span>
+            <span class="meta-label">${t.viewTexts.projects.projectColorLabel}</span>
             <div class="color-swatches">
               ${PROJECT_COLOR_SWATCHES.map(
                 (hex) => html`
@@ -873,7 +872,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Описание и цели проекта' : 'Description'}"
+              label="${t.viewTexts.projects.labelDescription}"
               .value="${this.formDescription}"
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
@@ -943,7 +942,7 @@ export class AppProjectDetail extends LitElement {
     const existing = this.projects.find((p) => p.id === this.detailProjectId);
     if (!existing) return;
     if (!this.formName.trim()) {
-      this.formError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.formError = getTranslation(this.currentLang).common.required;
       return;
     }
 
@@ -997,8 +996,7 @@ export class AppProjectDetail extends LitElement {
   private renderQuickTimeModal(
     proj: Project,
     projectTasks: typeof store.tasks,
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     const taskOpts = projectTasks.slice(0, 60).map((tk) => ({
       value: tk.id,
@@ -1019,13 +1017,13 @@ export class AppProjectDetail extends LitElement {
       <app-modal
         ?open="${this.timeModalOpen}"
         size="md"
-        title="${isRu ? `Списание времени · ${proj.key}` : `Log Time · ${proj.key}`}"
+        title="${t.viewTexts.projectDetail.quickTimeTitle(proj.key)}"
         @close="${() => (this.timeModalOpen = false)}"
       >
         <app-form-grid>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Задача проекта' : 'Task'}"
+              label="${t.viewTexts.projectDetail.labelProjectTask}"
               .value="${this.timeTaskId}"
               .options="${taskOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = eventValue(e))}"
@@ -1033,7 +1031,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Исполнитель' : 'Employee'}"
+              label="${t.viewTexts.timeTracking.labelEmployee}"
               .value="${this.timeUserId}"
               .options="${userOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = eventValue(e))}"
@@ -1041,18 +1039,18 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Часы' : 'Hours'}"
+              label="${t.viewTexts.timeTracking.labelHours}"
               .value="${this.timeHours}"
               min="0.25"
               max="24"
               step="0.5"
-              unit="ч"
+              unit="${t.viewTexts.timeTracking.hoursUnit}"
               @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = eventValue(e))}"
             ></app-number-input>
           </div>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Категория работ' : 'Category'}"
+              label="${t.viewTexts.timeTracking.labelCategory}"
               .value="${this.timeCategory}"
               .options="${catOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -1061,7 +1059,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Комментарий к отчёту' : 'Notes'}"
+              label="${t.viewTexts.projectDetail.quickNotesLabel}"
               .value="${this.timeDesc}"
               rows="2"
               @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
@@ -1099,11 +1097,10 @@ export class AppProjectDetail extends LitElement {
   private renderQuickExpenseModal(
     proj: Project,
     projectTasks: typeof store.tasks,
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     const taskOpts = [
-      { value: '', label: isRu ? 'На весь проект' : 'Project-wide' },
+      { value: '', label: t.viewTexts.projectDetail.optionProjectWide },
       ...projectTasks.slice(0, 60).map((tk) => ({ value: tk.id, label: `${tk.id} · ${tk.title}` })),
     ];
     const catOpts = [
@@ -1120,13 +1117,13 @@ export class AppProjectDetail extends LitElement {
       <app-modal
         ?open="${this.expenseModalOpen}"
         size="md"
-        title="${isRu ? `Новый расход · ${proj.key}` : `New Expense · ${proj.key}`}"
+        title="${t.viewTexts.projectDetail.quickExpenseTitle(proj.key)}"
         @close="${() => (this.expenseModalOpen = false)}"
       >
         <app-form-grid>
           <div class="col-span-2">
             <app-input
-              label="${isRu ? 'Наименование расхода' : 'Title'}"
+              label="${t.viewTexts.projectDetail.quickExpenseTitleLabel}"
               .value="${this.expTitle}"
               required
               error="${this.expError}"
@@ -1138,7 +1135,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Категория' : 'Category'}"
+              label="${t.viewTexts.expenses.thCategory}"
               .value="${this.expCategory}"
               .options="${catOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -1147,7 +1144,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Сумма (₽)' : 'Amount (₽)'}"
+              label="${t.viewTexts.projectDetail.labelAmountRub}"
               .value="${this.expAmount}"
               min="0"
               step="1000"
@@ -1157,7 +1154,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Задача (опционально)' : 'Task (optional)'}"
+              label="${t.viewTexts.expenses.labelLinkedTask}"
               .value="${this.expTaskId}"
               .options="${taskOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.expTaskId = eventValue(e))}"
@@ -1165,7 +1162,7 @@ export class AppProjectDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Поставщик' : 'Vendor'}"
+              label="${t.viewTexts.counterparties.typeVendor}"
               .value="${this.expVendor}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = eventValue(e))}"
             ></app-input>
@@ -1177,7 +1174,7 @@ export class AppProjectDetail extends LitElement {
             variant="primary"
             @click="${() => {
               if (!this.expTitle.trim()) {
-                this.expError = isRu ? 'Обязательное поле' : 'Required';
+                this.expError = t.common.required;
                 return;
               }
               store.addExpense({
