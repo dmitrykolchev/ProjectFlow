@@ -21,31 +21,31 @@ export type StatusDomain =
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
   variant: StatusBadgeVariant;
-  /** i18n group key (e.g. 'status', 'priority', 'projectStatuses') when labels live in i18n. */
-  i18nGroup?: string;
+  /** Path in the translation tree, e.g. ['status'] or ['calculations','statuses']. */
+  i18nPath?: string[];
   /** Hardcoded ru/en label pair (used when the domain has no i18n group). */
   label?: { ru: string; en: string };
 }
 
 export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = {
   task: {
-    backlog: { variant: 'neutral', i18nGroup: 'status' },
-    todo: { variant: 'info', i18nGroup: 'status' },
-    in_progress: { variant: 'warning', i18nGroup: 'status' },
-    review: { variant: 'primary', i18nGroup: 'status' },
-    done: { variant: 'success', i18nGroup: 'status' },
+    backlog: { variant: 'default', i18nPath: ['status'] },
+    todo: { variant: 'info', i18nPath: ['status'] },
+    in_progress: { variant: 'warning', i18nPath: ['status'] },
+    review: { variant: 'primary', i18nPath: ['status'] },
+    done: { variant: 'success', i18nPath: ['status'] },
   },
   priority: {
-    low: { variant: 'neutral', i18nGroup: 'priority' },
-    medium: { variant: 'info', i18nGroup: 'priority' },
-    high: { variant: 'warning', i18nGroup: 'priority' },
-    urgent: { variant: 'danger', i18nGroup: 'priority' },
+    low: { variant: 'default', i18nPath: ['priority'] },
+    medium: { variant: 'info', i18nPath: ['priority'] },
+    high: { variant: 'warning', i18nPath: ['priority'] },
+    urgent: { variant: 'danger', i18nPath: ['priority'] },
   },
   project: {
-    planning: { variant: 'info', i18nGroup: 'projectStatuses' },
-    active: { variant: 'success', i18nGroup: 'projectStatuses' },
-    on_hold: { variant: 'warning', i18nGroup: 'projectStatuses' },
-    completed: { variant: 'primary', i18nGroup: 'projectStatuses' },
+    planning: { variant: 'info', i18nPath: ['projectStatuses'] },
+    active: { variant: 'success', i18nPath: ['projectStatuses'] },
+    on_hold: { variant: 'warning', i18nPath: ['projectStatuses'] },
+    completed: { variant: 'primary', i18nPath: ['projectStatuses'] },
   },
   company: {
     active: { variant: 'success', label: { ru: 'Активна', en: 'Active' } },
@@ -70,20 +70,20 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     terminated: { variant: 'danger', label: { ru: 'Расторгнут', en: 'Terminated' } },
   },
   calculation: {
-    draft: { variant: 'default' },
-    sent: { variant: 'warning' },
-    approved: { variant: 'success' },
-    invoiced: { variant: 'info' },
-    rejected: { variant: 'danger' },
+    draft: { variant: 'default', i18nPath: ['calculations', 'statuses'] },
+    sent: { variant: 'warning', i18nPath: ['calculations', 'statuses'] },
+    approved: { variant: 'success', i18nPath: ['calculations', 'statuses'] },
+    invoiced: { variant: 'info', i18nPath: ['calculations', 'statuses'] },
+    rejected: { variant: 'danger', i18nPath: ['calculations', 'statuses'] },
   },
   invoice: {
-    draft: { variant: 'default' },
-    issued: { variant: 'info' },
-    sent: { variant: 'warning' },
-    partially_paid: { variant: 'warning' },
-    paid: { variant: 'success' },
-    overdue: { variant: 'danger' },
-    cancelled: { variant: 'default' },
+    draft: { variant: 'default', i18nPath: ['invoices', 'statuses'] },
+    issued: { variant: 'info', i18nPath: ['invoices', 'statuses'] },
+    sent: { variant: 'warning', i18nPath: ['invoices', 'statuses'] },
+    partially_paid: { variant: 'warning', i18nPath: ['invoices', 'statuses'] },
+    paid: { variant: 'success', i18nPath: ['invoices', 'statuses'] },
+    overdue: { variant: 'danger', i18nPath: ['invoices', 'statuses'] },
+    cancelled: { variant: 'default', i18nPath: ['invoices', 'statuses'] },
   },
   payment: {
     pending: { variant: 'warning' },
@@ -92,15 +92,15 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     overdue: { variant: 'danger' },
   },
   expense: {
-    pending: { variant: 'warning' },
-    approved: { variant: 'success' },
-    reimbursed: { variant: 'info' },
-    rejected: { variant: 'danger' },
+    pending: { variant: 'warning', i18nPath: ['expenses', 'statuses'] },
+    approved: { variant: 'success', i18nPath: ['expenses', 'statuses'] },
+    reimbursed: { variant: 'info', i18nPath: ['expenses', 'statuses'] },
+    rejected: { variant: 'danger', i18nPath: ['expenses', 'statuses'] },
   },
   timeEntry: {
-    logged: { variant: 'default' },
-    submitted: { variant: 'warning' },
-    approved: { variant: 'success' },
+    logged: { variant: 'default', i18nPath: ['timeTracking', 'statuses'] },
+    submitted: { variant: 'warning', i18nPath: ['timeTracking', 'statuses'] },
+    approved: { variant: 'success', i18nPath: ['timeTracking', 'statuses'] },
   },
   employee: {
     active: { variant: 'success', label: { ru: 'В штате', en: 'Active' } },
@@ -119,9 +119,13 @@ export function statusLabel(
 ): string {
   const token = STATUS_TOKENS[domain]?.[status];
   if (!token) return status;
-  if (token.i18nGroup) {
-    const group = translation[token.i18nGroup] as Record<string, string> | undefined;
-    return group?.[status] ?? status;
+  if (token.i18nPath) {
+    let node: unknown = translation;
+    for (const key of token.i18nPath) {
+      node = (node as Record<string, unknown>)?.[key];
+      if (!node) return status;
+    }
+    return (node as Record<string, string>)[status] ?? status;
   }
   return token.label ? token.label[lang] : status;
 }

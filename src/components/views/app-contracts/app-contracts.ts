@@ -33,6 +33,7 @@ import {
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -133,21 +134,6 @@ export class AppContracts extends LitElement {
     }
   }
 
-  private getStatusMeta(status: ContractStatus, isRu: boolean): { label: string; variant: 'default' | 'warning' | 'success' | 'info' | 'danger' } {
-    switch (status) {
-      case 'draft':
-        return { label: isRu ? 'Черновик' : 'Draft', variant: 'default' };
-      case 'on_approval':
-        return { label: isRu ? 'Согласование' : 'Approval', variant: 'warning' };
-      case 'active':
-        return { label: isRu ? 'Действует' : 'Active', variant: 'success' };
-      case 'completed':
-        return { label: isRu ? 'Исполнен' : 'Completed', variant: 'info' };
-      case 'terminated':
-        return { label: isRu ? 'Расторгнут' : 'Terminated', variant: 'danger' };
-    }
-  }
-
 
   private getDaysRemaining(endDate: string): number | null {
     if (!endDate) return null;
@@ -175,25 +161,6 @@ export class AppContracts extends LitElement {
         project.includes(query)
       );
     });
-  }
-
-  private getInvoiceStatusVariant(
-    status: InvoiceStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'draft':
-        return 'default';
-      case 'issued':
-        return 'info';
-      case 'sent':
-      case 'partially_paid':
-        return 'warning';
-      case 'paid':
-        return 'success';
-      case 'overdue':
-      case 'cancelled':
-        return 'danger';
-    }
   }
 
   private renderDueControlTag(inv: Invoice, t: ReturnType<typeof getTranslation>) {
@@ -241,23 +208,6 @@ export class AppContracts extends LitElement {
         <span>${t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta))}</span>
       </span>
     `;
-  }
-
-  private getCalculationStatusVariant(
-    status: CalculationStatus
-  ): 'default' | 'warning' | 'success' | 'info' | 'danger' {
-    switch (status) {
-      case 'draft':
-        return 'default';
-      case 'sent':
-        return 'warning';
-      case 'approved':
-        return 'success';
-      case 'invoiced':
-        return 'info';
-      case 'rejected':
-        return 'danger';
-    }
   }
 
   private getFilteredCalculations(): Calculation[] {
@@ -589,7 +539,6 @@ export class AppContracts extends LitElement {
                       const cp = store.counterparties.find((c) => c.id === ctr.counterpartyId);
                       const proj = store.projects.find((p) => p.id === ctr.projectId);
                       const owner = store.users.find((u) => u.id === ctr.ownerId);
-                      const statusMeta = this.getStatusMeta(ctr.status, isRu);
                       const daysLeft = ctr.status === 'active' ? this.getDaysRemaining(ctr.endDate) : null;
                       const billing = this.getContractBillingStats(ctr.id);
 
@@ -666,9 +615,7 @@ export class AppContracts extends LitElement {
                               : ''}
                           </td>
                           <td>
-                            <app-badge variant="${statusMeta.variant}" appearance="soft" size="sm">
-                              ${statusMeta.label}
-                            </app-badge>
+                            <app-status-chip domain="contract" status="${ctr.status}" size="sm"></app-status-chip>
                           </td>
                           <td>
                             <div class="actions-row">
@@ -807,13 +754,12 @@ export class AppContracts extends LitElement {
                               : ''}
                           </td>
                           <td>
-                            <app-badge
-                              variant="${this.getCalculationStatusVariant(calc.status)}"
+                            <app-status-chip
+                              domain="calculation"
+                              status="${calc.status}"
                               appearance="soft"
                               size="sm"
-                            >
-                              ${t.calculations.statuses[calc.status]}
-                            </app-badge>
+                            ></app-status-chip>
                           </td>
                           <td>
                             <div class="actions-row">
@@ -1081,13 +1027,12 @@ export class AppContracts extends LitElement {
                         </td>
                         <td class="amount-cell">${formatMoney(inv.totalAmount, inv.currency)}</td>
                         <td>
-                          <app-badge
-                            variant="${this.getInvoiceStatusVariant(inv.status)}"
+                          <app-status-chip
+                            domain="invoice"
+                            status="${inv.status}"
                             appearance="soft"
                             size="sm"
-                          >
-                            ${t.invoices.statuses[inv.status]}
-                          </app-badge>
+                          ></app-status-chip>
                         </td>
                         <td>
                           <div class="actions-row">
