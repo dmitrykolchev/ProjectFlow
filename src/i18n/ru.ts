@@ -1344,6 +1344,8 @@ export const ru = {
       weekSuffix: 'нед.',
       monthSuffix: 'мес.',
       demoStats: '2 000 задач · 3 года',
+      weekPrefix: 'Нед',
+      shortMonths: ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     },
     projectOverview: {
       millionsSuffix: 'млн ₽',

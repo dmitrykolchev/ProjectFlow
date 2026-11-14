@@ -111,7 +111,6 @@ export class AppCalendar extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
 
     return html`
       <div class="calendar-toolbar">
@@ -146,13 +145,13 @@ export class AppCalendar extends LitElement {
                     class="mode-btn ${this.weekDaysCount === 7 ? 'is-active' : ''}"
                     @click="${() => (this.weekDaysCount = 7)}"
                   >
-                    ${isRu ? '7 дней' : '7 days'}
+                    ${t.viewTexts.calendar.sevenDays}
                   </button>
                   <button
                     class="mode-btn ${this.weekDaysCount === 5 ? 'is-active' : ''}"
                     @click="${() => (this.weekDaysCount = 5)}"
                   >
-                    ${isRu ? '5 дней' : '5 days'}
+                    ${t.viewTexts.calendar.fiveDays}
                   </button>
                 </div>
               `

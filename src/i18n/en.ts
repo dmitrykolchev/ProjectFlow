@@ -1344,6 +1344,8 @@ export const en = {
       weekSuffix: 'w',
       monthSuffix: 'mo',
       demoStats: '2,000 tasks · 3 yrs',
+      weekPrefix: 'W',
+      shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     },
     projectOverview: {
       millionsSuffix: 'M ₽',

@@ -276,9 +276,7 @@ export class AppGantt extends LitElement {
       }
     }
 
-    const shortMonthsRu = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
-    const shortMonthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const shortMonths = this.currentLang === 'ru' ? shortMonthsRu : shortMonthsEn;
+    const shortMonths = t.viewTexts.gantt.shortMonths;
 
     if (this.timeScale === 'day') {
       const defaultFloor = this.datasetMode === 'project' && !this.tasksData ? parseUtcDateMs('2026-11-01') : minTaskMs;
@@ -327,7 +325,7 @@ export class AppGantt extends LitElement {
       const cellWidth = 140;
 
       const cols: TimelineColumn[] = new Array(totalWeeks);
-      const weekPrefix = this.currentLang === 'ru' ? 'Нед' : 'W';
+      const weekPrefix = t.viewTexts.gantt.weekPrefix;
       for (let w = 0; w < totalWeeks; w++) {
         const colStart = firstMondayMs + w * 7 * DAY_MS;
         const colEnd = colStart + 7 * DAY_MS;
@@ -561,7 +559,6 @@ export class AppGantt extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const tasks = this.getActiveTasks();
     const model = this.getTimelineModel(tasks, t);
     const { cols, colOffsets, totalWidth, todayTimelinePx, items } = model;
@@ -619,14 +616,14 @@ export class AppGantt extends LitElement {
                     class="scale-btn ${this.datasetMode === 'project' ? 'is-active' : ''}"
                     @click="${() => (this.datasetMode = 'project')}"
                   >
-                    ${isRu ? 'Проект' : 'Project'}
+                    ${t.viewTexts.timeTracking.labelProject}
                   </button>
                   <button
                     type="button"
                     class="scale-btn ${this.datasetMode === 'large' ? 'is-active' : ''}"
                     @click="${() => (this.datasetMode = 'large')}"
                   >
-                    ${isRu ? '2 000 задач · 3 года' : '2,000 tasks · 3 yrs'}
+                    ${t.viewTexts.gantt.demoStats}
                   </button>
                 </div>
               `
@@ -651,16 +648,10 @@ export class AppGantt extends LitElement {
             <span class="meta-sep">·</span>
             <span class="tabular-nums">${totalCols.toLocaleString()}</span>
             ${this.timeScale === 'day'
-              ? isRu
-                ? 'дн.'
-                : 'd'
+              ? t.viewTexts.contractDetail.daysSuffix
               : this.timeScale === 'week'
-              ? isRu
-                ? 'нед.'
-                : 'w'
-              : isRu
-              ? 'мес.'
-              : 'mo'}
+              ? t.viewTexts.gantt.weekSuffix
+              : t.viewTexts.gantt.monthSuffix}
           </span>
         </div>
       </div>
