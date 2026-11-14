@@ -114,6 +114,7 @@ export class AppDashboard extends LitElement {
     return html`
       <div class="dashboard-container">
         <app-page-header title="${t.dashboard.title}" subtitle="${t.dashboard.subtitle}">
+          <span slot="icon">${iconAnalytics(28)}</span>
           <app-segmented-switch
             slot="actions"
             size="sm"
