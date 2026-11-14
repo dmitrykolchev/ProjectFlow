@@ -221,18 +221,6 @@
 .data-table tr:hover td {
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .confirm-text {
   margin: 0;
   color: var(--text-secondary, #94a3b8);
@@ -242,9 +230,6 @@
 
 @media (max-width: 640px) {
   .cards-grid {
-    grid-template-columns: 1fr;
-  }
-  .form-grid {
     grid-template-columns: 1fr;
   }
 }

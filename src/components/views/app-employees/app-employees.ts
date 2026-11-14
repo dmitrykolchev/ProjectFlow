@@ -5,6 +5,8 @@ import { EmployeeStatus, User } from '../../../types';
 import { iconChevronRight, iconEdit, iconPlus, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -185,7 +187,7 @@ export class AppEmployees extends LitElement {
           : 'New Employee'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'ФИО' : 'Full Name'}"
@@ -272,7 +274,7 @@ export class AppEmployees extends LitElement {
               @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = e.detail.value)}"
             ></app-number-input>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -284,34 +286,23 @@ export class AppEmployees extends LitElement {
         </div>
       </app-modal>
 
-      <app-modal
-        ?open="${Boolean(this.deletingEmployee)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingEmployee)}"
         size="sm"
         title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        @close="${() => (this.deletingEmployee = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Удалить сотрудника «${this.deletingEmployee?.name || ''}» из справочника и проектных команд?`
-            : `Remove "${this.deletingEmployee?.name || ''}" from directory and project teams?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingEmployee = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingEmployee) {
-                store.deleteEmployee(this.deletingEmployee.id);
-                this.deletingEmployee = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Удалить сотрудника «${this.deletingEmployee?.name || ''}» из справочника и проектных команд?`
+          : `Remove "${this.deletingEmployee?.name || ''}" from directory and project teams?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingEmployee = null)}"
+        @confirm="${() => {
+          if (this.deletingEmployee) {
+            store.deleteEmployee(this.deletingEmployee.id);
+            this.deletingEmployee = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
