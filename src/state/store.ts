@@ -43,6 +43,7 @@ import {
   initialTimeEntries,
   initialUsers,
 } from './mock-data';
+import { locationToPath, pathToLocation, NavLocation } from '../domain/navigation';
 
 const STORAGE_KEY_CUSTOMIZATION = 'projectflow_customization_v1';
 const STORAGE_KEY_TASKS = 'projectflow_tasks_v2';
@@ -232,6 +233,7 @@ export class AppStore {
   public pendingInvoiceForContractId: string | null = null;
   public pendingCalculationForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
+  private historyApplying = false;
 
   public searchQuery: string = '';
   public filterStatus: string = 'all';
@@ -915,6 +917,12 @@ export class AppStore {
 
   public setActiveView(view: ActiveView): void {
     this.activeView = view;
+    this.expandSidebarGroupFor(view);
+    this.notify();
+    this.syncHistory(false);
+  }
+
+  private expandSidebarGroupFor(view: ActiveView): void {
     const targetGroup = this.getGroupForView(view);
     const expanded = this.customization.sidebarExpandedGroups || [];
     if (!expanded.includes(targetGroup)) {
@@ -925,7 +933,87 @@ export class AppStore {
       }
       this.saveCustomization();
     }
+  }
+
+  private currentDetailId(): string | undefined {
+    switch (this.activeView) {
+      case 'project-detail':
+        return this.detailProjectId || undefined;
+      case 'contract-detail':
+        return this.detailContractId || undefined;
+      case 'counterparty-detail':
+        return this.detailCounterpartyId || undefined;
+      case 'employee-detail':
+        return this.detailEmployeeId || undefined;
+      case 'task-detail':
+        return this.detailTaskId || undefined;
+      case 'project-chat':
+        return this.chatProjectId || undefined;
+      default:
+        return undefined;
+    }
+  }
+
+  private syncHistory(replace: boolean): void {
+    if (this.historyApplying) return;
+    const id = this.currentDetailId();
+    const path = locationToPath(this.activeView, id);
+    const state = { view: this.activeView, id };
+    if (location.hash === path) {
+      history.replaceState(state, '', path);
+      return;
+    }
+    if (replace) {
+      history.replaceState(state, '', path);
+    } else {
+      history.pushState(state, '', path);
+    }
+  }
+
+  public applyHistoryLocation(loc: NavLocation): void {
+    this.historyApplying = true;
+    let view = loc.view;
+    const id = loc.id;
+    if (view === 'project-detail') {
+      if (id && this.projects.some((p) => p.id === id)) this.detailProjectId = id;
+      else view = 'projects';
+    } else if (view === 'contract-detail') {
+      if (id && this.contracts.some((c) => c.id === id)) this.detailContractId = id;
+      else view = 'contracts';
+    } else if (view === 'counterparty-detail') {
+      if (id && this.counterparties.some((c) => c.id === id)) this.detailCounterpartyId = id;
+      else view = 'counterparties';
+    } else if (view === 'employee-detail') {
+      if (id && this.users.some((u) => u.id === id)) this.detailEmployeeId = id;
+      else view = 'employees';
+    } else if (view === 'task-detail') {
+      if (id && this.tasks.some((t) => t.id === id)) this.detailTaskId = id;
+      else view = 'grid';
+    } else if (view === 'project-chat') {
+      if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
+      else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
+    }
+    this.activeView = view;
+    this.expandSidebarGroupFor(view);
     this.notify();
+    this.historyApplying = false;
+  }
+
+  public initHistory(): void {
+    window.addEventListener('popstate', (e: PopStateEvent) => {
+      const st = e.state as { view: ActiveView; id?: string } | null;
+      const loc = st?.view ? { view: st.view, id: st.id } : pathToLocation(location.hash);
+      if (loc) this.applyHistoryLocation(loc);
+    });
+    const loc = pathToLocation(location.hash);
+    if (loc) {
+      this.applyHistoryLocation(loc);
+    }
+    history.replaceState(
+      { view: this.activeView, id: this.currentDetailId() },
+      '',
+      locationToPath(this.activeView, this.currentDetailId())
+    );
   }
 
   public selectProject(projectId: string): void {
@@ -1265,6 +1353,7 @@ export class AppStore {
       this.detailEmployeeId = this.users[0]?.id || '';
       if (this.activeView === 'employee-detail') {
         this.activeView = 'employees';
+        this.syncHistory(true);
       }
     }
     if (this.currentUserId === id) {
@@ -1307,6 +1396,7 @@ export class AppStore {
       this.detailCounterpartyId = this.counterparties[0]?.id || '';
       if (this.activeView === 'counterparty-detail') {
         this.activeView = 'counterparties';
+        this.syncHistory(true);
       }
     }
     this.saveCounterparties();
@@ -1345,6 +1435,7 @@ export class AppStore {
       this.detailContractId = this.contracts[0]?.id || '';
       if (this.activeView === 'contract-detail') {
         this.activeView = 'contracts';
+        this.syncHistory(true);
       }
     }
     this.saveContracts();
@@ -1760,6 +1851,7 @@ export class AppStore {
       this.detailProjectId = this.projects[0]?.id || '';
       if (this.activeView === 'project-detail') {
         this.activeView = 'projects';
+        this.syncHistory(true);
       }
     }
     this.saveProjects();
