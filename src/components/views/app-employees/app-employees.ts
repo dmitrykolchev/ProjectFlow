@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
+import { getTranslation } from '../../../i18n';
 import { iconChevronRight, iconEdit, iconPlus, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -99,6 +100,7 @@ export class AppEmployees extends LitElement {
   }
 
   render() {
+    const t = getTranslation(this.currentLang);
     const isRu = this.currentLang === 'ru';
     const filtered = this.getFilteredEmployees();
     const activeOnline = this.employees.filter((e) => (e.status || 'active') !== 'vacation').length;
@@ -173,8 +175,8 @@ export class AppEmployees extends LitElement {
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Сотрудники не найдены' : 'No employees found'}"></app-empty-state>`
         : this.displayMode === 'cards'
-        ? this.renderCards(filtered, isRu)
-        : this.renderTable(filtered, isRu)}
+        ? this.renderCards(filtered, t, isRu)
+        : this.renderTable(filtered, t, isRu)}
 
       <app-modal
         ?open="${this.modalOpen}"
@@ -290,17 +292,13 @@ export class AppEmployees extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingEmployee)}"
         size="sm"
-        title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        action="${isRu
-          ? `Сотрудник «${this.deletingEmployee?.name || ''}» будет удалён из справочника.`
-          : `Employee "${this.deletingEmployee?.name || ''}" will be removed from the directory.`}"
-        result="${isRu
-          ? 'Записи времени и участие в проектных командах будут потеряны.'
-          : 'Time entries and project team memberships will be lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.employeeDelete.title}"
+        action="${t.viewTexts.confirmDialogs.employeeDelete.action(this.deletingEmployee?.name || '')}"
+        result="${t.viewTexts.confirmDialogs.employeeDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingEmployee = null)}"
         @confirm="${() => {
           if (this.deletingEmployee) {
@@ -312,7 +310,7 @@ export class AppEmployees extends LitElement {
     `;
   }
 
-  private renderCards(list: User[], isRu: boolean) {
+  private renderCards(list: User[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
       <div class="cards-grid">
         ${list.map((emp) => {
@@ -392,7 +390,7 @@ export class AppEmployees extends LitElement {
                   <button
                     type="button"
                     class="icon-btn danger"
-                    title="${isRu ? 'Удалить' : 'Delete'}"
+                    title="${t.common.delete}"
                     @click="${() => (this.deletingEmployee = emp)}"
                   >
                     ${iconTrash(14)}
@@ -406,7 +404,7 @@ export class AppEmployees extends LitElement {
     `;
   }
 
-  private renderTable(list: User[], isRu: boolean) {
+  private renderTable(list: User[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
       <div class="table-card">
         <table class="data-table">

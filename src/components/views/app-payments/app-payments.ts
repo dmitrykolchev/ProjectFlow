@@ -862,15 +862,11 @@ export class AppPayments extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingPayment)}"
         size="sm"
-        title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        action="${isRu
-          ? 'Платёж будет удалён из счёта.'
-          : 'The payment will be removed from the invoice.'}"
-        result="${isRu
-          ? 'Сумма платежа будет вычтена из оплаченного счёта.'
-          : 'The payment amount will be subtracted from the paid invoice.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.paymentDelete.title}"
+        action="${t.viewTexts.confirmDialogs.paymentDelete.action}"
+        result="${t.viewTexts.confirmDialogs.paymentDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingPayment = null)}"

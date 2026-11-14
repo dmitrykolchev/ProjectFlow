@@ -753,7 +753,7 @@ export class AppProjectDetail extends LitElement {
       </div>
 
       ${this.renderEditModal(t, isRu)}
-      ${this.renderDeleteModal(proj, isRu)}
+      ${this.renderDeleteModal(proj, t)}
       ${this.renderQuickTimeModal(proj, projectTasks, t, isRu)}
       ${this.renderQuickExpenseModal(proj, projectTasks, t, isRu)}
     `;
@@ -893,22 +893,18 @@ export class AppProjectDetail extends LitElement {
     `;
   }
 
-  private renderDeleteModal(proj: Project, isRu: boolean) {
+  private renderDeleteModal(proj: Project, t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
         size="sm"
-        title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        action="${isRu
-          ? `Проект «${proj.name}» будет удалён из системы.`
-          : `Project "${proj.name}" will be deleted from the system.`}"
-        result="${isRu
-          ? 'Все задачи, участники и финансовые связи проекта будут безвозвратно потеряны.'
-          : 'All tasks, members and financial links of the project will be permanently lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.projectDelete.title}"
+        action="${t.viewTexts.confirmDialogs.projectDelete.action(proj.name)}"
+        result="${t.viewTexts.confirmDialogs.projectDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"
         @confirm="${() => {
           this.confirmDeleteOpen = false;

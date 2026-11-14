@@ -1294,14 +1294,14 @@ export class AppContractDetail extends LitElement {
 
       ${this.renderCalculationFormModal(ctr, t, isRu)}
       ${this.renderCalculationPreviewModal(ctr, t, isRu)}
-      ${this.renderDeleteCalculationModal(isRu)}
+      ${this.renderDeleteCalculationModal(t)}
       ${this.renderInvoiceFormModal(ctr, t, isRu)}
       ${this.renderInvoicePreviewModal(ctr, t, isRu)}
-      ${this.renderDeleteInvoiceModal(isRu)}
+      ${this.renderDeleteInvoiceModal(t)}
       ${this.renderPaymentModal(ctr, t, isRu)}
       ${this.renderDeletePaymentModal(t, isRu)}
       ${this.renderEditContractModal(isRu)}
-      ${this.renderDeleteContractModal(ctr, isRu)}
+      ${this.renderDeleteContractModal(ctr, t)}
     `;
   }
 
@@ -1775,22 +1775,18 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private renderDeleteCalculationModal(isRu: boolean) {
+  private renderDeleteCalculationModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingCalculation)}"
         size="sm"
-        title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
-        action="${isRu
-          ? `Калькуляция ${this.deletingCalculation?.number || ''} будет удалена.`
-          : `Calculation ${this.deletingCalculation?.number || ''} will be deleted.`}"
-        result="${isRu
-          ? 'Суммы калькуляции перестанут учитываться в финансах договора.'
-          : 'The calculation amounts will no longer count in contract finances.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.calculationDelete.title}"
+        action="${t.viewTexts.confirmDialogs.calculationDelete.action(this.deletingCalculation?.number || '')}"
+        result="${t.viewTexts.confirmDialogs.calculationDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingCalculation = null)}"
         @confirm="${() => {
           if (this.deletingCalculation) {
@@ -2321,22 +2317,18 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private renderDeleteInvoiceModal(isRu: boolean) {
+  private renderDeleteInvoiceModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingInvoice)}"
         size="sm"
-        title="${isRu ? 'Удалить счёт?' : 'Delete invoice?'}"
-        action="${isRu
-          ? `Счёт ${this.deletingInvoice?.number || ''} будет удалён.`
-          : `Invoice ${this.deletingInvoice?.number || ''} will be deleted.`}"
-        result="${isRu
-          ? 'Платежи по счёту будут потеряны, сумма договора пересчитается.'
-          : 'Payments of the invoice will be lost and the contract totals will be recalculated.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.invoiceDelete.title}"
+        action="${t.viewTexts.confirmDialogs.invoiceDelete.action(this.deletingInvoice?.number || '')}"
+        result="${t.viewTexts.confirmDialogs.invoiceDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingInvoice = null)}"
         @confirm="${() => {
           if (this.deletingInvoice) {
@@ -2547,15 +2539,11 @@ export class AppContractDetail extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingPayment)}"
         size="sm"
-        title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        action="${isRu
-          ? 'Платёж будет удалён из счёта.'
-          : 'The payment will be removed from the invoice.'}"
-        result="${isRu
-          ? 'Сумма платежа будет вычтена из оплаченного счёта.'
-          : 'The payment amount will be subtracted from the paid invoice.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.paymentDelete.title}"
+        action="${t.viewTexts.confirmDialogs.paymentDelete.action}"
+        result="${t.viewTexts.confirmDialogs.paymentDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingPayment = null)}"
@@ -2785,22 +2773,18 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private renderDeleteContractModal(ctr: Contract, isRu: boolean) {
+  private renderDeleteContractModal(ctr: Contract, t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${this.confirmDeleteContractOpen}"
         size="sm"
-        title="${isRu ? 'Удалить договор?' : 'Delete contract?'}"
-        action="${isRu
-          ? `Договор ${ctr.number} будет удалён.`
-          : `Contract ${ctr.number} will be deleted.`}"
-        result="${isRu
-          ? 'Счета, платежи и калькуляции договора будут безвозвратно потеряны.'
-          : 'Invoices, payments and calculations of the contract will be permanently lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.contractDelete.title}"
+        action="${t.viewTexts.confirmDialogs.contractDelete.action(ctr.number)}"
+        result="${t.viewTexts.confirmDialogs.contractDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteContractOpen = false)}"
         @confirm="${() => {
           this.confirmDeleteContractOpen = false;

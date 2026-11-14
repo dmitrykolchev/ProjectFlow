@@ -1089,15 +1089,11 @@ export class AppCalculations extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingCalculation)}"
         size="sm"
-        title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
-        action="${isRu
-          ? `Калькуляция ${this.deletingCalculation?.number || ''} будет удалена.`
-          : `Calculation ${this.deletingCalculation?.number || ''} will be deleted.`}"
-        result="${isRu
-          ? 'Суммы калькуляции перестанут учитываться в финансах договора.'
-          : 'The calculation amounts will no longer count in contract finances.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.calculationDelete.title}"
+        action="${t.viewTexts.confirmDialogs.calculationDelete.action(this.deletingCalculation?.number || '')}"
+        result="${t.viewTexts.confirmDialogs.calculationDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingCalculation = null)}"

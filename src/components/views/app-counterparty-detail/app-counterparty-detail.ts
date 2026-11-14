@@ -758,15 +758,11 @@ export class AppCounterpartyDetail extends LitElement {
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
         size="sm"
-        title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        action="${isRu
-          ? `Контрагент «${cp.name}» будет удалён из справочника.`
-          : `Counterparty "${cp.name}" will be removed from the directory.`}"
-        result="${isRu
-          ? 'Договоры и счета контрагента останутся без привязки к нему.'
-          : 'Contracts and invoices of the counterparty will lose their link to it.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.counterpartyDelete.title}"
+        action="${t.viewTexts.confirmDialogs.counterpartyDelete.action(cp.name)}"
+        result="${t.viewTexts.confirmDialogs.counterpartyDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"

@@ -624,7 +624,7 @@ export class AppContracts extends LitElement {
                               <button
                                 type="button"
                                 class="icon-btn danger"
-                                title="${isRu ? 'Удалить' : 'Delete'}"
+                                title="${t.common.delete}"
                                 @click="${() => (this.deletingContract = ctr)}"
                               >
                                 ${iconTrash(14)}
@@ -1219,17 +1219,13 @@ export class AppContracts extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingContract)}"
         size="sm"
-        title="${isRu ? 'Удалить договор?' : 'Delete contract?'}"
-        action="${isRu
-          ? `Договор ${this.deletingContract?.number || ''} будет удалён.`
-          : `Contract ${this.deletingContract?.number || ''} will be deleted.`}"
-        result="${isRu
-          ? 'Счета, платежи и калькуляции договора будут безвозвратно потеряны.'
-          : 'Invoices, payments and calculations of the contract will be permanently lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.contractDelete.title}"
+        action="${t.viewTexts.confirmDialogs.contractDelete.action(this.deletingContract?.number || '')}"
+        result="${t.viewTexts.confirmDialogs.contractDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingContract = null)}"
         @confirm="${() => {
           if (this.deletingContract) {
@@ -1438,15 +1434,11 @@ export class AppContracts extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingPayment)}"
         size="sm"
-        title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        action="${isRu
-          ? 'Платёж будет удалён из счёта.'
-          : 'The payment will be removed from the invoice.'}"
-        result="${isRu
-          ? 'Сумма платежа будет вычтена из оплаченного счёта.'
-          : 'The payment amount will be subtracted from the paid invoice.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.paymentDelete.title}"
+        action="${t.viewTexts.confirmDialogs.paymentDelete.action}"
+        result="${t.viewTexts.confirmDialogs.paymentDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingPayment = null)}"

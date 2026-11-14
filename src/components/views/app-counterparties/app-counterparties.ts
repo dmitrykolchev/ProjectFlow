@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
+import { getTranslation } from '../../../i18n';
 import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
@@ -93,6 +94,7 @@ export class AppCounterparties extends LitElement {
   }
 
   render() {
+    const t = getTranslation(this.currentLang);
     const isRu = this.currentLang === 'ru';
     const filtered = this.getFiltered();
 
@@ -170,8 +172,8 @@ export class AppCounterparties extends LitElement {
       ${filtered.length === 0
         ? html`<app-empty-state title="${isRu ? 'Контрагенты не найдены' : 'No counterparties found'}"></app-empty-state>`
         : this.displayMode === 'cards'
-        ? this.renderCards(filtered, isRu)
-        : this.renderTable(filtered, isRu)}
+        ? this.renderCards(filtered, t, isRu)
+        : this.renderTable(filtered, t, isRu)}
 
       <app-modal
         ?open="${this.modalOpen}"
@@ -299,17 +301,13 @@ export class AppCounterparties extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingItem)}"
         size="sm"
-        title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        action="${isRu
-          ? `Контрагент «${this.deletingItem?.name || ''}» будет удалён из справочника.`
-          : `Counterparty "${this.deletingItem?.name || ''}" will be removed from the directory.`}"
-        result="${isRu
-          ? 'Договоры и счета контрагента останутся без привязки к нему.'
-          : 'Contracts and invoices of the counterparty will lose their link to it.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.counterpartyDelete.title}"
+        action="${t.viewTexts.confirmDialogs.counterpartyDelete.action(this.deletingItem?.name || '')}"
+        result="${t.viewTexts.confirmDialogs.counterpartyDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingItem = null)}"
         @confirm="${() => {
           if (this.deletingItem) {
@@ -321,7 +319,7 @@ export class AppCounterparties extends LitElement {
     `;
   }
 
-  private renderCards(list: Counterparty[], isRu: boolean) {
+  private renderCards(list: Counterparty[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
       <div class="cards-grid">
         ${list.map((cp) => {
@@ -414,7 +412,7 @@ export class AppCounterparties extends LitElement {
                   <button
                     type="button"
                     class="icon-btn danger"
-                    title="${isRu ? 'Удалить' : 'Delete'}"
+                    title="${t.common.delete}"
                     @click="${() => (this.deletingItem = cp)}"
                   >
                     ${iconTrash(14)}
@@ -428,7 +426,7 @@ export class AppCounterparties extends LitElement {
     `;
   }
 
-  private renderTable(list: Counterparty[], isRu: boolean) {
+  private renderTable(list: Counterparty[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
       <div class="table-card">
         <table class="data-table">

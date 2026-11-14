@@ -619,15 +619,11 @@ export class AppEmployeeDetail extends LitElement {
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
         size="sm"
-        title="${isRu ? 'Удалить сотрудника?' : 'Delete employee?'}"
-        action="${isRu
-          ? `Сотрудник «${emp.name}» будет удалён из справочника.`
-          : `Employee "${emp.name}" will be removed from the directory.`}"
-        result="${isRu
-          ? 'Записи времени и участие в проектных командах будут потеряны.'
-          : 'Time entries and project team memberships will be lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.employeeDelete.title}"
+        action="${t.viewTexts.confirmDialogs.employeeDelete.action(emp.name)}"
+        result="${t.viewTexts.confirmDialogs.employeeDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.confirmDeleteOpen = false)}"

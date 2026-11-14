@@ -224,7 +224,7 @@ export class AppExpenses extends LitElement {
         : this.renderRegistryTable(filtered, t, isRu)}
 
       ${this.renderFormModal(t, isRu, categoryOptions, statusOptions)}
-      ${this.renderDeleteModal(isRu)}
+      ${this.renderDeleteModal(t)}
     `;
   }
 
@@ -609,22 +609,18 @@ export class AppExpenses extends LitElement {
     `;
   }
 
-  private renderDeleteModal(isRu: boolean) {
+  private renderDeleteModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingExpense)}"
         size="sm"
-        title="${isRu ? 'Удалить запись о расходе?' : 'Delete expense?'}"
-        action="${isRu
-          ? `Расход «${this.deletingExpense?.title || ''}» будет удалён.`
-          : `Expense "${this.deletingExpense?.title || ''}" will be deleted.`}"
-        result="${isRu
-          ? 'Сумма перестанет учитываться в бюджете проекта.'
-          : 'The amount will no longer count in the project budget.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.expenseDelete.title}"
+        action="${t.viewTexts.confirmDialogs.expenseDelete.action(this.deletingExpense?.title || '')}"
+        result="${t.viewTexts.confirmDialogs.expenseDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingExpense = null)}"
         @confirm="${() => {
           if (this.deletingExpense) {

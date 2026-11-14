@@ -341,7 +341,7 @@ export class AppTimeTracking extends LitElement {
         : this.renderByTaskView(filtered, t, isRu)}
 
       ${this.renderFormModal(t, isRu, categoryOptions, statusOptions)}
-      ${this.renderDeleteModal(isRu)}
+      ${this.renderDeleteModal(t)}
     `;
   }
 
@@ -722,22 +722,21 @@ export class AppTimeTracking extends LitElement {
     `;
   }
 
-  private renderDeleteModal(isRu: boolean) {
+  private renderDeleteModal(t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingEntry)}"
         size="sm"
-        title="${isRu ? 'Удалить запись о времени?' : 'Delete time entry?'}"
-        action="${isRu
-          ? `Запись (${this.deletingEntry?.hours || 0} ч по задаче ${this.deletingEntry?.taskId || ''}) будет удалена.`
-          : `The entry (${this.deletingEntry?.hours || 0}h for task ${this.deletingEntry?.taskId || ''}) will be deleted.`}"
-        result="${isRu
-          ? 'Часы будут вычтены из задачи.'
-          : 'Hours will be subtracted from the task.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${t.viewTexts.confirmDialogs.timeEntryDelete.title}"
+        action="${t.viewTexts.confirmDialogs.timeEntryDelete.action(
+          this.deletingEntry?.hours || 0,
+          this.deletingEntry?.taskId || ''
+        )}"
+        result="${t.viewTexts.confirmDialogs.timeEntryDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingEntry = null)}"
         @confirm="${() => {
           if (this.deletingEntry) {

@@ -577,15 +577,11 @@ export class AppProjectChat extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingMessage)}"
         size="sm"
-        title="${isRu ? 'Удалить сообщение?' : 'Delete message?'}"
-        action="${isRu
-          ? 'Сообщение будет удалено из истории чата.'
-          : 'The message will be deleted from the chat history.'}"
-        result="${isRu
-          ? 'Сообщение исчезнет у всех участников чата.'
-          : 'The message will disappear for all chat participants.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
+        title="${t.viewTexts.confirmDialogs.messageDelete.title}"
+        action="${t.viewTexts.confirmDialogs.messageDelete.action}"
+        result="${t.viewTexts.confirmDialogs.messageDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         .cancelLabel="${t.common.cancel}"
         .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingMessage = null)}"
