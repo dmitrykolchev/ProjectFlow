@@ -15,6 +15,7 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-avatar/app-avatar';
 import styles from './app-employees.css';
 
 @customElement('app-employees')
@@ -342,7 +343,7 @@ export class AppEmployees extends LitElement {
             <article class="employee-card">
               <div class="card-head">
                 <div class="person-box">
-                  <div class="avatar" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}">${emp.avatar}</div>
+                  <app-avatar size="md" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
                   <div class="person-info">
                     <div class="person-name">
                       <button
@@ -450,7 +451,7 @@ export class AppEmployees extends LitElement {
                 <tr>
                   <td>
                     <div class="person-box">
-                      <div class="avatar sm" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}">${emp.avatar}</div>
+                      <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
                       <div class="person-info">
                         <div class="person-name" style="font-size: 0.85rem;">
                           <button

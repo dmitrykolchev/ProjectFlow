@@ -26,6 +26,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
+import '../../common/app-avatar/app-avatar';
 import styles from './app-employee-detail.css';
 
 @customElement('app-employee-detail')
@@ -221,7 +222,7 @@ export class AppEmployeeDetail extends LitElement {
         <section class="overview-card">
           <div class="hero-top">
             <div class="hero-identity">
-              <div class="avatar-lg">${emp.avatar}</div>
+              <app-avatar size="lg" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
               <div class="title-block">
                 <div class="title-row">
                   <h1 class="emp-title">${emp.name}</h1>

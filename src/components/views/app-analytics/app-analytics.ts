@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import '../../common/app-avatar/app-avatar';
 import styles from './app-analytics.css';
 
 @customElement('app-analytics')
@@ -162,7 +163,7 @@ export class AppAnalytics extends LitElement {
                 <tr>
                   <td>
                     <div class="member-cell">
-                      <div class="avatar">${user.avatar}</div>
+                      <app-avatar size="sm" initials="${user.avatar}" title="${user.name}"></app-avatar>
                       <span>${user.name}</span>
                     </div>
                   </td>

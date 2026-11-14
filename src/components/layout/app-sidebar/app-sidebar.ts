@@ -3,6 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import '../../common/app-avatar/app-avatar';
 import styles from './app-sidebar.css';
 import {
   iconMoon,
@@ -280,7 +281,7 @@ export class AppSidebar extends LitElement {
           ${!this.collapsed
             ? html`
                 <div class="user-profile">
-                  <div class="avatar-circle">AM</div>
+                  <app-avatar size="md" initials="AM" title="Александр М." color="var(--bg-hover, #223049)"></app-avatar>
                   <div class="user-info">
                     <span class="user-name">Александр М.</span>
                     <span class="user-role">Lead Architect</span>
@@ -289,7 +290,7 @@ export class AppSidebar extends LitElement {
               `
             : html`
                 <div class="user-profile" style="justify-content: center;">
-                  <div class="avatar-circle">AM</div>
+                  <app-avatar size="md" initials="AM" title="Александр М." color="var(--bg-hover, #223049)"></app-avatar>
                 </div>
               `}
         </div>
