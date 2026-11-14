@@ -1319,6 +1319,37 @@ export const ru = {
       defaultDocContent:
         '## Контекст\n\n\n## Решение и порядок действий\n- [ ] Шаг 1\n- [ ] Шаг 2\n\n## Накопленный опыт\n> Ключевой вывод для будущих релизов',
     },
+    settings: {
+      accentNames: {
+        deepIndigo: 'Глубокий индиго',
+        emeraldNight: 'Изумрудная ночь',
+        amberGraphite: 'Янтарный графит',
+        crystalSlate: 'Кристальный сланец',
+        warmIvory: 'Тёплый пергамент',
+        arcticTeal: 'Ледяная бирюза',
+        nightCityNeon: 'Night City Неон',
+        acidLime: 'Кислотный лайм',
+        laserCyan: 'Лазерный циан',
+      },
+      darkDesc: 'Глубокие темные тона для комфортной работы при слабом освещении',
+      lightDesc: 'Чистые контрастные светлые поверхности для дневной работы',
+      comfortableDesc: 'Стандартные просторные отступы для максимальной читаемости',
+      compactDesc: 'Уменьшенные отступы и строки для профессионалов и плотных таблиц',
+    },
+    calendar: {
+      sevenDays: '7 дней',
+      fiveDays: '5 дней',
+    },
+    gantt: {
+      weekSuffix: 'нед.',
+      monthSuffix: 'мес.',
+      demoStats: '2 000 задач · 3 года',
+    },
+    projectOverview: {
+      millionsSuffix: 'млн ₽',
+      thousandsSuffix: 'тыс ₽',
+      numberLocale: 'ru-RU',
+    },
     confirmSectionLabels: {
       action: 'Выполняемое действие:',
       result: 'Ожидаемый результат:',

@@ -211,17 +211,17 @@ export class AppProjectOverview extends LitElement {
 
   private formatRub(value: number): string {
     const rounded = Math.round(value);
-    return `${rounded.toLocaleString(this.effectiveLang === 'ru' ? 'ru-RU' : 'en-US')} ₽`;
+    return `${rounded.toLocaleString(getTranslation(this.effectiveLang).viewTexts.projectOverview.numberLocale)} ₽`;
   }
 
   private formatShortRub(value: number): string {
-    const isRu = this.effectiveLang === 'ru';
+    const tx = getTranslation(this.effectiveLang).viewTexts.projectOverview;
     const abs = Math.abs(value);
     if (abs >= 1_000_000) {
-      return `${(value / 1_000_000).toFixed(2).replace(/\.00$/, '')} ${isRu ? 'млн ₽' : 'M ₽'}`;
+      return `${(value / 1_000_000).toFixed(2).replace(/\.00$/, '')} ${tx.millionsSuffix}`;
     }
     if (abs >= 1_000) {
-      return `${Math.round(value / 1_000)} ${isRu ? 'тыс ₽' : 'k ₽'}`;
+      return `${Math.round(value / 1_000)} ${tx.thousandsSuffix}`;
     }
     return `${Math.round(value)} ₽`;
   }

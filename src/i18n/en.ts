@@ -1319,6 +1319,37 @@ export const en = {
       defaultDocContent:
         '## Context\n\n\n## Decisions & Runbook\n- [ ] Step 1\n- [ ] Step 2\n\n## Key Takeaways\n> Important note for future teams',
     },
+    settings: {
+      accentNames: {
+        deepIndigo: 'Deep Indigo',
+        emeraldNight: 'Emerald Night',
+        amberGraphite: 'Amber Graphite',
+        crystalSlate: 'Crystal Slate',
+        warmIvory: 'Warm Ivory',
+        arcticTeal: 'Arctic Teal',
+        nightCityNeon: 'Night City Neon',
+        acidLime: 'Acid Matrix',
+        laserCyan: 'Laser Cyan',
+      },
+      darkDesc: 'Deep dark tones for comfortable low-light focus',
+      lightDesc: 'Crisp high-contrast light surfaces for daytime clarity',
+      comfortableDesc: 'Standard balanced spacing for comfortable reading',
+      compactDesc: 'Tighter spacing and rows for high-density workflows',
+    },
+    calendar: {
+      sevenDays: '7 days',
+      fiveDays: '5 days',
+    },
+    gantt: {
+      weekSuffix: 'w',
+      monthSuffix: 'mo',
+      demoStats: '2,000 tasks · 3 yrs',
+    },
+    projectOverview: {
+      millionsSuffix: 'M ₽',
+      thousandsSuffix: 'k ₽',
+      numberLocale: 'en-US',
+    },
     confirmSectionLabels: {
       action: 'Action performed:',
       result: 'Expected result:',
