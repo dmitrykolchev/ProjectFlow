@@ -41,6 +41,8 @@ export const ru = {
     employees: 'Сотрудники',
     counterparties: 'Контрагенты',
     contracts: 'Договоры',
+    calculations: 'Калькуляции',
+    payments: 'Платежи',
     timeTracking: 'Учет времени',
     expenses: 'Учет затрат',
     projectChat: 'Чат по проектам',

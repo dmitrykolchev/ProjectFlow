@@ -331,6 +331,8 @@ export type ActiveView =
   | 'counterparty-detail'
   | 'contracts'
   | 'contract-detail'
+  | 'calculations'
+  | 'payments'
   | 'projects'
   | 'project-detail'
   | 'project-chat'

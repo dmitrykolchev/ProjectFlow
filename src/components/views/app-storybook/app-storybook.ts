@@ -53,6 +53,8 @@ import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
 import counterpartyDetailMeta from '../app-counterparty-detail/app-counterparty-detail.story';
 import contractsMeta from '../app-contracts/app-contracts.story';
 import contractDetailMeta from '../app-contract-detail/app-contract-detail.story';
+import calculationsMeta from '../app-calculations/app-calculations.story';
+import paymentsMeta from '../app-payments/app-payments.story';
 import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
 import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
@@ -104,6 +106,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   counterpartyDetailMeta,
   contractsMeta,
   contractDetailMeta,
+  calculationsMeta,
+  paymentsMeta,
   timeTrackingMeta,
   expensesMeta,
   settingsMeta,

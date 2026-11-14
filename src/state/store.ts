@@ -834,7 +834,9 @@ export class AppStore {
       view === 'counterparties' ||
       view === 'counterparty-detail' ||
       view === 'contracts' ||
-      view === 'contract-detail'
+      view === 'contract-detail' ||
+      view === 'calculations' ||
+      view === 'payments'
     ) {
       return 'directory';
     }

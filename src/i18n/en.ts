@@ -41,6 +41,8 @@ export const en = {
     employees: 'Employees',
     counterparties: 'Counterparties',
     contracts: 'Contracts',
+    calculations: 'Calculations',
+    payments: 'Payments',
     timeTracking: 'Time Tracking',
     expenses: 'Expenses',
     projectChat: 'Project Chat',

@@ -20,6 +20,7 @@ import {
   iconFileText,
   iconClock,
   iconWallet,
+  iconCreditCard,
   iconMessageSquare,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
@@ -52,6 +53,8 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
     import('./components/views/app-counterparty-detail/app-counterparty-detail'),
   contracts: () => import('./components/views/app-contracts/app-contracts'),
   'contract-detail': () => import('./components/views/app-contract-detail/app-contract-detail'),
+  calculations: () => import('./components/views/app-calculations/app-calculations'),
+  payments: () => import('./components/views/app-payments/app-payments'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
@@ -281,6 +284,18 @@ export class AppRoot extends LitElement {
             label="${t.navigation.contracts}"
             .icon="${iconFileText()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="calculations"
+            label="${t.navigation.calculations}"
+            .icon="${iconTable()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="payments"
+            label="${t.navigation.payments}"
+            .icon="${iconCreditCard()}"
+          ></sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="system" label="${t.navigation.groupSystem}">
@@ -371,6 +386,10 @@ export class AppRoot extends LitElement {
         return html`<app-contracts></app-contracts>`;
       case 'contract-detail':
         return html`<app-contract-detail></app-contract-detail>`;
+      case 'calculations':
+        return html`<app-calculations></app-calculations>`;
+      case 'payments':
+        return html`<app-payments></app-payments>`;
       case 'time-tracking':
         return html`<app-time-tracking></app-time-tracking>`;
       case 'expenses':
