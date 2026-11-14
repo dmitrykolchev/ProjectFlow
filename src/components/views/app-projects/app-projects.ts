@@ -110,7 +110,6 @@ export class AppProjects extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const filtered = this.getFilteredProjects();
 
     const activeCount = this.projects.filter((p) => (p.status || 'active') === 'active').length;
@@ -120,7 +119,7 @@ export class AppProjects extends LitElement {
       : 0;
 
     const statusOptions = [
-      { value: 'all', label: isRu ? 'Все статусы' : 'All statuses' },
+      { value: 'all', label: t.viewTexts.projects.filterAllStatuses },
       { value: 'planning', label: t.projectStatuses.planning, color: '#0284c7' },
       { value: 'active', label: t.projectStatuses.active, color: '#10b981' },
       { value: 'on_hold', label: t.projectStatuses.on_hold, color: '#f59e0b' },
@@ -128,34 +127,32 @@ export class AppProjects extends LitElement {
     ];
 
     const companyFilterOptions = [
-      { value: 'all', label: isRu ? 'Все компании' : 'All companies' },
+      { value: 'all', label: t.viewTexts.projects.filterAllCompanies },
       ...store.companies.map((c) => ({ value: c.id, label: c.name })),
     ];
 
     return html`
       <app-page-header
         title="${t.navigation.projects}"
-        subtitle="${isRu
-          ? 'Список проектов портфеля. Выберите проект, чтобы открыть его страницу с командой по ролям, задачами и договорами'
-          : 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts'}"
+        subtitle="${t.viewTexts.pageSubtitles.projects}"
       >
         <span slot="icon">${iconFolder(28)}</span>
         <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
-          <span>${isRu ? 'Создать проект' : 'New Project'}</span>
+          <span>${t.viewTexts.projects.newProjectButton}</span>
         </app-button>
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${isRu ? 'Всего проектов' : 'Total Projects'}" value="${this.projects.length}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Активных' : 'Active'}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Назначений в ролях' : 'Role Assignments'}" value="${totalAssignments}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Средний прогресс' : 'Avg Progress'}" value="${avgProgress}%"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.projects.kpiTotalProjects}" value="${this.projects.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.projects.kpiActive}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.projects.kpiRoleAssignments}" value="${totalAssignments}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.projects.kpiAvgProgress}" value="${avgProgress}%"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${isRu ? 'Поиск по коду или названию...' : 'Search by key or name...'}"
+        placeholder="${t.viewTexts.projects.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
           { key: 'status', options: statusOptions },
@@ -172,8 +169,8 @@ export class AppProjects extends LitElement {
           size="sm"
           .value="${this.displayMode}"
           .options="${[
-            { value: 'cards', label: isRu ? 'Карточки' : 'Cards' },
-            { value: 'table', label: isRu ? 'Таблица' : 'Table' },
+            { value: 'cards', label: t.viewTexts.projects.viewCards },
+            { value: 'table', label: t.viewTexts.projects.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.displayMode = eventValue(e) as 'cards' | 'table')}"
@@ -181,17 +178,17 @@ export class AppProjects extends LitElement {
       </app-filter-bar>
 
       ${filtered.length === 0
-        ? html`<app-empty-state title="${isRu ? 'Проекты не найдены' : 'No projects found'}"></app-empty-state>`
+        ? html`<app-empty-state title="${t.viewTexts.projects.emptyNoProjects}"></app-empty-state>`
         : this.displayMode === 'cards'
-        ? this.renderCards(filtered, t, isRu)
-        : this.renderTable(filtered, t, isRu)}
+        ? this.renderCards(filtered, t)
+        : this.renderTable(filtered, t)}
 
-      ${this.renderProjectModal(t, isRu, statusOptions)}
-      ${this.renderDeleteModal(isRu)}
+      ${this.renderProjectModal(t, statusOptions)}
+      ${this.renderDeleteModal(t)}
     `;
   }
 
-  private renderCards(list: Project[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderCards(list: Project[], t: ReturnType<typeof getTranslation>) {
     return html`
       <div class="cards-grid">
         ${list.map((proj) => {
@@ -224,30 +221,30 @@ export class AppProjects extends LitElement {
 
               <div class="proj-meta-grid">
                 <div class="meta-item">
-                  <span class="meta-label">${isRu ? 'Компания' : 'Company'}</span>
+                  <span class="meta-label">${t.viewTexts.projects.metaCompany}</span>
                   <span class="meta-val">${company?.name || '—'}</span>
                 </div>
                 <div class="meta-item">
-                  <span class="meta-label">${isRu ? 'Контрагент' : 'Client'}</span>
+                  <span class="meta-label">${t.viewTexts.projects.metaClient}</span>
                   <span class="meta-val">${counterparty?.name || '—'}</span>
                 </div>
                 <div class="meta-item">
-                  <span class="meta-label">${isRu ? 'Бюджет' : 'Budget'}</span>
+                  <span class="meta-label">${t.viewTexts.projects.metaBudget}</span>
                   <span class="meta-val mono">
                     ${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}
                   </span>
                 </div>
                 <div class="meta-item">
-                  <span class="meta-label">${isRu ? 'Срок / Задач' : 'Due / Tasks'}</span>
+                  <span class="meta-label">${t.viewTexts.projects.metaDueTasks}</span>
                   <span class="meta-val mono">${proj.dueDate} · ${tasksCount}</span>
                 </div>
               </div>
 
               <div class="team-summary-line">
                 ${roleCounts.length === 0
-                  ? html`<span>${isRu ? 'Команда по ролям не назначена' : 'No team roles assigned'}</span>`
+                  ? html`<span>${t.viewTexts.projects.noTeamRoles}</span>`
                   : html`
-                      <span>${isRu ? 'Участников' : 'Team'}: <strong>${uniqueMembers}</strong></span>
+                      <span>${t.viewTexts.projects.teamMembersLabel}: <strong>${uniqueMembers}</strong></span>
                       ${roleCounts.map(
                         (rc) => html`
                           <span class="sep">·</span>
@@ -277,7 +274,7 @@ export class AppProjects extends LitElement {
                     }}"
                   >
                     <span slot="icon-start">${iconKanban()}</span>
-                    <span>${isRu ? 'Задачи' : 'Tasks'}</span>
+                    <span>${t.viewTexts.projects.tasksButton}</span>
                   </app-button>
                 </div>
 
@@ -285,7 +282,7 @@ export class AppProjects extends LitElement {
                   <button
                     type="button"
                     class="icon-btn"
-                    title="${isRu ? 'Редактировать' : 'Edit'}"
+                    title="${t.common.edit}"
                     @click="${() => this.openEditModal(proj)}"
                   >
                     ${iconEdit(14)}
@@ -293,7 +290,7 @@ export class AppProjects extends LitElement {
                   <button
                     type="button"
                     class="icon-btn danger"
-                    title="${isRu ? 'Удалить' : 'Delete'}"
+                    title="${t.common.delete}"
                     @click="${() => (this.deletingProject = proj)}"
                   >
                     ${iconTrash(14)}
@@ -307,20 +304,20 @@ export class AppProjects extends LitElement {
     `;
   }
 
-  private renderTable(list: Project[], t: ReturnType<typeof getTranslation>, isRu: boolean) {
+  private renderTable(list: Project[], t: ReturnType<typeof getTranslation>) {
     return html`
       <div class="table-card">
         <table class="data-table">
           <thead>
             <tr>
-              <th>${isRu ? 'Проект' : 'Project'}</th>
-              <th>${isRu ? 'Компания / Заказчик' : 'Company / Client'}</th>
-              <th>${isRu ? 'Команда' : 'Team'}</th>
-              <th>${isRu ? 'Задачи' : 'Tasks'}</th>
-              <th>${isRu ? 'Прогресс' : 'Progress'}</th>
-              <th>${isRu ? 'Бюджет' : 'Budget'}</th>
-              <th>${isRu ? 'Срок' : 'Due Date'}</th>
-              <th>${isRu ? 'Статус' : 'Status'}</th>
+              <th>${t.viewTexts.projects.thProject}</th>
+              <th>${t.viewTexts.projects.thCompanyClient}</th>
+              <th>${t.viewTexts.projects.thTeam}</th>
+              <th>${t.viewTexts.projects.thTasks}</th>
+              <th>${t.viewTexts.projects.thProgress}</th>
+              <th>${t.viewTexts.projects.thBudget}</th>
+              <th>${t.viewTexts.projects.thDueDate}</th>
+              <th>${t.viewTexts.projects.thStatus}</th>
               <th></th>
             </tr>
           </thead>
@@ -367,7 +364,7 @@ export class AppProjects extends LitElement {
                       <button
                         type="button"
                         class="icon-btn"
-                        title="${isRu ? 'Редактировать' : 'Edit'}"
+                        title="${t.common.edit}"
                         @click="${() => this.openEditModal(proj)}"
                       >
                         ${iconEdit(14)}
@@ -375,7 +372,7 @@ export class AppProjects extends LitElement {
                       <button
                         type="button"
                         class="icon-btn danger"
-                        title="${isRu ? 'Удалить' : 'Delete'}"
+                        title="${t.common.delete}"
                         @click="${() => (this.deletingProject = proj)}"
                       >
                         ${iconTrash(14)}
@@ -393,15 +390,14 @@ export class AppProjects extends LitElement {
 
   private renderProjectModal(
     t: ReturnType<typeof getTranslation>,
-    isRu: boolean,
     statusOptions: { value: string; label: string; color?: string }[]
   ) {
     const companyOptions = [
-      { value: '', label: isRu ? 'Не указана' : 'None' },
+      { value: '', label: t.viewTexts.projects.optionNoCompany },
       ...store.companies.map((c) => ({ value: c.id, label: c.name })),
     ];
     const counterpartyOptions = [
-      { value: '', label: isRu ? 'Внутренний проект' : 'Internal' },
+      { value: '', label: t.viewTexts.projects.optionInternalProject },
       ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
     ];
 
@@ -409,19 +405,13 @@ export class AppProjects extends LitElement {
       <app-modal
         ?open="${this.modalOpen}"
         size="lg"
-        title="${this.editingId
-          ? isRu
-            ? 'Редактирование проекта'
-            : 'Edit Project'
-          : isRu
-          ? 'Новый проект'
-          : 'New Project'}"
+        title="${this.editingId ? t.viewTexts.projects.modalTitleEdit : t.viewTexts.projects.modalTitleCreate}"
         @close="${() => (this.modalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'Название проекта' : 'Project Name'}"
+              label="${t.viewTexts.projects.labelProjectName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -433,7 +423,7 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Код (ключ)' : 'Project Key'}"
+              label="${t.viewTexts.projects.labelProjectKey}"
               placeholder="CORE"
               .value="${this.formKey}"
               @input="${(e: CustomEvent<{ value: string }>) =>
@@ -442,7 +432,7 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.projects.labelStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -451,14 +441,14 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Плановый срок' : 'Due Date'}"
+              label="${t.viewTexts.projects.labelDueDate}"
               .value="${this.formDueDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formDueDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Компания-исполнитель' : 'Company'}"
+              label="${t.viewTexts.projects.labelCompany}"
               .value="${this.formCompanyId}"
               .options="${companyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
@@ -466,7 +456,7 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Контрагент (заказчик)' : 'Counterparty'}"
+              label="${t.viewTexts.projects.labelCounterparty}"
               .value="${this.formCounterpartyId}"
               .options="${counterpartyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
@@ -474,7 +464,7 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Бюджет (₽)' : 'Budget (₽)'}"
+              label="${t.viewTexts.projects.labelBudgetRub}"
               .value="${this.formBudget}"
               min="0"
               step="100000"
@@ -484,7 +474,7 @@ export class AppProjects extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Прогресс (%)' : 'Progress (%)'}"
+              label="${t.viewTexts.projects.labelProgressPct}"
               .value="${this.formProgress}"
               min="0"
               max="100"
@@ -494,7 +484,7 @@ export class AppProjects extends LitElement {
             ></app-number-input>
           </div>
           <div class="col-span-2">
-            <span class="meta-label">${isRu ? 'Цвет проекта' : 'Project Color'}</span>
+            <span class="meta-label">${t.viewTexts.projects.projectColorLabel}</span>
             <div class="color-swatches">
               ${PROJECT_COLOR_SWATCHES.map(
                 (hex) => html`
@@ -510,7 +500,7 @@ export class AppProjects extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Описание и цели проекта' : 'Description'}"
+              label="${t.viewTexts.projects.labelDescription}"
               .value="${this.formDescription}"
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
@@ -530,22 +520,19 @@ export class AppProjects extends LitElement {
     `;
   }
 
-  private renderDeleteModal(isRu: boolean) {
+  private renderDeleteModal(t: ReturnType<typeof getTranslation>) {
+    const tx = t.viewTexts;
     return html`
       <app-confirm-dialog
         .open="${Boolean(this.deletingProject)}"
         size="sm"
-        title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        action="${isRu
-          ? `Проект «${this.deletingProject?.name || ''}» будет удалён из системы.`
-          : `Project "${this.deletingProject?.name || ''}" will be deleted from the system.`}"
-        result="${isRu
-          ? 'Все задачи, участники и финансовые связи проекта будут безвозвратно потеряны.'
-          : 'All tasks, members and financial links of the project will be permanently lost.'}"
-        .actionLabel="${isRu ? 'Выполняемое действие:' : 'Action performed:'}"
-        .resultLabel="${isRu ? 'Ожидаемый результат:' : 'Expected result:'}"
-        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
-        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        title="${tx.confirmDialogs.projectDelete.title}"
+        action="${tx.confirmDialogs.projectDelete.action(this.deletingProject?.name || '')}"
+        result="${tx.confirmDialogs.projectDelete.result}"
+        .actionLabel="${tx.confirmSectionLabels.action}"
+        .resultLabel="${tx.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deletingProject = null)}"
         @confirm="${() => {
           if (this.deletingProject) {
