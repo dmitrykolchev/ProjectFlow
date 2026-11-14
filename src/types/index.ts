@@ -119,7 +119,31 @@ export interface Calculation {
   createdAt: string;
 }
 
-export type InvoiceStatus = 'draft' | 'issued' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+export type InvoiceStatus =
+  | 'draft'
+  | 'issued'
+  | 'sent'
+  | 'partially_paid'
+  | 'paid'
+  | 'overdue'
+  | 'cancelled';
+
+export type PaymentMethod = 'bank_transfer' | 'card' | 'cash' | 'offset';
+
+export interface InvoicePayment {
+  id: string;
+  invoiceId: string;
+  contractId: string;
+  companyId: string;
+  counterpartyId: string;
+  amount: number;
+  currency: 'RUB' | 'USD' | 'EUR';
+  paymentDate: string; // YYYY-MM-DD
+  method: PaymentMethod;
+  documentNumber: string;
+  notes: string;
+  createdAt: string;
+}
 
 export interface InvoiceLineItem {
   id: string;
@@ -330,6 +354,7 @@ export interface ActivityLogItem {
     | 'contract'
     | 'calculation'
     | 'invoice'
+    | 'payment'
     | 'time_entry'
     | 'expense'
     | 'chat'

@@ -10,6 +10,7 @@ import {
   Counterparty,
   Expense,
   Invoice,
+  InvoicePayment,
   InvoiceStatus,
   NotificationItem,
   Project,
@@ -33,6 +34,7 @@ import {
   initialCounterparties,
   initialExpenses,
   initialInvoices,
+  initialPayments,
   initialProjects,
   initialTasks,
   initialTimeEntries,
@@ -49,6 +51,7 @@ const STORAGE_KEY_COUNTERPARTIES = 'projectflow_counterparties_v1';
 const STORAGE_KEY_CONTRACTS = 'projectflow_contracts_v1';
 const STORAGE_KEY_CALCULATIONS = 'projectflow_calculations_v1';
 const STORAGE_KEY_INVOICES = 'projectflow_invoices_v1';
+const STORAGE_KEY_PAYMENTS = 'projectflow_payments_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
@@ -205,6 +208,7 @@ export class AppStore {
   public contracts: Contract[] = [];
   public calculations: Calculation[] = [];
   public invoices: Invoice[] = [];
+  public payments: InvoicePayment[] = [];
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
   public chatMessages: ProjectChatMessage[] = [];
@@ -328,6 +332,11 @@ export class AppStore {
       const storedInvoices = localStorage.getItem(STORAGE_KEY_INVOICES);
       this.invoices = storedInvoices ? JSON.parse(storedInvoices) : [...initialInvoices];
 
+      const storedPayments = localStorage.getItem(STORAGE_KEY_PAYMENTS);
+      this.payments = storedPayments ? JSON.parse(storedPayments) : [...initialPayments];
+
+      this.syncOverdueInvoices(false);
+
       const storedTimeEntries = localStorage.getItem(STORAGE_KEY_TIME_ENTRIES);
       this.timeEntries = storedTimeEntries ? JSON.parse(storedTimeEntries) : [...initialTimeEntries];
 
@@ -377,6 +386,7 @@ export class AppStore {
       this.contracts = [...initialContracts];
       this.calculations = [...initialCalculations];
       this.invoices = [...initialInvoices];
+      this.payments = [...initialPayments];
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
       this.chatMessages = [...initialChatMessages];
@@ -442,6 +452,14 @@ export class AppStore {
   private saveInvoices(): void {
     try {
       localStorage.setItem(STORAGE_KEY_INVOICES, JSON.stringify(this.invoices));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private savePayments(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_PAYMENTS, JSON.stringify(this.payments));
     } catch (e) {
       console.error(e);
     }
@@ -1415,9 +1433,30 @@ export class AppStore {
   public updateInvoiceStatus(id: string, status: InvoiceStatus): void {
     const existing = this.invoices.find((inv) => inv.id === id);
     if (!existing) return;
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (status === 'paid') {
+      const remaining = this.getInvoiceRemainingAmount(existing);
+      if (remaining > 0) {
+        this.addInvoicePayment({
+          invoiceId: existing.id,
+          contractId: existing.contractId,
+          companyId: existing.companyId,
+          counterpartyId: existing.counterpartyId,
+          amount: remaining,
+          currency: existing.currency,
+          paymentDate: today,
+          method: 'bank_transfer',
+          documentNumber: `ПП-${today.slice(0, 4)}/AUTO-${existing.number.slice(-3)}`,
+          notes: `Полная оплата счёта ${existing.number}`,
+        });
+        return;
+      }
+    }
+
     const paidDate =
       status === 'paid'
-        ? existing.paidDate || new Date().toISOString().slice(0, 10)
+        ? existing.paidDate || today
         : status === 'cancelled' || status === 'draft'
         ? undefined
         : existing.paidDate;
@@ -1439,6 +1478,12 @@ export class AppStore {
     this.invoices = this.invoices.filter((inv) => inv.id !== id);
     this.saveInvoices();
 
+    const hadPayments = this.payments.some((p) => p.invoiceId === id);
+    if (hadPayments) {
+      this.payments = this.payments.filter((p) => p.invoiceId !== id);
+      this.savePayments();
+    }
+
     if (target.calculationId) {
       let linkedChanged = false;
       this.calculations = this.calculations.map((c) => {
@@ -1457,6 +1502,165 @@ export class AppStore {
 
     this.logActivity('delete', 'invoice', target.number, 'Счёт удалён');
     this.addNotification('warning', 'Счёт удалён', target.number);
+    this.notify();
+  }
+
+  // --- Invoice Payments & Due-Date Control ---
+  public getInvoicePayments(invoiceId: string): InvoicePayment[] {
+    return this.payments
+      .filter((p) => p.invoiceId === invoiceId)
+      .sort((a, b) => (b.paymentDate + b.createdAt).localeCompare(a.paymentDate + a.createdAt));
+  }
+
+  public getInvoicePaidAmount(invoiceId: string): number {
+    const sum = this.payments
+      .filter((p) => p.invoiceId === invoiceId)
+      .reduce((acc, p) => acc + (Number(p.amount) || 0), 0);
+    return Math.round(sum * 100) / 100;
+  }
+
+  public getInvoiceRemainingAmount(invoice: Invoice): number {
+    if (invoice.status === 'cancelled') return 0;
+    const paid = this.getInvoicePaidAmount(invoice.id);
+    return Math.max(0, Math.round((invoice.totalAmount - paid) * 100) / 100);
+  }
+
+  public getInvoiceDueControl(invoice: Invoice): {
+    state: 'paid' | 'overdue' | 'due_soon' | 'on_track' | 'draft' | 'cancelled';
+    daysDelta: number;
+  } {
+    if (invoice.status === 'cancelled') return { state: 'cancelled', daysDelta: 0 };
+    if (invoice.status === 'draft') return { state: 'draft', daysDelta: 0 };
+
+    const toDayMs = (iso: string): number | null => {
+      if (!iso) return null;
+      const parts = iso.split('-').map(Number);
+      if (parts.length !== 3 || parts.some(isNaN)) return null;
+      return Date.UTC(parts[0], parts[1] - 1, parts[2]);
+    };
+
+    const dueMs = toDayMs(invoice.dueDate);
+    const paid = this.getInvoicePaidAmount(invoice.id);
+    if (invoice.status === 'paid' || (invoice.totalAmount > 0 && paid >= invoice.totalAmount)) {
+      const paidMs = toDayMs(invoice.paidDate || '');
+      const delta = dueMs !== null && paidMs !== null ? Math.round((dueMs - paidMs) / 86400000) : 0;
+      return { state: 'paid', daysDelta: delta };
+    }
+
+    const now = new Date();
+    const todayMs = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+    if (dueMs === null) return { state: 'on_track', daysDelta: 0 };
+
+    const daysLeft = Math.round((dueMs - todayMs) / 86400000);
+    if (daysLeft < 0) return { state: 'overdue', daysDelta: Math.abs(daysLeft) };
+    if (daysLeft <= 5) return { state: 'due_soon', daysDelta: daysLeft };
+    return { state: 'on_track', daysDelta: daysLeft };
+  }
+
+  public syncOverdueInvoices(shouldNotify = true): number {
+    const today = new Date().toISOString().slice(0, 10);
+    let count = 0;
+    this.invoices = this.invoices.map((inv) => {
+      if (inv.status !== 'issued' && inv.status !== 'sent') return inv;
+      const remaining = this.getInvoiceRemainingAmount(inv);
+      if (inv.dueDate && inv.dueDate < today && remaining > 0) {
+        count += 1;
+        return { ...inv, status: 'overdue' as InvoiceStatus };
+      }
+      return inv;
+    });
+    if (count > 0) {
+      this.saveInvoices();
+      if (shouldNotify) {
+        this.notify();
+      }
+    }
+    return count;
+  }
+
+  private reconcileInvoiceAfterPayments(
+    invoiceId: string,
+    preferredStatusOnZero: InvoiceStatus = 'sent'
+  ): void {
+    const inv = this.invoices.find((i) => i.id === invoiceId);
+    if (!inv || inv.status === 'cancelled') return;
+
+    const invPayments = this.getInvoicePayments(invoiceId);
+    const paid = this.getInvoicePaidAmount(invoiceId);
+    const today = new Date().toISOString().slice(0, 10);
+
+    let nextStatus: InvoiceStatus = inv.status;
+    let nextPaidDate: string | undefined = inv.paidDate;
+
+    if (inv.totalAmount > 0 && paid >= inv.totalAmount) {
+      nextStatus = 'paid';
+      nextPaidDate = invPayments[0]?.paymentDate || inv.paidDate || today;
+    } else if (paid > 0) {
+      nextStatus = 'partially_paid';
+      nextPaidDate = undefined;
+    } else {
+      nextPaidDate = undefined;
+      if (inv.status === 'paid' || inv.status === 'partially_paid') {
+        nextStatus = inv.dueDate && inv.dueDate < today ? 'overdue' : preferredStatusOnZero;
+      }
+    }
+
+    if (nextStatus !== inv.status || nextPaidDate !== inv.paidDate) {
+      this.invoices = this.invoices.map((i) =>
+        i.id === invoiceId ? { ...i, status: nextStatus, paidDate: nextPaidDate } : i
+      );
+      this.saveInvoices();
+    }
+  }
+
+  public addInvoicePayment(data: Omit<InvoicePayment, 'id' | 'createdAt'>): InvoicePayment {
+    const amount = Math.max(0.01, Math.round((Number(data.amount) || 0) * 100) / 100);
+    const payment: InvoicePayment = {
+      ...data,
+      amount,
+      documentNumber: data.documentNumber.trim(),
+      notes: data.notes.trim(),
+      id: `pay-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.payments = [payment, ...this.payments];
+    this.savePayments();
+    this.reconcileInvoiceAfterPayments(payment.invoiceId);
+
+    const inv = this.invoices.find((i) => i.id === payment.invoiceId);
+    const sym = payment.currency === 'USD' ? '$' : payment.currency === 'EUR' ? '€' : '₽';
+    const isFull = inv ? inv.status === 'paid' : false;
+    this.logActivity(
+      'create',
+      'payment',
+      inv ? `${inv.number}${payment.documentNumber ? ` · ${payment.documentNumber}` : ''}` : payment.invoiceId,
+      `${isFull ? 'Полная оплата' : 'Частичный платёж'}: ${payment.amount.toLocaleString('ru-RU')} ${sym}`
+    );
+    this.addNotification(
+      'success',
+      isFull ? 'Счёт полностью оплачен' : 'Платёж зафиксирован',
+      `${inv?.number || ''} — ${payment.amount.toLocaleString('ru-RU')} ${sym}`
+    );
+    this.notify();
+    return payment;
+  }
+
+  public deleteInvoicePayment(paymentId: string): void {
+    const target = this.payments.find((p) => p.id === paymentId);
+    if (!target) return;
+    this.payments = this.payments.filter((p) => p.id !== paymentId);
+    this.savePayments();
+    this.reconcileInvoiceAfterPayments(target.invoiceId, 'sent');
+
+    const inv = this.invoices.find((i) => i.id === target.invoiceId);
+    const sym = target.currency === 'USD' ? '$' : target.currency === 'EUR' ? '€' : '₽';
+    this.logActivity(
+      'delete',
+      'payment',
+      inv ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}` : target.invoiceId,
+      `Удалён платёж на ${target.amount.toLocaleString('ru-RU')} ${sym}`
+    );
+    this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString('ru-RU')} ${sym}`);
     this.notify();
   }
 

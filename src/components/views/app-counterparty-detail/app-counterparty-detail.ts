@@ -8,10 +8,14 @@ import {
   Counterparty,
   CounterpartyStatus,
   CounterpartyType,
+  Invoice,
 } from '../../../types';
 import {
+  iconAlertTriangle,
+  iconCheck,
   iconChevronLeft,
   iconChevronRight,
+  iconClock,
   iconEdit,
   iconFileText,
   iconFolder,
@@ -145,6 +149,55 @@ export class AppCounterpartyDetail extends LitElement {
     return '★'.repeat(clamped) + '☆'.repeat(5 - clamped);
   }
 
+  private renderDueControlTag(inv: Invoice, t: ReturnType<typeof getTranslation>) {
+    const ctrl = store.getInvoiceDueControl(inv);
+    if (ctrl.state === 'draft' || ctrl.state === 'cancelled') {
+      return '';
+    }
+    if (ctrl.state === 'paid') {
+      if (ctrl.daysDelta < 0) {
+        return html`
+          <span class="due-tag due-soon">
+            ${iconClock(11)}
+            <span>${t.payments.paidLate.replace('{n}', String(Math.abs(ctrl.daysDelta)))}</span>
+          </span>
+        `;
+      }
+      return html`
+        <span class="due-tag paid-ok">
+          ${iconCheck(11)}
+          <span>${t.payments.paidOnTime}</span>
+        </span>
+      `;
+    }
+    if (ctrl.state === 'overdue') {
+      return html`
+        <span class="due-tag overdue">
+          ${iconAlertTriangle(11)}
+          <span>${t.payments.overdueBy.replace('{n}', String(ctrl.daysDelta))}</span>
+        </span>
+      `;
+    }
+    if (ctrl.state === 'due_soon') {
+      return html`
+        <span class="due-tag due-soon">
+          ${iconClock(11)}
+          <span>
+            ${ctrl.daysDelta === 0
+              ? t.payments.dueToday
+              : t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta))}
+          </span>
+        </span>
+      `;
+    }
+    return html`
+      <span class="due-tag on-track">
+        ${iconClock(11)}
+        <span>${t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta))}</span>
+      </span>
+    `;
+  }
+
   render() {
     const t = getTranslation(this.currentLang);
     const isRu = this.currentLang === 'ru';
@@ -181,8 +234,8 @@ export class AppCounterpartyDetail extends LitElement {
       .filter((i) => i.status !== 'cancelled')
       .reduce((sum, i) => sum + this.toRub(i.totalAmount, i.currency), 0);
     const totalPaidRub = cpInvoices
-      .filter((i) => i.status === 'paid')
-      .reduce((sum, i) => sum + this.toRub(i.totalAmount, i.currency), 0);
+      .filter((i) => i.status !== 'cancelled')
+      .reduce((sum, i) => sum + this.toRub(store.getInvoicePaidAmount(i.id), i.currency), 0);
 
     const cpSwitchOptions = this.counterparties.map((c) => ({
       value: c.id,
@@ -478,14 +531,26 @@ export class AppCounterpartyDetail extends LitElement {
                         <tr>
                           <th>${isRu ? 'Счёт' : 'Invoice'}</th>
                           <th>${isRu ? 'Договор' : 'Contract'}</th>
-                          <th>${isRu ? 'Дата / Срок' : 'Issued / Due'}</th>
+                          <th>${isRu ? 'Дата / Срок оплаты' : 'Issued / Due'}</th>
                           <th>${isRu ? 'Итого с НДС' : 'Total'}</th>
+                          <th>${isRu ? 'Оплачено / Остаток' : 'Paid / Balance'}</th>
                           <th>${isRu ? 'Статус' : 'Status'}</th>
                         </tr>
                       </thead>
                       <tbody>
                         ${cpInvoices.map((inv) => {
                           const ctr = cpContracts.find((c) => c.id === inv.contractId);
+                          const paidAmt = store.getInvoicePaidAmount(inv.id);
+                          const remainingAmt = store.getInvoiceRemainingAmount(inv);
+                          const payPct =
+                            inv.totalAmount > 0
+                              ? Math.min(100, Math.round((paidAmt / inv.totalAmount) * 100))
+                              : 0;
+                          const dueCtrl = store.getInvoiceDueControl(inv);
+                          const displayStatus =
+                            dueCtrl.state === 'overdue' && inv.status !== 'cancelled'
+                              ? 'overdue'
+                              : inv.status;
                           return html`
                             <tr>
                               <td>
@@ -498,25 +563,46 @@ export class AppCounterpartyDetail extends LitElement {
                                 </button>
                               </td>
                               <td>${ctr ? `${ctr.number} — ${ctr.title}` : '—'}</td>
-                              <td class="mono">${inv.issueDate} → ${inv.dueDate}</td>
+                              <td>
+                                <div class="mono">${inv.issueDate} → ${inv.dueDate}</div>
+                                ${this.renderDueControlTag(inv, t)}
+                              </td>
                               <td class="mono" style="font-weight: 700;">
                                 ${this.formatMoney(inv.totalAmount, inv.currency)}
                               </td>
                               <td>
+                                <div class="inv-pay-cell">
+                                  <div class="inv-pay-bar">
+                                    <div
+                                      class="inv-pay-fill ${payPct > 0 && payPct < 100 ? 'partial' : ''}"
+                                      style="width: ${payPct}%;"
+                                    ></div>
+                                  </div>
+                                  <div class="inv-pay-meta mono">
+                                    <span>${this.formatMoney(paidAmt, inv.currency)}</span>
+                                    <span>
+                                      ${remainingAmt > 0
+                                        ? `${isRu ? 'ост.' : 'bal.'} ${this.formatMoney(remainingAmt, inv.currency)}`
+                                        : '100%'}
+                                    </span>
+                                  </div>
+                                </div>
+                              </td>
+                              <td>
                                 <app-badge
-                                  variant="${inv.status === 'paid'
+                                  variant="${displayStatus === 'paid'
                                     ? 'success'
-                                    : inv.status === 'sent'
+                                    : displayStatus === 'partially_paid' || displayStatus === 'sent'
                                     ? 'warning'
-                                    : inv.status === 'overdue' || inv.status === 'cancelled'
+                                    : displayStatus === 'overdue' || displayStatus === 'cancelled'
                                     ? 'danger'
-                                    : inv.status === 'issued'
+                                    : displayStatus === 'issued'
                                     ? 'info'
                                     : 'default'}"
                                   appearance="soft"
                                   size="sm"
                                 >
-                                  ${t.invoices.statuses[inv.status]}
+                                  ${t.invoices.statuses[displayStatus]}
                                 </app-badge>
                               </td>
                             </tr>

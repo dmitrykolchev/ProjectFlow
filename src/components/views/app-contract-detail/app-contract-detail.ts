@@ -12,11 +12,16 @@ import {
   ContractType,
   Invoice,
   InvoiceLineItem,
+  InvoicePayment,
   InvoiceStatus,
+  PaymentMethod,
 } from '../../../types';
 import {
+  iconAlertTriangle,
   iconCheck,
   iconChevronLeft,
+  iconClock,
+  iconCreditCard,
   iconEdit,
   iconFileText,
   iconFolder,
@@ -25,6 +30,7 @@ import {
   iconSend,
   iconTable,
   iconTrash,
+  iconWallet,
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
@@ -46,10 +52,11 @@ export class AppContractDetail extends LitElement {
   @state() private contracts: Contract[] = store.contracts;
   @state() private calculations: Calculation[] = store.calculations;
   @state() private invoices: Invoice[] = store.invoices;
+  @state() private payments: InvoicePayment[] = store.payments;
   @state() private detailContractId: string = store.detailContractId || store.contracts[0]?.id || '';
   @state() private currentLang = store.customization.language;
   @state() private calcFilter: 'all' | 'pending' | 'approved' | 'invoiced' = 'all';
-  @state() private invoiceFilter: 'all' | 'unpaid' | 'paid' | 'draft' = 'all';
+  @state() private invoiceFilter: 'all' | 'unpaid' | 'partial' | 'overdue' | 'paid' | 'draft' = 'all';
 
   // Edit Contract modal
   @state() private contractModalOpen = false;
@@ -104,6 +111,17 @@ export class AppContractDetail extends LitElement {
   @state() private previewInvoice: Invoice | null = null;
   @state() private deletingInvoice: Invoice | null = null;
 
+  // Record / Delete Payment modals
+  @state() private paymentModalOpen = false;
+  @state() private paymentInvoiceId = '';
+  @state() private payAmount = 0;
+  @state() private payDate = '';
+  @state() private payMethod: PaymentMethod = 'bank_transfer';
+  @state() private payDocNumber = '';
+  @state() private payNotes = '';
+  @state() private payError = '';
+  @state() private deletingPayment: InvoicePayment | null = null;
+
   private unsubscribe?: () => void;
 
   static styles = styles;
@@ -123,6 +141,7 @@ export class AppContractDetail extends LitElement {
     this.contracts = store.contracts;
     this.calculations = store.calculations;
     this.invoices = store.invoices;
+    this.payments = store.payments;
     this.currentLang = store.customization.language;
 
     const candidateId = store.detailContractId || this.detailContractId;
@@ -208,6 +227,8 @@ export class AppContractDetail extends LitElement {
     switch (status) {
       case 'paid':
         return 'success';
+      case 'partially_paid':
+        return 'warning';
       case 'sent':
         return 'info';
       case 'issued':
@@ -219,6 +240,56 @@ export class AppContractDetail extends LitElement {
       default:
         return 'default';
     }
+  }
+
+  private renderDueControlTag(
+    inv: Invoice,
+    t: ReturnType<typeof getTranslation>
+  ) {
+    const ctrl = store.getInvoiceDueControl(inv);
+    if (ctrl.state === 'draft' || ctrl.state === 'cancelled') return '';
+    if (ctrl.state === 'paid') {
+      if (ctrl.daysDelta < 0) {
+        return html`
+          <span class="due-tag due-soon">
+            ${iconClock(11)}
+            <span>${t.payments.paidLate.replace('{n}', String(Math.abs(ctrl.daysDelta)))}</span>
+          </span>
+        `;
+      }
+      return html`
+        <span class="due-tag paid-ok">
+          ${iconCheck(11)}
+          <span>${t.payments.paidOnTime}</span>
+        </span>
+      `;
+    }
+    if (ctrl.state === 'overdue') {
+      return html`
+        <span class="due-tag overdue">
+          ${iconAlertTriangle(11)}
+          <span>${t.payments.overdueBy.replace('{n}', String(ctrl.daysDelta))}</span>
+        </span>
+      `;
+    }
+    if (ctrl.state === 'due_soon') {
+      return html`
+        <span class="due-tag due-soon">
+          ${iconClock(11)}
+          <span>
+            ${ctrl.daysDelta === 0
+              ? t.payments.dueToday
+              : t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta))}
+          </span>
+        </span>
+      `;
+    }
+    return html`
+      <span class="due-tag on-track">
+        ${iconClock(11)}
+        <span>${t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta))}</span>
+      </span>
+    `;
   }
 
   private getTypeLabel(type: ContractType, isRu: boolean): string {
@@ -423,22 +494,42 @@ export class AppContractDetail extends LitElement {
 
     const activeInvoices = contractInvoices.filter((inv) => inv.status !== 'cancelled');
     const invoicedTotal = activeInvoices.reduce((s, inv) => s + inv.totalAmount, 0);
-    const paidTotal = activeInvoices
-      .filter((inv) => inv.status === 'paid')
-      .reduce((s, inv) => s + inv.totalAmount, 0);
+    const paidTotal = activeInvoices.reduce(
+      (s, inv) => s + store.getInvoicePaidAmount(inv.id),
+      0
+    );
+    const unpaidInvoicesTotal = activeInvoices.reduce(
+      (s, inv) => s + store.getInvoiceRemainingAmount(inv),
+      0
+    );
+    const overdueInvoicesTotal = activeInvoices
+      .filter((inv) => store.getInvoiceDueControl(inv).state === 'overdue')
+      .reduce((s, inv) => s + store.getInvoiceRemainingAmount(inv), 0);
     const remainingLimit = Math.max(0, ctr.amount - invoicedTotal);
 
     const invoicedPct = ctr.amount > 0 ? Math.min(100, Math.round((invoicedTotal / ctr.amount) * 100)) : 0;
     const paidPct = ctr.amount > 0 ? Math.min(100, Math.round((paidTotal / ctr.amount) * 100)) : 0;
 
     const visibleInvoices = contractInvoices.filter((inv) => {
+      const dueCtrl = store.getInvoiceDueControl(inv);
+      const remaining = store.getInvoiceRemainingAmount(inv);
       if (this.invoiceFilter === 'paid') return inv.status === 'paid';
+      if (this.invoiceFilter === 'partial') return inv.status === 'partially_paid';
+      if (this.invoiceFilter === 'overdue') return inv.status === 'overdue' || dueCtrl.state === 'overdue';
       if (this.invoiceFilter === 'draft') return inv.status === 'draft';
       if (this.invoiceFilter === 'unpaid') {
-        return inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue';
+        return inv.status !== 'draft' && inv.status !== 'cancelled' && remaining > 0;
       }
       return true;
     });
+
+    const contractPayments = this.payments
+      .filter((p) => p.contractId === ctr.id)
+      .sort((a, b) => (b.paymentDate + b.createdAt).localeCompare(a.paymentDate + a.createdAt));
+
+    const payableContractInvoices = activeInvoices.filter(
+      (inv) => inv.status !== 'draft' && store.getInvoiceRemainingAmount(inv) > 0
+    );
 
     const contractSwitchOptions = this.contracts.map((c) => ({
       value: c.id,
@@ -807,7 +898,7 @@ export class AppContractDetail extends LitElement {
               `}
         </section>
 
-        <!-- Step 2: Contract Invoices & Invoicing Procedure -->
+        <!-- Step 2: Contract Invoices, Payment Progress & Due-Date Control -->
         <section class="section-card">
           <div class="section-header">
             <h2 class="section-title">
@@ -823,11 +914,19 @@ export class AppContractDetail extends LitElement {
                 .options="${[
                   { value: 'all', label: isRu ? 'Все' : 'All' },
                   { value: 'unpaid', label: isRu ? 'К оплате' : 'Unpaid' },
+                  { value: 'partial', label: isRu ? 'Частично' : 'Partial' },
+                  { value: 'overdue', label: isRu ? 'Просрочены' : 'Overdue' },
                   { value: 'paid', label: isRu ? 'Оплачены' : 'Paid' },
                   { value: 'draft', label: isRu ? 'Черновики' : 'Drafts' },
                 ]}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.invoiceFilter = e.detail.value as 'all' | 'unpaid' | 'paid' | 'draft')}"
+                  (this.invoiceFilter = e.detail.value as
+                    | 'all'
+                    | 'unpaid'
+                    | 'partial'
+                    | 'overdue'
+                    | 'paid'
+                    | 'draft')}"
               ></app-segmented-switch>
 
               <app-button
@@ -857,6 +956,15 @@ export class AppContractDetail extends LitElement {
               </span>
             </div>
             <div class="billing-stat">
+              <span class="billing-stat-label">${t.payments.remainingDue}</span>
+              <span
+                class="billing-stat-val"
+                style="color: ${overdueInvoicesTotal > 0 ? '#ef4444' : 'inherit'};"
+              >
+                ${this.formatMoney(unpaidInvoicesTotal, ctr.currency)}
+              </span>
+            </div>
+            <div class="billing-stat">
               <span class="billing-stat-label">${t.contractDetail.remainingLimit}</span>
               <span class="billing-stat-val">${this.formatMoney(remainingLimit, ctr.currency)}</span>
             </div>
@@ -882,10 +990,9 @@ export class AppContractDetail extends LitElement {
                     <thead>
                       <tr>
                         <th>${isRu ? 'Номер' : 'Invoice #'}</th>
-                        <th>${isRu ? 'Выставлен / Срок' : 'Issued / Due'}</th>
+                        <th>${isRu ? 'Сроки и контроль' : 'Dates & Control'}</th>
                         <th>${isRu ? 'Позиции и основание' : 'Items & Basis'}</th>
-                        <th>${isRu ? 'Без НДС' : 'Subtotal'}</th>
-                        <th>${isRu ? 'НДС' : 'VAT'}</th>
+                        <th>${isRu ? 'Оплата и остаток' : 'Payment Progress'}</th>
                         <th>${isRu ? 'Итого к оплате' : 'Total'}</th>
                         <th>${isRu ? 'Статус' : 'Status'}</th>
                         <th></th>
@@ -896,6 +1003,17 @@ export class AppContractDetail extends LitElement {
                         const sourceCalc = inv.calculationId
                           ? this.calculations.find((c) => c.id === inv.calculationId)
                           : undefined;
+                        const invPaid = store.getInvoicePaidAmount(inv.id);
+                        const invRemaining = store.getInvoiceRemainingAmount(inv);
+                        const invPayPct =
+                          inv.totalAmount > 0
+                            ? Math.min(100, Math.round((invPaid / inv.totalAmount) * 100))
+                            : 0;
+                        const dueCtrl = store.getInvoiceDueControl(inv);
+                        const invPayCount = store.getInvoicePayments(inv.id).length;
+                        const canRecordPayment =
+                          inv.status !== 'draft' && inv.status !== 'cancelled' && invRemaining > 0;
+
                         return html`
                           <tr>
                             <td>
@@ -909,8 +1027,8 @@ export class AppContractDetail extends LitElement {
                               </button>
                             </td>
                             <td class="mono" style="white-space: nowrap; font-size: 0.78rem;">
-                              <div>${inv.issueDate}</div>
-                              <div style="color: var(--text-muted);">→ ${inv.dueDate}</div>
+                              <div>${inv.issueDate} → ${inv.dueDate}</div>
+                              <div>${this.renderDueControlTag(inv, t)}</div>
                             </td>
                             <td>
                               <div class="items-summary" title="${inv.items[0]?.title || ''}">
@@ -930,17 +1048,50 @@ export class AppContractDetail extends LitElement {
                                       </button>
                                     `
                                   : ''}
-                                ${inv.paidDate ? html`<span>· ${isRu ? 'оплачен' : 'paid'} ${inv.paidDate}</span>` : ''}
+                                ${invPayCount > 0
+                                  ? html`<span>· ${invPayCount} ${isRu ? 'плат.' : 'pmts'}</span>`
+                                  : ''}
+                              </div>
+                            </td>
+                            <td>
+                              <div class="inv-pay-cell">
+                                <div class="inv-pay-meta mono">
+                                  <span style="color: ${invPaid > 0 ? '#10b981' : 'var(--text-muted)'}; font-weight: 600;">
+                                    ${this.formatMoney(invPaid, inv.currency)}
+                                  </span>
+                                  <span>${invPayPct}%</span>
+                                </div>
+                                <div class="inv-pay-bar">
+                                  <div
+                                    class="inv-pay-fill ${dueCtrl.state === 'overdue'
+                                      ? 'overdue'
+                                      : invPayPct > 0 && invPayPct < 100
+                                      ? 'partial'
+                                      : ''}"
+                                    style="width: ${invPayPct}%;"
+                                  ></div>
+                                </div>
+                                ${invRemaining > 0 && inv.status !== 'cancelled'
+                                  ? html`
+                                      <div class="inv-pay-meta mono">
+                                        <span>${isRu ? 'Остаток' : 'Due'}:</span>
+                                        <span style="color: ${dueCtrl.state === 'overdue' ? '#ef4444' : 'var(--text-primary)'}; font-weight: 600;">
+                                          ${this.formatMoney(invRemaining, inv.currency)}
+                                        </span>
+                                      </div>
+                                    `
+                                  : ''}
                               </div>
                             </td>
                             <td class="mono" style="white-space: nowrap;">
-                              ${this.formatMoney(inv.subtotal, inv.currency)}
-                            </td>
-                            <td class="mono" style="white-space: nowrap; color: var(--text-secondary);">
-                              ${inv.vatRate}% (${this.formatMoney(inv.vatAmount, inv.currency)})
-                            </td>
-                            <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                              ${this.formatMoney(inv.totalAmount, inv.currency)}
+                              <div style="font-weight: 700;">${this.formatMoney(inv.totalAmount, inv.currency)}</div>
+                              <div style="font-size: 0.72rem; color: var(--text-muted);">
+                                ${inv.vatRate > 0
+                                  ? `${isRu ? 'НДС' : 'VAT'} ${inv.vatRate}%`
+                                  : isRu
+                                  ? 'Без НДС'
+                                  : 'No VAT'}
+                              </div>
                             </td>
                             <td>
                               <app-badge
@@ -977,8 +1128,16 @@ export class AppContractDetail extends LitElement {
                                       </button>
                                     `
                                   : ''}
-                                ${inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue'
+                                ${canRecordPayment
                                   ? html`
+                                      <button
+                                        type="button"
+                                        class="icon-btn approve"
+                                        title="${t.payments.recordPayment}"
+                                        @click="${() => this.openPaymentModal(inv)}"
+                                      >
+                                        ${iconCreditCard(14)}
+                                      </button>
                                       <button
                                         type="button"
                                         class="icon-btn approve"
@@ -1002,6 +1161,97 @@ export class AppContractDetail extends LitElement {
                                   class="icon-btn danger"
                                   title="${t.common.delete}"
                                   @click="${() => (this.deletingInvoice = inv)}"
+                                >
+                                  ${iconTrash(14)}
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        `;
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              `}
+        </section>
+
+        <!-- Step 3: Contract Payments Ledger -->
+        <section class="section-card">
+          <div class="section-header">
+            <h2 class="section-title">
+              ${iconWallet(18)}
+              <span>${t.payments.sectionTitle}</span>
+              <span class="section-sub">(${contractPayments.length})</span>
+            </h2>
+
+            ${payableContractInvoices.length > 0
+              ? html`
+                  <app-button
+                    size="sm"
+                    variant="secondary"
+                    @click="${() => this.openPaymentModal(payableContractInvoices[0])}"
+                  >
+                    <span slot="icon-start">${iconCreditCard(14)}</span>
+                    <span>${t.payments.recordPayment}</span>
+                  </app-button>
+                `
+              : ''}
+          </div>
+
+          ${contractPayments.length === 0
+            ? html`<div class="empty-state">${t.payments.noContractPayments}</div>`
+            : html`
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>${t.payments.paymentDate}</th>
+                        <th>${t.payments.documentNumber}</th>
+                        <th>${isRu ? 'Счёт' : 'Invoice'}</th>
+                        <th>${t.payments.paymentMethod}</th>
+                        <th>${t.payments.notes}</th>
+                        <th>${isRu ? 'Сумма' : 'Amount'}</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${contractPayments.map((pay) => {
+                        const inv = contractInvoices.find((i) => i.id === pay.invoiceId);
+                        return html`
+                          <tr>
+                            <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                            <td class="mono" style="font-weight: 600; white-space: nowrap;">
+                              ${pay.documentNumber || '—'}
+                            </td>
+                            <td>
+                              ${inv
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="inv-num-btn"
+                                      @click="${() => (this.previewInvoice = inv)}"
+                                    >
+                                      ${inv.number}
+                                    </button>
+                                  `
+                                : '—'}
+                            </td>
+                            <td>
+                              <app-badge variant="default" appearance="soft" size="sm">
+                                ${t.payments.methods[pay.method]}
+                              </app-badge>
+                            </td>
+                            <td style="color: var(--text-secondary);">${pay.notes || '—'}</td>
+                            <td class="mono" style="font-weight: 700; color: #10b981; white-space: nowrap;">
+                              +${this.formatMoney(pay.amount, pay.currency)}
+                            </td>
+                            <td>
+                              <div class="actions-row">
+                                <button
+                                  type="button"
+                                  class="icon-btn danger"
+                                  title="${t.common.delete}"
+                                  @click="${() => (this.deletingPayment = pay)}"
                                 >
                                   ${iconTrash(14)}
                                 </button>
@@ -1140,6 +1390,8 @@ export class AppContractDetail extends LitElement {
       ${this.renderInvoiceFormModal(ctr, t, isRu)}
       ${this.renderInvoicePreviewModal(ctr, t, isRu)}
       ${this.renderDeleteInvoiceModal(isRu)}
+      ${this.renderPaymentModal(ctr, t, isRu)}
+      ${this.renderDeletePaymentModal(t, isRu)}
       ${this.renderEditContractModal(isRu)}
       ${this.renderDeleteContractModal(ctr, isRu)}
     `;
@@ -1663,6 +1915,7 @@ export class AppContractDetail extends LitElement {
       { value: 'draft', label: t.invoices.statuses.draft },
       { value: 'issued', label: t.invoices.statuses.issued },
       { value: 'sent', label: t.invoices.statuses.sent },
+      { value: 'partially_paid', label: t.invoices.statuses.partially_paid },
       { value: 'paid', label: t.invoices.statuses.paid },
       { value: 'overdue', label: t.invoices.statuses.overdue },
       { value: 'cancelled', label: t.invoices.statuses.cancelled },
@@ -1924,6 +2177,12 @@ export class AppContractDetail extends LitElement {
     const sourceCalc = inv.calculationId
       ? this.calculations.find((c) => c.id === inv.calculationId)
       : undefined;
+    const invPayments = store.getInvoicePayments(inv.id);
+    const invPaid = store.getInvoicePaidAmount(inv.id);
+    const invRemaining = store.getInvoiceRemainingAmount(inv);
+    const invPayPct =
+      inv.totalAmount > 0 ? Math.min(100, Math.round((invPaid / inv.totalAmount) * 100)) : 0;
+    const canPay = inv.status !== 'draft' && inv.status !== 'cancelled' && invRemaining > 0;
 
     return html`
       <app-modal
@@ -1938,16 +2197,39 @@ export class AppContractDetail extends LitElement {
               <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
                 ${isRu ? 'Счёт на оплату' : 'Invoice'} № ${inv.number}
               </div>
-              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                ${isRu ? 'от' : 'dated'} <span class="mono">${inv.issueDate}</span>
-                · ${isRu ? 'Оплатить до' : 'Due'} <span class="mono">${inv.dueDate}</span>
-                · ${isRu ? 'Основание' : 'Contract'}: ${ctr.number}
-                ${sourceCalc ? html` · <span class="mono">${sourceCalc.number}</span>` : ''}
+              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem; display: flex; gap: 0.45rem; flex-wrap: wrap; align-items: center;">
+                <span>${isRu ? 'от' : 'dated'} <span class="mono">${inv.issueDate}</span></span>
+                <span>· ${isRu ? 'Оплатить до' : 'Due'} <span class="mono">${inv.dueDate}</span></span>
+                <span>· ${isRu ? 'Основание' : 'Contract'}: ${ctr.number}</span>
+                ${sourceCalc ? html`<span>· <span class="mono">${sourceCalc.number}</span></span>` : ''}
+                ${this.renderDueControlTag(inv, t)}
               </div>
             </div>
             <app-badge variant="${this.getInvoiceStatusVariant(inv.status)}" appearance="soft">
               ${t.invoices.statuses[inv.status]}
             </app-badge>
+          </div>
+
+          <div class="pay-summary-card">
+            <div class="billing-stat">
+              <span class="billing-stat-label">${isRu ? 'Сумма счёта' : 'Invoice Total'}</span>
+              <span class="billing-stat-val">${this.formatMoney(inv.totalAmount, inv.currency)}</span>
+            </div>
+            <div class="billing-stat">
+              <span class="billing-stat-label">${t.payments.paidAmount} (${invPayPct}%)</span>
+              <span class="billing-stat-val" style="color: #10b981;">
+                ${this.formatMoney(invPaid, inv.currency)}
+              </span>
+            </div>
+            <div class="billing-stat">
+              <span class="billing-stat-label">${t.payments.remainingDue}</span>
+              <span
+                class="billing-stat-val"
+                style="color: ${invRemaining > 0 ? '#f59e0b' : '#10b981'};"
+              >
+                ${this.formatMoney(invRemaining, inv.currency)}
+              </span>
+            </div>
           </div>
 
           <div class="sheet-parties">
@@ -2009,6 +2291,70 @@ export class AppContractDetail extends LitElement {
             </div>
           </div>
 
+          <div class="items-editor">
+            <div class="payments-subhead">
+              <span style="font-size: 0.88rem; font-weight: 700; color: var(--text-primary);">
+                ${t.payments.historyTitle} (${invPayments.length})
+              </span>
+              ${canPay
+                ? html`
+                    <app-button
+                      size="sm"
+                      variant="secondary"
+                      @click="${() => this.openPaymentModal(inv)}"
+                    >
+                      <span slot="icon-start">${iconCreditCard(13)}</span>
+                      <span>${t.payments.recordPayment}</span>
+                    </app-button>
+                  `
+                : ''}
+            </div>
+
+            ${invPayments.length === 0
+              ? html`<div class="empty-state" style="padding: 1.25rem;">${t.payments.noPayments}</div>`
+              : html`
+                  <div class="table-wrap">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>${t.payments.paymentDate}</th>
+                          <th>${t.payments.documentNumber}</th>
+                          <th>${t.payments.paymentMethod}</th>
+                          <th>${t.payments.notes}</th>
+                          <th>${isRu ? 'Сумма' : 'Amount'}</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        ${invPayments.map(
+                          (pay) => html`
+                            <tr>
+                              <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                              <td class="mono" style="white-space: nowrap;">${pay.documentNumber || '—'}</td>
+                              <td>${t.payments.methods[pay.method]}</td>
+                              <td style="color: var(--text-secondary);">${pay.notes || '—'}</td>
+                              <td class="mono" style="color: #10b981; font-weight: 700; white-space: nowrap;">
+                                +${this.formatMoney(pay.amount, pay.currency)}
+                              </td>
+                              <td>
+                                <button
+                                  type="button"
+                                  class="icon-btn danger"
+                                  title="${t.common.delete}"
+                                  @click="${() => (this.deletingPayment = pay)}"
+                                >
+                                  ${iconTrash(13)}
+                                </button>
+                              </td>
+                            </tr>
+                          `
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                `}
+          </div>
+
           ${inv.notes
             ? html`<div style="font-size: 0.82rem; color: var(--text-secondary);">${inv.notes}</div>`
             : ''}
@@ -2035,8 +2381,15 @@ export class AppContractDetail extends LitElement {
                 </app-button>
               `
             : ''}
-          ${inv.status === 'issued' || inv.status === 'sent' || inv.status === 'overdue'
+          ${canPay
             ? html`
+                <app-button
+                  variant="secondary"
+                  @click="${() => this.openPaymentModal(inv)}"
+                >
+                  <span slot="icon-start">${iconCreditCard(14)}</span>
+                  <span>${t.payments.recordPayment}</span>
+                </app-button>
                 <app-button
                   variant="primary"
                   @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
@@ -2084,6 +2437,267 @@ export class AppContractDetail extends LitElement {
         </div>
       </app-modal>
     `;
+  }
+
+  private renderPaymentModal(
+    ctr: Contract,
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    const contractInvoices = this.invoices.filter(
+      (i) => i.contractId === ctr.id && i.status !== 'draft' && i.status !== 'cancelled'
+    );
+    const payableInvoices = contractInvoices.filter(
+      (i) => store.getInvoiceRemainingAmount(i) > 0 || i.id === this.paymentInvoiceId
+    );
+    const inv = contractInvoices.find((i) => i.id === this.paymentInvoiceId) || payableInvoices[0] || null;
+
+    if (!this.paymentModalOpen || !inv) return '';
+
+    const paidSoFar = store.getInvoicePaidAmount(inv.id);
+    const remainingBefore = store.getInvoiceRemainingAmount(inv);
+    const entered = Math.max(0, Number(this.payAmount) || 0);
+    const paidAfter = Math.round((paidSoFar + entered) * 100) / 100;
+    const remainingAfter = Math.max(0, Math.round((inv.totalAmount - paidAfter) * 100) / 100);
+    const willBeFull = remainingAfter === 0 && entered > 0;
+
+    const invoiceOptions = payableInvoices.map((i) => ({
+      value: i.id,
+      label: `${i.number} · ${isRu ? 'Остаток' : 'Due'}: ${this.formatMoney(
+        store.getInvoiceRemainingAmount(i),
+        i.currency
+      )}`,
+    }));
+
+    const methodOptions: { value: PaymentMethod; label: string }[] = [
+      { value: 'bank_transfer', label: t.payments.methods.bank_transfer },
+      { value: 'card', label: t.payments.methods.card },
+      { value: 'cash', label: t.payments.methods.cash },
+      { value: 'offset', label: t.payments.methods.offset },
+    ];
+
+    return html`
+      <app-modal
+        ?open="${this.paymentModalOpen}"
+        size="md"
+        title="${t.payments.newPayment} · ${inv.number}"
+        @close="${() => (this.paymentModalOpen = false)}"
+      >
+        <div class="form-grid">
+          ${payableInvoices.length > 1
+            ? html`
+                <div class="col-span-2">
+                  <app-select
+                    label="${isRu ? 'Счёт к оплате' : 'Target Invoice'}"
+                    .value="${inv.id}"
+                    .options="${invoiceOptions}"
+                    @change="${(e: CustomEvent<{ value: string }>) => {
+                      const nextInv = contractInvoices.find((i) => i.id === e.detail.value);
+                      if (nextInv) this.openPaymentModal(nextInv);
+                    }}"
+                  ></app-select>
+                </div>
+              `
+            : ''}
+
+          <div class="col-span-2 pay-summary-card">
+            <div class="billing-stat">
+              <span class="billing-stat-label">${isRu ? 'Итого по счёту' : 'Invoice Total'}</span>
+              <span class="billing-stat-val">${this.formatMoney(inv.totalAmount, inv.currency)}</span>
+            </div>
+            <div class="billing-stat">
+              <span class="billing-stat-label">${t.payments.paidAmount}</span>
+              <span class="billing-stat-val" style="color: #10b981;">
+                ${this.formatMoney(paidSoFar, inv.currency)}
+              </span>
+            </div>
+            <div class="billing-stat">
+              <span class="billing-stat-label">${t.payments.remainingDue}</span>
+              <span class="billing-stat-val" style="color: #f59e0b;">
+                ${this.formatMoney(remainingBefore, inv.currency)}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <app-number-input
+              label="${isRu ? `Сумма платежа (${inv.currency})` : `Payment Amount (${inv.currency})`}"
+              .value="${this.payAmount}"
+              min="1"
+              step="1000"
+              error="${this.payError}"
+              @change="${(e: CustomEvent<{ value: number }>) => {
+                this.payAmount = e.detail.value;
+                this.payError = '';
+              }}"
+            ></app-number-input>
+            <div class="quick-term-row" style="margin-top: 0.4rem;">
+              <button
+                type="button"
+                class="quick-term-btn"
+                @click="${() => {
+                  this.payAmount = Math.max(1, Math.round(remainingBefore * 0.25));
+                  this.payError = '';
+                }}"
+              >
+                25%
+              </button>
+              <button
+                type="button"
+                class="quick-term-btn"
+                @click="${() => {
+                  this.payAmount = Math.max(1, Math.round(remainingBefore * 0.5));
+                  this.payError = '';
+                }}"
+              >
+                50%
+              </button>
+              <button
+                type="button"
+                class="quick-term-btn"
+                @click="${() => {
+                  this.payAmount = remainingBefore;
+                  this.payError = '';
+                }}"
+              >
+                ${isRu ? '100% остатка' : '100% due'}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <app-date-input
+              label="${t.payments.paymentDate}"
+              .value="${this.payDate}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.payDate = e.detail.value)}"
+            ></app-date-input>
+          </div>
+
+          <div>
+            <app-select
+              label="${t.payments.paymentMethod}"
+              .value="${this.payMethod}"
+              .options="${methodOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.payMethod = e.detail.value as PaymentMethod)}"
+            ></app-select>
+          </div>
+
+          <div>
+            <app-input
+              label="${t.payments.documentNumber}"
+              placeholder="ПП-2026/0850"
+              .value="${this.payDocNumber}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.payDocNumber = e.detail.value)}"
+            ></app-input>
+          </div>
+
+          <div class="col-span-2 pay-preview-result">
+            <span>
+              ${isRu ? 'После платежа:' : 'After payment:'}
+              <strong class="mono">${this.formatMoney(paidAfter, inv.currency)}</strong>
+              · ${t.payments.remainingDue}:
+              <strong class="mono">${this.formatMoney(remainingAfter, inv.currency)}</strong>
+            </span>
+            <app-badge
+              variant="${willBeFull ? 'success' : 'warning'}"
+              appearance="soft"
+              size="sm"
+            >
+              ${willBeFull ? t.payments.fullPayment : t.payments.partialPayment}
+            </app-badge>
+          </div>
+
+          <div class="col-span-2">
+            <app-textarea
+              label="${t.payments.notes}"
+              .value="${this.payNotes}"
+              rows="2"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = e.detail.value)}"
+            ></app-textarea>
+          </div>
+        </div>
+
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.paymentModalOpen = false)}">
+            ${t.common.cancel}
+          </app-button>
+          <app-button variant="primary" @click="${() => this.handleSavePayment(inv)}">
+            ${t.payments.recordPayment}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
+  }
+
+  private renderDeletePaymentModal(
+    t: ReturnType<typeof getTranslation>,
+    isRu: boolean
+  ) {
+    return html`
+      <app-modal
+        ?open="${Boolean(this.deletingPayment)}"
+        size="sm"
+        title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
+        @close="${() => (this.deletingPayment = null)}"
+      >
+        <p class="confirm-text">${t.payments.deleteConfirm}</p>
+        <div slot="footer">
+          <app-button variant="ghost" @click="${() => (this.deletingPayment = null)}">
+            ${t.common.cancel}
+          </app-button>
+          <app-button
+            variant="danger"
+            @click="${() => {
+              if (this.deletingPayment) {
+                store.deleteInvoicePayment(this.deletingPayment.id);
+                this.deletingPayment = null;
+              }
+            }}"
+          >
+            ${t.common.delete}
+          </app-button>
+        </div>
+      </app-modal>
+    `;
+  }
+
+  private openPaymentModal(inv: Invoice) {
+    const today = new Date().toISOString().slice(0, 10);
+    const remaining = store.getInvoiceRemainingAmount(inv);
+    const seq = this.payments.length + 1;
+
+    this.paymentInvoiceId = inv.id;
+    this.payAmount = remaining > 0 ? remaining : inv.totalAmount;
+    this.payDate = today;
+    this.payMethod = 'bank_transfer';
+    this.payDocNumber = `ПП-${today.slice(0, 4)}/${String(840 + seq).padStart(4, '0')}`;
+    this.payNotes = `Оплата по счёту ${inv.number}`;
+    this.payError = '';
+    this.paymentModalOpen = true;
+  }
+
+  private handleSavePayment(inv: Invoice) {
+    const amount = Number(this.payAmount) || 0;
+    if (amount <= 0) {
+      this.payError = this.currentLang === 'ru' ? 'Введите сумму больше 0' : 'Enter amount > 0';
+      return;
+    }
+
+    store.addInvoicePayment({
+      invoiceId: inv.id,
+      contractId: inv.contractId,
+      companyId: inv.companyId,
+      counterpartyId: inv.counterpartyId,
+      amount,
+      currency: inv.currency,
+      paymentDate: this.payDate || new Date().toISOString().slice(0, 10),
+      method: this.payMethod,
+      documentNumber: this.payDocNumber,
+      notes: this.payNotes,
+    });
+
+    this.paymentModalOpen = false;
   }
 
   private renderEditContractModal(isRu: boolean) {
