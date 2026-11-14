@@ -6,6 +6,8 @@ import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -182,7 +184,7 @@ export class AppCounterparties extends LitElement {
           : 'New Counterparty'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Краткое наименование' : 'Short Name'}"
@@ -281,7 +283,7 @@ export class AppCounterparties extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -293,34 +295,23 @@ export class AppCounterparties extends LitElement {
         </div>
       </app-modal>
 
-      <app-modal
-        ?open="${Boolean(this.deletingItem)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingItem)}"
         size="sm"
         title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        @close="${() => (this.deletingItem = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить контрагента «${this.deletingItem?.name || ''}»?`
-            : `Are you sure you want to delete "${this.deletingItem?.name || ''}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingItem = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingItem) {
-                store.deleteCounterparty(this.deletingItem.id);
-                this.deletingItem = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить контрагента «${this.deletingItem?.name || ''}»?`
+          : `Are you sure you want to delete "${this.deletingItem?.name || ''}"?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingItem = null)}"
+        @confirm="${() => {
+          if (this.deletingItem) {
+            store.deleteCounterparty(this.deletingItem.id);
+            this.deletingItem = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 

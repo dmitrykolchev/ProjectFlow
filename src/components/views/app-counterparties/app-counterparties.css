@@ -263,18 +263,6 @@
 .data-table tr:hover td {
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .col-span-2 {
   grid-column: span 2;
 }
@@ -290,10 +278,7 @@
   .cards-grid {
     grid-template-columns: 1fr;
   }
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .col-span-2 {
+.col-span-2 {
     grid-column: span 1;
   }
 }
