@@ -317,7 +317,7 @@ export class AppPayments extends LitElement {
 
       <app-filter-bar
         variant="bare"
-        style="--filter-search-min: 270px; --filter-search-max: 270px; --filter-select-width: 210px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 210px;"
         placeholder="${this.viewTab === 'due_control'
           ? isRu
             ? 'Поиск по номеру счёта, договору, клиенту...'

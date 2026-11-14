@@ -119,7 +119,7 @@ export class AppCompanies extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
-        style="--filter-search-max: 340px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px;"
         placeholder="${isRu ? 'Поиск по названию, ИНН, городу...' : 'Search by name, INN, city...'}"
         .searchValue="${this.localSearch}"
         .filters="${[{ key: 'status', options: statusOptions }]}"

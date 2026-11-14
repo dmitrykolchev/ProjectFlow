@@ -141,7 +141,7 @@ export class AppEmployees extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
-        style="--filter-search-min: 200px; --filter-search-max: 300px; --filter-select-width: 185px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
         placeholder="${isRu ? 'Поиск по ФИО, должности, отделу...' : 'Search name, role, dept...'}"
         .searchValue="${this.localSearch}"
         .filters="${[

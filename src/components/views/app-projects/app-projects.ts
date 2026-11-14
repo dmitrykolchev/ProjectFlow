@@ -151,6 +151,7 @@ export class AppProjects extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
+        style="--filter-search-min: 280px; --filter-search-max: 280px;"
         placeholder="${isRu ? 'Поиск по коду или названию...' : 'Search by key or name...'}"
         .searchValue="${this.localSearch}"
         .filters="${[

@@ -138,7 +138,7 @@ export class AppCounterparties extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
-        style="--filter-select-width: 185px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
         placeholder="${isRu ? 'Поиск по названию, ИНН, контакту...' : 'Search name, INN, contact...'}"
         .searchValue="${this.localSearch}"
         .filters="${[

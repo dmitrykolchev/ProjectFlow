@@ -303,7 +303,7 @@ export class AppTimeTracking extends LitElement {
 
       <!-- Filters Toolbar -->
       <app-filter-bar
-        style="--filter-select-width: 185px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
         placeholder="${isRu ? 'Поиск по задаче, комментарию, сотруднику...' : 'Search task, notes, employee...'}"
         .searchValue="${this.localSearch}"
         .filters="${[

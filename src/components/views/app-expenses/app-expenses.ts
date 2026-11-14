@@ -186,7 +186,7 @@ export class AppExpenses extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
-        style="--filter-search-max: 300px; --filter-select-width: 185px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
         placeholder="${isRu ? 'Поиск по статье, поставщику, задаче...' : 'Search item, vendor, task...'}"
         .searchValue="${this.localSearch}"
         .filters="${[

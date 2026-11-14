@@ -430,6 +430,7 @@ export class AppContracts extends LitElement {
       </app-kpi-strip>
 
       <app-filter-bar
+        style="--filter-search-min: 280px; --filter-search-max: 280px;"
         placeholder="${this.viewTab === 'contracts'
           ? isRu
             ? 'Поиск по номеру, предмету, контрагенту...'
