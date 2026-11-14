@@ -1309,6 +1309,16 @@ export const ru = {
       emptyNoMembers: 'Участники не назначены',
       pinnedShort: 'Закреп.',
     },
+    knowledgeBase: {
+      docsNotesButton: 'Документы и заметки',
+      docIdLabel: 'Идентификатор:',
+      optionNoProjectLink: 'Без привязки к проекту',
+      optionNoCompanyLink: 'Без привязки к компании',
+      revisionPlaceholder: 'Кратко: что добавлено или уточнено...',
+      checklistUpdateNote: 'Обновлён чек-лист документа',
+      defaultDocContent:
+        '## Контекст\n\n\n## Решение и порядок действий\n- [ ] Шаг 1\n- [ ] Шаг 2\n\n## Накопленный опыт\n> Ключевой вывод для будущих релизов',
+    },
     confirmSectionLabels: {
       action: 'Выполняемое действие:',
       result: 'Ожидаемый результат:',

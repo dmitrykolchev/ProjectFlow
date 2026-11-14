@@ -1309,6 +1309,16 @@ export const en = {
       emptyNoMembers: 'No assigned members',
       pinnedShort: 'Pinned',
     },
+    knowledgeBase: {
+      docsNotesButton: 'Documents & Notes',
+      docIdLabel: 'Doc ID:',
+      optionNoProjectLink: 'No project link',
+      optionNoCompanyLink: 'No company link',
+      revisionPlaceholder: 'What changed in this revision...',
+      checklistUpdateNote: 'Updated document checklist',
+      defaultDocContent:
+        '## Context\n\n\n## Decisions & Runbook\n- [ ] Step 1\n- [ ] Step 2\n\n## Key Takeaways\n> Important note for future teams',
+    },
     confirmSectionLabels: {
       action: 'Action performed:',
       result: 'Expected result:',

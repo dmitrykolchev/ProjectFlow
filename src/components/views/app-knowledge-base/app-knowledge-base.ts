@@ -374,14 +374,13 @@ export class AppKnowledgeBase extends LitElement {
     }
     store.updateKnowledgeArticle(
       { ...article, content: lines.join('\n') },
-      this.currentLang === 'ru' ? 'Обновлён чек-лист документа' : 'Updated document checklist'
+      getTranslation(this.currentLang).viewTexts.knowledgeBase.checklistUpdateNote
     );
   }
 
   render() {
     const t = getTranslation(this.currentLang);
     const kb = t.knowledgeBase;
-    const isRu = this.currentLang === 'ru';
 
     const filtered = this.getFilteredArticles();
     const selectedArticle =
@@ -546,7 +545,7 @@ export class AppKnowledgeBase extends LitElement {
           <!-- Left Pane: Articles Catalog -->
           <aside class="kb-index">
             <div class="index-head">
-              <span>${isRu ? 'Документы и заметки' : 'Documents & Notes'}</span>
+              <span>${t.viewTexts.knowledgeBase.docsNotesButton}</span>
               <span class="index-count">${filtered.length}</span>
             </div>
 
@@ -639,7 +638,6 @@ export class AppKnowledgeBase extends LitElement {
   private renderArticleReader(article: KnowledgeArticle) {
     const t = getTranslation(this.currentLang);
     const kb = t.knowledgeBase;
-    const isRu = this.currentLang === 'ru';
 
     const proj = article.projectId
       ? store.projects.find((p) => p.id === article.projectId)
@@ -821,7 +819,7 @@ export class AppKnowledgeBase extends LitElement {
           </button>
 
           <span style="font-size: 0.78rem; color: var(--text-muted);">
-            ${isRu ? 'Идентификатор:' : 'Doc ID:'}
+            ${t.viewTexts.knowledgeBase.docIdLabel}
             <span style="font-family: var(--font-mono, 'JetBrains Mono', monospace);">${article.id}</span>
           </span>
         </div>
@@ -853,7 +851,6 @@ export class AppKnowledgeBase extends LitElement {
   private renderEditorModal() {
     const t = getTranslation(this.currentLang);
     const kb = t.knowledgeBase;
-    const isRu = this.currentLang === 'ru';
 
     const scopeOptions = (Object.keys(kb.scopes) as KnowledgeScope[]).map((sc) => ({
       value: sc,
@@ -861,12 +858,12 @@ export class AppKnowledgeBase extends LitElement {
     }));
 
     const projectOptions = [
-      { value: '', label: isRu ? 'Без привязки к проекту' : 'No project link' },
+      { value: '', label: t.viewTexts.knowledgeBase.optionNoProjectLink },
       ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
     ];
 
     const companyOptions = [
-      { value: '', label: isRu ? 'Без привязки к компании' : 'No company link' },
+      { value: '', label: t.viewTexts.knowledgeBase.optionNoCompanyLink },
       ...store.companies.map((c) => ({ value: c.id, label: c.name })),
     ];
 
@@ -1016,7 +1013,7 @@ export class AppKnowledgeBase extends LitElement {
 
           <app-input
             label="${kb.fieldRevisionSummary}"
-            placeholder="${isRu ? 'Кратко: что добавлено или уточнено...' : 'What changed in this revision...'}"
+            placeholder="${t.viewTexts.knowledgeBase.revisionPlaceholder}"
             .value="${this.formRevisionSummary}"
             @input="${(e: CustomEvent<{ value: string }>) => (this.formRevisionSummary = eventValue(e))}"
           ></app-input>
@@ -1086,10 +1083,7 @@ export class AppKnowledgeBase extends LitElement {
     this.editorTab = 'write';
     this.formTitle = '';
     this.formSummary = '';
-    this.formContent =
-      this.currentLang === 'ru'
-        ? `## Контекст\n\n\n## Решение и порядок действий\n- [ ] Шаг 1\n- [ ] Шаг 2\n\n## Накопленный опыт\n> Ключевой вывод для будущих релизов`
-        : `## Context\n\n\n## Decisions & Runbook\n- [ ] Step 1\n- [ ] Step 2\n\n## Key Takeaways\n> Important note for future teams`;
+    this.formContent = getTranslation(this.currentLang).viewTexts.knowledgeBase.defaultDocContent;
     this.formScope =
       this.scopeFilter !== 'all'
         ? this.scopeFilter
