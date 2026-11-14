@@ -13,6 +13,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-counterparties.css';
 
 @customElement('app-counterparties')
@@ -150,24 +152,12 @@ export class AppCounterparties extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего контрагентов' : 'Total Counterparties'}</span>
-          <span class="kpi-value">${this.counterparties.length}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Заказчики' : 'Clients'}</span>
-          <span class="kpi-value" style="color: var(--accent-primary, #6366f1);">${clientsCount}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Поставщики и подрядчики' : 'Vendors & Partners'}</span>
-          <span class="kpi-value">${contractorsVendorsCount}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Портфель активных договоров' : 'Active Contract Portfolio'}</span>
-          <span class="kpi-value">${(activePortfolioRub / 1_000_000).toFixed(1)}M ₽</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${isRu ? 'Всего контрагентов' : 'Total Counterparties'}" value="${this.counterparties.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Заказчики' : 'Clients'}" value="${clientsCount}" valueColor="var(--accent-primary, #6366f1)"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Поставщики и подрядчики' : 'Vendors & Partners'}" value="${contractorsVendorsCount}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Портфель активных договоров' : 'Active Contract Portfolio'}" value="${(activePortfolioRub / 1_000_000).toFixed(1)}M ₽"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

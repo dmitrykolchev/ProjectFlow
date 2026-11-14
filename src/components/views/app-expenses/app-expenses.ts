@@ -24,6 +24,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-expenses.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -195,32 +197,12 @@ export class AppExpenses extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${t.expenses.totalExpenses}</span>
-          <span class="kpi-value">${totalRub.toLocaleString('ru-RU')} ₽</span>
-          <span class="kpi-sub">${nonRejected.length} ${isRu ? 'активных записей' : 'active entries'}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.expenses.approvedAmount}</span>
-          <span class="kpi-value" style="color: #10b981;">${approvedRub.toLocaleString('ru-RU')} ₽</span>
-          <span class="kpi-sub">
-            ${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${isRu ? 'от суммы расходов' : 'of expenses'}
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.expenses.pendingCount}</span>
-          <span class="kpi-value" style="color: ${pendingList.length > 0 ? '#f59e0b' : 'inherit'};">
-            ${pendingList.length}
-          </span>
-          <span class="kpi-sub">${pendingRub.toLocaleString('ru-RU')} ₽ ${isRu ? 'к согласованию' : 'awaiting'}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.expenses.billableAmount}</span>
-          <span class="kpi-value">${billableRub.toLocaleString('ru-RU')} ₽</span>
-          <span class="kpi-sub">${isRu ? 'Покрывается заказчиками' : 'Client billable'}</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${t.expenses.totalExpenses}" value="${totalRub.toLocaleString('ru-RU')} ₽" subtitle="${nonRejected.length} ${isRu ? 'активных записей' : 'active entries'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.approvedAmount}" value="${approvedRub.toLocaleString('ru-RU')} ₽" valueColor="#10b981" subtitle="${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${isRu ? 'от суммы расходов' : 'of expenses'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.pendingCount}" value="${pendingList.length}" valueColor="${pendingList.length > 0 ? '#f59e0b' : ''}" subtitle="${pendingRub.toLocaleString('ru-RU')} ₽ ${isRu ? 'к согласованию' : 'awaiting'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString('ru-RU')} ₽" subtitle="${isRu ? 'Покрывается заказчиками' : 'Client billable'}"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

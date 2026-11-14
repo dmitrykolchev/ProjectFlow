@@ -27,6 +27,8 @@ import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
@@ -327,45 +329,12 @@ export class AppPayments extends LitElement {
           : ''}
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${t.payments.paidAmount} (RUB)</span>
-          <span class="kpi-value" style="color: #10b981;">${this.formatMoney(totalPaidRub, 'RUB')}</span>
-          <span class="kpi-sub">
-            ${this.payments.length} ${isRu ? 'проведённ. платёж(ей)' : 'recorded payment(s)'}
-          </span>
-        </div>
-
-        <div class="kpi-card">
-          <span class="kpi-label">${t.payments.remainingDue} (RUB)</span>
-          <span class="kpi-value" style="color: var(--accent-primary, #6366f1);">
-            ${this.formatMoney(totalRemainingRub, 'RUB')}
-          </span>
-          <span class="kpi-sub">
-            ${payableInvoices.length} ${isRu ? 'неоплач./частичных счетов' : 'open invoice(s)'}
-          </span>
-        </div>
-
-        <div class="kpi-card">
-          <span class="kpi-label">${t.payments.overdueAlert}</span>
-          <span class="kpi-value" style="color: ${overdueRub > 0 ? '#ef4444' : 'inherit'};">
-            ${this.formatMoney(overdueRub, 'RUB')}
-          </span>
-          <span class="kpi-sub">
-            ${overdueInvoices.length} ${isRu ? 'просроченн. счёт(ов)' : 'overdue invoice(s)'}
-          </span>
-        </div>
-
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Ближайшие сроки (≤ 5 дн.)' : 'Due Within 5 Days'}</span>
-          <span class="kpi-value" style="color: ${dueSoonRub > 0 ? '#f59e0b' : 'inherit'};">
-            ${this.formatMoney(dueSoonRub, 'RUB')}
-          </span>
-          <span class="kpi-sub">
-            ${dueSoonInvoices.length} ${isRu ? 'счёт(ов) к оплате' : 'invoice(s) due soon'}
-          </span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${t.payments.paidAmount} (RUB)" value="${this.formatMoney(totalPaidRub, 'RUB')}" valueColor="#10b981" subtitle="${this.payments.length} ${isRu ? 'проведённ. платёж(ей)' : 'recorded payment(s)'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.remainingDue} (RUB)" value="${this.formatMoney(totalRemainingRub, 'RUB')}" valueColor="var(--accent-primary, #6366f1)" subtitle="${payableInvoices.length} ${isRu ? 'неоплач./частичных счетов' : 'open invoice(s)'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.overdueAlert}" value="${this.formatMoney(overdueRub, 'RUB')}" valueColor="${overdueRub > 0 ? '#ef4444' : ''}" subtitle="${overdueInvoices.length} ${isRu ? 'просроченн. счёт(ов)' : 'overdue invoice(s)'}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Ближайшие сроки (≤ 5 дн.)' : 'Due Within 5 Days'}" value="${this.formatMoney(dueSoonRub, 'RUB')}" valueColor="${dueSoonRub > 0 ? '#f59e0b' : ''}" subtitle="${dueSoonInvoices.length} ${isRu ? 'счёт(ов) к оплате' : 'invoice(s) due soon'}"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

@@ -13,6 +13,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-employees.css';
 
 @customElement('app-employees')
@@ -129,24 +131,12 @@ export class AppEmployees extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего сотрудников' : 'Total Employees'}</span>
-          <span class="kpi-value">${this.employees.length}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Доступны к работе' : 'Available'}</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">${activeOnline}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Отделов' : 'Departments'}</span>
-          <span class="kpi-value">${departments}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Средняя ставка' : 'Avg Rate'}</span>
-          <span class="kpi-value">${avgRate.toLocaleString('ru-RU')} ₽/ч</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${isRu ? 'Всего сотрудников' : 'Total Employees'}" value="${this.employees.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Доступны к работе' : 'Available'}" value="${activeOnline}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Отделов' : 'Departments'}" value="${departments}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Средняя ставка' : 'Avg Rate'}" value="${avgRate.toLocaleString('ru-RU')} ₽/ч"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

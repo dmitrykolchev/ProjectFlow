@@ -31,6 +31,8 @@ import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
@@ -361,37 +363,12 @@ export class AppCalculations extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего калькуляций' : 'Total Calculations'}</span>
-          <span class="kpi-value">${this.calculations.length}</span>
-          <span class="kpi-sub">
-            ${isRu ? 'В том числе выставлено в счета:' : 'Invoiced:'}
-            ${this.calculations.filter((c) => c.status === 'invoiced').length}
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'На согласовании у клиента' : 'Pending Client Approval'}</span>
-          <span class="kpi-value" style="color: #f59e0b;">${sentCalcs.length}</span>
-          <span class="kpi-sub mono">${this.formatMoney(sentAmountRub, 'RUB')}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Согласовано (к счетам)' : 'Approved (Ready to Bill)'}</span>
-          <span class="kpi-value" style="color: #10b981;">${this.formatMoney(approvedReadyRub, 'RUB')}</span>
-          <span class="kpi-sub">
-            ${approvedCalcs.length} ${isRu ? 'соглас. отчёт(ов)' : 'approved report(s)'}
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Часы в калькуляциях' : 'Logged Hours in Reports'}</span>
-          <span class="kpi-value">
-            ${totalBillableHours.toFixed(1)} ${hUnit}
-          </span>
-          <span class="kpi-sub">
-            +${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)
-          </span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${isRu ? 'Всего калькуляций' : 'Total Calculations'}" value="${this.calculations.length}" subtitle="${isRu ? 'В том числе выставлено в счета:' : 'Invoiced:'} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'На согласовании у клиента' : 'Pending Client Approval'}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${this.formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Согласовано (к счетам)' : 'Approved (Ready to Bill)'}" value="${this.formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${isRu ? 'соглас. отчёт(ов)' : 'approved report(s)'}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Часы в калькуляциях' : 'Logged Hours in Reports'}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

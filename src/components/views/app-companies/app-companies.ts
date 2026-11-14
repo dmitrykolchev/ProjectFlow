@@ -11,6 +11,8 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-companies.css';
 
 @customElement('app-companies')
@@ -107,24 +109,12 @@ export class AppCompanies extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего компаний' : 'Total Companies'}</span>
-          <span class="kpi-value">${this.companies.length}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Действующих' : 'Active'}</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">${activeCount}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Сотрудников в группе' : 'Group Employees'}</span>
-          <span class="kpi-value">${totalEmployees}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Действующих договоров' : 'Active Contracts'}</span>
-          <span class="kpi-value">${activeContracts}</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${isRu ? 'Всего компаний' : 'Total Companies'}" value="${this.companies.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Действующих' : 'Active'}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Сотрудников в группе' : 'Group Employees'}" value="${totalEmployees}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Действующих договоров' : 'Active Contracts'}" value="${activeContracts}"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

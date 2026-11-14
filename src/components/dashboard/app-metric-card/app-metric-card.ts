@@ -10,6 +10,7 @@ export class AppMetricCard extends LitElement {
   @property({ type: String }) trend: 'up' | 'down' | 'neutral' = 'neutral';
   @property({ type: String }) subtitle: string = '';
   @property({ type: String }) accentColor: string = 'var(--accent-primary, #6366f1)';
+  @property({ type: String }) valueColor: string = '';
   @property({ type: Array }) sparkline: number[] = [];
   @property({ type: Boolean }) clickable: boolean = false;
   @property({ type: String }) size: 'full' | 'compact' = 'full';
@@ -32,7 +33,7 @@ export class AppMetricCard extends LitElement {
         </div>
 
         <div class="metric-body">
-          <span class="metric-value">${this.value}</span>
+          <span class="metric-value" style="${this.valueColor ? `color: ${this.valueColor};` : ''}">${this.value}</span>
           ${this.sparkline.length > 1 ? this.renderSparkline() : ''}
         </div>
 

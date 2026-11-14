@@ -23,6 +23,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-time-tracking.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -200,30 +202,12 @@ export class AppTimeTracking extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${t.timeTracking.totalHours}</span>
-          <span class="kpi-value">${totalHours.toFixed(1)} ч</span>
-          <span class="kpi-sub">${isRu ? 'По текущей выборке' : 'Current filter scope'}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.timeTracking.billableHours}</span>
-          <span class="kpi-value" style="color: #10b981;">${billableHours.toFixed(1)} ч</span>
-          <span class="kpi-sub">${billablePct}% ${isRu ? 'от общих часов' : 'of total hours'}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.timeTracking.estimatedCost}</span>
-          <span class="kpi-value">${estCostRub.toLocaleString('ru-RU')} ₽</span>
-          <span class="kpi-sub">${isRu ? `Базовая ставка ${HOURLY_RATE_RUB.toLocaleString('ru-RU')} ₽/ч` : `Rate ${HOURLY_RATE_RUB} ₽/h`}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.timeTracking.entriesCount}</span>
-          <span class="kpi-value">${filtered.length}</span>
-          <span class="kpi-sub">
-            ${filtered.filter((e) => e.status === 'approved').length} ${isRu ? 'утверждено' : 'approved'}
-          </span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${t.timeTracking.totalHours}" value="${totalHours.toFixed(1)} ч" subtitle="${isRu ? 'По текущей выборке' : 'Current filter scope'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.billableHours}" value="${billableHours.toFixed(1)} ч" valueColor="#10b981" subtitle="${billablePct}% ${isRu ? 'от общих часов' : 'of total hours'}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.estimatedCost}" value="${estCostRub.toLocaleString('ru-RU')} ₽" subtitle="${isRu ? `Базовая ставка ${HOURLY_RATE_RUB.toLocaleString('ru-RU')} ₽/ч` : `Rate ${HOURLY_RATE_RUB} ₽/h`}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.entriesCount}" value="${filtered.length}" subtitle="${filtered.filter((e) => e.status === 'approved').length} ${isRu ? 'утверждено' : 'approved'}"></app-metric-card>
+      </app-kpi-strip>
 
       <!-- Quick Inline Task Report -->
       <section class="quick-log-card">

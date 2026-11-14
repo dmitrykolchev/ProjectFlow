@@ -15,6 +15,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-projects.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -151,24 +153,12 @@ export class AppProjects extends LitElement {
         </app-button>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего проектов' : 'Total Projects'}</span>
-          <span class="kpi-value">${this.projects.length}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Активных' : 'Active'}</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">${activeCount}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Назначений в ролях' : 'Role Assignments'}</span>
-          <span class="kpi-value">${totalAssignments}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Средний прогресс' : 'Avg Progress'}</span>
-          <span class="kpi-value">${avgProgress}%</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${isRu ? 'Всего проектов' : 'Total Projects'}" value="${this.projects.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Активных' : 'Active'}" value="${activeCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Назначений в ролях' : 'Role Assignments'}" value="${totalAssignments}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Средний прогресс' : 'Avg Progress'}" value="${avgProgress}%"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">

@@ -42,6 +42,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-contracts.css';
 
 @customElement('app-contracts')
@@ -471,42 +473,14 @@ export class AppContracts extends LitElement {
         </div>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Всего договоров' : 'Total Contracts'}</span>
-          <span class="kpi-value">${this.contracts.length}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Активная сумма (RUB)' : 'Active Volume (RUB)'}</span>
-          <span class="kpi-value">${(rubTotal / 1_000_000).toFixed(2)}M ₽</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.contractDetail.invoicedTotal} (RUB)</span>
-          <span class="kpi-value" style="color: var(--accent-primary, #6366f1);">
-            ${(rubInvoicedTotal / 1_000_000).toFixed(2)}M ₽
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.contractDetail.paidTotal} (RUB)</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">
-            ${(rubPaidTotal / 1_000_000).toFixed(2)}M ₽
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">
-            ${t.payments.overdueAlert} (${overdueInvoices.length})
-          </span>
-          <span class="kpi-value" style="color: ${rubOverdueDebt > 0 ? '#ef4444' : 'inherit'};">
-            ${(rubOverdueDebt / 1_000_000).toFixed(2)}M ₽
-          </span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${isRu ? 'Истекают ≤ 45 дн.' : 'Expiring ≤ 45d'}</span>
-          <span class="kpi-value" style="color: ${expiringSoon > 0 ? '#f59e0b' : 'inherit'};">
-            ${expiringSoon}
-          </span>
-        </div>
-      </div>
+      <app-kpi-strip columns="6">
+        <app-metric-card size="compact" label="${isRu ? 'Всего договоров' : 'Total Contracts'}" value="${this.contracts.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Активная сумма (RUB)' : 'Active Volume (RUB)'}" value="${(rubTotal / 1_000_000).toFixed(2)}M ₽"></app-metric-card>
+        <app-metric-card size="compact" label="${t.contractDetail.invoicedTotal} (RUB)" value="${(rubInvoicedTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--accent-primary, #6366f1)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.contractDetail.paidTotal} (RUB)" value="${(rubPaidTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.overdueAlert} (${overdueInvoices.length})" value="${(rubOverdueDebt / 1_000_000).toFixed(2)}M ₽" valueColor="${rubOverdueDebt > 0 ? '#ef4444' : ''}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Истекают ≤ 45 дн.' : 'Expiring ≤ 45d'}" value="${expiringSoon}" valueColor="${expiringSoon > 0 ? '#f59e0b' : ''}"></app-metric-card>
+      </app-kpi-strip>
 
       <div class="toolbar">
         <div class="toolbar-filters">
