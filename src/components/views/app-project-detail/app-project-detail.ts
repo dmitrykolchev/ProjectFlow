@@ -20,6 +20,8 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
@@ -779,7 +781,7 @@ export class AppProjectDetail extends LitElement {
         title="${isRu ? 'Редактирование проекта' : 'Edit Project'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Название проекта' : 'Project Name'}"
@@ -876,7 +878,7 @@ export class AppProjectDetail extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -892,32 +894,21 @@ export class AppProjectDetail extends LitElement {
 
   private renderDeleteModal(proj: Project, isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${this.confirmDeleteOpen}"
+      <app-confirm-dialog
+        .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить проект?' : 'Delete project?'}"
-        @close="${() => (this.confirmDeleteOpen = false)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить проект «${proj.name}»?`
-            : `Are you sure you want to delete "${proj.name}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.confirmDeleteOpen = false)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              this.confirmDeleteOpen = false;
-              store.deleteProject(proj.id);
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить проект «${proj.name}»?`
+          : `Are you sure you want to delete "${proj.name}"?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.confirmDeleteOpen = false)}"
+        @confirm="${() => {
+          this.confirmDeleteOpen = false;
+          store.deleteProject(proj.id);
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -1029,7 +1020,7 @@ export class AppProjectDetail extends LitElement {
         title="${isRu ? `Списание времени · ${proj.key}` : `Log Time · ${proj.key}`}"
         @close="${() => (this.timeModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-select
               label="${isRu ? 'Задача проекта' : 'Task'}"
@@ -1074,7 +1065,7 @@ export class AppProjectDetail extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.timeModalOpen = false)}">${t.common.cancel}</app-button>
           <app-button
@@ -1130,7 +1121,7 @@ export class AppProjectDetail extends LitElement {
         title="${isRu ? `Новый расход · ${proj.key}` : `New Expense · ${proj.key}`}"
         @close="${() => (this.expenseModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-input
               label="${isRu ? 'Наименование расхода' : 'Title'}"
@@ -1177,7 +1168,7 @@ export class AppProjectDetail extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = e.detail.value)}"
             ></app-input>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.expenseModalOpen = false)}">${t.common.cancel}</app-button>
           <app-button
