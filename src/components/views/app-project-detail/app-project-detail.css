@@ -202,8 +202,9 @@
   grid-template-columns: minmax(220px, 1.45fr) minmax(200px, 1.1fr) 140px auto;
   gap: 0.85rem;
   align-items: end;
+  margin-bottom: 0.85rem;
   padding: 1rem 1.15rem;
-  background: var(--bg-subtle, #1a2438);
+  background: var(--bg-canvas, #090d16);
   border: 1px solid var(--border-subtle, #273449);
   border-radius: var(--radius-md, 8px);
 }
