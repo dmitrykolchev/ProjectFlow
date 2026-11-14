@@ -174,13 +174,12 @@ export class AppCounterpartyDetail extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const cp = this.counterparties.find((c) => c.id === this.detailCounterpartyId) || null;
 
     if (!cp) {
       return html`
         <div class="page-shell">
-          <app-empty-state title="${isRu ? 'Контрагент не найден' : 'Counterparty not found'}">
+          <app-empty-state title="${t.viewTexts.counterpartyDetail.emptyNotFound}">
             <app-button slot="action" variant="primary" @click="${() => store.setActiveView('counterparties')}">
               <span slot="icon-start">${iconChevronLeft(16)}</span>
               <span>${t.counterpartyDetail.backToCounterparties}</span>
@@ -278,7 +277,7 @@ export class AppCounterpartyDetail extends LitElement {
                 <div class="cp-legal-sub">
                   <span>${cp.legalName}</span>
                   <span aria-hidden="true">·</span>
-                  <span class="mono">${isRu ? 'ИНН' : 'INN'} ${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}</span>
+                  <span class="mono">${t.viewTexts.calculations.innLabel} ${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}</span>
                   <span aria-hidden="true">·</span>
                   <span>${cp.city}</span>
                   <span aria-hidden="true">·</span>
@@ -312,11 +311,11 @@ export class AppCounterpartyDetail extends LitElement {
           <app-meta-grid
             columns="3"
             .items="${[
-              { label: isRu ? 'Контактное лицо' : 'Contact Person', value: cp.contactPerson || '—' },
-              { label: isRu ? 'Телефон' : 'Phone', value: cp.phone || '—', mono: true },
+              { label: t.viewTexts.counterparties.labelContactPerson, value: cp.contactPerson || '—' },
+              { label: t.viewTexts.counterparties.labelPhone, value: cp.phone || '—', mono: true },
               { label: 'Email', value: cp.email || '—' },
-              { label: isRu ? 'Город' : 'City', value: cp.city || '—' },
-              { label: isRu ? 'ИНН / КПП' : 'Tax ID', value: `${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}`, mono: true },
+              { label: t.viewTexts.counterparties.labelCity, value: cp.city || '—' },
+              { label: t.viewTexts.counterpartyDetail.taxIdLabel, value: `${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}`, mono: true },
             ]}"
           ></app-meta-grid>
         </section>
@@ -405,7 +404,7 @@ export class AppCounterpartyDetail extends LitElement {
                             </div>
                             <div class="row-sub">
                               <span>${t.projectStatuses[statusKey]}</span>
-                              <span>· ${(proj.members || []).length} ${isRu ? 'участн.' : 'members'}</span>
+                              <span>· ${(proj.members || []).length} ${t.viewTexts.counterpartyDetail.membersSuffix}</span>
                               ${proj.budget
                                 ? html`<span class="mono">· ${proj.budget.toLocaleString('ru-RU')} ₽</span>`
                                 : ''}
@@ -464,12 +463,12 @@ export class AppCounterpartyDetail extends LitElement {
                     <table class="data-table">
                       <thead>
                         <tr>
-                          <th>${isRu ? 'Счёт' : 'Invoice'}</th>
-                          <th>${isRu ? 'Договор' : 'Contract'}</th>
-                          <th>${isRu ? 'Дата / Срок оплаты' : 'Issued / Due'}</th>
-                          <th>${isRu ? 'Итого с НДС' : 'Total'}</th>
-                          <th>${isRu ? 'Оплачено / Остаток' : 'Paid / Balance'}</th>
-                          <th>${isRu ? 'Статус' : 'Status'}</th>
+                          <th>${t.viewTexts.payments.thInvoice}</th>
+                          <th>${t.viewTexts.payments.thContract}</th>
+                          <th>${t.viewTexts.counterpartyDetail.thIssueDue}</th>
+                          <th>${t.viewTexts.counterpartyDetail.thTotalVat}</th>
+                          <th>${t.viewTexts.payments.thPaidBalance}</th>
+                          <th>${t.viewTexts.counterparties.thStatus}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -517,7 +516,7 @@ export class AppCounterpartyDetail extends LitElement {
                                     <span>${formatMoney(paidAmt, inv.currency)}</span>
                                     <span>
                                       ${remainingAmt > 0
-                                        ? `${isRu ? 'ост.' : 'bal.'} ${formatMoney(remainingAmt, inv.currency)}`
+                                        ? `${t.viewTexts.counterpartyDetail.balanceShort} ${formatMoney(remainingAmt, inv.currency)}`
                                         : '100%'}
                                     </span>
                                   </div>
@@ -554,12 +553,12 @@ export class AppCounterpartyDetail extends LitElement {
                   <table class="data-table">
                     <thead>
                       <tr>
-                        <th>${isRu ? 'Калькуляция' : 'Calculation'}</th>
-                        <th>${isRu ? 'Договор' : 'Contract'}</th>
-                        <th>${isRu ? 'Период' : 'Period'}</th>
-                        <th>${isRu ? 'Часы (оплач. / 0 ₽)' : 'Hours'}</th>
-                        <th>${isRu ? 'Сумма к оплате' : 'Billable'}</th>
-                        <th>${isRu ? 'Статус' : 'Status'}</th>
+                        <th>${t.viewTexts.calculations.thCalculation}</th>
+                        <th>${t.viewTexts.payments.thContract}</th>
+                        <th>${t.viewTexts.calculations.previewPeriod}</th>
+                        <th>${t.viewTexts.counterpartyDetail.thHoursMixed}</th>
+                        <th>${t.viewTexts.counterpartyDetail.thBillableSum}</th>
+                        <th>${t.viewTexts.counterparties.thStatus}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -579,9 +578,9 @@ export class AppCounterpartyDetail extends LitElement {
                             <td>${ctr ? ctr.number : '—'}</td>
                             <td class="mono">${calc.periodStart} → ${calc.periodEnd}</td>
                             <td class="mono">
-                              ${calc.billableHours} ${isRu ? 'ч' : 'h'}
+                              ${calc.billableHours} ${t.viewTexts.calculations.hoursUnitShort}
                               ${calc.nonBillableHours > 0
-                                ? ` (+${calc.nonBillableHours} ${isRu ? 'ч' : 'h'} · 0 ₽)`
+                                ? ` (+${calc.nonBillableHours} ${t.viewTexts.calculations.hoursUnitShort} · 0 ₽)`
                                 : ''}
                             </td>
                             <td class="mono" style="font-weight: 700;">
@@ -614,36 +613,36 @@ export class AppCounterpartyDetail extends LitElement {
         </app-section-card>
       </div>
 
-      ${this.renderEditModal(isRu, t)}
-      ${this.renderDeleteModal(cp, isRu, t)}
-      ${this.renderQuickContractModal(cp, isRu, t)}
+      ${this.renderEditModal(t)}
+      ${this.renderDeleteModal(cp, t)}
+      ${this.renderQuickContractModal(cp, t)}
     `;
   }
 
-  private renderEditModal(isRu: boolean, t: ReturnType<typeof getTranslation>) {
+  private renderEditModal(t: ReturnType<typeof getTranslation>) {
     const typeOptions = [
-      { value: 'client', label: isRu ? 'Заказчик' : 'Client', color: '#6366f1' },
-      { value: 'vendor', label: isRu ? 'Поставщик' : 'Vendor', color: '#0284c7' },
-      { value: 'partner', label: isRu ? 'Партнёр' : 'Partner', color: '#f59e0b' },
-      { value: 'contractor', label: isRu ? 'Подрядчик' : 'Contractor', color: '#64748b' },
+      { value: 'client', label: t.viewTexts.counterparties.typeClient, color: '#6366f1' },
+      { value: 'vendor', label: t.viewTexts.counterparties.typeVendor, color: '#0284c7' },
+      { value: 'partner', label: t.viewTexts.counterparties.typePartner, color: '#f59e0b' },
+      { value: 'contractor', label: t.viewTexts.counterparties.typeContractor, color: '#64748b' },
     ];
     const statusOptions = [
-      { value: 'active', label: isRu ? 'Активный' : 'Active', color: '#10b981' },
-      { value: 'pending', label: isRu ? 'На проверке' : 'Pending', color: '#f59e0b' },
-      { value: 'blocked', label: isRu ? 'Заблокирован' : 'Blocked', color: '#ef4444' },
+      { value: 'active', label: t.viewTexts.counterparties.statusActive, color: '#10b981' },
+      { value: 'pending', label: t.viewTexts.counterparties.statusPending, color: '#f59e0b' },
+      { value: 'blocked', label: t.viewTexts.counterparties.statusBlocked, color: '#ef4444' },
     ];
 
     return html`
       <app-modal
         ?open="${this.editModalOpen}"
         size="lg"
-        title="${isRu ? 'Редактирование контрагента' : 'Edit Counterparty'}"
+        title="${t.viewTexts.counterparties.modalTitleEdit}"
         @close="${() => (this.editModalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'Краткое наименование' : 'Short Name'}"
+              label="${t.viewTexts.counterparties.labelShortName}"
               .value="${this.formName}"
               required
               error="${this.formError}"
@@ -655,14 +654,14 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Юридическое лицо' : 'Legal Name'}"
+              label="${t.viewTexts.counterparties.labelLegalName}"
               .value="${this.formLegalName}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Тип' : 'Type'}"
+              label="${t.viewTexts.counterparties.thType}"
               .value="${this.formType}"
               .options="${typeOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -671,7 +670,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Статус' : 'Status'}"
+              label="${t.viewTexts.counterparties.thStatus}"
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -680,21 +679,21 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'ИНН' : 'INN'}"
+              label="${t.viewTexts.calculations.innLabel}"
               .value="${this.formInn}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'КПП' : 'KPP'}"
+              label="${t.viewTexts.counterparties.labelKpp}"
               .value="${this.formKpp}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Контактное лицо' : 'Contact Person'}"
+              label="${t.viewTexts.counterparties.labelContactPerson}"
               .value="${this.formContactPerson}"
               @input="${(e: CustomEvent<{ value: string }>) =>
                 (this.formContactPerson = eventValue(e))}"
@@ -702,14 +701,14 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Город' : 'City'}"
+              label="${t.viewTexts.counterparties.labelCity}"
               .value="${this.formCity}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
-              label="${isRu ? 'Телефон' : 'Phone'}"
+              label="${t.viewTexts.counterparties.labelPhone}"
               .value="${this.formPhone}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
@@ -724,7 +723,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Рейтинг надёжности (1–5)' : 'Rating (1–5)'}"
+              label="${t.viewTexts.counterpartyDetail.ratingLabel}"
               .value="${this.formRating}"
               min="1"
               max="5"
@@ -734,7 +733,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div class="col-span-2">
             <app-textarea
-              label="${isRu ? 'Примечания' : 'Notes'}"
+              label="${t.viewTexts.counterpartyDetail.notesLabel}"
               .value="${this.formNotes}"
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
@@ -753,7 +752,7 @@ export class AppCounterpartyDetail extends LitElement {
     `;
   }
 
-  private renderDeleteModal(cp: Counterparty, isRu: boolean, t: ReturnType<typeof getTranslation>) {
+  private renderDeleteModal(cp: Counterparty, t: ReturnType<typeof getTranslation>) {
     return html`
       <app-confirm-dialog
         .open="${this.confirmDeleteOpen}"
@@ -776,18 +775,17 @@ export class AppCounterpartyDetail extends LitElement {
 
   private renderQuickContractModal(
     cp: Counterparty,
-    isRu: boolean,
     t: ReturnType<typeof getTranslation>
   ) {
     const companyOpts = store.companies.map((c) => ({ value: c.id, label: c.name }));
     const projOpts = [
-      { value: '', label: isRu ? 'Без проекта' : 'No project' },
+      { value: '', label: t.viewTexts.counterpartyDetail.optionNoProject },
       ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
     ];
     const typeOpts = [
-      { value: 'service', label: isRu ? 'Услуги / Разработка' : 'Services' },
-      { value: 'supply', label: isRu ? 'Поставка' : 'Supply' },
-      { value: 'license', label: isRu ? 'Лицензия' : 'License' },
+      { value: 'service', label: t.viewTexts.counterpartyDetail.typeService },
+      { value: 'supply', label: t.viewTexts.counterpartyDetail.typeSupply },
+      { value: 'license', label: t.viewTexts.counterpartyDetail.typeLicense },
       { value: 'sla', label: 'SLA' },
       { value: 'nda', label: 'NDA' },
     ];
@@ -808,13 +806,13 @@ export class AppCounterpartyDetail extends LitElement {
       <app-modal
         ?open="${this.contractModalOpen}"
         size="lg"
-        title="${isRu ? `Новый договор · ${cp.name}` : `New Contract · ${cp.name}`}"
+        title="${t.viewTexts.counterpartyDetail.quickContractTitle(cp.name)}"
         @close="${() => (this.contractModalOpen = false)}"
       >
         <app-form-grid>
           <div>
             <app-input
-              label="${isRu ? 'Номер договора' : 'Contract Number'}"
+              label="${t.viewTexts.counterpartyDetail.labelContractNumber}"
               .value="${this.ctrNumber}"
               required
               error="${this.ctrError}"
@@ -826,7 +824,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Тип' : 'Type'}"
+              label="${t.viewTexts.counterparties.thType}"
               .value="${this.ctrType}"
               .options="${typeOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -835,14 +833,14 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div class="col-span-2">
             <app-input
-              label="${isRu ? 'Предмет договора' : 'Subject'}"
+              label="${t.viewTexts.counterpartyDetail.labelSubject}"
               .value="${this.ctrTitle}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.ctrTitle = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Наша компания' : 'Company'}"
+              label="${t.viewTexts.counterpartyDetail.labelOurCompany}"
               .value="${this.ctrCompanyId}"
               .options="${companyOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.ctrCompanyId = eventValue(e))}"
@@ -850,7 +848,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Проект' : 'Project'}"
+              label="${t.viewTexts.timeTracking.labelProject}"
               .value="${this.ctrProjectId}"
               .options="${projOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.ctrProjectId = eventValue(e))}"
@@ -858,7 +856,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-number-input
-              label="${isRu ? 'Сумма' : 'Amount'}"
+              label="${t.viewTexts.expenses.thAmount}"
               .value="${this.ctrAmount}"
               min="0"
               step="50000"
@@ -867,7 +865,7 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-select
-              label="${isRu ? 'Валюта' : 'Currency'}"
+              label="${t.viewTexts.expenses.labelCurrency}"
               .value="${this.ctrCurrency}"
               .options="${curOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -876,21 +874,21 @@ export class AppCounterpartyDetail extends LitElement {
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата начала' : 'Start Date'}"
+              label="${t.viewTexts.counterpartyDetail.labelStartDate}"
               .value="${this.ctrStartDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.ctrStartDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-date-input
-              label="${isRu ? 'Дата окончания' : 'End Date'}"
+              label="${t.viewTexts.counterpartyDetail.labelEndDate}"
               .value="${this.ctrEndDate}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.ctrEndDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div class="col-span-2">
             <app-select
-              label="${isRu ? 'Периодичность калькуляций' : 'Calculation Cycle'}"
+              label="${t.viewTexts.counterpartyDetail.labelCalcCycle}"
               .value="${this.ctrFrequency}"
               .options="${freqOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
@@ -929,7 +927,7 @@ export class AppCounterpartyDetail extends LitElement {
 
   private handleSaveEdit() {
     if (!this.formName.trim()) {
-      this.formError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.formError = getTranslation(this.currentLang).common.required;
       return;
     }
     store.updateCounterparty({
@@ -953,7 +951,7 @@ export class AppCounterpartyDetail extends LitElement {
   private openCreateContractModal(cp: Counterparty) {
     const today = new Date().toISOString().slice(0, 10);
     const linkedProj = store.projects.find((p) => p.counterpartyId === cp.id);
-    this.ctrNumber = `ДГ-${new Date().getFullYear()}/${String(store.contracts.length + 1).padStart(3, '0')}`;
+    this.ctrNumber = `${getTranslation(this.currentLang).viewTexts.counterpartyDetail.ctrNumberPrefix}${new Date().getFullYear()}/${String(store.contracts.length + 1).padStart(3, '0')}`;
     this.ctrTitle = '';
     this.ctrType = 'service';
     this.ctrCompanyId = store.companies[0]?.id || '';
@@ -969,7 +967,7 @@ export class AppCounterpartyDetail extends LitElement {
 
   private handleCreateContract(cp: Counterparty) {
     if (!this.ctrNumber.trim()) {
-      this.ctrError = this.currentLang === 'ru' ? 'Обязательное поле' : 'Required';
+      this.ctrError = getTranslation(this.currentLang).common.required;
       return;
     }
     const created = store.addContract({
