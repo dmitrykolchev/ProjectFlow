@@ -28,6 +28,7 @@ import '../../common/app-modal/app-modal';
 import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-project-detail.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -380,13 +381,9 @@ export class AppProjectDetail extends LitElement {
         ></app-project-overview>
 
         <!-- Full-Width Spacious Team by Roles Section -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${iconUsers(19)}
-              <span>${t.projectDetail.teamByRoles}</span>
-              <span class="section-sub">(${members.length})</span>
-            </h2>
+        <app-section-card title="${t.projectDetail.teamByRoles}" subtitle="(${members.length})">
+          <span slot="icon">${iconUsers(19)}</span>
+          <div slot="actions">
             <app-segmented-switch
               size="sm"
               .value="${this.roleFilterMode}"
@@ -569,17 +566,13 @@ export class AppProjectDetail extends LitElement {
                   `;
                 })}
           </div>
-        </section>
+        </app-section-card>
 
         <!-- Secondary Context: Tasks Overview & Linked Contracts -->
         <div class="secondary-grid">
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconKanban()}
-                <span>${t.projectDetail.tasksSummary}</span>
-                <span class="section-sub">(${projectTasks.length})</span>
-              </h2>
+          <app-section-card title="${t.projectDetail.tasksSummary}" subtitle="(${projectTasks.length})">
+            <span slot="icon">${iconKanban()}</span>
+            <div slot="actions">
               <app-button
                 size="sm"
                 variant="ghost"
@@ -610,15 +603,11 @@ export class AppProjectDetail extends LitElement {
                 `;
               })}
             </div>
-          </section>
+          </app-section-card>
 
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFileText(18)}
-                <span>${t.projectDetail.linkedContracts}</span>
-                <span class="section-sub">(${linkedContracts.length})</span>
-              </h2>
+          <app-section-card title="${t.projectDetail.linkedContracts}" subtitle="(${linkedContracts.length})">
+            <span slot="icon">${iconFileText(18)}</span>
+            <div slot="actions">
               <app-button
                 size="sm"
                 variant="ghost"
@@ -664,35 +653,29 @@ export class AppProjectDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
         </div>
 
         <!-- Time Tracking & Expenses Panels for Project -->
         <div class="secondary-grid">
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconClock(18)}
-                <span>${isRu ? 'Учёт времени по проекту' : 'Project Time Tracking'}</span>
-                <span class="section-sub">(${projectHoursTotal.toFixed(1)} ч)</span>
-              </h2>
-              <div class="section-actions-inline">
-                <app-button
-                  size="sm"
-                  variant="secondary"
-                  @click="${() => this.openQuickTimeModal(proj.id)}"
-                >
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${isRu ? 'Списать' : 'Log'}</span>
-                </app-button>
-                <app-button
-                  size="sm"
-                  variant="ghost"
-                  @click="${() => store.setActiveView('time-tracking')}"
-                >
-                  ${isRu ? 'Журнал' : 'All'}
-                </app-button>
-              </div>
+          <app-section-card title="${isRu ? 'Учёт времени по проекту' : 'Project Time Tracking'}" subtitle="(${projectHoursTotal.toFixed(1)} ч)">
+            <span slot="icon">${iconClock(18)}</span>
+            <div slot="actions" class="section-actions-inline">
+              <app-button
+                size="sm"
+                variant="secondary"
+                @click="${() => this.openQuickTimeModal(proj.id)}"
+              >
+                <span slot="icon-start">${iconPlus(13)}</span>
+                <span>${isRu ? 'Списать' : 'Log'}</span>
+              </app-button>
+              <app-button
+                size="sm"
+                variant="ghost"
+                @click="${() => store.setActiveView('time-tracking')}"
+              >
+                ${isRu ? 'Журнал' : 'All'}
+              </app-button>
             </div>
 
             ${projectTimeEntries.length === 0
@@ -725,32 +708,26 @@ export class AppProjectDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
 
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconWallet(18)}
-                <span>${isRu ? 'Расходы по проекту' : 'Project Expenses'}</span>
-                <span class="section-sub">(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)</span>
-              </h2>
-              <div class="section-actions-inline">
-                <app-button
-                  size="sm"
-                  variant="secondary"
-                  @click="${() => this.openQuickExpenseModal()}"
-                >
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${isRu ? 'Расход' : 'Expense'}</span>
-                </app-button>
-                <app-button
-                  size="sm"
-                  variant="ghost"
-                  @click="${() => store.setActiveView('expenses')}"
-                >
-                  ${isRu ? 'Реестр' : 'All'}
-                </app-button>
-              </div>
+          <app-section-card title="${isRu ? 'Расходы по проекту' : 'Project Expenses'}" subtitle="(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)">
+            <span slot="icon">${iconWallet(18)}</span>
+            <div slot="actions" class="section-actions-inline">
+              <app-button
+                size="sm"
+                variant="secondary"
+                @click="${() => this.openQuickExpenseModal()}"
+              >
+                <span slot="icon-start">${iconPlus(13)}</span>
+                <span>${isRu ? 'Расход' : 'Expense'}</span>
+              </app-button>
+              <app-button
+                size="sm"
+                variant="ghost"
+                @click="${() => store.setActiveView('expenses')}"
+              >
+                ${isRu ? 'Реестр' : 'All'}
+              </app-button>
             </div>
 
             ${projectExpenses.length === 0
@@ -784,7 +761,7 @@ export class AppProjectDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
         </div>
       </div>
 
