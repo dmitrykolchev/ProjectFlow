@@ -8,13 +8,13 @@ import {
   iconCheck,
   iconEdit,
   iconPlus,
-  iconSearch,
   iconTrash,
   iconWallet,
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -185,43 +185,23 @@ export class AppExpenses extends LitElement {
         <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString('ru-RU')} ₽" subtitle="${isRu ? 'Покрывается заказчиками' : 'Client billable'}"></app-metric-card>
       </app-kpi-strip>
 
-      <div class="toolbar">
-        <div class="toolbar-filters">
-          <div class="filter-search">
-            <app-input
-              placeholder="${isRu ? 'Поиск по статье, поставщику, задаче...' : 'Search item, vendor, task...'}"
-              .value="${this.localSearch}"
-              clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
-            >
-              <span slot="icon">${iconSearch(15)}</span>
-            </app-input>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.projectFilter}"
-              .options="${projectFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.projectFilter = e.detail.value)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.categoryFilter}"
-              .options="${categoryFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.categoryFilter = e.detail.value as 'all' | ExpenseCategory)}"
-            ></app-select>
-          </div>
-          <div class="filter-select">
-            <app-select
-              .value="${this.statusFilter}"
-              .options="${statusFilterOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.statusFilter = e.detail.value as 'all' | ExpenseStatus)}"
-            ></app-select>
-          </div>
-        </div>
-
+      <app-filter-bar
+        style="--filter-search-max: 300px; --filter-select-width: 185px;"
+        placeholder="${isRu ? 'Поиск по статье, поставщику, задаче...' : 'Search item, vendor, task...'}"
+        .searchValue="${this.localSearch}"
+        .filters="${[
+          { key: 'project', options: projectFilterOptions },
+          { key: 'category', options: categoryFilterOptions },
+          { key: 'status', options: statusFilterOptions },
+        ]}"
+        .values="${{ project: this.projectFilter, category: this.categoryFilter, status: this.statusFilter }}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+          if (e.detail.key === 'project') this.projectFilter = e.detail.value;
+          if (e.detail.key === 'category') this.categoryFilter = e.detail.value as 'all' | ExpenseCategory;
+          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | ExpenseStatus;
+        }}"
+      >
         <app-segmented-switch
           size="sm"
           .value="${this.viewMode}"
@@ -232,7 +212,7 @@ export class AppExpenses extends LitElement {
           @change="${(e: CustomEvent<{ value: string }>) =>
             (this.viewMode = e.detail.value as 'registry' | 'budgets')}"
         ></app-segmented-switch>
-      </div>
+      </app-filter-bar>
 
       ${this.viewMode === 'budgets'
         ? this.renderBudgetsView(isRu)
