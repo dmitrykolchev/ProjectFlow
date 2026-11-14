@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
+import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
   CalculationFrequency,
@@ -134,10 +135,6 @@ export class AppCounterpartyDetail extends LitElement {
     }
   }
 
-  private formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
-    const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₽';
-    return `${Math.round(amount).toLocaleString('ru-RU')} ${sym}`;
-  }
 
   private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
     if (currency === 'USD') return amount * 96;
@@ -327,15 +324,15 @@ export class AppCounterpartyDetail extends LitElement {
           <div class="kpi-strip">
             <div class="kpi-cell">
               <span class="kpi-label">${t.counterpartyDetail.totalContractSum} (RUB)</span>
-              <span class="kpi-val">${this.formatMoney(totalContractRub)}</span>
+              <span class="kpi-val">${formatMoney(totalContractRub)}</span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.counterpartyDetail.invoicedSum} (RUB)</span>
-              <span class="kpi-val accent">${this.formatMoney(totalInvoicedRub)}</span>
+              <span class="kpi-val accent">${formatMoney(totalInvoicedRub)}</span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.counterpartyDetail.paidSum} (RUB)</span>
-              <span class="kpi-val success">${this.formatMoney(totalPaidRub)}</span>
+              <span class="kpi-val success">${formatMoney(totalPaidRub)}</span>
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.counterpartyDetail.projectsCount}</span>
@@ -413,7 +410,7 @@ export class AppCounterpartyDetail extends LitElement {
                           </div>
                           <div class="row-right">
                             <span class="mono" style="font-weight: 700;">
-                              ${this.formatMoney(ctr.amount, ctr.currency)}
+                              ${formatMoney(ctr.amount, ctr.currency)}
                             </span>
                             <app-badge
                               variant="${ctr.status === 'active'
@@ -568,7 +565,7 @@ export class AppCounterpartyDetail extends LitElement {
                                 ${this.renderDueControlTag(inv, t)}
                               </td>
                               <td class="mono" style="font-weight: 700;">
-                                ${this.formatMoney(inv.totalAmount, inv.currency)}
+                                ${formatMoney(inv.totalAmount, inv.currency)}
                               </td>
                               <td>
                                 <div class="inv-pay-cell">
@@ -579,10 +576,10 @@ export class AppCounterpartyDetail extends LitElement {
                                     ></div>
                                   </div>
                                   <div class="inv-pay-meta mono">
-                                    <span>${this.formatMoney(paidAmt, inv.currency)}</span>
+                                    <span>${formatMoney(paidAmt, inv.currency)}</span>
                                     <span>
                                       ${remainingAmt > 0
-                                        ? `${isRu ? 'ост.' : 'bal.'} ${this.formatMoney(remainingAmt, inv.currency)}`
+                                        ? `${isRu ? 'ост.' : 'bal.'} ${formatMoney(remainingAmt, inv.currency)}`
                                         : '100%'}
                                     </span>
                                   </div>
@@ -650,7 +647,7 @@ export class AppCounterpartyDetail extends LitElement {
                                 : ''}
                             </td>
                             <td class="mono" style="font-weight: 700;">
-                              ${this.formatMoney(calc.billableAmount, calc.currency)}
+                              ${formatMoney(calc.billableAmount, calc.currency)}
                             </td>
                             <td>
                               <app-badge

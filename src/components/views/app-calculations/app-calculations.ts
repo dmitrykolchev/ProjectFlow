@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
+import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
   Calculation,
@@ -96,10 +97,6 @@ export class AppCalculations extends LitElement {
     }
   }
 
-  private formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
-    const sym = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₽';
-    return `${Math.round(amount).toLocaleString('ru-RU')} ${sym}`;
-  }
 
   private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
     if (currency === 'USD') return amount * 96;
@@ -365,8 +362,8 @@ export class AppCalculations extends LitElement {
 
       <app-kpi-strip columns="4">
         <app-metric-card size="compact" label="${isRu ? 'Всего калькуляций' : 'Total Calculations'}" value="${this.calculations.length}" subtitle="${isRu ? 'В том числе выставлено в счета:' : 'Invoiced:'} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'На согласовании у клиента' : 'Pending Client Approval'}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${this.formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
-        <app-metric-card size="compact" label="${isRu ? 'Согласовано (к счетам)' : 'Approved (Ready to Bill)'}" value="${this.formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${isRu ? 'соглас. отчёт(ов)' : 'approved report(s)'}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'На согласовании у клиента' : 'Pending Client Approval'}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
+        <app-metric-card size="compact" label="${isRu ? 'Согласовано (к счетам)' : 'Approved (Ready to Bill)'}" value="${formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${isRu ? 'соглас. отчёт(ов)' : 'approved report(s)'}"></app-metric-card>
         <app-metric-card size="compact" label="${isRu ? 'Часы в калькуляциях' : 'Logged Hours in Reports'}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
       </app-kpi-strip>
 
@@ -510,7 +507,7 @@ export class AppCalculations extends LitElement {
                             : ''}
                         </td>
                         <td class="amount-cell">
-                          <div>${this.formatMoney(calc.billableAmount, calc.currency)}</div>
+                          <div>${formatMoney(calc.billableAmount, calc.currency)}</div>
                           ${linkedInv
                             ? html`
                                 <div class="cell-sub" style="color: #10b981;">
@@ -794,7 +791,7 @@ export class AppCalculations extends LitElement {
             </div>
             <div class="calc-summary-item">
               <span class="calc-summary-label">${isRu ? 'Итого по калькуляции' : 'Billable Total'}</span>
-              <span class="calc-summary-val">${this.formatMoney(billableAmount, ctr.currency)}</span>
+              <span class="calc-summary-val">${formatMoney(billableAmount, ctr.currency)}</span>
             </div>
           </div>
 
@@ -856,7 +853,7 @@ export class AppCalculations extends LitElement {
                               ></app-input>
                             </div>
                             <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
-                              ${this.formatMoney(item.billable ? item.amount : 0, ctr.currency)}
+                              ${formatMoney(item.billable ? item.amount : 0, ctr.currency)}
                             </div>
                             <button
                               type="button"
@@ -1031,10 +1028,10 @@ export class AppCalculations extends LitElement {
                         </span>
                       </td>
                       <td class="mono" style="white-space: nowrap;">
-                        ${this.formatMoney(item.billable ? item.unitPrice : 0, calc.currency)}
+                        ${formatMoney(item.billable ? item.unitPrice : 0, calc.currency)}
                       </td>
                       <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                        ${this.formatMoney(item.billable ? item.amount : 0, calc.currency)}
+                        ${formatMoney(item.billable ? item.amount : 0, calc.currency)}
                       </td>
                     </tr>
                   `
@@ -1052,7 +1049,7 @@ export class AppCalculations extends LitElement {
             </div>
             <div class="total-line grand">
               <span>${isRu ? 'Итого к выставлению в счёт (без НДС)' : 'Subtotal to Invoice'}:</span>
-              <span class="mono">${this.formatMoney(calc.billableAmount, calc.currency)}</span>
+              <span class="mono">${formatMoney(calc.billableAmount, calc.currency)}</span>
             </div>
           </div>
 

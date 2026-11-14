@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
+import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
   Calculation,
@@ -147,10 +148,6 @@ export class AppContracts extends LitElement {
     }
   }
 
-  private formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR'): string {
-    const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₽';
-    return `${amount.toLocaleString('ru-RU')} ${symbol}`;
-  }
 
   private getDaysRemaining(endDate: string): number | null {
     if (!endDate) return null;
@@ -641,7 +638,7 @@ export class AppContracts extends LitElement {
                               : '—'}
                           </td>
                           <td class="amount-cell">
-                            <div>${this.formatMoney(ctr.amount, ctr.currency)}</div>
+                            <div>${formatMoney(ctr.amount, ctr.currency)}</div>
                             ${billing.count > 0 || billing.calcCount > 0
                               ? html`
                                   <div class="billing-sub">
@@ -652,11 +649,11 @@ export class AppContracts extends LitElement {
                                       : ''}
                                     ${billing.count > 0
                                       ? html`<span>
-                                          ${billing.calcCount > 0 ? '· ' : ''}${isRu ? 'Счетов' : 'Inv'}: ${this.formatMoney(billing.invoiced, ctr.currency)}
+                                          ${billing.calcCount > 0 ? '· ' : ''}${isRu ? 'Счетов' : 'Inv'}: ${formatMoney(billing.invoiced, ctr.currency)}
                                         </span>`
                                       : ''}
                                     ${billing.paid > 0
-                                      ? html`<span class="paid-val">· ${isRu ? 'Опл' : 'Paid'}: ${this.formatMoney(billing.paid, ctr.currency)}</span>`
+                                      ? html`<span class="paid-val">· ${isRu ? 'Опл' : 'Paid'}: ${formatMoney(billing.paid, ctr.currency)}</span>`
                                       : ''}
                                   </div>
                                 `
@@ -802,7 +799,7 @@ export class AppContracts extends LitElement {
                               : ''}
                           </td>
                           <td class="amount-cell">
-                            <div>${this.formatMoney(calc.billableAmount, calc.currency)}</div>
+                            <div>${formatMoney(calc.billableAmount, calc.currency)}</div>
                             ${linkedInv
                               ? html`<div class="billing-sub">
                                   <span class="paid-val">${linkedInv.number}</span>
@@ -958,7 +955,7 @@ export class AppContracts extends LitElement {
                             ${pay.notes || '—'}
                           </td>
                           <td class="amount-cell" style="color: var(--color-success, #10b981);">
-                            +${this.formatMoney(pay.amount, pay.currency)}
+                            +${formatMoney(pay.amount, pay.currency)}
                           </td>
                           <td>
                             <div class="actions-row">
@@ -1056,7 +1053,7 @@ export class AppContracts extends LitElement {
                           <div class="inv-pay-cell">
                             <div class="inv-pay-meta mono">
                               <span style="color: ${invPaid > 0 ? '#10b981' : 'var(--text-muted)'}; font-weight: 600;">
-                                ${this.formatMoney(invPaid, inv.currency)}
+                                ${formatMoney(invPaid, inv.currency)}
                               </span>
                               <span>${invPayPct}%</span>
                             </div>
@@ -1075,14 +1072,14 @@ export class AppContracts extends LitElement {
                                   <div class="inv-pay-meta mono">
                                     <span>${isRu ? 'Остаток' : 'Due'}:</span>
                                     <span style="color: ${dueCtrl.state === 'overdue' ? '#ef4444' : 'var(--text-primary)'}; font-weight: 600;">
-                                      ${this.formatMoney(invRemaining, inv.currency)}
+                                      ${formatMoney(invRemaining, inv.currency)}
                                     </span>
                                   </div>
                                 `
                               : ''}
                           </div>
                         </td>
-                        <td class="amount-cell">${this.formatMoney(inv.totalAmount, inv.currency)}</td>
+                        <td class="amount-cell">${formatMoney(inv.totalAmount, inv.currency)}</td>
                         <td>
                           <app-badge
                             variant="${this.getInvoiceStatusVariant(inv.status)}"
@@ -1359,7 +1356,7 @@ export class AppContracts extends LitElement {
       const cp = store.counterparties.find((c) => c.id === i.counterpartyId);
       return {
         value: i.id,
-        label: `${i.number} (${cp?.name || '—'}) · ${isRu ? 'Остаток' : 'Due'}: ${this.formatMoney(
+        label: `${i.number} (${cp?.name || '—'}) · ${isRu ? 'Остаток' : 'Due'}: ${formatMoney(
           store.getInvoiceRemainingAmount(i),
           i.currency
         )}`,
@@ -1400,18 +1397,18 @@ export class AppContracts extends LitElement {
           <div class="col-span-2 pay-summary-card">
             <div class="pay-stat">
               <span class="pay-stat-label">${isRu ? 'Сумма счёта' : 'Invoice Total'}</span>
-              <span class="pay-stat-val">${this.formatMoney(inv.totalAmount, inv.currency)}</span>
+              <span class="pay-stat-val">${formatMoney(inv.totalAmount, inv.currency)}</span>
             </div>
             <div class="pay-stat">
               <span class="pay-stat-label">${t.payments.paidAmount}</span>
               <span class="pay-stat-val" style="color: #10b981;">
-                ${this.formatMoney(paidSoFar, inv.currency)}
+                ${formatMoney(paidSoFar, inv.currency)}
               </span>
             </div>
             <div class="pay-stat">
               <span class="pay-stat-label">${t.payments.remainingDue}</span>
               <span class="pay-stat-val" style="color: #f59e0b;">
-                ${this.formatMoney(remainingBefore, inv.currency)}
+                ${formatMoney(remainingBefore, inv.currency)}
               </span>
             </div>
           </div>
@@ -1492,9 +1489,9 @@ export class AppContracts extends LitElement {
           <div class="col-span-2 pay-preview-result">
             <span>
               ${isRu ? 'После платежа:' : 'After payment:'}
-              <strong class="mono">${this.formatMoney(paidAfter, inv.currency)}</strong>
+              <strong class="mono">${formatMoney(paidAfter, inv.currency)}</strong>
               · ${t.payments.remainingDue}:
-              <strong class="mono">${this.formatMoney(remainingAfter, inv.currency)}</strong>
+              <strong class="mono">${formatMoney(remainingAfter, inv.currency)}</strong>
             </span>
             <app-badge
               variant="${willBeFull ? 'success' : 'warning'}"

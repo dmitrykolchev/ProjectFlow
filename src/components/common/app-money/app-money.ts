@@ -8,12 +8,12 @@ const CURRENCY_SYMBOL: Record<'RUB' | 'USD' | 'EUR', string> = {
   EUR: '€',
 };
 
-export function formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR'): string {
+export function formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
   const symbol = CURRENCY_SYMBOL[currency];
   return `${amount.toLocaleString('ru-RU')} ${symbol}`;
 }
 
-export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR'): string {
+export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
   const symbol = CURRENCY_SYMBOL[currency];
   if (Math.abs(amount) >= 1_000_000) {
     return `${(amount / 1_000_000).toFixed(2)}M ${symbol}`;

@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
+import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import { Expense, ExpenseCategory, ExpenseStatus } from '../../../types';
 import {
@@ -87,10 +88,6 @@ export class AppExpenses extends LitElement {
     return amount;
   }
 
-  private formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR'): string {
-    const symbol = currency === 'USD' ? '$' : currency === 'EUR' ? '€' : '₽';
-    return `${amount.toLocaleString('ru-RU')} ${symbol}`;
-  }
 
   private getStatusVariant(
     status: ExpenseStatus
@@ -332,7 +329,7 @@ export class AppExpenses extends LitElement {
                   </td>
                   <td style="white-space: nowrap;">${user?.name || exp.userId}</td>
                   <td class="amount-cell">
-                    <div>${this.formatMoney(exp.amount, exp.currency)}</div>
+                    <div>${formatMoney(exp.amount, exp.currency)}</div>
                     ${exp.billable
                       ? html`<div class="billable-sub">${isRu ? 'Перевыставляется' : 'Billable'}</div>`
                       : ''}
