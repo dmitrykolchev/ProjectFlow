@@ -1301,6 +1301,14 @@ export const ru = {
       expensePlaceholder: 'Сервер, лицензия, подрядчик...',
       taskExpenseNote: (id: string) => `Расход по задаче ${id}`,
     },
+    projectChat: {
+      emptyNoProject: 'Создайте хотя бы один проект, чтобы начать переписку',
+      noMessages: 'Нет сообщений',
+      msgsSuffix: 'сообщ.',
+      sendingAsLabel: 'Пишет:',
+      emptyNoMembers: 'Участники не назначены',
+      pinnedShort: 'Закреп.',
+    },
     confirmSectionLabels: {
       action: 'Выполняемое действие:',
       result: 'Ожидаемый результат:',

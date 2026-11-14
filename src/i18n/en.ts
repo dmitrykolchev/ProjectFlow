@@ -1301,6 +1301,14 @@ export const en = {
       expensePlaceholder: 'Cloud server, license, contractor...',
       taskExpenseNote: (id: string) => `Expense for task ${id}`,
     },
+    projectChat: {
+      emptyNoProject: 'Create a project to start chatting',
+      noMessages: 'No messages',
+      msgsSuffix: 'msgs',
+      sendingAsLabel: 'Sending as:',
+      emptyNoMembers: 'No assigned members',
+      pinnedShort: 'Pinned',
+    },
     confirmSectionLabels: {
       action: 'Action performed:',
       result: 'Expected result:',

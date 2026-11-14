@@ -169,13 +169,12 @@ export class AppProjectChat extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const isRu = this.currentLang === 'ru';
     const activeProject =
       this.projects.find((p) => p.id === this.activeProjectId) || this.projects[0] || null;
 
     if (!activeProject) {
       return html`
-        <app-empty-state title="${isRu ? 'Создайте хотя бы один проект, чтобы начать переписку' : 'Create a project to start chatting'}">
+        <app-empty-state title="${t.viewTexts.projectChat.emptyNoProject}">
           <span slot="icon">${iconMessageSquare(48)}</span>
         </app-empty-state>
       `;
@@ -319,9 +318,7 @@ export class AppProjectChat extends LitElement {
                     <span class="channel-snippet">
                       ${lastMsg
                         ? `${lastSender?.name.split(' ')[0] || ''}: ${lastMsg.text}`
-                        : isRu
-                        ? 'Нет сообщений'
-                        : 'No messages'}
+                        : t.viewTexts.projectChat.noMessages}
                     </span>
                     ${lastMsg
                       ? html`<span class="channel-time">${this.formatMessageTime(lastMsg.createdAt)}</span>`
@@ -363,7 +360,7 @@ export class AppProjectChat extends LitElement {
                   <span class="proj-key">${activeProject.key}</span>
                   <h1 class="channel-title">${activeProject.name}</h1>
                   <app-badge variant="default" appearance="soft" size="sm">
-                    ${projectMessages.length} ${isRu ? 'сообщ.' : 'msgs'}
+                    ${projectMessages.length} ${t.viewTexts.projectChat.msgsSuffix}
                   </app-badge>
                 </div>
                 <div class="channel-subtitle">
@@ -457,7 +454,7 @@ export class AppProjectChat extends LitElement {
               : groupedByDate.map(
                   (group) => html`
                     <div class="date-divider"><span>${group.label}</span></div>
-                    ${group.items.map((msg) => this.renderMessage(msg, activeProject, projectMessages, t, isRu))}
+                    ${group.items.map((msg) => this.renderMessage(msg, activeProject, projectMessages, t))}
                   `
                 )}
           </div>
@@ -493,7 +490,7 @@ export class AppProjectChat extends LitElement {
                 ></app-select>
               </div>
               <span style="font-size: 0.75rem; color: var(--text-muted);">
-                ${isRu ? 'Пишет:' : 'Sending as:'}
+                ${t.viewTexts.projectChat.sendingAsLabel}
                 <strong style="color: var(--text-secondary);">
                   ${this.users.find((u) => u.id === this.currentUserId)?.name || '—'}
                 </strong>
@@ -544,7 +541,7 @@ export class AppProjectChat extends LitElement {
                 <div class="members-scroll">
                   ${participantList.length === 0
                     ? html`
-                        <app-empty-state compact title="${isRu ? 'Участники не назначены' : 'No assigned members'}"></app-empty-state>
+                        <app-empty-state compact title="${t.viewTexts.projectChat.emptyNoMembers}"></app-empty-state>
                       `
                     : participantList.map((entry) => {
                         const statusClass = entry.user.status || 'active';
@@ -599,8 +596,7 @@ export class AppProjectChat extends LitElement {
     msg: ProjectChatMessage,
     activeProject: Project,
     projectMessages: ProjectChatMessage[],
-    t: ReturnType<typeof getTranslation>,
-    isRu: boolean
+    t: ReturnType<typeof getTranslation>
   ) {
     const sender = this.users.find((u) => u.id === msg.senderId);
     const roleLabel = this.getMemberRoleLabel(activeProject, msg.senderId);
@@ -648,7 +644,7 @@ export class AppProjectChat extends LitElement {
               <span class="msg-time">${this.formatMessageTime(msg.createdAt)}</span>
               ${msg.editedAt ? html`<span class="edited-mark">(${t.projectChat.edited})</span>` : ''}
               ${msg.pinned
-                ? html`<span class="pin-indicator">${iconPin(11)} ${isRu ? 'Закреп.' : 'Pinned'}</span>`
+                ? html`<span class="pin-indicator">${iconPin(11)} ${t.viewTexts.projectChat.pinnedShort}</span>`
                 : ''}
             </div>
 
