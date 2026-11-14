@@ -13,7 +13,7 @@ export class AppMetricCard extends LitElement {
   @property({ type: String }) valueColor: string = '';
   @property({ type: Array }) sparkline: number[] = [];
   @property({ type: Boolean }) clickable: boolean = false;
-  @property({ type: String }) size: 'full' | 'compact' = 'full';
+  @property({ type: String }) size: 'full' | 'compact' | 'strip' = 'full';
 
   static styles = styles;
 
@@ -26,7 +26,7 @@ export class AppMetricCard extends LitElement {
         : 'delta-neutral';
 
     return html`
-      <div class="metric-card ${this.clickable ? 'is-clickable' : ''} ${this.size === 'compact' ? 'is-compact' : ''}">
+      <div class="metric-card ${this.clickable ? 'is-clickable' : ''} ${this.size === 'compact' ? 'is-compact' : ''} ${this.size === 'strip' ? 'is-strip' : ''}">
         <div class="metric-top">
           <span class="metric-label">${this.label}</span>
           <span class="metric-icon"><slot name="icon"></slot></span>
