@@ -73,8 +73,8 @@ export const meta: ComponentStoryMeta = {
               Иконка заголовка задаётся свойством headerIcon и отображается перед текстом title.
             </p>
             <div slot="footer">
-              <app-button variant="ghost" @click="${(e: Event) => { (e.target as HTMLElement).closest('app-modal')!.open = false; }}">Отмена</app-button>
-              <app-button variant="danger" @click="${(e: Event) => { (e.target as HTMLElement).closest('app-modal')!.open = false; }}">Удалить</app-button>
+              <app-button variant="ghost" @click="${(e: Event) => { const m = (e.target as HTMLElement).closest('app-modal') as any; if (m) m.open = false; }}">Отмена</app-button>
+              <app-button variant="danger" @click="${(e: Event) => { const m = (e.target as HTMLElement).closest('app-modal') as any; if (m) m.open = false; }}">Удалить</app-button>
             </div>
           </app-modal>
         </div>
