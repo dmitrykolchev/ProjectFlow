@@ -229,17 +229,6 @@
 }
 
 /* Modal Forms & Calculation Items Editor */
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .col-span-2 {
   grid-column: span 2;
 }
@@ -532,7 +521,6 @@
   :host {
     padding: 1rem;
   }
-  .form-grid,
   .calc-row-top,
   .calc-row-bottom {
     grid-template-columns: 1fr;

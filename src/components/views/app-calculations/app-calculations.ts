@@ -26,6 +26,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-date-input/app-date-input';
@@ -634,7 +636,7 @@ export class AppCalculations extends LitElement {
         title="${this.editingCalcId ? t.calculations.editCalculation : t.calculations.newCalculation}"
         @close="${() => (this.calcModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-select
               label="${isRu ? 'Договор' : 'Contract'}"
@@ -899,7 +901,7 @@ export class AppCalculations extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.calcModalOpen = false)}">
@@ -1083,34 +1085,23 @@ export class AppCalculations extends LitElement {
 
   private renderDeleteModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingCalculation)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingCalculation)}"
         size="sm"
         title="${isRu ? 'Удалить калькуляцию?' : 'Delete calculation?'}"
-        @close="${() => (this.deletingCalculation = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Удалить калькуляцию ${this.deletingCalculation?.number || ''}?`
-            : `Delete calculation ${this.deletingCalculation?.number || ''}?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingCalculation = null)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingCalculation) {
-                store.deleteCalculation(this.deletingCalculation.id);
-                this.deletingCalculation = null;
-              }
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Удалить калькуляцию ${this.deletingCalculation?.number || ''}?`
+          : `Delete calculation ${this.deletingCalculation?.number || ''}?`}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingCalculation = null)}"
+        @confirm="${() => {
+          if (this.deletingCalculation) {
+            store.deleteCalculation(this.deletingCalculation.id);
+            this.deletingCalculation = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
