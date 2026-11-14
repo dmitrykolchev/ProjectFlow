@@ -12,6 +12,8 @@ import {
   Invoice,
   InvoicePayment,
   InvoiceStatus,
+  KnowledgeArticle,
+  KnowledgeScope,
   NotificationItem,
   Project,
   ProjectChatMessage,
@@ -34,6 +36,7 @@ import {
   initialCounterparties,
   initialExpenses,
   initialInvoices,
+  initialKnowledgeArticles,
   initialPayments,
   initialProjects,
   initialTasks,
@@ -55,6 +58,7 @@ const STORAGE_KEY_PAYMENTS = 'projectflow_payments_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
+const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -212,12 +216,17 @@ export class AppStore {
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
   public chatMessages: ProjectChatMessage[] = [];
+  public knowledgeArticles: KnowledgeArticle[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
   public detailContractId: string = '';
   public detailCounterpartyId: string = '';
   public detailEmployeeId: string = '';
   public detailTaskId: string = '';
+  public detailKnowledgeId: string = '';
+  public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
+  public knowledgeFilterProjectId: string = 'all';
+  public knowledgeFilterCompanyId: string = 'all';
   public chatProjectId: string = '';
   public currentUserId: string = 'user-1';
   public pendingInvoiceForContractId: string | null = null;
@@ -347,6 +356,11 @@ export class AppStore {
       const storedChat = localStorage.getItem(STORAGE_KEY_CHAT);
       this.chatMessages = storedChat ? JSON.parse(storedChat) : [...initialChatMessages];
 
+      const storedKnowledge = localStorage.getItem(STORAGE_KEY_KNOWLEDGE);
+      this.knowledgeArticles = storedKnowledge
+        ? JSON.parse(storedKnowledge)
+        : [...initialKnowledgeArticles];
+
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
         this.activityLog = JSON.parse(storedLogs);
@@ -393,6 +407,7 @@ export class AppStore {
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
       this.chatMessages = [...initialChatMessages];
+      this.knowledgeArticles = [...initialKnowledgeArticles];
     }
   }
 
@@ -487,6 +502,14 @@ export class AppStore {
   private saveChatMessages(): void {
     try {
       localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(this.chatMessages));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveKnowledgeArticles(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(this.knowledgeArticles));
     } catch (e) {
       console.error(e);
     }
@@ -822,6 +845,7 @@ export class AppStore {
       view === 'projects' ||
       view === 'project-detail' ||
       view === 'project-chat' ||
+      view === 'knowledge-base' ||
       view === 'task-detail' ||
       view === 'kanban' ||
       view === 'gantt' ||
@@ -939,6 +963,31 @@ export class AppStore {
           : this.projects[0]?.id || '';
     }
     this.setActiveView('project-chat');
+  }
+
+  public openKnowledgeBase(options?: {
+    scope?: 'all' | KnowledgeScope;
+    projectId?: string;
+    companyId?: string;
+    articleId?: string;
+  }): void {
+    if (options) {
+      this.knowledgeFilterScope = options.scope ?? (options.projectId ? 'project' : options.companyId ? 'company' : 'all');
+      this.knowledgeFilterProjectId = options.projectId || 'all';
+      this.knowledgeFilterCompanyId = options.companyId || 'all';
+      if (options.articleId) {
+        this.detailKnowledgeId = options.articleId;
+      } else {
+        const match = this.knowledgeArticles.find((a) => {
+          if (this.knowledgeFilterProjectId !== 'all' && a.projectId !== this.knowledgeFilterProjectId) return false;
+          if (this.knowledgeFilterCompanyId !== 'all' && a.companyId !== this.knowledgeFilterCompanyId) return false;
+          if (this.knowledgeFilterScope !== 'all' && a.scope !== this.knowledgeFilterScope) return false;
+          return true;
+        });
+        if (match) this.detailKnowledgeId = match.id;
+      }
+    }
+    this.setActiveView('knowledge-base');
   }
 
   public setCurrentUser(userId: string): void {
@@ -2018,6 +2067,149 @@ export class AppStore {
     if (!target) return;
     this.chatMessages = this.chatMessages.filter((m) => m.id !== id);
     this.saveChatMessages();
+    this.notify();
+  }
+
+  // --- Knowledge Base CRUD ---
+  public setKnowledgeFilters(filters: {
+    scope?: 'all' | KnowledgeScope;
+    projectId?: string;
+    companyId?: string;
+  }): void {
+    if (filters.scope !== undefined) this.knowledgeFilterScope = filters.scope;
+    if (filters.projectId !== undefined) this.knowledgeFilterProjectId = filters.projectId;
+    if (filters.companyId !== undefined) this.knowledgeFilterCompanyId = filters.companyId;
+    this.notify();
+  }
+
+  public selectKnowledgeArticle(id: string): void {
+    if (this.detailKnowledgeId === id) return;
+    this.detailKnowledgeId = id;
+    this.knowledgeArticles = this.knowledgeArticles.map((a) =>
+      a.id === id ? { ...a, viewsCount: (a.viewsCount || 0) + 1 } : a
+    );
+    this.saveKnowledgeArticles();
+    this.notify();
+  }
+
+  public addKnowledgeArticle(
+    data: Omit<KnowledgeArticle, 'id' | 'viewsCount' | 'helpfulUserIds' | 'revisions' | 'createdAt' | 'updatedAt'> & {
+      revisionSummary?: string;
+    }
+  ): KnowledgeArticle {
+    const now = new Date().toISOString();
+    const { revisionSummary, ...rest } = data;
+    const article: KnowledgeArticle = {
+      ...rest,
+      id: `kb-${Date.now().toString().slice(-6)}`,
+      helpfulUserIds: [],
+      viewsCount: 1,
+      revisions: [
+        {
+          id: `rev-${Date.now()}`,
+          editedById: data.authorId || this.currentUserId || 'user-1',
+          editedAt: now,
+          summary: revisionSummary?.trim() || 'Создание документа в базе знаний',
+        },
+      ],
+      createdAt: now,
+      updatedAt: now,
+      verifiedAt: data.status === 'verified' ? now : undefined,
+    };
+    this.knowledgeArticles = [article, ...this.knowledgeArticles];
+    this.detailKnowledgeId = article.id;
+    this.saveKnowledgeArticles();
+    this.logActivity('create', 'knowledge', article.title, `Добавлен материал (${article.category})`, article.id);
+    this.addNotification('success', 'База знаний', `Статья "${article.title}" опубликована`);
+    this.notify();
+    return article;
+  }
+
+  public updateKnowledgeArticle(updated: KnowledgeArticle, revisionSummary?: string): void {
+    const now = new Date().toISOString();
+    const editorId = this.currentUserId || updated.authorId || 'user-1';
+    const nextRevision = {
+      id: `rev-${Date.now()}`,
+      editedById: editorId,
+      editedAt: now,
+      summary: revisionSummary?.trim() || 'Обновление документации и выводов',
+    };
+    const next: KnowledgeArticle = {
+      ...updated,
+      updatedAt: now,
+      verifiedAt:
+        updated.status === 'verified' ? updated.verifiedAt || now : undefined,
+      revisions: [nextRevision, ...(updated.revisions || [])].slice(0, 25),
+    };
+    this.knowledgeArticles = this.knowledgeArticles.map((a) => (a.id === next.id ? next : a));
+    this.saveKnowledgeArticles();
+    this.logActivity('update', 'knowledge', next.title, nextRevision.summary, next.id);
+    this.addNotification('info', 'База знаний', `Статья "${next.title}" обновлена`);
+    this.notify();
+  }
+
+  public togglePinKnowledgeArticle(id: string): void {
+    this.knowledgeArticles = this.knowledgeArticles.map((a) =>
+      a.id === id ? { ...a, pinned: !a.pinned } : a
+    );
+    this.saveKnowledgeArticles();
+    this.notify();
+  }
+
+  public toggleVerifyKnowledgeArticle(id: string): void {
+    const now = new Date().toISOString();
+    const target = this.knowledgeArticles.find((a) => a.id === id);
+    if (!target) return;
+    const isVerified = target.status === 'verified';
+    const nextStatus = isVerified ? 'published' : 'verified';
+    this.knowledgeArticles = this.knowledgeArticles.map((a) =>
+      a.id === id
+        ? {
+            ...a,
+            status: nextStatus,
+            reviewerId: a.reviewerId || this.currentUserId || 'user-1',
+            verifiedAt: isVerified ? undefined : now,
+            updatedAt: now,
+          }
+        : a
+    );
+    this.saveKnowledgeArticles();
+    this.logActivity(
+      'status_change',
+      'knowledge',
+      target.title,
+      isVerified ? 'Снята отметка верификации' : 'Подтверждена актуальность документа',
+      target.id
+    );
+    this.notify();
+  }
+
+  public toggleHelpfulKnowledgeArticle(id: string, userId?: string): void {
+    const uid = userId || this.currentUserId || this.users[0]?.id || 'user-1';
+    this.knowledgeArticles = this.knowledgeArticles.map((a) => {
+      if (a.id !== id) return a;
+      const exists = a.helpfulUserIds.includes(uid);
+      return {
+        ...a,
+        helpfulUserIds: exists
+          ? a.helpfulUserIds.filter((u) => u !== uid)
+          : [...a.helpfulUserIds, uid],
+      };
+    });
+    this.saveKnowledgeArticles();
+    this.notify();
+  }
+
+  public deleteKnowledgeArticle(id: string): void {
+    const target = this.knowledgeArticles.find((a) => a.id === id);
+    if (!target) return;
+    this.knowledgeArticles = this.knowledgeArticles.filter((a) => a.id !== id);
+    if (this.detailKnowledgeId === id) {
+      this.detailKnowledgeId = this.knowledgeArticles[0]?.id || '';
+    }
+    this.saveKnowledgeArticles();
+    this.logActivity('delete', 'knowledge', target.title, 'Материал удалён из базы знаний', target.id);
+    this.addNotification('warning', 'Удалено', `Статья "${target.title}" удалена`);
     this.notify();
   }
 

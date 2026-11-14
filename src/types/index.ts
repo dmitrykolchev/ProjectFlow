@@ -336,6 +336,7 @@ export type ActiveView =
   | 'projects'
   | 'project-detail'
   | 'project-chat'
+  | 'knowledge-base'
   | 'task-detail'
   | 'time-tracking'
   | 'expenses'
@@ -361,10 +362,54 @@ export interface ActivityLogItem {
     | 'time_entry'
     | 'expense'
     | 'chat'
+    | 'knowledge'
     | 'settings';
   targetId?: string;
   targetTitle: string;
   details: string;
+}
+
+export type KnowledgeScope = 'project' | 'company' | 'general';
+
+export type KnowledgeCategory =
+  | 'architecture'
+  | 'runbook'
+  | 'onboarding'
+  | 'postmortem'
+  | 'playbook'
+  | 'decision'
+  | 'client_context';
+
+export type KnowledgeArticleStatus = 'draft' | 'published' | 'verified' | 'archived';
+
+export interface KnowledgeArticleRevision {
+  id: string;
+  editedById: string;
+  editedAt: string;
+  summary: string;
+}
+
+export interface KnowledgeArticle {
+  id: string;
+  title: string;
+  summary: string;
+  content: string;
+  scope: KnowledgeScope;
+  projectId?: string;
+  companyId?: string;
+  category: KnowledgeCategory;
+  status: KnowledgeArticleStatus;
+  tags: string[];
+  authorId: string;
+  reviewerId?: string;
+  pinned?: boolean;
+  helpfulUserIds: string[];
+  linkedTaskIds?: string[];
+  viewsCount: number;
+  revisions: KnowledgeArticleRevision[];
+  createdAt: string;
+  updatedAt: string;
+  verifiedAt?: string;
 }
 
 export interface NotificationItem {

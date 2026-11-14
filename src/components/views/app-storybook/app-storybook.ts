@@ -48,6 +48,7 @@ import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
 import projectDetailMeta from '../app-project-detail/app-project-detail.story';
 import projectChatMeta from '../app-project-chat/app-project-chat.story';
+import knowledgeBaseMeta from '../app-knowledge-base/app-knowledge-base.story';
 import companiesMeta from '../app-companies/app-companies.story';
 import employeesMeta from '../app-employees/app-employees.story';
 import employeeDetailMeta from '../app-employee-detail/app-employee-detail.story';
@@ -103,6 +104,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   projectsMeta,
   projectDetailMeta,
   projectChatMeta,
+  knowledgeBaseMeta,
   companiesMeta,
   employeesMeta,
   employeeDetailMeta,

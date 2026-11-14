@@ -22,6 +22,7 @@ import {
   iconWallet,
   iconCreditCard,
   iconMessageSquare,
+  iconBookOpen,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -46,6 +47,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   projects: () => import('./components/views/app-projects/app-projects'),
   'project-detail': () => import('./components/views/app-project-detail/app-project-detail'),
   'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
+  'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
   companies: () => import('./components/views/app-companies/app-companies'),
   employees: () => import('./components/views/app-employees/app-employees'),
   'employee-detail': () => import('./components/views/app-employee-detail/app-employee-detail'),
@@ -69,6 +71,7 @@ export class AppRoot extends LitElement {
   @state() private currentLang = store.customization.language;
   @state() private taskCount = store.tasks.length;
   @state() private chatCount = store.chatMessages.length;
+  @state() private knowledgeCount = store.knowledgeArticles.length;
   @state() private loadedViews: Set<ActiveView> = new Set();
 
   private loadingViews: Set<ActiveView> = new Set();
@@ -94,6 +97,7 @@ export class AppRoot extends LitElement {
     this.currentLang = store.customization.language;
     this.taskCount = store.tasks.length;
     this.chatCount = store.chatMessages.length;
+    this.knowledgeCount = store.knowledgeArticles.length;
     this.ensureViewLoaded(this.activeView);
   }
 
@@ -241,6 +245,13 @@ export class AppRoot extends LitElement {
             badge="${String(this.chatCount)}"
             .icon="${iconMessageSquare()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="knowledge-base"
+            label="${t.navigation.knowledgeBase}"
+            badge="${String(this.knowledgeCount)}"
+            .icon="${iconBookOpen()}"
+          ></sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
@@ -377,6 +388,8 @@ export class AppRoot extends LitElement {
         return html`<app-project-detail></app-project-detail>`;
       case 'project-chat':
         return html`<app-project-chat></app-project-chat>`;
+      case 'knowledge-base':
+        return html`<app-knowledge-base></app-knowledge-base>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
       case 'employees':

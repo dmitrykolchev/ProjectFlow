@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { ExpenseCategory, Project, ProjectRole, ProjectStatus, TaskStatus, TimeEntryCategory } from '../../../types';
 import {
+  iconBookOpen,
   iconChevronLeft,
   iconClock,
   iconEdit,
@@ -252,6 +253,17 @@ export class AppProjectDetail extends LitElement {
             >
               <span slot="icon-start">${iconMessageSquare(15)}</span>
               <span>${isRu ? 'Чат проекта' : 'Project Chat'}</span>
+            </app-button>
+
+            <app-button
+              size="sm"
+              variant="outline"
+              @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: proj.id })}"
+            >
+              <span slot="icon-start">${iconBookOpen(15)}</span>
+              <span>
+                ${t.navigation.knowledgeBase} (${store.knowledgeArticles.filter((a) => a.projectId === proj.id).length})
+              </span>
             </app-button>
 
             <app-button

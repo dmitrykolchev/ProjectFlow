@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Company, CompanyStatus } from '../../../types';
-import { iconBuilding, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -227,6 +227,14 @@ export class AppCompanies extends LitElement {
                         </span>
                       </div>
                       <div class="card-actions">
+                        <button
+                          type="button"
+                          class="icon-btn"
+                          title="${isRu ? 'База знаний компании' : 'Company Knowledge Base'}"
+                          @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
+                        >
+                          ${iconBookOpen(14)}
+                        </button>
                         <button
                           type="button"
                           class="icon-btn"

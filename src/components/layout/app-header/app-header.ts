@@ -70,6 +70,8 @@ export class AppHeader extends LitElement {
       'project-detail': detailProject ? `${detailProject.key} · ${detailProject.name}` : t.navigation.projects,
       kanban: t.navigation.kanban,
       'task-detail': detailTask ? `${detailTask.id} · ${detailTask.title}` : t.navigation.kanban,
+      'knowledge-base': t.navigation.knowledgeBase,
+      'project-chat': t.navigation.projectChat,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,
       calendar: t.navigation.calendar,

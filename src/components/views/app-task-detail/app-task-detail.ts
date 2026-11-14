@@ -15,6 +15,7 @@ import {
 } from '../../../types';
 import {
   iconActivity,
+  iconBookOpen,
   iconChevronLeft,
   iconClock,
   iconCornerUpLeft,
@@ -717,6 +718,53 @@ export class AppTaskDetail extends LitElement {
                     <span class="cost-val">${Math.round(totalCostRub).toLocaleString('ru-RU')} ₽</span>
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section class="section-card">
+              <div class="section-head">
+                <h2 class="section-title">${t.navigation.knowledgeBase}</h2>
+                <button
+                  type="button"
+                  class="link-btn"
+                  @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
+                >
+                  ${iconBookOpen(14)}
+                </button>
+              </div>
+              <div class="section-body">
+                ${(() => {
+                  const linkedDocs = store.knowledgeArticles.filter(
+                    (a) =>
+                      (a.linkedTaskIds || []).includes(task.id) ||
+                      a.projectId === task.projectId
+                  );
+                  if (linkedDocs.length === 0) {
+                    return html`<div style="font-size: 0.8125rem; color: var(--text-muted);">${t.knowledgeBase.emptyCatalog}</div>`;
+                  }
+                  return html`
+                    <div class="cost-list">
+                      ${linkedDocs.slice(0, 4).map(
+                        (doc) => html`
+                          <button
+                            type="button"
+                            class="link-btn"
+                            style="text-align: left; justify-content: flex-start; padding: 0.35rem 0; font-size: 0.8125rem;"
+                            @click="${() =>
+                              store.openKnowledgeBase({
+                                scope: doc.scope,
+                                projectId: doc.projectId || 'all',
+                                companyId: doc.companyId || 'all',
+                                articleId: doc.id,
+                              })}"
+                          >
+                            <span>${doc.title}</span>
+                          </button>
+                        `
+                      )}
+                    </div>
+                  `;
+                })()}
               </div>
             </section>
           </aside>

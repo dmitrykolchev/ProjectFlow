@@ -6,6 +6,7 @@ import {
   Expense,
   Invoice,
   InvoicePayment,
+  KnowledgeArticle,
   Project,
   ProjectChatMessage,
   Task,
@@ -1964,5 +1965,336 @@ export const initialPayments: InvoicePayment[] = [
     createdAt: '2026-03-29T14:05:00Z',
   },
 ];
+
+export const initialKnowledgeArticles: KnowledgeArticle[] = [
+  {
+    id: 'kb-101',
+    title: 'Архитектура L2-кэширования и стратегия инвалидации в Core Platform 3.0',
+    summary:
+      'Схема двухуровневого кэша (in-memory LRU + Redis Cluster), правила TTL-бюджетирования и защита от Cache Stampede при пиковых банковских нагрузках.',
+    content: `## Контекст и проблема
+При нагрузке свыше 14 000 RPS на сервис профилей и прав доступа прямые обращения к PostgreSQL создавали задержку p99 > 420 мс.
+
+## Принятое решение
+- Уровень L1: локальный LRU-кэш внутри пода с коротким TTL (15 сек) и лимитом памяти 128 МБ.
+- Уровень L2: распределённый Redis Cluster с TTL 10 минут и префиксным версионированием ключей.
+- Инвалидация через брокер событий при изменении прав RBAC и ротации токенов.
+
+## Защита от Cache Stampede
+- [x] Использовать singleflight-группировку запросов на ключ
+- [x] Включить вероятностное досрочное обновление (XFetch) при оставшемся TTL < 15%
+- [x] Настроить circuit-breaker с деградацией на read-replica при недоступности Redis
+
+\`\`\`ts
+const cacheKey = \`rbac:v\${schemaVersion}:user:\${userId}\`;
+const payload = await singleflight.do(cacheKey, () => fetchWithL2Fallback(cacheKey));
+\`\`\`
+
+## Накопленный опыт (Lessons Learned)
+> Не используйте массовый \`KEYS *\` или паттерн-удаление \`DEL\` в горячем контуре — переключение на версионированный префикс сократило время инвалидации с 1.8 с до 0 мс.`,
+    scope: 'project',
+    projectId: 'proj-1',
+    companyId: 'comp-1',
+    category: 'architecture',
+    status: 'verified',
+    tags: ['Redis', 'Caching', 'Highload', 'ADR'],
+    authorId: 'user-1',
+    reviewerId: 'user-3',
+    pinned: true,
+    helpfulUserIds: ['user-2', 'user-3', 'user-6', 'user-8'],
+    linkedTaskIds: ['CORE-101', 'CORE-102'],
+    viewsCount: 48,
+    revisions: [
+      {
+        id: 'rev-101-2',
+        editedById: 'user-3',
+        editedAt: '2026-11-08T14:20:00Z',
+        summary: 'Добавлены выводы по запрету KEYS * после нагрузочного тестирования',
+      },
+      {
+        id: 'rev-101-1',
+        editedById: 'user-1',
+        editedAt: '2026-10-19T10:00:00Z',
+        summary: 'Первичная спецификация L1/L2-кэша',
+      },
+    ],
+    createdAt: '2026-10-19T10:00:00Z',
+    updatedAt: '2026-11-08T14:20:00Z',
+    verifiedAt: '2026-11-09T09:30:00Z',
+  },
+  {
+    id: 'kb-102',
+    title: 'Стандарт разработки Lit Web Components и CSS-модулей (ProjectFlow Tech)',
+    summary:
+      'Внутренний playbook компании: структура папок компонентов, изоляция Shadow DOM, переменные тем и правила оптимизации бандла esbuild.',
+    content: `## Структура компонента
+Каждый UI-компонент размещается в отдельной директории и состоит из трёх файлов:
+1. \`component-name.ts\` — логика на LitElement, свойства и события.
+2. \`component-name.css\` — изолированный CSS-модуль, использующий исключительно токены темы.
+3. \`component-name.story.ts\` — сценарии для встроенного Storybook.
+
+## Обязательные правила оформления
+- [x] Использовать \`tabular-nums\` и моноширинный шрифт для всех таблиц, дат и сумм
+- [x] Запрещено дублировать статичные метаданные яркими плашками — разделяйте их знаком \`·\`
+- [x] Стили полос прокрутки наследуют \`--scrollbar-track\` и \`--scrollbar-thumb\` активной темы
+
+## Настройка темизации
+> При добавлении нового режима интерфейса все цвета поверхностей и границ должны читаться через \`var(--bg-surface)\` и \`var(--border-subtle)\`, без жёстко зашитых hex-значений.`,
+    scope: 'company',
+    companyId: 'comp-1',
+    category: 'playbook',
+    status: 'verified',
+    tags: ['Lit', 'Frontend', 'Design System', 'CSS Modules'],
+    authorId: 'user-2',
+    reviewerId: 'user-1',
+    pinned: true,
+    helpfulUserIds: ['user-1', 'user-4', 'user-8'],
+    linkedTaskIds: ['CORE-102'],
+    viewsCount: 64,
+    revisions: [
+      {
+        id: 'rev-102-1',
+        editedById: 'user-2',
+        editedAt: '2026-11-02T11:40:00Z',
+        summary: 'Актуализированы требования к скроллбарам и табличным цифрам',
+      },
+    ],
+    createdAt: '2026-09-14T09:15:00Z',
+    updatedAt: '2026-11-02T11:40:00Z',
+    verifiedAt: '2026-11-03T16:10:00Z',
+  },
+  {
+    id: 'kb-103',
+    title: 'Post-mortem #14: Сброс оффлайн-очереди IndexedDB на iOS Safari 18',
+    summary:
+      'Разбор инцидента потери локальных черновиков при неактивности PWA более 7 дней, корневая причина ITP и план превентивных мер для мобильных проектов.',
+    content: `## Хронология инцидента
+14 октября пользователи розничной сети сообщили об очистке локальной корзины заказов после недельного перерыва в работе с PWA.
+
+## Корневая причина
+Политика Intelligent Tracking Prevention (ITP) в WebKit автоматически очищает хранилище IndexedDB через 7 дней без взаимодействия, если не запрошен режим \`navigator.storage.persist()\` и нет вынесенного серверного sync-checkpoint.
+
+## Что сработало и что исправили
+- [x] Включили запрос \`navigator.storage.persist()\` сразу после первой авторизации
+- [x] Добавили фоновую синхронизацию черновиков каждые 90 секунд при наличии сети
+- [x] Реализовали компактный экспорт несинхронизированной очереди в файл восстановления
+
+## Вывод для будущих проектов
+> Любой оффлайн-first модуль на iOS обязан иметь серверное резервирование не реже 1 раза в сутки и явный индикатор статуса синхронизации.`,
+    scope: 'project',
+    projectId: 'proj-2',
+    companyId: 'comp-4',
+    category: 'postmortem',
+    status: 'verified',
+    tags: ['iOS', 'IndexedDB', 'Offline', 'PWA', 'Incident'],
+    authorId: 'user-4',
+    reviewerId: 'user-5',
+    pinned: false,
+    helpfulUserIds: ['user-2', 'user-5', 'user-6', 'user-7', 'user-8'],
+    linkedTaskIds: ['MOB-202'],
+    viewsCount: 53,
+    revisions: [
+      {
+        id: 'rev-103-1',
+        editedById: 'user-4',
+        editedAt: '2026-10-22T17:05:00Z',
+        summary: 'Финальный разбор инцидента с проверкой на iOS 18.1',
+      },
+    ],
+    createdAt: '2026-10-20T13:00:00Z',
+    updatedAt: '2026-10-22T17:05:00Z',
+    verifiedAt: '2026-10-24T10:15:00Z',
+  },
+  {
+    id: 'kb-104',
+    title: 'Runbook: Релизный чек-лист и прохождение аудита SOC2 Type II / ФСТЭК',
+    summary:
+      'Операционная инструкция FlowCloud Infra перед выкладкой в production: проверка ротации секретов, immutable-логов и матрицы RBAC.',
+    content: `## Предрелизная проверка контура ИБ
+Перед каждым релизом в контур заказчика инженер DevSecOps выполняет обязательный прогон:
+- [x] Сканирование зависимостей и образов контейнеров (0 критических CVE)
+- [x] Проверка политики хранения аудит-логов (минимум 365 дней WORM-хранилище)
+- [x] Валидация матрицы доступа RBAC и отзыв временных токенов подрядчиков
+- [ ] Подписание релизного акта ответственным от ИБ и заказчика
+
+\`\`\`bash
+./scripts/audit-preflight.sh --env prod --verify-rbac --check-worm-logs
+\`\`\`
+
+## Порядок действий при нештатном отклонении
+1. Немедленно остановить rollout в ArgoCD и зафиксировать snapshot состояния кластера.
+2. Оповестить дежурного ИБ и создать инцидент в проекте SEC с привязкой к релизу.`,
+    scope: 'company',
+    companyId: 'comp-2',
+    category: 'runbook',
+    status: 'published',
+    tags: ['SOC2', 'ФСТЭК', 'DevSecOps', 'Release'],
+    authorId: 'user-6',
+    reviewerId: 'user-5',
+    pinned: false,
+    helpfulUserIds: ['user-1', 'user-5'],
+    linkedTaskIds: ['SEC-301'],
+    viewsCount: 39,
+    revisions: [
+      {
+        id: 'rev-104-1',
+        editedById: 'user-6',
+        editedAt: '2026-11-05T15:30:00Z',
+        summary: 'Обновлена команда preflight-проверки для кластера v2.4',
+      },
+    ],
+    createdAt: '2026-09-28T09:00:00Z',
+    updatedAt: '2026-11-05T15:30:00Z',
+  },
+  {
+    id: 'kb-105',
+    title: 'Проектирование витрин ClickHouse и контроль SLA потоковой аналитики',
+    summary:
+      'Правила партиционирования событий по месяцам, выбор ключей сортировки ORDER BY и оптимизация материализованных представлений для дашбордов SLA.',
+    content: `## Ключевые правила моделирования в DataCore Lab
+1. Партиционируйте таблицы фактов по \`toYYYYMM(event_time)\`, избегая ежедневных партиций при объёме < 50M строк/день.
+2. В \`ORDER BY\` выносите поля с низкой кардинальностью перед временной меткой: \`(tenant_id, project_id, toStartOfHour(event_time), event_type)\`.
+3. Для агрегатов реального времени используйте движок \`AggregatingMergeTree\` с \`-State\` / \`-Merge\` комбинаторами.
+
+\`\`\`sql
+CREATE MATERIALIZED VIEW mv_sla_hourly
+ENGINE = AggregatingMergeTree()
+ORDER BY (project_id, hour_bucket) AS
+SELECT project_id, toStartOfHour(ts) AS hour_bucket, quantileState(0.95)(latency_ms) AS p95
+FROM raw_events GROUP BY project_id, hour_bucket;
+\`\`\`
+
+## Наблюдение из эксплуатации
+> Промежуточные \`JOIN\` в материализованных представлениях вызывают всплески RAM при вставке — обогащайте справочники на уровне Kafka/Vector до записи в ClickHouse.`,
+    scope: 'project',
+    projectId: 'proj-4',
+    companyId: 'comp-3',
+    category: 'architecture',
+    status: 'verified',
+    tags: ['ClickHouse', 'Analytics', 'SLA', 'Performance'],
+    authorId: 'user-7',
+    reviewerId: 'user-3',
+    pinned: false,
+    helpfulUserIds: ['user-1', 'user-3', 'user-6'],
+    viewsCount: 31,
+    revisions: [
+      {
+        id: 'rev-105-1',
+        editedById: 'user-7',
+        editedAt: '2026-10-30T12:10:00Z',
+        summary: 'Добавлен пример AggregatingMergeTree для квантилей SLA',
+      },
+    ],
+    createdAt: '2026-10-25T11:00:00Z',
+    updatedAt: '2026-10-30T12:10:00Z',
+    verifiedAt: '2026-11-01T10:00:00Z',
+  },
+  {
+    id: 'kb-106',
+    title: 'Онбординг инженеров MobileForge Studio: стенды, WebAuthn и песочница',
+    summary:
+      'Пошаговая памятка для новых разработчиков и дизайнеров: настройка HTTPS-туннелей, тестовые профили биометрии и гайдлайны UX.',
+    content: `## Первый день в команде
+- [x] Получить доступ в репозиторий, проектном чате и тестовом контуре Stage-Mobile
+- [x] Поднять локальный HTTPS-прокси (WebAuthn и Service Worker не работают по чистому HTTP, кроме localhost)
+- [x] Проверить тестовые учётные записи заказчика РитейлГрупп в защищённом хранилище
+
+## Полезные ориентиры
+1. Дизайн-макеты и токены плотности синхронизируются с UI-библиотекой каждую пятницу.
+2. Перед сдачей задачи обязательно прикладывайте запись экрана с проверкой оффлайн-режима.`,
+    scope: 'company',
+    companyId: 'comp-4',
+    category: 'onboarding',
+    status: 'published',
+    tags: ['Onboarding', 'PWA', 'WebAuthn', 'Checklist'],
+    authorId: 'user-4',
+    reviewerId: 'user-8',
+    pinned: false,
+    helpfulUserIds: ['user-2', 'user-5'],
+    viewsCount: 27,
+    revisions: [
+      {
+        id: 'rev-106-1',
+        editedById: 'user-4',
+        editedAt: '2026-10-14T09:50:00Z',
+        summary: 'Создан чек-лист онбординга для разработчиков MobileForge',
+      },
+    ],
+    createdAt: '2026-10-14T09:50:00Z',
+    updatedAt: '2026-10-14T09:50:00Z',
+  },
+  {
+    id: 'kb-107',
+    title: 'ADR-008: Переход на периодические калькуляции перед выставлением счетов',
+    summary:
+      'Регламент финансовой прозрачности: включение как billable, так и non-billable работ/расходов с нулевой ценой для согласования с заказчиком.',
+    content: `## Причина изменения процесса
+Клиенты часто запрашивали детализацию внутренних работ, которые не включались в итоговый счёт, чтобы понимать полную загрузку команды по договору.
+
+## Согласованный процесс
+1. Перед формированием счёта менеджер создаёт периодическую калькуляцию (неделя, 2 недели, месяц, квартал).
+2. В документ подтягиваются **все** работы и расходы за период (плюс неучтённые позиции прошлых периодов при необходимости).
+3. Позиции с признаком \`non-billable\` отображаются в отчёте перед клиентом с ценой \`0 ₽\`, повышая прозрачность без влияния на сумму оплаты.
+4. После согласования калькуляции счёт выставляется в один клик с автоматическим контролем платежей и сроков.`,
+    scope: 'general',
+    companyId: 'comp-1',
+    category: 'decision',
+    status: 'verified',
+    tags: ['Биллинг', 'Калькуляции', 'Процессы', 'ADR'],
+    authorId: 'user-8',
+    reviewerId: 'user-1',
+    pinned: false,
+    helpfulUserIds: ['user-1', 'user-4', 'user-7'],
+    viewsCount: 44,
+    revisions: [
+      {
+        id: 'rev-107-1',
+        editedById: 'user-8',
+        editedAt: '2026-11-01T14:00:00Z',
+        summary: 'Утверждён единый регламент калькуляций для всех компаний группы',
+      },
+    ],
+    createdAt: '2026-11-01T14:00:00Z',
+    updatedAt: '2026-11-01T14:00:00Z',
+    verifiedAt: '2026-11-02T09:00:00Z',
+  },
+  {
+    id: 'kb-108',
+    title: 'Контекст заказчика ПАО «Северный Капитал Банк»: окна релизов и приёмка',
+    summary:
+      'Особенности взаимодействия со службой эксплуатации банка, график технологических окон и перечень обязательных артефактов для закрытия этапа.',
+    content: `## Регламент релизных окон
+- Плановые выкладки в промконтур согласуются за 5 рабочих дней и проводятся в окно вторник/четверг 22:00–02:00 МСК.
+- Заморозка изменений (Code Freeze) действует последние 3 банковских дня каждого квартала.
+
+## Обязательные артефакты к закрытию этапа
+- [x] Согласованная калькуляция трудозатрат и прямых расходов за период
+- [x] Протокол нагрузочного тестирования (p95 < 120 мс)
+- [ ] Заключение внешнего аудитора по результатам регрессионного сканирования`,
+    scope: 'project',
+    projectId: 'proj-1',
+    companyId: 'comp-1',
+    category: 'client_context',
+    status: 'draft',
+    tags: ['Заказчик', 'Банк', 'Релизы', 'Приёмка'],
+    authorId: 'user-8',
+    reviewerId: 'user-6',
+    pinned: false,
+    helpfulUserIds: ['user-1'],
+    linkedTaskIds: ['CORE-101', 'SEC-301'],
+    viewsCount: 16,
+    revisions: [
+      {
+        id: 'rev-108-1',
+        editedById: 'user-8',
+        editedAt: '2026-11-11T16:45:00Z',
+        summary: 'Черновик памятки по приёмке Q4',
+      },
+    ],
+    createdAt: '2026-11-11T16:45:00Z',
+    updatedAt: '2026-11-11T16:45:00Z',
+  },
+];
+
 
 
