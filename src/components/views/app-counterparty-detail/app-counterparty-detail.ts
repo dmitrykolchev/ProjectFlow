@@ -29,6 +29,8 @@ import {
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -637,7 +639,7 @@ export class AppCounterpartyDetail extends LitElement {
         title="${isRu ? 'Редактирование контрагента' : 'Edit Counterparty'}"
         @close="${() => (this.editModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Краткое наименование' : 'Short Name'}"
@@ -737,7 +739,7 @@ export class AppCounterpartyDetail extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
             ${t.common.cancel}
@@ -752,32 +754,21 @@ export class AppCounterpartyDetail extends LitElement {
 
   private renderDeleteModal(cp: Counterparty, isRu: boolean, t: ReturnType<typeof getTranslation>) {
     return html`
-      <app-modal
-        ?open="${this.confirmDeleteOpen}"
+      <app-confirm-dialog
+        .open="${this.confirmDeleteOpen}"
         size="sm"
         title="${isRu ? 'Удалить контрагента?' : 'Delete counterparty?'}"
-        @close="${() => (this.confirmDeleteOpen = false)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить контрагента «${cp.name}»?`
-            : `Are you sure you want to delete "${cp.name}"?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.confirmDeleteOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              this.confirmDeleteOpen = false;
-              store.deleteCounterparty(cp.id);
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить контрагента «${cp.name}»?`
+          : `Are you sure you want to delete "${cp.name}"?`}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmDeleteOpen = false)}"
+        @confirm="${() => {
+          this.confirmDeleteOpen = false;
+          store.deleteCounterparty(cp.id);
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -818,7 +809,7 @@ export class AppCounterpartyDetail extends LitElement {
         title="${isRu ? `Новый договор · ${cp.name}` : `New Contract · ${cp.name}`}"
         @close="${() => (this.contractModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Номер договора' : 'Contract Number'}"
@@ -904,7 +895,7 @@ export class AppCounterpartyDetail extends LitElement {
                 (this.ctrFrequency = e.detail.value as CalculationFrequency)}"
             ></app-select>
           </div>
-        </div>
+        </app-form-grid>
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.contractModalOpen = false)}">
             ${t.common.cancel}
