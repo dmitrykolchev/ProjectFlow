@@ -31,6 +31,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-expenses.css';
+import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
 
@@ -197,11 +198,11 @@ export class AppExpenses extends LitElement {
           { key: 'status', options: statusFilterOptions },
         ]}"
         .values="${{ project: this.projectFilter, category: this.categoryFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'project') this.projectFilter = e.detail.value;
-          if (e.detail.key === 'category') this.categoryFilter = e.detail.value as 'all' | ExpenseCategory;
-          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | ExpenseStatus;
+          if (e.detail.key === 'project') this.projectFilter = eventValue(e);
+          if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | ExpenseCategory;
+          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ExpenseStatus;
         }}"
       >
         <app-segmented-switch
@@ -212,7 +213,7 @@ export class AppExpenses extends LitElement {
             { value: 'budgets', label: t.expenses.viewBudgets },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewMode = e.detail.value as 'registry' | 'budgets')}"
+            (this.viewMode = eventValue(e) as 'registry' | 'budgets')}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -493,7 +494,7 @@ export class AppExpenses extends LitElement {
               required
               error="${this.formError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formTitle = e.detail.value;
+                this.formTitle = eventValue(e);
                 this.formError = '';
               }}"
             ></app-input>
@@ -504,7 +505,7 @@ export class AppExpenses extends LitElement {
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formProjectId = e.detail.value;
+                this.formProjectId = eventValue(e);
                 this.formTaskId = '';
               }}"
             ></app-select>
@@ -514,7 +515,7 @@ export class AppExpenses extends LitElement {
               label="${isRu ? 'Задача (опционально)' : 'Linked Task (optional)'}"
               .value="${this.formTaskId}"
               .options="${taskOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -523,7 +524,7 @@ export class AppExpenses extends LitElement {
               .value="${this.formCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCategory = e.detail.value as ExpenseCategory)}"
+                (this.formCategory = eventValue(e) as ExpenseCategory)}"
             ></app-select>
           </div>
           <div>
@@ -531,7 +532,7 @@ export class AppExpenses extends LitElement {
               label="${isRu ? 'Сотрудник / Инициатор' : 'Submitted By'}"
               .value="${this.formUserId}"
               .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -540,7 +541,7 @@ export class AppExpenses extends LitElement {
               .value="${this.formAmount}"
               min="0"
               step="500"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = eventValue(e))}"
             ></app-number-input>
           </div>
           <div>
@@ -549,14 +550,14 @@ export class AppExpenses extends LitElement {
               .value="${this.formCurrency}"
               .options="${currencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCurrency = e.detail.value as 'RUB' | 'USD' | 'EUR')}"
+                (this.formCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата расхода' : 'Date'}"
               .value="${this.formDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -565,7 +566,7 @@ export class AppExpenses extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as ExpenseStatus)}"
+                (this.formStatus = eventValue(e) as ExpenseStatus)}"
             ></app-select>
           </div>
           <div>
@@ -573,7 +574,7 @@ export class AppExpenses extends LitElement {
               label="${isRu ? 'Поставщик / Контрагент' : 'Vendor'}"
               placeholder="Yandex Cloud, JetBrains..."
               .value="${this.formVendor}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = eventValue(e))}"
             ></app-input>
           </div>
           <div style="display: flex; align-items: flex-end;">
@@ -591,7 +592,7 @@ export class AppExpenses extends LitElement {
               label="${isRu ? 'Обоснование и комментарии' : 'Notes'}"
               .value="${this.formNotes}"
               rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

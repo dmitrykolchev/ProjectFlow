@@ -22,6 +22,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-split-button/app-split-button';
 import '../../common/app-badge/app-badge';
 import '../../common/app-page-header/app-page-header';
+import { eventValue } from '../../common/event-value';
 
 @customElement('app-dashboard')
 export class AppDashboard extends LitElement {
@@ -126,7 +127,7 @@ export class AppDashboard extends LitElement {
                 { value: 'quarter', label: t.dashboard.periodQuarter },
               ]}"
               @change="${(e: CustomEvent) => {
-                this.timeframe = e.detail.value;
+                this.timeframe = eventValue(e);
               }}"
             ></app-segmented-switch>
 

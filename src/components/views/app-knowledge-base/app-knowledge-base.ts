@@ -32,6 +32,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-page-header/app-page-header';
 import styles from './app-knowledge-base.css';
+import { eventValue } from '../../common/event-value';
 
 interface ParsedBlock {
   type: 'h1' | 'h2' | 'h3' | 'p' | 'ul' | 'ol' | 'checklist' | 'quote' | 'code';
@@ -467,7 +468,7 @@ export class AppKnowledgeBase extends LitElement {
                 placeholder="${kb.searchPlaceholder}"
                 .value="${this.localSearch}"
                 clearable
-                @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+                @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
               >
                 <span slot="icon">${iconSearch(14)}</span>
               </app-input>
@@ -483,7 +484,7 @@ export class AppKnowledgeBase extends LitElement {
                 { value: 'general', label: kb.scopeGeneral },
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                const nextScope = e.detail.value as 'all' | KnowledgeScope;
+                const nextScope = eventValue(e) as 'all' | KnowledgeScope;
                 store.setKnowledgeFilters({
                   scope: nextScope,
                   projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
@@ -500,7 +501,7 @@ export class AppKnowledgeBase extends LitElement {
                 .value="${this.projectFilter}"
                 .options="${projectOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ projectId: e.detail.value })}"
+                  store.setKnowledgeFilters({ projectId: eventValue(e) })}"
               ></app-select>
             </div>
             <div class="filter-select">
@@ -509,7 +510,7 @@ export class AppKnowledgeBase extends LitElement {
                 .value="${this.companyFilter}"
                 .options="${companyOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ companyId: e.detail.value })}"
+                  store.setKnowledgeFilters({ companyId: eventValue(e) })}"
               ></app-select>
             </div>
             <div class="filter-select">
@@ -518,7 +519,7 @@ export class AppKnowledgeBase extends LitElement {
                 .value="${this.categoryFilter}"
                 .options="${categoryOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.categoryFilter = e.detail.value as 'all' | KnowledgeCategory)}"
+                  (this.categoryFilter = eventValue(e) as 'all' | KnowledgeCategory)}"
               ></app-select>
             </div>
             <div class="filter-select" style="width: 150px;">
@@ -527,7 +528,7 @@ export class AppKnowledgeBase extends LitElement {
                 .value="${this.statusFilter}"
                 .options="${statusOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.statusFilter = e.detail.value as 'all' | KnowledgeArticleStatus)}"
+                  (this.statusFilter = eventValue(e) as 'all' | KnowledgeArticleStatus)}"
               ></app-select>
             </div>
             ${hasActiveFilters
@@ -895,7 +896,7 @@ export class AppKnowledgeBase extends LitElement {
             required
             error="${this.formError}"
             @input="${(e: CustomEvent<{ value: string }>) => {
-              this.formTitle = e.detail.value;
+              this.formTitle = eventValue(e);
               this.formError = '';
             }}"
           ></app-input>
@@ -904,7 +905,7 @@ export class AppKnowledgeBase extends LitElement {
             label="${kb.fieldSummary}"
             rows="2"
             .value="${this.formSummary}"
-            @input="${(e: CustomEvent<{ value: string }>) => (this.formSummary = e.detail.value)}"
+            @input="${(e: CustomEvent<{ value: string }>) => (this.formSummary = eventValue(e))}"
           ></app-textarea>
 
           <div class="form-grid-3">
@@ -913,7 +914,7 @@ export class AppKnowledgeBase extends LitElement {
               .value="${this.formScope}"
               .options="${scopeOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formScope = e.detail.value as KnowledgeScope)}"
+                (this.formScope = eventValue(e) as KnowledgeScope)}"
             ></app-select>
 
             <app-select
@@ -921,7 +922,7 @@ export class AppKnowledgeBase extends LitElement {
               .value="${this.formCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCategory = e.detail.value as KnowledgeCategory)}"
+                (this.formCategory = eventValue(e) as KnowledgeCategory)}"
             ></app-select>
 
             <app-select
@@ -929,7 +930,7 @@ export class AppKnowledgeBase extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as KnowledgeArticleStatus)}"
+                (this.formStatus = eventValue(e) as KnowledgeArticleStatus)}"
             ></app-select>
           </div>
 
@@ -939,7 +940,7 @@ export class AppKnowledgeBase extends LitElement {
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formProjectId = e.detail.value;
+                this.formProjectId = eventValue(e);
                 if (this.formProjectId && !this.formCompanyId) {
                   const p = store.projects.find((pr) => pr.id === this.formProjectId);
                   if (p?.companyId) this.formCompanyId = p.companyId;
@@ -951,7 +952,7 @@ export class AppKnowledgeBase extends LitElement {
               label="${kb.fieldCompany}"
               .value="${this.formCompanyId}"
               .options="${companyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
             ></app-select>
           </div>
 
@@ -960,14 +961,14 @@ export class AppKnowledgeBase extends LitElement {
               label="${kb.fieldAuthor}"
               .value="${this.formAuthorId}"
               .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formAuthorId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formAuthorId = eventValue(e))}"
             ></app-select>
 
             <app-select
               label="${kb.fieldReviewer}"
               .value="${this.formReviewerId}"
               .options="${[{ value: '', label: '—' }, ...userOptions]}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formReviewerId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formReviewerId = eventValue(e))}"
             ></app-select>
           </div>
 
@@ -976,14 +977,14 @@ export class AppKnowledgeBase extends LitElement {
               label="${kb.fieldTags}"
               placeholder="Redis, Runbook, SLA..."
               .value="${this.formTags}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formTags = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formTags = eventValue(e))}"
             ></app-input>
 
             <app-input
               label="${kb.fieldLinkedTasks}"
               placeholder="CORE-101, MOB-202..."
               .value="${this.formLinkedTasks}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLinkedTasks = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formLinkedTasks = eventValue(e))}"
             ></app-input>
           </div>
 
@@ -999,7 +1000,7 @@ export class AppKnowledgeBase extends LitElement {
                 { value: 'preview', label: kb.previewTab },
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.editorTab = e.detail.value as 'write' | 'preview')}"
+                (this.editorTab = eventValue(e) as 'write' | 'preview')}"
             ></app-segmented-switch>
           </div>
 
@@ -1008,7 +1009,7 @@ export class AppKnowledgeBase extends LitElement {
                 <app-textarea
                   rows="10"
                   .value="${this.formContent}"
-                  @input="${(e: CustomEvent<{ value: string }>) => (this.formContent = e.detail.value)}"
+                  @input="${(e: CustomEvent<{ value: string }>) => (this.formContent = eventValue(e))}"
                 ></app-textarea>
               `
             : html`<div class="preview-surface">${this.renderMarkdown(this.formContent)}</div>`}
@@ -1017,7 +1018,7 @@ export class AppKnowledgeBase extends LitElement {
             label="${kb.fieldRevisionSummary}"
             placeholder="${isRu ? 'Кратко: что добавлено или уточнено...' : 'What changed in this revision...'}"
             .value="${this.formRevisionSummary}"
-            @input="${(e: CustomEvent<{ value: string }>) => (this.formRevisionSummary = e.detail.value)}"
+            @input="${(e: CustomEvent<{ value: string }>) => (this.formRevisionSummary = eventValue(e))}"
           ></app-input>
         </div>
 

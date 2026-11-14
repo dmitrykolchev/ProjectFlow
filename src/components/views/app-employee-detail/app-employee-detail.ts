@@ -31,6 +31,7 @@ import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-employee-detail.css';
+import { eventValue } from '../../common/event-value';
 
 @customElement('app-employee-detail')
 export class AppEmployeeDetail extends LitElement {
@@ -171,7 +172,7 @@ export class AppEmployeeDetail extends LitElement {
                 .value="${emp.id}"
                 .options="${empSwitchOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.openEmployeeDetail(e.detail.value)}"
+                  store.openEmployeeDetail(eventValue(e))}"
               ></app-select>
             </div>
           </div>
@@ -324,7 +325,7 @@ export class AppEmployeeDetail extends LitElement {
                   { value: 'all', label: t.common.all },
                 ]}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.taskFilter = e.detail.value as 'all' | 'active' | 'done')}"
+                  (this.taskFilter = eventValue(e) as 'all' | 'active' | 'done')}"
               ></app-segmented-switch>
 
             ${filteredTasks.length === 0
@@ -383,7 +384,7 @@ export class AppEmployeeDetail extends LitElement {
                 { value: 'expenses', label: `${t.employeeDetail.expensesTitle} (${empExpenses.length})` },
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.activityTab = e.detail.value as 'time' | 'expenses')}"
+                (this.activityTab = eventValue(e) as 'time' | 'expenses')}"
             ></app-segmented-switch>
 
           ${this.activityTab === 'time'
@@ -521,7 +522,7 @@ export class AppEmployeeDetail extends LitElement {
               required
               error="${this.formError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = e.detail.value;
+                this.formName = eventValue(e);
                 this.formError = '';
               }}"
             ></app-input>
@@ -530,14 +531,14 @@ export class AppEmployeeDetail extends LitElement {
             <app-input
               label="${isRu ? 'Должность' : 'Role'}"
               .value="${this.formRole}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Отдел' : 'Department'}"
               .value="${this.formDepartment}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -548,7 +549,7 @@ export class AppEmployeeDetail extends LitElement {
                 { value: '', label: isRu ? 'Не указана' : 'None' },
                 ...store.companies.map((c) => ({ value: c.id, label: c.name })),
               ]}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -556,21 +557,21 @@ export class AppEmployeeDetail extends LitElement {
               label="Email"
               type="email"
               .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Телефон' : 'Phone'}"
               .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Город' : 'Location'}"
               .value="${this.formLocation}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -579,14 +580,14 @@ export class AppEmployeeDetail extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as EmployeeStatus)}"
+                (this.formStatus = eventValue(e) as EmployeeStatus)}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата найма' : 'Hire Date'}"
               .value="${this.formHireDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -597,7 +598,7 @@ export class AppEmployeeDetail extends LitElement {
               max="25000"
               step="100"
               unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = eventValue(e))}"
             ></app-number-input>
           </div>
         </app-form-grid>
@@ -672,14 +673,14 @@ export class AppEmployeeDetail extends LitElement {
               label="${isRu ? 'Задача' : 'Task'}"
               .value="${this.timeTaskId}"
               .options="${taskOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата' : 'Date'}"
               .value="${this.timeDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.timeDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.timeDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -690,7 +691,7 @@ export class AppEmployeeDetail extends LitElement {
               max="24"
               step="0.5"
               unit="ч"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = eventValue(e))}"
             ></app-number-input>
           </div>
           <div class="col-span-2">
@@ -699,7 +700,7 @@ export class AppEmployeeDetail extends LitElement {
               .value="${this.timeCategory}"
               .options="${catOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.timeCategory = e.detail.value as TimeEntryCategory)}"
+                (this.timeCategory = eventValue(e) as TimeEntryCategory)}"
             ></app-select>
           </div>
           <div class="col-span-2">
@@ -707,7 +708,7 @@ export class AppEmployeeDetail extends LitElement {
               label="${isRu ? 'Комментарий' : 'Notes'}"
               .value="${this.timeDesc}"
               rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

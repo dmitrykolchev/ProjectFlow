@@ -44,6 +44,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-task-detail.css';
+import { eventValue } from '../../common/event-value';
 
 type DetailTab = 'timeline' | 'time' | 'expenses' | 'discussions';
 type TimelineFilter = 'all' | 'time' | 'expense' | 'discussion' | 'audit';
@@ -420,7 +421,7 @@ export class AppTaskDetail extends LitElement {
                 .value="${task.id}"
                 .options="${taskSwitchOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.openTaskDetail(e.detail.value)}"
+                  store.openTaskDetail(eventValue(e))}"
               ></app-select>
             </div>
           </div>
@@ -506,7 +507,7 @@ export class AppTaskDetail extends LitElement {
                   .value="${task.status}"
                   .options="${statusOptions}"
                   @change="${(e: CustomEvent<{ value: string }>) => {
-                    const nextStatus = e.detail.value as TaskStatus;
+                    const nextStatus = eventValue(e) as TaskStatus;
                     if (nextStatus !== task.status) {
                       store.moveTaskStatus(task.id, nextStatus);
                     }
@@ -521,7 +522,7 @@ export class AppTaskDetail extends LitElement {
                   .value="${task.priority}"
                   .options="${priorityOptions}"
                   @change="${(e: CustomEvent<{ value: string }>) => {
-                    const nextPriority = e.detail.value as TaskPriority;
+                    const nextPriority = eventValue(e) as TaskPriority;
                     if (nextPriority !== task.priority) {
                       store.updateTask({ ...task, priority: nextPriority });
                     }
@@ -536,7 +537,7 @@ export class AppTaskDetail extends LitElement {
                   .value="${task.assigneeId}"
                   .options="${assigneeOptions}"
                   @change="${(e: CustomEvent<{ value: string }>) => {
-                    const nextAssignee = e.detail.value;
+                    const nextAssignee = eventValue(e);
                     if (nextAssignee !== task.assigneeId) {
                       store.updateTask({ ...task, assigneeId: nextAssignee });
                     }
@@ -605,7 +606,7 @@ export class AppTaskDetail extends LitElement {
                     { value: 'discussions', label: `${t.taskDetail.tabDiscussions} (${discussions.length})` },
                   ]}"
                   @change="${(e: CustomEvent<{ value: string }>) => {
-                    this.activeTab = e.detail.value as DetailTab;
+                    this.activeTab = eventValue(e) as DetailTab;
                   }}"
                 ></app-segmented-switch>
               </div>
@@ -661,7 +662,7 @@ export class AppTaskDetail extends LitElement {
                     size="sm"
                     placeholder="${t.taskDetail.addSubtaskPlaceholder}"
                     .value="${this.newSubtaskTitle}"
-                    @input="${(e: CustomEvent<{ value: string }>) => (this.newSubtaskTitle = e.detail.value)}"
+                    @input="${(e: CustomEvent<{ value: string }>) => (this.newSubtaskTitle = eventValue(e))}"
                     @keydown="${(e: KeyboardEvent) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
@@ -799,7 +800,7 @@ export class AppTaskDetail extends LitElement {
             { value: 'audit', label: t.taskDetail.filterChanges },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.timelineFilter = e.detail.value as TimelineFilter;
+            this.timelineFilter = eventValue(e) as TimelineFilter;
           }}"
         ></app-segmented-switch>
 
@@ -811,7 +812,7 @@ export class AppTaskDetail extends LitElement {
             { value: 'oldest', label: t.taskDetail.sortChronological },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.sortOrder = e.detail.value as 'newest' | 'oldest';
+            this.sortOrder = eventValue(e) as 'newest' | 'oldest';
           }}"
         ></app-segmented-switch>
       </div>
@@ -875,14 +876,14 @@ export class AppTaskDetail extends LitElement {
             label="${t.taskDetail.fieldEmployee}"
             .value="${this.timeUserId}"
             .options="${userOptions}"
-            @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = e.detail.value)}"
+            @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = eventValue(e))}"
           ></app-select>
 
           <app-date-input
             size="sm"
             label="${t.taskDetail.fieldDate}"
             .value="${this.timeDate}"
-            @change="${(e: CustomEvent<{ value: string }>) => (this.timeDate = e.detail.value)}"
+            @change="${(e: CustomEvent<{ value: string }>) => (this.timeDate = eventValue(e))}"
           ></app-date-input>
 
           <app-number-input
@@ -893,7 +894,7 @@ export class AppTaskDetail extends LitElement {
             max="24"
             step="0.5"
             unit="${t.common.hours}"
-            @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = e.detail.value)}"
+            @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = eventValue(e))}"
           ></app-number-input>
         </div>
 
@@ -904,7 +905,7 @@ export class AppTaskDetail extends LitElement {
             .value="${this.timeCategory}"
             .options="${catOptions}"
             @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.timeCategory = e.detail.value as TimeEntryCategory)}"
+              (this.timeCategory = eventValue(e) as TimeEntryCategory)}"
           ></app-select>
 
           <app-input
@@ -912,7 +913,7 @@ export class AppTaskDetail extends LitElement {
             label="${t.taskDetail.fieldDescription}"
             placeholder="${isRu ? 'Что было выполнено...' : 'Describe work performed...'}"
             .value="${this.timeDesc}"
-            @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = e.detail.value)}"
+            @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
           ></app-input>
         </div>
 
@@ -1022,7 +1023,7 @@ export class AppTaskDetail extends LitElement {
             label="${t.taskDetail.fieldExpenseTitle}"
             placeholder="${isRu ? 'Сервер, лицензия, подрядчик...' : 'Cloud server, license, contractor...'}"
             .value="${this.expTitle}"
-            @input="${(e: CustomEvent<{ value: string }>) => (this.expTitle = e.detail.value)}"
+            @input="${(e: CustomEvent<{ value: string }>) => (this.expTitle = eventValue(e))}"
           ></app-input>
 
           <app-select
@@ -1031,7 +1032,7 @@ export class AppTaskDetail extends LitElement {
             .value="${this.expCategory}"
             .options="${catOptions}"
             @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.expCategory = e.detail.value as ExpenseCategory)}"
+              (this.expCategory = eventValue(e) as ExpenseCategory)}"
           ></app-select>
         </div>
 
@@ -1043,7 +1044,7 @@ export class AppTaskDetail extends LitElement {
             min="0"
             max="100000000"
             step="500"
-            @change="${(e: CustomEvent<{ value: number }>) => (this.expAmount = e.detail.value)}"
+            @change="${(e: CustomEvent<{ value: number }>) => (this.expAmount = eventValue(e))}"
           ></app-number-input>
 
           <app-select
@@ -1052,7 +1053,7 @@ export class AppTaskDetail extends LitElement {
             .value="${this.expCurrency}"
             .options="${currencyOptions}"
             @change="${(e: CustomEvent<{ value: string }>) =>
-              (this.expCurrency = e.detail.value as 'RUB' | 'USD' | 'EUR')}"
+              (this.expCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
           ></app-select>
 
           <app-input
@@ -1060,7 +1061,7 @@ export class AppTaskDetail extends LitElement {
             label="${t.taskDetail.fieldVendor}"
             placeholder="Yandex Cloud, JetBrains..."
             .value="${this.expVendor}"
-            @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = e.detail.value)}"
+            @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = eventValue(e))}"
           ></app-input>
         </div>
 
@@ -1221,7 +1222,7 @@ export class AppTaskDetail extends LitElement {
                               rows="2"
                               .value="${this.editingMsgText}"
                               @input="${(e: CustomEvent<{ value: string }>) =>
-                                (this.editingMsgText = e.detail.value)}"
+                                (this.editingMsgText = eventValue(e))}"
                             ></app-textarea>
                             <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
                               <app-button
@@ -1304,7 +1305,7 @@ export class AppTaskDetail extends LitElement {
           rows="2"
           placeholder="${t.taskDetail.discussionPlaceholder}"
           .value="${this.commentText}"
-          @input="${(e: CustomEvent<{ value: string }>) => (this.commentText = e.detail.value)}"
+          @input="${(e: CustomEvent<{ value: string }>) => (this.commentText = eventValue(e))}"
           @keydown="${(e: KeyboardEvent) => {
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
@@ -1320,7 +1321,7 @@ export class AppTaskDetail extends LitElement {
               label="${t.projectChat.actingAs}"
               .value="${this.commentAuthorId}"
               .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.commentAuthorId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.commentAuthorId = eventValue(e))}"
             ></app-select>
           </div>
 

@@ -18,6 +18,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-companies.css';
+import { eventValue } from '../../common/event-value';
 
 @customElement('app-companies')
 export class AppCompanies extends LitElement {
@@ -126,9 +127,9 @@ export class AppCompanies extends LitElement {
         .searchValue="${this.localSearch}"
         .filters="${[{ key: 'status', options: statusOptions }]}"
         .values="${{ status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | CompanyStatus;
+          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CompanyStatus;
         }}"
       ></app-filter-bar>
 
@@ -251,7 +252,7 @@ export class AppCompanies extends LitElement {
               required
               error="${this.formError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = e.detail.value;
+                this.formName = eventValue(e);
                 this.formError = '';
               }}"
             ></app-input>
@@ -260,42 +261,42 @@ export class AppCompanies extends LitElement {
             <app-input
               label="${isRu ? 'Юридическое наименование' : 'Legal Name'}"
               .value="${this.formLegalName}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'ИНН' : 'Tax ID (INN)'}"
               .value="${this.formInn}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'КПП' : 'KPP'}"
               .value="${this.formKpp}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Отрасль' : 'Industry'}"
               .value="${this.formIndustry}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formIndustry = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formIndustry = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Город' : 'City'}"
               .value="${this.formCity}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Телефон' : 'Phone'}"
               .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -303,7 +304,7 @@ export class AppCompanies extends LitElement {
               label="Email"
               type="email"
               .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -311,7 +312,7 @@ export class AppCompanies extends LitElement {
               label="${isRu ? 'Руководитель' : 'Director'}"
               .value="${this.formDirectorId}"
               .options="${directorOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDirectorId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formDirectorId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -320,7 +321,7 @@ export class AppCompanies extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as CompanyStatus)}"
+                (this.formStatus = eventValue(e) as CompanyStatus)}"
             ></app-select>
           </div>
           <div class="col-span-2">
@@ -328,7 +329,7 @@ export class AppCompanies extends LitElement {
               label="${isRu ? 'Описание деятельности' : 'Description'}"
               .value="${this.formDescription}"
               rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

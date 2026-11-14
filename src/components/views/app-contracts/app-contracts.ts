@@ -49,6 +49,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-contracts.css';
+import { eventValue } from '../../common/event-value';
 
 @customElement('app-contracts')
 export class AppContracts extends LitElement {
@@ -466,13 +467,13 @@ export class AppContracts extends LitElement {
           : this.viewTab === 'payments'
           ? { payMethod: this.paymentMethodFilter }
           : { invoiceStatus: this.invoiceStatusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | ContractStatus;
-          if (e.detail.key === 'type') this.typeFilter = e.detail.value as 'all' | ContractType;
-          if (e.detail.key === 'calcStatus') this.calcStatusFilter = e.detail.value as 'all' | CalculationStatus;
-          if (e.detail.key === 'payMethod') this.paymentMethodFilter = e.detail.value as 'all' | PaymentMethod;
-          if (e.detail.key === 'invoiceStatus') this.invoiceStatusFilter = e.detail.value as 'all' | InvoiceStatus;
+          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
+          if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
+          if (e.detail.key === 'calcStatus') this.calcStatusFilter = eventValue(e) as 'all' | CalculationStatus;
+          if (e.detail.key === 'payMethod') this.paymentMethodFilter = eventValue(e) as 'all' | PaymentMethod;
+          if (e.detail.key === 'invoiceStatus') this.invoiceStatusFilter = eventValue(e) as 'all' | InvoiceStatus;
         }}"
       >
         <app-segmented-switch
@@ -480,7 +481,7 @@ export class AppContracts extends LitElement {
           .value="${this.viewTab}"
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewTab = e.detail.value as 'contracts' | 'calculations' | 'invoices' | 'payments')}"
+            (this.viewTab = eventValue(e) as 'contracts' | 'calculations' | 'invoices' | 'payments')}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -1092,7 +1093,7 @@ export class AppContracts extends LitElement {
               required
               error="${this.formError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formNumber = e.detail.value;
+                this.formNumber = eventValue(e);
                 this.formError = '';
               }}"
             ></app-input>
@@ -1103,14 +1104,14 @@ export class AppContracts extends LitElement {
               .value="${this.formType}"
               .options="${typeOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formType = e.detail.value as ContractType)}"
+                (this.formType = eventValue(e) as ContractType)}"
             ></app-select>
           </div>
           <div class="col-span-2">
             <app-input
               label="${isRu ? 'Предмет договора' : 'Contract Title'}"
               .value="${this.formTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formTitle = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formTitle = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -1118,7 +1119,7 @@ export class AppContracts extends LitElement {
               label="${isRu ? 'Наша компания' : 'Company'}"
               .value="${this.formCompanyId}"
               .options="${companyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -1126,7 +1127,7 @@ export class AppContracts extends LitElement {
               label="${isRu ? 'Контрагент' : 'Counterparty'}"
               .value="${this.formCounterpartyId}"
               .options="${counterpartyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -1134,7 +1135,7 @@ export class AppContracts extends LitElement {
               label="${isRu ? 'Проект' : 'Project'}"
               .value="${this.formProjectId}"
               .options="${projectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -1142,7 +1143,7 @@ export class AppContracts extends LitElement {
               label="${isRu ? 'Ответственный' : 'Owner'}"
               .value="${this.formOwnerId}"
               .options="${ownerOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formOwnerId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formOwnerId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -1151,7 +1152,7 @@ export class AppContracts extends LitElement {
               .value="${this.formAmount}"
               min="0"
               step="50000"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = eventValue(e))}"
             ></app-number-input>
           </div>
           <div>
@@ -1160,21 +1161,21 @@ export class AppContracts extends LitElement {
               .value="${this.formCurrency}"
               .options="${currencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCurrency = e.detail.value as 'RUB' | 'USD' | 'EUR')}"
+                (this.formCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата начала' : 'Start Date'}"
               .value="${this.formStartDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formStartDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formStartDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата окончания' : 'End Date'}"
               .value="${this.formEndDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formEndDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formEndDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -1183,7 +1184,7 @@ export class AppContracts extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions.filter((o) => o.value !== 'all')}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as ContractStatus)}"
+                (this.formStatus = eventValue(e) as ContractStatus)}"
             ></app-select>
           </div>
           <div>
@@ -1192,7 +1193,7 @@ export class AppContracts extends LitElement {
               .value="${this.formBillingFrequency}"
               .options="${frequencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formBillingFrequency = e.detail.value as CalculationFrequency)}"
+                (this.formBillingFrequency = eventValue(e) as CalculationFrequency)}"
             ></app-select>
           </div>
           <div class="col-span-2">
@@ -1200,7 +1201,7 @@ export class AppContracts extends LitElement {
               label="${isRu ? 'Условия и комментарии' : 'Description'}"
               .value="${this.formDescription}"
               rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>
@@ -1294,7 +1295,7 @@ export class AppContracts extends LitElement {
                     .value="${inv.id}"
                     .options="${invoiceOptions}"
                     @change="${(e: CustomEvent<{ value: string }>) => {
-                      const next = this.invoices.find((x) => x.id === e.detail.value);
+                      const next = this.invoices.find((x) => x.id === eventValue(e));
                       if (next) this.openPaymentModal(next);
                     }}"
                   ></app-select>
@@ -1329,7 +1330,7 @@ export class AppContracts extends LitElement {
               step="1000"
               error="${this.payError}"
               @change="${(e: CustomEvent<{ value: number }>) => {
-                this.payAmount = e.detail.value;
+                this.payAmount = eventValue(e);
                 this.payError = '';
               }}"
             ></app-number-input>
@@ -1371,7 +1372,7 @@ export class AppContracts extends LitElement {
             <app-date-input
               label="${t.payments.paymentDate}"
               .value="${this.payDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.payDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.payDate = eventValue(e))}"
             ></app-date-input>
           </div>
 
@@ -1381,7 +1382,7 @@ export class AppContracts extends LitElement {
               .value="${this.payMethod}"
               .options="${methodOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.payMethod = e.detail.value as PaymentMethod)}"
+                (this.payMethod = eventValue(e) as PaymentMethod)}"
             ></app-select>
           </div>
 
@@ -1390,7 +1391,7 @@ export class AppContracts extends LitElement {
               label="${t.payments.documentNumber}"
               placeholder="ПП-2026/0850"
               .value="${this.payDocNumber}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.payDocNumber = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.payDocNumber = eventValue(e))}"
             ></app-input>
           </div>
 
@@ -1415,7 +1416,7 @@ export class AppContracts extends LitElement {
               label="${t.payments.notes}"
               .value="${this.payNotes}"
               rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

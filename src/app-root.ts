@@ -31,6 +31,7 @@ import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
 import './components/common/app-activity-panel/app-activity-panel';
 import './components/common/app-task-modal/app-task-modal';
+import { eventValue } from './components/common/event-value';
 
 const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   dashboard: () => import('./components/views/app-dashboard/app-dashboard'),
@@ -422,7 +423,7 @@ export class AppRoot extends LitElement {
   }
 
   private handleSidebarSelect(e: CustomEvent<{ value: string }>) {
-    const val = e.detail.value;
+    const val = eventValue(e);
     if (val === 'activity') {
       store.toggleActivityPanel();
       return;

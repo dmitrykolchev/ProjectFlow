@@ -8,6 +8,7 @@ import '../../common/app-button/app-button';
 import { iconSearch } from '../icons';
 import type { SelectOption } from '../../common/app-select/app-select';
 import styles from './app-filter-bar.css';
+import { eventValue } from '../event-value';
 
 export interface FilterDef {
   key: string;
@@ -40,7 +41,7 @@ export class AppFilterBar extends LitElement {
                     placeholder="${this.placeholder}"
                     .value="${this.searchValue}"
                     clearable
-                    @input="${(e: CustomEvent<{ value: string }>) => this.emitSearch(e.detail.value)}"
+                    @input="${(e: CustomEvent<{ value: string }>) => this.emitSearch(eventValue(e))}"
                   >
                     <span slot="icon">${iconSearch(15)}</span>
                   </app-input>
@@ -53,7 +54,7 @@ export class AppFilterBar extends LitElement {
                 <app-select
                   .value="${this.values[f.key] ?? 'all'}"
                   .options="${f.options}"
-                  @change="${(e: CustomEvent<{ value: string }>) => this.emitFilter(f.key, e.detail.value)}"
+                  @change="${(e: CustomEvent<{ value: string }>) => this.emitFilter(f.key, eventValue(e))}"
                 ></app-select>
               </div>
             `

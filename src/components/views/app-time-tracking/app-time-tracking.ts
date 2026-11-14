@@ -29,6 +29,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-time-tracking.css';
+import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
 
@@ -218,7 +219,7 @@ export class AppTimeTracking extends LitElement {
               .value="${this.quickProjectId}"
               .options="${quickProjectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.quickProjectId = e.detail.value;
+                this.quickProjectId = eventValue(e);
                 this.ensureQuickTaskValid();
               }}"
             ></app-select>
@@ -229,7 +230,7 @@ export class AppTimeTracking extends LitElement {
               size="sm"
               .value="${this.quickTaskId}"
               .options="${quickTaskOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.quickTaskId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.quickTaskId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -238,7 +239,7 @@ export class AppTimeTracking extends LitElement {
               size="sm"
               .value="${this.quickUserId}"
               .options="${userSelectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.quickUserId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.quickUserId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -246,7 +247,7 @@ export class AppTimeTracking extends LitElement {
               label="${isRu ? 'Дата' : 'Date'}"
               size="sm"
               .value="${this.quickDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.quickDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.quickDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -258,7 +259,7 @@ export class AppTimeTracking extends LitElement {
               max="24"
               step="0.5"
               unit="ч"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.quickHours = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.quickHours = eventValue(e))}"
             ></app-number-input>
           </div>
         </div>
@@ -271,7 +272,7 @@ export class AppTimeTracking extends LitElement {
               .value="${this.quickCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.quickCategory = e.detail.value as TimeEntryCategory)}"
+                (this.quickCategory = eventValue(e) as TimeEntryCategory)}"
             ></app-select>
           </div>
           <div>
@@ -280,7 +281,7 @@ export class AppTimeTracking extends LitElement {
               size="sm"
               placeholder="${isRu ? 'Что было сделано по задаче...' : 'Describe completed work...'}"
               .value="${this.quickDescription}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.quickDescription = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.quickDescription = eventValue(e))}"
             ></app-input>
           </div>
           <div class="billable-toggle-wrap">
@@ -314,11 +315,11 @@ export class AppTimeTracking extends LitElement {
           { key: 'category', options: categoryFilterOptions },
         ]}"
         .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'project') this.projectFilter = e.detail.value;
-          if (e.detail.key === 'user') this.userFilter = e.detail.value;
-          if (e.detail.key === 'category') this.categoryFilter = e.detail.value as 'all' | TimeEntryCategory;
+          if (e.detail.key === 'project') this.projectFilter = eventValue(e);
+          if (e.detail.key === 'user') this.userFilter = eventValue(e);
+          if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
         }}"
       >
         <app-segmented-switch
@@ -329,7 +330,7 @@ export class AppTimeTracking extends LitElement {
             { value: 'by-task', label: t.timeTracking.viewByTask },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewMode = e.detail.value as 'journal' | 'by-task')}"
+            (this.viewMode = eventValue(e) as 'journal' | 'by-task')}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -626,7 +627,7 @@ export class AppTimeTracking extends LitElement {
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formProjectId = e.detail.value;
+                this.formProjectId = eventValue(e);
                 const firstTask = store.tasks.find((tk) => tk.projectId === this.formProjectId);
                 this.formTaskId = firstTask?.id || '';
                 this.formError = '';
@@ -640,7 +641,7 @@ export class AppTimeTracking extends LitElement {
               .options="${taskOptions}"
               error="${this.formError}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formTaskId = e.detail.value;
+                this.formTaskId = eventValue(e);
                 this.formError = '';
               }}"
             ></app-select>
@@ -650,14 +651,14 @@ export class AppTimeTracking extends LitElement {
               label="${isRu ? 'Исполнитель' : 'Employee'}"
               .value="${this.formUserId}"
               .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата выполнения' : 'Date'}"
               .value="${this.formDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
@@ -668,7 +669,7 @@ export class AppTimeTracking extends LitElement {
               max="24"
               step="0.5"
               unit="ч"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formHours = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.formHours = eventValue(e))}"
             ></app-number-input>
           </div>
           <div>
@@ -677,7 +678,7 @@ export class AppTimeTracking extends LitElement {
               .value="${this.formCategory}"
               .options="${categoryOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCategory = e.detail.value as TimeEntryCategory)}"
+                (this.formCategory = eventValue(e) as TimeEntryCategory)}"
             ></app-select>
           </div>
           <div>
@@ -686,7 +687,7 @@ export class AppTimeTracking extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as TimeEntryStatus)}"
+                (this.formStatus = eventValue(e) as TimeEntryStatus)}"
             ></app-select>
           </div>
           <div style="display: flex; align-items: flex-end;">
@@ -704,7 +705,7 @@ export class AppTimeTracking extends LitElement {
               label="${isRu ? 'Описание выполненных работ' : 'Work description'}"
               .value="${this.formDescription}"
               rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

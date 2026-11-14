@@ -19,6 +19,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-button/app-button';
 import styles from './app-project-overview.css';
+import { eventValue } from '../../common/event-value';
 
 type HoursGroupMode = 'timeline' | 'category' | 'team';
 
@@ -1256,7 +1257,7 @@ export class AppProjectOverview extends LitElement {
                       .value="${this.projectId || 'all'}"
                       .options="${projectOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) =>
-                        this.selectProjectScope(e.detail.value)}"
+                        this.selectProjectScope(eventValue(e))}"
                     ></app-select>
                   </div>
                 `
@@ -1399,7 +1400,7 @@ export class AppProjectOverview extends LitElement {
                     { value: 'team', label: t.projectOverview.modeTeam },
                   ]}"
                   @change="${(e: CustomEvent<{ value: string }>) => {
-                    this.hoursMode = e.detail.value as HoursGroupMode;
+                    this.hoursMode = eventValue(e) as HoursGroupMode;
                   }}"
                 ></app-segmented-switch>
               </div>

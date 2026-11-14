@@ -43,6 +43,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-counterparty-detail.css';
+import { eventValue } from '../../common/event-value';
 
 @customElement('app-counterparty-detail')
 export class AppCounterpartyDetail extends LitElement {
@@ -230,7 +231,7 @@ export class AppCounterpartyDetail extends LitElement {
                 .value="${cp.id}"
                 .options="${cpSwitchOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.openCounterpartyDetail(e.detail.value)}"
+                  store.openCounterpartyDetail(eventValue(e))}"
               ></app-select>
             </div>
           </div>
@@ -452,7 +453,7 @@ export class AppCounterpartyDetail extends LitElement {
                 { value: 'calculations', label: `${t.counterpartyDetail.calculationsTitle} (${cpCalculations.length})` },
               ]}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.financeTab = e.detail.value as 'invoices' | 'calculations')}"
+                (this.financeTab = eventValue(e) as 'invoices' | 'calculations')}"
             ></app-segmented-switch>
 
           ${this.financeTab === 'invoices'
@@ -647,7 +648,7 @@ export class AppCounterpartyDetail extends LitElement {
               required
               error="${this.formError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = e.detail.value;
+                this.formName = eventValue(e);
                 this.formError = '';
               }}"
             ></app-input>
@@ -656,7 +657,7 @@ export class AppCounterpartyDetail extends LitElement {
             <app-input
               label="${isRu ? 'Юридическое лицо' : 'Legal Name'}"
               .value="${this.formLegalName}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -665,7 +666,7 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.formType}"
               .options="${typeOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formType = e.detail.value as CounterpartyType)}"
+                (this.formType = eventValue(e) as CounterpartyType)}"
             ></app-select>
           </div>
           <div>
@@ -674,21 +675,21 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.formStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = e.detail.value as CounterpartyStatus)}"
+                (this.formStatus = eventValue(e) as CounterpartyStatus)}"
             ></app-select>
           </div>
           <div>
             <app-input
               label="${isRu ? 'ИНН' : 'INN'}"
               .value="${this.formInn}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'КПП' : 'KPP'}"
               .value="${this.formKpp}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -696,21 +697,21 @@ export class AppCounterpartyDetail extends LitElement {
               label="${isRu ? 'Контактное лицо' : 'Contact Person'}"
               .value="${this.formContactPerson}"
               @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formContactPerson = e.detail.value)}"
+                (this.formContactPerson = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Город' : 'City'}"
               .value="${this.formCity}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
             ></app-input>
           </div>
           <div>
             <app-input
               label="${isRu ? 'Телефон' : 'Phone'}"
               .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -718,7 +719,7 @@ export class AppCounterpartyDetail extends LitElement {
               label="Email"
               type="email"
               .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -728,7 +729,7 @@ export class AppCounterpartyDetail extends LitElement {
               min="1"
               max="5"
               step="1"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formRating = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.formRating = eventValue(e))}"
             ></app-number-input>
           </div>
           <div class="col-span-2">
@@ -736,7 +737,7 @@ export class AppCounterpartyDetail extends LitElement {
               label="${isRu ? 'Примечания' : 'Notes'}"
               .value="${this.formNotes}"
               rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>
@@ -822,7 +823,7 @@ export class AppCounterpartyDetail extends LitElement {
               required
               error="${this.ctrError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.ctrNumber = e.detail.value;
+                this.ctrNumber = eventValue(e);
                 this.ctrError = '';
               }}"
             ></app-input>
@@ -833,14 +834,14 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.ctrType}"
               .options="${typeOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrType = e.detail.value as ContractType)}"
+                (this.ctrType = eventValue(e) as ContractType)}"
             ></app-select>
           </div>
           <div class="col-span-2">
             <app-input
               label="${isRu ? 'Предмет договора' : 'Subject'}"
               .value="${this.ctrTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.ctrTitle = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.ctrTitle = eventValue(e))}"
             ></app-input>
           </div>
           <div>
@@ -848,7 +849,7 @@ export class AppCounterpartyDetail extends LitElement {
               label="${isRu ? 'Наша компания' : 'Company'}"
               .value="${this.ctrCompanyId}"
               .options="${companyOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrCompanyId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrCompanyId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -856,7 +857,7 @@ export class AppCounterpartyDetail extends LitElement {
               label="${isRu ? 'Проект' : 'Project'}"
               .value="${this.ctrProjectId}"
               .options="${projOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrProjectId = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrProjectId = eventValue(e))}"
             ></app-select>
           </div>
           <div>
@@ -865,7 +866,7 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.ctrAmount}"
               min="0"
               step="50000"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.ctrAmount = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: number }>) => (this.ctrAmount = eventValue(e))}"
             ></app-number-input>
           </div>
           <div>
@@ -874,21 +875,21 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.ctrCurrency}"
               .options="${curOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrCurrency = e.detail.value as 'RUB' | 'USD' | 'EUR')}"
+                (this.ctrCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
             ></app-select>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата начала' : 'Start Date'}"
               .value="${this.ctrStartDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrStartDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrStartDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div>
             <app-date-input
               label="${isRu ? 'Дата окончания' : 'End Date'}"
               .value="${this.ctrEndDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrEndDate = e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrEndDate = eventValue(e))}"
             ></app-date-input>
           </div>
           <div class="col-span-2">
@@ -897,7 +898,7 @@ export class AppCounterpartyDetail extends LitElement {
               .value="${this.ctrFrequency}"
               .options="${freqOpts}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrFrequency = e.detail.value as CalculationFrequency)}"
+                (this.ctrFrequency = eventValue(e) as CalculationFrequency)}"
             ></app-select>
           </div>
         </app-form-grid>

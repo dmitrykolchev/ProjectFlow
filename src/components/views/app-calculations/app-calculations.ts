@@ -41,6 +41,7 @@ import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import styles from './app-calculations.css';
+import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
 
@@ -366,11 +367,11 @@ export class AppCalculations extends LitElement {
           { key: 'frequency', options: frequencyOptions },
         ]}"
         .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = e.detail.value)}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'status') this.statusFilter = e.detail.value as 'all' | CalculationStatus;
-          if (e.detail.key === 'contract') this.contractFilter = e.detail.value;
-          if (e.detail.key === 'frequency') this.frequencyFilter = e.detail.value as 'all' | CalculationFrequency;
+          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
+          if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
+          if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
         }}"
       ></app-filter-bar>
 
@@ -644,7 +645,7 @@ export class AppCalculations extends LitElement {
               .options="${contractOptions}"
               ?disabled="${Boolean(this.editingCalcId)}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                const next = this.contracts.find((c) => c.id === e.detail.value);
+                const next = this.contracts.find((c) => c.id === eventValue(e));
                 if (!next) return;
                 this.calcContractId = next.id;
                 const freq = next.billingFrequency || this.calcFrequency;
@@ -664,7 +665,7 @@ export class AppCalculations extends LitElement {
               required
               error="${this.calcError}"
               @input="${(e: CustomEvent<{ value: string }>) => {
-                this.calcNumber = e.detail.value;
+                this.calcNumber = eventValue(e);
                 this.calcError = '';
               }}"
             ></app-input>
@@ -676,7 +677,7 @@ export class AppCalculations extends LitElement {
               .value="${this.calcFrequency}"
               .options="${frequencyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcFrequency = e.detail.value as CalculationFrequency)}"
+                (this.calcFrequency = eventValue(e) as CalculationFrequency)}"
             ></app-select>
           </div>
 
@@ -685,7 +686,7 @@ export class AppCalculations extends LitElement {
               label="${isRu ? 'Начало периода' : 'Period Start'}"
               .value="${this.calcPeriodStart}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.calcPeriodStart = e.detail.value;
+                this.calcPeriodStart = eventValue(e);
                 this.refreshItemsForPeriod(ctr);
               }}"
             ></app-date-input>
@@ -696,7 +697,7 @@ export class AppCalculations extends LitElement {
               label="${isRu ? 'Окончание периода' : 'Period End'}"
               .value="${this.calcPeriodEnd}"
               @change="${(e: CustomEvent<{ value: string }>) => {
-                this.calcPeriodEnd = e.detail.value;
+                this.calcPeriodEnd = eventValue(e);
                 this.refreshItemsForPeriod(ctr);
               }}"
             ></app-date-input>
@@ -814,7 +815,7 @@ export class AppCalculations extends LitElement {
                                 label="${isRu ? 'Наименование работы / расхода' : 'Description'}"
                                 .value="${item.title}"
                                 @input="${(e: CustomEvent<{ value: string }>) =>
-                                  this.updateCalcItem(item.id, { title: e.detail.value })}"
+                                  this.updateCalcItem(item.id, { title: eventValue(e) })}"
                               ></app-input>
                             </div>
                             <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
@@ -840,7 +841,7 @@ export class AppCalculations extends LitElement {
                                 max="10000"
                                 step="0.5"
                                 @change="${(e: CustomEvent<{ value: number }>) =>
-                                  this.updateCalcItem(item.id, { quantity: e.detail.value })}"
+                                  this.updateCalcItem(item.id, { quantity: eventValue(e) })}"
                               ></app-number-input>
                             </div>
                             <div>
@@ -849,7 +850,7 @@ export class AppCalculations extends LitElement {
                                 label="${isRu ? 'Ед.' : 'Unit'}"
                                 .value="${item.unit}"
                                 @input="${(e: CustomEvent<{ value: string }>) =>
-                                  this.updateCalcItem(item.id, { unit: e.detail.value })}"
+                                  this.updateCalcItem(item.id, { unit: eventValue(e) })}"
                               ></app-input>
                             </div>
                             <div>
@@ -862,7 +863,7 @@ export class AppCalculations extends LitElement {
                                 step="500"
                                 ?disabled="${!item.billable}"
                                 @change="${(e: CustomEvent<{ value: number }>) =>
-                                  this.updateCalcItem(item.id, { baseRate: e.detail.value, unitPrice: e.detail.value })}"
+                                  this.updateCalcItem(item.id, { baseRate: eventValue(e), unitPrice: eventValue(e) })}"
                               ></app-number-input>
                             </div>
                             <div class="calc-bill-cell">
@@ -890,7 +891,7 @@ export class AppCalculations extends LitElement {
               .value="${this.calcStatus}"
               .options="${statusOptions}"
               @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcStatus = e.detail.value as CalculationStatus)}"
+                (this.calcStatus = eventValue(e) as CalculationStatus)}"
             ></app-select>
           </div>
           <div class="col-span-2">
@@ -898,7 +899,7 @@ export class AppCalculations extends LitElement {
               label="${isRu ? 'Комментарий к отчёту для клиента' : 'Report Notes'}"
               .value="${this.calcNotes}"
               rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = eventValue(e))}"
             ></app-textarea>
           </div>
         </app-form-grid>

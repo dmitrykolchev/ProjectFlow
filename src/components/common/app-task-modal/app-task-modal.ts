@@ -179,7 +179,7 @@ export class AppTaskModal extends LitElement {
               .value="${this.taskTitle}"
               required
               error="${this.errors.title || ''}"
-              @input="${(e: CustomEvent) => (this.taskTitle = e.detail.value)}"
+              @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.taskTitle = String(v); }}"
             ></app-input>
           </div>
 
@@ -189,7 +189,7 @@ export class AppTaskModal extends LitElement {
               placeholder="${t.taskModal.descPlaceholder}"
               .value="${this.description}"
               rows="3"
-              @input="${(e: CustomEvent) => (this.description = e.detail.value)}"
+              @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.description = String(v); }}"
             ></app-textarea>
           </div>
 
@@ -198,7 +198,7 @@ export class AppTaskModal extends LitElement {
               label="${t.taskModal.projectLabel}"
               .value="${this.projectId}"
               .options="${projectOptions}"
-              @change="${(e: CustomEvent) => (this.projectId = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.projectId = String(v); }}"
             ></app-select>
           </div>
 
@@ -207,7 +207,7 @@ export class AppTaskModal extends LitElement {
               label="${t.taskModal.assigneeLabel}"
               .value="${this.assigneeId}"
               .options="${assigneeOptions}"
-              @change="${(e: CustomEvent) => (this.assigneeId = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.assigneeId = String(v); }}"
             ></app-select>
           </div>
 
@@ -216,7 +216,7 @@ export class AppTaskModal extends LitElement {
               label="${t.taskModal.statusLabel}"
               .value="${this.status}"
               .options="${statusOptions}"
-              @change="${(e: CustomEvent) => (this.status = e.detail.value as TaskStatus)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.status = String(v) as TaskStatus; }}"
             ></app-select>
           </div>
 
@@ -225,7 +225,7 @@ export class AppTaskModal extends LitElement {
               label="${t.taskModal.priorityLabel}"
               .value="${this.priority}"
               .options="${priorityOptions}"
-              @change="${(e: CustomEvent) => (this.priority = e.detail.value as TaskPriority)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.priority = String(v) as TaskPriority; }}"
             ></app-select>
           </div>
 
@@ -233,7 +233,7 @@ export class AppTaskModal extends LitElement {
             <app-date-input
               label="${t.taskModal.startDate}"
               .value="${this.startDate}"
-              @change="${(e: CustomEvent) => (this.startDate = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.startDate = String(v); }}"
             ></app-date-input>
           </div>
 
@@ -241,7 +241,7 @@ export class AppTaskModal extends LitElement {
             <app-date-input
               label="${t.taskModal.dueDate}"
               .value="${this.dueDate}"
-              @change="${(e: CustomEvent) => (this.dueDate = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.dueDate = String(v); }}"
             ></app-date-input>
           </div>
 
@@ -252,7 +252,7 @@ export class AppTaskModal extends LitElement {
               min="1"
               max="200"
               unit="ч"
-              @change="${(e: CustomEvent) => (this.estimatedHours = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.estimatedHours = Number(v); }}"
             ></app-number-input>
           </div>
 
@@ -263,7 +263,7 @@ export class AppTaskModal extends LitElement {
               min="0"
               max="200"
               unit="ч"
-              @change="${(e: CustomEvent) => (this.loggedHours = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.loggedHours = Number(v); }}"
             ></app-number-input>
           </div>
 
@@ -352,7 +352,7 @@ export class AppTaskModal extends LitElement {
                 class="add-subtask-input-field"
                 placeholder="${t.taskModal.subtaskPlaceholder}"
                 .value="${this.newSubtaskText}"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.newSubtaskText = e.detail.value)}"
+                @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.newSubtaskText = String(v); }}"
                 @keydown="${(e: KeyboardEvent) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -578,6 +578,15 @@ export class AppTaskModal extends LitElement {
     store.closeTaskModal();
   }
 
+  private readVal(e: Event): string | number | undefined {
+    const detail = (e as CustomEvent).detail;
+    if (detail && typeof detail.value === 'string' || (detail && typeof detail.value === 'number')) {
+      return detail.value;
+    }
+    const target = e.composedPath()[0] as HTMLInputElement | null;
+    return target && typeof target.value === 'string' ? target.value : undefined;
+  }
+
   private handleDelete() {
     if (!this.editingTask) return;
     this.confirmDeleteOpen = true;
@@ -669,7 +678,7 @@ export class AppTaskModal extends LitElement {
               max="24"
               step="0.5"
               unit="ч"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.quickTimeHours = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeHours = Number(v); }}"
             ></app-number-input>
           </div>
           <div>
@@ -678,8 +687,7 @@ export class AppTaskModal extends LitElement {
               label="${isRu ? 'Категория' : 'Category'}"
               .value="${this.quickTimeCategory}"
               .options="${timeCatOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.quickTimeCategory = e.detail.value as TimeEntryCategory)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeCategory = String(v) as TimeEntryCategory; }}"
             ></app-select>
           </div>
           <div>
@@ -688,7 +696,7 @@ export class AppTaskModal extends LitElement {
               label="${isRu ? 'Комментарий' : 'Notes'}"
               placeholder="${isRu ? 'Выполненные работы...' : 'Work done...'}"
               .value="${this.quickTimeDesc}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.quickTimeDesc = e.detail.value)}"
+              @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickTimeDesc = String(v); }}"
             ></app-input>
           </div>
           <app-button
@@ -751,7 +759,7 @@ export class AppTaskModal extends LitElement {
               label="${isRu ? 'Статья расхода' : 'Expense title'}"
               placeholder="${isRu ? 'Лицензия, сервер, подрядчик...' : 'License, server...'}"
               .value="${this.quickExpenseTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.quickExpenseTitle = e.detail.value)}"
+              @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickExpenseTitle = String(v); }}"
             ></app-input>
           </div>
           <div>
@@ -762,7 +770,7 @@ export class AppTaskModal extends LitElement {
               min="0"
               step="500"
               unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.quickExpenseAmount = e.detail.value)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickExpenseAmount = Number(v); }}"
             ></app-number-input>
           </div>
           <div>
@@ -771,8 +779,7 @@ export class AppTaskModal extends LitElement {
               label="${isRu ? 'Категория' : 'Category'}"
               .value="${this.quickExpenseCategory}"
               .options="${expenseCatOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.quickExpenseCategory = e.detail.value as ExpenseCategory)}"
+              @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.quickExpenseCategory = String(v) as ExpenseCategory; }}"
             ></app-select>
           </div>
           <app-button

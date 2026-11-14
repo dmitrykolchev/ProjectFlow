@@ -23,6 +23,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import styles from './app-project-chat.css';
+import { eventValue } from '../../common/event-value';
 
 const QUICK_REACTIONS = ['👍', '✅', '🔥', '👏', '👀'];
 
@@ -283,7 +284,7 @@ export class AppProjectChat extends LitElement {
               placeholder="${t.projectChat.searchChannels}"
               .value="${this.channelSearch}"
               clearable
-              @input="${(e: CustomEvent<{ value: string }>) => (this.channelSearch = e.detail.value)}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.channelSearch = eventValue(e))}"
             >
               <span slot="icon">${iconSearch(14)}</span>
             </app-input>
@@ -337,7 +338,7 @@ export class AppProjectChat extends LitElement {
               label="${t.projectChat.actingAs}"
               .value="${this.currentUserId}"
               .options="${userSwitchOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => store.setCurrentUser(e.detail.value)}"
+              @change="${(e: CustomEvent<{ value: string }>) => store.setCurrentUser(eventValue(e))}"
             ></app-select>
           </div>
         </aside>
@@ -352,7 +353,7 @@ export class AppProjectChat extends LitElement {
                   .value="${activeProject.id}"
                   .options="${channelSwitchOptions}"
                   @change="${(e: CustomEvent<{ value: string }>) =>
-                    this.selectChannel(e.detail.value)}"
+                    this.selectChannel(eventValue(e))}"
                 ></app-select>
               </div>
 
@@ -378,7 +379,7 @@ export class AppProjectChat extends LitElement {
                   placeholder="${t.projectChat.searchMessages}"
                   .value="${this.messageSearch}"
                   clearable
-                  @input="${(e: CustomEvent<{ value: string }>) => (this.messageSearch = e.detail.value)}"
+                  @input="${(e: CustomEvent<{ value: string }>) => (this.messageSearch = eventValue(e))}"
                 >
                   <span slot="icon">${iconSearch(14)}</span>
                 </app-input>
@@ -488,7 +489,7 @@ export class AppProjectChat extends LitElement {
                   size="sm"
                   .value="${this.taskRefId}"
                   .options="${taskRefOptions}"
-                  @change="${(e: CustomEvent<{ value: string }>) => (this.taskRefId = e.detail.value)}"
+                  @change="${(e: CustomEvent<{ value: string }>) => (this.taskRefId = eventValue(e))}"
                 ></app-select>
               </div>
               <span style="font-size: 0.75rem; color: var(--text-muted);">
