@@ -382,7 +382,7 @@
 
 /* Inline Entry Forms (Time & Expenses) */
 .inline-form-box {
-  background: var(--bg-subtle, #1a2438);
+  background: var(--bg-canvas, #090d16);
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-md, 8px);
   padding: 1rem;
