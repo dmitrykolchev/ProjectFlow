@@ -7,6 +7,7 @@ import { getTranslation } from '../../../i18n';
 import { iconArrowUpRight, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
+import '../app-confirm-dialog/app-confirm-dialog';
 import '../app-badge/app-badge';
 import '../app-button/app-button';
 import '../app-input/app-input';
@@ -21,6 +22,7 @@ import '../app-checkbox/app-checkbox';
 export class AppTaskModal extends LitElement {
   @state() private isOpen: boolean = false;
   @state() private editingTask: Task | null = null;
+  @state() private confirmDeleteOpen = false;
   @state() private currentLang = store.customization.language;
 
   // Form fields
@@ -398,6 +400,23 @@ export class AppTaskModal extends LitElement {
           </app-button>
         </div>
       </app-modal>
+      <app-confirm-dialog
+        .open="${this.confirmDeleteOpen}"
+        size="sm"
+        title="${this.currentLang === 'ru' ? 'Удалить задачу?' : 'Delete task?'}"
+        action="${this.currentLang === 'ru'
+          ? `Задача «${this.editingTask?.title || ''}» будет удалена.`
+          : `Task "${this.editingTask?.title || ''}" will be deleted.`}"
+        result="${this.currentLang === 'ru'
+          ? 'Подзадачи, отчёты по времени, расходы и комментарии будут потеряны.'
+          : 'Subtasks, time reports, expenses and comments will be lost.'}"
+        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmDeleteOpen = false)}"
+        @confirm="${() => this.doDelete()}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -535,10 +554,14 @@ export class AppTaskModal extends LitElement {
 
   private handleDelete() {
     if (!this.editingTask) return;
-    if (confirm(getTranslation(this.currentLang).common.confirmDelete)) {
-      store.deleteTask(this.editingTask.id);
-      store.closeTaskModal();
-    }
+    this.confirmDeleteOpen = true;
+  }
+
+  private doDelete() {
+    if (!this.editingTask) return;
+    store.deleteTask(this.editingTask.id);
+    this.confirmDeleteOpen = false;
+    store.closeTaskModal();
   }
 
   private renderTaskReportsAndExpenses(t: ReturnType<typeof getTranslation>) {

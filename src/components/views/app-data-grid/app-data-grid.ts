@@ -16,6 +16,7 @@ import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import { DataGridColumn } from '../data-grid-column/data-grid-column';
 import '../data-grid-column/data-grid-column';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
@@ -94,6 +95,7 @@ export class AppDataGrid extends LitElement {
   @state() private hiddenColumns: Set<string> = new Set();
 
   @state() private selectedIds: Set<string> = new Set();
+  @state() private confirmBulkDeleteOpen = false;
   @state() private sortRules: GridSortRule[] = [];
   @state() private multiSortEnabled: boolean = false;
   @state() private groupByFields: string[] = [];
@@ -902,6 +904,23 @@ export class AppDataGrid extends LitElement {
             </div>
           `
         : ''}
+      <app-confirm-dialog
+        .open="${this.confirmBulkDeleteOpen}"
+        size="sm"
+        title="${this.currentLang === 'ru' ? 'Массовое удаление задач?' : 'Bulk delete tasks?'}"
+        action="${this.currentLang === 'ru'
+          ? `${this.selectedIds.size} выбранных задач будут удалены.`
+          : `${this.selectedIds.size} selected tasks will be deleted.`}"
+        result="${this.currentLang === 'ru'
+          ? 'Подзадачи, отчёты по времени и расходы выбранных задач будут потеряны.'
+          : 'Subtasks, time reports and expenses of the selected tasks will be lost.'}"
+        .actionLabel="${this.currentLang === 'ru' ? 'Выполняемое действие:' : 'Action performed:'}"
+        .resultLabel="${this.currentLang === 'ru' ? 'Ожидаемый результат:' : 'Expected result:'}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmBulkDeleteOpen = false)}"
+        @confirm="${() => this.doBulkDelete()}"
+      ></app-confirm-dialog>
     `;
   }
 
@@ -1437,10 +1456,14 @@ export class AppDataGrid extends LitElement {
   }
 
   private bulkDelete() {
-    if (confirm(getTranslation(this.currentLang).common.confirmDelete)) {
-      store.bulkDeleteTasks(Array.from(this.selectedIds));
-      this.selectedIds = new Set();
-    }
+    if (this.selectedIds.size === 0) return;
+    this.confirmBulkDeleteOpen = true;
+  }
+
+  private doBulkDelete() {
+    store.bulkDeleteTasks(Array.from(this.selectedIds));
+    this.selectedIds = new Set();
+    this.confirmBulkDeleteOpen = false;
   }
 
   private toggleColumnVisibility(field: string) {
