@@ -265,18 +265,6 @@
   border-color: var(--color-danger-border, rgba(239, 68, 68, 0.4));
   background: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
-
-.form-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 1rem;
-  width: 100%;
-}
-
-.form-grid > div {
-  min-width: 0;
-}
-
 .col-span-2 {
   grid-column: span 2;
 }
@@ -431,10 +419,7 @@
 }
 
 @media (max-width: 640px) {
-  .form-grid {
-    grid-template-columns: 1fr;
-  }
-  .col-span-2 {
+.col-span-2 {
     grid-column: span 1;
   }
 }

@@ -34,6 +34,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -1081,7 +1083,7 @@ export class AppContracts extends LitElement {
           : 'New Contract'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-input
               label="${isRu ? 'Номер договора' : 'Contract Number'}"
@@ -1201,7 +1203,7 @@ export class AppContracts extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -1213,34 +1215,23 @@ export class AppContracts extends LitElement {
         </div>
       </app-modal>
 
-      <app-modal
-        ?open="${Boolean(this.deletingContract)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingContract)}"
         size="sm"
         title="${isRu ? 'Удалить договор?' : 'Delete contract?'}"
-        @close="${() => (this.deletingContract = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Вы уверены, что хотите удалить договор ${this.deletingContract?.number || ''}?`
-            : `Are you sure you want to delete contract ${this.deletingContract?.number || ''}?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingContract = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingContract) {
-                store.deleteContract(this.deletingContract.id);
-                this.deletingContract = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Вы уверены, что хотите удалить договор ${this.deletingContract?.number || ''}?`
+          : `Are you sure you want to delete contract ${this.deletingContract?.number || ''}?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingContract = null)}"
+        @confirm="${() => {
+          if (this.deletingContract) {
+            store.deleteContract(this.deletingContract.id);
+            this.deletingContract = null;
+          }
+        }}"
+      ></app-confirm-dialog>
 
       ${this.renderPaymentModal(t, isRu, payableInvoices)}
       ${this.renderDeletePaymentModal(t, isRu)}
@@ -1289,7 +1280,7 @@ export class AppContracts extends LitElement {
         title="${t.payments.newPayment} · ${inv.number}"
         @close="${() => (this.paymentModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           ${payableInvoices.length > 0
             ? html`
                 <div class="col-span-2">
@@ -1422,7 +1413,7 @@ export class AppContracts extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.paymentModalOpen = false)}">
@@ -1438,30 +1429,21 @@ export class AppContracts extends LitElement {
 
   private renderDeletePaymentModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingPayment)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingPayment)}"
         size="sm"
         title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        @close="${() => (this.deletingPayment = null)}"
-      >
-        <p class="confirm-text">${t.payments.deleteConfirm}</p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingPayment = null)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingPayment) {
-                store.deleteInvoicePayment(this.deletingPayment.id);
-                this.deletingPayment = null;
-              }
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${t.payments.deleteConfirm}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingPayment = null)}"
+        @confirm="${() => {
+          if (this.deletingPayment) {
+            store.deleteInvoicePayment(this.deletingPayment.id);
+            this.deletingPayment = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
