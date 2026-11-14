@@ -13,6 +13,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -617,7 +619,7 @@ export class AppTimeTracking extends LitElement {
           : 'New Time Entry'}"
         @close="${() => (this.modalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div>
             <app-select
               label="${isRu ? 'Проект' : 'Project'}"
@@ -705,7 +707,7 @@ export class AppTimeTracking extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
@@ -721,34 +723,23 @@ export class AppTimeTracking extends LitElement {
 
   private renderDeleteModal(isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingEntry)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingEntry)}"
         size="sm"
         title="${isRu ? 'Удалить запись о времени?' : 'Delete time entry?'}"
-        @close="${() => (this.deletingEntry = null)}"
-      >
-        <p class="confirm-text">
-          ${isRu
-            ? `Удалить отчёт (${this.deletingEntry?.hours || 0} ч по задаче ${this.deletingEntry?.taskId || ''})? Часы будут вычтены из задачи.`
-            : `Delete time entry (${this.deletingEntry?.hours || 0}h for ${this.deletingEntry?.taskId || ''})?`}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingEntry = null)}">
-            ${isRu ? 'Отмена' : 'Cancel'}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingEntry) {
-                store.deleteTimeEntry(this.deletingEntry.id);
-                this.deletingEntry = null;
-              }
-            }}"
-          >
-            ${isRu ? 'Удалить' : 'Delete'}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${isRu
+          ? `Удалить отчёт (${this.deletingEntry?.hours || 0} ч по задаче ${this.deletingEntry?.taskId || ''})? Часы будут вычтены из задачи.`
+          : `Delete time entry (${this.deletingEntry?.hours || 0}h for ${this.deletingEntry?.taskId || ''})?`}"
+        .cancelLabel="${isRu ? 'Отмена' : 'Cancel'}"
+        .confirmLabel="${isRu ? 'Удалить' : 'Delete'}"
+        @cancel="${() => (this.deletingEntry = null)}"
+        @confirm="${() => {
+          if (this.deletingEntry) {
+            store.deleteTimeEntry(this.deletingEntry.id);
+            this.deletingEntry = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
