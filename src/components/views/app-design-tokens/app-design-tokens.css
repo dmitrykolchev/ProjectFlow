@@ -5,8 +5,18 @@
 }
 
 :host {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-canvas, #090d16);
   padding: 1.5rem;
+  gap: 1.25rem;
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  color: var(--text-primary, #f8fafc);
 }
 
 .theme-switch {
@@ -19,7 +29,6 @@
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.25rem;
-  margin-top: 1.25rem;
 }
 
 .token-list {
@@ -29,6 +38,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+  font-size: 0.85rem;
 }
 
 .token-row {
@@ -36,6 +46,10 @@
   align-items: center;
   gap: 0.6rem;
   min-width: 0;
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.4rem 0.6rem;
+  background: var(--bg-surface, #111827);
 }
 
 .swatch {
@@ -80,6 +94,10 @@
   border-bottom: 1px solid var(--border-subtle, #1e293b);
 }
 
+.theme-table thead th {
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
 .theme-table th {
   color: var(--text-muted, #64748b);
   font-weight: 600;
@@ -117,7 +135,7 @@
 
 .example-title {
   margin: 0 0 0.5rem;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: var(--text-primary, #f8fafc);
 }
@@ -202,7 +220,7 @@ pre code {
   color: var(--text-secondary, #94a3b8);
   background: var(--bg-subtle, #1a2438);
   border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: 999px;
+  border-radius: var(--radius-md, 8px);
   padding: 0.3rem 0.7rem;
 }
 
