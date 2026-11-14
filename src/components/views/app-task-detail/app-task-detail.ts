@@ -622,7 +622,11 @@ export class AppTaskDetail extends LitElement {
 
           <!-- Right Sidebar: Subtasks & Cost Summary -->
           <aside class="side-column">
-            <app-section-card title="${t.taskDetail.subtasksTitle}" subtitle="${doneSubtasks}/${task.subtasks.length} (${subtaskPct}%)">
+            <app-section-card variant="tabbed" title="${t.taskDetail.subtasksTitle}">
+              <span slot="actions" class="mono-num" style="font-size: 0.8rem; color: var(--text-secondary);">
+                ${doneSubtasks}/${task.subtasks.length} (${subtaskPct}%)
+              </span>
+
                 <app-progress-bar value="${subtaskPct}"></app-progress-bar>
 
                 ${task.subtasks.length === 0
@@ -677,7 +681,7 @@ export class AppTaskDetail extends LitElement {
                 </div>
             </app-section-card>
 
-            <app-section-card title="${t.taskDetail.costSummaryTitle}">
+            <app-section-card variant="tabbed" title="${t.taskDetail.costSummaryTitle}">
                 <div class="cost-list">
                   <div class="cost-row">
                     <span class="cost-label">${t.taskModal.estimatedHours}</span>
@@ -706,7 +710,7 @@ export class AppTaskDetail extends LitElement {
                 </div>
             </app-section-card>
 
-            <app-section-card title="${t.navigation.knowledgeBase}">
+            <app-section-card variant="tabbed" title="${t.navigation.knowledgeBase}">
               <button
                 slot="actions"
                 type="button"
