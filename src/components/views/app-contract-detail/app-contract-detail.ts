@@ -46,6 +46,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-contract-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -693,15 +694,10 @@ export class AppContractDetail extends LitElement {
         </section>
 
         <!-- Step 1: Periodic Calculations (Client Work & Expense Reports) -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${iconTable()}
-              <span>${t.contractDetail.calculationsTitle}</span>
-              <span class="section-sub">(${contractCalculations.length})</span>
-            </h2>
+        <app-section-card title="${t.contractDetail.calculationsTitle}" subtitle="(${contractCalculations.length})">
+          <span slot="icon">${iconTable()}</span>
 
-            <div class="section-actions">
+            <div slot="actions" class="section-actions">
               <app-segmented-switch
                 size="sm"
                 .value="${this.calcFilter}"
@@ -724,7 +720,6 @@ export class AppContractDetail extends LitElement {
                 <span>${t.contractDetail.createCalculation}</span>
               </app-button>
             </div>
-          </div>
 
           ${visibleCalculations.length === 0
             ? html`
@@ -891,18 +886,13 @@ export class AppContractDetail extends LitElement {
                   </table>
                 </div>
               `}
-        </section>
+        </app-section-card>
 
         <!-- Step 2: Contract Invoices, Payment Progress & Due-Date Control -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${iconReceipt(19)}
-              <span>${t.contractDetail.invoicesTitle}</span>
-              <span class="section-sub">(${contractInvoices.length})</span>
-            </h2>
+        <app-section-card title="${t.contractDetail.invoicesTitle}" subtitle="(${contractInvoices.length})">
+          <span slot="icon">${iconReceipt(19)}</span>
 
-            <div class="section-actions">
+            <div slot="actions" class="section-actions">
               <app-segmented-switch
                 size="sm"
                 .value="${this.invoiceFilter}"
@@ -933,7 +923,6 @@ export class AppContractDetail extends LitElement {
                 <span>${t.contractDetail.issueInvoice}</span>
               </app-button>
             </div>
-          </div>
 
           <div class="billing-strip">
             <div class="billing-stat">
@@ -1163,19 +1152,15 @@ export class AppContractDetail extends LitElement {
                   </table>
                 </div>
               `}
-        </section>
+        </app-section-card>
 
         <!-- Step 3: Contract Payments Ledger -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${iconWallet(18)}
-              <span>${t.payments.sectionTitle}</span>
-              <span class="section-sub">(${contractPayments.length})</span>
-            </h2>
+        <app-section-card title="${t.payments.sectionTitle}" subtitle="(${contractPayments.length})">
+          <span slot="icon">${iconWallet(18)}</span>
 
-            ${payableContractInvoices.length > 0
-              ? html`
+          ${payableContractInvoices.length > 0
+            ? html`
+                <div slot="actions">
                   <app-button
                     size="sm"
                     variant="secondary"
@@ -1184,9 +1169,9 @@ export class AppContractDetail extends LitElement {
                     <span slot="icon-start">${iconCreditCard(14)}</span>
                     <span>${t.payments.recordPayment}</span>
                   </app-button>
-                `
-              : ''}
-          </div>
+                </div>
+              `
+            : ''}
 
           ${contractPayments.length === 0
             ? html`<app-empty-state compact title="${t.payments.noContractPayments}"></app-empty-state>`
@@ -1254,17 +1239,12 @@ export class AppContractDetail extends LitElement {
                   </table>
                 </div>
               `}
-        </section>
+          </app-section-card>
 
         <!-- Secondary Context: Legal Parties & Linked Project Billing -->
         <div class="secondary-grid">
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFileText(18)}
-                <span>${t.contractDetail.partiesTitle}</span>
-              </h2>
-            </div>
+          <app-section-card title="${t.contractDetail.partiesTitle}">
+            <span slot="icon">${iconFileText(18)}</span>
 
             <div class="party-list">
               <div class="party-block">
@@ -1299,16 +1279,13 @@ export class AppContractDetail extends LitElement {
                 </span>
               </div>
             </div>
-          </section>
+          </app-section-card>
 
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFolder(18)}
-                <span>${t.contractDetail.projectLinkTitle}</span>
-              </h2>
-              ${project
-                ? html`
+          <app-section-card title="${t.contractDetail.projectLinkTitle}">
+            <span slot="icon">${iconFolder(18)}</span>
+            ${project
+              ? html`
+                  <div slot="actions">
                     <app-button
                       size="sm"
                       variant="ghost"
@@ -1316,9 +1293,9 @@ export class AppContractDetail extends LitElement {
                     >
                       ${isRu ? 'Открыть проект' : 'Open Project'}
                     </app-button>
-                  `
-                : ''}
-            </div>
+                  </div>
+                `
+              : ''}
 
             ${!project
               ? html`
@@ -1368,7 +1345,7 @@ export class AppContractDetail extends LitElement {
                       : ''}
                   </div>
                 `}
-          </section>
+          </app-section-card>
         </div>
       </div>
 
