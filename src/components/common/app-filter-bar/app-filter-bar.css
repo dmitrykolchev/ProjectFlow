@@ -1,0 +1,62 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+/* Exact match of original .toolbar (carded list views) */
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  padding: 0.85rem 1rem;
+}
+
+/* Bare variant — calculations/payments toolbars (no card chrome) */
+.bar.bare {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+/* Exact match of original .toolbar-filters */
+.filters {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+
+/* .filter-search — widths parameterized via custom properties */
+.search {
+  flex: 1;
+  min-width: var(--filter-search-min, 210px);
+  max-width: var(--filter-search-max, 320px);
+}
+
+/* .filter-select */
+.select {
+  width: var(--filter-select-width, 190px);
+  max-width: 100%;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
