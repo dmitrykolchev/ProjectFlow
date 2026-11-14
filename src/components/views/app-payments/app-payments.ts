@@ -23,6 +23,8 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-form-grid/app-form-grid';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
@@ -710,7 +712,7 @@ export class AppPayments extends LitElement {
         title="${t.payments.newPayment} · ${inv.number}"
         @close="${() => (this.paymentModalOpen = false)}"
       >
-        <div class="form-grid">
+        <app-form-grid>
           <div class="col-span-2">
             <app-select
               label="${isRu ? 'Счёт к оплате' : 'Target Invoice'}"
@@ -840,7 +842,7 @@ export class AppPayments extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = e.detail.value)}"
             ></app-textarea>
           </div>
-        </div>
+        </app-form-grid>
 
         <div slot="footer">
           <app-button variant="ghost" @click="${() => (this.paymentModalOpen = false)}">
@@ -856,30 +858,21 @@ export class AppPayments extends LitElement {
 
   private renderDeletePaymentModal(t: ReturnType<typeof getTranslation>, isRu: boolean) {
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingPayment)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingPayment)}"
         size="sm"
         title="${isRu ? 'Удалить платёж?' : 'Delete payment?'}"
-        @close="${() => (this.deletingPayment = null)}"
-      >
-        <p class="confirm-text">${t.payments.deleteConfirm}</p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingPayment = null)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingPayment) {
-                store.deleteInvoicePayment(this.deletingPayment.id);
-                this.deletingPayment = null;
-              }
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        message="${t.payments.deleteConfirm}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingPayment = null)}"
+        @confirm="${() => {
+          if (this.deletingPayment) {
+            store.deleteInvoicePayment(this.deletingPayment.id);
+            this.deletingPayment = null;
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
