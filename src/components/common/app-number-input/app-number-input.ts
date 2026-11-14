@@ -19,7 +19,7 @@ export class AppNumberInput extends LitElement {
     return html`
       <div class="form-group">
         ${this.label ? html`<label>${this.label}</label>` : ''}
-        <div class="stepper-wrapper ${this.size === 'sm' ? 'sm' : ''}">
+        <div class="stepper-wrapper">
           <button
             type="button"
             class="step-btn"

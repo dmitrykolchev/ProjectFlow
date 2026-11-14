@@ -30,10 +30,6 @@ label {
   transition: border-color var(--transition-fast, 150ms ease);
 }
 
-.stepper-wrapper.sm {
-  height: var(--control-height-sm, 32px);
-}
-
 .stepper-wrapper:focus-within {
   border-color: var(--accent-primary, #6366f1);
 }
@@ -53,11 +49,6 @@ input {
   line-height: 1.25;
   text-align: center;
   -moz-appearance: textfield;
-}
-
-.stepper-wrapper.sm input {
-  padding: 0 0.3rem;
-  font-size: 0.8125rem;
 }
 
 input::-webkit-outer-spin-button,
@@ -81,11 +72,6 @@ input::-webkit-inner-spin-button {
   user-select: none;
   transition: background-color var(--transition-fast, 150ms ease),
               color var(--transition-fast, 150ms ease);
-}
-
-.stepper-wrapper.sm .step-btn {
-  width: 24px;
-  font-size: 0.95rem;
 }
 
 .step-btn:hover:not(:disabled) {
