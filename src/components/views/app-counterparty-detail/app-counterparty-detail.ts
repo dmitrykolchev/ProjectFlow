@@ -37,6 +37,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-meta-grid/app-meta-grid';
 import styles from './app-counterparty-detail.css';
 
 @customElement('app-counterparty-detail')
@@ -340,28 +341,16 @@ export class AppCounterpartyDetail extends LitElement {
             </div>
           </div>
 
-          <div class="meta-strip">
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Контактное лицо' : 'Contact Person'}</span>
-              <span class="meta-val">${cp.contactPerson || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Телефон' : 'Phone'}</span>
-              <span class="meta-val mono">${cp.phone || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">Email</span>
-              <span class="meta-val">${cp.email || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Город' : 'City'}</span>
-              <span class="meta-val">${cp.city || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'ИНН / КПП' : 'Tax ID'}</span>
-              <span class="meta-val mono">${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}</span>
-            </div>
-          </div>
+          <app-meta-grid
+            columns="3"
+            .items="${[
+              { label: isRu ? 'Контактное лицо' : 'Contact Person', value: cp.contactPerson || '—' },
+              { label: isRu ? 'Телефон' : 'Phone', value: cp.phone || '—', mono: true },
+              { label: 'Email', value: cp.email || '—' },
+              { label: isRu ? 'Город' : 'City', value: cp.city || '—' },
+              { label: isRu ? 'ИНН / КПП' : 'Tax ID', value: `${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}`, mono: true },
+            ]}"
+          ></app-meta-grid>
         </section>
 
         <!-- Contracts & Linked Projects -->

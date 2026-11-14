@@ -196,37 +196,6 @@
   color: var(--text-muted, #64748b);
 }
 
-.meta-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
-  gap: 0.9rem 1.25rem;
-  padding: 1rem 1.15rem;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: var(--radius-md, 8px);
-}
-
-.meta-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
-  min-width: 0;
-}
-
-.meta-label {
-  font-size: 0.72rem;
-  color: var(--text-muted, #64748b);
-  font-weight: 500;
-}
-
-.meta-val {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .mono {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;

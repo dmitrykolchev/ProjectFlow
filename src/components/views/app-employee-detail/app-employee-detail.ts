@@ -25,6 +25,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-meta-grid/app-meta-grid';
 import styles from './app-employee-detail.css';
 
 @customElement('app-employee-detail')
@@ -263,32 +264,17 @@ export class AppEmployeeDetail extends LitElement {
             </div>
           </div>
 
-          <div class="meta-strip">
-            <div class="meta-box">
-              <span class="meta-label">Email</span>
-              <span class="meta-val">${emp.email || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Телефон' : 'Phone'}</span>
-              <span class="meta-val mono">${emp.phone || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Отдел' : 'Department'}</span>
-              <span class="meta-val">${emp.department || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Компания' : 'Company'}</span>
-              <span class="meta-val">${company?.name || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Дата найма' : 'Hire Date'}</span>
-              <span class="meta-val mono">${emp.hireDate || '—'}</span>
-            </div>
-            <div class="meta-box">
-              <span class="meta-label">${isRu ? 'Ставка' : 'Hourly Rate'}</span>
-              <span class="meta-val mono">${hourlyRate.toLocaleString('ru-RU')} ₽/ч</span>
-            </div>
-          </div>
+          <app-meta-grid
+            columns="3"
+            .items="${[
+              { label: 'Email', value: emp.email || '—' },
+              { label: isRu ? 'Телефон' : 'Phone', value: emp.phone || '—', mono: true },
+              { label: isRu ? 'Отдел' : 'Department', value: emp.department || '—' },
+              { label: isRu ? 'Компания' : 'Company', value: company?.name || '—' },
+              { label: isRu ? 'Дата найма' : 'Hire Date', value: emp.hireDate || '—', mono: true },
+              { label: isRu ? 'Ставка' : 'Hourly Rate', value: `${hourlyRate.toLocaleString('ru-RU')} ₽/ч`, mono: true },
+            ]}"
+          ></app-meta-grid>
         </section>
 
         <!-- Projects & Assigned Tasks -->
