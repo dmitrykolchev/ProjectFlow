@@ -331,7 +331,7 @@ export class AppCalculations extends LitElement {
           ? 'Периодические отчёты-калькуляции перед заказчиками (billable и non-billable по 0 ₽), согласование и передача в выставление счетов'
           : 'Periodic client cost & work calculations (billable + non-billable at 0), approval workflow, and invoice handoff'}"
       >
-        <span slot="icon">${iconReceipt(28)}</span>
+        <span slot="icon">${iconTable(28)}</span>
         <app-button
           slot="actions"
           variant="primary"
