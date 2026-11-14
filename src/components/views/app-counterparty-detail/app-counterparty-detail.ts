@@ -38,6 +38,7 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
+import '../../common/app-section-card/app-section-card';
 import styles from './app-counterparty-detail.css';
 
 @customElement('app-counterparty-detail')
@@ -355,22 +356,17 @@ export class AppCounterpartyDetail extends LitElement {
 
         <!-- Contracts & Linked Projects -->
         <div class="two-col-grid">
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFileText(18)}
-                <span>${t.counterpartyDetail.contractsTitle}</span>
-                <span class="section-sub">(${cpContracts.length})</span>
-              </h2>
-              <app-button
-                size="sm"
-                variant="secondary"
-                @click="${() => this.openCreateContractModal(cp)}"
-              >
+          <app-section-card title="${t.counterpartyDetail.contractsTitle}" subtitle="(${cpContracts.length})">
+            <span slot="icon">${iconFileText(18)}</span>
+            <app-button
+              slot="actions"
+              size="sm"
+              variant="secondary"
+              @click="${() => this.openCreateContractModal(cp)}"
+            >
                 <span slot="icon-start">${iconPlus(14)}</span>
                 <span>${t.counterpartyDetail.createContract}</span>
               </app-button>
-            </div>
 
             ${cpContracts.length === 0
               ? html`<app-empty-state compact title="${t.counterpartyDetail.noContracts}"></app-empty-state>`
@@ -421,16 +417,10 @@ export class AppCounterpartyDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
 
-          <section class="section-card">
-            <div class="section-header">
-              <h2 class="section-title">
-                ${iconFolder(18)}
-                <span>${t.counterpartyDetail.projectsTitle}</span>
-                <span class="section-sub">(${cpProjects.length})</span>
-              </h2>
-            </div>
+          <app-section-card title="${t.counterpartyDetail.projectsTitle}" subtitle="(${cpProjects.length})">
+            <span slot="icon">${iconFolder(18)}</span>
 
             ${cpProjects.length === 0
               ? html`<app-empty-state compact title="${t.counterpartyDetail.noProjects}"></app-empty-state>`
@@ -478,25 +468,18 @@ export class AppCounterpartyDetail extends LitElement {
                     })}
                   </div>
                 `}
-          </section>
+          </app-section-card>
         </div>
 
         <!-- Calculations & Invoices History -->
-        <section class="section-card">
-          <div class="section-header">
-            <h2 class="section-title">
-              ${this.financeTab === 'invoices' ? iconReceipt(18) : iconTable()}
-              <span>
-                ${this.financeTab === 'invoices'
-                  ? t.counterpartyDetail.invoicesTitle
-                  : t.counterpartyDetail.calculationsTitle}
-              </span>
-              <span class="section-sub">
-                (${this.financeTab === 'invoices' ? cpInvoices.length : cpCalculations.length})
-              </span>
-            </h2>
-            <app-segmented-switch
-              size="sm"
+        <app-section-card
+          title="${this.financeTab === 'invoices' ? t.counterpartyDetail.invoicesTitle : t.counterpartyDetail.calculationsTitle}"
+          subtitle="(${this.financeTab === 'invoices' ? cpInvoices.length : cpCalculations.length})"
+        >
+          <span slot="icon">${this.financeTab === 'invoices' ? iconReceipt(18) : iconTable()}</span>
+          <app-segmented-switch
+            slot="actions"
+            size="sm"
               .value="${this.financeTab}"
               .options="${[
                 { value: 'invoices', label: `${t.counterpartyDetail.invoicesTitle} (${cpInvoices.length})` },
@@ -505,7 +488,6 @@ export class AppCounterpartyDetail extends LitElement {
               @change="${(e: CustomEvent<{ value: string }>) =>
                 (this.financeTab = e.detail.value as 'invoices' | 'calculations')}"
             ></app-segmented-switch>
-          </div>
 
           ${this.financeTab === 'invoices'
             ? cpInvoices.length === 0
@@ -662,7 +644,7 @@ export class AppCounterpartyDetail extends LitElement {
                   </table>
                 </div>
               `}
-        </section>
+        </app-section-card>
       </div>
 
       ${this.renderEditModal(isRu, t)}
