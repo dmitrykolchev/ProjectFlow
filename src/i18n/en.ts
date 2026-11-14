@@ -1403,6 +1403,7 @@ export const en = {
         demoCard: 'Card on current tokens',
         densityRow: 'Density row line',
         glowButton: 'Hover the button',
+        glowCodeComment: '/* Light/Dark: --accent-glow-hover = none → glow fades out */',
       },
     },
     taskModal: {

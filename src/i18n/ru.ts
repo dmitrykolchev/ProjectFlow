@@ -1403,6 +1403,7 @@ export const ru = {
         demoCard: 'Карточка на текущих токенах',
         densityRow: 'Строка рядовой плотности',
         glowButton: 'Наведите на кнопку',
+        glowCodeComment: '/* Light/Dark: --accent-glow-hover = none → свечение гаснет */',
       },
     },
     taskModal: {

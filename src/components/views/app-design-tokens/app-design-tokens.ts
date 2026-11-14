@@ -14,15 +14,13 @@ interface TokenDef {
 }
 
 interface CategoryDef {
-  titleRu: string;
-  titleEn: string;
+  key: 'backgrounds' | 'text' | 'borders' | 'accent' | 'statusColors' | 'scrollbars' | 'shadows';
   tokens: TokenDef[];
 }
 
 const CATEGORIES: CategoryDef[] = [
   {
-    titleRu: 'Фоны',
-    titleEn: 'Backgrounds',
+    key: 'backgrounds',
     tokens: [
       { name: 'bg-canvas', swatch: true },
       { name: 'bg-surface', swatch: true },
@@ -33,8 +31,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Текст',
-    titleEn: 'Text',
+    key: 'text',
     tokens: [
       { name: 'text-primary', swatch: true },
       { name: 'text-secondary', swatch: true },
@@ -44,8 +41,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Границы',
-    titleEn: 'Borders',
+    key: 'borders',
     tokens: [
       { name: 'border-subtle', swatch: true },
       { name: 'border-strong', swatch: true },
@@ -53,8 +49,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Акцент',
-    titleEn: 'Accent',
+    key: 'accent',
     tokens: [
       { name: 'accent-primary', swatch: true },
       { name: 'accent-hover', swatch: true },
@@ -63,8 +58,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Статусные цвета',
-    titleEn: 'Status colors',
+    key: 'statusColors',
     tokens: [
       { name: 'color-success', swatch: true },
       { name: 'color-success-solid', swatch: true },
@@ -77,8 +71,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Скроллбары',
-    titleEn: 'Scrollbars',
+    key: 'scrollbars',
     tokens: [
       { name: 'scrollbar-track', swatch: true },
       { name: 'scrollbar-thumb', swatch: true },
@@ -86,8 +79,7 @@ const CATEGORIES: CategoryDef[] = [
     ],
   },
   {
-    titleRu: 'Тени',
-    titleEn: 'Shadows',
+    key: 'shadows',
     tokens: [
       { name: 'shadow-sm', swatch: false },
       { name: 'shadow-md', swatch: false },
@@ -150,13 +142,11 @@ export class AppDesignTokens extends LitElement {
   }
 
   render() {
-    const isRu = this.currentLang === 'ru';
+    const tx = getTranslation(this.currentLang);
     return html`
       <app-page-header
         title="Design Tokens"
-        subtitle="${isRu
-          ? 'CSS-переменные, определяющие темы Light, Dark и Cyberpunk. Живые значения обновляются при смене темы.'
-          : 'CSS custom properties powering the Light, Dark and Cyberpunk themes. Live values update when the theme changes.'}"
+        subtitle="${tx.viewTexts.pageSubtitles.designTokens}"
       >
         <span slot="icon">${iconLayers(28)}</span>
         <div slot="actions" class="theme-switch">
@@ -180,7 +170,7 @@ export class AppDesignTokens extends LitElement {
 
       <section class="token-grid">
         ${CATEGORIES.map((cat) => {
-          const title = isRu ? cat.titleRu : cat.titleEn;
+          const title = tx.viewTexts.designTokens.categories[cat.key];
           return html`
             <app-section-card title="${title}">
               <ul class="token-list">
@@ -199,7 +189,7 @@ export class AppDesignTokens extends LitElement {
         })}
       </section>
 
-      <app-section-card title="${isRu ? 'Три темы — справочные значения' : 'Three themes — reference values'}">
+      <app-section-card title="${tx.viewTexts.designTokens.sections.themeTable}">
         <table class="theme-table">
           <thead>
             <tr>
@@ -222,22 +212,22 @@ export class AppDesignTokens extends LitElement {
         </table>
       </app-section-card>
 
-      <app-section-card title="${isRu ? 'Примеры использования' : 'Usage examples'}">
+      <app-section-card title="${tx.viewTexts.designTokens.sections.examples}">
         <div class="examples">
           <div class="example">
-            <p class="example-title">${isRu ? '1. Обращение к токену с fallback (соглашение компонентов)' : '1. Token access with fallback (component convention)'}</p>
+            <p class="example-title">${tx.viewTexts.designTokens.examples.tokenFallback}</p>
             <pre><code>.badge {
   color: var(--color-success, #34d399);
   background: var(--color-success-bg, rgba(52, 211, 153, 0.15));
   border: 1px solid var(--color-success-border, rgba(52, 211, 153, 0.28));
 }</code></pre>
             <div class="demo-row">
-              <span class="demo-badge">${isRu ? 'Активен' : 'Active'}</span>
+              <span class="demo-badge">${tx.viewTexts.designTokens.demos.activeBadge}</span>
             </div>
           </div>
 
           <div class="example">
-            <p class="example-title">${isRu ? '2. Поверхности и границы карточки' : '2. Card surfaces and borders'}</p>
+            <p class="example-title">${tx.viewTexts.designTokens.examples.cardSurfaces}</p>
             <pre><code>.card {
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);
@@ -245,36 +235,36 @@ export class AppDesignTokens extends LitElement {
   box-shadow: var(--shadow-md);
 }</code></pre>
             <div class="demo-row">
-              <div class="demo-card">${isRu ? 'Карточка на текущих токенах' : 'Card on current tokens'}</div>
+              <div class="demo-card">${tx.viewTexts.designTokens.demos.demoCard}</div>
             </div>
           </div>
 
           <div class="example">
-            <p class="example-title">${isRu ? '3. Плотность через --density-*' : '3. Density via --density-*'}</p>
+            <p class="example-title">${tx.viewTexts.designTokens.examples.density}</p>
             <pre><code>.grid-row {
   height: var(--density-row-height, 44px);
   padding: var(--density-padding-base, 0.75rem);
 }
 /* data-density="compact": row 36px, padding 0.5rem */</code></pre>
             <div class="demo-row">
-              <div class="demo-row-line">${isRu ? 'Строка рядовой плотности' : 'Density row line'}</div>
+              <div class="demo-row-line">${tx.viewTexts.designTokens.demos.densityRow}</div>
             </div>
           </div>
 
           <div class="example">
-            <p class="example-title">${isRu ? '4. Glow-хуки: неон только в Cyberpunk' : '4. Glow hooks: neon only in Cyberpunk'}</p>
+            <p class="example-title">${tx.viewTexts.designTokens.examples.glowHooks}</p>
             <pre><code>.accent-btn:hover {
   box-shadow: var(--accent-glow-hover, none);
 }
-/* Light/Dark: --accent-glow-hover = none → свечение гаснет */</code></pre>
+${tx.viewTexts.designTokens.demos.glowCodeComment}</code></pre>
             <div class="demo-row">
-              <span class="demo-glow">${isRu ? 'Наведите на кнопку' : 'Hover the button'}</span>
+              <span class="demo-glow">${tx.viewTexts.designTokens.demos.glowButton}</span>
             </div>
           </div>
         </div>
       </app-section-card>
 
-      <app-section-card title="${isRu ? 'Общая база (все темы)' : 'Shared base (all themes)'}">
+      <app-section-card title="${tx.viewTexts.designTokens.sections.sharedBase}">
         <div class="shared-chips">
           <code>--font-sans: Plus Jakarta Sans</code>
           <code>--font-mono: JetBrains Mono</code>
