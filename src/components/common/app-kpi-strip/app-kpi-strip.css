@@ -1,0 +1,30 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.kpi-strip {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(var(--strip-columns, 4), minmax(0, 1fr));
+}
+
+@media (max-width: 1024px) {
+  .kpi-strip {
+    grid-template-columns: repeat(min(2, var(--strip-columns, 4)), minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-strip {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}

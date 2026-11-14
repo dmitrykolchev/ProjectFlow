@@ -1,0 +1,57 @@
+import { LitElement, html } from 'lit';
+import { customElement, property } from 'lit/decorators.js';
+import { iconChevronDown } from '../icons';
+import styles from './app-section-card.css';
+
+@customElement('app-section-card')
+export class AppSectionCard extends LitElement {
+  @property({ type: String }) title: string = '';
+  @property({ type: String }) subtitle: string = '';
+  @property({ type: Boolean, attribute: 'collapsible' }) collapsible: boolean = false;
+  @property({ type: Boolean, reflect: true }) collapsed: boolean = false;
+
+  static styles = styles;
+
+  render() {
+    return html`
+      <section class="section-card">
+        <div
+          class="section-header ${this.collapsible ? 'is-collapsible' : ''}"
+          role="${this.collapsible ? 'button' : 'presentation'}"
+          tabindex="${this.collapsible ? 0 : -1}"
+          aria-expanded="${this.collapsible && !this.collapsed ? 'true' : 'false'}"
+          @click="${this.handleToggle}"
+          @keydown="${(e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.handleToggle();
+            }
+          }}"
+        >
+          <div class="header-titles">
+            ${this.title ? html`<span class="section-title">${this.title}</span>` : ''}
+            ${this.subtitle ? html`<span class="section-subtitle">${this.subtitle}</span>` : ''}
+            <slot name="header-left"></slot>
+          </div>
+          <div class="header-right">
+            <slot name="actions"></slot>
+            ${this.collapsible ? html`<span class="chevron ${this.collapsed ? 'is-collapsed' : ''}">${iconChevronDown(16)}</span>` : ''}
+          </div>
+        </div>
+        ${!this.collapsed ? html`<div class="section-body"><slot></slot></div>` : ''}
+      </section>
+    `;
+  }
+
+  private handleToggle() {
+    if (!this.collapsible) return;
+    this.collapsed = !this.collapsed;
+    this.dispatchEvent(
+      new CustomEvent('toggle', {
+        detail: { collapsed: this.collapsed },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+}

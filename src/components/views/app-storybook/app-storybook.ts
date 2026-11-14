@@ -27,6 +27,12 @@ import toastMeta from '../../common/app-toast/app-toast.story';
 import activityMeta from '../../common/app-activity-panel/app-activity-panel.story';
 import taskModalMeta from '../../common/app-task-modal/app-task-modal.story';
 import emptyStateMeta from '../../common/app-empty-state/app-empty-state.story';
+import kpiStripMeta from '../../common/app-kpi-strip/app-kpi-strip.story';
+import sectionCardMeta from '../../common/app-section-card/app-section-card.story';
+import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
+import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
+import avatarMeta from '../../common/app-avatar/app-avatar.story';
+import moneyMeta from '../../common/app-money/app-money.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -86,6 +92,12 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   modalPortalMeta,
   taskModalMeta,
   emptyStateMeta,
+  kpiStripMeta,
+  sectionCardMeta,
+  metaGridMeta,
+  progressBarMeta,
+  avatarMeta,
+  moneyMeta,
   toastMeta,
   activityMeta,
   headerMeta,

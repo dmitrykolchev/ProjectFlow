@@ -51,6 +51,12 @@ export { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 export { AppTaskModal } from './app-task-modal/app-task-modal';
 export { AppEmptyState } from './app-empty-state/app-empty-state';
 export { AppPageHeader } from './app-page-header/app-page-header';
+export { AppKpiStrip } from './app-kpi-strip/app-kpi-strip';
+export { AppSectionCard } from './app-section-card/app-section-card';
+export { AppMetaGrid, type MetaItem } from './app-meta-grid/app-meta-grid';
+export { AppProgressBar, type ProgressSegment } from './app-progress-bar/app-progress-bar';
+export { AppAvatar } from './app-avatar/app-avatar';
+export { AppMoney, formatMoney, formatMoneyShort } from './app-money/app-money';
 
 export * as icons from './icons';
 
@@ -78,6 +84,12 @@ import { AppActivityPanel } from './app-activity-panel/app-activity-panel';
 import { AppTaskModal } from './app-task-modal/app-task-modal';
 import { AppEmptyState } from './app-empty-state/app-empty-state';
 import { AppPageHeader } from './app-page-header/app-page-header';
+import { AppKpiStrip } from './app-kpi-strip/app-kpi-strip';
+import { AppSectionCard } from './app-section-card/app-section-card';
+import { AppMetaGrid } from './app-meta-grid/app-meta-grid';
+import { AppProgressBar } from './app-progress-bar/app-progress-bar';
+import { AppAvatar } from './app-avatar/app-avatar';
+import { AppMoney } from './app-money/app-money';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -104,6 +116,12 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-task-modal': AppTaskModal,
   'app-empty-state': AppEmptyState,
   'app-page-header': AppPageHeader,
+  'app-kpi-strip': AppKpiStrip,
+  'app-section-card': AppSectionCard,
+  'app-meta-grid': AppMetaGrid,
+  'app-progress-bar': AppProgressBar,
+  'app-avatar': AppAvatar,
+  'app-money': AppMoney,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

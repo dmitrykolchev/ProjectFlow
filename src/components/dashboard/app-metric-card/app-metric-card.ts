@@ -12,6 +12,7 @@ export class AppMetricCard extends LitElement {
   @property({ type: String }) accentColor: string = 'var(--accent-primary, #6366f1)';
   @property({ type: Array }) sparkline: number[] = [];
   @property({ type: Boolean }) clickable: boolean = false;
+  @property({ type: String }) size: 'full' | 'compact' = 'full';
 
   static styles = styles;
 
@@ -24,7 +25,7 @@ export class AppMetricCard extends LitElement {
         : 'delta-neutral';
 
     return html`
-      <div class="metric-card ${this.clickable ? 'is-clickable' : ''}">
+      <div class="metric-card ${this.clickable ? 'is-clickable' : ''} ${this.size === 'compact' ? 'is-compact' : ''}">
         <div class="metric-top">
           <span class="metric-label">${this.label}</span>
           <span class="metric-icon"><slot name="icon"></slot></span>

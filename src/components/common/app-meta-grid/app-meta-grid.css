@@ -1,0 +1,64 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.meta-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.meta-grid.strip {
+  grid-template-columns: repeat(var(--meta-columns, 3), minmax(0, 1fr));
+}
+
+.meta-grid.grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 768px) {
+  .meta-grid.strip {
+    grid-template-columns: repeat(min(2, var(--meta-columns, 3)), minmax(0, 1fr));
+  }
+}
+
+.meta-box {
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-md, 8px);
+  padding: 0.6rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.meta-label {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.meta-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+  overflow-wrap: anywhere;
+}
+
+.meta-value.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.meta-value.danger {
+  color: var(--color-danger, #f87171);
+}

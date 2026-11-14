@@ -1,0 +1,23 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: inline-block;
+  min-width: 0;
+}
+
+.money {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--text-primary, #f8fafc);
+  font-weight: 600;
+}
+
+.money.is-zero {
+  color: var(--text-muted, #64748b);
+  font-weight: 400;
+}
