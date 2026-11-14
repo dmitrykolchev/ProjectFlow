@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
-import { iconChevronRight, iconEdit, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconPlus, iconSearch, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -11,6 +11,8 @@ import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-employees.css';
 
 @customElement('app-employees')
@@ -114,20 +116,18 @@ export class AppEmployees extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${isRu ? 'Сотрудники' : 'Employees'}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Штат компании, специализации, ставки, текущие проекты и загрузка по задачам'
-              : 'Team directory, roles, hourly rates, project assignments, and task workload'}
-          </p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header
+        title="${isRu ? 'Сотрудники' : 'Employees'}"
+        subtitle="${isRu
+          ? 'Штат компании, специализации, ставки, текущие проекты и загрузка по задачам'
+          : 'Team directory, roles, hourly rates, project assignments, and task workload'}"
+      >
+        <span slot="icon">${iconUsers(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${isRu ? 'Добавить сотрудника' : 'Add Employee'}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -190,7 +190,7 @@ export class AppEmployees extends LitElement {
       </div>
 
       ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Сотрудники не найдены' : 'No employees found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Сотрудники не найдены' : 'No employees found'}"></app-empty-state>`
         : this.displayMode === 'cards'
         ? this.renderCards(filtered, isRu)
         : this.renderTable(filtered, isRu)}

@@ -40,6 +40,8 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-contracts.css';
 
 @customElement('app-contracts')
@@ -442,16 +444,14 @@ export class AppContracts extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${isRu ? 'Договоры' : 'Contracts'}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Реестр контрактов с заказчиками и подрядчиками, калькуляции, счета, контроль сроков и учёт оплат'
-              : 'Contract registry with clients and vendors, calculations, invoicing, due-date control, and payment tracking'}
-          </p>
-        </div>
-        <div style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+      <app-page-header
+        title="${isRu ? 'Договоры' : 'Contracts'}"
+        subtitle="${isRu
+          ? 'Реестр контрактов с заказчиками и подрядчиками, калькуляции, счета, контроль сроков и учёт оплат'
+          : 'Contract registry with clients and vendors, calculations, invoicing, due-date control, and payment tracking'}"
+      >
+        <span slot="icon">${iconFileText(28)}</span>
+        <div slot="actions" style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
           ${payableInvoices.length > 0
             ? html`
                 <app-button
@@ -469,7 +469,7 @@ export class AppContracts extends LitElement {
             <span>${isRu ? 'Новый договор' : 'New Contract'}</span>
           </app-button>
         </div>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -596,7 +596,7 @@ export class AppContracts extends LitElement {
 
       ${this.viewTab === 'contracts'
         ? filtered.length === 0
-          ? html`<div class="empty-state">${isRu ? 'Договоры не найдены' : 'No contracts found'}</div>`
+          ? html`<app-empty-state compact title="${isRu ? 'Договоры не найдены' : 'No contracts found'}"></app-empty-state>`
           : html`
               <div class="table-card">
                 <table class="data-table">
@@ -752,7 +752,7 @@ export class AppContracts extends LitElement {
             `
         : this.viewTab === 'calculations'
         ? filteredCalculations.length === 0
-          ? html`<div class="empty-state">${t.contractDetail.noCalculations}</div>`
+          ? html`<app-empty-state compact title="${t.contractDetail.noCalculations}"></app-empty-state>`
           : html`
               <div class="table-card">
                 <table class="data-table">
@@ -913,7 +913,7 @@ export class AppContracts extends LitElement {
             `
         : this.viewTab === 'payments'
         ? filteredPayments.length === 0
-          ? html`<div class="empty-state">${t.payments.noPayments}</div>`
+          ? html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`
           : html`
               <div class="table-card">
                 <table class="data-table">
@@ -1018,7 +1018,7 @@ export class AppContracts extends LitElement {
               </div>
             `
         : filteredInvoices.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Счета не найдены' : 'No invoices found'}</div>`
+        ? html`<app-empty-state compact title="${isRu ? 'Счета не найдены' : 'No invoices found'}"></app-empty-state>`
         : html`
             <div class="table-card">
               <table class="data-table">

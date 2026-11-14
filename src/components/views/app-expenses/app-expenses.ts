@@ -9,6 +9,7 @@ import {
   iconPlus,
   iconSearch,
   iconTrash,
+  iconWallet,
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
@@ -21,6 +22,8 @@ import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-expenses.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -184,16 +187,13 @@ export class AppExpenses extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${t.expenses.title}</h1>
-          <p class="view-subtitle">${t.expenses.subtitle}</p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header title="${t.expenses.title}" subtitle="${t.expenses.subtitle}">
+        <span slot="icon">${iconWallet(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${t.expenses.addExpense}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -274,7 +274,7 @@ export class AppExpenses extends LitElement {
       ${this.viewMode === 'budgets'
         ? this.renderBudgetsView(isRu)
         : filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Расходы не найдены' : 'No expenses found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Расходы не найдены' : 'No expenses found'}"></app-empty-state>`
         : this.renderRegistryTable(filtered, t, isRu)}
 
       ${this.renderFormModal(t, isRu, categoryOptions, statusOptions)}

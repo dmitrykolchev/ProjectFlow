@@ -21,6 +21,8 @@ import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-time-tracking.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -190,16 +192,13 @@ export class AppTimeTracking extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${t.timeTracking.title}</h1>
-          <p class="view-subtitle">${t.timeTracking.subtitle}</p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header title="${t.timeTracking.title}" subtitle="${t.timeTracking.subtitle}">
+        <span slot="icon">${iconClock(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${t.timeTracking.addEntry}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -378,7 +377,7 @@ export class AppTimeTracking extends LitElement {
       </div>
 
       ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Записи о времени не найдены' : 'No time entries found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Записи о времени не найдены' : 'No time entries found'}"></app-empty-state>`
         : this.viewMode === 'journal'
         ? this.renderJournalTable(filtered, t, isRu)
         : this.renderByTaskView(filtered, t, isRu)}

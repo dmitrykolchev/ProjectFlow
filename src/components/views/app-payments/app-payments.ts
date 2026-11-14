@@ -25,6 +25,8 @@ import '../../common/app-button/app-button';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
@@ -303,18 +305,17 @@ export class AppPayments extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${t.navigation.payments}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Контроль сроков оплаты счетов, частичные и полные транши, реестр платёжных поручений и остатков задолженности'
-              : 'Invoice due-date monitoring, partial & full payment settlements, and transaction ledger'}
-          </p>
-        </div>
+      <app-page-header
+        title="${t.navigation.payments}"
+        subtitle="${isRu
+          ? 'Контроль сроков оплаты счетов, частичные и полные транши, реестр платёжных поручений и остатков задолженности'
+          : 'Invoice due-date monitoring, partial & full payment settlements, and transaction ledger'}"
+      >
+        <span slot="icon">${iconCreditCard(28)}</span>
         ${payableInvoices.length > 0
           ? html`
               <app-button
+                slot="actions"
                 variant="primary"
                 size="md"
                 @click="${() => this.openPaymentModal(payableInvoices[0])}"
@@ -324,7 +325,7 @@ export class AppPayments extends LitElement {
               </app-button>
             `
           : ''}
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -442,9 +443,7 @@ export class AppPayments extends LitElement {
   ) {
     if (invoices.length === 0) {
       return html`
-        <div class="empty-state">
-          <span>${isRu ? 'Счета по выбранным фильтрам не найдены' : 'No invoices match filters'}</span>
-        </div>
+        <app-empty-state compact title="${isRu ? 'Счета по выбранным фильтрам не найдены' : 'No invoices match filters'}"></app-empty-state>
       `;
     }
 
@@ -615,7 +614,7 @@ export class AppPayments extends LitElement {
     isRu: boolean
   ) {
     if (payments.length === 0) {
-      return html`<div class="empty-state">${t.payments.noPayments}</div>`;
+      return html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`;
     }
 
     return html`

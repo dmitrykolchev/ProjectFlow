@@ -11,6 +11,8 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-counterparties.css';
 
 @customElement('app-counterparties')
@@ -135,20 +137,18 @@ export class AppCounterparties extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${isRu ? 'Контрагенты' : 'Counterparties'}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Заказчики, поставщики, подрядчики, рейтинг надёжности и связанные договоры'
-              : 'Clients, vendors, contractors, reliability ratings, and linked contracts'}
-          </p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header
+        title="${isRu ? 'Контрагенты' : 'Counterparties'}"
+        subtitle="${isRu
+          ? 'Заказчики, поставщики, подрядчики, рейтинг надёжности и связанные договоры'
+          : 'Clients, vendors, contractors, reliability ratings, and linked contracts'}"
+      >
+        <span slot="icon">${iconHandshake(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${isRu ? 'Добавить контрагента' : 'Add Counterparty'}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -212,7 +212,7 @@ export class AppCounterparties extends LitElement {
       </div>
 
       ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Контрагенты не найдены' : 'No counterparties found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Контрагенты не найдены' : 'No counterparties found'}"></app-empty-state>`
         : this.displayMode === 'cards'
         ? this.renderCards(filtered, isRu)
         : this.renderTable(filtered, isRu)}

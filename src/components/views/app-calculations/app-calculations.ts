@@ -29,6 +29,8 @@ import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
@@ -340,16 +342,15 @@ export class AppCalculations extends LitElement {
     const hUnit = isRu ? 'ч' : 'h';
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${t.navigation.calculations}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Периодические отчёты-калькуляции перед заказчиками (billable и non-billable по 0 ₽), согласование и передача в выставление счетов'
-              : 'Periodic client cost & work calculations (billable + non-billable at 0), approval workflow, and invoice handoff'}
-          </p>
-        </div>
+      <app-page-header
+        title="${t.navigation.calculations}"
+        subtitle="${isRu
+          ? 'Периодические отчёты-калькуляции перед заказчиками (billable и non-billable по 0 ₽), согласование и передача в выставление счетов'
+          : 'Periodic client cost & work calculations (billable + non-billable at 0), approval workflow, and invoice handoff'}"
+      >
+        <span slot="icon">${iconReceipt(28)}</span>
         <app-button
+          slot="actions"
           variant="primary"
           size="md"
           ?disabled="${this.contracts.length === 0}"
@@ -358,7 +359,7 @@ export class AppCalculations extends LitElement {
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${t.calculations.newCalculation}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -435,17 +436,16 @@ export class AppCalculations extends LitElement {
 
       ${filtered.length === 0
         ? html`
-            <div class="empty-state">
-              <span>${t.contractDetail.noCalculations}</span>
+            <app-empty-state title="${t.contractDetail.noCalculations}">
               ${this.contracts.length > 0
                 ? html`
-                    <app-button variant="secondary" @click="${() => this.openCreateModal()}">
+                    <app-button slot="action" variant="secondary" @click="${() => this.openCreateModal()}">
                       <span slot="icon-start">${iconPlus(15)}</span>
                       <span>${t.calculations.newCalculation}</span>
                     </app-button>
                   `
                 : ''}
-            </div>
+            </app-empty-state>
           `
         : html`
             <div class="table-card">
@@ -839,11 +839,12 @@ export class AppCalculations extends LitElement {
             </div>
 
             ${this.calcItems.length === 0
-              ? html`<div class="empty-state" style="padding: 1.4rem;">
-                  ${isRu
+              ? html`<app-empty-state
+                  compact
+                  title="${isRu
                     ? 'Нет работ или расходов за выбранный период. Выберите другой период или добавьте позицию вручную.'
-                    : 'No works or expenses found for this period.'}
-                </div>`
+                    : 'No works or expenses found for this period.'}"
+                ></app-empty-state>`
               : html`
                   <div class="calc-items-list">
                     ${this.calcItems.map(

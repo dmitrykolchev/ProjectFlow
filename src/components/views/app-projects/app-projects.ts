@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { Project, ProjectRole, ProjectStatus } from '../../../types';
-import { iconChevronRight, iconEdit, iconKanban, iconPlus, iconSearch, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconSearch, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-input/app-input';
@@ -13,6 +13,8 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-page-header/app-page-header';
+import '../../common/app-empty-state/app-empty-state';
 import styles from './app-projects.css';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -136,20 +138,18 @@ export class AppProjects extends LitElement {
     ];
 
     return html`
-      <div class="view-header">
-        <div class="header-titles">
-          <h1 class="view-title">${t.navigation.projects}</h1>
-          <p class="view-subtitle">
-            ${isRu
-              ? 'Список проектов портфеля. Выберите проект, чтобы открыть его страницу с командой по ролям, задачами и договорами'
-              : 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts'}
-          </p>
-        </div>
-        <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+      <app-page-header
+        title="${t.navigation.projects}"
+        subtitle="${isRu
+          ? 'Список проектов портфеля. Выберите проект, чтобы открыть его страницу с командой по ролям, задачами и договорами'
+          : 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts'}"
+      >
+        <span slot="icon">${iconFolder(28)}</span>
+        <app-button slot="actions" variant="primary" size="md" @click="${() => this.openCreateModal()}">
           <span slot="icon-start">${iconPlus(16)}</span>
           <span>${isRu ? 'Создать проект' : 'New Project'}</span>
         </app-button>
-      </div>
+      </app-page-header>
 
       <div class="kpi-grid">
         <div class="kpi-card">
@@ -212,7 +212,7 @@ export class AppProjects extends LitElement {
       </div>
 
       ${filtered.length === 0
-        ? html`<div class="empty-state">${isRu ? 'Проекты не найдены' : 'No projects found'}</div>`
+        ? html`<app-empty-state title="${isRu ? 'Проекты не найдены' : 'No projects found'}"></app-empty-state>`
         : this.displayMode === 'cards'
         ? this.renderCards(filtered, t, isRu)
         : this.renderTable(filtered, t, isRu)}
