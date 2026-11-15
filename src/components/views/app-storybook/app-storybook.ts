@@ -39,6 +39,7 @@ import avatarMeta from '../../common/app-avatar/app-avatar.story';
 import moneyMeta from '../../common/app-money/app-money.story';
 import paginationMeta from '../../common/app-pagination/app-pagination.story';
 import fileDropzoneMeta from '../../common/app-file-dropzone/app-file-dropzone.story';
+import documentPreviewerMeta from '../../common/app-document-previewer/app-document-previewer.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -112,6 +113,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   moneyMeta,
   paginationMeta,
   fileDropzoneMeta,
+  documentPreviewerMeta,
   toastMeta,
   activityMeta,
   headerMeta,

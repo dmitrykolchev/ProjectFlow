@@ -8,6 +8,7 @@ import {
   formatFileSize,
   getSafeExternalUrl,
   isImageMimeOrExt,
+  isPdfMimeOrExt,
   isTextMimeOrExt,
   readBrowserFile,
 } from '../../common/document-utils';
@@ -29,17 +30,16 @@ import {
   iconBuilding,
   iconChevronLeft,
   iconChevronRight,
-  iconCopy,
   iconDownload,
   iconEdit,
   iconEye,
-  iconFile,
   iconFileText,
   iconFolder,
   iconFolderOpen,
   iconGlobe,
   iconMessageSquare,
   iconPlus,
+  iconSearch,
   iconTrash,
   iconUpload,
   iconUsers,
@@ -49,6 +49,7 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-date-input/app-date-input';
+import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-form-grid/app-form-grid';
@@ -127,9 +128,11 @@ export class AppCompanyDetail extends LitElement {
   @state() private docDescription = '';
   @state() private docError = '';
 
-  // Preview Document modal state
+  // Embedded Company Library & Preview Modal state
+  @state() private selectedDocId = '';
+  @state() private docSearchQuery = '';
+  @state() private docTypeFilter: 'all' | 'pdf' | 'image' | 'text' = 'all';
   @state() private previewDoc: DocumentItem | null = null;
-  @state() private copiedText = false;
 
   private unsubscribe?: () => void;
 
@@ -862,11 +865,57 @@ export class AppCompanyDetail extends LitElement {
     `;
   }
 
+  private filterCompanyDocuments(docs: DocumentItem[]): DocumentItem[] {
+    const q = this.docSearchQuery.trim().toLowerCase();
+    return docs.filter((doc) => {
+      if (this.docTypeFilter === 'pdf' && !isPdfMimeOrExt(doc.mimeType, doc.extension)) {
+        return false;
+      }
+      if (this.docTypeFilter === 'image' && !isImageMimeOrExt(doc.mimeType, doc.extension)) {
+        return false;
+      }
+      if (
+        this.docTypeFilter === 'text' &&
+        (isPdfMimeOrExt(doc.mimeType, doc.extension) ||
+          isImageMimeOrExt(doc.mimeType, doc.extension) ||
+          !isTextMimeOrExt(doc.mimeType, doc.extension))
+      ) {
+        return false;
+      }
+      if (!q) return true;
+      return (
+        doc.title.toLowerCase().includes(q) ||
+        doc.fileName.toLowerCase().includes(q) ||
+        doc.tags.some((tag) => tag.toLowerCase().includes(q))
+      );
+    });
+  }
+
+  private getExtBadgeVariant(doc: DocumentItem): string {
+    if (isPdfMimeOrExt(doc.mimeType, doc.extension)) return 'is-pdf';
+    if (isImageMimeOrExt(doc.mimeType, doc.extension)) return 'is-image';
+    if (isTextMimeOrExt(doc.mimeType, doc.extension)) return 'is-code';
+    return '';
+  }
+
   private renderDocumentsSection(
     company: Company,
     companyDocs: DocumentItem[],
     t: ReturnType<typeof getTranslation>
   ) {
+    const pdfCount = companyDocs.filter((d) => isPdfMimeOrExt(d.mimeType, d.extension)).length;
+    const imageCount = companyDocs.filter((d) => isImageMimeOrExt(d.mimeType, d.extension)).length;
+    const textCount = companyDocs.filter(
+      (d) =>
+        !isPdfMimeOrExt(d.mimeType, d.extension) &&
+        !isImageMimeOrExt(d.mimeType, d.extension) &&
+        isTextMimeOrExt(d.mimeType, d.extension)
+    ).length;
+
+    const filteredDocs = this.filterCompanyDocuments(companyDocs);
+    const activeDoc =
+      filteredDocs.find((d) => d.id === this.selectedDocId) || filteredDocs[0] || null;
+
     return html`
       <app-section-card title="${t.companyDetail.documentsTab}" subtitle="(${companyDocs.length})">
         <span slot="icon">${iconFolderOpen(18)}</span>
@@ -891,8 +940,96 @@ export class AppCompanyDetail extends LitElement {
         ${companyDocs.length === 0
           ? html`<app-empty-state compact title="${t.companyDetail.noDocuments}"></app-empty-state>`
           : html`
-              <div class="rows-list">
-                ${companyDocs.map((doc) => this.renderDocumentRow(doc, t))}
+              <div class="company-docs-workspace">
+                <div class="docs-list-pane">
+                  <app-input
+                    size="sm"
+                    placeholder="${t.documents.searchInLibrary}"
+                    .value="${this.docSearchQuery}"
+                    @input="${(e: CustomEvent<{ value: string }>) =>
+                      (this.docSearchQuery = eventValue(e))}"
+                  >
+                    <span slot="prefix">${iconSearch(14)}</span>
+                  </app-input>
+
+                  <div class="docs-filter-pills">
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'all' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'all')}"
+                    >
+                      ${t.documents.filterAllTypes} (${companyDocs.length})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'pdf' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'pdf')}"
+                    >
+                      ${t.documents.filterPdf} (${pdfCount})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'image' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'image')}"
+                    >
+                      ${t.documents.filterImages} (${imageCount})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'text' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'text')}"
+                    >
+                      ${t.documents.filterText} (${textCount})
+                    </button>
+                  </div>
+
+                  ${filteredDocs.length === 0
+                    ? html`<app-empty-state compact title="${t.documents.noCompanyDocsMatch}"></app-empty-state>`
+                    : html`
+                        <div class="docs-pane-items">
+                          ${filteredDocs.map((doc) => {
+                            const isActive = activeDoc?.id === doc.id;
+                            const extLabel = (doc.extension || 'file').toUpperCase();
+                            return html`
+                              <button
+                                type="button"
+                                class="doc-select-card ${isActive ? 'is-active' : ''}"
+                                @click="${() => (this.selectedDocId = doc.id)}"
+                              >
+                                <span class="ext-badge ${this.getExtBadgeVariant(doc)}">${extLabel}</span>
+                                <div class="doc-select-main">
+                                  <span class="doc-select-title">${doc.title}</span>
+                                  <div class="doc-select-sub">
+                                    <span class="mono">${doc.fileName}</span>
+                                    <span>·</span>
+                                    <span class="mono">${formatFileSize(doc.sizeBytes, t)}</span>
+                                  </div>
+                                </div>
+                                <app-status-chip
+                                  domain="document"
+                                  status="${doc.status}"
+                                  appearance="soft"
+                                  size="sm"
+                                ></app-status-chip>
+                              </button>
+                            `;
+                          })}
+                        </div>
+                      `}
+                </div>
+
+                <div class="docs-preview-pane">
+                  <app-document-previewer
+                    .document="${activeDoc}"
+                    .documents="${filteredDocs}"
+                    show-expand
+                    height="560px"
+                    @select-document="${(e: CustomEvent<{ document: DocumentItem }>) =>
+                      (this.selectedDocId = e.detail.document.id)}"
+                    @expand="${(e: CustomEvent<{ document: DocumentItem }>) =>
+                      (this.previewDoc = e.detail.document)}"
+                  ></app-document-previewer>
+                </div>
               </div>
             `}
       </app-section-card>
@@ -902,10 +1039,16 @@ export class AppCompanyDetail extends LitElement {
   private renderDocumentRow(doc: DocumentItem, t: ReturnType<typeof getTranslation>) {
     const extLabel = (doc.extension || 'file').toUpperCase();
     return html`
-      <div class="list-row clickable" @click="${() => (this.previewDoc = doc)}">
+      <div
+        class="list-row clickable"
+        @click="${() => {
+          this.selectedDocId = doc.id;
+          this.previewDoc = doc;
+        }}"
+      >
         <div class="row-main">
           <div class="row-title">
-            <span class="ext-badge">${extLabel}</span>
+            <span class="ext-badge ${this.getExtBadgeVariant(doc)}">${extLabel}</span>
             <span>${doc.title}</span>
             <app-status-chip domain="document" status="${doc.status}" appearance="soft" size="sm"></app-status-chip>
           </div>
@@ -921,7 +1064,10 @@ export class AppCompanyDetail extends LitElement {
             type="button"
             class="icon-btn"
             title="${t.documents.previewTitle}"
-            @click="${() => (this.previewDoc = doc)}"
+            @click="${() => {
+              this.selectedDocId = doc.id;
+              this.previewDoc = doc;
+            }}"
           >
             ${iconEye(14)}
           </button>
@@ -1348,13 +1494,11 @@ export class AppCompanyDetail extends LitElement {
   private renderPreviewModal(t: ReturnType<typeof getTranslation>) {
     const doc = this.previewDoc;
     if (!doc) return '';
-    const canShowImage = Boolean(doc.dataUrl) && isImageMimeOrExt(doc.mimeType, doc.extension);
-    const canShowText = Boolean(doc.textContent) && isTextMimeOrExt(doc.mimeType, doc.extension);
 
     return html`
       <app-modal
         open
-        size="lg"
+        size="xl"
         title="${doc.title}"
         @close="${() => (this.previewDoc = null)}"
       >
@@ -1366,39 +1510,11 @@ export class AppCompanyDetail extends LitElement {
 
           ${doc.description ? html`<p class="company-desc">${doc.description}</p>` : ''}
 
-          ${canShowImage
-            ? html`
-                <div class="preview-image-frame">
-                  <img src="${doc.dataUrl!}" alt="${doc.title}" />
-                </div>
-              `
-            : canShowText
-            ? html`
-                <div style="display: flex; justify-content: flex-end;">
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => {
-                      navigator.clipboard?.writeText(doc.textContent || '');
-                      this.copiedText = true;
-                      window.setTimeout(() => (this.copiedText = false), 1500);
-                    }}"
-                  >
-                    <span slot="icon-start">${iconCopy(13)}</span>
-                    <span>
-                      ${this.copiedText ? t.viewTexts.documents.copiedContent : t.viewTexts.documents.copyContent}
-                    </span>
-                  </app-button>
-                </div>
-                <pre class="preview-code">${doc.textContent}</pre>
-              `
-            : html`
-                <div class="preview-binary-box">
-                  ${iconFile(28)}
-                  <strong style="color: var(--text-primary);">${t.documents.previewNotAvailable}</strong>
-                  <span>${t.documents.binaryPreviewHint}</span>
-                </div>
-              `}
+          <app-document-previewer
+            .document="${doc}"
+            .showHeader="${false}"
+            height="540px"
+          ></app-document-previewer>
         </div>
 
         <div slot="footer">
@@ -1537,7 +1653,7 @@ export class AppCompanyDetail extends LitElement {
     const ext = parts.length > 1 ? (parts.pop() || 'txt').toLowerCase() : this.docExtension || 'txt';
     const textBytes = this.docTextContent ? new Blob([this.docTextContent]).size : 512;
 
-    store.addDocument({
+    const created = store.addDocument({
       title: this.docTitle.trim(),
       fileName,
       extension: ext,
@@ -1558,6 +1674,10 @@ export class AppCompanyDetail extends LitElement {
       textContent: this.docTextContent.trim() || undefined,
       versionNote: t.viewTexts.documents.initialVersionNote,
     });
+    this.selectedDocId = created.id;
+    this.docTypeFilter = 'all';
+    this.docSearchQuery = '';
+    this.activeTab = 'documents';
     this.uploadDocModalOpen = false;
   }
 }

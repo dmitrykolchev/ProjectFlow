@@ -17,7 +17,6 @@ import {
   DocumentStatus,
 } from '../../../types';
 import {
-  iconCopy,
   iconDownload,
   iconEdit,
   iconEye,
@@ -33,6 +32,7 @@ import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
+import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -95,7 +95,6 @@ export class AppDocuments extends LitElement {
 
   // Preview & Versioning Modal
   @state() private previewDoc: DocumentItem | null = null;
-  @state() private copiedContent = false;
   @state() private newVersionPayload: ReadFilePayload | null = null;
   @state() private newVersionNote = '';
   @state() private versionTruncatedNote = '';
@@ -892,13 +891,11 @@ export class AppDocuments extends LitElement {
 
     const uploader = store.users.find((u) => u.id === doc.uploadedById);
     const linked = this.getLinkedEntityLabel(doc, t);
-    const canShowImage = Boolean(doc.dataUrl) && isImageMimeOrExt(doc.mimeType, doc.extension);
-    const canShowText = Boolean(doc.textContent) && isTextMimeOrExt(doc.mimeType, doc.extension);
 
     return html`
       <app-modal
         open
-        size="lg"
+        size="xl"
         title="${doc.title}"
         @close="${() => (this.previewDoc = null)}"
       >
@@ -947,43 +944,11 @@ export class AppDocuments extends LitElement {
 
           ${doc.description ? html`<p class="doc-desc" style="-webkit-line-clamp: unset;">${doc.description}</p>` : ''}
 
-          ${canShowImage
-            ? html`
-                <div class="preview-image-frame">
-                  <img src="${doc.dataUrl!}" alt="${doc.title}" />
-                </div>
-              `
-            : canShowText
-            ? html`
-                <div class="preview-code-wrap">
-                  <div style="display: flex; justify-content: flex-end;">
-                    <app-button
-                      size="sm"
-                      variant="outline"
-                      @click="${() => {
-                        navigator.clipboard?.writeText(doc.textContent || '');
-                        this.copiedContent = true;
-                        window.setTimeout(() => (this.copiedContent = false), 1500);
-                      }}"
-                    >
-                      <span slot="icon-start">${iconCopy(13)}</span>
-                      <span>
-                        ${this.copiedContent
-                          ? t.viewTexts.documents.copiedContent
-                          : t.viewTexts.documents.copyContent}
-                      </span>
-                    </app-button>
-                  </div>
-                  <pre class="preview-code">${doc.textContent}</pre>
-                </div>
-              `
-            : html`
-                <div class="preview-binary-box">
-                  ${iconFile(28)}
-                  <strong style="color: var(--text-primary);">${t.documents.previewNotAvailable}</strong>
-                  <span>${t.documents.binaryPreviewHint}</span>
-                </div>
-              `}
+          <app-document-previewer
+            .document="${doc}"
+            .showHeader="${false}"
+            height="480px"
+          ></app-document-previewer>
 
           <div class="versions-section">
             <div class="versions-header">
@@ -1168,7 +1133,6 @@ export class AppDocuments extends LitElement {
     this.newVersionPayload = null;
     this.newVersionNote = '';
     this.versionTruncatedNote = '';
-    this.copiedContent = false;
     this.previewDoc = doc;
   }
 

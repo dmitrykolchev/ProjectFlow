@@ -112,6 +112,96 @@ export function isImageMimeOrExt(mime: string, ext: string): boolean {
   return (mime || '').toLowerCase().startsWith('image/');
 }
 
+export function isPdfMimeOrExt(mime: string, ext: string): boolean {
+  const normalizedExt = (ext || '').toLowerCase();
+  if (normalizedExt === 'pdf') return true;
+  return (mime || '').toLowerCase().includes('pdf');
+}
+
+export function dataUrlToBlobUrl(dataUrl: string, overrideMime?: string): string | null {
+  try {
+    if (!dataUrl || !dataUrl.startsWith('data:')) return null;
+    const commaIdx = dataUrl.indexOf(',');
+    if (commaIdx === -1) return null;
+    const meta = dataUrl.slice(5, commaIdx);
+    const dataPart = dataUrl.slice(commaIdx + 1);
+    const mimeMatch = meta.match(/^([^;]+)/);
+    const mimeType = overrideMime || mimeMatch?.[1] || 'application/octet-stream';
+    const isBase64 = /;base64/i.test(meta);
+
+    if (isBase64) {
+      const binary = atob(dataPart);
+      const bytes = new Uint8Array(binary.length);
+      for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+      }
+      return URL.createObjectURL(new Blob([bytes], { type: mimeType }));
+    }
+
+    const decoded = decodeURIComponent(dataPart);
+    return URL.createObjectURL(new Blob([decoded], { type: mimeType }));
+  } catch {
+    return null;
+  }
+}
+
+export function parseCsvRows(text: string): string[][] {
+  const normalized = (text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+  if (!normalized) return [];
+  const firstLine = normalized.split('\n')[0] || '';
+  const commaCount = (firstLine.match(/,/g) || []).length;
+  const semiCount = (firstLine.match(/;/g) || []).length;
+  const tabCount = (firstLine.match(/\t/g) || []).length;
+  const delimiter = tabCount > commaCount && tabCount > semiCount ? '\t' : semiCount > commaCount ? ';' : ',';
+
+  const rows: string[][] = [];
+  let currentRow: string[] = [];
+  let currentCell = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < normalized.length; i++) {
+    const ch = normalized[i];
+    const next = normalized[i + 1];
+    if (inQuotes) {
+      if (ch === '"' && next === '"') {
+        currentCell += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        currentCell += ch;
+      }
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === delimiter) {
+      currentRow.push(currentCell.trim());
+      currentCell = '';
+    } else if (ch === '\n') {
+      currentRow.push(currentCell.trim());
+      if (currentRow.some((cell) => cell.length > 0)) {
+        rows.push(currentRow);
+      }
+      currentRow = [];
+      currentCell = '';
+    } else {
+      currentCell += ch;
+    }
+  }
+  currentRow.push(currentCell.trim());
+  if (currentRow.some((cell) => cell.length > 0)) {
+    rows.push(currentRow);
+  }
+  return rows;
+}
+
+export function formatJsonPretty(text: string): string {
+  try {
+    return JSON.stringify(JSON.parse(text), null, 2);
+  } catch {
+    return text;
+  }
+}
+
 function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

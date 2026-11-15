@@ -2320,6 +2320,93 @@ const L2_CACHE_SVG_DATA_URL =
 </svg>`
   );
 
+function escapePdfText(text: string): string {
+  return text.replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+}
+
+function buildSamplePdfDataUrl(lines: string[]): string {
+  const safeLines = lines.slice(0, 32);
+  const contentOps: string[] = ['BT', '/F1 14 Tf', '48 760 Td', '18 TL'];
+  safeLines.forEach((line, idx) => {
+    if (idx === 1) {
+      contentOps.push('/F1 10.5 Tf');
+      contentOps.push('0 -24 Td');
+    } else if (idx > 1) {
+      contentOps.push('T*');
+    }
+    contentOps.push(`(${escapePdfText(line)}) Tj`);
+  });
+  contentOps.push('ET');
+  const stream = contentOps.join('\n');
+
+  const objects: string[] = [
+    '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n',
+    '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n',
+    '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>\nendobj\n',
+    `4 0 obj\n<< /Length ${stream.length} >>\nstream\n${stream}\nendstream\nendobj\n`,
+    '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n',
+  ];
+
+  let pdf = '%PDF-1.4\n';
+  const offsets: number[] = [0];
+  for (const obj of objects) {
+    offsets.push(pdf.length);
+    pdf += obj;
+  }
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n`;
+  pdf += '0000000000 65535 f \n';
+  for (let i = 1; i <= objects.length; i++) {
+    pdf += `${String(offsets[i]).padStart(10, '0')} 00000 n \n`;
+  }
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+
+  return `data:application/pdf;base64,${btoa(pdf)}`;
+}
+
+const CONTRACT_001_PDF_DATA_URL = buildSamplePdfDataUrl([
+  'ProjectFlow Tech LLC - Contract DG-2026/001',
+  '------------------------------------------------------------------------',
+  'Document: Bilateral Software Development Agreement (Core Platform 3.0)',
+  'Contractor: ProjectFlow Tech LLC (INN 7704351920 / KPP 770401001)',
+  'Client: PJSC Severny Kapital Bank (INN 7702070139)',
+  'Linked Project: [CORE] Core Platform 3.0',
+  'Contract Value: 12,000,000.00 RUB (VAT 20% included)',
+  'Term: 2026-05-15 to 2026-12-31 | Billing Cycle: Monthly Calculations',
+  '',
+  'Scope of Services (Appendix No. 1):',
+  '  1. Microservices API Gateway & gRPC-Web Streaming Layer',
+  '  2. Distributed L1/L2 Caching (Redis Cluster + Kafka Event Bus)',
+  '  3. RBAC Policy Engine & Immutable Audit Trail',
+  '  4. Performance Tuning & Production Rollout',
+  '',
+  'Electronic Signature (Diadoc EDS):',
+  '  - Signed by: Morozov A.S. (CEO, ProjectFlow Tech LLC)',
+  '  - Signed by: Volkov D.A. (Authorized Rep, Severny Kapital Bank)',
+  '  - EDS Status: Verified & Validated (2026-05-15 14:20 UTC)',
+]);
+
+const OWASP_AUDIT_PDF_DATA_URL = buildSamplePdfDataUrl([
+  'FlowCloud Infra - OWASP ASVS v4.0 Security Audit Report',
+  '------------------------------------------------------------------------',
+  'Audit Scope: SEC-301 Cloud Perimeter, CI/CD SAST & Pen-Test Verification',
+  'Project: [SEC] Cloud Security Hardening & SOC2 Compliance',
+  'Company: FlowCloud Infra LLC | Auditor: External AppSec Team',
+  'Date: 2026-11-08 | Overall Verdict: APPROVED (Zero Critical/High Issues)',
+  '',
+  'Executive Summary:',
+  '  - Critical Vulnerabilities: 0',
+  '  - High Vulnerabilities: 0',
+  '  - Medium Findings (Remediated in Stage 1): 2',
+  '  - Semgrep SAST Ruleset: 100% Pass across 14 repositories',
+  '',
+  'Verified Controls:',
+  '  [PASS] HashiCorp Vault 30-day automated service key rotation',
+  '  [PASS] Mutual TLS 1.3 enforced on internal service mesh',
+  '  [PASS] Immutable WORM audit log streaming to SIEM cluster',
+  '  [PASS] Mandatory Hardware MFA for privileged contractor sessions',
+]);
+
 export const initialDocuments: DocumentItem[] = [
   {
     id: 'doc-1',
@@ -2419,6 +2506,7 @@ export const initialDocuments: DocumentItem[] = [
     tags: ['Договор', 'ЭЦП', 'Банк', 'Core'],
     version: 1,
     uploadedById: 'user-8',
+    dataUrl: CONTRACT_001_PDF_DATA_URL,
     versions: [
       {
         version: 1,
@@ -2522,6 +2610,7 @@ export const initialDocuments: DocumentItem[] = [
     tags: ['OWASP', 'Пентест', 'SAST', 'Отчёт'],
     version: 1,
     uploadedById: 'user-5',
+    dataUrl: OWASP_AUDIT_PDF_DATA_URL,
     versions: [
       {
         version: 1,

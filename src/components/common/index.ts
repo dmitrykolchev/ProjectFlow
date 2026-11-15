@@ -64,6 +64,7 @@ export { AppMoney, formatMoney, formatMoneyShort } from './app-money/app-money';
 export { AppPagination } from './app-pagination/app-pagination';
 export type { PaginationVariant } from './app-pagination/app-pagination';
 export { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
+export { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -110,6 +111,7 @@ import { AppAvatar } from './app-avatar/app-avatar';
 import { AppMoney } from './app-money/app-money';
 import { AppPagination } from './app-pagination/app-pagination';
 import { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
+import { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -148,6 +150,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-money': AppMoney,
   'app-pagination': AppPagination,
   'app-file-dropzone': AppFileDropzone,
+  'app-document-previewer': AppDocumentPreviewer,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

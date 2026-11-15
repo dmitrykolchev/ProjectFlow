@@ -381,9 +381,16 @@ export class AppStore {
         : [...initialKnowledgeArticles];
 
       const storedDocuments = localStorage.getItem(STORAGE_KEY_DOCUMENTS);
-      this.documents = storedDocuments
-        ? JSON.parse(storedDocuments)
-        : [...initialDocuments];
+      if (storedDocuments) {
+        const parsedDocs: DocumentItem[] = JSON.parse(storedDocuments);
+        this.documents = parsedDocs.map((doc) => {
+          if (doc.dataUrl) return doc;
+          const seed = initialDocuments.find((d) => d.id === doc.id);
+          return seed?.dataUrl ? { ...doc, dataUrl: seed.dataUrl } : doc;
+        });
+      } else {
+        this.documents = [...initialDocuments];
+      }
 
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
