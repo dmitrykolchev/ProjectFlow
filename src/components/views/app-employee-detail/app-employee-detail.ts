@@ -217,7 +217,18 @@ export class AppEmployeeDetail extends LitElement {
                 <div class="emp-sub">
                   <span>${emp.role}</span>
                   ${emp.department ? html`<span aria-hidden="true">·</span><span>${emp.department}</span>` : ''}
-                  ${company ? html`<span aria-hidden="true">·</span><span>${company.name}</span>` : ''}
+                  ${company
+                    ? html`
+                        <span aria-hidden="true">·</span>
+                        <button
+                          type="button"
+                          class="link-btn"
+                          @click="${() => store.openCompanyDetail(company.id)}"
+                        >
+                          ${company.name}
+                        </button>
+                      `
+                    : ''}
                   ${emp.location ? html`<span aria-hidden="true">·</span><span>${emp.location}</span>` : ''}
                 </div>
               </div>

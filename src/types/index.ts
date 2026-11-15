@@ -325,6 +325,7 @@ export type ActiveView =
   | 'calendar'
   | 'analytics'
   | 'companies'
+  | 'company-detail'
   | 'employees'
   | 'employee-detail'
   | 'counterparties'
@@ -337,6 +338,7 @@ export type ActiveView =
   | 'project-detail'
   | 'project-chat'
   | 'knowledge-base'
+  | 'documents'
   | 'task-detail'
   | 'time-tracking'
   | 'expenses'
@@ -364,6 +366,7 @@ export interface ActivityLogItem {
     | 'expense'
     | 'chat'
     | 'knowledge'
+    | 'document'
     | 'settings';
   targetId?: string;
   targetTitle: string;
@@ -411,6 +414,62 @@ export interface KnowledgeArticle {
   createdAt: string;
   updatedAt: string;
   verifiedAt?: string;
+}
+
+export type DocumentScope =
+  | 'general'
+  | 'company'
+  | 'project'
+  | 'contract'
+  | 'counterparty'
+  | 'task';
+
+export type DocumentCategory =
+  | 'contract'
+  | 'act_invoice'
+  | 'spec'
+  | 'design'
+  | 'legal'
+  | 'policy'
+  | 'report'
+  | 'other';
+
+export type DocumentStatus = 'draft' | 'review' | 'approved' | 'archived';
+
+export interface DocumentVersion {
+  version: number;
+  fileName: string;
+  sizeBytes: number;
+  mimeType: string;
+  uploadedById: string;
+  uploadedAt: string;
+  notes: string;
+}
+
+export interface DocumentItem {
+  id: string;
+  title: string;
+  fileName: string;
+  extension: string;
+  mimeType: string;
+  sizeBytes: number;
+  category: DocumentCategory;
+  status: DocumentStatus;
+  scope: DocumentScope;
+  companyId?: string;
+  projectId?: string;
+  contractId?: string;
+  counterpartyId?: string;
+  taskId?: string;
+  description: string;
+  tags: string[];
+  version: number;
+  uploadedById: string;
+  dataUrl?: string;
+  textContent?: string;
+  versions: DocumentVersion[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface NotificationItem {

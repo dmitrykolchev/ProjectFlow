@@ -3,7 +3,15 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Company, CompanyStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconBookOpen, iconBuilding, iconEdit, iconPlus, iconTrash } from '../../common/icons';
+import {
+  iconBookOpen,
+  iconBuilding,
+  iconChevronRight,
+  iconEdit,
+  iconFolderOpen,
+  iconPlus,
+  iconTrash,
+} from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -232,6 +240,13 @@ export class AppCompanies extends LitElement {
             ></app-select>
           </div>
           <div class="col-span-2">
+            <app-input
+              label="${t.viewTexts.companies.labelWebsite}"
+              .value="${this.formWebsite}"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.formWebsite = eventValue(e))}"
+            ></app-input>
+          </div>
+          <div class="col-span-2">
             <app-textarea
               label="${t.viewTexts.companies.labelDescription}"
               .value="${this.formDescription}"
@@ -289,7 +304,13 @@ export class AppCompanies extends LitElement {
                 <div class="company-identity">
                   <div class="company-icon">${iconBuilding(20)}</div>
                   <div class="company-names">
-                    <div class="company-name">${company.name}</div>
+                    <button
+                      type="button"
+                      class="company-name-btn"
+                      @click="${() => store.openCompanyDetail(company.id)}"
+                    >
+                      ${company.name}
+                    </button>
                     <div class="company-legal" title="${company.legalName}">${company.legalName}</div>
                   </div>
                 </div>
@@ -343,6 +364,14 @@ export class AppCompanies extends LitElement {
                   <button
                     type="button"
                     class="icon-btn"
+                    title="${t.viewTexts.companies.documentsTitle}"
+                    @click="${() => store.openDocuments({ scope: 'company', companyId: company.id })}"
+                  >
+                    ${iconFolderOpen(14)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
                     title="${t.viewTexts.companies.knowledgeBaseTitle}"
                     @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
                   >
@@ -363,6 +392,14 @@ export class AppCompanies extends LitElement {
                     @click="${() => (this.deletingCompany = company)}"
                   >
                     ${iconTrash(14)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="${t.viewTexts.companies.openCardButton}"
+                    @click="${() => store.openCompanyDetail(company.id)}"
+                  >
+                    ${iconChevronRight(15)}
                   </button>
                 </div>
               </div>

@@ -676,10 +676,14 @@ export class AppKnowledgeBase extends LitElement {
           ${comp
             ? html`
                 <span aria-hidden="true">/</span>
-                <span style="display: inline-flex; align-items: center; gap: 0.25rem; color: var(--text-primary); font-weight: 500;">
+                <button
+                  type="button"
+                  class="link-btn"
+                  @click="${() => store.openCompanyDetail(comp.id)}"
+                >
                   ${iconBuilding(13)}
                   <span>${comp.name}</span>
-                </span>
+                </button>
               `
             : ''}
           <span aria-hidden="true">·</span>

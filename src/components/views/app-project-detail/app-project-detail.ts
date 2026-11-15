@@ -316,7 +316,17 @@ export class AppProjectDetail extends LitElement {
           <div class="meta-strip">
             <div class="meta-box">
               <span class="meta-label">${t.viewTexts.projectDetail.metaCompany}</span>
-              <span class="meta-val">${company?.name || '—'}</span>
+              ${company
+                ? html`
+                    <button
+                      type="button"
+                      class="link-btn"
+                      @click="${() => store.openCompanyDetail(company.id)}"
+                    >
+                      ${company.name}
+                    </button>
+                  `
+                : html`<span class="meta-val">—</span>`}
             </div>
             <div class="meta-box">
               <span class="meta-label">${t.viewTexts.projectDetail.metaCounterparty}</span>

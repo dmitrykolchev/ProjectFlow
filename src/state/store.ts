@@ -8,6 +8,8 @@ import {
   Company,
   Contract,
   Counterparty,
+  DocumentItem,
+  DocumentScope,
   Expense,
   Invoice,
   InvoicePayment,
@@ -34,6 +36,7 @@ import {
   initialCompanies,
   initialContracts,
   initialCounterparties,
+  initialDocuments,
   initialExpenses,
   initialInvoices,
   initialKnowledgeArticles,
@@ -60,6 +63,7 @@ const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
 const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
+const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -220,8 +224,10 @@ export class AppStore {
   public expenses: Expense[] = [];
   public chatMessages: ProjectChatMessage[] = [];
   public knowledgeArticles: KnowledgeArticle[] = [];
+  public documents: DocumentItem[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
+  public detailCompanyId: string = '';
   public detailContractId: string = '';
   public detailCounterpartyId: string = '';
   public detailEmployeeId: string = '';
@@ -230,6 +236,9 @@ export class AppStore {
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
   public knowledgeFilterCompanyId: string = 'all';
+  public documentFilterScope: 'all' | DocumentScope = 'all';
+  public documentFilterCompanyId: string = 'all';
+  public documentFilterProjectId: string = 'all';
   public chatProjectId: string = '';
   public currentUserId: string = 'user-1';
   public pendingInvoiceForContractId: string | null = null;
@@ -371,6 +380,11 @@ export class AppStore {
         ? JSON.parse(storedKnowledge)
         : [...initialKnowledgeArticles];
 
+      const storedDocuments = localStorage.getItem(STORAGE_KEY_DOCUMENTS);
+      this.documents = storedDocuments
+        ? JSON.parse(storedDocuments)
+        : [...initialDocuments];
+
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
         this.activityLog = JSON.parse(storedLogs);
@@ -418,6 +432,7 @@ export class AppStore {
       this.expenses = [...initialExpenses];
       this.chatMessages = [...initialChatMessages];
       this.knowledgeArticles = [...initialKnowledgeArticles];
+      this.documents = [...initialDocuments];
     }
   }
 
@@ -522,6 +537,24 @@ export class AppStore {
       localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(this.knowledgeArticles));
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  private saveDocuments(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_DOCUMENTS, JSON.stringify(this.documents));
+    } catch (e) {
+      console.warn('localStorage quota exceeded while saving documents, stripping large binary payloads:', e);
+      try {
+        const compacted = this.documents.map((doc) =>
+          doc.dataUrl && doc.dataUrl.length > 60_000
+            ? { ...doc, dataUrl: undefined }
+            : doc
+        );
+        localStorage.setItem(STORAGE_KEY_DOCUMENTS, JSON.stringify(compacted));
+      } catch (err) {
+        console.error(err);
+      }
     }
   }
 
@@ -872,6 +905,7 @@ export class AppStore {
       view === 'project-detail' ||
       view === 'project-chat' ||
       view === 'knowledge-base' ||
+      view === 'documents' ||
       view === 'task-detail' ||
       view === 'kanban' ||
       view === 'gantt' ||
@@ -883,6 +917,7 @@ export class AppStore {
     if (view === 'grid' || view === 'calendar' || view === 'analytics') return 'views';
     if (
       view === 'companies' ||
+      view === 'company-detail' ||
       view === 'employees' ||
       view === 'employee-detail' ||
       view === 'counterparties' ||
@@ -963,6 +998,8 @@ export class AppStore {
     switch (this.activeView) {
       case 'project-detail':
         return this.detailProjectId || undefined;
+      case 'company-detail':
+        return this.detailCompanyId || undefined;
       case 'contract-detail':
         return this.detailContractId || undefined;
       case 'counterparty-detail':
@@ -1001,6 +1038,9 @@ export class AppStore {
     if (view === 'project-detail') {
       if (id && this.projects.some((p) => p.id === id)) this.detailProjectId = id;
       else view = 'projects';
+    } else if (view === 'company-detail') {
+      if (id && this.companies.some((c) => c.id === id)) this.detailCompanyId = id;
+      else view = 'companies';
     } else if (view === 'contract-detail') {
       if (id && this.contracts.some((c) => c.id === id)) this.detailContractId = id;
       else view = 'contracts';
@@ -1050,6 +1090,11 @@ export class AppStore {
     this.setActiveView('project-detail');
   }
 
+  public openCompanyDetail(companyId: string): void {
+    this.detailCompanyId = companyId;
+    this.setActiveView('company-detail');
+  }
+
   public openCounterpartyDetail(counterpartyId: string): void {
     this.detailCounterpartyId = counterpartyId;
     this.setActiveView('counterparty-detail');
@@ -1075,6 +1120,20 @@ export class AppStore {
           : this.projects[0]?.id || '';
     }
     this.setActiveView('project-chat');
+  }
+
+  public openDocuments(options?: {
+    scope?: 'all' | DocumentScope;
+    companyId?: string;
+    projectId?: string;
+  }): void {
+    if (options) {
+      this.documentFilterScope =
+        options.scope ?? (options.projectId ? 'project' : options.companyId ? 'company' : 'all');
+      this.documentFilterCompanyId = options.companyId || 'all';
+      this.documentFilterProjectId = options.projectId || 'all';
+    }
+    this.setActiveView('documents');
   }
 
   public openKnowledgeBase(options?: {
@@ -1322,6 +1381,13 @@ export class AppStore {
     const target = this.companies.find((c) => c.id === id);
     if (!target) return;
     this.companies = this.companies.filter((c) => c.id !== id);
+    if (this.detailCompanyId === id) {
+      this.detailCompanyId = this.companies[0]?.id || '';
+      if (this.activeView === 'company-detail') {
+        this.activeView = 'companies';
+        this.syncHistory(true);
+      }
+    }
     this.saveCompanies();
     this.logActivity('delete', 'company', target.name, 'Компания удалена');
     this.addNotification('warning', 'Удалено', `Компания "${target.name}" удалена`);
@@ -2326,6 +2392,122 @@ export class AppStore {
     this.saveKnowledgeArticles();
     this.logActivity('delete', 'knowledge', target.title, 'Материал удалён из базы знаний', target.id);
     this.addNotification('warning', 'Удалено', `Статья "${target.title}" удалена`);
+    this.notify();
+  }
+
+  // --- Documents Library CRUD ---
+  public setDocumentFilters(filters: {
+    scope?: 'all' | DocumentScope;
+    companyId?: string;
+    projectId?: string;
+  }): void {
+    if (filters.scope !== undefined) this.documentFilterScope = filters.scope;
+    if (filters.companyId !== undefined) this.documentFilterCompanyId = filters.companyId;
+    if (filters.projectId !== undefined) this.documentFilterProjectId = filters.projectId;
+    this.notify();
+  }
+
+  public addDocument(
+    data: Omit<DocumentItem, 'id' | 'version' | 'versions' | 'createdAt' | 'updatedAt'> & {
+      versionNote?: string;
+    }
+  ): DocumentItem {
+    const now = new Date().toISOString();
+    const { versionNote, ...rest } = data;
+    const uploaderId = data.uploadedById || this.currentUserId || this.users[0]?.id || 'user-1';
+    const doc: DocumentItem = {
+      ...rest,
+      uploadedById: uploaderId,
+      id: `doc-${Date.now().toString().slice(-6)}-${Math.random().toString(36).substring(2, 4)}`,
+      version: 1,
+      versions: [
+        {
+          version: 1,
+          fileName: data.fileName,
+          sizeBytes: data.sizeBytes,
+          mimeType: data.mimeType,
+          uploadedById: uploaderId,
+          uploadedAt: now,
+          notes: versionNote?.trim() || 'Первичная загрузка файла',
+        },
+      ],
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.documents = [doc, ...this.documents];
+    this.saveDocuments();
+    this.logActivity('create', 'document', doc.title, `${doc.fileName} (${doc.category})`, doc.id);
+    this.addNotification('success', 'Документ загружен', doc.title);
+    this.notify();
+    return doc;
+  }
+
+  public updateDocument(updated: DocumentItem): void {
+    const now = new Date().toISOString();
+    const next: DocumentItem = { ...updated, updatedAt: now };
+    this.documents = this.documents.map((d) => (d.id === next.id ? next : d));
+    this.saveDocuments();
+    this.logActivity('update', 'document', next.title, `Обновлены метаданные (${next.status})`, next.id);
+    this.addNotification('info', 'Документ обновлён', next.title);
+    this.notify();
+  }
+
+  public uploadDocumentVersion(
+    id: string,
+    payload: {
+      fileName: string;
+      extension: string;
+      mimeType: string;
+      sizeBytes: number;
+      dataUrl?: string;
+      textContent?: string;
+      notes: string;
+      uploadedById?: string;
+    }
+  ): void {
+    const existing = this.documents.find((d) => d.id === id);
+    if (!existing) return;
+    const now = new Date().toISOString();
+    const nextVersion = (existing.version || 1) + 1;
+    const uploaderId = payload.uploadedById || this.currentUserId || existing.uploadedById || 'user-1';
+    const nextDoc: DocumentItem = {
+      ...existing,
+      fileName: payload.fileName,
+      extension: payload.extension,
+      mimeType: payload.mimeType,
+      sizeBytes: payload.sizeBytes,
+      dataUrl: payload.dataUrl,
+      textContent: payload.textContent,
+      uploadedById: uploaderId,
+      version: nextVersion,
+      updatedAt: now,
+      versions: [
+        {
+          version: nextVersion,
+          fileName: payload.fileName,
+          sizeBytes: payload.sizeBytes,
+          mimeType: payload.mimeType,
+          uploadedById: uploaderId,
+          uploadedAt: now,
+          notes: payload.notes.trim() || `Версия ${nextVersion}`,
+        },
+        ...(existing.versions || []),
+      ].slice(0, 20),
+    };
+    this.documents = this.documents.map((d) => (d.id === id ? nextDoc : d));
+    this.saveDocuments();
+    this.logActivity('update', 'document', nextDoc.title, `Загружена v${nextVersion}: ${nextDoc.fileName}`, nextDoc.id);
+    this.addNotification('success', `Версия v${nextVersion}`, nextDoc.title);
+    this.notify();
+  }
+
+  public deleteDocument(id: string): void {
+    const target = this.documents.find((d) => d.id === id);
+    if (!target) return;
+    this.documents = this.documents.filter((d) => d.id !== id);
+    this.saveDocuments();
+    this.logActivity('delete', 'document', target.title, `Удалён файл ${target.fileName}`, target.id);
+    this.addNotification('warning', 'Документ удалён', target.title);
     this.notify();
   }
 

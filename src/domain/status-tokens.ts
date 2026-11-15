@@ -16,7 +16,8 @@ export type StatusDomain =
   | 'payment'
   | 'expense'
   | 'timeEntry'
-  | 'employee';
+  | 'employee'
+  | 'document';
 
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
@@ -107,6 +108,12 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     remote: { variant: 'info', label: { ru: 'Удалённо', en: 'Remote' } },
     vacation: { variant: 'warning', label: { ru: 'Отпуск', en: 'Vacation' } },
     onboarding: { variant: 'primary', label: { ru: 'Адаптация', en: 'Onboarding' } },
+  },
+  document: {
+    draft: { variant: 'default', i18nPath: ['documents', 'statuses'] },
+    review: { variant: 'warning', i18nPath: ['documents', 'statuses'] },
+    approved: { variant: 'success', i18nPath: ['documents', 'statuses'] },
+    archived: { variant: 'default', i18nPath: ['documents', 'statuses'] },
   },
 };
 

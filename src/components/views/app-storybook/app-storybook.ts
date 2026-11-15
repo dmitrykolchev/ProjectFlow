@@ -38,6 +38,7 @@ import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.stor
 import avatarMeta from '../../common/app-avatar/app-avatar.story';
 import moneyMeta from '../../common/app-money/app-money.story';
 import paginationMeta from '../../common/app-pagination/app-pagination.story';
+import fileDropzoneMeta from '../../common/app-file-dropzone/app-file-dropzone.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -62,7 +63,9 @@ import projectsMeta from '../app-projects/app-projects.story';
 import projectDetailMeta from '../app-project-detail/app-project-detail.story';
 import projectChatMeta from '../app-project-chat/app-project-chat.story';
 import knowledgeBaseMeta from '../app-knowledge-base/app-knowledge-base.story';
+import documentsMeta from '../app-documents/app-documents.story';
 import companiesMeta from '../app-companies/app-companies.story';
+import companyDetailMeta from '../app-company-detail/app-company-detail.story';
 import employeesMeta from '../app-employees/app-employees.story';
 import employeeDetailMeta from '../app-employee-detail/app-employee-detail.story';
 import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
@@ -108,6 +111,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   avatarMeta,
   moneyMeta,
   paginationMeta,
+  fileDropzoneMeta,
   toastMeta,
   activityMeta,
   headerMeta,
@@ -131,7 +135,9 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   projectDetailMeta,
   projectChatMeta,
   knowledgeBaseMeta,
+  documentsMeta,
   companiesMeta,
+  companyDetailMeta,
   employeesMeta,
   employeeDetailMeta,
   counterpartiesMeta,

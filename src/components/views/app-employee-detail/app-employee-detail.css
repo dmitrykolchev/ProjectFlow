@@ -324,6 +324,21 @@
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
 
+.link-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--accent-primary, #6366f1);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
 .icon-btn {
   width: 32px;
   height: 32px;

@@ -24,6 +24,7 @@ import {
   iconCreditCard,
   iconMessageSquare,
   iconBookOpen,
+  iconFolderOpen,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -50,7 +51,9 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'project-detail': () => import('./components/views/app-project-detail/app-project-detail'),
   'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
   'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
+  documents: () => import('./components/views/app-documents/app-documents'),
   companies: () => import('./components/views/app-companies/app-companies'),
+  'company-detail': () => import('./components/views/app-company-detail/app-company-detail'),
   employees: () => import('./components/views/app-employees/app-employees'),
   'employee-detail': () => import('./components/views/app-employee-detail/app-employee-detail'),
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
@@ -75,6 +78,7 @@ export class AppRoot extends LitElement {
   @state() private taskCount = store.tasks.length;
   @state() private chatCount = store.chatMessages.length;
   @state() private knowledgeCount = store.knowledgeArticles.length;
+  @state() private documentCount = store.documents.length;
   @state() private loadedViews: Set<ActiveView> = new Set();
 
   private loadingViews: Set<ActiveView> = new Set();
@@ -101,6 +105,7 @@ export class AppRoot extends LitElement {
     this.taskCount = store.tasks.length;
     this.chatCount = store.chatMessages.length;
     this.knowledgeCount = store.knowledgeArticles.length;
+    this.documentCount = store.documents.length;
     this.ensureViewLoaded(this.activeView);
   }
 
@@ -201,6 +206,8 @@ export class AppRoot extends LitElement {
           ? 'counterparties'
           : this.activeView === 'employee-detail'
           ? 'employees'
+          : this.activeView === 'company-detail'
+          ? 'companies'
           : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
@@ -254,6 +261,13 @@ export class AppRoot extends LitElement {
             label="${t.navigation.knowledgeBase}"
             badge="${String(this.knowledgeCount)}"
             .icon="${iconBookOpen()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="documents"
+            label="${t.navigation.documents}"
+            badge="${String(this.documentCount)}"
+            .icon="${iconFolderOpen()}"
           ></sidebar-item>
         </sidebar-group>
 
@@ -399,8 +413,12 @@ export class AppRoot extends LitElement {
         return html`<app-project-chat></app-project-chat>`;
       case 'knowledge-base':
         return html`<app-knowledge-base></app-knowledge-base>`;
+      case 'documents':
+        return html`<app-documents></app-documents>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
+      case 'company-detail':
+        return html`<app-company-detail></app-company-detail>`;
       case 'employees':
         return html`<app-employees></app-employees>`;
       case 'employee-detail':
