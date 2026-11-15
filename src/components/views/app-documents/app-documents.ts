@@ -17,6 +17,9 @@ import {
   DocumentStatus,
 } from '../../../types';
 import {
+  iconAlertTriangle,
+  iconCheck,
+  iconCpu,
   iconDownload,
   iconEdit,
   iconEye,
@@ -25,9 +28,14 @@ import {
   iconFolderOpen,
   iconImage,
   iconPlus,
+  iconTag,
   iconTrash,
   iconUpload,
 } from '../../common/icons';
+import {
+  formatAiError,
+  generateDocumentSummaryAndTags,
+} from '../../../services/openai-client';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
@@ -107,6 +115,13 @@ export class AppDocuments extends LitElement {
   @state() private newVersionPayload: ReadFilePayload | null = null;
   @state() private newVersionNote = '';
   @state() private versionTruncatedNote = '';
+
+  // AI Summary & Tags state
+  @state() private aiFormLoading = false;
+  @state() private aiFormError = '';
+  @state() private aiPreviewLoading = false;
+  @state() private aiPreviewError = '';
+  @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
 
   // Delete Confirm
   @state() private deletingDoc: DocumentItem | null = null;
@@ -841,6 +856,34 @@ export class AppDocuments extends LitElement {
                 @change="${(e: CustomEvent<{ value: string }>) => (this.formUploadedById = eventValue(e))}"
               ></app-entity-selector>
             </div>
+            <div class="col-span-2">
+              <div class="ai-doc-bar">
+                <div class="ai-doc-bar-row">
+                  <span class="ai-doc-hint">${t.viewTexts.ai.docFormHint}</span>
+                  <app-button
+                    size="sm"
+                    variant="secondary"
+                    ?disabled="${this.aiFormLoading}"
+                    @click="${this.handleGenerateFormSummary}"
+                  >
+                    <span slot="icon-start">${iconCpu(14)}</span>
+                    <span>
+                      ${this.aiFormLoading
+                        ? t.viewTexts.ai.docGenerating
+                        : t.viewTexts.ai.docGenerateBtn}
+                    </span>
+                  </app-button>
+                </div>
+                ${this.aiFormError
+                  ? html`
+                      <div class="ai-doc-error">
+                        <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                        <span>${this.aiFormError}</span>
+                      </div>
+                    `
+                  : ''}
+              </div>
+            </div>
             <div>
               <app-input
                 label="${t.documents.fieldTags}"
@@ -852,7 +895,7 @@ export class AppDocuments extends LitElement {
               <app-textarea
                 label="${t.documents.fieldDescription}"
                 .value="${this.formDescription}"
-                rows="2"
+                rows="3"
                 @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
               ></app-textarea>
             </div>
@@ -949,6 +992,77 @@ export class AppDocuments extends LitElement {
           </div>
 
           ${doc.description ? html`<p class="doc-desc" style="-webkit-line-clamp: unset;">${doc.description}</p>` : ''}
+
+          <div class="ai-doc-bar">
+            <div class="ai-doc-bar-row">
+              <span class="ai-doc-hint">
+                <span style="display: inline-flex; vertical-align: middle; margin-right: 0.3rem;">${iconTag(13)}</span>
+                ${t.viewTexts.ai.docSectionTitle}
+              </span>
+              <app-button
+                size="sm"
+                variant="secondary"
+                ?disabled="${this.aiPreviewLoading}"
+                @click="${() => this.handleGeneratePreviewSummary(doc)}"
+              >
+                <span slot="icon-start">${iconCpu(14)}</span>
+                <span>
+                  ${this.aiPreviewLoading
+                    ? t.viewTexts.ai.docGenerating
+                    : t.viewTexts.ai.docGenerateBtn}
+                </span>
+              </app-button>
+            </div>
+
+            ${this.aiPreviewError
+              ? html`
+                  <div class="ai-doc-error">
+                    <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                    <span>${this.aiPreviewError}</span>
+                  </div>
+                `
+              : ''}
+
+            ${this.aiPreviewSuggestion
+              ? html`
+                  <div class="ai-doc-suggestion">
+                    <div class="ai-doc-suggestion-head">
+                      <span>${t.viewTexts.ai.docGeneratedPreview}</span>
+                      ${this.aiPreviewSuggestion.model
+                        ? html`<span class="mono">${this.aiPreviewSuggestion.model}</span>`
+                        : ''}
+                    </div>
+                    <p class="ai-doc-suggestion-summary">${this.aiPreviewSuggestion.summary}</p>
+                    ${this.aiPreviewSuggestion.tags.length > 0
+                      ? html`
+                          <div class="ai-doc-suggestion-tags">
+                            ${this.aiPreviewSuggestion.tags.map(
+                              (tag) => html`<app-badge variant="info" appearance="soft" size="sm">#${tag}</app-badge>`
+                            )}
+                          </div>
+                        `
+                      : ''}
+                    <div class="ai-doc-suggestion-actions">
+                      <app-button
+                        size="sm"
+                        variant="primary"
+                        @click="${() => this.handleApplyPreviewSuggestion(doc)}"
+                      >
+                        <span slot="icon-start">${iconCheck(14)}</span>
+                        <span>${t.viewTexts.ai.docApplyBtn}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="ghost"
+                        @click="${() => (this.aiPreviewSuggestion = null)}"
+                      >
+                        ${t.viewTexts.ai.docDismissBtn}
+                      </app-button>
+                    </div>
+                  </div>
+                `
+              : ''}
+          </div>
 
           <app-document-previewer
             .document="${doc}"
@@ -1139,6 +1253,9 @@ export class AppDocuments extends LitElement {
     this.newVersionPayload = null;
     this.newVersionNote = '';
     this.versionTruncatedNote = '';
+    this.aiPreviewLoading = false;
+    this.aiPreviewError = '';
+    this.aiPreviewSuggestion = null;
     this.previewDoc = doc;
   }
 
@@ -1171,6 +1288,8 @@ export class AppDocuments extends LitElement {
     this.formDescription = '';
     this.formVersionNote = t.viewTexts.documents.initialVersionNote;
     this.formError = '';
+    this.aiFormLoading = false;
+    this.aiFormError = '';
     this.modalOpen = true;
   }
 
@@ -1197,7 +1316,105 @@ export class AppDocuments extends LitElement {
     this.formDescription = doc.description || '';
     this.formVersionNote = '';
     this.formError = '';
+    this.aiFormLoading = false;
+    this.aiFormError = '';
     this.modalOpen = true;
+  }
+
+  private async handleGenerateFormSummary() {
+    const t = getTranslation(this.currentLang);
+    if (!this.formTitle.trim() && !this.formFileName.trim() && !this.formTextContent.trim()) {
+      this.aiFormError = t.viewTexts.ai.errors.missingDocInfo;
+      return;
+    }
+
+    const endpoint = store.customization.aiEndpoint;
+    const model = store.customization.aiModel;
+    this.aiFormLoading = true;
+    this.aiFormError = '';
+
+    const linkedCompany = this.formCompanyId
+      ? store.companies.find((c) => c.id === this.formCompanyId)?.name
+      : undefined;
+    const linkedProject = this.formProjectId
+      ? store.projects.find((p) => p.id === this.formProjectId)?.name
+      : undefined;
+
+    try {
+      const result = await generateDocumentSummaryAndTags({
+        doc: {
+          title: this.formTitle.trim(),
+          fileName: this.formFileName.trim(),
+          mimeType: this.formMimeType,
+          category: this.formCategory,
+          scope: this.formScope,
+          description: this.formDescription,
+          tags: this.formTags
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
+          textContent: this.formTextContent,
+          dataUrl: this.formDataUrl,
+        },
+        linkedContext: [linkedCompany, linkedProject].filter(Boolean).join(' · ') || undefined,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model,
+      });
+
+      if (result.summary) {
+        this.formDescription = result.summary;
+      }
+      if (result.tags.length > 0) {
+        this.formTags = result.tags.join(', ');
+      }
+      store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
+    } catch (err) {
+      this.aiFormError = formatAiError(err, endpoint, t);
+    } finally {
+      this.aiFormLoading = false;
+    }
+  }
+
+  private async handleGeneratePreviewSummary(doc: DocumentItem) {
+    const t = getTranslation(this.currentLang);
+    const endpoint = store.customization.aiEndpoint;
+    const model = store.customization.aiModel;
+    this.aiPreviewLoading = true;
+    this.aiPreviewError = '';
+
+    const linked = this.getLinkedEntityLabel(doc, t).label;
+    try {
+      const result = await generateDocumentSummaryAndTags({
+        doc,
+        linkedContext: linked,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model,
+      });
+      this.aiPreviewSuggestion = result;
+    } catch (err) {
+      this.aiPreviewError = formatAiError(err, endpoint, t);
+    } finally {
+      this.aiPreviewLoading = false;
+    }
+  }
+
+  private handleApplyPreviewSuggestion(doc: DocumentItem) {
+    if (!this.aiPreviewSuggestion) return;
+    const t = getTranslation(this.currentLang);
+    const mergedTags = Array.from(
+      new Set([...(doc.tags || []), ...this.aiPreviewSuggestion.tags])
+    ).slice(0, 10);
+    const updated: DocumentItem = {
+      ...doc,
+      description: this.aiPreviewSuggestion.summary || doc.description,
+      tags: mergedTags.length > 0 ? mergedTags : doc.tags,
+    };
+    store.updateDocument(updated);
+    this.previewDoc = updated;
+    this.aiPreviewSuggestion = null;
+    store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
   }
 
   private handleSaveModal() {

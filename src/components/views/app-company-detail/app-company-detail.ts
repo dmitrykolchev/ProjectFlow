@@ -25,11 +25,14 @@ import {
   User,
 } from '../../../types';
 import {
+  iconAlertTriangle,
   iconArrowUpRight,
   iconBookOpen,
   iconBuilding,
+  iconCheck,
   iconChevronLeft,
   iconChevronRight,
+  iconCpu,
   iconDownload,
   iconEdit,
   iconEye,
@@ -40,10 +43,15 @@ import {
   iconMessageSquare,
   iconPlus,
   iconSearch,
+  iconTag,
   iconTrash,
   iconUpload,
   iconUsers,
 } from '../../common/icons';
+import {
+  formatAiError,
+  generateDocumentSummaryAndTags,
+} from '../../../services/openai-client';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
@@ -133,6 +141,11 @@ export class AppCompanyDetail extends LitElement {
   @state() private docSearchQuery = '';
   @state() private docTypeFilter: 'all' | 'pdf' | 'image' | 'text' = 'all';
   @state() private previewDoc: DocumentItem | null = null;
+  @state() private aiDocLoading = false;
+  @state() private aiDocError = '';
+  @state() private aiPreviewLoading = false;
+  @state() private aiPreviewError = '';
+  @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
 
   private unsubscribe?: () => void;
 
@@ -1027,7 +1040,7 @@ export class AppCompanyDetail extends LitElement {
                     @select-document="${(e: CustomEvent<{ document: DocumentItem }>) =>
                       (this.selectedDocId = e.detail.document.id)}"
                     @expand="${(e: CustomEvent<{ document: DocumentItem }>) =>
-                      (this.previewDoc = e.detail.document)}"
+                      this.openDocPreviewModal(e.detail.document)}"
                   ></app-document-previewer>
                 </div>
               </div>
@@ -1043,7 +1056,7 @@ export class AppCompanyDetail extends LitElement {
         class="list-row clickable"
         @click="${() => {
           this.selectedDocId = doc.id;
-          this.previewDoc = doc;
+          this.openDocPreviewModal(doc);
         }}"
       >
         <div class="row-main">
@@ -1066,7 +1079,7 @@ export class AppCompanyDetail extends LitElement {
             title="${t.documents.previewTitle}"
             @click="${() => {
               this.selectedDocId = doc.id;
-              this.previewDoc = doc;
+              this.openDocPreviewModal(doc);
             }}"
           >
             ${iconEye(14)}
@@ -1461,6 +1474,34 @@ export class AppCompanyDetail extends LitElement {
                 @change="${(e: CustomEvent<{ value: string }>) => (this.docProjectId = eventValue(e))}"
               ></app-select>
             </div>
+            <div class="col-span-2">
+              <div class="ai-doc-bar">
+                <div class="ai-doc-bar-row">
+                  <span class="ai-doc-hint">${t.viewTexts.ai.docFormHint}</span>
+                  <app-button
+                    size="sm"
+                    variant="secondary"
+                    ?disabled="${this.aiDocLoading}"
+                    @click="${() => this.handleGenerateUploadDocAi(company)}"
+                  >
+                    <span slot="icon-start">${iconCpu(14)}</span>
+                    <span>
+                      ${this.aiDocLoading
+                        ? t.viewTexts.ai.docGenerating
+                        : t.viewTexts.ai.docGenerateBtn}
+                    </span>
+                  </app-button>
+                </div>
+                ${this.aiDocError
+                  ? html`
+                      <div class="ai-doc-error">
+                        <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                        <span>${this.aiDocError}</span>
+                      </div>
+                    `
+                  : ''}
+              </div>
+            </div>
             <div>
               <app-input
                 label="${t.documents.fieldTags}"
@@ -1472,7 +1513,7 @@ export class AppCompanyDetail extends LitElement {
               <app-textarea
                 label="${t.documents.fieldDescription}"
                 .value="${this.docDescription}"
-                rows="2"
+                rows="3"
                 @input="${(e: CustomEvent<{ value: string }>) => (this.docDescription = eventValue(e))}"
               ></app-textarea>
             </div>
@@ -1494,6 +1535,7 @@ export class AppCompanyDetail extends LitElement {
   private renderPreviewModal(t: ReturnType<typeof getTranslation>) {
     const doc = this.previewDoc;
     if (!doc) return '';
+    const company = this.companies.find((c) => c.id === (doc.companyId || this.detailCompanyId));
 
     return html`
       <app-modal
@@ -1509,6 +1551,77 @@ export class AppCompanyDetail extends LitElement {
           </div>
 
           ${doc.description ? html`<p class="company-desc">${doc.description}</p>` : ''}
+
+          <div class="ai-doc-bar">
+            <div class="ai-doc-bar-row">
+              <span class="ai-doc-hint">
+                <span style="display: inline-flex; vertical-align: middle; margin-right: 0.3rem;">${iconTag(13)}</span>
+                ${t.viewTexts.ai.docSectionTitle}
+              </span>
+              <app-button
+                size="sm"
+                variant="secondary"
+                ?disabled="${this.aiPreviewLoading}"
+                @click="${() => this.handleGeneratePreviewAi(doc, company)}"
+              >
+                <span slot="icon-start">${iconCpu(14)}</span>
+                <span>
+                  ${this.aiPreviewLoading
+                    ? t.viewTexts.ai.docGenerating
+                    : t.viewTexts.ai.docGenerateBtn}
+                </span>
+              </app-button>
+            </div>
+
+            ${this.aiPreviewError
+              ? html`
+                  <div class="ai-doc-error">
+                    <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                    <span>${this.aiPreviewError}</span>
+                  </div>
+                `
+              : ''}
+
+            ${this.aiPreviewSuggestion
+              ? html`
+                  <div class="ai-doc-suggestion">
+                    <div class="ai-doc-suggestion-head">
+                      <span>${t.viewTexts.ai.docGeneratedPreview}</span>
+                      ${this.aiPreviewSuggestion.model
+                        ? html`<span class="mono">${this.aiPreviewSuggestion.model}</span>`
+                        : ''}
+                    </div>
+                    <p class="ai-doc-suggestion-summary">${this.aiPreviewSuggestion.summary}</p>
+                    ${this.aiPreviewSuggestion.tags.length > 0
+                      ? html`
+                          <div class="ai-doc-suggestion-tags">
+                            ${this.aiPreviewSuggestion.tags.map(
+                              (tag) => html`<app-badge variant="info" appearance="soft" size="sm">#${tag}</app-badge>`
+                            )}
+                          </div>
+                        `
+                      : ''}
+                    <div class="ai-doc-suggestion-actions">
+                      <app-button
+                        size="sm"
+                        variant="primary"
+                        @click="${() => this.handleApplyPreviewAi(doc)}"
+                      >
+                        <span slot="icon-start">${iconCheck(14)}</span>
+                        <span>${t.viewTexts.ai.docApplyBtn}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="ghost"
+                        @click="${() => (this.aiPreviewSuggestion = null)}"
+                      >
+                        ${t.viewTexts.ai.docDismissBtn}
+                      </app-button>
+                    </div>
+                  </div>
+                `
+              : ''}
+          </div>
 
           <app-document-previewer
             .document="${doc}"
@@ -1619,7 +1732,95 @@ export class AppCompanyDetail extends LitElement {
     this.docTags = company.name.toLowerCase();
     this.docDescription = '';
     this.docError = '';
+    this.aiDocLoading = false;
+    this.aiDocError = '';
     this.uploadDocModalOpen = true;
+  }
+
+  private async handleGenerateUploadDocAi(company: Company) {
+    const t = getTranslation(this.currentLang);
+    if (!this.docTitle.trim() && !this.docFileName.trim() && !this.docTextContent.trim()) {
+      this.aiDocError = t.viewTexts.ai.errors.missingDocInfo;
+      return;
+    }
+    const endpoint = store.customization.aiEndpoint;
+    const model = store.customization.aiModel;
+    this.aiDocLoading = true;
+    this.aiDocError = '';
+    try {
+      const result = await generateDocumentSummaryAndTags({
+        doc: {
+          title: this.docTitle.trim(),
+          fileName: this.docFileName.trim(),
+          mimeType: this.docMimeType,
+          category: this.docCategory,
+          scope: this.docProjectId ? 'project' : 'company',
+          description: this.docDescription,
+          tags: this.docTags
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean),
+          textContent: this.docTextContent,
+          dataUrl: this.docDataUrl,
+        },
+        linkedContext: company.name,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model,
+      });
+      if (result.summary) this.docDescription = result.summary;
+      if (result.tags.length > 0) this.docTags = result.tags.join(', ');
+      store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
+    } catch (err) {
+      this.aiDocError = formatAiError(err, endpoint, t);
+    } finally {
+      this.aiDocLoading = false;
+    }
+  }
+
+  private openDocPreviewModal(doc: DocumentItem) {
+    this.aiPreviewLoading = false;
+    this.aiPreviewError = '';
+    this.aiPreviewSuggestion = null;
+    this.previewDoc = doc;
+  }
+
+  private async handleGeneratePreviewAi(doc: DocumentItem, company?: Company) {
+    const t = getTranslation(this.currentLang);
+    const endpoint = store.customization.aiEndpoint;
+    const model = store.customization.aiModel;
+    this.aiPreviewLoading = true;
+    this.aiPreviewError = '';
+    try {
+      this.aiPreviewSuggestion = await generateDocumentSummaryAndTags({
+        doc,
+        linkedContext: company?.name,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model,
+      });
+    } catch (err) {
+      this.aiPreviewError = formatAiError(err, endpoint, t);
+    } finally {
+      this.aiPreviewLoading = false;
+    }
+  }
+
+  private handleApplyPreviewAi(doc: DocumentItem) {
+    if (!this.aiPreviewSuggestion) return;
+    const t = getTranslation(this.currentLang);
+    const mergedTags = Array.from(
+      new Set([...(doc.tags || []), ...this.aiPreviewSuggestion.tags])
+    ).slice(0, 10);
+    const updated: DocumentItem = {
+      ...doc,
+      description: this.aiPreviewSuggestion.summary || doc.description,
+      tags: mergedTags.length > 0 ? mergedTags : doc.tags,
+    };
+    store.updateDocument(updated);
+    this.previewDoc = updated;
+    this.aiPreviewSuggestion = null;
+    store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
   }
 
   private async handleDropzoneFileSelected(e: CustomEvent<{ file: File }>) {

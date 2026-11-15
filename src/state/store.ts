@@ -80,6 +80,8 @@ const defaultCustomization: UserCustomization = {
   showActivityPanel: false,
   tablePageSize: 10,
   cardGridPageSize: 6,
+  aiEndpoint: 'http://127.0.0.1:47831/v1',
+  aiModel: '',
   gridColumns: {
     id: true,
     title: true,
@@ -301,6 +303,12 @@ export class AppStore {
         }
         if (typeof this.customization.cardGridPageSize !== 'number' || this.customization.cardGridPageSize < 1) {
           this.customization.cardGridPageSize = defaultCustomization.cardGridPageSize;
+        }
+        if (typeof this.customization.aiEndpoint !== 'string' || !this.customization.aiEndpoint.trim()) {
+          this.customization.aiEndpoint = defaultCustomization.aiEndpoint;
+        }
+        if (typeof this.customization.aiModel !== 'string') {
+          this.customization.aiModel = defaultCustomization.aiModel;
         }
         this.activeView = this.customization.defaultView || 'dashboard';
       }

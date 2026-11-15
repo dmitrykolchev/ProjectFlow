@@ -8,6 +8,7 @@ import {
   ExpenseCategory,
   ProjectChatMessage,
   Task,
+  TaskAiAnalysis,
   TaskPriority,
   TaskStatus,
   TimeEntry,
@@ -43,6 +44,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-task-ai-panel/app-task-ai-panel';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -617,6 +619,49 @@ export class AppTaskDetail extends LitElement {
                 ? this.renderExpensesTab(t, task, expenses)
                 : this.renderDiscussionsTab(t, task, discussions)}
             </app-section-card>
+
+            <app-task-ai-panel
+              .task="${task}"
+              .analysis="${task.aiAnalysis}"
+              .timeSummary="${timeEntries
+                .slice(0, 6)
+                .map((te) => `${te.date}: ${te.hours}h (${te.category}) - ${te.description}`)
+                .join('; ')}"
+              .expenseSummary="${activeExpenses
+                .slice(0, 5)
+                .map((ex) => `${ex.title}: ${ex.amount} ${ex.currency}`)
+                .join('; ')}"
+              .discussionsSummary="${discussions
+                .slice(-5)
+                .map((m) => m.text)
+                .join(' | ')}"
+              @apply-description="${(e: CustomEvent<{ description: string; mode: 'replace' | 'append' }>) => {
+                const { description, mode } = e.detail;
+                const nextDescription =
+                  mode === 'append' && task.description.trim()
+                    ? `${task.description.trim()}\n\n${description}`
+                    : description;
+                store.updateTask({ ...task, description: nextDescription });
+                store.addNotification('success', t.viewTexts.ai.taskSectionTitle, t.viewTexts.ai.descAppliedToast);
+              }}"
+              @analysis-complete="${(e: CustomEvent<{ analysis: TaskAiAnalysis }>) => {
+                store.updateTask({ ...task, aiAnalysis: e.detail.analysis });
+              }}"
+              @analysis-cleared="${() => {
+                store.updateTask({ ...task, aiAnalysis: undefined });
+              }}"
+              @add-subtask="${(e: CustomEvent<{ title: string }>) => {
+                const title = e.detail?.title?.trim();
+                if (!title) return;
+                store.updateTask({
+                  ...task,
+                  subtasks: [
+                    ...task.subtasks,
+                    { id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`, title, completed: false },
+                  ],
+                });
+              }}"
+            ></app-task-ai-panel>
           </div>
 
           <!-- Right Sidebar: Subtasks & Cost Summary -->

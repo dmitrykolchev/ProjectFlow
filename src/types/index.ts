@@ -229,6 +229,25 @@ export interface Task {
   order: number;
   createdAt: string;
   updatedAt: string;
+  aiAnalysis?: TaskAiAnalysis;
+}
+
+export interface TaskAiContextRef {
+  kind: 'knowledge' | 'document';
+  id: string;
+  title: string;
+  reason?: string;
+}
+
+export interface TaskAiAnalysis {
+  overview: string;
+  risks: string[];
+  recommendations: string[];
+  effortAssessment: string;
+  suggestedSubtasks: string[];
+  contextSources: TaskAiContextRef[];
+  model?: string;
+  updatedAt: string;
 }
 
 export type TimeEntryCategory =
@@ -495,6 +514,8 @@ export interface UserCustomization {
   showActivityPanel: boolean;
   tablePageSize: number;
   cardGridPageSize: number;
+  aiEndpoint: string;
+  aiModel: string;
   gridColumns: {
     id: boolean;
     title: boolean;

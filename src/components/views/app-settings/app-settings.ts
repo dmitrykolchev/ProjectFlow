@@ -3,9 +3,12 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconDashboard, iconTable } from '../../common/icons';
+import { iconAlertTriangle, iconCheck, iconCpu, iconDashboard, iconRefreshCw, iconTable } from '../../common/icons';
+import { DEFAULT_AI_ENDPOINT, fetchAvailableModels, formatAiError } from '../../../services/openai-client';
+import { eventValue } from '../../common/event-value';
 import { CARD_GRID_PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE_OPTIONS } from '../../common/paginate';
 import '../../common/app-button/app-button';
+import '../../common/app-input/app-input';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-settings.css';
@@ -73,6 +76,10 @@ const CURATED_BASE_PALETTES: Record<ThemeMode, BasePaletteOption[]> = {
 export class AppSettings extends LitElement {
   @state() private custom = { ...store.customization };
   @state() private currentLang = store.customization.language;
+  @state() private aiTesting = false;
+  @state() private detectedModels: string[] = [];
+  @state() private aiStatusKind: 'none' | 'ok' | 'warn' | 'error' = 'none';
+  @state() private aiStatusMessage = '';
 
   private unsubscribe?: () => void;
 
@@ -510,6 +517,99 @@ export class AppSettings extends LitElement {
           </div>
         </app-section-card>
 
+        <!-- OpenAI-compatible AI Endpoint Settings (no API key fields) -->
+        <app-section-card variant="panel" title="${t.viewTexts.ai.settingsTitle}">
+          <span slot="icon">${iconCpu(17)}</span>
+          <p class="section-desc">${t.viewTexts.ai.settingsDesc}</p>
+
+          <div class="ai-settings-grid">
+            <div class="ai-field-group">
+              <app-input
+                label="${t.viewTexts.ai.endpointLabel}"
+                placeholder="${t.viewTexts.ai.endpointPlaceholder}"
+                hint="${t.viewTexts.ai.endpointHint}"
+                .value="${this.custom.aiEndpoint || DEFAULT_AI_ENDPOINT}"
+                @input="${(e: CustomEvent<{ value: string }>) => {
+                  store.updateCustomization({ aiEndpoint: eventValue(e) });
+                  this.aiStatusKind = 'none';
+                  this.aiStatusMessage = '';
+                }}"
+              ></app-input>
+            </div>
+
+            <div class="ai-field-group">
+              <app-input
+                label="${t.viewTexts.ai.modelLabel}"
+                placeholder="${t.viewTexts.ai.modelPlaceholder}"
+                hint="${t.viewTexts.ai.modelAutoHint}"
+                .value="${this.custom.aiModel || ''}"
+                @input="${(e: CustomEvent<{ value: string }>) => {
+                  store.updateCustomization({ aiModel: eventValue(e) });
+                }}"
+              ></app-input>
+            </div>
+          </div>
+
+          <div class="ai-actions-bar">
+            <app-button
+              size="sm"
+              variant="secondary"
+              ?disabled="${this.aiTesting}"
+              @click="${this.handleDetectModels}"
+            >
+              <span slot="icon-start">${iconRefreshCw(14)}</span>
+              <span>
+                ${this.aiTesting
+                  ? t.viewTexts.ai.testingConnection
+                  : t.viewTexts.ai.detectModelsBtn}
+              </span>
+            </app-button>
+
+            <app-button
+              size="sm"
+              variant="ghost"
+              @click="${() => {
+                store.updateCustomization({ aiEndpoint: DEFAULT_AI_ENDPOINT, aiModel: '' });
+                this.detectedModels = [];
+                this.aiStatusKind = 'none';
+                this.aiStatusMessage = '';
+              }}"
+            >
+              ${t.viewTexts.ai.resetEndpointBtn}
+            </app-button>
+          </div>
+
+          ${this.detectedModels.length > 0
+            ? html`
+                <div class="ai-models-row">
+                  <span class="ai-models-label">${t.viewTexts.ai.availableModelsLabel}</span>
+                  ${this.detectedModels.map(
+                    (m) => html`
+                      <button
+                        type="button"
+                        class="ai-model-chip ${this.custom.aiModel === m ? 'is-active' : ''}"
+                        @click="${() => store.updateCustomization({ aiModel: m })}"
+                      >
+                        ${m}
+                      </button>
+                    `
+                  )}
+                </div>
+              `
+            : ''}
+
+          ${this.aiStatusKind !== 'none'
+            ? html`
+                <div class="ai-status-banner is-${this.aiStatusKind}">
+                  <span style="flex-shrink: 0; margin-top: 1px;">
+                    ${this.aiStatusKind === 'ok' ? iconCheck(15) : iconAlertTriangle(15)}
+                  </span>
+                  <span>${this.aiStatusMessage}</span>
+                </div>
+              `
+            : ''}
+        </app-section-card>
+
         <!-- Reset Actions -->
         <div class="actions-footer">
           <app-button variant="outline" @click="${() => store.resetCustomization()}">
@@ -518,5 +618,34 @@ export class AppSettings extends LitElement {
         </div>
       </div>
     `;
+  }
+
+  private async handleDetectModels() {
+    const t = getTranslation(this.currentLang);
+    const endpoint = this.custom.aiEndpoint || DEFAULT_AI_ENDPOINT;
+    this.aiTesting = true;
+    this.aiStatusKind = 'none';
+    this.aiStatusMessage = '';
+
+    try {
+      const models = await fetchAvailableModels(endpoint);
+      this.detectedModels = models;
+      if (models.length > 0) {
+        if (!this.custom.aiModel?.trim()) {
+          store.updateCustomization({ aiModel: models[0] });
+        }
+        this.aiStatusKind = 'ok';
+        this.aiStatusMessage = t.viewTexts.ai.connectionOk(models.length, this.custom.aiModel || models[0]);
+      } else {
+        this.aiStatusKind = 'warn';
+        this.aiStatusMessage = t.viewTexts.ai.noModelsFound;
+      }
+    } catch (err) {
+      this.detectedModels = [];
+      this.aiStatusKind = 'error';
+      this.aiStatusMessage = formatAiError(err, endpoint, t);
+    } finally {
+      this.aiTesting = false;
+    }
   }
 }

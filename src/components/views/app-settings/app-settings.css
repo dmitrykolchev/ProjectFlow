@@ -418,3 +418,96 @@
   box-shadow: var(--accent-glow, none);
 }
 
+.ai-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.ai-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.ai-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.ai-status-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.ai-status-banner.is-ok {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--color-success, #34d399);
+}
+
+.ai-status-banner.is-warn {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: var(--color-warning, #fbbf24);
+}
+
+.ai-status-banner.is-error {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--color-danger, #f87171);
+}
+
+.ai-models-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.ai-models-label {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.ai-model-chip {
+  padding: 0.25rem 0.6rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-strong, #334155);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-secondary, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease);
+}
+
+.ai-model-chip:hover {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--text-primary, #f8fafc);
+}
+
+.ai-model-chip.is-active {
+  border-color: var(--accent-primary, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  color: var(--accent-primary, #818cf8);
+}
+
+@media (max-width: 720px) {
+  .ai-settings-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
