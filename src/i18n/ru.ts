@@ -829,6 +829,17 @@ export const ru = {
       task: 'Задача',
     },
   },
+  entitySelector: {
+    placeholder: 'Выберите элемент...',
+    searchPlaceholder: 'Поиск по названию, коду, деталям...',
+    emptyOptions: 'Список элементов пуст',
+    noMatches: 'Совпадения не найдены',
+    resetSearch: 'Сбросить поиск',
+    clearSelection: 'Очистить выбор',
+    showingCount: (shown: number, total: number) => `Показано ${shown} из ${total}`,
+    refineHint: 'Уточните запрос для сужения списка',
+    loadMore: (count: number) => `Показать ещё (+${count})`,
+  },
   viewTexts: {
     pageSubtitles: {
       projects: 'Список проектов портфеля. Выберите проект, чтобы открыть его страницу с командой по ролям, задачами и договорами',

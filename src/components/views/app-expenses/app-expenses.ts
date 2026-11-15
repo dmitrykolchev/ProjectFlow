@@ -22,6 +22,8 @@ import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -493,21 +495,14 @@ export class AppExpenses extends LitElement {
     categoryOptions: { value: ExpenseCategory; label: string }[],
     statusOptions: { value: ExpenseStatus; label: string; color: string }[]
   ) {
-    const projectOptions = store.projects.map((p) => ({
-      value: p.id,
-      label: `[${p.key}] ${p.name}`,
-      color: p.color,
-    }));
+    const projectOptions = mapProjectOptions(store.projects, t);
 
-    const taskOptions = [
-      { value: '', label: t.viewTexts.expenses.optionNoTask },
-      ...store.tasks
-        .filter((tk) => tk.projectId === this.formProjectId)
-        .slice(0, 80)
-        .map((tk) => ({ value: tk.id, label: `${tk.id} · ${tk.title}` })),
-    ];
+    const taskOptions = mapTaskOptions(
+      store.tasks.filter((tk) => tk.projectId === this.formProjectId),
+      t
+    );
 
-    const userOptions = store.users.map((u) => ({ value: u.id, label: u.name }));
+    const userOptions = mapUserOptions(store.users, t);
     const currencyOptions = [
       { value: 'RUB', label: 'RUB (₽)' },
       { value: 'USD', label: 'USD ($)' },
@@ -536,7 +531,7 @@ export class AppExpenses extends LitElement {
             ></app-input>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.expenses.labelProject}"
               .value="${this.formProjectId}"
               .options="${projectOptions}"
@@ -544,15 +539,17 @@ export class AppExpenses extends LitElement {
                 this.formProjectId = eventValue(e);
                 this.formTaskId = '';
               }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.expenses.labelLinkedTask}"
+              placeholder="${t.viewTexts.expenses.optionNoTask}"
+              clearable
               .value="${this.formTaskId}"
               .options="${taskOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-select
@@ -564,12 +561,12 @@ export class AppExpenses extends LitElement {
             ></app-select>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.expenses.labelSubmittedBy}"
               .value="${this.formUserId}"
               .options="${userOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-number-input

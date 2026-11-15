@@ -33,6 +33,9 @@ export { AppDateInput } from './app-date-input/app-date-input';
 export { AppSelect } from './app-select/app-select';
 export type { SelectOption } from './app-select/app-select';
 
+export { AppEntitySelector } from './app-entity-selector/app-entity-selector';
+export type { EntitySelectorOption, EntitySelectorSize } from './app-entity-selector/app-entity-selector';
+
 export { AppCombobox } from './app-combobox/app-combobox';
 
 export { AppModal } from './app-modal/app-modal';
@@ -91,6 +94,7 @@ import { AppTextarea } from './app-textarea/app-textarea';
 import { AppNumberInput } from './app-number-input/app-number-input';
 import { AppDateInput } from './app-date-input/app-date-input';
 import { AppSelect } from './app-select/app-select';
+import { AppEntitySelector } from './app-entity-selector/app-entity-selector';
 import { AppCombobox } from './app-combobox/app-combobox';
 import { AppModal } from './app-modal/app-modal';
 import { AppModalPortal } from './app-modal-portal/app-modal-portal';
@@ -130,6 +134,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-number-input': AppNumberInput,
   'app-date-input': AppDateInput,
   'app-select': AppSelect,
+  'app-entity-selector': AppEntitySelector,
   'app-combobox': AppCombobox,
   'app-modal': AppModal,
   'app-modal-portal': AppModalPortal,

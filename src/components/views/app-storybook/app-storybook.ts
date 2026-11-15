@@ -18,6 +18,7 @@ import textareaMeta from '../../common/app-textarea/app-textarea.story';
 import numberMeta from '../../common/app-number-input/app-number-input.story';
 import dateMeta from '../../common/app-date-input/app-date-input.story';
 import selectMeta from '../../common/app-select/app-select.story';
+import entitySelectorMeta from '../../common/app-entity-selector/app-entity-selector.story';
 import comboboxMeta from '../../common/app-combobox/app-combobox.story';
 import checkboxMeta from '../../common/app-checkbox/app-checkbox.story';
 import switchMeta from '../../common/app-switch/app-switch.story';
@@ -96,6 +97,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   numberMeta,
   dateMeta,
   selectMeta,
+  entitySelectorMeta,
   comboboxMeta,
   modalMeta,
   modalPortalMeta,

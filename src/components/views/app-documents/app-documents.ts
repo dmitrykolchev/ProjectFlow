@@ -44,6 +44,15 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import {
+  mapCompanyOptions,
+  mapContractOptions,
+  mapCounterpartyOptions,
+  mapProjectOptions,
+  mapTaskOptions,
+  mapUserOptions,
+} from '../../common/entity-selector-options';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
@@ -675,27 +684,12 @@ export class AppDocuments extends LitElement {
       value: k,
       label: t.documents.scopes[k],
     }));
-    const companyOptions = [
-      { value: '', label: t.documents.scopeNone },
-      ...store.companies.map((c) => ({ value: c.id, label: c.name })),
-    ];
-    const projectOptions = [
-      { value: '', label: t.documents.scopeNone },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}` })),
-    ];
-    const contractOptions = [
-      { value: '', label: t.documents.scopeNone },
-      ...store.contracts.map((c) => ({ value: c.id, label: `${c.number} · ${c.title}` })),
-    ];
-    const counterpartyOptions = [
-      { value: '', label: t.documents.scopeNone },
-      ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
-    ];
-    const taskOptions = [
-      { value: '', label: t.documents.scopeNone },
-      ...store.tasks.slice(0, 80).map((tk) => ({ value: tk.id, label: `${tk.id} · ${tk.title}` })),
-    ];
-    const userOptions = store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` }));
+    const companyOptions = mapCompanyOptions(store.companies, t);
+    const projectOptions = mapProjectOptions(store.projects, t);
+    const contractOptions = mapContractOptions(store.contracts, t);
+    const counterpartyOptions = mapCounterpartyOptions(store.counterparties, t);
+    const taskOptions = mapTaskOptions(store.tasks, t);
+    const userOptions = mapUserOptions(store.users, t);
 
     return html`
       <app-modal
@@ -775,65 +769,77 @@ export class AppDocuments extends LitElement {
             <div>
               ${this.formScope === 'company'
                 ? html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldCompany}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formCompanyId}"
                       .options="${companyOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `
                 : this.formScope === 'project'
                 ? html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldProject}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formProjectId}"
                       .options="${projectOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `
                 : this.formScope === 'contract'
                 ? html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldContract}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formContractId}"
                       .options="${contractOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formContractId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `
                 : this.formScope === 'counterparty'
                 ? html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldCounterparty}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formCounterpartyId}"
                       .options="${counterpartyOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `
                 : this.formScope === 'task'
                 ? html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldTask}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formTaskId}"
                       .options="${taskOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `
                 : html`
-                    <app-select
+                    <app-entity-selector
                       label="${t.documents.fieldCompany}"
+                      placeholder="${t.documents.scopeNone}"
+                      clearable
                       .value="${this.formCompanyId}"
                       .options="${companyOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-                    ></app-select>
+                    ></app-entity-selector>
                   `}
             </div>
             <div>
-              <app-select
+              <app-entity-selector
                 label="${t.documents.fieldUploadedBy}"
                 .value="${this.formUploadedById}"
                 .options="${userOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) => (this.formUploadedById = eventValue(e))}"
-              ></app-select>
+              ></app-entity-selector>
             </div>
             <div>
               <app-input

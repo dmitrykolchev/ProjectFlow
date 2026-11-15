@@ -20,6 +20,8 @@ import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -148,26 +150,19 @@ export class AppTimeTracking extends LitElement {
       ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
     ];
 
-    const quickProjectOptions = store.projects.map((p) => ({
-      value: p.id,
-      label: `[${p.key}] ${p.name}`,
-      color: p.color,
-    }));
+    const quickProjectOptions = mapProjectOptions(store.projects, t);
 
-    const quickTaskOptions = store.tasks
-      .filter((tk) => tk.projectId === this.quickProjectId)
-      .slice(0, 60)
-      .map((tk) => ({
-        value: tk.id,
-        label: `${tk.id} · ${tk.title}`,
-      }));
+    const quickTaskOptions = mapTaskOptions(
+      store.tasks.filter((tk) => tk.projectId === this.quickProjectId),
+      t
+    );
 
     const userFilterOptions = [
       { value: 'all', label: t.viewTexts.timeTracking.filterAllEmployees },
       ...store.users.map((u) => ({ value: u.id, label: u.name })),
     ];
 
-    const userSelectOptions = store.users.map((u) => ({ value: u.id, label: u.name }));
+    const userSelectOptions = mapUserOptions(store.users, t);
 
     const categoryOptions: { value: TimeEntryCategory; label: string }[] = [
       { value: 'development', label: t.timeTracking.categories.development },
@@ -217,7 +212,7 @@ export class AppTimeTracking extends LitElement {
 
         <div class="quick-log-grid">
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelProject}"
               size="sm"
               .value="${this.quickProjectId}"
@@ -226,25 +221,25 @@ export class AppTimeTracking extends LitElement {
                 this.quickProjectId = eventValue(e);
                 this.ensureQuickTaskValid();
               }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelTask}"
               size="sm"
               .value="${this.quickTaskId}"
               .options="${quickTaskOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.quickTaskId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelEmployee}"
               size="sm"
               .value="${this.quickUserId}"
               .options="${userSelectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.quickUserId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-date-input
@@ -634,21 +629,14 @@ export class AppTimeTracking extends LitElement {
     categoryOptions: { value: TimeEntryCategory; label: string }[],
     statusOptions: { value: TimeEntryStatus; label: string; color: string }[]
   ) {
-    const projectOptions = store.projects.map((p) => ({
-      value: p.id,
-      label: `[${p.key}] ${p.name}`,
-      color: p.color,
-    }));
+    const projectOptions = mapProjectOptions(store.projects, t);
 
-    const taskOptions = store.tasks
-      .filter((tk) => tk.projectId === this.formProjectId)
-      .slice(0, 80)
-      .map((tk) => ({
-        value: tk.id,
-        label: `${tk.id} · ${tk.title}`,
-      }));
+    const taskOptions = mapTaskOptions(
+      store.tasks.filter((tk) => tk.projectId === this.formProjectId),
+      t
+    );
 
-    const userOptions = store.users.map((u) => ({ value: u.id, label: u.name }));
+    const userOptions = mapUserOptions(store.users, t);
 
     return html`
       <app-modal
@@ -659,7 +647,7 @@ export class AppTimeTracking extends LitElement {
       >
         <app-form-grid>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelProject}"
               .value="${this.formProjectId}"
               .options="${projectOptions}"
@@ -669,10 +657,10 @@ export class AppTimeTracking extends LitElement {
                 this.formTaskId = firstTask?.id || '';
                 this.formError = '';
               }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelTask}"
               .value="${this.formTaskId}"
               .options="${taskOptions}"
@@ -681,15 +669,15 @@ export class AppTimeTracking extends LitElement {
                 this.formTaskId = eventValue(e);
                 this.formError = '';
               }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelEmployee}"
               .value="${this.formUserId}"
               .options="${userOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-date-input

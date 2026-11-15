@@ -829,6 +829,17 @@ export const en = {
       task: 'Task',
     },
   },
+  entitySelector: {
+    placeholder: 'Select an item...',
+    searchPlaceholder: 'Search by name, code, details...',
+    emptyOptions: 'No items available',
+    noMatches: 'No matching items',
+    resetSearch: 'Clear search',
+    clearSelection: 'Clear selection',
+    showingCount: (shown: number, total: number) => `Showing ${shown} of ${total}`,
+    refineHint: 'Type to narrow results',
+    loadMore: (count: number) => `Show more (+${count})`,
+  },
   viewTexts: {
     pageSubtitles: {
       projects: 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts',

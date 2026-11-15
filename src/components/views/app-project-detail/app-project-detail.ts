@@ -25,6 +25,8 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import { mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
@@ -195,10 +197,7 @@ export class AppProjectDetail extends LitElement {
       color: p.color,
     }));
 
-    const userOptions = store.users.map((u) => ({
-      value: u.id,
-      label: `${u.name} (${u.role})`,
-    }));
+    const userOptions = mapUserOptions(store.users, t);
 
     const roleOptions = ALL_PROJECT_ROLES.map((role) => ({
       value: role,
@@ -397,13 +396,13 @@ export class AppProjectDetail extends LitElement {
 
           <div class="add-member-bar">
             <div>
-              <app-select
+              <app-entity-selector
                 label="${t.viewTexts.projectDetail.labelEmployee}"
                 size="sm"
                 .value="${this.addMemberUserId}"
                 .options="${userOptions}"
                 @change="${(e: CustomEvent<{ value: string }>) => (this.addMemberUserId = eventValue(e))}"
-              ></app-select>
+              ></app-entity-selector>
             </div>
             <div>
               <app-select
@@ -1034,11 +1033,8 @@ export class AppProjectDetail extends LitElement {
     projectTasks: typeof store.tasks,
     t: ReturnType<typeof getTranslation>
   ) {
-    const taskOpts = projectTasks.slice(0, 60).map((tk) => ({
-      value: tk.id,
-      label: `${tk.id} · ${tk.title}`,
-    }));
-    const userOpts = store.users.map((u) => ({ value: u.id, label: u.name }));
+    const taskOpts = mapTaskOptions(projectTasks, t);
+    const userOpts = mapUserOptions(store.users, t);
     const catOpts = [
       { value: 'development', label: t.timeTracking.categories.development },
       { value: 'design', label: t.timeTracking.categories.design },
@@ -1058,20 +1054,20 @@ export class AppProjectDetail extends LitElement {
       >
         <app-form-grid>
           <div class="col-span-2">
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.projectDetail.labelProjectTask}"
               .value="${this.timeTaskId}"
               .options="${taskOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelEmployee}"
               .value="${this.timeUserId}"
               .options="${userOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-number-input
@@ -1135,10 +1131,7 @@ export class AppProjectDetail extends LitElement {
     projectTasks: typeof store.tasks,
     t: ReturnType<typeof getTranslation>
   ) {
-    const taskOpts = [
-      { value: '', label: t.viewTexts.projectDetail.optionProjectWide },
-      ...projectTasks.slice(0, 60).map((tk) => ({ value: tk.id, label: `${tk.id} · ${tk.title}` })),
-    ];
+    const taskOpts = mapTaskOptions(projectTasks, t);
     const catOpts = [
       { value: 'infrastructure', label: t.expenses.categories.infrastructure },
       { value: 'software', label: t.expenses.categories.software },
@@ -1189,12 +1182,14 @@ export class AppProjectDetail extends LitElement {
             ></app-number-input>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.expenses.labelLinkedTask}"
+              placeholder="${t.viewTexts.projectDetail.optionProjectWide}"
+              clearable
               .value="${this.expTaskId}"
               .options="${taskOpts}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.expTaskId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-input

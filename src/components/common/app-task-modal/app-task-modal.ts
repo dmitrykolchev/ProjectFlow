@@ -13,6 +13,8 @@ import '../app-button/app-button';
 import '../app-input/app-input';
 import '../app-textarea/app-textarea';
 import '../app-select/app-select';
+import '../app-entity-selector/app-entity-selector';
+import { mapProjectOptions, mapUserOptions } from '../entity-selector-options';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
@@ -133,11 +135,7 @@ export class AppTaskModal extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
 
-    const projectOptions = store.projects.map((p) => ({
-      value: p.id,
-      label: `${p.key} - ${p.name}`,
-      color: p.color,
-    }));
+    const projectOptions = mapProjectOptions(store.projects, t);
 
     const statusOptions = [
       { value: 'backlog', label: t.status.backlog, color: '#64748b' },
@@ -154,10 +152,7 @@ export class AppTaskModal extends LitElement {
       { value: 'urgent', label: t.priority.urgent, color: '#ef4444' },
     ];
 
-    const assigneeOptions = [
-      { value: '', label: t.taskModal.unassigned },
-      ...store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
-    ];
+    const assigneeOptions = mapUserOptions(store.users, t);
 
     const availableTags = ['Dev', 'Frontend', 'Backend', 'Design', 'Architecture', 'Security', 'Performance', 'QA', 'API'];
 
@@ -194,21 +189,23 @@ export class AppTaskModal extends LitElement {
           </div>
 
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.taskModal.projectLabel}"
               .value="${this.projectId}"
               .options="${projectOptions}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.projectId = String(v); }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
 
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.taskModal.assigneeLabel}"
+              placeholder="${t.taskModal.unassigned}"
+              clearable
               .value="${this.assigneeId}"
               .options="${assigneeOptions}"
               @change="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.assigneeId = String(v); }}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
 
           <div>

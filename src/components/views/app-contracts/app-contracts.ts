@@ -41,6 +41,13 @@ import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import {
+  mapCompanyOptions,
+  mapCounterpartyOptions,
+  mapProjectOptions,
+  mapUserOptions,
+} from '../../common/entity-selector-options';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
@@ -344,16 +351,10 @@ export class AppContracts extends LitElement {
       { value: 'nda', label: 'NDA' },
     ];
 
-    const companyOptions = store.companies.map((c) => ({ value: c.id, label: c.name }));
-    const counterpartyOptions = store.counterparties.map((c) => ({ value: c.id, label: c.name }));
-    const projectOptions = [
-      { value: '', label: t.viewTexts.contracts.optionNoProject },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
-    ];
-    const ownerOptions = [
-      { value: '', label: t.viewTexts.contracts.optionUnassignedOwner },
-      ...store.users.map((u) => ({ value: u.id, label: u.name })),
-    ];
+    const companyOptions = mapCompanyOptions(store.companies, t);
+    const counterpartyOptions = mapCounterpartyOptions(store.counterparties, t);
+    const projectOptions = mapProjectOptions(store.projects, t);
+    const ownerOptions = mapUserOptions(store.users, t);
     const currencyOptions = [
       { value: 'RUB', label: 'RUB (₽)' },
       { value: 'USD', label: 'USD ($)' },
@@ -1169,36 +1170,40 @@ export class AppContracts extends LitElement {
             ></app-input>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.counterpartyDetail.labelOurCompany}"
               .value="${this.formCompanyId}"
               .options="${companyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.payments.thCounterparty}"
               .value="${this.formCounterpartyId}"
               .options="${counterpartyOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.timeTracking.labelProject}"
+              placeholder="${t.viewTexts.contracts.optionNoProject}"
+              clearable
               .value="${this.formProjectId}"
               .options="${projectOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
-            <app-select
+            <app-entity-selector
               label="${t.viewTexts.contracts.labelOwner}"
+              placeholder="${t.viewTexts.contracts.optionUnassignedOwner}"
+              clearable
               .value="${this.formOwnerId}"
               .options="${ownerOptions}"
               @change="${(e: CustomEvent<{ value: string }>) => (this.formOwnerId = eventValue(e))}"
-            ></app-select>
+            ></app-entity-selector>
           </div>
           <div>
             <app-number-input
