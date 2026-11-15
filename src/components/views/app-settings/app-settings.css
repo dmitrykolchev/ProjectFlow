@@ -336,3 +336,85 @@
   gap: 1rem;
   padding-top: 1rem;
 }
+
+.pagination-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.pagination-mode-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+}
+
+.pagination-mode-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.pagination-mode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #818cf8);
+  flex-shrink: 0;
+}
+
+.pagination-mode-desc {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+}
+
+.page-size-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.page-size-pill {
+  min-width: 44px;
+  height: 34px;
+  padding: 0 0.7rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-strong, #334155);
+  background: var(--bg-surface, #111827);
+  color: var(--text-secondary, #94a3b8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: border-color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease);
+}
+
+.page-size-pill:hover {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--text-primary, #f8fafc);
+  background: var(--bg-hover, #223049);
+}
+
+.page-size-pill.is-active {
+  border-color: var(--accent-primary, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  color: var(--accent-primary, #818cf8);
+  box-shadow: var(--accent-glow, none);
+}
+

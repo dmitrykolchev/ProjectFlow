@@ -434,6 +434,8 @@ export interface UserCustomization {
   sidebarExpandedGroups: string[];
   defaultView: ActiveView;
   showActivityPanel: boolean;
+  tablePageSize: number;
+  cardGridPageSize: number;
   gridColumns: {
     id: boolean;
     title: boolean;

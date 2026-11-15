@@ -3,6 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { iconDashboard, iconTable } from '../../common/icons';
+import { CARD_GRID_PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE_OPTIONS } from '../../common/paginate';
 import '../../common/app-button/app-button';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-section-card/app-section-card';
@@ -458,7 +460,55 @@ export class AppSettings extends LitElement {
               <p class="option-card-desc">${t.settings.sidebarGroupMultipleDesc}</p>
             </div>
           </div>
-        </div>
+        </app-section-card>
+
+        <!-- Pagination Defaults (Tables vs Card Grids) -->
+        <app-section-card variant="panel" title="${t.settings.paginationTitle}">
+          <p class="section-desc">${t.settings.paginationDesc}</p>
+          <div class="pagination-settings-grid">
+            <div class="pagination-mode-box">
+              <div class="pagination-mode-head">
+                <span class="pagination-mode-icon">${iconTable(15)}</span>
+                <span>${t.settings.paginationTableLabel}</span>
+              </div>
+              <p class="pagination-mode-desc">${t.settings.paginationTableDesc}</p>
+              <div class="page-size-pills">
+                ${TABLE_PAGE_SIZE_OPTIONS.map(
+                  (size) => html`
+                    <button
+                      type="button"
+                      class="page-size-pill ${this.custom.tablePageSize === size ? 'is-active' : ''}"
+                      @click="${() => store.setTablePageSize(size)}"
+                    >
+                      ${size}
+                    </button>
+                  `
+                )}
+              </div>
+            </div>
+
+            <div class="pagination-mode-box">
+              <div class="pagination-mode-head">
+                <span class="pagination-mode-icon">${iconDashboard(15)}</span>
+                <span>${t.settings.paginationCardsLabel}</span>
+              </div>
+              <p class="pagination-mode-desc">${t.settings.paginationCardsDesc}</p>
+              <div class="page-size-pills">
+                ${CARD_GRID_PAGE_SIZE_OPTIONS.map(
+                  (size) => html`
+                    <button
+                      type="button"
+                      class="page-size-pill ${this.custom.cardGridPageSize === size ? 'is-active' : ''}"
+                      @click="${() => store.setCardGridPageSize(size)}"
+                    >
+                      ${size}
+                    </button>
+                  `
+                )}
+              </div>
+            </div>
+          </div>
+        </app-section-card>
 
         <!-- Reset Actions -->
         <div class="actions-footer">

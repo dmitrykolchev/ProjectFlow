@@ -40,6 +40,8 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-calculations.css';
 import { eventValue } from '../../common/event-value';
 
@@ -56,6 +58,8 @@ export class AppCalculations extends LitElement {
   @state() private statusFilter: 'all' | CalculationStatus = 'all';
   @state() private contractFilter = 'all';
   @state() private frequencyFilter: 'all' | CalculationFrequency = 'all';
+  @state() private currentPage = 1;
+  @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private previewCalculation: Calculation | null = null;
   @state() private deletingCalculation: Calculation | null = null;
@@ -95,6 +99,7 @@ export class AppCalculations extends LitElement {
     this.invoices = store.invoices;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.tablePageSize = store.customization.tablePageSize;
     if (this.previewCalculation) {
       this.previewCalculation =
         this.calculations.find((c) => c.id === this.previewCalculation!.id) || null;
@@ -287,6 +292,7 @@ export class AppCalculations extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const filtered = this.getFiltered();
+    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
 
     const sentCalcs = this.calculations.filter((c) => c.status === 'sent');
     const approvedCalcs = this.calculations.filter((c) => c.status === 'approved');
@@ -362,11 +368,15 @@ export class AppCalculations extends LitElement {
           { key: 'frequency', options: frequencyOptions },
         ]}"
         .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
           if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
           if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
+          this.currentPage = 1;
         }}"
       ></app-filter-bar>
 
@@ -399,7 +409,7 @@ export class AppCalculations extends LitElement {
                   </tr>
                 </thead>
                 <tbody>
-                  ${filtered.map((calc) => {
+                  ${paged.items.map((calc) => {
                     const ctr = this.contracts.find((c) => c.id === calc.contractId);
                     const cp = store.counterparties.find((c) => c.id === calc.counterpartyId);
                     const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
@@ -576,6 +586,20 @@ export class AppCalculations extends LitElement {
                 </tbody>
               </table>
             </div>
+            <app-pagination
+              layout-mode="table"
+              .totalItems="${paged.totalItems}"
+              .page="${paged.page}"
+              .pageSize="${paged.pageSize}"
+              @page-change="${(e: CustomEvent<{ page: number }>) => {
+                this.currentPage = e.detail.page;
+                this.scrollTop = 0;
+              }}"
+              @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+                this.currentPage = 1;
+                store.setTablePageSize(e.detail.pageSize);
+              }}"
+            ></app-pagination>
           `}
 
       ${this.renderFormModal(t)}

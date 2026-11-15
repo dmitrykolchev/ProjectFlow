@@ -74,6 +74,8 @@ const defaultCustomization: UserCustomization = {
   sidebarExpandedGroups: ['workspace', 'views', 'directory', 'system'],
   defaultView: 'dashboard',
   showActivityPanel: false,
+  tablePageSize: 10,
+  cardGridPageSize: 6,
   gridColumns: {
     id: true,
     title: true,
@@ -284,6 +286,12 @@ export class AppStore {
         }
         if (this.customization.sidebarGroupMode !== 'single' && this.customization.sidebarGroupMode !== 'multiple') {
           this.customization.sidebarGroupMode = 'multiple';
+        }
+        if (typeof this.customization.tablePageSize !== 'number' || this.customization.tablePageSize < 1) {
+          this.customization.tablePageSize = defaultCustomization.tablePageSize;
+        }
+        if (typeof this.customization.cardGridPageSize !== 'number' || this.customization.cardGridPageSize < 1) {
+          this.customization.cardGridPageSize = defaultCustomization.cardGridPageSize;
         }
         this.activeView = this.customization.defaultView || 'dashboard';
       }
@@ -815,6 +823,22 @@ export class AppStore {
   public setDensity(density: 'comfortable' | 'compact'): void {
     this.customization.density = density;
     this.applyThemeAndCustomization();
+    this.saveCustomization();
+    this.notify();
+  }
+
+  public setTablePageSize(size: number): void {
+    const next = Math.max(1, Math.min(200, Math.floor(Number(size) || 10)));
+    if (this.customization.tablePageSize === next) return;
+    this.customization.tablePageSize = next;
+    this.saveCustomization();
+    this.notify();
+  }
+
+  public setCardGridPageSize(size: number): void {
+    const next = Math.max(1, Math.min(100, Math.floor(Number(size) || 6)));
+    if (this.customization.cardGridPageSize === next) return;
+    this.customization.cardGridPageSize = next;
     this.saveCustomization();
     this.notify();
   }

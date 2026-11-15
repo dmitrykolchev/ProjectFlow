@@ -61,6 +61,15 @@ export { AppConfirmDialog } from './app-confirm-dialog/app-confirm-dialog';
 export { AppProgressBar, type ProgressSegment } from './app-progress-bar/app-progress-bar';
 export { AppAvatar } from './app-avatar/app-avatar';
 export { AppMoney, formatMoney, formatMoneyShort } from './app-money/app-money';
+export { AppPagination } from './app-pagination/app-pagination';
+export type { PaginationVariant } from './app-pagination/app-pagination';
+export {
+  paginateItems,
+  TABLE_PAGE_SIZE_OPTIONS,
+  CARD_GRID_PAGE_SIZE_OPTIONS,
+  type PaginationLayoutMode,
+  type PaginatedSlice,
+} from './paginate';
 
 export * as icons from './icons';
 
@@ -98,6 +107,7 @@ import { AppConfirmDialog } from './app-confirm-dialog/app-confirm-dialog';
 import { AppProgressBar } from './app-progress-bar/app-progress-bar';
 import { AppAvatar } from './app-avatar/app-avatar';
 import { AppMoney } from './app-money/app-money';
+import { AppPagination } from './app-pagination/app-pagination';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -134,6 +144,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-progress-bar': AppProgressBar,
   'app-avatar': AppAvatar,
   'app-money': AppMoney,
+  'app-pagination': AppPagination,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

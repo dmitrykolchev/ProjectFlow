@@ -17,6 +17,7 @@ import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
+import '../../common/app-pagination/app-pagination';
 import { DataGridColumn } from '../data-grid-column/data-grid-column';
 import '../data-grid-column/data-grid-column';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
@@ -102,7 +103,7 @@ export class AppDataGrid extends LitElement {
   @state() private collapsedGroups: Set<string> = new Set();
 
   @state() private currentPage: number = 1;
-  @state() private rowsPerPage: number = 15;
+  @state() private rowsPerPage: number = store.customization.tablePageSize;
   @state() private showColumnMenu: boolean = false;
   @state() private columnMenuRight: number = 12;
   @state() private columnMenuTop: number | null = null;
@@ -320,6 +321,7 @@ export class AppDataGrid extends LitElement {
     this.storeTasks = store.getFilteredTasks();
     this.currentLang = store.customization.language;
     this.currentDensity = store.customization.density;
+    this.rowsPerPage = store.customization.tablePageSize;
     this.style.setProperty('--grid-row-height', `${this.rowHeightPx}px`);
   }
 
@@ -848,45 +850,22 @@ export class AppDataGrid extends LitElement {
       ${!this.virtual && !isGrouped
         ? html`
             <div class="grid-footer">
-              <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span class="page-info">${t.grid.rowsPerPage}:</span>
-                <select
-                  class="rows-select"
-                  .value="${this.rowsPerPage.toString()}"
-                  @change="${(e: Event) => {
-                    this.rowsPerPage = parseInt((e.target as HTMLSelectElement).value, 10);
-                    this.currentPage = 1;
-                  }}"
-                >
-                  <option value="10">10</option>
-                  <option value="15">15</option>
-                  <option value="25">25</option>
-                  <option value="50">50</option>
-                </select>
-              </div>
-
-              <div class="pagination-controls">
-                <span class="page-info">
-                  ${t.grid.pageOf} <strong class="tabular-nums">${safePage}</strong> /
-                  <strong class="tabular-nums">${totalPages}</strong>
-                </span>
-                <app-button
-                  size="sm"
-                  variant="ghost"
-                  ?disabled="${safePage <= 1}"
-                  @click="${() => (this.currentPage = Math.max(1, safePage - 1))}"
-                >
-                  ←
-                </app-button>
-                <app-button
-                  size="sm"
-                  variant="ghost"
-                  ?disabled="${safePage >= totalPages}"
-                  @click="${() => (this.currentPage = Math.min(totalPages, safePage + 1))}"
-                >
-                  →
-                </app-button>
-              </div>
+              <app-pagination
+                variant="bare"
+                compact
+                layout-mode="table"
+                .totalItems="${sortedRows.length}"
+                .page="${safePage}"
+                .pageSize="${this.rowsPerPage}"
+                @page-change="${(e: CustomEvent<{ page: number }>) => {
+                  this.currentPage = e.detail.page;
+                }}"
+                @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+                  this.rowsPerPage = e.detail.pageSize;
+                  this.currentPage = 1;
+                  store.setTablePageSize(e.detail.pageSize);
+                }}"
+              ></app-pagination>
             </div>
           `
         : this.virtual && totalVirtualCount > 0

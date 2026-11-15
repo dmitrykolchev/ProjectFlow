@@ -20,6 +20,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-avatar/app-avatar';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-employees.css';
 import { eventValue } from '../../common/event-value';
 
@@ -32,6 +34,9 @@ export class AppEmployees extends LitElement {
   @state() private companyFilter = 'all';
   @state() private statusFilter: 'all' | EmployeeStatus = 'all';
   @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private currentPage = 1;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
+  @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private modalOpen = false;
   @state() private editingId: string | null = null;
@@ -68,6 +73,8 @@ export class AppEmployees extends LitElement {
     this.employees = store.users;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.cardPageSize = store.customization.cardGridPageSize;
+    this.tablePageSize = store.customization.tablePageSize;
   }
 
   private getStatusLabel(
@@ -155,10 +162,14 @@ export class AppEmployees extends LitElement {
           { key: 'status', options: statusOptions },
         ]}"
         .values="${{ company: this.companyFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'company') this.companyFilter = eventValue(e);
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | EmployeeStatus;
+          this.currentPage = 1;
         }}"
       >
         <app-segmented-switch
@@ -168,8 +179,10 @@ export class AppEmployees extends LitElement {
             { value: 'cards', label: t.viewTexts.employees.viewCards },
             { value: 'table', label: t.viewTexts.employees.viewTable },
           ]}"
-          @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.displayMode = eventValue(e) as 'cards' | 'table')}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.displayMode = eventValue(e) as 'cards' | 'table';
+            this.currentPage = 1;
+          }}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -306,9 +319,11 @@ export class AppEmployees extends LitElement {
   }
 
   private renderCards(list: User[], t: ReturnType<typeof getTranslation>) {
+    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+
     return html`
       <div class="cards-grid">
-        ${list.map((emp) => {
+        ${paged.items.map((emp) => {
           const company = store.companies.find((c) => c.id === emp.companyId);
           const taskCount = store.tasks.filter((t) => t.assigneeId === emp.id).length;
           const projCount = store.projects.filter((p) =>
@@ -396,10 +411,27 @@ export class AppEmployees extends LitElement {
           `;
         })}
       </div>
+
+      <app-pagination
+        layout-mode="cards"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
   private renderTable(list: User[], t: ReturnType<typeof getTranslation>) {
+    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+
     return html`
       <div class="table-card">
         <table class="data-table">
@@ -416,7 +448,7 @@ export class AppEmployees extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${list.map((emp) => {
+            ${paged.items.map((emp) => {
               const company = store.companies.find((c) => c.id === emp.companyId);
               const taskCount = store.tasks.filter((t) => t.assigneeId === emp.id).length;
               const projCount = store.projects.filter((p) =>
@@ -486,6 +518,21 @@ export class AppEmployees extends LitElement {
           </tbody>
         </table>
       </div>
+
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

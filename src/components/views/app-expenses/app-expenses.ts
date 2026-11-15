@@ -30,6 +30,8 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-expenses.css';
 import { eventValue } from '../../common/event-value';
 
@@ -45,6 +47,9 @@ export class AppExpenses extends LitElement {
   @state() private categoryFilter: 'all' | ExpenseCategory = 'all';
   @state() private statusFilter: 'all' | ExpenseStatus = 'all';
   @state() private viewMode: 'registry' | 'budgets' = 'registry';
+  @state() private currentPage = 1;
+  @state() private tablePageSize = store.customization.tablePageSize;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
 
   // Form modal
   @state() private modalOpen = false;
@@ -84,6 +89,8 @@ export class AppExpenses extends LitElement {
     this.expenses = store.expenses;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.tablePageSize = store.customization.tablePageSize;
+    this.cardPageSize = store.customization.cardGridPageSize;
   }
 
   private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
@@ -197,11 +204,15 @@ export class AppExpenses extends LitElement {
           { key: 'status', options: statusFilterOptions },
         ]}"
         .values="${{ project: this.projectFilter, category: this.categoryFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'project') this.projectFilter = eventValue(e);
           if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | ExpenseCategory;
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ExpenseStatus;
+          this.currentPage = 1;
         }}"
       >
         <app-segmented-switch
@@ -211,8 +222,10 @@ export class AppExpenses extends LitElement {
             { value: 'registry', label: t.expenses.viewRegistry },
             { value: 'budgets', label: t.expenses.viewBudgets },
           ]}"
-          @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewMode = eventValue(e) as 'registry' | 'budgets')}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.viewMode = eventValue(e) as 'registry' | 'budgets';
+            this.currentPage = 1;
+          }}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -231,6 +244,8 @@ export class AppExpenses extends LitElement {
     filtered: Expense[],
     t: ReturnType<typeof getTranslation>
   ) {
+    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
+
     return html`
       <div class="table-card">
         <table class="data-table">
@@ -247,7 +262,7 @@ export class AppExpenses extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${filtered.map((exp) => {
+            ${paged.items.map((exp) => {
               const proj = store.projects.find((p) => p.id === exp.projectId);
               const task = exp.taskId ? store.tasks.find((tk) => tk.id === exp.taskId) : undefined;
               const user = store.users.find((u) => u.id === exp.userId);
@@ -353,6 +368,20 @@ export class AppExpenses extends LitElement {
           </tbody>
         </table>
       </div>
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
@@ -362,9 +391,11 @@ export class AppExpenses extends LitElement {
         ? store.projects
         : store.projects.filter((p) => p.id === this.projectFilter);
 
+    const paged = paginateItems(visibleProjects, this.currentPage, this.cardPageSize);
+
     return html`
       <div class="budgets-grid">
-        ${visibleProjects.map((proj) => {
+        ${paged.items.map((proj) => {
           const projExpenses = this.expenses.filter(
             (e) => e.projectId === proj.id && e.status !== 'rejected'
           );
@@ -440,6 +471,20 @@ export class AppExpenses extends LitElement {
           `;
         })}
       </div>
+      <app-pagination
+        layout-mode="cards"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

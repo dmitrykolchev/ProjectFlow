@@ -37,6 +37,8 @@ import '../../common/app-number-input/app-number-input';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-payments.css';
 import { eventValue } from '../../common/event-value';
 
@@ -60,6 +62,8 @@ export class AppPayments extends LitElement {
   @state() private methodFilter: 'all' | PaymentMethod = 'all';
   @state() private counterpartyFilter = 'all';
   @state() private contractFilter = 'all';
+  @state() private currentPage = 1;
+  @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private paymentModalOpen = false;
   @state() private paymentInvoiceId = '';
@@ -92,6 +96,7 @@ export class AppPayments extends LitElement {
     this.contracts = store.contracts;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.tablePageSize = store.customization.tablePageSize;
   }
 
 
@@ -330,7 +335,10 @@ export class AppPayments extends LitElement {
           counterparty: this.counterpartyFilter,
           contract: this.contractFilter,
         }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'first') {
             if (this.viewTab === 'due_control') {
@@ -341,14 +349,17 @@ export class AppPayments extends LitElement {
           }
           if (e.detail.key === 'counterparty') this.counterpartyFilter = eventValue(e);
           if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
+          this.currentPage = 1;
         }}"
       >
         <app-segmented-switch
           slot="prefix"
           .value="${this.viewTab}"
           .options="${tabOptions}"
-          @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewTab = eventValue(e) as 'due_control' | 'ledger')}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.viewTab = eventValue(e) as 'due_control' | 'ledger';
+            this.currentPage = 1;
+          }}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -371,6 +382,8 @@ export class AppPayments extends LitElement {
       `;
     }
 
+    const paged = paginateItems(invoices, this.currentPage, this.tablePageSize);
+
     return html`
       <div class="table-card">
         <table class="data-table">
@@ -387,7 +400,7 @@ export class AppPayments extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${invoices.map((inv) => {
+            ${paged.items.map((inv) => {
               const ctr = this.contracts.find((c) => c.id === inv.contractId);
               const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
               const invPaid = store.getInvoicePaidAmount(inv.id);
@@ -528,6 +541,20 @@ export class AppPayments extends LitElement {
           </tbody>
         </table>
       </div>
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
@@ -538,6 +565,8 @@ export class AppPayments extends LitElement {
     if (payments.length === 0) {
       return html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`;
     }
+
+    const paged = paginateItems(payments, this.currentPage, this.tablePageSize);
 
     return html`
       <div class="table-card">
@@ -556,7 +585,7 @@ export class AppPayments extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${payments.map((pay) => {
+            ${paged.items.map((pay) => {
               const inv = this.invoices.find((i) => i.id === pay.invoiceId);
               const ctr = this.contracts.find((c) => c.id === pay.contractId);
               const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
@@ -652,6 +681,20 @@ export class AppPayments extends LitElement {
           </tbody>
         </table>
       </div>
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

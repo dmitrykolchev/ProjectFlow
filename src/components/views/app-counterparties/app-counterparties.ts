@@ -20,6 +20,8 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-counterparties.css';
 import { eventValue } from '../../common/event-value';
 
@@ -32,6 +34,9 @@ export class AppCounterparties extends LitElement {
   @state() private typeFilter: 'all' | CounterpartyType = 'all';
   @state() private statusFilter: 'all' | CounterpartyStatus = 'all';
   @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private currentPage = 1;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
+  @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private modalOpen = false;
   @state() private editingId: string | null = null;
@@ -70,6 +75,8 @@ export class AppCounterparties extends LitElement {
     this.counterparties = store.counterparties;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.cardPageSize = store.customization.cardGridPageSize;
+    this.tablePageSize = store.customization.tablePageSize;
   }
 
   private getFiltered(): Counterparty[] {
@@ -148,10 +155,14 @@ export class AppCounterparties extends LitElement {
           { key: 'status', options: statusOptions },
         ]}"
         .values="${{ type: this.typeFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
+          this.currentPage = 1;
         }}"
       >
         <app-segmented-switch
@@ -161,8 +172,10 @@ export class AppCounterparties extends LitElement {
             { value: 'cards', label: t.viewTexts.counterparties.viewCards },
             { value: 'table', label: t.viewTexts.counterparties.viewTable },
           ]}"
-          @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.displayMode = eventValue(e) as 'cards' | 'table')}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.displayMode = eventValue(e) as 'cards' | 'table';
+            this.currentPage = 1;
+          }}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -311,9 +324,11 @@ export class AppCounterparties extends LitElement {
   }
 
   private renderCards(list: Counterparty[], t: ReturnType<typeof getTranslation>) {
+    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+
     return html`
       <div class="cards-grid">
-        ${list.map((cp) => {
+        ${paged.items.map((cp) => {
           const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
           const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
           const cpProjects = store.projects.filter((p) => p.counterpartyId === cp.id).length;
@@ -414,10 +429,27 @@ export class AppCounterparties extends LitElement {
           `;
         })}
       </div>
+
+      <app-pagination
+        layout-mode="cards"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
   private renderTable(list: Counterparty[], t: ReturnType<typeof getTranslation>) {
+    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+
     return html`
       <div class="table-card">
         <table class="data-table">
@@ -434,7 +466,7 @@ export class AppCounterparties extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${list.map((cp) => {
+            ${paged.items.map((cp) => {
               const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
               const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
 
@@ -497,6 +529,21 @@ export class AppCounterparties extends LitElement {
           </tbody>
         </table>
       </div>
+
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

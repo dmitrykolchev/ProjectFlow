@@ -18,6 +18,8 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-companies.css';
 import { eventValue } from '../../common/event-value';
 
@@ -28,6 +30,8 @@ export class AppCompanies extends LitElement {
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
   @state() private statusFilter: 'all' | CompanyStatus = 'all';
+  @state() private currentPage = 1;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
 
   @state() private modalOpen = false;
   @state() private editingId: string | null = null;
@@ -66,6 +70,7 @@ export class AppCompanies extends LitElement {
     this.companies = store.companies;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.cardPageSize = store.customization.cardGridPageSize;
   }
 
   private getFilteredCompanies(): Company[] {
@@ -126,110 +131,19 @@ export class AppCompanies extends LitElement {
         .searchValue="${this.localSearch}"
         .filters="${[{ key: 'status', options: statusOptions }]}"
         .values="${{ status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CompanyStatus;
+          this.currentPage = 1;
         }}"
       ></app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.companies.emptyNoCompanies}"></app-empty-state>`
-        : html`
-            <div class="cards-grid">
-              ${filtered.map((company) => {
-                const director = store.users.find((u) => u.id === company.directorId);
-                const empCount = store.users.filter((u) => u.companyId === company.id).length;
-                const projCount = store.projects.filter((p) => p.companyId === company.id).length;
-                const ctrCount = store.contracts.filter((c) => c.companyId === company.id).length;
-
-                return html`
-                  <article class="company-card">
-                    <div class="card-top">
-                      <div class="company-identity">
-                        <div class="company-icon">${iconBuilding(20)}</div>
-                        <div class="company-names">
-                          <div class="company-name">${company.name}</div>
-                          <div class="company-legal" title="${company.legalName}">${company.legalName}</div>
-                        </div>
-                      </div>
-                      <app-status-chip domain="company" status="${company.status}"></app-status-chip>
-                    </div>
-
-                    <p class="company-desc">${company.description}</p>
-
-                    <div class="meta-grid">
-                      <div class="meta-item">
-                        <span class="meta-label">${t.viewTexts.companies.metaTaxId}</span>
-                        <span class="meta-value mono">
-                          ${company.inn}${company.kpp ? ` / ${company.kpp}` : ''}
-                        </span>
-                      </div>
-                      <div class="meta-item">
-                        <span class="meta-label">${t.viewTexts.companies.metaCity}</span>
-                        <span class="meta-value">${company.city}</span>
-                      </div>
-                      <div class="meta-item">
-                        <span class="meta-label">${t.viewTexts.companies.metaDirector}</span>
-                        <span class="meta-value">${director?.name || '—'}</span>
-                      </div>
-                      <div class="meta-item">
-                        <span class="meta-label">${t.viewTexts.companies.metaIndustry}</span>
-                        <span class="meta-value" title="${company.industry}">${company.industry}</span>
-                      </div>
-                      <div class="meta-item">
-                        <span class="meta-label">${t.viewTexts.companies.metaPhone}</span>
-                        <span class="meta-value mono">${company.phone}</span>
-                      </div>
-                      <div class="meta-item">
-                        <span class="meta-label">Email</span>
-                        <span class="meta-value">${company.email}</span>
-                      </div>
-                    </div>
-
-                    <div class="card-footer">
-                      <div class="stats-row">
-                        <span class="stat-pill">
-                          ${t.viewTexts.companies.staffCountLabel}: <strong>${empCount}</strong>
-                        </span>
-                        <span class="stat-pill">
-                          ${t.viewTexts.companies.projectsCountLabel}: <strong>${projCount}</strong>
-                        </span>
-                        <span class="stat-pill">
-                          ${t.viewTexts.companies.contractsCountLabel}: <strong>${ctrCount}</strong>
-                        </span>
-                      </div>
-                      <div class="card-actions">
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          title="${t.viewTexts.companies.knowledgeBaseTitle}"
-                          @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
-                        >
-                          ${iconBookOpen(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          title="${t.common.edit}"
-                          @click="${() => this.openEditModal(company)}"
-                        >
-                          ${iconEdit(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn danger"
-                          title="${t.common.delete}"
-                          @click="${() => (this.deletingCompany = company)}"
-                        >
-                          ${iconTrash(14)}
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                `;
-              })}
-            </div>
-          `}
+        : this.renderCardsGrid(filtered, t)}
 
       <app-modal
         ?open="${this.modalOpen}"
@@ -355,6 +269,122 @@ export class AppCompanies extends LitElement {
           }
         }}"
       ></app-confirm-dialog>
+    `;
+  }
+
+  private renderCardsGrid(filtered: Company[], t: ReturnType<typeof getTranslation>) {
+    const paged = paginateItems(filtered, this.currentPage, this.cardPageSize);
+
+    return html`
+      <div class="cards-grid">
+        ${paged.items.map((company) => {
+          const director = store.users.find((u) => u.id === company.directorId);
+          const empCount = store.users.filter((u) => u.companyId === company.id).length;
+          const projCount = store.projects.filter((p) => p.companyId === company.id).length;
+          const ctrCount = store.contracts.filter((c) => c.companyId === company.id).length;
+
+          return html`
+            <article class="company-card">
+              <div class="card-top">
+                <div class="company-identity">
+                  <div class="company-icon">${iconBuilding(20)}</div>
+                  <div class="company-names">
+                    <div class="company-name">${company.name}</div>
+                    <div class="company-legal" title="${company.legalName}">${company.legalName}</div>
+                  </div>
+                </div>
+                <app-status-chip domain="company" status="${company.status}"></app-status-chip>
+              </div>
+
+              <p class="company-desc">${company.description}</p>
+
+              <div class="meta-grid">
+                <div class="meta-item">
+                  <span class="meta-label">${t.viewTexts.companies.metaTaxId}</span>
+                  <span class="meta-value mono">
+                    ${company.inn}${company.kpp ? ` / ${company.kpp}` : ''}
+                  </span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${t.viewTexts.companies.metaCity}</span>
+                  <span class="meta-value">${company.city}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${t.viewTexts.companies.metaDirector}</span>
+                  <span class="meta-value">${director?.name || '—'}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${t.viewTexts.companies.metaIndustry}</span>
+                  <span class="meta-value" title="${company.industry}">${company.industry}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${t.viewTexts.companies.metaPhone}</span>
+                  <span class="meta-value mono">${company.phone}</span>
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">Email</span>
+                  <span class="meta-value">${company.email}</span>
+                </div>
+              </div>
+
+              <div class="card-footer">
+                <div class="stats-row">
+                  <span class="stat-pill">
+                    ${t.viewTexts.companies.staffCountLabel}: <strong>${empCount}</strong>
+                  </span>
+                  <span class="stat-pill">
+                    ${t.viewTexts.companies.projectsCountLabel}: <strong>${projCount}</strong>
+                  </span>
+                  <span class="stat-pill">
+                    ${t.viewTexts.companies.contractsCountLabel}: <strong>${ctrCount}</strong>
+                  </span>
+                </div>
+                <div class="card-actions">
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="${t.viewTexts.companies.knowledgeBaseTitle}"
+                    @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
+                  >
+                    ${iconBookOpen(14)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(company)}"
+                  >
+                    ${iconEdit(14)}
+                  </button>
+                  <button
+                    type="button"
+                    class="icon-btn danger"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingCompany = company)}"
+                  >
+                    ${iconTrash(14)}
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        })}
+      </div>
+
+      <app-pagination
+        layout-mode="cards"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

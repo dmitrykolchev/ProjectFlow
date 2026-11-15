@@ -28,6 +28,8 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../../common/app-pagination/app-pagination';
+import { paginateItems } from '../../common/paginate';
 import styles from './app-time-tracking.css';
 import { eventValue } from '../../common/event-value';
 
@@ -43,6 +45,8 @@ export class AppTimeTracking extends LitElement {
   @state() private userFilter = 'all';
   @state() private categoryFilter: 'all' | TimeEntryCategory = 'all';
   @state() private viewMode: 'journal' | 'by-task' = 'journal';
+  @state() private currentPage = 1;
+  @state() private tablePageSize = store.customization.tablePageSize;
 
   // Quick inline report form
   @state() private quickProjectId = store.projects[0]?.id || '';
@@ -90,6 +94,7 @@ export class AppTimeTracking extends LitElement {
     this.entries = store.timeEntries;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
+    this.tablePageSize = store.customization.tablePageSize;
     if (!store.projects.some((p) => p.id === this.quickProjectId)) {
       this.quickProjectId = store.projects[0]?.id || '';
     }
@@ -314,11 +319,15 @@ export class AppTimeTracking extends LitElement {
           { key: 'category', options: categoryFilterOptions },
         ]}"
         .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+        @search-change="${(e: CustomEvent<{ value: string }>) => {
+          this.localSearch = eventValue(e);
+          this.currentPage = 1;
+        }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'project') this.projectFilter = eventValue(e);
           if (e.detail.key === 'user') this.userFilter = eventValue(e);
           if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
+          this.currentPage = 1;
         }}"
       >
         <app-segmented-switch
@@ -328,8 +337,10 @@ export class AppTimeTracking extends LitElement {
             { value: 'journal', label: t.timeTracking.viewJournal },
             { value: 'by-task', label: t.timeTracking.viewByTask },
           ]}"
-          @change="${(e: CustomEvent<{ value: string }>) =>
-            (this.viewMode = eventValue(e) as 'journal' | 'by-task')}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.viewMode = eventValue(e) as 'journal' | 'by-task';
+            this.currentPage = 1;
+          }}"
         ></app-segmented-switch>
       </app-filter-bar>
 
@@ -348,6 +359,8 @@ export class AppTimeTracking extends LitElement {
     filtered: TimeEntry[],
     t: ReturnType<typeof getTranslation>
   ) {
+    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
+
     return html`
       <div class="table-card">
         <table class="data-table">
@@ -365,7 +378,7 @@ export class AppTimeTracking extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${filtered.map((entry) => {
+            ${paged.items.map((entry) => {
               const task = store.tasks.find((tk) => tk.id === entry.taskId);
               const proj = store.projects.find((p) => p.id === entry.projectId);
               const user = store.users.find((u) => u.id === entry.userId);
@@ -458,6 +471,20 @@ export class AppTimeTracking extends LitElement {
           </tbody>
         </table>
       </div>
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
@@ -472,9 +499,15 @@ export class AppTimeTracking extends LitElement {
       groupsMap.set(entry.taskId, list);
     }
 
+    const pagedGroups = paginateItems(
+      Array.from(groupsMap.entries()),
+      this.currentPage,
+      this.tablePageSize
+    );
+
     return html`
       <div class="task-groups-list">
-        ${Array.from(groupsMap.entries()).map(([taskId, list]) => {
+        ${pagedGroups.items.map(([taskId, list]) => {
           const task = store.tasks.find((tk) => tk.id === taskId);
           const proj = store.projects.find((p) => p.id === (task?.projectId || list[0]?.projectId));
           const groupHours = list.reduce((s, e) => s + e.hours, 0);
@@ -579,6 +612,20 @@ export class AppTimeTracking extends LitElement {
           `;
         })}
       </div>
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${pagedGroups.totalItems}"
+        .page="${pagedGroups.page}"
+        .pageSize="${pagedGroups.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 

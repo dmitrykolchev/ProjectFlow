@@ -37,6 +37,7 @@ import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
 import avatarMeta from '../../common/app-avatar/app-avatar.story';
 import moneyMeta from '../../common/app-money/app-money.story';
+import paginationMeta from '../../common/app-pagination/app-pagination.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -106,6 +107,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   progressBarMeta,
   avatarMeta,
   moneyMeta,
+  paginationMeta,
   toastMeta,
   activityMeta,
   headerMeta,
