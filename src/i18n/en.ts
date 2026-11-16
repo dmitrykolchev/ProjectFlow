@@ -962,6 +962,8 @@ export const en = {
       slotsTitle: 'Slots',
       noSlots: 'Component uses no slots',
       thSlot: 'Slot',
+      childrenTitle: 'Child components',
+      thChild: 'Component',
       noProps: 'Component properties not found',
       thProp: 'Property',
       thAttr: 'Attribute',

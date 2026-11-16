@@ -962,6 +962,8 @@ export const ru = {
       slotsTitle: 'Слоты',
       noSlots: 'Компонент не использует слотов',
       thSlot: 'Слот',
+      childrenTitle: 'Дочерние компоненты',
+      thChild: 'Компонент',
       noProps: 'Свойства компонента не найдены',
       thProp: 'Свойство',
       thAttr: 'Атрибут',

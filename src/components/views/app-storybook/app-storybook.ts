@@ -519,6 +519,30 @@ export class AppStorybook extends LitElement {
             </table>
           `;
         })()}
+
+        ${meta.childrenDoc
+          ? html`
+              <h4 class="sb-subsection-title">${t.viewTexts.storybook.childrenTitle}</h4>
+              <table class="sb-props-table">
+                <thead>
+                  <tr>
+                    <th>${t.viewTexts.storybook.thChild}</th>
+                    <th>${t.viewTexts.storybook.thDescription}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${Object.entries(meta.childrenDoc).map(
+                    ([tag, desc]) => html`
+                      <tr>
+                        <td><span class="sb-prop-name">&lt;${tag}&gt;</span></td>
+                        <td>${desc}</td>
+                      </tr>
+                    `
+                  )}
+                </tbody>
+              </table>
+            `
+          : ''}
       </section>
     `;
   }

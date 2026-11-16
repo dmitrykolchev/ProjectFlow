@@ -12,6 +12,9 @@ export type PropsDoc = Record<string, string>;
 /** Per-slot English descriptions keyed by slot name ("(default)" for the unnamed slot). */
 export type SlotsDoc = Record<string, string>;
 
+/** Child components usable inside the component, keyed by tag name with an English description. */
+export type ChildrenDoc = Record<string, string>;
+
 export interface ComponentStoryMeta {
   title: string;
   component: string;
@@ -28,4 +31,5 @@ export interface ComponentStoryMeta {
   stories: Story[];
   propsDoc?: PropsDoc;
   slotsDoc?: SlotsDoc;
+  childrenDoc?: ChildrenDoc;
 }
