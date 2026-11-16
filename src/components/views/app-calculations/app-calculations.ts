@@ -94,6 +94,7 @@ export class AppCalculations extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'calculations' ? store.activePage : 1;
     this.calculations = store.calculations;
     this.contracts = store.contracts;
     this.invoices = store.invoices;
@@ -370,13 +371,13 @@ export class AppCalculations extends LitElement {
         .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
           if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
           if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       ></app-filter-bar>
 
@@ -592,11 +593,11 @@ export class AppCalculations extends LitElement {
               .page="${paged.page}"
               .pageSize="${paged.pageSize}"
               @page-change="${(e: CustomEvent<{ page: number }>) => {
-                this.currentPage = e.detail.page;
+                this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                 this.scrollTop = 0;
               }}"
               @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                this.currentPage = 1;
+                this.currentPage = 1; store.setActivePage(1, false);
                 store.setTablePageSize(e.detail.pageSize);
               }}"
             ></app-pagination>
