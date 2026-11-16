@@ -10,11 +10,6 @@
   height: var(--mi-icon, var(--mi-h));
   font-size: var(--mi-icon, var(--mi-h));
   line-height: normal;
-  /* glyph advance is slightly wider than the box — as a flex item inside a control,
-     min-content would stretch the slot past its canonical size (icon-only buttons
-     stop being square). Clamp so the slot equals --mi-icon exactly. */
-  min-width: 0;
-  min-height: 0;
 }
 
 .glyph {
