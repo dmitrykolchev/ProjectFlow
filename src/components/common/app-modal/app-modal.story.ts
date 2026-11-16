@@ -7,7 +7,8 @@ import { iconAlertTriangle, iconTrash } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Overlays/Modal',
   component: 'app-modal',
-  description: 'Customizable modal dialog with backdrop blur, customizable sizes, header, and footer actions.',
+  description:
+    'Customizable modal dialog with backdrop blur, customizable sizes, header, and footer actions. The title slot replaces the header caption, the default slot is the modal body, and the footer slot hosts footer buttons.',
   category: 'Overlays',
   slotsDoc: {
     title: 'Custom header content replacing the title text',
