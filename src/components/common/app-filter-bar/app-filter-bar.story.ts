@@ -7,7 +7,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/Filter Bar',
   component: 'app-filter-bar',
   description:
-    'Toolbar with search input, N filter selects, optional reset button and trailing actions slot.',
+    'Toolbar with search input, N filter selects, optional reset button and trailing actions slot. The prefix slot renders extra controls before the filter selects, and the default slot appends additional controls after them.',
   category: 'Common',
   slotsDoc: {
     prefix: 'Extra controls rendered before the filter selects',
