@@ -842,18 +842,12 @@ export class AppStore {
     root.style.setProperty('--control-font-sm', '0.8125rem');
     root.style.setProperty('--control-font-md', '0.875rem');
     root.style.setProperty('--control-font-lg', '1rem');
-    // root.style.setProperty('--control-padding-x-sm', '0.65rem');
-    // root.style.setProperty('--control-padding-x-md', '0.875rem');
-    // root.style.setProperty('--control-padding-x-lg', '1.15rem');
-    // root.style.setProperty('--control-padding-x-sm', '0.428rem');
-    // root.style.setProperty('--control-padding-x-md', '0.572rem');
-    // root.style.setProperty('--control-padding-x-lg', '0.645rem');
+    root.style.setProperty('--control-padding-x-sm', '0.65rem');
+    root.style.setProperty('--control-padding-x-md', '0.875rem');
+    root.style.setProperty('--control-padding-x-lg', '1.15rem');
     root.style.setProperty('--control-icon-sm', '16px');
     root.style.setProperty('--control-icon-md', '20px');
     root.style.setProperty('--control-icon-lg', '24px');
-    root.style.setProperty('--control-padding-x-sm', '6px');
-    root.style.setProperty('--control-padding-x-md', '8px');
-    root.style.setProperty('--control-padding-x-lg', '9px');
   }
 
   public setTheme(theme: ThemeMode): void {
