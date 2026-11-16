@@ -128,6 +128,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the option list (value, label, code, subtitle, meta, badge, avatar, keywords, start / end graphics)',
   },
+  childrenDoc: {
+    'app-option': 'Declarative entity row (value, label, code, subtitle, meta, badge, avatar, keywords, start / end slot graphics) appended to the options prop list and included in the search filter',
+  },
   propsDoc: {
     label: 'Caption above the field',
     value: 'Id of the currently selected entity',
