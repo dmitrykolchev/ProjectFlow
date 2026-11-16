@@ -12,6 +12,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the dropdown list',
   },
+  childrenDoc: {
+    'app-option': 'Declarative option row (value, label, color, start / end slot graphics) appended to the options prop list',
+  },
   propsDoc: {
     label: 'Caption above the field',
     value: 'Currently selected option value',
