@@ -19,6 +19,17 @@ export const meta: ComponentStoryMeta = {
   },
   stories: [
     {
+      name: 'Size Scale',
+      description: 'Canonical control size scale sm|md|lg (30/38/44px heights, md default)',
+      render: () => html`
+        <div style="max-width: 240px; display: flex; flex-direction: column; gap: 0.75rem;">
+          <app-number-input size="sm" label="Small" value="10" unit="ч"></app-number-input>
+          <app-number-input size="md" label="Medium (default)" value="10" unit="ч"></app-number-input>
+          <app-number-input size="lg" label="Large" value="10" unit="ч"></app-number-input>
+        </div>
+      `,
+    },
+    {
       name: 'Default',
       description: 'Hours estimation with stepper controls',
       render: () => html`

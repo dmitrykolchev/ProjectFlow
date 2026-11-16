@@ -10,7 +10,8 @@ export class AppNumberInput extends LitElement {
   @property({ type: Number }) max: number = 1000;
   @property({ type: Number }) step: number = 1;
   @property({ type: String }) unit: string = '';
-  @property({ type: String }) size: 'sm' | 'md' = 'md';
+  // canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
+  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';
   @property({ type: Boolean }) disabled: boolean = false;
 
   static styles = styles;
@@ -19,7 +20,7 @@ export class AppNumberInput extends LitElement {
     return html`
       <div class="form-group">
         ${this.label ? html`<label>${this.label}</label>` : ''}
-        <div class="stepper-wrapper">
+        <div class="stepper-wrapper size-${this.size}">
           <button
             type="button"
             class="step-btn"

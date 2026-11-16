@@ -30,6 +30,33 @@ label {
   transition: border-color var(--transition-fast, 150ms ease);
 }
 
+/* canonical control size scale (Priority E): md values stay the historical ones */
+.stepper-wrapper.size-sm {
+  height: var(--control-height-sm, 30px);
+}
+
+.stepper-wrapper.size-sm .step-btn {
+  width: 28px;
+  font-size: 0.95rem;
+}
+
+.stepper-wrapper.size-sm input {
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.stepper-wrapper.size-lg {
+  height: var(--control-height-lg, 44px);
+}
+
+.stepper-wrapper.size-lg .step-btn {
+  width: 44px;
+  font-size: 1.3rem;
+}
+
+.stepper-wrapper.size-lg input {
+  font-size: var(--control-font-lg, 1rem);
+}
+
 .stepper-wrapper:focus-within {
   border-color: var(--accent-primary, #6366f1);
 }
