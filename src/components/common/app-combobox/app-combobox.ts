@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { store } from '../../../state/store';
+import { getTranslation } from '../../../i18n';
 import styles from './app-combobox.css';
 
 @customElement('app-combobox')
@@ -139,7 +141,7 @@ export class AppCombobox extends LitElement {
                 @mousedown="${(e: MouseEvent) => e.preventDefault()}"
                 @click="${() => this.addTag(this.inputValue.trim())}"
               >
-                + Добавить "${this.inputValue.trim()}"
+                ${getTranslation(store.customization.language).common.addOption(this.inputValue.trim())}
               </div>
             `
           : ''}

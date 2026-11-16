@@ -1,5 +1,7 @@
 import { LitElement, html, svg } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { store } from '../../../state/store';
+import { getTranslation } from '../../../i18n';
 import styles from './app-chart-card.css';
 
 export interface ChartDataPoint {
@@ -14,11 +16,12 @@ export class AppChartCard extends LitElement {
   @property({ type: String }) subtitle: string = '';
   @property({ type: String }) type: 'bar' | 'donut' | 'line' = 'bar';
   @property({ type: Array }) data: ChartDataPoint[] = [];
-  @property({ type: String }) centerLabel: string = 'Всего';
+  @property({ type: String }) centerLabel: string = '';
 
   static styles = styles;
 
   render() {
+    const t = getTranslation(store.customization.language);
     return html`
       <div class="chart-card">
         <div class="chart-header">
@@ -30,7 +33,7 @@ export class AppChartCard extends LitElement {
         </div>
 
         ${this.data.length === 0
-          ? html`<div style="padding: 2rem 0; text-align: center; color: var(--text-muted);">Нет данных</div>`
+          ? html`<div style="padding: 2rem 0; text-align: center; color: var(--text-muted);">${t.common.empty}</div>`
           : this.type === 'donut'
           ? this.renderDonut()
           : this.type === 'line'
@@ -111,7 +114,7 @@ export class AppChartCard extends LitElement {
           </svg>
           <div class="donut-center">
             <span class="donut-total">${total}</span>
-            <span class="donut-caption">${this.centerLabel}</span>
+            ${this.centerLabel ? html`<span class="donut-caption">${this.centerLabel}</span>` : ''}
           </div>
         </div>
 

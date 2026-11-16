@@ -20,6 +20,8 @@ export const en = {
     empty: 'No data to display',
     actions: 'Actions',
     exportCsv: 'Export CSV',
+    exportSuccess: 'CSV file downloaded successfully',
+    addOption: (value: string) => `+ Add "${value}"`,
     exportJson: 'Export JSON',
     details: 'Details',
     confirm: 'Confirm',

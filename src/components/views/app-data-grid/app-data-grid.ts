@@ -1466,6 +1466,7 @@ export class AppDataGrid extends LitElement {
     a.download = `projectflow_export_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    store.addNotification('info', 'Экспорт', 'CSV файл успешно скачан');
+    const t = getTranslation(this.currentLang);
+    store.addNotification('info', t.common.exportCsv, t.common.exportSuccess);
   }
 }

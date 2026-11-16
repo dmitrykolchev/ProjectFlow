@@ -20,6 +20,8 @@ export const ru = {
     empty: 'Нет данных для отображения',
     actions: 'Действия',
     exportCsv: 'Экспорт CSV',
+    exportSuccess: 'CSV файл успешно скачан',
+    addOption: (value: string) => `+ Добавить "${value}"`,
     exportJson: 'Экспорт JSON',
     details: 'Подробнее',
     confirm: 'Подтвердить',
