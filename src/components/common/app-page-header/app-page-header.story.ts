@@ -8,7 +8,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Layout/Page Header',
   component: 'app-page-header',
   description:
-    'Standard page header with title, subtitle, optional leading icon, and an actions zone on the right.',
+    'Standard page header with title, subtitle, optional leading icon, and an actions zone on the right. The icon slot renders the leading graphic, the default slot adds extra content under the title, and the actions slot hosts action buttons on the right.',
   category: 'Layout',
   slotsDoc: {
     icon: 'Leading page icon (28px recommended)',
