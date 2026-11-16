@@ -8,7 +8,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/Section Card',
   component: 'app-section-card',
   description:
-    'Card container with header (title, subtitle, actions slot) and body; optional collapsible mode.',
+    'Card container with header (title, subtitle, actions slot) and body; optional collapsible mode. The icon slot renders a leading header graphic, header-left holds content at the left of the header, actions holds controls at the right, and the default slot is the section body.',
   category: 'Common',
   slotsDoc: {
     icon: 'Leading icon in the section header',
