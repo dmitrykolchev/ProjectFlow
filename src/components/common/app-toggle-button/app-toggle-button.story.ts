@@ -6,7 +6,8 @@ import { iconFilter } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Common/ToggleButton',
   component: 'app-toggle-button',
-  description: 'Stateful pressable button supporting soft and solid active variants, icons, and accessibility aria-pressed.',
+  description:
+    'Stateful pressable button supporting soft and solid active variants, icons, and accessibility aria-pressed. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start / icon-end are legacy aliases of start / end.',
   category: 'Common',
   slotsDoc: {
     start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
