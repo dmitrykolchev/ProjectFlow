@@ -23,6 +23,20 @@
   box-shadow: var(--shadow-sm), var(--surface-glow, none);
 }
 
+/* canonical control scale (Priority E): surface mode uses the canonical md button size;
+   compact mode keeps the historical local 32px token */
+.pagination-bar {
+  --pg-btn-size: var(--control-height-md, 38px);
+  --pg-font: var(--control-font-md, 0.875rem);
+  --pg-select-h: var(--control-height-md, 38px);
+}
+
+.pagination-bar.is-compact {
+  --pg-btn-size: 32px;
+  --pg-font: 0.8rem;
+  --pg-select-h: 32px;
+}
+
 .pagination-bar.is-bare {
   background: transparent;
   border: none;
@@ -90,7 +104,7 @@
 
 .page-size-select {
   width: 78px;
-  --control-height-md: 32px;
+  --control-height-md: var(--pg-select-h, 32px);
 }
 
 .pages-nav {
@@ -103,15 +117,15 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 32px;
-  height: 32px;
+  min-width: var(--pg-btn-size, 38px);
+  height: var(--pg-btn-size, 38px);
   padding: 0 0.45rem;
   border-radius: var(--radius-md, 8px);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-secondary, #94a3b8);
   font-family: var(--font-mono, monospace);
-  font-size: 0.8rem;
+  font-size: var(--pg-font, 0.875rem);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
   cursor: pointer;
