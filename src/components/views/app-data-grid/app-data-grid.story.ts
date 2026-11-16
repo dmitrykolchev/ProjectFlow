@@ -50,6 +50,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-data-grid',
   description: 'Declarative enterprise data grid composed with <data-grid-column>, supporting virtual row scrolling, multi-column sorting, multi-level hierarchical grouping (dropdown & drag-to-group), column drag reorder, and column resize.',
   category: 'Views',
+  childrenDoc: {
+    'data-grid-column': 'Column definition child (field, header, width, sortable, groupable, cell-type) composing the grid',
+  },
   stories: [
     {
       name: 'Interactive Declarative Data Grid',
