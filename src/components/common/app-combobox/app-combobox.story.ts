@@ -6,7 +6,8 @@ import '../app-option/app-option';
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/Combobox',
   component: 'app-combobox',
-  description: 'Searchable multi-tag combobox input with autocomplete and tag removal.',
+  description:
+    'Searchable multi-tag combobox input with autocomplete and tag removal. The default slot accepts declarative app-option children whose labels append to the items prop.',
   category: 'Inputs',
   slotsDoc: {
     '(default)': 'Declarative <app-option> children adding suggestions (label is the suggestion text)',
