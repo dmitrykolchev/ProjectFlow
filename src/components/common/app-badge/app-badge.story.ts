@@ -13,6 +13,9 @@ export const meta: ComponentStoryMeta = {
     end: 'Content rendered after the badge text (text, SVG icon, material icon) — centered vertically',
     icon: 'Legacy alias of start',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the badge text',
+  },
   propsDoc: {
     variant: 'Semantic color of the badge (neutral, info, success, warning, danger)',
     appearance: 'Rendering style: soft fill / outline',
