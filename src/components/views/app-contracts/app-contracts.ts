@@ -125,6 +125,7 @@ export class AppContracts extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'contracts' ? store.activePage : 1;
     this.contracts = store.contracts;
     this.calculations = store.calculations;
     this.invoices = store.invoices;
@@ -468,7 +469,7 @@ export class AppContracts extends LitElement {
           : { invoiceStatus: this.invoiceStatusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
@@ -476,7 +477,7 @@ export class AppContracts extends LitElement {
           if (e.detail.key === 'calcStatus') this.calcStatusFilter = eventValue(e) as 'all' | CalculationStatus;
           if (e.detail.key === 'payMethod') this.paymentMethodFilter = eventValue(e) as 'all' | PaymentMethod;
           if (e.detail.key === 'invoiceStatus') this.invoiceStatusFilter = eventValue(e) as 'all' | InvoiceStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -485,7 +486,7 @@ export class AppContracts extends LitElement {
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.viewTab = eventValue(e) as 'contracts' | 'calculations' | 'invoices' | 'payments';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -648,11 +649,11 @@ export class AppContracts extends LitElement {
                 .page="${pagedContracts.page}"
                 .pageSize="${pagedContracts.pageSize}"
                 @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page;
+                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                   this.scrollTop = 0;
                 }}"
                 @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                  this.currentPage = 1;
+                  this.currentPage = 1; store.setActivePage(1, false);
                   store.setTablePageSize(e.detail.pageSize);
                 }}"
               ></app-pagination>
@@ -822,11 +823,11 @@ export class AppContracts extends LitElement {
                 .page="${pagedCalculations.page}"
                 .pageSize="${pagedCalculations.pageSize}"
                 @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page;
+                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                   this.scrollTop = 0;
                 }}"
                 @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                  this.currentPage = 1;
+                  this.currentPage = 1; store.setActivePage(1, false);
                   store.setTablePageSize(e.detail.pageSize);
                 }}"
               ></app-pagination>
@@ -942,11 +943,11 @@ export class AppContracts extends LitElement {
                 .page="${pagedPayments.page}"
                 .pageSize="${pagedPayments.pageSize}"
                 @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page;
+                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                   this.scrollTop = 0;
                 }}"
                 @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                  this.currentPage = 1;
+                  this.currentPage = 1; store.setActivePage(1, false);
                   store.setTablePageSize(e.detail.pageSize);
                 }}"
               ></app-pagination>
@@ -1123,11 +1124,11 @@ export class AppContracts extends LitElement {
               .page="${pagedInvoices.page}"
               .pageSize="${pagedInvoices.pageSize}"
               @page-change="${(e: CustomEvent<{ page: number }>) => {
-                this.currentPage = e.detail.page;
+                this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                 this.scrollTop = 0;
               }}"
               @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                this.currentPage = 1;
+                this.currentPage = 1; store.setActivePage(1, false);
                 store.setTablePageSize(e.detail.pageSize);
               }}"
             ></app-pagination>
