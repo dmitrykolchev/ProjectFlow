@@ -6,7 +6,8 @@ import './app-project-progress';
 export const meta: ComponentStoryMeta = {
   title: 'Dashboard/ProjectProgress',
   component: 'app-project-progress',
-  description: 'Portfolio progress tracker displaying completion bars, task ratios, and click-to-open project filtering.',
+  description:
+    'Portfolio progress tracker displaying completion bars, task ratios, and click-to-open project filtering. The actions slot renders controls at the right of the section header.',
   category: 'Dashboard',
   slotsDoc: {
     actions: 'Controls at the right of the section header',
