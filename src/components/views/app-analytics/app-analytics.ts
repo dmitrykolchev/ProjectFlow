@@ -79,22 +79,22 @@ export class AppAnalytics extends LitElement {
         <div class="kpi-card">
           <span class="kpi-label">${t.analytics.totalTasks}</span>
           <span class="kpi-value">${total}</span>
-          <span class="kpi-sub">${store.projects.length} активных проекта</span>
+          <span class="kpi-sub">${t.analytics.kpiActiveProjects(store.projects.length)}</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">${t.analytics.completedTasks}</span>
           <span class="kpi-value" style="color: var(--color-success, #10b981);">${completed}</span>
-          <span class="kpi-sub">${rate}% от общего объема</span>
+          <span class="kpi-sub">${t.analytics.kpiCompletedRate(rate)}</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">${t.analytics.urgentTasks}</span>
           <span class="kpi-value" style="color: var(--color-danger, #ef4444);">${urgent}</span>
-          <span class="kpi-sub">Требуют немедленного внимания</span>
+          <span class="kpi-sub">${t.analytics.kpiUrgentSub}</span>
         </div>
         <div class="kpi-card">
           <span class="kpi-label">${t.analytics.totalEstimatedHours}</span>
-          <span class="kpi-value">${estimatedHoursTotal} ч.</span>
-          <span class="kpi-sub">Залогировано: ${loggedHoursTotal} ч.</span>
+          <span class="kpi-value">${estimatedHoursTotal}${t.analytics.hoursSuffix}</span>
+          <span class="kpi-sub">${t.analytics.kpiLogged(loggedHoursTotal)}</span>
         </div>
       </div>
 
@@ -144,11 +144,11 @@ export class AppAnalytics extends LitElement {
         <table class="team-table">
           <thead>
             <tr>
-              <th>Сотрудник</th>
-              <th>Роль</th>
-              <th>Задач</th>
-              <th>Оценка</th>
-              <th>Залогировано</th>
+              <th>${t.analytics.thEmployee}</th>
+              <th>${t.analytics.thRole}</th>
+              <th>${t.analytics.thTasks}</th>
+              <th>${t.analytics.thEstimate}</th>
+              <th>${t.analytics.thLogged}</th>
             </tr>
           </thead>
           <tbody>
@@ -167,8 +167,8 @@ export class AppAnalytics extends LitElement {
                   </td>
                   <td><span style="color: var(--text-muted, #64748b);">${user.role}</span></td>
                   <td><strong class="tabular-nums">${userTasks.length}</strong></td>
-                  <td><span class="tabular-nums">${est} ч.</span></td>
-                  <td><span class="tabular-nums">${log} ч.</span></td>
+                  <td><span class="tabular-nums">${est}${t.analytics.hoursSuffix}</span></td>
+                  <td><span class="tabular-nums">${log}${t.analytics.hoursSuffix}</span></td>
                 </tr>
               `;
             })}
