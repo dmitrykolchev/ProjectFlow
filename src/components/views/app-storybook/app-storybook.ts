@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { ComponentStoryMeta } from '../../../types/storybook';
+import { store } from '../../../state/store';
+import { getTranslation } from '../../../i18n';
 import styles from './app-storybook.css';
 
 // Import all component story definitions
@@ -180,6 +182,7 @@ export class AppStorybook extends LitElement {
   }
 
   render() {
+    const t = getTranslation(store.customization.language);
     const meta = this.selectedMeta;
     const query = this.searchQuery.toLowerCase().trim();
 
@@ -213,7 +216,7 @@ export class AppStorybook extends LitElement {
             <input
               type="text"
               class="sb-search-box"
-              placeholder="Поиск по компонентам..."
+              placeholder="${t.viewTexts.storybook.searchPlaceholder}"
               .value="${this.searchQuery}"
               @input="${(e: InputEvent) => {
                 this.searchQuery = (e.target as HTMLInputElement).value;
@@ -292,13 +295,13 @@ export class AppStorybook extends LitElement {
               class="sb-tab ${this.activeTab === 'code' ? 'is-active' : ''}"
               @click="${() => (this.activeTab = 'code')}"
             >
-              Код и импорт
+              ${t.viewTexts.storybook.tabCode}
             </button>
             <button
               class="sb-tab ${this.activeTab === 'props' ? 'is-active' : ''}"
               @click="${() => (this.activeTab = 'props')}"
             >
-              Спецификация API
+              ${t.viewTexts.storybook.tabApi}
             </button>
           </div>
 
@@ -363,29 +366,30 @@ ${importLine}
 // HTML Template
 <${meta.component}></${meta.component}>`;
 
+    const t = getTranslation(store.customization.language);
     return html`
       <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <h3 style="font-size: 1rem; font-weight: 600;">Как использовать компонент</h3>
+        <h3 style="font-size: 1rem; font-weight: 600;">${t.viewTexts.storybook.howToUseTitle}</h3>
         <pre class="sb-code-box">${importSnippet}</pre>
         <p style="font-size: 0.8125rem; color: var(--text-secondary, #94a3b8);">
-          Все компоненты построены на чистом Lit, инкапсулируют стили через Shadow DOM и модульный CSS,
-          и реагируют на кастомные свойства CSS темы приложения.
+          ${t.viewTexts.storybook.howToUseBody}
         </p>
       </div>
     `;
   }
 
   private renderPropsDocs(meta: ComponentStoryMeta) {
+    const t = getTranslation(store.customization.language);
     return html`
       <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <h3 style="font-size: 1rem; font-weight: 600;">Спецификация &lt;${meta.component}&gt;</h3>
+        <h3 style="font-size: 1rem; font-weight: 600;">${t.viewTexts.storybook.apiSpecTitle(meta.component)}</h3>
         <table class="sb-props-table">
           <thead>
             <tr>
-              <th>Свойство / Аттрибут</th>
-              <th>Тип</th>
-              <th>По умолчанию</th>
-              <th>Описание</th>
+              <th>${t.viewTexts.storybook.thProp}</th>
+              <th>${t.viewTexts.storybook.thType}</th>
+              <th>${t.viewTexts.storybook.thDefault}</th>
+              <th>${t.viewTexts.storybook.thDescription}</th>
             </tr>
           </thead>
           <tbody>
@@ -393,19 +397,19 @@ ${importLine}
               <td><span class="sb-prop-name">disabled</span></td>
               <td><span class="sb-prop-type">boolean</span></td>
               <td>false</td>
-              <td>Отключает интерактивность компонента</td>
+              <td>${t.viewTexts.storybook.descDisabled}</td>
             </tr>
             <tr>
               <td><span class="sb-prop-name">size</span></td>
               <td><span class="sb-prop-type">'sm' | 'md' | 'lg'</span></td>
               <td>'md'</td>
-              <td>Размер и визуальная плотность элемента</td>
+              <td>${t.viewTexts.storybook.descSize}</td>
             </tr>
             <tr>
               <td><span class="sb-prop-name">variant</span></td>
               <td><span class="sb-prop-type">string</span></td>
               <td>'default'</td>
-              <td>Визуальная тема стиля компонента</td>
+              <td>${t.viewTexts.storybook.descVariant}</td>
             </tr>
           </tbody>
         </table>
