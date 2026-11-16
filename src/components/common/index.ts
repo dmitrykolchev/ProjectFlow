@@ -39,6 +39,9 @@ export { AppDateInput } from './app-date-input/app-date-input';
 export { AppSelect } from './app-select/app-select';
 export type { SelectOption } from './app-select/app-select';
 
+export { AppOption } from './app-option/app-option';
+export type { DeclarativeOption, OptionDataSource } from './app-option/app-option';
+
 export { AppEntitySelector } from './app-entity-selector/app-entity-selector';
 export type { EntitySelectorOption, EntitySelectorSize } from './app-entity-selector/app-entity-selector';
 

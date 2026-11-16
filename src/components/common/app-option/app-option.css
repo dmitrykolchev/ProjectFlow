@@ -1,0 +1,6 @@
+/* Declarative option carrier used as a child of option-list components
+   (app-select, app-entity-selector, app-combobox, app-radio-group,
+   app-segmented-switch). It renders nothing itself; the parent collects its props. */
+:host {
+  display: none;
+}
