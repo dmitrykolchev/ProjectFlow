@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { buildSnippet, getComponentProps } from '../../../domain/component-meta';
 import styles from './app-storybook.css';
 
 // Import all component story definitions
@@ -169,8 +170,11 @@ const ALL_STORIES: ComponentStoryMeta[] = [
 export class AppStorybook extends LitElement {
   @state() private selectedComponentName: string = 'app-button';
   @state() private searchQuery: string = '';
-  @state() private activeTab: 'preview' | 'code' | 'props' = 'preview';
   @state() private viewportWidth: 'full' | 'tablet' | 'mobile' = 'full';
+  @state() private playgroundCode: string = buildSnippet('app-button');
+
+  /** User edits per component, preserved while browsing the storybook. */
+  private playgroundEdits: Map<string, string> = new Map();
 
   static styles = styles;
 
@@ -178,6 +182,50 @@ export class AppStorybook extends LitElement {
     return (
       ALL_STORIES.find((s) => s.component === this.selectedComponentName) ||
       ALL_STORIES[0]
+    );
+  }
+
+  private selectComponent(name: string) {
+    this.selectedComponentName = name;
+    this.playgroundCode = this.playgroundEdits.get(name) ?? buildSnippet(name);
+  }
+
+  private handleEditorInput(value: string) {
+    this.playgroundCode = value;
+    this.playgroundEdits.set(this.selectedComponentName, value);
+  }
+
+  private resetPlayground() {
+    const tag = this.selectedComponentName;
+    this.playgroundEdits.delete(tag);
+    this.playgroundCode = buildSnippet(tag);
+  }
+
+  private async copyPlayground() {
+    const t = getTranslation(store.customization.language);
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(this.playgroundCode);
+      ok = true;
+    } catch {
+      // Fallback for contexts where the async clipboard API is unavailable.
+      const ta = document.createElement('textarea');
+      ta.value = this.playgroundCode;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        ok = document.execCommand('copy');
+      } catch {
+        ok = false;
+      }
+      document.body.removeChild(ta);
+    }
+    store.addNotification(
+      ok ? 'success' : 'warning',
+      t.viewTexts.storybook.copyBtn,
+      ok ? t.viewTexts.storybook.copiedToast : t.viewTexts.storybook.copyFailedToast,
     );
   }
 
@@ -235,7 +283,7 @@ export class AppStorybook extends LitElement {
                     return html`
                       <div
                         class="sb-item ${isSelected ? 'is-selected' : ''}"
-                        @click="${() => (this.selectedComponentName = story.component)}"
+                        @click="${() => this.selectComponent(story.component)}"
                       >
                         <span>${story.title.split('/')[1] || story.title}</span>
                         <span class="sb-item-count">${story.stories.length}</span>
@@ -284,54 +332,66 @@ export class AppStorybook extends LitElement {
             </div>
           </header>
 
-          <div class="sb-tabs-row">
-            <button
-              class="sb-tab ${this.activeTab === 'preview' ? 'is-active' : ''}"
-              @click="${() => (this.activeTab = 'preview')}"
-            >
-              Stories (${meta.stories.length})
-            </button>
-            <button
-              class="sb-tab ${this.activeTab === 'code' ? 'is-active' : ''}"
-              @click="${() => (this.activeTab = 'code')}"
-            >
-              ${t.viewTexts.storybook.tabCode}
-            </button>
-            <button
-              class="sb-tab ${this.activeTab === 'props' ? 'is-active' : ''}"
-              @click="${() => (this.activeTab = 'props')}"
-            >
-              ${t.viewTexts.storybook.tabApi}
-            </button>
-          </div>
-
           <div class="sb-canvas-body">
             <div class="sb-viewport-wrapper" style="max-width: ${viewportMaxWidth};">
-              ${this.activeTab === 'preview'
-                ? html`
-                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                      ${meta.stories.map(
-                        (story) => html`
-                          <div class="sb-story-card">
-                            <div class="sb-story-header">
-                              <div>
-                                <span class="sb-story-name">${story.name}</span>
-                                ${story.description
-                                  ? html`<div class="sb-story-desc">${story.description}</div>`
-                                  : ''}
-                              </div>
-                            </div>
-                            <div class="sb-story-stage">
-                              ${story.render()}
-                            </div>
+              <!-- Stories -->
+              <section class="sb-section">
+                <h3 class="sb-section-title">${t.viewTexts.storybook.storiesSection(meta.stories.length)}</h3>
+                <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                  ${meta.stories.map(
+                    (story) => html`
+                      <div class="sb-story-card">
+                        <div class="sb-story-header">
+                          <div>
+                            <span class="sb-story-name">${story.name}</span>
+                            ${story.description
+                              ? html`<div class="sb-story-desc">${story.description}</div>`
+                              : ''}
                           </div>
-                        `
-                      )}
-                    </div>
-                  `
-                : this.activeTab === 'code'
-                ? this.renderCodeSnippet(meta)
-                : this.renderPropsDocs(meta)}
+                        </div>
+                        <div class="sb-story-stage">
+                          ${story.render()}
+                        </div>
+                      </div>
+                    `
+                  )}
+                </div>
+              </section>
+
+              <!-- Live Playground -->
+              <section class="sb-section">
+                <div class="sb-section-head">
+                  <h3 class="sb-section-title">${t.viewTexts.storybook.playgroundTitle}</h3>
+                  <div class="sb-playground-actions">
+                    <button class="sb-tool-btn" @click="${() => this.resetPlayground()}">
+                      ${t.viewTexts.storybook.resetBtn}
+                    </button>
+                    <button class="sb-tool-btn" @click="${() => this.copyPlayground()}">
+                      ${t.viewTexts.storybook.copyBtn}
+                    </button>
+                  </div>
+                </div>
+                <pre class="sb-import-line">${this.buildImportLine(meta)}</pre>
+                <div class="sb-playground-grid">
+                  <div class="sb-editor-col">
+                    <span class="sb-col-label">${t.viewTexts.storybook.editorLabel}</span>
+                    <textarea
+                      class="sb-code-editor"
+                      spellcheck="false"
+                      .value="${this.playgroundCode}"
+                      @input="${(e: InputEvent) =>
+                        this.handleEditorInput((e.target as HTMLTextAreaElement).value)}"
+                    ></textarea>
+                  </div>
+                  <div class="sb-preview-col">
+                    <span class="sb-col-label">${t.viewTexts.storybook.previewLabel}</span>
+                    <div class="sb-preview-stage" .innerHTML="${this.playgroundCode}"></div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- API Specification -->
+              ${this.renderApiSpec(meta, t)}
             </div>
           </div>
         </main>
@@ -339,7 +399,7 @@ export class AppStorybook extends LitElement {
     `;
   }
 
-  private renderCodeSnippet(meta: ComponentStoryMeta) {
+  private buildImportLine(meta: ComponentStoryMeta): string {
     const pascalName = meta.component
       .split('-')
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -350,70 +410,63 @@ export class AppStorybook extends LitElement {
       meta.category !== 'Layout' &&
       meta.category !== 'Views';
 
-    const importLine = isCommon
+    return isCommon
       ? `import { ${pascalName} } from '@/src/components/common';`
       : `import '@/src/components/${
           meta.category === 'Dashboard'
             ? 'dashboard'
             : meta.category === 'Layout'
-            ? 'layout'
-            : 'views'
+              ? 'layout'
+              : 'views'
         }/${meta.component}/${meta.component}';`;
-
-    const importSnippet = `// TypeScript / Lit
-${importLine}
-
-// HTML Template
-<${meta.component}></${meta.component}>`;
-
-    const t = getTranslation(store.customization.language);
-    return html`
-      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <h3 style="font-size: 1rem; font-weight: 600;">${t.viewTexts.storybook.howToUseTitle}</h3>
-        <pre class="sb-code-box">${importSnippet}</pre>
-        <p style="font-size: 0.8125rem; color: var(--text-secondary, #94a3b8);">
-          ${t.viewTexts.storybook.howToUseBody}
-        </p>
-      </div>
-    `;
   }
 
-  private renderPropsDocs(meta: ComponentStoryMeta) {
-    const t = getTranslation(store.customization.language);
+  private renderApiSpec(meta: ComponentStoryMeta, t: ReturnType<typeof getTranslation>) {
+    const props = getComponentProps(meta.component);
+    const doc = meta.propsDoc || {};
+
     return html`
-      <div style="display: flex; flex-direction: column; gap: 1.25rem;">
-        <h3 style="font-size: 1rem; font-weight: 600;">${t.viewTexts.storybook.apiSpecTitle(meta.component)}</h3>
-        <table class="sb-props-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.storybook.thProp}</th>
-              <th>${t.viewTexts.storybook.thType}</th>
-              <th>${t.viewTexts.storybook.thDefault}</th>
-              <th>${t.viewTexts.storybook.thDescription}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><span class="sb-prop-name">disabled</span></td>
-              <td><span class="sb-prop-type">boolean</span></td>
-              <td>false</td>
-              <td>${t.viewTexts.storybook.descDisabled}</td>
-            </tr>
-            <tr>
-              <td><span class="sb-prop-name">size</span></td>
-              <td><span class="sb-prop-type">'sm' | 'md' | 'lg'</span></td>
-              <td>'md'</td>
-              <td>${t.viewTexts.storybook.descSize}</td>
-            </tr>
-            <tr>
-              <td><span class="sb-prop-name">variant</span></td>
-              <td><span class="sb-prop-type">string</span></td>
-              <td>'default'</td>
-              <td>${t.viewTexts.storybook.descVariant}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <section class="sb-section">
+        <div class="sb-section-head">
+          <h3 class="sb-section-title">${t.viewTexts.storybook.apiSpecTitle(meta.component)}</h3>
+          ${props.length > 0
+            ? html`<span class="sb-props-count">${t.viewTexts.storybook.propsCount(props.length)}</span>`
+            : ''}
+        </div>
+
+        ${props.length === 0
+          ? html`<p class="sb-no-props">${t.viewTexts.storybook.noProps}</p>`
+          : html`
+              <table class="sb-props-table">
+                <thead>
+                  <tr>
+                    <th>${t.viewTexts.storybook.thProp}</th>
+                    <th>${t.viewTexts.storybook.thAttr}</th>
+                    <th>${t.viewTexts.storybook.thType}</th>
+                    <th>${t.viewTexts.storybook.thDefault}</th>
+                    <th>${t.viewTexts.storybook.thDescription}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${props.map(
+                    (p) => html`
+                      <tr>
+                        <td><span class="sb-prop-name">${p.prop}</span></td>
+                        <td>
+                          ${p.attribute
+                            ? html`<code class="sb-prop-attr">${p.attribute}</code>`
+                            : html`<span class="sb-prop-only">.prop</span>`}
+                        </td>
+                        <td><span class="sb-prop-type">${p.type}</span></td>
+                        <td><code class="sb-prop-default">${p.defaultValue || '—'}</code></td>
+                        <td>${doc[p.prop] || ''}</td>
+                      </tr>
+                    `
+                  )}
+                </tbody>
+              </table>
+            `}
+      </section>
     `;
   }
 }
