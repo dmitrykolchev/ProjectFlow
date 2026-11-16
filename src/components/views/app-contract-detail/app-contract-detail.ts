@@ -2560,7 +2560,7 @@ export class AppContractDetail extends LitElement {
     this.payDate = today;
     this.payMethod = 'bank_transfer';
     this.payDocNumber = `ПП-${today.slice(0, 4)}/${String(840 + seq).padStart(4, '0')}`;
-    this.payNotes = `Оплата по счёту ${inv.number}`;
+    this.payNotes = getTranslation(this.currentLang).viewTexts.payments.payNotesTemplate(inv.number);
     this.payError = '';
     this.paymentModalOpen = true;
   }
