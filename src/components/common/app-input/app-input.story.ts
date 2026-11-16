@@ -5,7 +5,8 @@ import './app-input';
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/TextInput',
   component: 'app-input',
-  description: 'Single-line text input field supporting labels, helpers, errors, and clear buttons.',
+  description:
+    'Single-line text input field supporting labels, helpers, errors, and clear buttons. The icon slot renders a leading graphic inside the field.',
   category: 'Inputs',
   slotsDoc: {
     icon: 'Leading icon inside the field',
