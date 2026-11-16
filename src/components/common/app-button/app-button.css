@@ -30,6 +30,15 @@ button:focus-visible {
   box-shadow: 0 0 0 2px var(--bg-surface, #fff), 0 0 0 4px var(--accent-primary, #6366f1);
 }
 
+/* canonical slot API: start / default / end.
+   The button is a flex container with align-items: center, so every slotted element
+   (text, SVG icon, material icon) sits centered on the vertical axis. */
+::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 button:active:not(:disabled) {
   transform: scale(0.98);
 }
