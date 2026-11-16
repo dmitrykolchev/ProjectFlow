@@ -6,7 +6,8 @@ import '../app-material-icon/app-material-icon';
 export const meta: ComponentStoryMeta = {
   title: 'Elements/Button',
   component: 'app-button',
-  description: 'Interactive button with multiple semantic variants, sizes, and states.',
+  description:
+    'Interactive button with multiple semantic variants, sizes, and states. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start / icon-end are legacy aliases of start / end.',
   category: 'Elements',
   slotsDoc: {
     start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
