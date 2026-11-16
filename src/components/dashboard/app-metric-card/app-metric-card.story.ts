@@ -11,6 +11,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     icon: 'Leading icon before the metric label',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the leading icon slot before the metric label',
+  },
   propsDoc: {
     label: 'Metric caption',
     value: 'Main value text',
