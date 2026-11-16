@@ -19,8 +19,9 @@ export class AppSelect extends LitElement {
   @property({ type: String }) placeholder: string = 'Select...';
 
   @state() private isOpen: boolean = false;
-  @state() private panelLeft: number = 0;
-  @state() private panelWidth: number = 200;
+  @state() private panelRight: number = 0;
+  @state() private panelMinWidth: number = 200;
+  @state() private panelMaxWidth: number = 400;
   @state() private panelTop: number | null = null;
   @state() private panelBottom: number | null = null;
   @state() private panelMaxHeight: number = 220;
@@ -54,10 +55,12 @@ export class AppSelect extends LitElement {
     const maxDesired = 220;
     const spaceBelow = window.innerHeight - rect.bottom - 12;
     const spaceAbove = rect.top - 12;
-    const left = Math.max(8, Math.min(rect.left, window.innerWidth - rect.width - 8));
-
-    this.panelLeft = left;
-    this.panelWidth = rect.width;
+    // panel width is driven by its content (shrink-to-fit, rows never wrap):
+    // min width = trigger width, max width = a third of the screen.
+    // Panel is right-aligned with the trigger's right edge.
+    this.panelRight = window.innerWidth - rect.right;
+    this.panelMinWidth = rect.width;
+    this.panelMaxWidth = Math.max(rect.width, Math.min(Math.floor(window.innerWidth / 3), rect.right - 8));
 
     if (spaceBelow >= 140 || spaceBelow >= spaceAbove) {
       this.panelTop = rect.bottom + 4;
@@ -100,8 +103,8 @@ export class AppSelect extends LitElement {
   private renderDropdownPanel() {
     const panelStyle =
       this.panelBottom !== null
-        ? `left: ${this.panelLeft}px; width: ${this.panelWidth}px; bottom: ${this.panelBottom}px; top: auto; max-height: ${this.panelMaxHeight}px;`
-        : `left: ${this.panelLeft}px; width: ${this.panelWidth}px; top: ${this.panelTop ?? 0}px; bottom: auto; max-height: ${this.panelMaxHeight}px;`;
+        ? `right: ${this.panelRight}px; left: auto; min-width: ${this.panelMinWidth}px; max-width: ${this.panelMaxWidth}px; bottom: ${this.panelBottom}px; top: auto; max-height: ${this.panelMaxHeight}px;`
+        : `right: ${this.panelRight}px; left: auto; min-width: ${this.panelMinWidth}px; max-width: ${this.panelMaxWidth}px; top: ${this.panelTop ?? 0}px; bottom: auto; max-height: ${this.panelMaxHeight}px;`;
 
     return html`
       <div class="dropdown-panel" style="${panelStyle}">
@@ -115,7 +118,7 @@ export class AppSelect extends LitElement {
                 ${opt.color
                   ? html`<span class="dot-indicator" style="background-color: ${opt.color}"></span>`
                   : ''}
-                <span>${opt.label}</span>
+                <span class="option-label">${opt.label}</span>
               </div>
               ${opt.value === this.value ? html`<span class="check-mark">✓</span>` : ''}
             </div>
