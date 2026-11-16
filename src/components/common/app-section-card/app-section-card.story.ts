@@ -16,6 +16,11 @@ export const meta: ComponentStoryMeta = {
     actions: 'Controls at the right of the section header',
     '(default)': 'Section body content',
   },
+  childrenDoc: {
+    'app-button': 'Header control placed in the actions slot',
+    'app-badge': 'Count badge placed in the header-left slot',
+    'app-material-icon': 'Leading icon placed in the icon slot',
+  },
   propsDoc: {
     title: 'Section caption',
     subtitle: 'Secondary line under the caption',
