@@ -14,6 +14,13 @@ export const meta: ComponentStoryMeta = {
     '(default)': 'Modal body content',
     footer: 'Footer area (buttons)',
   },
+  childrenDoc: {
+    'app-form-grid': 'Form field grid rendered in the modal body',
+    'app-button': 'Footer action button placed in the footer slot',
+    'app-input': 'Text field child of the modal body',
+    'app-select': 'Dropdown select child of the modal body',
+    'app-textarea': 'Multiline text field child of the modal body',
+  },
   propsDoc: {
     open: 'Opens the modal (rendered through the portal)',
     title: 'Header caption',
