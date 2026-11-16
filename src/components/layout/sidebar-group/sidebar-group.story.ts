@@ -20,6 +20,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Sidebar items of the group',
   },
+  childrenDoc: {
+    'sidebar-item': 'Navigation item with icon, badge, and active state rendered inside the group',
+  },
   propsDoc: {
     groupId: 'Stable group id used by the sidebar controller',
     label: 'Group caption',
