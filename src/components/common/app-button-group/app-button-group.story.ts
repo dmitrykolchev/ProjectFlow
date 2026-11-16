@@ -7,8 +7,16 @@ import '../app-toggle-button/app-toggle-button';
 export const meta: ComponentStoryMeta = {
   title: 'Common/ButtonGroup',
   component: 'app-button-group',
-  description: 'Groups related buttons or toggle buttons horizontally or vertically with seamless joined borders.',
+  description:
+    'Groups related buttons or toggle buttons horizontally or vertically with seamless joined borders. The default slot accepts app-button and app-toggle-button children.',
   category: 'Common',
+  slotsDoc: {
+    '(default)': 'app-button and app-toggle-button children rendered side by side (vertical) or joined (horizontal)',
+  },
+  childrenDoc: {
+    'app-button': 'Grouped action button child',
+    'app-toggle-button': 'Grouped toggle button child',
+  },
   propsDoc: {
     orientation: 'Layout direction of the group: horizontal / vertical',
     attached: 'Shares borders between children (no gaps)',
