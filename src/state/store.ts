@@ -239,6 +239,8 @@ export class AppStore {
   public detailEmployeeId: string = '';
   public detailTaskId: string = '';
   public detailKnowledgeId: string = '';
+  public detailRequirementId: string = '';
+  public requirementFilterProjectId: string = 'all';
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
   public knowledgeFilterCompanyId: string = 'all';
@@ -935,6 +937,8 @@ export class AppStore {
       view === 'dashboard' ||
       view === 'projects' ||
       view === 'project-detail' ||
+      view === 'requirements' ||
+      view === 'requirement-detail' ||
       view === 'project-chat' ||
       view === 'knowledge-base' ||
       view === 'documents' ||
@@ -1040,6 +1044,8 @@ export class AppStore {
         return this.detailEmployeeId || undefined;
       case 'task-detail':
         return this.detailTaskId || undefined;
+      case 'requirement-detail':
+        return this.detailRequirementId || undefined;
       case 'project-chat':
         return this.chatProjectId || undefined;
       default:
@@ -1085,6 +1091,9 @@ export class AppStore {
     } else if (view === 'task-detail') {
       if (id && this.tasks.some((t) => t.id === id)) this.detailTaskId = id;
       else view = 'grid';
+    } else if (view === 'requirement-detail') {
+      if (id && this.requirements.some((r) => r.id === id)) this.detailRequirementId = id;
+      else view = 'requirements';
     } else if (view === 'project-chat') {
       if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
@@ -1140,6 +1149,18 @@ export class AppStore {
   public openTaskDetail(taskId: string): void {
     this.detailTaskId = taskId;
     this.setActiveView('task-detail');
+  }
+
+  public openRequirements(projectId?: string): void {
+    if (projectId !== undefined) {
+      this.requirementFilterProjectId = projectId || 'all';
+    }
+    this.setActiveView('requirements');
+  }
+
+  public openRequirementDetail(requirementId: string): void {
+    this.detailRequirementId = requirementId;
+    this.setActiveView('requirement-detail');
   }
 
   public openProjectChat(projectId?: string): void {

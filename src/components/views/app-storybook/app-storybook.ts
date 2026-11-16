@@ -65,6 +65,8 @@ import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
 import projectDetailMeta from '../app-project-detail/app-project-detail.story';
+import requirementsMeta from '../app-requirements/app-requirements.story';
+import requirementDetailMeta from '../app-requirement-detail/app-requirement-detail.story';
 import projectChatMeta from '../app-project-chat/app-project-chat.story';
 import knowledgeBaseMeta from '../app-knowledge-base/app-knowledge-base.story';
 import documentsMeta from '../app-documents/app-documents.story';
@@ -141,6 +143,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   analyticsMeta,
   projectsMeta,
   projectDetailMeta,
+  requirementsMeta,
+  requirementDetailMeta,
   projectChatMeta,
   knowledgeBaseMeta,
   documentsMeta,

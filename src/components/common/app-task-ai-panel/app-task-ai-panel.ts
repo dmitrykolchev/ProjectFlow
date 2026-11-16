@@ -192,10 +192,7 @@ export class AppTaskAiPanel extends LitElement {
 
   private openContextSource(item: { kind: 'knowledge' | 'document' | 'requirement'; id: string }) {
     if (item.kind === 'requirement') {
-      const req = store.requirements.find((r) => r.id === item.id);
-      if (req) {
-        store.openProjectDetail(req.projectId);
-      }
+      store.openRequirementDetail(item.id);
       return;
     }
     if (item.kind === 'knowledge') {

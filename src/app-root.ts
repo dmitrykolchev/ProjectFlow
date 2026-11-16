@@ -49,6 +49,9 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   analytics: () => import('./components/views/app-analytics/app-analytics'),
   projects: () => import('./components/views/app-projects/app-projects'),
   'project-detail': () => import('./components/views/app-project-detail/app-project-detail'),
+  requirements: () => import('./components/views/app-requirements/app-requirements'),
+  'requirement-detail': () =>
+    import('./components/views/app-requirement-detail/app-requirement-detail'),
   'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
   'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
   documents: () => import('./components/views/app-documents/app-documents'),
@@ -76,6 +79,7 @@ export class AppRoot extends LitElement {
   @state() private sidebarCollapsed: boolean = store.customization.sidebarCollapsed;
   @state() private currentLang = store.customization.language;
   @state() private taskCount = store.tasks.length;
+  @state() private requirementsCount = store.requirements.length;
   @state() private chatCount = store.chatMessages.length;
   @state() private knowledgeCount = store.knowledgeArticles.length;
   @state() private documentCount = store.documents.length;
@@ -103,6 +107,7 @@ export class AppRoot extends LitElement {
     this.sidebarCollapsed = store.customization.sidebarCollapsed;
     this.currentLang = store.customization.language;
     this.taskCount = store.tasks.length;
+    this.requirementsCount = store.requirements.length;
     this.chatCount = store.chatMessages.length;
     this.knowledgeCount = store.knowledgeArticles.length;
     this.documentCount = store.documents.length;
@@ -198,6 +203,8 @@ export class AppRoot extends LitElement {
         ?collapsed="${this.sidebarCollapsed}"
         .activeValue="${this.activeView === 'project-detail'
           ? 'projects'
+          : this.activeView === 'requirement-detail'
+          ? 'requirements'
           : this.activeView === 'task-detail'
           ? 'kanban'
           : this.activeView === 'contract-detail'
@@ -222,6 +229,13 @@ export class AppRoot extends LitElement {
             value="projects"
             label="${t.navigation.projects}"
             .icon="${iconFolder()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="requirements"
+            label="${t.navigation.requirements}"
+            badge="${String(this.requirementsCount)}"
+            .icon="${iconLayers()}"
           ></sidebar-item>
 
           <sidebar-item
@@ -409,6 +423,10 @@ export class AppRoot extends LitElement {
         return html`<app-projects></app-projects>`;
       case 'project-detail':
         return html`<app-project-detail></app-project-detail>`;
+      case 'requirements':
+        return html`<app-requirements></app-requirements>`;
+      case 'requirement-detail':
+        return html`<app-requirement-detail></app-requirement-detail>`;
       case 'project-chat':
         return html`<app-project-chat></app-project-chat>`;
       case 'knowledge-base':

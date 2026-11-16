@@ -170,6 +170,14 @@ export class AppProjectRequirements extends LitElement {
         <div slot="actions" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <app-button
             size="sm"
+            variant="ghost"
+            @click="${() => store.openRequirements(this.projectId || 'all')}"
+          >
+            <span>${t.viewTexts.requirements.allRequirementsBtn}</span>
+          </app-button>
+
+          <app-button
+            size="sm"
             variant="secondary"
             @click="${this.openSpecModal}"
           >
@@ -355,6 +363,13 @@ export class AppProjectRequirements extends LitElement {
           <div class="req-card-actions">
             <app-button
               size="sm"
+              variant="ghost"
+              @click="${() => store.openRequirementDetail(req.id)}"
+            >
+              <span>${t.common.details}</span>
+            </app-button>
+            <app-button
+              size="sm"
               variant="outline"
               ?disabled="${this.decomposing}"
               @click="${() => this.handleDecompose([req.id])}"
@@ -381,7 +396,13 @@ export class AppProjectRequirements extends LitElement {
           </div>
         </div>
 
-        <h4 class="req-title">${req.title}</h4>
+        <h4
+          class="req-title"
+          style="cursor: pointer;"
+          @click="${() => store.openRequirementDetail(req.id)}"
+        >
+          ${req.title}
+        </h4>
         ${req.description ? html`<p class="req-desc">${req.description}</p>` : ''}
 
         ${req.acceptanceCriteria.length > 0

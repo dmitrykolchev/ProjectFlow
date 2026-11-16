@@ -8,6 +8,7 @@ import type {
   RequirementPriority,
   RequirementType,
   SupportedLang,
+  Task,
   TaskAiAnalysis,
   TaskAiClarificationMessage,
   TaskAiContextRef,
@@ -1286,3 +1287,85 @@ export async function clarifyTaskWithContext(params: {
   };
 }
 
+export async function clarifyRequirementWithContext(params: {
+  requirement: ProjectRequirement;
+  project?: Project;
+  sourceDoc?: DocumentItem;
+  linkedKnowledge: KnowledgeArticle[];
+  linkedTasks: Task[];
+  history: TaskAiClarificationMessage[];
+  question: string;
+  lang: SupportedLang;
+  baseUrl?: string;
+  model?: string;
+  signal?: AbortSignal;
+}): Promise<{ reply: string; model: string }> {
+  const {
+    requirement,
+    project,
+    sourceDoc,
+    linkedKnowledge,
+    linkedTasks,
+    history,
+    question,
+    lang,
+  } = params;
+  const langName = lang === 'en' ? 'English' : 'Russian';
+
+  const systemPrompt = [
+    'You are a Principal Product Analyst & Systems Architect collaborating with a product/engineering specialist to refine a requirement.',
+    `Respond in ${langName} clearly, structurally, and practically.`,
+    'Always ground your feedback in the requirement specification, acceptance criteria, project source specification, linked Knowledge Base articles, and linked tasks.',
+    'Highlight ambiguities, missing edge cases, testable acceptance criteria, NFR impacts (performance, security, observability), and dependencies.',
+    'Do not wrap the whole reply in markdown code fences.',
+  ].join('\n');
+
+  const reqContextParts = [
+    `Requirement: ${requirement.code} — ${requirement.title}`,
+    `Type: ${requirement.type === 'functional' ? 'Functional (FR)' : 'Non-Functional (NFR)'}`,
+    `Category: ${requirement.category} | Priority: ${requirement.priority} | Status: ${requirement.status}`,
+    project ? `Project: [${project.key}] ${project.name}${project.description ? ` — ${project.description}` : ''}` : '',
+    requirement.description?.trim() ? `Description:\n${requirement.description.trim()}` : '',
+    requirement.acceptanceCriteria.length
+      ? `Current Acceptance Criteria:\n${requirement.acceptanceCriteria.map((c, idx) => `${idx + 1}. ${c}`).join('\n')}`
+      : 'Current Acceptance Criteria: None yet',
+    sourceDoc ? `Source Specification Document:\n${extractDocumentTextContext(sourceDoc).slice(0, 2600)}` : '',
+    linkedKnowledge.length
+      ? `Linked Knowledge Base Articles:\n${linkedKnowledge
+          .map((k) => `- ${k.title}: ${k.summary || k.content.slice(0, 500)}`)
+          .join('\n')}`
+      : '',
+    linkedTasks.length
+      ? `Linked Tasks:\n${linkedTasks
+          .map((tk) => `- [${tk.id}] ${tk.title} (${tk.status}, ${tk.priority}, ${tk.estimatedHours}h)`)
+          .join('\n')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+
+  const recentHistory = history.slice(-8).map((m) => ({
+    role: m.role,
+    content: m.content,
+  }));
+
+  const messages: OpenAIChatMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Requirement & project context:\n\n${reqContextParts}` },
+    ...recentHistory,
+    { role: 'user', content: question.trim() },
+  ];
+
+  const { content, model } = await chatCompletion({
+    baseUrl: params.baseUrl,
+    model: params.model,
+    messages,
+    temperature: 0.3,
+    signal: params.signal,
+  });
+
+  return {
+    reply: content.replace(/^```(?:markdown|md|txt)?\s*/i, '').replace(/```\s*$/i, '').trim(),
+    model,
+  };
+}

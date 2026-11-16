@@ -1474,7 +1474,7 @@ export class AppTaskDetail extends LitElement {
                         <button
                           type="button"
                           class="trace-link-main"
-                          @click="${() => store.openProjectDetail(req.projectId)}"
+                          @click="${() => store.openRequirementDetail(req.id)}"
                         >
                           <span class="trace-code ${req.type === 'non_functional' ? 'is-nfr' : ''}">${req.code}</span>
                           <span class="trace-name" title="${req.title}">${req.title}</span>

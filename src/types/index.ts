@@ -231,6 +231,7 @@ export interface ProjectRequirement {
   linkedKnowledgeIds: string[];
   linkedTaskIds?: string[];
   sourceDocumentId?: string;
+  clarifications?: TaskAiClarificationMessage[];
   createdAt: string;
   updatedAt: string;
 }
@@ -391,6 +392,8 @@ export type ActiveView =
   | 'payments'
   | 'projects'
   | 'project-detail'
+  | 'requirements'
+  | 'requirement-detail'
   | 'project-chat'
   | 'knowledge-base'
   | 'documents'
