@@ -7,7 +7,8 @@ import '../app-material-icon/app-material-icon';
 export const meta: ComponentStoryMeta = {
   title: 'Common/RadioGroup',
   component: 'app-radio-group',
-  description: 'Accessible radio selection group with standard, horizontal, and rich card layouts.',
+  description:
+    'Accessible radio selection group with standard, horizontal, and rich card layouts. The default slot accepts declarative app-option children that append to the options prop.',
   category: 'Common',
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the option list (value, label, description, disabled, start / end graphics)',
