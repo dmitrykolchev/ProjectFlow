@@ -45,30 +45,24 @@
 .size-sm .split-toggle {
   font-size: var(--control-font-sm, 0.8125rem);
   height: var(--control-height-sm, 30px);
+  padding: 0 var(--control-padding-x-sm, 6px);
   --mi-icon: var(--control-icon-sm, 16px);
-}
-.size-sm .split-main {
-  padding: 0 0.7rem;
 }
 
 .size-md .split-main,
 .size-md .split-toggle {
   font-size: var(--control-font-md, 0.875rem);
   height: var(--control-height-md, 38px);
+  padding: 0 var(--control-padding-x-md, 8px);
   --mi-icon: var(--control-icon-md, 20px);
-}
-.size-md .split-main {
-  padding: 0 0.9rem;
 }
 
 .size-lg .split-main,
 .size-lg .split-toggle {
   font-size: var(--control-font-lg, 1rem);
   height: var(--control-height-lg, 44px);
+  padding: 0 var(--control-padding-x-lg, 9px);
   --mi-icon: var(--control-icon-lg, 24px);
-}
-.size-lg .split-main {
-  padding: 0 1.15rem;
 }
 
 /* Variants */

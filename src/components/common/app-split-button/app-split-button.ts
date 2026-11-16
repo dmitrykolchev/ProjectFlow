@@ -161,7 +161,8 @@ export class AppSplitButton extends LitElement {
           ?disabled="${this.disabled}"
           @click="${this.toggleMenu}"
         >
-          ${iconChevronDown(14)}
+          <!-- canonical control scale (Priority E): the chevron follows the control icon slot size -->
+          ${iconChevronDown(this.size)}
         </button>
         <slot class="menu-slot-source" hidden></slot>
       </div>
