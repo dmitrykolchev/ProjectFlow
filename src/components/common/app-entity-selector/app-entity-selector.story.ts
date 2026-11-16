@@ -123,7 +123,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Inputs/EntitySelector',
   component: 'app-entity-selector',
   description:
-    'Searchable portal selector for large collections (tasks, employees, counterparties, contracts) with multi-token filtering, match highlighting, secondary metadata, and windowed rendering.',
+    'Searchable portal selector for large collections (tasks, employees, counterparties, contracts) with multi-token filtering, match highlighting, secondary metadata, and windowed rendering. The default slot accepts declarative app-option children that append to the options prop.',
   category: 'Inputs',
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the option list (value, label, code, subtitle, meta, badge, avatar, keywords, start / end graphics)',
