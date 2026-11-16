@@ -7,10 +7,34 @@
 
 .toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
   margin-bottom: 1rem;
+}
+
+/* all filter/param controls in one row; flex-basis widths override the host width:100% */
+.controls {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.controls app-input {
+  flex: 1 1 200px;
+  min-width: 140px;
+}
+
+.controls app-select {
+  flex: 0 1 80px;
+  min-width: 76px;
+}
+
+.controls app-select.category {
+  flex: 0 1 110px;
+  min-width: 100px;
 }
 
 .grid {

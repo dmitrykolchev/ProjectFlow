@@ -125,20 +125,22 @@ export class AppMaterialIconGallery extends LitElement {
     const axes = `--mi-fill:${this.fill};--mi-wght:${this.weight};--mi-grad:${this.grade}`;
     return html`
       <div class="toolbar">
-        <app-input label=${t.common.icons.search} .value=${this.query}
-          @input="${(e: Event) => { this.query = String(eventValue(e) ?? ''); this.cursor = 0; }}"></app-input>
-        <app-select label=${t.common.icons.category} .options=${catOpts} .value=${this.category}
-          @change="${(e: Event) => { this.category = String(eventValue(e)); this.cursor = 0; }}"></app-select>
-        <app-select label=${t.common.icons.family} .options=${famOpts} .value=${this.family}
-          @change="${(e: Event) => { this.family = String(eventValue(e)) as GalleryFamily; this.cursor = 0; this.emitParams(); }}"></app-select>
-        <app-select label=${t.common.icons.size} .options=${sizeOpts} .value=${this.size}
-          @change="${(e: Event) => { this.size = String(eventValue(e)) as GallerySize; this.cursor = 0; this.emitParams(); }}"></app-select>
-        <app-select label=${t.common.icons.fill} .options=${fillOpts} .value=${String(this.fill)}
-          @change="${(e: Event) => { this.fill = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
-        <app-select label=${t.common.icons.weight} .options=${weightOpts} .value=${String(this.weight)}
-          @change="${(e: Event) => { this.weight = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
-        <app-select label=${t.common.icons.grade} .options=${gradeOpts} .value=${String(this.grade)}
-          @change="${(e: Event) => { this.grade = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
+        <div class="controls">
+          <app-input label=${t.common.icons.search} .value=${this.query}
+            @input="${(e: Event) => { this.query = String(eventValue(e) ?? ''); this.cursor = 0; }}"></app-input>
+          <app-select class="category" label=${t.common.icons.category} .options=${catOpts} .value=${this.category}
+            @change="${(e: Event) => { this.category = String(eventValue(e)); this.cursor = 0; }}"></app-select>
+          <app-select label=${t.common.icons.family} .options=${famOpts} .value=${this.family}
+            @change="${(e: Event) => { this.family = String(eventValue(e)) as GalleryFamily; this.cursor = 0; this.emitParams(); }}"></app-select>
+          <app-select label=${t.common.icons.size} .options=${sizeOpts} .value=${this.size}
+            @change="${(e: Event) => { this.size = String(eventValue(e)) as GallerySize; this.cursor = 0; this.emitParams(); }}"></app-select>
+          <app-select label=${t.common.icons.fill} .options=${fillOpts} .value=${String(this.fill)}
+            @change="${(e: Event) => { this.fill = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
+          <app-select label=${t.common.icons.weight} .options=${weightOpts} .value=${String(this.weight)}
+            @change="${(e: Event) => { this.weight = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
+          <app-select label=${t.common.icons.grade} .options=${gradeOpts} .value=${String(this.grade)}
+            @change="${(e: Event) => { this.grade = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
+        </div>
         <app-badge variant="neutral" size="md">${String(items.length)}</app-badge>
       </div>
       ${items.length === 0 ? html`<p class="empty">${t.common.icons.empty}</p>` : html`
