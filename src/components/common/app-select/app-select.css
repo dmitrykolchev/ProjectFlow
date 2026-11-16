@@ -33,10 +33,23 @@ label {
   color: var(--text-primary, #f8fafc);
   cursor: pointer;
   user-select: none;
-  font-size: 0.875rem;
+  font-size: var(--control-font-md, 0.875rem);
   line-height: 1.25;
   transition: border-color var(--transition-fast, 150ms ease),
               box-shadow var(--transition-fast, 150ms ease);
+}
+
+/* canonical control size scale (Priority E): md padding stays the historical value */
+.select-trigger.size-sm {
+  height: var(--control-height-sm, 30px);
+  padding: 0 0.6rem;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.select-trigger.size-lg {
+  height: var(--control-height-lg, 44px);
+  padding: 0 1rem;
+  font-size: var(--control-font-lg, 1rem);
 }
 
 .select-trigger:focus-visible,

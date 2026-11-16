@@ -10,6 +10,8 @@ export interface SelectOption {
   icon?: string;
 }
 
+export type SelectSize = 'sm' | 'md' | 'lg'; // canonical control scale (docs/ComponentApiSpecs.md, Priority E)
+
 @customElement('app-select')
 export class AppSelect extends LitElement {
   @property({ type: String }) label: string = '';
@@ -17,6 +19,8 @@ export class AppSelect extends LitElement {
   @property({ type: Array }) options: SelectOption[] = [];
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) placeholder: string = 'Select...';
+  // canonical control size scale, md default = historical pixel-identical look
+  @property({ type: String }) size: SelectSize = 'md';
 
   @state() private isOpen: boolean = false;
   @state() private panelRight: number = 0;
@@ -135,7 +139,7 @@ export class AppSelect extends LitElement {
       <div class="form-group">
         ${this.label ? html`<label>${this.label}</label>` : ''}
         <div
-          class="select-trigger ${this.isOpen ? 'is-open' : ''} ${this.disabled ? 'is-disabled' : ''}"
+          class="select-trigger size-${this.size} ${this.isOpen ? 'is-open' : ''} ${this.disabled ? 'is-disabled' : ''}"
           @click="${this.toggleOpen}"
           tabindex="${this.disabled ? -1 : 0}"
           @keydown="${this.handleKeydown}"

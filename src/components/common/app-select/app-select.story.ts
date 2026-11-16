@@ -13,8 +13,26 @@ export const meta: ComponentStoryMeta = {
     options: 'Option definitions (value + label)',
     disabled: 'Disables the dropdown',
     placeholder: 'Text shown when nothing is selected',
+    size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
   stories: [
+    {
+      name: 'Size Scale',
+      description: 'Canonical control size scale sm|md|lg on the trigger',
+      render: () => {
+        const options = [
+          { value: 'a', label: 'Первый вариант' },
+          { value: 'b', label: 'Второй вариант' },
+        ];
+        return html`
+          <div style="max-width: 280px; display: flex; flex-direction: column; gap: 0.75rem;">
+            <app-select size="sm" label="Small" .options="${options}" value="a"></app-select>
+            <app-select size="md" label="Medium (default)" .options="${options}" value="a"></app-select>
+            <app-select size="lg" label="Large" .options="${options}" value="a"></app-select>
+          </div>
+        `;
+      },
+    },
     {
       name: 'Status Selector',
       description: 'Dropdown populated with project statuses and color indicators',
