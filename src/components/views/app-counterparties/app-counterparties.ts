@@ -72,6 +72,7 @@ export class AppCounterparties extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'counterparties' ? store.activePage : 1;
     this.counterparties = store.counterparties;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -157,12 +158,12 @@ export class AppCounterparties extends LitElement {
         .values="${{ type: this.typeFilter, status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -174,7 +175,7 @@ export class AppCounterparties extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.displayMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -436,11 +437,11 @@ export class AppCounterparties extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -536,11 +537,11 @@ export class AppCounterparties extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
