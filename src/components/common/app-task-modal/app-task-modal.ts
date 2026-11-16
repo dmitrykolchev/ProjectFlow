@@ -907,7 +907,7 @@ export class AppTaskModal extends LitElement {
             ${iconWallet(14)}
             <span>${t.viewTexts.taskModal.expensesSection} (${this.taskExpenses.length})</span>
           </span>
-          <span class="records-total">${Math.round(totalExpenseRub).toLocaleString('ru-RU')} ₽</span>
+          <span class="records-total">${Math.round(totalExpenseRub).toLocaleString(t.common.locale)} ₽</span>
         </div>
 
         ${this.taskExpenses.length === 0
@@ -925,7 +925,7 @@ export class AppTaskModal extends LitElement {
                         </div>
                       </div>
                       <div class="record-right">
-                        <span class="record-val">${exp.amount.toLocaleString('ru-RU')} ${sym}</span>
+                        <span class="record-val">${exp.amount.toLocaleString(t.common.locale)} ${sym}</span>
                         <button
                           type="button"
                           class="subtask-action-btn subtask-remove"

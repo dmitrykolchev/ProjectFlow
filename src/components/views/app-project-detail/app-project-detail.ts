@@ -345,7 +345,7 @@ export class AppProjectDetail extends LitElement {
             <div class="meta-box">
               <span class="meta-label">${t.viewTexts.projectDetail.metaBudget}</span>
               <span class="meta-val mono">
-                ${proj.budget ? `${proj.budget.toLocaleString('ru-RU')} ₽` : '—'}
+                ${proj.budget ? `${proj.budget.toLocaleString(t.common.locale)} ₽` : '—'}
               </span>
             </div>
             <div class="meta-box">
@@ -368,7 +368,7 @@ export class AppProjectDetail extends LitElement {
             </div>
             <div class="meta-box">
               <span class="meta-label">${t.viewTexts.projectDetail.metaDirectExpenses}</span>
-              <span class="meta-val mono">${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽</span>
+              <span class="meta-val mono">${projectDirectExpensesRub.toLocaleString(t.common.locale)} ₽</span>
             </div>
             ${proj.specDocumentId
               ? (() => {
@@ -659,7 +659,7 @@ export class AppProjectDetail extends LitElement {
                           </div>
                           <div class="contract-right">
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">
-                              ${ctr.amount.toLocaleString('ru-RU')} ${symbol}
+                              ${ctr.amount.toLocaleString(t.common.locale)} ${symbol}
                             </span>
                             <app-badge
                               variant="${ctr.status === 'active' ? 'success' : ctr.status === 'on_approval' ? 'warning' : 'default'}"
@@ -730,7 +730,7 @@ export class AppProjectDetail extends LitElement {
                 `}
           </app-section-card>
 
-          <app-section-card title="${t.viewTexts.projectDetail.expensesSectionTitle}" subtitle="(${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽)">
+          <app-section-card title="${t.viewTexts.projectDetail.expensesSectionTitle}" subtitle="(${projectDirectExpensesRub.toLocaleString(t.common.locale)} ₽)">
             <span slot="icon">${iconWallet(18)}</span>
             <div slot="actions" class="section-actions-inline">
               <app-button
@@ -766,7 +766,7 @@ export class AppProjectDetail extends LitElement {
                           </div>
                           <div class="contract-right">
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">
-                              ${exp.amount.toLocaleString('ru-RU')} ${sym}
+                              ${exp.amount.toLocaleString(t.common.locale)} ${sym}
                             </span>
                             <app-status-chip
                               domain="expense"

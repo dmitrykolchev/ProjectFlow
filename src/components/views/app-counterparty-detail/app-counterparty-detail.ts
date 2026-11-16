@@ -406,7 +406,7 @@ export class AppCounterpartyDetail extends LitElement {
                               <span>${t.projectStatuses[statusKey]}</span>
                               <span>· ${(proj.members || []).length} ${t.viewTexts.counterpartyDetail.membersSuffix}</span>
                               ${proj.budget
-                                ? html`<span class="mono">· ${proj.budget.toLocaleString('ru-RU')} ₽</span>`
+                                ? html`<span class="mono">· ${proj.budget.toLocaleString(t.common.locale)} ₽</span>`
                                 : ''}
                             </div>
                           </div>

@@ -532,7 +532,7 @@ export class AppCompanyDetail extends LitElement {
                           <div class="row-sub">
                             <span>${cp ? cp.name : t.viewTexts.projectDetail.internalProject}</span>
                             ${proj.budget
-                              ? html`<span class="mono">· ${proj.budget.toLocaleString('ru-RU')} ₽</span>`
+                              ? html`<span class="mono">· ${proj.budget.toLocaleString(t.common.locale)} ₽</span>`
                               : ''}
                           </div>
                         </div>
@@ -724,7 +724,7 @@ export class AppCompanyDetail extends LitElement {
                                 `
                               : t.viewTexts.projectDetail.internalProject}
                           </td>
-                          <td class="mono">${proj.budget ? `${proj.budget.toLocaleString('ru-RU')} ₽` : '—'}</td>
+                          <td class="mono">${proj.budget ? `${proj.budget.toLocaleString(t.common.locale)} ₽` : '—'}</td>
                           <td>
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
                               <div class="mini-progress">
@@ -799,7 +799,7 @@ export class AppCompanyDetail extends LitElement {
                         <td>${emp.department || '—'}</td>
                         <td class="mono">${emp.email || '—'}</td>
                         <td class="mono">
-                          ${(emp.hourlyRate || 2800).toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}
+                          ${(emp.hourlyRate || 2800).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}
                         </td>
                         <td>
                           <app-status-chip domain="employee" status="${emp.status || 'active'}" appearance="soft" size="sm"></app-status-chip>

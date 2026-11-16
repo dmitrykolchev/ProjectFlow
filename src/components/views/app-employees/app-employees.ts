@@ -150,7 +150,7 @@ export class AppEmployees extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.employees.kpiTotalEmployees}" value="${this.employees.length}"></app-metric-card>
         <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvailable}" value="${activeOnline}" valueColor="var(--color-success, #10b981)"></app-metric-card>
         <app-metric-card size="compact" label="${t.viewTexts.employees.kpiDepartments}" value="${departments}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvgRate}" value="${avgRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvgRate}" value="${avgRate.toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
@@ -371,7 +371,7 @@ export class AppEmployees extends LitElement {
                 </div>
                 <div class="detail-row">
                   <span class="detail-label">${t.viewTexts.employees.detailRate}</span>
-                  <span class="detail-val mono">${(emp.hourlyRate || 3500).toLocaleString('ru-RU')} ₽/ч</span>
+                  <span class="detail-val mono">${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</span>
                 </div>
               </div>
 
@@ -482,7 +482,7 @@ export class AppEmployees extends LitElement {
                     <div style="font-size: 0.74rem; color: var(--text-muted);">${emp.phone || '—'}</div>
                   </td>
                   <td class="mono">${projCount} / ${taskCount}</td>
-                  <td class="mono">${(emp.hourlyRate || 3500).toLocaleString('ru-RU')} ₽/ч</td>
+                  <td class="mono">${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</td>
                   <td>
                     <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
                   </td>

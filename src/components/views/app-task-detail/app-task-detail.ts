@@ -214,7 +214,7 @@ export class AppTaskDetail extends LitElement {
           { label: `+${te.hours.toFixed(1)} ${t.common.hours}`, highlight: true },
           { label: t.timeTracking.categories[te.category] },
           { label: te.billable ? (t.viewTexts.timeTracking.billableSwitch) : (t.viewTexts.taskDetail.nonBillableLabel) },
-          { label: `${cost.toLocaleString('ru-RU')} ₽` },
+          { label: `${cost.toLocaleString(t.common.locale)} ₽` },
           { label: t.timeTracking.statuses[te.status] },
         ],
       });
@@ -235,7 +235,7 @@ export class AppTaskDetail extends LitElement {
         kindLabel: t.taskDetail.expenseAddedEvent,
         body: `${ex.title}${ex.notes ? ` — ${ex.notes}` : ''}`,
         metaParts: [
-          { label: `${ex.amount.toLocaleString('ru-RU')} ${sym}`, highlight: true },
+          { label: `${ex.amount.toLocaleString(t.common.locale)} ${sym}`, highlight: true },
           { label: t.expenses.categories[ex.category] },
           ...(ex.vendor ? [{ label: ex.vendor }] : []),
           { label: t.expenses.statuses[ex.status] },
@@ -572,7 +572,7 @@ export class AppTaskDetail extends LitElement {
               <div class="kpi-value-row">
                 <span class="kpi-val">${totalHours.toFixed(1)} ${t.common.hours}</span>
                 <span class="kpi-sub">
-                  ${t.viewTexts.dashboard.planSuffix} ${task.estimatedHours} ${t.common.hours} · ${Math.round(laborCostRub).toLocaleString('ru-RU')} ₽
+                  ${t.viewTexts.dashboard.planSuffix} ${task.estimatedHours} ${t.common.hours} · ${Math.round(laborCostRub).toLocaleString(t.common.locale)} ₽
                 </span>
               </div>
             </div>
@@ -580,7 +580,7 @@ export class AppTaskDetail extends LitElement {
             <div class="kpi-cell">
               <span class="kpi-label">${t.taskDetail.tabExpenses}</span>
               <div class="kpi-value-row">
-                <span class="kpi-val">${Math.round(directExpensesRub).toLocaleString('ru-RU')} ₽</span>
+                <span class="kpi-val">${Math.round(directExpensesRub).toLocaleString(t.common.locale)} ₽</span>
                 <span class="kpi-sub">${expenses.length} ${t.viewTexts.taskDetail.recordsSuffix}</span>
               </div>
             </div>
@@ -750,15 +750,15 @@ export class AppTaskDetail extends LitElement {
                   </div>
                   <div class="cost-row">
                     <span class="cost-label">${t.taskDetail.laborCost}</span>
-                    <span class="cost-val">${Math.round(laborCostRub).toLocaleString('ru-RU')} ₽</span>
+                    <span class="cost-val">${Math.round(laborCostRub).toLocaleString(t.common.locale)} ₽</span>
                   </div>
                   <div class="cost-row">
                     <span class="cost-label">${t.taskDetail.directExpenses}</span>
-                    <span class="cost-val">${Math.round(directExpensesRub).toLocaleString('ru-RU')} ₽</span>
+                    <span class="cost-val">${Math.round(directExpensesRub).toLocaleString(t.common.locale)} ₽</span>
                   </div>
                   <div class="cost-row total-row">
                     <span>${t.taskDetail.totalCost}</span>
-                    <span class="cost-val">${Math.round(totalCostRub).toLocaleString('ru-RU')} ₽</span>
+                    <span class="cost-val">${Math.round(totalCostRub).toLocaleString(t.common.locale)} ₽</span>
                   </div>
                 </div>
             </app-section-card>
@@ -989,7 +989,7 @@ export class AppTaskDetail extends LitElement {
                           </div>
                         </td>
                         <td class="num-col"><strong>${te.hours.toFixed(1)} ${t.common.hours}</strong></td>
-                        <td class="num-col">${cost.toLocaleString('ru-RU')} ₽</td>
+                        <td class="num-col">${cost.toLocaleString(t.common.locale)} ₽</td>
                         <td style="text-align: right;">
                           <button
                             type="button"
@@ -1124,7 +1124,7 @@ export class AppTaskDetail extends LitElement {
                             ${t.expenses.statuses[exp.status]}
                           </span>
                         </td>
-                        <td class="num-col"><strong>${exp.amount.toLocaleString('ru-RU')} ${sym}</strong></td>
+                        <td class="num-col"><strong>${exp.amount.toLocaleString(t.common.locale)} ${sym}</strong></td>
                         <td style="text-align: right;">
                           <button
                             type="button"

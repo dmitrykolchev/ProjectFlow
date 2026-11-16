@@ -197,7 +197,7 @@ export class AppTimeTracking extends LitElement {
       <app-kpi-strip columns="4">
         <app-metric-card size="compact" label="${t.timeTracking.totalHours}" value="${totalHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}" subtitle="${t.viewTexts.timeTracking.kpiScopeSubtitle}"></app-metric-card>
         <app-metric-card size="compact" label="${t.timeTracking.billableHours}" value="${billableHours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}" valueColor="#10b981" subtitle="${billablePct}% ${t.viewTexts.timeTracking.kpiOfTotal}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.timeTracking.estimatedCost}" value="${estCostRub.toLocaleString('ru-RU')} ₽" subtitle="${t.viewTexts.timeTracking.kpiRateBase(HOURLY_RATE_RUB.toLocaleString('ru-RU'))}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.timeTracking.estimatedCost}" value="${estCostRub.toLocaleString(t.common.locale)} ₽" subtitle="${t.viewTexts.timeTracking.kpiRateBase(HOURLY_RATE_RUB.toLocaleString(t.common.locale))}"></app-metric-card>
         <app-metric-card size="compact" label="${t.timeTracking.entriesCount}" value="${filtered.length}" subtitle="${filtered.filter((e) => e.status === 'approved').length} ${t.viewTexts.timeTracking.kpiApproved}"></app-metric-card>
       </app-kpi-strip>
 

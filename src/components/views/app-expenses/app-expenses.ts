@@ -190,10 +190,10 @@ export class AppExpenses extends LitElement {
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.expenses.totalExpenses}" value="${totalRub.toLocaleString('ru-RU')} ₽" subtitle="${nonRejected.length} ${t.viewTexts.expenses.kpiActiveEntries}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.approvedAmount}" value="${approvedRub.toLocaleString('ru-RU')} ₽" valueColor="#10b981" subtitle="${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${t.viewTexts.expenses.kpiOfExpenses}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.pendingCount}" value="${pendingList.length}" valueColor="${pendingList.length > 0 ? '#f59e0b' : ''}" subtitle="${pendingRub.toLocaleString('ru-RU')} ₽ ${t.viewTexts.expenses.kpiAwaiting}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString('ru-RU')} ₽" subtitle="${t.viewTexts.expenses.kpiClientBillable}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.totalExpenses}" value="${totalRub.toLocaleString(t.common.locale)} ₽" subtitle="${nonRejected.length} ${t.viewTexts.expenses.kpiActiveEntries}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.approvedAmount}" value="${approvedRub.toLocaleString(t.common.locale)} ₽" valueColor="#10b981" subtitle="${totalRub > 0 ? Math.round((approvedRub / totalRub) * 100) : 0}% ${t.viewTexts.expenses.kpiOfExpenses}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.pendingCount}" value="${pendingList.length}" valueColor="${pendingList.length > 0 ? '#f59e0b' : ''}" subtitle="${pendingRub.toLocaleString(t.common.locale)} ₽ ${t.viewTexts.expenses.kpiAwaiting}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.expenses.billableAmount}" value="${billableRub.toLocaleString(t.common.locale)} ₽" subtitle="${t.viewTexts.expenses.kpiClientBillable}"></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
@@ -432,15 +432,15 @@ export class AppExpenses extends LitElement {
               <div class="budget-metrics">
                 <div class="bm-item">
                   <span class="bm-label">${t.viewTexts.expenses.bmDirect}</span>
-                  <span class="bm-val">${directRub.toLocaleString('ru-RU')} ₽</span>
+                  <span class="bm-val">${directRub.toLocaleString(t.common.locale)} ₽</span>
                 </div>
                 <div class="bm-item">
                   <span class="bm-label">${t.viewTexts.expenses.laborLabel(projHours.toFixed(0))}</span>
-                  <span class="bm-val">${laborRub.toLocaleString('ru-RU')} ₽</span>
+                  <span class="bm-val">${laborRub.toLocaleString(t.common.locale)} ₽</span>
                 </div>
                 <div class="bm-item">
                   <span class="bm-label">${t.viewTexts.expenses.bmProjectBudget}</span>
-                  <span class="bm-val">${budget ? `${budget.toLocaleString('ru-RU')} ₽` : '—'}</span>
+                  <span class="bm-val">${budget ? `${budget.toLocaleString(t.common.locale)} ₽` : '—'}</span>
                 </div>
               </div>
 
@@ -448,7 +448,7 @@ export class AppExpenses extends LitElement {
                 <div class="budget-progress-head">
                   <span>${t.viewTexts.expenses.bmUtilization}</span>
                   <span class="mono" style="font-weight: 700;">
-                    ${totalSpend.toLocaleString('ru-RU')} ₽ (${usedPct}%)
+                    ${totalSpend.toLocaleString(t.common.locale)} ₽ (${usedPct}%)
                   </span>
                 </div>
                 <div class="budget-track">

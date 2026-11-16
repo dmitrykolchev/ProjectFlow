@@ -1,6 +1,8 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-money.css';
+import { store } from '../../../state/store';
+import { getTranslation } from '../../../i18n';
 
 const CURRENCY_SYMBOL: Record<'RUB' | 'USD' | 'EUR', string> = {
   RUB: '₽',
@@ -10,7 +12,7 @@ const CURRENCY_SYMBOL: Record<'RUB' | 'USD' | 'EUR', string> = {
 
 export function formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
   const symbol = CURRENCY_SYMBOL[currency];
-  return `${amount.toLocaleString('ru-RU')} ${symbol}`;
+  return `${amount.toLocaleString(getTranslation(store.customization.language).common.locale)} ${symbol}`;
 }
 
 export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
@@ -21,7 +23,7 @@ export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR'
   if (Math.abs(amount) >= 10_000) {
     return `${(amount / 1_000).toFixed(0)}K ${symbol}`;
   }
-  return `${amount.toLocaleString('ru-RU')} ${symbol}`;
+  return `${amount.toLocaleString(getTranslation(store.customization.language).common.locale)} ${symbol}`;
 }
 
 @customElement('app-money')

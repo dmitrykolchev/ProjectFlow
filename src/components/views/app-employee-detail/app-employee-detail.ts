@@ -255,8 +255,8 @@ export class AppEmployeeDetail extends LitElement {
             </div>
             <div class="kpi-cell">
               <span class="kpi-label">${t.employeeDetail.estimatedValue}</span>
-              <span class="kpi-val success">${estimatedValue.toLocaleString('ru-RU')} ₽</span>
-              <span class="kpi-hint mono">${hourlyRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}</span>
+              <span class="kpi-val success">${estimatedValue.toLocaleString(t.common.locale)} ₽</span>
+              <span class="kpi-hint mono">${hourlyRate.toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</span>
             </div>
           </div>
 
@@ -268,7 +268,7 @@ export class AppEmployeeDetail extends LitElement {
               { label: t.viewTexts.employees.labelDepartment, value: emp.department || '—' },
               { label: t.viewTexts.employees.labelCompany, value: company?.name || '—' },
               { label: t.viewTexts.employees.labelHireDate, value: emp.hireDate || '—', mono: true },
-              { label: t.viewTexts.employeeDetail.rateLabel, value: `${hourlyRate.toLocaleString('ru-RU')} ${t.viewTexts.employees.rateUnit}`, mono: true },
+              { label: t.viewTexts.employeeDetail.rateLabel, value: `${hourlyRate.toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}`, mono: true },
             ]}"
           ></app-meta-grid>
         </section>
@@ -476,7 +476,7 @@ export class AppEmployeeDetail extends LitElement {
                             <td>${exp.title}</td>
                             <td>${proj ? `[${proj.key}] ${proj.name}` : '—'}</td>
                             <td class="mono" style="font-weight: 700;">
-                              ${exp.amount.toLocaleString('ru-RU')} ${sym}
+                              ${exp.amount.toLocaleString(t.common.locale)} ${sym}
                             </td>
                             <td>
                               <app-badge
