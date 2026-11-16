@@ -6,7 +6,8 @@ import { iconEdit, iconDownload, iconTrash, iconPlus } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Common/MenuItem',
   component: 'app-menu-item',
-  description: 'Declarative interactive menu entry used inside <app-menu> with support for icons, shortcuts, checkmarks, danger, and disabled states.',
+  description:
+    'Declarative interactive menu entry used inside <app-menu> with support for icons, shortcuts, checkmarks, danger, and disabled states. Canonical start / default / end slots carry leading graphics, label markup, and trailing content; icon and shortcut are legacy aliases of start / end.',
   category: 'Common',
   slotsDoc: {
     start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
