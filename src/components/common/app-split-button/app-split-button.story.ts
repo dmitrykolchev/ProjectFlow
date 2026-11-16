@@ -6,7 +6,8 @@ import { iconPlus, iconDownload, iconKanban, iconTable } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Common/SplitButton',
   component: 'app-split-button',
-  description: 'Dual-action button combining a primary action trigger with a secondary options menu.',
+  description:
+    'Dual-action button combining a primary action trigger with a secondary options menu. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start is a legacy alias of start. The default slot accepts declarative app-menu-item, app-menu-header, and app-menu-divider children.',
   category: 'Common',
   slotsDoc: {
     start: 'Content rendered before the main label (text, SVG icon, material icon) — centered vertically',
