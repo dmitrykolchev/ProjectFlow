@@ -16,8 +16,20 @@ export const meta: ComponentStoryMeta = {
     required: 'Marks the field as required',
     disabled: 'Disables editing and the calendar popover',
     error: 'Error message; renders the field in danger state',
+    size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
   stories: [
+    {
+      name: 'Size Scale',
+      description: 'Canonical control size scale sm|md|lg on the trigger',
+      render: () => html`
+        <div style="max-width: 280px; display: flex; flex-direction: column; gap: 0.75rem;">
+          <app-date-input size="sm" label="Small" value="2026-11-16"></app-date-input>
+          <app-date-input size="md" label="Medium (default)" value="2026-11-16"></app-date-input>
+          <app-date-input size="lg" label="Large" value="2026-11-16"></app-date-input>
+        </div>
+      `,
+    },
     {
       name: 'Interactive Date Pickers',
       description: 'Default date picker, constrained range, and error state',

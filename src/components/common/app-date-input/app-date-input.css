@@ -46,6 +46,21 @@ label {
   outline: none;
 }
 
+/* canonical control size scale (Priority E): md padding stays the historical value */
+.date-trigger.size-sm {
+  height: var(--control-height-sm, 30px);
+  min-height: var(--control-height-sm, 30px);
+  padding: 0 0.6rem;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.date-trigger.size-lg {
+  height: var(--control-height-lg, 44px);
+  min-height: var(--control-height-lg, 44px);
+  padding: 0 1rem;
+  font-size: var(--control-font-lg, 1rem);
+}
+
 .date-trigger:hover:not(.is-disabled) {
   border-color: var(--text-muted, #64748b);
 }

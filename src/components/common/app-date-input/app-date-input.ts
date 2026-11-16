@@ -16,6 +16,8 @@ export class AppDateInput extends LitElement {
   @property({ type: Boolean }) required: boolean = false;
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) error: string = '';
+  // canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
+  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';
 
   @state() private isOpen: boolean = false;
   @state() private viewYear: number = 2026;
@@ -130,7 +132,7 @@ export class AppDateInput extends LitElement {
           : ''}
 
         <div
-          class="date-trigger ${this.isOpen ? 'is-open' : ''} ${this.error ? 'has-error' : ''} ${this.disabled ? 'is-disabled' : ''}"
+          class="date-trigger size-${this.size} ${this.isOpen ? 'is-open' : ''} ${this.error ? 'has-error' : ''} ${this.disabled ? 'is-disabled' : ''}"
           tabindex="${this.disabled ? -1 : 0}"
           role="combobox"
           aria-expanded="${this.isOpen}"
