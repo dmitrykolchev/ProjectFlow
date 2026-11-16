@@ -7,7 +7,8 @@ import '../app-material-icon/app-material-icon';
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/SelectDropdown',
   component: 'app-select',
-  description: 'Custom dropdown select with indicator dots, keyboard navigation, and smooth popover.',
+  description:
+    'Custom dropdown select with indicator dots, keyboard navigation, and smooth popover. The default slot accepts declarative app-option children that append to the options prop.',
   category: 'Inputs',
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the dropdown list',
