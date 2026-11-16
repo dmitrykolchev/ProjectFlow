@@ -88,6 +88,7 @@ export class AppExpenses extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'expenses' ? store.activePage : 1;
     this.expenses = store.expenses;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -208,13 +209,13 @@ export class AppExpenses extends LitElement {
         .values="${{ project: this.projectFilter, category: this.categoryFilter, status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'project') this.projectFilter = eventValue(e);
           if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | ExpenseCategory;
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ExpenseStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -226,7 +227,7 @@ export class AppExpenses extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.viewMode = eventValue(e) as 'registry' | 'budgets';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -376,11 +377,11 @@ export class AppExpenses extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -479,11 +480,11 @@ export class AppExpenses extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
