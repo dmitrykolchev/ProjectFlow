@@ -84,6 +84,15 @@
   color: var(--color-danger, #f87171);
 }
 
+/* graphic elements from the canonical start / end slots of <app-meta-item> */
+.item-slot-start,
+.item-slot-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
   .meta-grid.strip {
     grid-template-columns: repeat(min(2, var(--meta-columns, 3)), minmax(0, 1fr));
