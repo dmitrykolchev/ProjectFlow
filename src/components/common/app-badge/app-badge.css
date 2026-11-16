@@ -28,6 +28,11 @@
   padding: 0.3rem 0.6rem;
 }
 
+.size-lg {
+  font-size: var(--control-font-lg, 1rem);
+  padding: 0.4rem 0.8rem;
+}
+
 /* Soft appearance */
 .appearance-soft.variant-neutral {
   background: var(--bg-subtle, #1a2438);

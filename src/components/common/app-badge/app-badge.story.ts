@@ -20,6 +20,17 @@ export const meta: ComponentStoryMeta = {
   },
   stories: [
     {
+      name: 'Size Scale',
+      description: 'Canonical size scale sm|md|lg (md default)',
+      render: () => html`
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <app-badge size="sm">Small</app-badge>
+          <app-badge size="md">Medium (default)</app-badge>
+          <app-badge size="lg">Large</app-badge>
+        </div>
+      `,
+    },
+    {
       name: 'Soft Variants',
       description: 'Subtle tinted badges for statuses and labels',
       render: () => html`

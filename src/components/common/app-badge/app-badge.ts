@@ -4,7 +4,8 @@ import styles from './app-badge.css';
 
 export type BadgeVariant = 'neutral' | 'primary' | 'success' | 'warning' | 'danger' | 'info';
 export type BadgeAppearance = 'soft' | 'solid' | 'outline';
-export type BadgeSize = 'sm' | 'md';
+// canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
+export type BadgeSize = 'sm' | 'md' | 'lg';
 
 @customElement('app-badge')
 export class AppBadge extends LitElement {
