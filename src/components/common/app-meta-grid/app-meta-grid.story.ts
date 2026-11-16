@@ -13,6 +13,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-meta-item> children filling the boxes (label, value, mono, danger, start / end graphics)',
   },
+  childrenDoc: {
+    'app-meta-item': 'Declarative meta box (label, value, mono, danger, start / end slot graphics) appended to the items prop list',
+  },
   propsDoc: {
     items: 'Meta field definitions (label + value)',
     columns: 'Number of columns in the grid',
