@@ -5,7 +5,8 @@ import './app-switch';
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/Switch',
   component: 'app-switch',
-  description: 'Toggle switch for boolean settings and feature flags.',
+  description:
+    'Toggle switch for boolean settings and feature flags. The default slot overrides the label property with custom label markup.',
   category: 'Inputs',
   slotsDoc: {
     '(default)': 'Label text next to the switch (overrides the label property)',
