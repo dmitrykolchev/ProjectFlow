@@ -1,0 +1,5 @@
+/* Declarative meta field carrier used as a child of app-meta-grid.
+   It renders nothing itself; the parent collects its props. */
+:host {
+  display: none;
+}

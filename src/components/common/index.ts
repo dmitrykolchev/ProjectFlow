@@ -41,6 +41,8 @@ export type { SelectOption } from './app-select/app-select';
 
 export { AppOption } from './app-option/app-option';
 export type { DeclarativeOption, OptionDataSource } from './app-option/app-option';
+export { AppMetaItem } from './app-meta-item/app-meta-item';
+export type { DeclarativeMetaItem } from './app-meta-item/app-meta-item';
 
 export { AppEntitySelector } from './app-entity-selector/app-entity-selector';
 export type { EntitySelectorOption, EntitySelectorSize } from './app-entity-selector/app-entity-selector';
