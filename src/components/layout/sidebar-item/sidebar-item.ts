@@ -32,12 +32,19 @@ export class SidebarItem extends LitElement {
       >
         <div class="nav-item-left">
           <span class="nav-icon">
-            ${this.icon ? this.icon : html`<slot name="icon"></slot>`}
+            <!-- canonical start slot; icon is a legacy alias -->
+            ${this.icon
+              ? this.icon
+              : html`<slot name="start">
+                  <slot name="icon"></slot>
+                </slot>`}
           </span>
           ${!this.collapsed
             ? html`<span class="nav-label">${this.label || html`<slot></slot>`}</span>`
             : ''}
         </div>
+        <!-- canonical end slot for graphic elements -->
+        ${!this.collapsed ? html`<slot name="end"></slot>` : ''}
         ${!this.collapsed && this.badge
           ? html`<span class="nav-badge tabular-nums">${this.badge}</span>`
           : ''}

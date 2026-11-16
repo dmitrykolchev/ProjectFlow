@@ -9,8 +9,10 @@ export const meta: ComponentStoryMeta = {
   description: 'Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode.',
   category: 'Layout',
   slotsDoc: {
-    icon: 'Leading icon of the item',
+    start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
     '(default)': 'Item label markup (overrides the label property)',
+    end: 'Content rendered after the label (text, SVG icon, material icon) — centered vertically',
+    icon: 'Legacy alias of start',
   },
   propsDoc: {
     value: 'View id emitted when the item is clicked',

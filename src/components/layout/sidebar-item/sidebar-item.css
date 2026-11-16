@@ -57,6 +57,22 @@
   flex-shrink: 0;
 }
 
+/* canonical slot API: start / default / end.
+   .nav-item and .nav-item-left are flex containers with align-items: center, so every
+   slotted element (text, SVG icon, material icon) sits centered on the vertical axis. */
+.nav-icon ::slotted(*),
+slot[name="end"]::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+slot[name="end"] {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
 .nav-label {
   white-space: nowrap;
   overflow: hidden;
