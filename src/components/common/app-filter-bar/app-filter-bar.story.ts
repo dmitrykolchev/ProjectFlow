@@ -13,6 +13,10 @@ export const meta: ComponentStoryMeta = {
     prefix: 'Extra controls rendered before the filter selects',
     '(default)': 'Additional controls appended after the filter selects',
   },
+  childrenDoc: {
+    'app-segmented-switch': 'View-mode switch placed in the default slot after the filter selects',
+    'app-button': 'Toolbar action placed in the prefix or default slot',
+  },
   propsDoc: {
     searchValue: 'Current text of the search box',
     searchEnabled: 'Shows the search input',
