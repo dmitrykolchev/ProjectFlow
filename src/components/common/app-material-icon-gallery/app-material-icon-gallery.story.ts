@@ -14,7 +14,7 @@ export const meta: ComponentStoryMeta = {
       name: 'Full Palette',
       description: 'All Material Symbols glyphs with the toolbar filters',
       render: () => html`
-        <app-material-icon-gallery .icons="${materialIcons}"></app-material-icon-gallery>
+        <app-material-icon-gallery style="height: 70vh;" .icons="${materialIcons}"></app-material-icon-gallery>
       `,
     },
     {
