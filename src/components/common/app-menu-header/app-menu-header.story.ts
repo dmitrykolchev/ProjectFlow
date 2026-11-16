@@ -5,7 +5,8 @@ import './app-menu-header';
 export const meta: ComponentStoryMeta = {
   title: 'Common/MenuHeader',
   component: 'app-menu-header',
-  description: 'Declarative section heading element for grouping related <app-menu-item> entries inside <app-menu>.',
+  description:
+    'Declarative section heading element for grouping related <app-menu-item> entries inside <app-menu>. The default slot supplies the header text markup when the label property is omitted.',
   category: 'Common',
   slotsDoc: {
     '(default)': 'Header text markup (used when the label property is omitted)',
