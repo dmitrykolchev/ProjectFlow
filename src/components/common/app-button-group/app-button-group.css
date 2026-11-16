@@ -14,6 +14,11 @@
   flex-direction: column;
 }
 
+/* vertical groups: every button stretches to the widest one so all widths match */
+.group.vertical ::slotted(*) {
+  width: 100%;
+}
+
 .group.attached {
   gap: 0;
 }
