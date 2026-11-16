@@ -15,6 +15,9 @@ export const meta: ComponentStoryMeta = {
     icon: 'Legacy alias of start',
     shortcut: 'Legacy alias of end',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the item label',
+  },
   propsDoc: {
     value: 'Action identifier emitted in the select event detail (falls back to id)',
     label: 'Item text caption',
