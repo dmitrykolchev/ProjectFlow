@@ -14,6 +14,10 @@ export const meta: ComponentStoryMeta = {
     icon: 'Illustration icon above the title',
     action: 'Optional action button below the message',
   },
+  childrenDoc: {
+    'app-button': 'Action button placed in the action slot',
+    'app-material-icon': 'Illustration icon placed in the icon slot',
+  },
   propsDoc: {
     title: 'Headline of the empty state',
     message: 'Secondary explanation text',
