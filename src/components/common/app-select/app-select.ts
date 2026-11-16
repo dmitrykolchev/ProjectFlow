@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { DeclarativeOption, OptionDataSource, optionsFromElements, resolveDataSource } from '../app-option/app-option';
 import styles from './app-select.css';
 
 export interface SelectOption {
@@ -17,12 +18,18 @@ export class AppSelect extends LitElement {
   @property({ type: String }) label: string = '';
   @property({ type: String }) value: string = '';
   @property({ type: Array }) options: SelectOption[] = [];
+  // declarative <app-option> children and data sources fill the list as well:
+  // array, promise, or a function returning an array (sync or async)
+  @property({ attribute: false }) dataSource?: OptionDataSource;
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) placeholder: string = 'Select...';
   // canonical control size scale, md default = historical pixel-identical look
   @property({ type: String }) size: SelectSize = 'md';
 
   @state() private isOpen: boolean = false;
+  @state() private declarativeOptions: DeclarativeOption[] = [];
+  @state() private resolvedOptions: DeclarativeOption[] = [];
+  private loadedSource: OptionDataSource | undefined;
   @state() private panelRight: number = 0;
   @state() private panelMinWidth: number = 200;
   @state() private panelMaxWidth: number = 400;
@@ -77,7 +84,11 @@ export class AppSelect extends LitElement {
     }
   }
 
-  protected updated() {
+  protected updated(changed: Map<string, unknown>) {
+    if (changed.has('dataSource') && this.dataSource !== this.loadedSource) {
+      this.loadedSource = this.dataSource;
+      void this.loadDataSource();
+    }
     if (this.isOpen && !this.disabled) {
       const template = this.renderDropdownPanel();
       if (!this.portalHandle) {
@@ -104,6 +115,27 @@ export class AppSelect extends LitElement {
     }
   }
 
+  // options from the prop, declarative <app-option> children, and the data source
+  private allOptions(): DeclarativeOption[] {
+    return [...this.options, ...this.declarativeOptions, ...this.resolvedOptions];
+  }
+
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    this.declarativeOptions = optionsFromElements(
+      slot.assignedElements({ flatten: true }) as HTMLElement[]
+    );
+  }
+
+  private async loadDataSource() {
+    const source = this.dataSource;
+    const result = await resolveDataSource(source);
+    // ignore a stale response if the source changed while loading
+    if (this.dataSource === source) {
+      this.resolvedOptions = result;
+    }
+  }
+
   private renderDropdownPanel() {
     const panelStyle =
       this.panelBottom !== null
@@ -112,7 +144,7 @@ export class AppSelect extends LitElement {
 
     return html`
       <div class="dropdown-panel" style="${panelStyle}">
-        ${this.options.map(
+        ${this.allOptions().map(
           (opt) => html`
             <div
               class="option-item ${opt.value === this.value ? 'is-selected' : ''}"
@@ -122,7 +154,9 @@ export class AppSelect extends LitElement {
                 ${opt.color
                   ? html`<span class="dot-indicator" style="background-color: ${opt.color}"></span>`
                   : ''}
+                ${opt.start ? html`<span class="option-slot-start">${opt.start}</span>` : ''}
                 <span class="option-label">${opt.label}</span>
+                ${opt.end ? html`<span class="option-slot-end">${opt.end}</span>` : ''}
               </div>
               ${opt.value === this.value ? html`<span class="check-mark">✓</span>` : ''}
             </div>
@@ -133,7 +167,7 @@ export class AppSelect extends LitElement {
   }
 
   render() {
-    const selectedOpt = this.options.find((o) => o.value === this.value);
+    const selectedOpt = this.allOptions().find((o) => o.value === this.value);
 
     return html`
       <div class="form-group">
@@ -152,6 +186,8 @@ export class AppSelect extends LitElement {
           </div>
           <span class="chevron">▼</span>
         </div>
+        <!-- declarative <app-option> children -->
+        <slot @slotchange="${this.handleSlotChange}"></slot>
       </div>
     `;
   }

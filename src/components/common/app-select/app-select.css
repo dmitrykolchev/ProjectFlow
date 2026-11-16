@@ -143,6 +143,15 @@ label {
   white-space: nowrap;
 }
 
+/* graphic elements from the canonical start / end slots of <app-option> */
+.option-slot-start,
+.option-slot-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
 .check-mark {
   font-size: 0.8rem;
   flex-shrink: 0;

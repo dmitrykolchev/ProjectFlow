@@ -1,21 +1,62 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-select';
+import '../app-option/app-option';
+import '../app-material-icon/app-material-icon';
 
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/SelectDropdown',
   component: 'app-select',
   description: 'Custom dropdown select with indicator dots, keyboard navigation, and smooth popover.',
   category: 'Inputs',
+  slotsDoc: {
+    '(default)': 'Declarative <app-option> children filling the dropdown list',
+  },
   propsDoc: {
     label: 'Caption above the field',
     value: 'Currently selected option value',
     options: 'Option definitions (value + label)',
+    dataSource: 'Data source for options: array, promise, or function returning an array (sync or async)',
     disabled: 'Disables the dropdown',
     placeholder: 'Text shown when nothing is selected',
     size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
   stories: [
+    {
+      name: 'Declarative Options',
+      description: 'Dropdown filled with declarative app-option children, including graphic elements in the start / end slots',
+      render: () => html`
+        <div style="max-width: 280px;">
+          <app-select label="Status" placeholder="Select...">
+            <app-option value="backlog" label="Бэклог" color="#64748b"></app-option>
+            <app-option value="todo" label="К выполнению" color="#0284c7"></app-option>
+            <app-option value="in_progress" label="В работе" color="#f59e0b">
+              <app-material-icon slot="end">schedule</app-material-icon>
+            </app-option>
+            <app-option value="review">
+              <app-material-icon slot="start">rate_review</app-material-icon>
+              Ревью
+            </app-option>
+          </app-select>
+        </div>
+      `,
+    },
+    {
+      name: 'Data Source',
+      description: 'Options loaded from a data source prop (array, promise, or function)',
+      render: () => html`
+        <div style="max-width: 280px;">
+          <app-select
+            label="Async data source"
+            placeholder="Select..."
+            .dataSource="${async () => [
+              { value: 'a', label: 'Первый вариант' },
+              { value: 'b', label: 'Второй вариант', color: '#22c55e' },
+            ]}"
+          ></app-select>
+        </div>
+      `,
+    },
     {
       name: 'Size Scale',
       description: 'Canonical control size scale sm|md|lg on the trigger',
