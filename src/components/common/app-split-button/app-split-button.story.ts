@@ -18,6 +18,7 @@ export const meta: ComponentStoryMeta = {
     'app-menu-header': 'Section caption of the dropdown menu (declarative children replace the items prop)',
     'app-menu-item': 'Menu row with label, icon, shortcut, checkable state, danger style',
     'app-menu-divider': 'Horizontal separator between menu rows',
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the main label',
   },
   propsDoc: {
     label: 'Main button caption',
