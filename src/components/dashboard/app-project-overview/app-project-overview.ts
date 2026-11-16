@@ -1,6 +1,7 @@
 import { LitElement, html, PropertyValues } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import * as d3 from 'd3';
+import 'd3-transition';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import {
