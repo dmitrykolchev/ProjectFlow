@@ -506,7 +506,8 @@ export class AppEntitySelector extends LitElement {
                   </button>
                 `
               : ''}
-            <span class="chevron">${iconChevronDown(14)}</span>
+            <!-- canonical control scale (Priority E): the chevron follows the control icon slot size -->
+            <span class="chevron">${iconChevronDown(this.size)}</span>
           </div>
         </div>
 
