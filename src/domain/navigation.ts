@@ -3,6 +3,8 @@ import { ActiveView } from '../types';
 export interface NavLocation {
   view: ActiveView;
   id?: string;
+  /** page number for paginated list views (#/<view>/p/<n>) */
+  page?: number;
 }
 
 const VIEW_SEGMENTS: Record<ActiveView, string> = {
@@ -41,15 +43,22 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
 export function pathToLocation(hash: string): NavLocation | null {
   const clean = hash.replace(/^#\/?/, '');
   if (!clean) return null;
-  const [segment, id] = clean.split('/');
+  const [segment, second, third] = clean.split('/');
   const view = (Object.keys(VIEW_SEGMENTS) as ActiveView[]).find(
     (v) => VIEW_SEGMENTS[v] === segment
   );
   if (!view) return null;
-  return { view, id: id ? decodeURIComponent(id) : undefined };
+  // page segment "p/<n>" is used by paginated list views
+  if (second === 'p') {
+    const page = Number(third);
+    return { view, page: Number.isInteger(page) && page > 1 ? page : undefined };
+  }
+  return { view, id: second ? decodeURIComponent(second) : undefined };
 }
 
-export function locationToPath(view: ActiveView, id?: string): string {
+export function locationToPath(view: ActiveView, id?: string, page?: number): string {
   const seg = VIEW_SEGMENTS[view];
-  return id ? `#/${seg}/${encodeURIComponent(id)}` : `#/${seg}`;
+  if (id) return `#/${seg}/${encodeURIComponent(id)}`;
+  if (page !== undefined && page > 1) return `#/${seg}/p/${page}`;
+  return `#/${seg}`;
 }

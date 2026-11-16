@@ -253,6 +253,8 @@ export class AppStore {
   public pendingInvoiceForContractId: string | null = null;
   public pendingCalculationForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
+  /** current page of the active paginated list view (1 = first page, not in hash) */
+  public activePage = 1;
   private historyApplying = false;
 
   public searchQuery: string = '';
@@ -1013,9 +1015,20 @@ export class AppStore {
 
   public setActiveView(view: ActiveView): void {
     this.activeView = view;
+    this.activePage = 1;
     this.expandSidebarGroupFor(view);
     this.notify();
     this.syncHistory(false);
+  }
+
+  /** Paginated list views report page changes; push adds a history entry so
+   * browser back restores the previous page, replace updates the current entry. */
+  public setActivePage(page: number, push: boolean = true): void {
+    if (page < 1) return;
+    if (this.activePage === page) return;
+    this.activePage = page;
+    this.notify();
+    this.syncHistory(!push);
   }
 
   private expandSidebarGroupFor(view: ActiveView): void {
@@ -1057,8 +1070,9 @@ export class AppStore {
   private syncHistory(replace: boolean): void {
     if (this.historyApplying) return;
     const id = this.currentDetailId();
-    const path = locationToPath(this.activeView, id);
-    const state = { view: this.activeView, id };
+    const page = this.activePage > 1 ? this.activePage : undefined;
+    const path = locationToPath(this.activeView, id, page);
+    const state = { view: this.activeView, id, page };
     if (location.hash === path) {
       history.replaceState(state, '', path);
       return;
@@ -1100,6 +1114,7 @@ export class AppStore {
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
     }
     this.activeView = view;
+    this.activePage = loc.page ?? 1;
     this.expandSidebarGroupFor(view);
     this.notify();
     this.historyApplying = false;
@@ -1107,18 +1122,20 @@ export class AppStore {
 
   public initHistory(): void {
     window.addEventListener('popstate', (e: PopStateEvent) => {
-      const st = e.state as { view: ActiveView; id?: string } | null;
-      const loc = st?.view ? { view: st.view, id: st.id } : pathToLocation(location.hash);
+      const st = e.state as { view: ActiveView; id?: string; page?: number } | null;
+      const loc = st?.view ? { view: st.view, id: st.id, page: st.page } : pathToLocation(location.hash);
       if (loc) this.applyHistoryLocation(loc);
     });
     const loc = pathToLocation(location.hash);
     if (loc) {
       this.applyHistoryLocation(loc);
     }
+    const initId = this.currentDetailId();
+    const initPage = this.activePage > 1 ? this.activePage : undefined;
     history.replaceState(
-      { view: this.activeView, id: this.currentDetailId() },
+      { view: this.activeView, id: initId, page: initPage },
       '',
-      locationToPath(this.activeView, this.currentDetailId())
+      locationToPath(this.activeView, initId, initPage)
     );
   }
 
