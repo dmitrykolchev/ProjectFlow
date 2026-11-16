@@ -8,7 +8,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Feedback/Empty State',
   component: 'app-empty-state',
   description:
-    'Dashed-border placeholder for empty lists and tables with icon, title, message, and optional action.',
+    'Dashed-border placeholder for empty lists and tables with icon, title, message, and optional action. The icon slot renders an illustration graphic above the title, and the action slot hosts a button below the message.',
   category: 'Feedback',
   slotsDoc: {
     icon: 'Illustration icon above the title',
