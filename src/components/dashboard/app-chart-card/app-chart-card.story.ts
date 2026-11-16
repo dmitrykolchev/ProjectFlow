@@ -10,6 +10,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     actions: 'Controls at the right of the chart header',
   },
+  childrenDoc: {
+    'app-button': 'Header control placed in the actions slot at the right of the chart header',
+  },
   propsDoc: {
     title: 'Chart caption',
     subtitle: 'Secondary line under the caption',
