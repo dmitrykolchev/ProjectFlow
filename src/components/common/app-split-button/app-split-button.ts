@@ -2,10 +2,13 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ButtonSize } from '../app-button/app-button';
 import { MenuItem } from '../app-menu/app-menu';
+import type { AppMenuItem } from '../app-menu-item/app-menu-item';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import { iconChevronDown } from '../icons';
 import '../app-menu/app-menu';
 import styles from './app-split-button.css';
+
+const DECLARATIVE_MENU_TAGS = new Set(['app-menu-item', 'app-menu-header', 'app-menu-divider']);
 
 @customElement('app-split-button')
 export class AppSplitButton extends LitElement {
@@ -22,6 +25,8 @@ export class AppSplitButton extends LitElement {
   @state() private menuMaxHeight: number = 280;
 
   private portalHandle: PortalHandle | null = null;
+  private clonedMenuNodes: HTMLElement[] = [];
+  private clonedToSourceItem = new WeakMap<HTMLElement, AppMenuItem>();
 
   static styles = styles;
 
@@ -41,6 +46,28 @@ export class AppSplitButton extends LitElement {
       this.updateMenuPosition();
     }
   };
+
+  private prepareClonedMenuNodes() {
+    this.clonedMenuNodes = [];
+    this.clonedToSourceItem = new WeakMap();
+
+    const sources = Array.from(this.children).filter((el) =>
+      DECLARATIVE_MENU_TAGS.has(el.tagName.toLowerCase())
+    );
+
+    for (const src of sources) {
+      const clone = src.cloneNode(true) as HTMLElement;
+      if (src.tagName.toLowerCase() === 'app-menu-item') {
+        const srcItem = src as AppMenuItem;
+        const cloneItem = clone as AppMenuItem;
+        if (srcItem.icon !== undefined) {
+          cloneItem.icon = srcItem.icon;
+        }
+        this.clonedToSourceItem.set(clone, srcItem);
+      }
+      this.clonedMenuNodes.push(clone);
+    }
+  }
 
   private updateMenuPosition() {
     const wrapper = this.shadowRoot?.querySelector('.split-wrapper') as HTMLElement | null;
@@ -90,6 +117,7 @@ export class AppSplitButton extends LitElement {
       this.portalHandle.close();
       this.portalHandle = null;
     }
+    this.clonedMenuNodes = [];
   }
 
   private renderMenuPopover() {
@@ -104,7 +132,9 @@ export class AppSplitButton extends LitElement {
         <app-menu
           .items="${this.items}"
           @select="${this.handleMenuSelect}"
-        ></app-menu>
+        >
+          ${this.clonedMenuNodes}
+        </app-menu>
       </div>
     `;
   }
@@ -133,6 +163,7 @@ export class AppSplitButton extends LitElement {
         >
           ${iconChevronDown(14)}
         </button>
+        <slot class="menu-slot-source" hidden></slot>
       </div>
     `;
   }
@@ -153,6 +184,7 @@ export class AppSplitButton extends LitElement {
     e.stopPropagation();
     if (this.disabled) return;
     if (!this.isOpen) {
+      this.prepareClonedMenuNodes();
       this.updateMenuPosition();
       this.isOpen = true;
     } else {
@@ -162,6 +194,13 @@ export class AppSplitButton extends LitElement {
 
   private handleMenuSelect(e: CustomEvent) {
     e.stopPropagation();
+    const clonedEl = e.detail?.element as HTMLElement | undefined;
+    if (clonedEl) {
+      const sourceEl = this.clonedToSourceItem.get(clonedEl);
+      if (sourceEl && sourceEl.checkable) {
+        sourceEl.checked = (clonedEl as AppMenuItem).checked;
+      }
+    }
     this.isOpen = false;
     this.dispatchEvent(
       new CustomEvent('select', {

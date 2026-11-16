@@ -10,6 +10,7 @@ export const meta: ComponentStoryMeta = {
   category: 'Common',
   slotsDoc: {
     'icon-start': 'Icon rendered before the main button label',
+    '(default)': 'Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
   propsDoc: {
     label: 'Main button caption',
@@ -21,7 +22,7 @@ export const meta: ComponentStoryMeta = {
   stories: [
     {
       name: 'Split Button Variants',
-      description: 'Primary, secondary, and outline split buttons',
+      description: 'Primary, secondary declarative, and outline split buttons',
       render: () => html`
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; min-height: 190px; align-items: flex-start;">
           <app-split-button
@@ -37,14 +38,11 @@ export const meta: ComponentStoryMeta = {
             <span slot="icon-start">${iconPlus(15)}</span>
           </app-split-button>
 
-          <app-split-button
-            label="Сохранить"
-            variant="secondary"
-            .items="${[
-              { id: 'save-draft', label: 'Сохранить как черновик' },
-              { id: 'save-template', label: 'Сохранить как шаблон' },
-            ]}"
-          ></app-split-button>
+          <app-split-button label="Сохранить" variant="secondary">
+            <app-menu-header label="Варианты сохранения"></app-menu-header>
+            <app-menu-item value="save-draft" label="Сохранить как черновик"></app-menu-item>
+            <app-menu-item value="save-template" label="Сохранить как шаблон"></app-menu-item>
+          </app-split-button>
 
           <app-split-button
             label="Экспорт"

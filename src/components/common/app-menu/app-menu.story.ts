@@ -6,18 +6,46 @@ import { iconEdit, iconDownload, iconTrash, iconPlus } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Common/Menu',
   component: 'app-menu',
-  description: 'Standalone accessible menu surface supporting icons, shortcuts, checkmarks, section headers, dividers, and destructive actions.',
+  description: 'Standalone accessible menu surface supporting both programmatic items arrays and declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> composition.',
   category: 'Common',
   slotsDoc: {
-    '(default)': 'Menu item markup rendered inside the menu',
+    '(default)': 'Declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
   propsDoc: {
     items: 'Menu item definitions (label, icon, action, separators)',
   },
   stories: [
     {
-      name: 'Context & Action Menu',
-      description: 'Structured menu with icons, keyboard shortcuts, and danger item',
+      name: 'Declarative Composition (<app-menu-*>)',
+      description: 'Menu configured declaratively using <app-menu-header>, <app-menu-item>, and <app-menu-divider>',
+      render: () => html`
+        <div style="width: 240px;">
+          <app-menu>
+            <app-menu-header label="Операции с задачей"></app-menu-header>
+            <app-menu-item value="new" label="Создать подзадачу" shortcut="⌘N">
+              <span slot="icon">${iconPlus(14)}</span>
+            </app-menu-item>
+            <app-menu-item value="edit" shortcut="E">
+              <span slot="icon">${iconEdit(14)}</span>
+              Редактировать
+            </app-menu-item>
+            <app-menu-item value="export" label="Экспорт в CSV" shortcut="⌘S">
+              <span slot="icon">${iconDownload(14)}</span>
+            </app-menu-item>
+            <app-menu-divider></app-menu-divider>
+            <app-menu-item value="pin" checkable checked>Закрепить вверху</app-menu-item>
+            <app-menu-item value="watch" checkable>Отслеживать изменения</app-menu-item>
+            <app-menu-divider></app-menu-divider>
+            <app-menu-item value="delete" label="Удалить задачу" danger shortcut="⌫">
+              <span slot="icon">${iconTrash(14)}</span>
+            </app-menu-item>
+          </app-menu>
+        </div>
+      `,
+    },
+    {
+      name: 'Context & Action Menu (items array)',
+      description: 'Structured menu with icons, keyboard shortcuts, and danger item via .items property',
       render: () => html`
         <div style="width: 240px;">
           <app-menu

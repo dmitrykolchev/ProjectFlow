@@ -1,0 +1,17 @@
+:host {
+  display: block;
+}
+
+:host([hidden]) {
+  display: none;
+}
+
+.menu-divider {
+  height: 1px;
+  background: var(--border-subtle, #1e293b);
+  margin: 0.25rem 0.35rem;
+}
+
+.menu-divider.is-inset {
+  margin: 0.25rem 0.35rem 0.25rem 2rem;
+}

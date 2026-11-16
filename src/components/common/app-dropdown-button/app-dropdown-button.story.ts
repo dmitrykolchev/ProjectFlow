@@ -10,6 +10,7 @@ export const meta: ComponentStoryMeta = {
   category: 'Common',
   slotsDoc: {
     'icon-start': 'Icon rendered before the label',
+    '(default)': 'Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
   propsDoc: {
     label: 'Button caption',
@@ -22,7 +23,7 @@ export const meta: ComponentStoryMeta = {
   stories: [
     {
       name: 'Dropdown Variants',
-      description: 'Primary, secondary, and outline dropdown triggers',
+      description: 'Primary array-driven dropdown, outline declarative dropdown, and bottom-end alignment',
       render: () => html`
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; min-height: 200px; align-items: flex-start;">
           <app-dropdown-button
@@ -40,13 +41,17 @@ export const meta: ComponentStoryMeta = {
             label="Действия"
             variant="outline"
             placement="bottom-end"
-            .items="${[
-              { id: 'edit', label: 'Массовое редактирование', icon: iconEdit(14) },
-              { id: 'archive', label: 'Переместить в архив' },
-              { id: 'div', divider: true },
-              { id: 'delete', label: 'Удалить выбранное', icon: iconTrash(14), danger: true },
-            ]}"
-          ></app-dropdown-button>
+          >
+            <app-menu-header label="Операции"></app-menu-header>
+            <app-menu-item value="edit" label="Массовое редактирование">
+              <span slot="icon">${iconEdit(14)}</span>
+            </app-menu-item>
+            <app-menu-item value="archive">Переместить в архив</app-menu-item>
+            <app-menu-divider></app-menu-divider>
+            <app-menu-item value="delete" label="Удалить выбранное" danger>
+              <span slot="icon">${iconTrash(14)}</span>
+            </app-menu-item>
+          </app-dropdown-button>
         </div>
       `,
     },

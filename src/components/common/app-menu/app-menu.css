@@ -35,9 +35,17 @@
   outline: none;
 }
 
+.menu-surface > slot {
+  display: contents;
+}
+
 .menu-item:hover:not(:disabled),
 .menu-item:focus-visible:not(:disabled) {
   background: var(--bg-hover, #223049);
+}
+
+.menu-item:focus-visible:not(:disabled) {
+  box-shadow: inset 0 0 0 1px var(--accent-border, var(--border-strong, #334155));
 }
 
 .menu-item.is-danger {

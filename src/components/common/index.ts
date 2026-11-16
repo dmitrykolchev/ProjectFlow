@@ -20,6 +20,9 @@ export { AppSplitButton } from './app-split-button/app-split-button';
 
 export { AppMenu } from './app-menu/app-menu';
 export type { MenuItem } from './app-menu/app-menu';
+export { AppMenuItem } from './app-menu-item/app-menu-item';
+export { AppMenuHeader } from './app-menu-header/app-menu-header';
+export { AppMenuDivider } from './app-menu-divider/app-menu-divider';
 
 export { AppSegmentedSwitch } from './app-segmented-switch/app-segmented-switch';
 export type { SegmentedOption } from './app-segmented-switch/app-segmented-switch';
@@ -89,6 +92,9 @@ import { AppButtonGroup } from './app-button-group/app-button-group';
 import { AppDropdownButton } from './app-dropdown-button/app-dropdown-button';
 import { AppSplitButton } from './app-split-button/app-split-button';
 import { AppMenu } from './app-menu/app-menu';
+import { AppMenuItem } from './app-menu-item/app-menu-item';
+import { AppMenuHeader } from './app-menu-header/app-menu-header';
+import { AppMenuDivider } from './app-menu-divider/app-menu-divider';
 import { AppSegmentedSwitch } from './app-segmented-switch/app-segmented-switch';
 import { AppSwitch } from './app-switch/app-switch';
 import { AppInput } from './app-input/app-input';
@@ -131,6 +137,9 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-dropdown-button': AppDropdownButton,
   'app-split-button': AppSplitButton,
   'app-menu': AppMenu,
+  'app-menu-item': AppMenuItem,
+  'app-menu-header': AppMenuHeader,
+  'app-menu-divider': AppMenuDivider,
   'app-segmented-switch': AppSegmentedSwitch,
   'app-switch': AppSwitch,
   'app-input': AppInput,

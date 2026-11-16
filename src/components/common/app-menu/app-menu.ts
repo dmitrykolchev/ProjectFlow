@@ -1,6 +1,10 @@
 import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { iconCheck } from '../icons';
+import type { AppMenuItem } from '../app-menu-item/app-menu-item';
+import '../app-menu-item/app-menu-item';
+import '../app-menu-header/app-menu-header';
+import '../app-menu-divider/app-menu-divider';
 import styles from './app-menu.css';
 
 export interface MenuItem {
@@ -23,7 +27,7 @@ export class AppMenu extends LitElement {
 
   render() {
     return html`
-      <div class="menu-surface" role="menu">
+      <div class="menu-surface" role="menu" @keydown="${this.handleKeyDown}">
         ${this.items.map((item) => {
           if (item.divider) {
             return html`<div class="menu-divider" role="separator"></div>`;
@@ -54,6 +58,47 @@ export class AppMenu extends LitElement {
         <slot></slot>
       </div>
     `;
+  }
+
+  private getFocusableTargets(): HTMLElement[] {
+    const shadowItems = Array.from(
+      this.shadowRoot?.querySelectorAll('.menu-surface > button.menu-item:not(:disabled)') ?? []
+    ) as HTMLElement[];
+
+    const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
+    const slottedItems = (slot?.assignedElements({ flatten: true }) ?? []).filter((el) => {
+      if (el.tagName.toLowerCase() !== 'app-menu-item') return false;
+      const item = el as AppMenuItem;
+      return !item.disabled && !item.hidden;
+    }) as HTMLElement[];
+
+    return [...shadowItems, ...slottedItems];
+  }
+
+  private handleKeyDown(e: KeyboardEvent) {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+    const targets = this.getFocusableTargets();
+    if (targets.length === 0) return;
+
+    e.preventDefault();
+
+    const root = this.getRootNode() as Document | ShadowRoot;
+    const activeShadowEl = this.shadowRoot?.activeElement as HTMLElement | null;
+    const activeHostEl = root.activeElement as HTMLElement | null;
+    const currentIndex = targets.findIndex((el) => el === activeShadowEl || el === activeHostEl);
+
+    let nextIndex = 0;
+    if (e.key === 'ArrowDown') {
+      nextIndex = currentIndex >= 0 ? (currentIndex + 1) % targets.length : 0;
+    } else if (e.key === 'ArrowUp') {
+      nextIndex = currentIndex >= 0 ? (currentIndex - 1 + targets.length) % targets.length : targets.length - 1;
+    } else if (e.key === 'Home') {
+      nextIndex = 0;
+    } else if (e.key === 'End') {
+      nextIndex = targets.length - 1;
+    }
+
+    targets[nextIndex]?.focus();
   }
 
   private selectItem(item: MenuItem) {

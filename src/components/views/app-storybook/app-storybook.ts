@@ -14,6 +14,9 @@ import toggleButtonMeta from '../../common/app-toggle-button/app-toggle-button.s
 import dropdownButtonMeta from '../../common/app-dropdown-button/app-dropdown-button.story';
 import splitButtonMeta from '../../common/app-split-button/app-split-button.story';
 import menuMeta from '../../common/app-menu/app-menu.story';
+import menuItemMeta from '../../common/app-menu-item/app-menu-item.story';
+import menuHeaderMeta from '../../common/app-menu-header/app-menu-header.story';
+import menuDividerMeta from '../../common/app-menu-divider/app-menu-divider.story';
 import badgeMeta from '../../common/app-badge/app-badge.story';
 import entityEmblemMeta from '../../common/app-entity-emblem/app-entity-emblem.story';
 import materialIconMeta from '../../common/app-material-icon/app-material-icon.story';
@@ -99,6 +102,9 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   dropdownButtonMeta,
   splitButtonMeta,
   menuMeta,
+  menuItemMeta,
+  menuHeaderMeta,
+  menuDividerMeta,
   badgeMeta,
   entityEmblemMeta,
   materialIconMeta,
