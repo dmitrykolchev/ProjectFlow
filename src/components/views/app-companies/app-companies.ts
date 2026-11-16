@@ -75,6 +75,7 @@ export class AppCompanies extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'companies' ? store.activePage : 1;
     this.companies = store.companies;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -141,11 +142,11 @@ export class AppCompanies extends LitElement {
         .values="${{ status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CompanyStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       ></app-filter-bar>
 
@@ -414,11 +415,11 @@ export class AppCompanies extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
