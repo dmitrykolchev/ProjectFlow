@@ -9,7 +9,8 @@ import { statusLabel, statusVariant, type StatusDomain } from '../../../domain/s
 export class AppStatusChip extends LitElement {
   @property({ type: String }) domain: StatusDomain = 'task';
   @property({ type: String }) status: string = '';
-  @property({ type: String }) size: 'sm' | 'md' = 'sm';
+  // canonical control size scale, delegated to app-badge
+  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'sm';
   @property({ type: String }) appearance: 'soft' | 'solid' | 'outline' = 'soft';
   @property({ type: Boolean, attribute: 'dot' }) dot: boolean = false;
 
