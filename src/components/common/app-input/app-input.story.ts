@@ -20,8 +20,20 @@ export const meta: ComponentStoryMeta = {
     error: 'Error message; renders the field in danger state',
     helper: 'Helper text below the field',
     clearable: 'Shows a clear (×) button when the field has a value',
+    size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
   stories: [
+    {
+      name: 'Size Scale',
+      description: 'Canonical control size scale sm|md|lg',
+      render: () => html`
+        <div style="max-width: 320px; display: flex; flex-direction: column; gap: 0.75rem;">
+          <app-input size="sm" label="Small" placeholder="Compact input"></app-input>
+          <app-input size="md" label="Medium (default)" placeholder="Standard input"></app-input>
+          <app-input size="lg" label="Large" placeholder="Tall input"></app-input>
+        </div>
+      `,
+    },
     {
       name: 'Default',
       description: 'Standard text input with label and placeholder',

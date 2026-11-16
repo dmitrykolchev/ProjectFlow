@@ -2,6 +2,8 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-input.css';
 
+export type InputSize = 'sm' | 'md' | 'lg'; // canonical control scale (docs/ComponentApiSpecs.md, Priority E)
+
 @customElement('app-input')
 export class AppInput extends LitElement {
   @property({ type: String }) label: string = '';
@@ -13,6 +15,8 @@ export class AppInput extends LitElement {
   @property({ type: String }) error: string = '';
   @property({ type: String }) helper: string = '';
   @property({ type: Boolean, attribute: 'clearable' }) clearable: boolean = false;
+  // canonical control size scale, md default = historical pixel-identical look
+  @property({ type: String }) size: InputSize = 'md';
 
   static styles = styles;
 
@@ -27,7 +31,7 @@ export class AppInput extends LitElement {
               </label>
             `
           : ''}
-        <div class="input-wrapper ${this.error ? 'has-error' : ''} ${this.disabled ? 'is-disabled' : ''}">
+        <div class="input-wrapper size-${this.size} ${this.error ? 'has-error' : ''} ${this.disabled ? 'is-disabled' : ''}">
           <div class="icon-slot">
             <slot name="icon"></slot>
           </div>

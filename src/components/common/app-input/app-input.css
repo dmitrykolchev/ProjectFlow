@@ -40,6 +40,18 @@ label {
               box-shadow var(--transition-fast, 150ms ease);
 }
 
+/* canonical control size scale (Priority E): heights/fonts from root tokens,
+   horizontal padding per component (md = historical value, pixel-identical) */
+.input-wrapper.size-sm {
+  height: var(--control-height-sm, 30px);
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.input-wrapper.size-lg {
+  height: var(--control-height-lg, 44px);
+  font-size: var(--control-font-lg, 1rem);
+}
+
 .input-wrapper:focus-within {
   border-color: var(--accent-primary, #6366f1);
   box-shadow: 0 0 0 1px var(--accent-primary, #6366f1);
@@ -65,8 +77,18 @@ input {
   outline: none;
   color: var(--text-primary, #f8fafc);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--control-font-md, 0.875rem);
   line-height: 1.25;
+}
+
+.size-sm input {
+  padding: 0 0.6rem;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.size-lg input {
+  padding: 0 1rem;
+  font-size: var(--control-font-lg, 1rem);
 }
 
 input::placeholder {
@@ -82,6 +104,18 @@ input:disabled {
   align-items: center;
   padding-left: 0.75rem;
   color: var(--text-muted, #64748b);
+  /* slotted app-material-icon inherits the control's icon slot size */
+  --mi-icon: var(--control-icon-md, 20px);
+}
+
+.size-sm .icon-slot {
+  padding-left: 0.6rem;
+  --mi-icon: var(--control-icon-sm, 16px);
+}
+
+.size-lg .icon-slot {
+  padding-left: 1rem;
+  --mi-icon: var(--control-icon-lg, 24px);
 }
 
 .clear-btn {
