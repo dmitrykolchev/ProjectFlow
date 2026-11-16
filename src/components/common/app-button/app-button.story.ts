@@ -15,6 +15,9 @@ export const meta: ComponentStoryMeta = {
     'icon-start': 'Legacy alias of start',
     'icon-end': 'Legacy alias of end',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the label',
+  },
   propsDoc: {
     variant: 'Visual style: primary, secondary, outline, ghost, danger',
     size: 'Control height: sm / md / lg',
