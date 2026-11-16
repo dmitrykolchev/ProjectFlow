@@ -410,6 +410,57 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 
 ---
 
+# ПРИОРИТЕТ E — унификация размеров контролов (план, решение 2026-11-16)
+
+Каноническая шкала размеров контролов **sm | md | lg** (решено пользователем). Ничего не реализуется
+до явного старта; фиксация контракта обязательна перед миграциями.
+
+## E0. Канонические токены (задаются один раз на `:root` через store тем)
+
+| токен | sm | md | lg |
+|---|---|---|---|
+| `--control-height-{s,m,l}` | 30px | 38px | 44px |
+| `--control-font-{s,m,l}` | 0.8125rem (13px) | 0.875rem (14px) | 1rem (16px) |
+| `--control-padding-x-{s,m,l}` | 0.65rem | 0.875rem | 1.15rem |
+| `--control-icon-{s,m,l}` (из иконочной шкалы xxs..xxl) | 16px (sm) | 20px (md) | 24px (lg) |
+
+Значения = текущие фолбэки `app-button`/`app-toggle-button`, поэтому md-визуал всех контролов
+остаётся пиксель в пиксель. Иконочная шкала (коммиты `cbc30c1`, `56028f7`) уже стыкуется:
+иконка sm=16px в 30px-контроле, md=20px в 38px, lg=24px в 44px; слот-правила контролов задают
+`--mi-icon` = `--control-icon-*`.
+
+## E1. Матрица компонентов и миграции
+
+| компонент | сейчас | цель |
+|---|---|---|
+| `app-button`, `app-toggle-button`, `app-split-button`, `app-dropdown-button` | sm/md/lg по токенам (эталон) | референс, не мигрируется |
+| `app-input`, `app-select`, `app-combobox`, `app-date-input` | size-пропа нет, фиксированный md=38px | добавить `size: 'sm'|'md'|'lg'`, default `md` — пиксельная паритетность; токены E0 |
+| `app-number-input` | sm/md | дополнить lg; токены E0 |
+| `app-segmented-switch` | sm/md | дополнить lg; токены E0 |
+| `app-entity-selector` | sm/md/lg, свои font/padding | перевести font/padding на токены E0 |
+| `app-status-chip` | sm/md | sm|md|lg по токенам (font/padding/height) |
+| `app-badge` | sm/md | sm|md|lg по токенам |
+| `app-pagination` | локальный override `--control-height-md: 32px` (bare-режим) | **compact-вариант**: обычные кнопки — канонический md=38; компактный режим (bare/table) — явный compact с локальным токеном, не перебивающим канон |
+
+Не унифицируются (media scale, отдельная шкала): `app-avatar` (xs..xl), `app-entity-emblem` (xs..lg),
+`app-modal` (size = ширина), `app-progress-bar` (толщина). Зафиксировать как «media scale» в API-спеках.
+
+## E2. Порядок внедрения (каждый шаг — отдельный коммит)
+
+1. Токены E0 на `:root` (store тем) — визуально ничего не меняет (значения = фолбэки).
+2. Size-prop + токены: `app-input` → `app-select` → `app-combobox` → `app-date-input` (default md, паритет).
+3. Дополнение lg: `app-number-input`, `app-segmented-switch`.
+4. `app-status-chip`, `app-badge` — полная sm|md|lg.
+5. `app-entity-selector` — font/padding на токены.
+6. `app-pagination` — compact-вариант.
+7. Слот-правила иконок: в каждом контроле `--mi-icon` = `--control-icon-*` (svg-иконки слота получают тот же размер).
+
+Проверка каждого коммита: `npx tsc --noEmit`, `npm run build`, браузерный пиксельный контроль md
+против эталона (main), smoke story'ков затронутых компонентов. Storybook stories дополняются
+демо sm/md/lg для каждого мигрированного компонента.
+
+---
+
 # Архитектурные сопровождающие (фазы 3–4)
 
 ## StoreMixin/ReactiveController
