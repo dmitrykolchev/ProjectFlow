@@ -8,7 +8,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/Meta Grid',
   component: 'app-meta-grid',
   description:
-    'Label/value boxes in strip (1×N) or grid (2-column) layout, with mono and danger value variants.',
+    'Label/value boxes in strip (1×N) or grid (2-column) layout, with mono and danger value variants. The default slot accepts declarative app-meta-item children that append to the items prop.',
   category: 'Common',
   slotsDoc: {
     '(default)': 'Declarative <app-meta-item> children filling the boxes (label, value, mono, danger, start / end graphics)',
