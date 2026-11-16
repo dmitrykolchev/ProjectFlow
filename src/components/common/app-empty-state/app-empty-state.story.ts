@@ -10,6 +10,11 @@ export const meta: ComponentStoryMeta = {
   description:
     'Dashed-border placeholder for empty lists and tables with icon, title, message, and optional action.',
   category: 'Feedback',
+  propsDoc: {
+    title: 'Headline of the empty state',
+    message: 'Secondary explanation text',
+    compact: 'Reduced padding and typography for use inside cards',
+  },
   stories: [
     {
       name: 'Default',

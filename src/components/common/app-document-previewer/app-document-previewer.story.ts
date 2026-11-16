@@ -15,6 +15,14 @@ export const meta: ComponentStoryMeta = {
   category: 'Common',
   description:
     'Встроенный просмотрщик документов без скачивания: PDF (через Blob Object URL в iframe), масштабируемые изображения/SVG, форматированный Markdown, табличный CSV, JSON/SQL/код с нумерацией строк и переносом, а также fallback для бинарных форматов.',
+  propsDoc: {
+    document: 'Single document to preview (id + metadata)',
+    documents: 'Document list with a selector when more than one is provided',
+    compact: 'Reduced chrome for embedding inside cards',
+    showHeader: 'Shows the document header bar',
+    showExpand: 'Shows the expand-to-fullscreen control',
+    height: 'Preview viewport height (CSS length)',
+  },
   stories: [
     {
       name: 'PDF Document Preview',

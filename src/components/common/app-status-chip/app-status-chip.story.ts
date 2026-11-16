@@ -8,6 +8,13 @@ export const meta: ComponentStoryMeta = {
   description:
     'Domain-driven status chip: resolves label and badge variant from central STATUS_TOKENS registry.',
   category: 'Common',
+  propsDoc: {
+    domain: 'Status vocabulary: task, contract, invoice, project, ...',
+    status: 'Status code within the domain (rendered with its label and color)',
+    size: 'Visual density: sm / md',
+    appearance: 'Rendering style: soft fill / outline',
+    dot: 'Shows a leading status dot',
+  },
   stories: [
     {
       name: 'Contract Statuses',

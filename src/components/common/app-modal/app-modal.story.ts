@@ -9,6 +9,13 @@ export const meta: ComponentStoryMeta = {
   component: 'app-modal',
   description: 'Customizable modal dialog with backdrop blur, customizable sizes, header, and footer actions.',
   category: 'Overlays',
+  propsDoc: {
+    open: 'Opens the modal (rendered through the portal)',
+    title: 'Header caption',
+    size: 'Modal width preset: sm / md / lg',
+    hideClose: 'Hides the header close (×) button',
+    headerIcon: 'Icon descriptor rendered before the title',
+  },
   stories: [
     {
       name: 'Interactive Demo',

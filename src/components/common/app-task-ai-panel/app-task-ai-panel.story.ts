@@ -36,6 +36,15 @@ export const meta: ComponentStoryMeta = {
   category: 'Common',
   description:
     'Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиотеки документов, генерация структурированного описания и контекстный анализ рисков, трудоёмкости и подзадач через OpenAI-совместимый API.',
+  propsDoc: {
+    task: 'Task being analyzed',
+    analysis: 'AI analysis result (summary, risks, recommendations)',
+    clarifications: 'Clarification Q&A items',
+    compact: 'Reduced layout for embedding inside modals',
+    timeSummary: 'Time-tracking summary rendered next to the analysis',
+    expenseSummary: 'Expense summary rendered next to the analysis',
+    discussionsSummary: 'Discussion summary rendered next to the analysis',
+  },
   stories: [
     {
       name: 'Full Task Analysis Panel',

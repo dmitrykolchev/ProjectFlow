@@ -7,6 +7,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-switch',
   description: 'Toggle switch for boolean settings and feature flags.',
   category: 'Inputs',
+  propsDoc: {
+    checked: 'On/off state of the switch',
+    disabled: 'Disables interaction',
+    label: 'Text next to the switch',
+  },
   stories: [
     {
       name: 'Default',

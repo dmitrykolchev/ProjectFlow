@@ -8,6 +8,13 @@ export const meta: ComponentStoryMeta = {
   description:
     'Circular initials/image avatar in five sizes, used for employees, assignees, and user profile.',
   category: 'Common',
+  propsDoc: {
+    initials: 'Initials rendered when no image is set',
+    src: 'Image URL (falls back to initials on error)',
+    size: 'Avatar diameter preset',
+    color: 'Background color of the initials tile',
+    title: 'Native tooltip text',
+  },
   stories: [
     {
       name: 'Sizes',

@@ -8,6 +8,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-menu',
   description: 'Standalone accessible menu surface supporting icons, shortcuts, checkmarks, section headers, dividers, and destructive actions.',
   category: 'Common',
+  propsDoc: {
+    items: 'Menu item definitions (label, icon, action, separators)',
+  },
   stories: [
     {
       name: 'Context & Action Menu',

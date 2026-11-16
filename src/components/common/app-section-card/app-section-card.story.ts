@@ -10,6 +10,13 @@ export const meta: ComponentStoryMeta = {
   description:
     'Card container with header (title, subtitle, actions slot) and body; optional collapsible mode.',
   category: 'Common',
+  propsDoc: {
+    title: 'Section caption',
+    subtitle: 'Secondary line under the caption',
+    variant: 'Surface style: default / plain / elevated',
+    collapsible: 'Enables collapse toggle in the header',
+    collapsed: 'Current collapsed state (only for collapsible sections)',
+  },
   stories: [
     {
       name: 'Default',

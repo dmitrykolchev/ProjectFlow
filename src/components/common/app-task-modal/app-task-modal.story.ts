@@ -9,6 +9,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-task-modal',
   description: 'Comprehensive task creation and editing modal dialog with subtasks, dates, and assignees.',
   category: 'Overlays',
+  propsDoc: {
+    isOpen: 'Opens the full task editor modal',
+    editingTask: 'Task being edited (null = create mode)',
+    currentLang: 'UI language of the form',
+  },
   stories: [
     {
       name: 'Create Task Trigger',

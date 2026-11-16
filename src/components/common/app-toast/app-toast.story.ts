@@ -9,6 +9,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-toast',
   description: 'Automated floating notification stack with auto-dismiss and status colors.',
   category: 'Feedback',
+  propsDoc: {
+    notifications: 'Notification queue rendered as stacked toasts (type, title, message)',
+  },
   stories: [
     {
       name: 'Trigger Notifications',

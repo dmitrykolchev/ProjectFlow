@@ -9,6 +9,16 @@ export const meta: ComponentStoryMeta = {
   description:
     'Interactive D3.js Project Overview dashboard visualizing project progress, logged hours breakdown, and budget utilization.',
   category: 'Dashboard',
+  propsDoc: {
+    projectId: 'Project scope (all = portfolio overview)',
+    hideProjectSelector: 'Hides the project selector row',
+    locale: 'Locale for number/date formatting (defaults to UI language)',
+    projects: 'Project records',
+    tasks: 'Task records',
+    timeEntries: 'Time-tracking records',
+    expenses: 'Expense records',
+    users: 'User records (team workload)',
+  },
   stories: [
     {
       name: 'Single Project Overview (Core Platform)',

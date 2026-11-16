@@ -8,6 +8,11 @@ export const meta: ComponentStoryMeta = {
   description:
     'Tabular-numeral currency formatting (RUB/USD/EUR) with full and short (K/M) formats.',
   category: 'Common',
+  propsDoc: {
+    amount: 'Numeric amount',
+    currency: 'Currency code: RUB / USD / EUR (symbol and locale formatting follow UI language)',
+    format: 'full = grouped digits; short = K/M compact notation',
+  },
   stories: [
     {
       name: 'Full Format',

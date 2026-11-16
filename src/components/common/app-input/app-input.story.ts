@@ -7,6 +7,17 @@ export const meta: ComponentStoryMeta = {
   component: 'app-input',
   description: 'Single-line text input field supporting labels, helpers, errors, and clear buttons.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    placeholder: 'Placeholder text shown when empty',
+    value: 'Current input value',
+    type: 'Native input type (text, email, password, number, ...)',
+    required: 'Marks the field as required (asterisk in label)',
+    disabled: 'Disables editing',
+    error: 'Error message; renders the field in danger state',
+    helper: 'Helper text below the field',
+    clearable: 'Shows a clear (×) button when the field has a value',
+  },
   stories: [
     {
       name: 'Default',

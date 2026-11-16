@@ -7,6 +7,13 @@ export const meta: ComponentStoryMeta = {
   component: 'app-badge',
   description: 'Semantic status, priority, and count badges supporting soft, solid, and outline styles.',
   category: 'Common',
+  propsDoc: {
+    variant: 'Semantic color of the badge (neutral, info, success, warning, danger)',
+    appearance: 'Rendering style: soft fill / outline',
+    size: 'Visual density: sm / md / lg',
+    dot: 'Renders a status dot without text',
+    removable: 'Shows a remove (×) affordance',
+  },
   stories: [
     {
       name: 'Soft Variants',

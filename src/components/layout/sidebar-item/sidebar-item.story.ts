@@ -8,6 +8,15 @@ export const meta: ComponentStoryMeta = {
   component: 'sidebar-item',
   description: 'Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode.',
   category: 'Layout',
+  propsDoc: {
+    value: 'View id emitted when the item is clicked',
+    label: 'Item caption',
+    badge: 'Count badge on the right side',
+    active: 'Item is the current view',
+    collapsed: 'Sidebar is in icon-only mode',
+    disabled: 'Item is not clickable',
+    icon: 'Leading icon (SVG template)',
+  },
   stories: [
     {
       name: 'States & Badges',

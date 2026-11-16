@@ -7,6 +7,13 @@ export const meta: ComponentStoryMeta = {
   component: 'app-select',
   description: 'Custom dropdown select with indicator dots, keyboard navigation, and smooth popover.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    value: 'Currently selected option value',
+    options: 'Option definitions (value + label)',
+    disabled: 'Disables the dropdown',
+    placeholder: 'Text shown when nothing is selected',
+  },
   stories: [
     {
       name: 'Status Selector',

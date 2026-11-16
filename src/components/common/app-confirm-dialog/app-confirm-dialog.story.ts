@@ -8,6 +8,20 @@ export const meta: ComponentStoryMeta = {
   description:
     'Confirmation modal built on app-modal: header icon + title, "выполняемое действие" and "ожидаемый результат" sections, cancel/confirm buttons. Variants: info, success, warning, danger; events confirm and cancel.',
   category: 'Common',
+  propsDoc: {
+    open: 'Opens the dialog',
+    title: 'Header caption',
+    variant: 'Semantic color: info / success / warning / danger',
+    icon: 'Header icon name',
+    action: 'Text of the "action being performed" section',
+    result: 'Text of the "expected result" box',
+    message: 'Legacy single-body message (used when action/result are empty)',
+    actionLabel: 'Caption of the action section header',
+    resultLabel: 'Caption of the result section header',
+    confirmLabel: 'Caption of the confirm button',
+    cancelLabel: 'Caption of the cancel button',
+    size: 'Dialog width preset',
+  },
   stories: [
     {
       name: 'Danger Confirm',
