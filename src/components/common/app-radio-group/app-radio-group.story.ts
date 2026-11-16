@@ -12,6 +12,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the option list (value, label, description, disabled, start / end graphics)',
   },
+  childrenDoc: {
+    'app-option': 'Declarative radio row (value, label, description, disabled, start / end slot graphics) appended to the options prop list',
+  },
   propsDoc: {
     label: 'Caption above the option list',
     name: 'Native radio group name (shared within a page)',
