@@ -11,6 +11,11 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
+  childrenDoc: {
+    'app-menu-header': 'Section caption rendered at the top of the menu',
+    'app-menu-item': 'Menu row with label, icon, shortcut, checkable state, danger style',
+    'app-menu-divider': 'Horizontal separator between menu rows',
+  },
   propsDoc: {
     items: 'Menu item definitions (label, icon, action, separators)',
   },
