@@ -14,6 +14,9 @@ export const meta: ComponentStoryMeta = {
     end: 'Content rendered after the label (text, SVG icon, material icon) — centered vertically',
     icon: 'Legacy alias of start',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the item label',
+  },
   propsDoc: {
     value: 'View id emitted when the item is clicked',
     label: 'Item caption',
