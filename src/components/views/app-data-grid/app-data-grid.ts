@@ -318,6 +318,7 @@ export class AppDataGrid extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'grid' ? store.activePage : 1;
     this.storeTasks = store.getFilteredTasks();
     this.currentLang = store.customization.language;
     this.currentDensity = store.customization.density;
@@ -594,7 +595,7 @@ export class AppDataGrid extends LitElement {
             ?pressed="${this.virtual}"
             @change="${(e: CustomEvent<{ pressed: boolean }>) => {
               this.virtual = e.detail.pressed;
-              this.currentPage = 1;
+              this.currentPage = 1; store.setActivePage(1, false);
             }}"
           >
             ${t.grid.virtualMode}
@@ -858,11 +859,11 @@ export class AppDataGrid extends LitElement {
                 .page="${safePage}"
                 .pageSize="${this.rowsPerPage}"
                 @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page;
+                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
                 }}"
                 @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
                   this.rowsPerPage = e.detail.pageSize;
-                  this.currentPage = 1;
+                  this.currentPage = 1; store.setActivePage(1, false);
                   store.setTablePageSize(e.detail.pageSize);
                 }}"
               ></app-pagination>
