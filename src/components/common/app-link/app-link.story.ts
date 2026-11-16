@@ -14,6 +14,9 @@ export const meta: ComponentStoryMeta = {
     '(default)': 'Link label text — centered vertically',
     end: 'Content rendered after the label (text, SVG icon, material icon) — centered vertically',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the start / end slot before or after the link label',
+  },
   propsDoc: {
     href: 'Link target; with href the element renders as an anchor',
     target: 'Anchor target (_blank adds rel="noopener noreferrer")',
