@@ -65,7 +65,10 @@ export function getComponentProps(tag: string): PropMeta[] {
         : opt.attribute === false
           ? null
           : prop.toLowerCase();
-    const type = opt.converter ? 'converter' : typeLabel(opt.type as Function | undefined);
+    // plain @property() carries Lit's default String converter; label by the
+    // declared type first, only fall back to "converter" when no type is given
+    const typeOf = typeLabel(opt.type as Function | undefined);
+    const type = typeOf === 'any' && opt.converter ? 'converter' : typeOf;
     const defaultValue = instance && prop in instance ? formatDefault(instance[prop]) : '';
     rows.push({ prop, attribute, type, defaultValue, reflect: opt.reflect === true });
   }
