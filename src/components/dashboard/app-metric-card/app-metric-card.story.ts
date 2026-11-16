@@ -6,7 +6,8 @@ import { iconAnalytics, iconClock } from '../../common/icons';
 export const meta: ComponentStoryMeta = {
   title: 'Dashboard/MetricCard',
   component: 'app-metric-card',
-  description: 'Executive KPI summary card featuring tabular numerals, trend delta, and optional inline SVG sparkline.',
+  description:
+    'Executive KPI summary card featuring tabular numerals, trend delta, and optional inline SVG sparkline. The icon slot renders a leading graphic before the metric label.',
   category: 'Dashboard',
   slotsDoc: {
     icon: 'Leading icon before the metric label',
