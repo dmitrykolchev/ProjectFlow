@@ -14,6 +14,9 @@ export type { RadioOption } from './app-radio-group/app-radio-group';
 export { AppButton } from './app-button/app-button';
 export type { ButtonVariant, ButtonSize } from './app-button/app-button';
 
+export { AppLink } from './app-link/app-link';
+export type { LinkVariant, LinkSize } from './app-link/app-link';
+
 export { AppButtonGroup } from './app-button-group/app-button-group';
 export { AppDropdownButton } from './app-dropdown-button/app-dropdown-button';
 export { AppSplitButton } from './app-split-button/app-split-button';
