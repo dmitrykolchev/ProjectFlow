@@ -12,6 +12,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Metric cards (app-metric-card elements)',
   },
+  childrenDoc: {
+    'app-metric-card': 'KPI card child rendered as a grid cell of the strip (label, value, trend, sparkline)',
+  },
   propsDoc: {
     columns: 'Number of grid columns for the metric cards',
     variant: 'Layout style: grid / strip',
