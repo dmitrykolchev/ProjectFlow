@@ -9,7 +9,9 @@ export const meta: ComponentStoryMeta = {
   description: 'Action button paired with a contextual dropdown menu popover and outside-click dismissal.',
   category: 'Common',
   slotsDoc: {
-    'icon-start': 'Icon rendered before the label',
+    start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
+    end: 'Content rendered after the label, before the menu chevron — centered vertically',
+    'icon-start': 'Legacy alias of start',
     '(default)': 'Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
   propsDoc: {

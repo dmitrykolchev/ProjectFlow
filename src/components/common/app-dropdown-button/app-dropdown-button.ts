@@ -165,9 +165,13 @@ export class AppDropdownButton extends LitElement {
           ?disabled="${this.disabled}"
           @click="${this.toggleMenu}"
         >
-          <slot name="icon-start" slot="icon-start"></slot>
+          <!-- canonical slots: start / end for graphic elements; icon-start is a legacy alias,
+               forwarded into the same inner-button slot so both render in document order -->
+          <slot name="start" slot="start"></slot>
+          <slot name="icon-start" slot="start"></slot>
           <span>${this.label}</span>
-          <span slot="icon-end" class="chevron ${this.isOpen ? 'is-open' : ''}">
+          <slot name="end" slot="end"></slot>
+          <span slot="end" class="chevron ${this.isOpen ? 'is-open' : ''}">
             ${iconChevronDown(14)}
           </span>
         </app-button>
