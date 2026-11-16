@@ -127,6 +127,7 @@ export class AppRequirements extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'requirements' ? store.activePage : 1;
     this.requirements = store.requirements;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -280,7 +281,7 @@ export class AppRequirements extends LitElement {
         }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           const val = eventValue(e);
@@ -291,7 +292,7 @@ export class AppRequirements extends LitElement {
           if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
           if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
           if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -303,7 +304,7 @@ export class AppRequirements extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.displayMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -505,11 +506,11 @@ export class AppRequirements extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -636,11 +637,11 @@ export class AppRequirements extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
