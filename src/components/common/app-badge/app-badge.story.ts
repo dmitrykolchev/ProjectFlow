@@ -8,8 +8,10 @@ export const meta: ComponentStoryMeta = {
   description: 'Semantic status, priority, and count badges supporting soft, solid, and outline styles.',
   category: 'Common',
   slotsDoc: {
-    icon: 'Leading icon before the badge text',
-    '(default)': 'Badge text',
+    start: 'Content rendered before the badge text (text, SVG icon, material icon) — centered vertically',
+    '(default)': 'Badge text — centered vertically',
+    end: 'Content rendered after the badge text (text, SVG icon, material icon) — centered vertically',
+    icon: 'Legacy alias of start',
   },
   propsDoc: {
     variant: 'Semantic color of the badge (neutral, info, success, warning, danger)',

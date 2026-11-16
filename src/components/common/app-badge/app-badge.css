@@ -18,6 +18,15 @@
               color var(--transition-fast, 150ms ease);
 }
 
+/* canonical slot API: start / default / end.
+   The badge is a flex container with align-items: center, so every slotted element
+   (text, SVG icon, material icon) sits centered on the vertical axis. */
+::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .size-sm {
   font-size: 0.6875rem;
   padding: 0.2rem 0.45rem;

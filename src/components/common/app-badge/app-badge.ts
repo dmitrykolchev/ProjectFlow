@@ -21,8 +21,12 @@ export class AppBadge extends LitElement {
     return html`
       <span class="badge appearance-${this.appearance} variant-${this.variant} size-${this.size}">
         ${this.dot ? html`<span class="badge-dot" aria-hidden="true"></span>` : ''}
-        <slot name="icon"></slot>
+        <!-- canonical slots: start / default / end; icon is a legacy alias -->
+        <slot name="start">
+          <slot name="icon"></slot>
+        </slot>
         <slot></slot>
+        <slot name="end"></slot>
         ${this.removable
           ? html`
               <button
