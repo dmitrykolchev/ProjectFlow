@@ -27,7 +27,7 @@ export class AppMaterialIcons extends LitElement {
   @state() private currentLang = store.customization.language;
   @state() private selected = 'check_circle';
   @state() private family: GalleryFamily = 'outlined';
-  @state() private size: GallerySize = 'md';
+  @state() private size: GallerySize | number = 'md';
   @state() private fill = 0;
   @state() private weight = 400;
   @state() private grade = 0;
@@ -107,7 +107,7 @@ export class AppMaterialIcons extends LitElement {
             this.family = g.family;
             this.size = g.size;
           }}"
-          @params-change="${(e: CustomEvent<{ family: GalleryFamily; size: GallerySize; fill: number; weight: number; grade: number }>) => {
+          @params-change="${(e: CustomEvent<{ family: GalleryFamily; size: GallerySize | number; fill: number; weight: number; grade: number }>) => {
             this.family = e.detail.family;
             this.size = e.detail.size;
             this.fill = e.detail.fill;

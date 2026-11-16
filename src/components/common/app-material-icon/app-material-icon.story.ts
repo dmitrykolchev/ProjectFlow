@@ -25,6 +25,18 @@ export const meta: ComponentStoryMeta = {
       `,
     },
     {
+      name: 'Numeric Size',
+      description: 'size also accepts a plain number = nominal box in px, the same unit as SVG icons (ink parity at equal px)',
+      render: () => html`
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <app-material-icon size="14">star</app-material-icon>
+          <app-material-icon size="18">star</app-material-icon>
+          <app-material-icon size="24">star</app-material-icon>
+          <app-material-icon size="32">star</app-material-icon>
+        </div>
+      `,
+    },
+    {
       name: 'Status Variants',
       description: 'Icon color from status tokens; neutral inherits currentColor',
       render: () => html`

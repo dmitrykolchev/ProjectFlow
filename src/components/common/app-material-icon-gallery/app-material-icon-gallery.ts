@@ -43,7 +43,16 @@ export class AppMaterialIconGallery extends LitElement {
   @property() query = '';
   @property() category = 'all';
   @property() family: GalleryFamily = 'outlined';
-  @property() size: GallerySize = 'md'; // canonical scale, md default (20px)
+  // canonical scale names, legacy aliases (xsm = xs, xlg = xl), or a numeric px size
+  @property({
+    converter: {
+      fromAttribute: (value: string) => {
+        const n = Number(value);
+        return value.trim() !== '' && Number.isFinite(n) ? n : value;
+      },
+    },
+  })
+  size: GallerySize | number = 'md'; // canonical scale, md default (20px)
   @property({ type: Number }) fill = 0; // 0 | 1 — FILL axis
   @property({ type: Number }) weight = 400; // 100..700 — wght axis
   @property({ type: Number }) grade = 0; // -50..200 — GRAD axis
@@ -69,7 +78,18 @@ export class AppMaterialIconGallery extends LitElement {
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('size')) {
       this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg');
-      this.classList.add(GALLERY_SIZE_CLASS[this.size] ?? 'md');
+      if (typeof this.size === 'number') {
+        // numeric size = glyph box in px; label font-size stays proportional and readable
+        const px = Math.max(1, Math.round(this.size));
+        this.style.setProperty('--gh', `${px}px`);
+        this.style.setProperty('--fs', `${Math.min(18, Math.max(10, Math.round(px * 0.7)))}px`);
+        this.style.setProperty('--mi-opsz', String(Math.min(48, Math.max(20, px))));
+      } else {
+        this.style.removeProperty('--gh');
+        this.style.removeProperty('--fs');
+        this.style.removeProperty('--mi-opsz');
+        this.classList.add(GALLERY_SIZE_CLASS[this.size] ?? 'md');
+      }
     }
   }
 
@@ -87,7 +107,7 @@ export class AppMaterialIconGallery extends LitElement {
   // toolbar params = every axis/property of <app-material-icon> (family/size/fill/weight/grade);
   // the parent updates its snippet; event fires on change
   private emitParams(): void {
-    this.dispatchEvent(new CustomEvent<{ family: GalleryFamily; size: GallerySize; fill: number; weight: number; grade: number }>(
+    this.dispatchEvent(new CustomEvent<{ family: GalleryFamily; size: GallerySize | number; fill: number; weight: number; grade: number }>(
       'params-change', { detail: { family: this.family, size: this.size, fill: this.fill, weight: this.weight, grade: this.grade }, bubbles: true, composed: true }));
   }
 
@@ -146,7 +166,8 @@ export class AppMaterialIconGallery extends LitElement {
             @change="${(e: Event) => { this.category = String(eventValue(e)); this.cursor = 0; }}"></app-select>
           <app-select label=${t.common.icons.family} .options=${famOpts} .value=${this.family}
             @change="${(e: Event) => { this.family = String(eventValue(e)) as GalleryFamily; this.cursor = 0; this.emitParams(); }}"></app-select>
-          <app-select label=${t.common.icons.size} .options=${sizeOpts} .value=${this.size}
+          <app-select label=${t.common.icons.size} .options=${sizeOpts}
+            .value=${typeof this.size === 'number' ? '' : this.size}
             @change="${(e: Event) => { this.size = String(eventValue(e)) as GallerySize; this.cursor = 0; this.emitParams(); }}"></app-select>
           <app-select label=${t.common.icons.fill} .options=${fillOpts} .value=${String(this.fill)}
             @change="${(e: Event) => { this.fill = Number(eventValue(e)); this.cursor = 0; this.emitParams(); }}"></app-select>
