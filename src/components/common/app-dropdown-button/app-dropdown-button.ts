@@ -168,7 +168,8 @@ export class AppDropdownButton extends LitElement {
           <slot name="icon-start" slot="icon-start"></slot>
           <span>${this.label}</span>
           <span slot="icon-end" class="chevron ${this.isOpen ? 'is-open' : ''}">
-            ${iconChevronDown(14)}
+            <!-- canonical control scale (Priority E): the chevron follows the control icon slot size -->
+            ${iconChevronDown(this.size)}
           </span>
         </app-button>
         <slot class="menu-slot-source" hidden></slot>
