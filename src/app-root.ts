@@ -25,6 +25,7 @@ import {
   iconMessageSquare,
   iconBookOpen,
   iconFolderOpen,
+  iconGrid,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -71,6 +72,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   settings: () => import('./components/views/app-settings/app-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
   'design-tokens': () => import('./components/views/app-design-tokens/app-design-tokens'),
+  'material-icons': () => import('./components/views/app-material-icons/app-material-icons'),
 };
 
 @customElement('app-root')
@@ -357,6 +359,12 @@ export class AppRoot extends LitElement {
           ></sidebar-item>
 
           <sidebar-item
+            value="material-icons"
+            label="${t.navigation.materialIcons}"
+            .icon="${iconGrid(18)}"
+          ></sidebar-item>
+
+          <sidebar-item
             value="design-tokens"
             label="${t.navigation.designTokens}"
             .icon="${iconLayers()}"
@@ -463,6 +471,8 @@ export class AppRoot extends LitElement {
         return html`<app-storybook></app-storybook>`;
       case 'design-tokens':
         return html`<app-design-tokens></app-design-tokens>`;
+      case 'material-icons':
+        return html`<app-material-icons></app-material-icons>`;
       default:
         return html`<app-dashboard></app-dashboard>`;
     }

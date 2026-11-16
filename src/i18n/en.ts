@@ -32,6 +32,18 @@ export const en = {
     days: 'd',
     clear: 'Clear',
     today: 'Today',
+    icons: {
+      search: 'Search icon...',
+      category: 'Category',
+      family: 'Family style',
+      size: 'Size',
+      fill: 'Fill',
+      weight: 'Weight',
+      grade: 'Grade',
+      all: 'All categories',
+      empty: 'Nothing found',
+      palette: 'Material Symbols palette',
+    },
   },
   navigation: {
     dashboard: 'Dashboard',
@@ -57,6 +69,7 @@ export const en = {
     activity: 'Activity Log',
     storybook: 'Component Storybook',
     designTokens: 'Design Tokens',
+    materialIcons: 'Material Symbols',
     groupWorkspace: 'Workspace',
     groupPlanning: 'Data & Analytics',
     groupDirectory: 'Directory & CRM',
@@ -910,6 +923,7 @@ export const en = {
       counterparties: 'Clients, suppliers, contractors, reliability rating and linked contracts',
       documents: 'Corporate file repository: upload from disk, versioning, preview, and links to projects, contracts, and companies',
       designTokens: 'CSS custom properties powering the Light, Dark and Cyberpunk themes. Live values update when the theme changes.',
+      materialIcons: 'Palette of every Material Symbols ligature with search by name, category and tags; <app-material-icon> snippet with copy to clipboard',
     },
     sidebar: {
       themeToggleTitle: 'Switch theme (Dark / Light / Cyberpunk)',
@@ -1860,6 +1874,12 @@ export const en = {
         action: (code: string, title: string) => `Requirement ${code} "${title}" will be removed from the project.`,
         result: 'Task links to this requirement will be cleared.',
       },
+    },
+    materialIcons: {
+      selected: 'Selected icon',
+      code: 'Component snippet',
+      copy: 'Copy',
+      copied: 'Copied',
     },
     designTokens: {
       categories: {

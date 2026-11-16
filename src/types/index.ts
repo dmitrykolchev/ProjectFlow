@@ -402,7 +402,8 @@ export type ActiveView =
   | 'expenses'
   | 'settings'
   | 'storybook'
-  | 'design-tokens';
+  | 'design-tokens'
+  | 'material-icons';
 
 export interface ActivityLogItem {
   id: string;

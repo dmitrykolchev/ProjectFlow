@@ -85,6 +85,8 @@ export class AppHeader extends LitElement {
       expenses: t.navigation.expenses,
       settings: t.navigation.settings,
       storybook: t.navigation.storybook,
+      'design-tokens': t.navigation.designTokens,
+      'material-icons': t.navigation.materialIcons,
     };
 
     return html`
