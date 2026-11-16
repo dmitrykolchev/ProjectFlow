@@ -1,6 +1,8 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-entity-selector';
+import '../app-option/app-option';
+import '../app-material-icon/app-material-icon';
 import { EntitySelectorOption } from './app-entity-selector';
 
 const SAMPLE_EMPLOYEES: EntitySelectorOption[] = [
@@ -123,10 +125,14 @@ export const meta: ComponentStoryMeta = {
   description:
     'Searchable portal selector for large collections (tasks, employees, counterparties, contracts) with multi-token filtering, match highlighting, secondary metadata, and windowed rendering.',
   category: 'Inputs',
+  slotsDoc: {
+    '(default)': 'Declarative <app-option> children filling the option list (value, label, code, subtitle, meta, badge, avatar, keywords, start / end graphics)',
+  },
   propsDoc: {
     label: 'Caption above the field',
     value: 'Id of the currently selected entity',
     options: 'Entity option definitions (id, label, meta)',
+    dataSource: 'Data source for options: array, promise, or function returning an array (sync or async)',
     placeholder: 'Text shown when nothing is selected',
     searchPlaceholder: 'Placeholder inside the search box of the panel',
     size: 'Control height: sm / md / lg',
@@ -139,6 +145,24 @@ export const meta: ComponentStoryMeta = {
     hint: 'Helper text below the field',
   },
   stories: [
+    {
+      name: 'Declarative Options',
+      description: 'Selector filled with declarative app-option children, including graphic elements in the start / end slots',
+      render: () => html`
+        <div style="max-width: 320px;">
+          <app-entity-selector label="Employee" placeholder="Select an employee">
+            <app-option value="u-1" label="Алексей Смирнов" code="U-1" avatar="АС" subtitle="Tech Lead" meta="4 200 ₽/ч" badge="В штате" badge-color="#10b981"></app-option>
+            <app-option value="u-2" label="Мария Иванова" code="U-2" avatar="МИ" subtitle="Product Designer" meta="3 800 ₽/ч">
+              <app-material-icon slot="end">star</app-material-icon>
+            </app-option>
+            <app-option value="u-3">
+              <app-material-icon slot="start">person</app-material-icon>
+              Дмитрий Кузнецов
+            </app-option>
+          </app-entity-selector>
+        </div>
+      `,
+    },
     {
       name: 'Large Task Dataset (1,500 items)',
       description:

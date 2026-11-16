@@ -5,6 +5,7 @@ import { getTranslation } from '../../../i18n';
 import { store } from '../../../state/store';
 import { SupportedLang } from '../../../types';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { DeclarativeOption, OptionDataSource, optionsFromElements, resolveDataSource } from '../app-option/app-option';
 import { iconCheck, iconChevronDown, iconSearch, iconX } from '../icons';
 import styles from './app-entity-selector.css';
 
@@ -20,6 +21,9 @@ export interface EntitySelectorOption {
   color?: string;
   keywords?: string[];
   disabled?: boolean;
+  // cloned graphic content from the canonical start / end slots of <app-option>
+  start?: Node[];
+  end?: Node[];
 }
 
 export type EntitySelectorSize = 'sm' | 'md' | 'lg';
@@ -33,6 +37,9 @@ export class AppEntitySelector extends LitElement {
   @property({ type: String }) label: string = '';
   @property({ type: String }) value: string = '';
   @property({ type: Array }) options: EntitySelectorOption[] = [];
+  // declarative <app-option> children and data sources fill the list as well:
+  // array, promise, or a function returning an array (sync or async)
+  @property({ attribute: false }) dataSource?: OptionDataSource;
   @property({ type: String }) placeholder: string = '';
   @property({ type: String, attribute: 'search-placeholder' }) searchPlaceholder: string = '';
   @property({ type: String }) size: EntitySelectorSize = 'md';
@@ -46,6 +53,9 @@ export class AppEntitySelector extends LitElement {
 
   @state() private currentLang: SupportedLang = store.customization.language;
   @state() private isOpen: boolean = false;
+  @state() private declarativeOptions: DeclarativeOption[] = [];
+  @state() private resolvedOptions: DeclarativeOption[] = [];
+  private loadedSource: OptionDataSource | undefined;
   @state() private searchQuery: string = '';
   @state() private activeIndex: number = -1;
   @state() private visibleLimit: number = 80;
@@ -130,20 +140,41 @@ export class AppEntitySelector extends LitElement {
     }
   }
 
+  // options from the prop, declarative <app-option> children, and the data source
+  private allOptions(): EntitySelectorOption[] {
+    return [...this.options, ...this.declarativeOptions, ...this.resolvedOptions];
+  }
+
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    this.declarativeOptions = optionsFromElements(
+      slot.assignedElements({ flatten: true }) as HTMLElement[]
+    );
+  }
+
+  private async loadDataSource() {
+    const source = this.dataSource;
+    const result = await resolveDataSource(source);
+    // ignore a stale response if the source changed while loading
+    if (this.dataSource === source) {
+      this.resolvedOptions = result;
+    }
+  }
+
   private getTokens(): string[] {
     return this.searchQuery.trim().toLowerCase().split(/\s+/).filter(Boolean);
   }
 
   private getFilteredOptions(): EntitySelectorOption[] {
     const tokens = this.getTokens();
-    if (tokens.length === 0) return this.options;
+    if (tokens.length === 0) return this.allOptions();
 
     const exactMatches: EntitySelectorOption[] = [];
     const prefixMatches: EntitySelectorOption[] = [];
     const otherMatches: EntitySelectorOption[] = [];
     const fullQuery = tokens.join(' ');
 
-    for (const opt of this.options) {
+    for (const opt of this.allOptions()) {
       const code = (opt.code || '').toLowerCase();
       const label = opt.label.toLowerCase();
       const haystack = [
@@ -220,7 +251,11 @@ export class AppEntitySelector extends LitElement {
     }
   }
 
-  protected updated() {
+  protected updated(changed: Map<string, unknown>) {
+    if (changed.has('dataSource') && this.dataSource !== this.loadedSource) {
+      this.loadedSource = this.dataSource;
+      void this.loadDataSource();
+    }
     if (this.isOpen && !this.disabled) {
       const filtered = this.getFilteredOptions();
       const visibleOptions = filtered.slice(0, this.visibleLimit);
@@ -314,7 +349,7 @@ export class AppEntitySelector extends LitElement {
             .value="${this.searchQuery}"
             @input="${this.handleSearchInput}"
           />
-          <span class="search-count">${filtered.length} / ${this.options.length}</span>
+          <span class="search-count">${filtered.length} / ${this.allOptions().length}</span>
           ${this.searchQuery
             ? html`
                 <button
@@ -336,7 +371,7 @@ export class AppEntitySelector extends LitElement {
             ? html`
                 <div class="empty-box">
                   <span>
-                    ${this.options.length === 0
+                    ${this.allOptions().length === 0
                       ? t.entitySelector.emptyOptions
                       : t.entitySelector.noMatches}
                   </span>
@@ -377,6 +412,7 @@ export class AppEntitySelector extends LitElement {
                         : opt.color
                         ? html`<span class="dot-indicator" style="background-color: ${opt.color};"></span>`
                         : ''}
+                      ${opt.start ? html`<span class="option-slot-start">${opt.start}</span>` : ''}
                       <div class="option-body">
                         <div class="option-title-line">
                           ${opt.code
@@ -403,6 +439,7 @@ export class AppEntitySelector extends LitElement {
                             </span>
                           `
                         : ''}
+                      ${opt.end ? html`<span class="option-slot-end">${opt.end}</span>` : ''}
                       ${isSelected ? html`<span class="option-check">${iconCheck(14)}</span>` : ''}
                     </div>
                   </div>
@@ -428,7 +465,7 @@ export class AppEntitySelector extends LitElement {
                 </button>
               </div>
             `
-          : filtered.length > 0 && this.options.length > 20
+          : filtered.length > 0 && this.allOptions().length > 20
           ? html`
               <div class="panel-footer">
                 <span class="footer-summary">
@@ -443,7 +480,7 @@ export class AppEntitySelector extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const selectedOpt = this.options.find((o) => o.value === this.value) || null;
+    const selectedOpt = this.allOptions().find((o) => o.value === this.value) || null;
     const ph = this.placeholder || t.entitySelector.placeholder;
     const showClear = this.clearable && Boolean(this.value) && !this.disabled;
 
@@ -515,6 +552,9 @@ export class AppEntitySelector extends LitElement {
           : this.hint
           ? html`<span class="helper-text">${this.hint}</span>`
           : ''}
+
+        <!-- declarative <app-option> children -->
+        <slot @slotchange="${this.handleSlotChange}"></slot>
       </div>
     `;
   }
