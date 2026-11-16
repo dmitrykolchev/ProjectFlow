@@ -13,6 +13,17 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Form fields laid out in the grid (full width via col-span)',
   },
+  childrenDoc: {
+    'app-input': 'Text field child',
+    'app-textarea': 'Multiline text field child',
+    'app-select': 'Dropdown select child',
+    'app-entity-selector': 'Searchable entity selector child',
+    'app-combobox': 'Multi-tag combobox child',
+    'app-number-input': 'Numeric field child',
+    'app-date-input': 'Date field child',
+    'app-checkbox': 'Checkbox child',
+    'app-switch': 'Toggle switch child',
+  },
   propsDoc: {
     columns: 'Number of form grid columns (children span full width via col-span)',
   },
