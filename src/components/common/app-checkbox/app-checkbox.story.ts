@@ -5,7 +5,8 @@ import './app-checkbox';
 export const meta: ComponentStoryMeta = {
   title: 'Inputs/Checkbox',
   component: 'app-checkbox',
-  description: 'Checkbox element with checked, unchecked, indeterminate, and disabled states.',
+  description:
+    'Checkbox element with checked, unchecked, indeterminate, and disabled states. The default slot overrides the label property with custom label markup.',
   category: 'Inputs',
   slotsDoc: {
     '(default)': 'Label text next to the box (overrides the label property)',
