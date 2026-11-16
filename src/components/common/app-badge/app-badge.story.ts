@@ -5,7 +5,8 @@ import './app-badge';
 export const meta: ComponentStoryMeta = {
   title: 'Common/Badge',
   component: 'app-badge',
-  description: 'Semantic status, priority, and count badges supporting soft, solid, and outline styles.',
+  description:
+    'Semantic status, priority, and count badges supporting soft, solid, and outline styles. Canonical start / default / end slots carry leading graphics, badge text, and trailing content; icon is a legacy alias of start.',
   category: 'Common',
   slotsDoc: {
     start: 'Content rendered before the badge text (text, SVG icon, material icon) — centered vertically',
