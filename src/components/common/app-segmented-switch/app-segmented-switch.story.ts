@@ -7,7 +7,8 @@ import '../app-material-icon/app-material-icon';
 export const meta: ComponentStoryMeta = {
   title: 'Common/SegmentedSwitch',
   component: 'app-segmented-switch',
-  description: 'Compact segmented control for switching between mutually exclusive views, timeframes, or filter modes.',
+  description:
+    'Compact segmented control for switching between mutually exclusive views, timeframes, or filter modes. The default slot accepts declarative app-option children that append to the options prop.',
   category: 'Common',
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the segments (value, label, disabled, start / end graphics)',
