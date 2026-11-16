@@ -49,6 +49,7 @@ import {
   initialUsers,
 } from './mock-data';
 import { locationToPath, pathToLocation, NavLocation } from '../domain/navigation';
+import { getTranslation } from '../i18n';
 
 const STORAGE_KEY_CUSTOMIZATION = 'projectflow_customization_v1';
 const STORAGE_KEY_TASKS = 'projectflow_tasks_v2';
@@ -1607,7 +1608,7 @@ export class AppStore {
       'create',
       'calculation',
       calc.number,
-      `Сформирована калькуляция (${calc.periodStart} → ${calc.periodEnd}, ${calc.billableAmount.toLocaleString('ru-RU')} ${sym})`
+      `Сформирована калькуляция (${calc.periodStart} → ${calc.periodEnd}, ${calc.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
     );
     this.addNotification('success', 'Калькуляция сформирована', calc.number);
     this.notify();
@@ -1622,7 +1623,7 @@ export class AppStore {
       'update',
       'calculation',
       updated.number,
-      `Обновлена калькуляция (${updated.status}, ${updated.billableAmount.toLocaleString('ru-RU')} ${sym})`
+      `Обновлена калькуляция (${updated.status}, ${updated.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
     );
     this.addNotification('info', 'Калькуляция обновлена', updated.number);
     this.notify();
@@ -1696,12 +1697,12 @@ export class AppStore {
       'create',
       'invoice',
       `${invoice.number}`,
-      `Выставлен счёт на сумму ${invoice.totalAmount.toLocaleString('ru-RU')} ${sym}`
+      `Выставлен счёт на сумму ${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.addNotification(
       'success',
       'Счёт создан',
-      `${invoice.number} на ${invoice.totalAmount.toLocaleString('ru-RU')} ${sym}`
+      `${invoice.number} на ${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.notify();
     return invoice;
@@ -1726,7 +1727,7 @@ export class AppStore {
       'update',
       'invoice',
       updated.number,
-      `Обновлён счёт (${updated.status}, ${updated.totalAmount.toLocaleString('ru-RU')} ${sym})`
+      `Обновлён счёт (${updated.status}, ${updated.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
     );
     this.addNotification('info', 'Счёт обновлён', updated.number);
     this.notify();
@@ -1936,12 +1937,12 @@ export class AppStore {
       'create',
       'payment',
       inv ? `${inv.number}${payment.documentNumber ? ` · ${payment.documentNumber}` : ''}` : payment.invoiceId,
-      `${isFull ? 'Полная оплата' : 'Частичный платёж'}: ${payment.amount.toLocaleString('ru-RU')} ${sym}`
+      `${isFull ? 'Полная оплата' : 'Частичный платёж'}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.addNotification(
       'success',
       isFull ? 'Счёт полностью оплачен' : 'Платёж зафиксирован',
-      `${inv?.number || ''} — ${payment.amount.toLocaleString('ru-RU')} ${sym}`
+      `${inv?.number || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.notify();
     return payment;
@@ -1960,9 +1961,9 @@ export class AppStore {
       'delete',
       'payment',
       inv ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}` : target.invoiceId,
-      `Удалён платёж на ${target.amount.toLocaleString('ru-RU')} ${sym}`
+      `Удалён платёж на ${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
-    this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString('ru-RU')} ${sym}`);
+    this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`);
     this.notify();
   }
 
@@ -2187,12 +2188,12 @@ export class AppStore {
       'create',
       'expense',
       expense.title,
-      `${expense.amount.toLocaleString('ru-RU')} ${symbol} · ${proj?.key || expense.projectId}${
+      `${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol} · ${proj?.key || expense.projectId}${
         expense.taskId ? ` (${expense.taskId})` : ''
       }`,
       expense.taskId
     );
-    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString('ru-RU')} ${symbol}`);
+    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`);
     this.notify();
     return expense;
   }
@@ -2208,7 +2209,7 @@ export class AppStore {
       'update',
       'expense',
       normalized.title,
-      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString('ru-RU')} ${symbol}`,
+      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`,
       normalized.taskId
     );
     this.addNotification('info', 'Расход обновлён', normalized.title);
