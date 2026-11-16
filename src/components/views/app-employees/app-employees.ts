@@ -70,6 +70,7 @@ export class AppEmployees extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'employees' ? store.activePage : 1;
     this.employees = store.users;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -164,12 +165,12 @@ export class AppEmployees extends LitElement {
         .values="${{ company: this.companyFilter, status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'company') this.companyFilter = eventValue(e);
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | EmployeeStatus;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -181,7 +182,7 @@ export class AppEmployees extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.displayMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -418,11 +419,11 @@ export class AppEmployees extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -525,11 +526,11 @@ export class AppEmployees extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
