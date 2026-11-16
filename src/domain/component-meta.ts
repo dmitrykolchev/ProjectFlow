@@ -108,14 +108,16 @@ function collectSlots(tpl: unknown, out: string[]) {
   if (!tpl || typeof tpl !== 'object') return;
   const t = tpl as LitTemplate;
   if (!Array.isArray(t.strings)) return;
-  for (const chunk of t.strings) {
-    const re = /<slot(?=[\s>])([^>]*)>/g;
-    let m: RegExpExecArray | null;
-    while ((m = re.exec(chunk))) {
-      const nameMatch = /(?:^|\s)name="([^"]+)"/.exec(m[1]);
-      const name = nameMatch ? nameMatch[1] : '(default)';
-      if (!out.includes(name)) out.push(name);
-    }
+  // template strings are split at every lit interpolation, so a slot tag whose
+  // attributes contain expressions (for example @slotchange="${...}") arrives in
+  // fragments; join the chunks with a placeholder before matching
+  const joined = t.strings.join('\u0000');
+  const re = /<slot(?=[\s>])([^>]*)>/g;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(joined))) {
+    const nameMatch = /(?:^|\s)name="([^"]+)"/.exec(m[1]);
+    const name = nameMatch ? nameMatch[1] : '(default)';
+    if (!out.includes(name)) out.push(name);
   }
   if (Array.isArray(t.values)) {
     for (const v of t.values) {
