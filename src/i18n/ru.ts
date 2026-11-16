@@ -909,6 +909,10 @@ export const ru = {
       documents: 'Корпоративная библиотека файлов: загрузка с диска, версионирование, превью и привязка к проектам, договорам и компаниям',
       designTokens: 'CSS-переменные, определяющие темы Light, Dark и Cyberpunk. Живые значения обновляются при смене темы.',
     },
+    sidebar: {
+      themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk)',
+      langToggleTitle: 'Сменить язык (RU / EN)',
+    },
     projects: {
       filterAllStatuses: 'Все статусы',
       filterAllCompanies: 'Все компании',

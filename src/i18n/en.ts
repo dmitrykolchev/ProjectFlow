@@ -909,6 +909,10 @@ export const en = {
       documents: 'Corporate file repository: upload from disk, versioning, preview, and links to projects, contracts, and companies',
       designTokens: 'CSS custom properties powering the Light, Dark and Cyberpunk themes. Live values update when the theme changes.',
     },
+    sidebar: {
+      themeToggleTitle: 'Switch theme (Dark / Light / Cyberpunk)',
+      langToggleTitle: 'Change language (RU / EN)',
+    },
     projects: {
       filterAllStatuses: 'All statuses',
       filterAllCompanies: 'All companies',

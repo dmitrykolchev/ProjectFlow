@@ -262,7 +262,7 @@ export class AppSidebar extends LitElement {
             <button
               class="quick-btn"
               @click="${() => store.toggleTheme()}"
-              title="Переключить тему (Dark / Light / Cyberpunk)"
+              title="${t.viewTexts.sidebar.themeToggleTitle}"
             >
               ${this.theme === 'cyberpunk' ? iconZap(14) : this.theme === 'dark' ? iconSun(14) : iconMoon(14)}
               ${!this.collapsed
@@ -273,27 +273,31 @@ export class AppSidebar extends LitElement {
               class="quick-btn"
               @click="${() =>
                 store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
-              title="Сменить язык (RU / EN)"
+              title="${t.viewTexts.sidebar.langToggleTitle}"
             >
               ${!this.collapsed ? html`<span>${this.currentLang.toUpperCase()}</span>` : html`<span>${this.currentLang.toUpperCase()}</span>`}
             </button>
           </div>
 
-          ${!this.collapsed
-            ? html`
-                <div class="user-profile">
-                  <app-avatar size="md" initials="AM" title="Александр М." color="var(--bg-hover, #223049)"></app-avatar>
-                  <div class="user-info">
-                    <span class="user-name">Александр М.</span>
-                    <span class="user-role">Lead Architect</span>
+          ${(() => {
+            const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
+            if (!currentUser) return '';
+            return !this.collapsed
+              ? html`
+                  <div class="user-profile">
+                    <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                    <div class="user-info">
+                      <span class="user-name">${currentUser.name}</span>
+                      <span class="user-role">${currentUser.role}</span>
+                    </div>
                   </div>
-                </div>
-              `
-            : html`
-                <div class="user-profile" style="justify-content: center;">
-                  <app-avatar size="md" initials="AM" title="Александр М." color="var(--bg-hover, #223049)"></app-avatar>
-                </div>
-              `}
+                `
+              : html`
+                  <div class="user-profile" style="justify-content: center;">
+                    <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                  </div>
+                `;
+          })()}
         </div>
       </div>
     `;
