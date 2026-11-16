@@ -15,6 +15,10 @@ export const meta: ComponentStoryMeta = {
     '(default)': 'Extra content under the title and subtitle',
     actions: 'Action buttons on the right of the header',
   },
+  childrenDoc: {
+    'app-button': 'Action button placed in the actions slot',
+    'app-material-icon': 'Leading icon placed in the icon slot',
+  },
   propsDoc: {
     title: 'Page caption',
     subtitle: 'Secondary description line under the caption',
