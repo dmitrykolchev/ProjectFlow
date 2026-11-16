@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { DeclarativeOption, OptionDataSource, optionsFromElements, resolveDataSource } from '../app-option/app-option';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-combobox.css';
@@ -9,6 +10,9 @@ import styles from './app-combobox.css';
 export class AppCombobox extends LitElement {
   @property({ type: String }) label: string = '';
   @property({ type: Array }) items: string[] = []; // available suggestions
+  // declarative <app-option> children and data sources add suggestions as well:
+  // array, promise, or a function returning an array (sync or async)
+  @property({ attribute: false }) dataSource?: OptionDataSource;
   @property({ type: Array }) selected: string[] = []; // selected tags/values
   @property({ type: String }) placeholder: string = 'Add tag or filter...';
   @property({ type: Boolean }) allowCustom: boolean = true;
@@ -17,6 +21,9 @@ export class AppCombobox extends LitElement {
 
   @state() private inputValue: string = '';
   @state() private isOpen: boolean = false;
+  @state() private declarativeItems: string[] = [];
+  @state() private resolvedItems: string[] = [];
+  private loadedSource: OptionDataSource | undefined;
   @state() private panelLeft: number = 0;
   @state() private panelWidth: number = 240;
   @state() private panelTop: number | null = null;
@@ -80,20 +87,46 @@ export class AppCombobox extends LitElement {
     }
   }
 
+  // suggestions from the items prop, declarative <app-option> children, and the data source
+  private allItems(): string[] {
+    return [...this.items, ...this.declarativeItems, ...this.resolvedItems];
+  }
+
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    this.declarativeItems = optionsFromElements(
+      slot.assignedElements({ flatten: true }) as HTMLElement[]
+    ).map((opt) => opt.label);
+  }
+
+  private async loadDataSource() {
+    const source = this.dataSource;
+    const result = await resolveDataSource(source);
+    // ignore a stale response if the source changed while loading
+    if (this.dataSource === source) {
+      this.resolvedItems = result.map((opt) => opt.label);
+    }
+  }
+
   private getDropdownData() {
     const query = this.inputValue.toLowerCase().trim();
-    const filteredSuggestions = this.items.filter(
+    const all = this.allItems();
+    const filteredSuggestions = all.filter(
       (item) => !this.selected.includes(item) && item.toLowerCase().includes(query)
     );
     const canAddCustom =
       this.allowCustom &&
       Boolean(query) &&
-      !this.items.map((i) => i.toLowerCase()).includes(query);
+      !all.map((i) => i.toLowerCase()).includes(query);
     const hasDropdownContent = filteredSuggestions.length > 0 || canAddCustom;
     return { query, filteredSuggestions, canAddCustom, hasDropdownContent };
   }
 
-  protected updated() {
+  protected updated(changed: Map<string, unknown>) {
+    if (changed.has('dataSource') && this.dataSource !== this.loadedSource) {
+      this.loadedSource = this.dataSource;
+      void this.loadDataSource();
+    }
     const { filteredSuggestions, canAddCustom, hasDropdownContent } = this.getDropdownData();
 
     if (this.isOpen && hasDropdownContent) {
@@ -184,6 +217,9 @@ export class AppCombobox extends LitElement {
             @keydown="${this.handleKeydown}"
           />
         </div>
+
+        <!-- declarative <app-option> children -->
+        <slot @slotchange="${this.handleSlotChange}"></slot>
       </div>
     `;
   }
