@@ -120,7 +120,7 @@ export class AppMaterialIcons extends LitElement {
           <app-section-card title="${t.viewTexts.materialIcons.selected}">
             <div class="preview">
               <app-material-icon
-                size="xlg"
+                size="xxl"
                 name=${this.selected}
                 family=${this.family}
                 fill=${this.fill}

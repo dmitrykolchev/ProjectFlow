@@ -134,10 +134,14 @@
   font-size: var(--fs);
 }
 
-/* size scale: xsm|sm|md|lg|xlg = 24/28/36/42/48px; md default; label font-size scales
-   proportionally with the size (monotonic); opsz follows the glyph size */
-:host { --gh: 36px; --fs: 14px; --mi-opsz: 48; font-size: var(--fs); }
-:host(.xsm) { --gh: 24px; --fs: 11px; --mi-opsz: 20; }
-:host(.sm) { --gh: 28px; --fs: 12px; --mi-opsz: 24; }
-:host(.lg) { --gh: 42px; --fs: 16px; --mi-opsz: 40; }
-:host(.xlg) { --gh: 48px; --fs: 18px; --mi-opsz: 48; }
+/* size scale: canonical icon scale xxs|xs|sm|md|lg|xl|xxl = 12/14/16/20/24/28/36px; md default;
+   aliases xsm = xs, xlg = xl; label font-size scales proportionally with the size (monotonic);
+   opsz follows the glyph size */
+:host { --gh: 20px; --fs: 13px; --mi-opsz: 24; font-size: var(--fs); }
+:host(.xxs) { --gh: 12px; --fs: 10px; --mi-opsz: 20; }
+:host(.xs), :host(.xsm) { --gh: 14px; --fs: 11px; --mi-opsz: 20; }
+:host(.sm) { --gh: 16px; --fs: 12px; --mi-opsz: 24; }
+:host(.md) { --gh: 20px; --fs: 13px; --mi-opsz: 24; }
+:host(.lg) { --gh: 24px; --fs: 14px; --mi-opsz: 28; }
+:host(.xl), :host(.xlg) { --gh: 28px; --fs: 15px; --mi-opsz: 32; }
+:host(.xxl) { --gh: 36px; --fs: 16px; --mi-opsz: 40; }

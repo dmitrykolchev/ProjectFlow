@@ -13,7 +13,21 @@ import { categoriesOf, filterIcons } from '../../../domain/material-icons/search
 import type { MaterialIconDef } from '../../../domain/material-icons/icons.data';
 
 export type GalleryFamily = 'outlined' | 'rounded' | 'sharp';
-export type GallerySize = 'xsm' | 'sm' | 'md' | 'lg' | 'xlg'; // app scale 24/28/36/42/48px
+// canonical icon scale shared with SVG icons and <app-material-icon>:
+// xxs|xs|sm|md|lg|xl|xxl = 12/14/16/20/24/28/36px; legacy aliases xsm = xs, xlg = xl
+export type GallerySize = 'xxs' | 'xs' | 'xsm' | 'sm' | 'md' | 'lg' | 'xl' | 'xxl' | 'xlg';
+
+const GALLERY_SIZE_CLASS: Record<GallerySize, string> = {
+  xxs: 'xxs',
+  xs: 'xs',
+  xsm: 'xs',
+  sm: 'sm',
+  md: 'md',
+  lg: 'lg',
+  xl: 'xl',
+  xxl: 'xxl',
+  xlg: 'xl',
+};
 
 // Material Symbols palette — every ligature glyph of the self-hosted variable fonts
 // (fonts.google.com/icons) with search by name, category and tags. Toolbar: query +
@@ -29,7 +43,7 @@ export class AppMaterialIconGallery extends LitElement {
   @property() query = '';
   @property() category = 'all';
   @property() family: GalleryFamily = 'outlined';
-  @property() size: GallerySize = 'md'; // 24/28/36/42/48px, md default
+  @property() size: GallerySize = 'md'; // canonical scale, md default (20px)
   @property({ type: Number }) fill = 0; // 0 | 1 — FILL axis
   @property({ type: Number }) weight = 400; // 100..700 — wght axis
   @property({ type: Number }) grade = 0; // -50..200 — GRAD axis
@@ -54,8 +68,8 @@ export class AppMaterialIconGallery extends LitElement {
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('size')) {
-      this.classList.remove('xsm', 'sm', 'md', 'lg', 'xlg');
-      this.classList.add(this.size);
+      this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg');
+      this.classList.add(GALLERY_SIZE_CLASS[this.size] ?? 'md');
     }
   }
 
@@ -117,7 +131,7 @@ export class AppMaterialIconGallery extends LitElement {
     const cats = ['all', ...categoriesOf(this.icons)];
     const catOpts: SelectOption[] = cats.map((c) => ({ value: c, label: c === 'all' ? t.common.icons.all : c }));
     const famOpts: SelectOption[] = (['outlined', 'rounded', 'sharp'] as GalleryFamily[]).map((f) => ({ value: f, label: f }));
-    const sizeOpts: SelectOption[] = (['xsm', 'sm', 'md', 'lg', 'xlg'] as const).map((s) => ({ value: s, label: s }));
+    const sizeOpts: SelectOption[] = (['xxs', 'xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const).map((s) => ({ value: s, label: s }));
     // Google axes — fixed registry levels, same as the playground
     const fillOpts: SelectOption[] = ['0', '1'].map((v) => ({ value: v, label: v }));
     const weightOpts: SelectOption[] = ['100', '200', '300', '400', '500', '600', '700'].map((v) => ({ value: v, label: v }));

@@ -11,14 +11,16 @@ export const meta: ComponentStoryMeta = {
   stories: [
     {
       name: 'Size Scale',
-      description: 'App size scale xsm|sm|md|lg|xlg (24/28/36/42/48px)',
+      description: 'Canonical icon scale xxs|xs|sm|md|lg|xl|xxl (12/14/16/20/24/28/36px), shared with SVG icons',
       render: () => html`
         <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-          <app-material-icon size="xsm">star</app-material-icon>
+          <app-material-icon size="xxs">star</app-material-icon>
+          <app-material-icon size="xs">star</app-material-icon>
           <app-material-icon size="sm">star</app-material-icon>
           <app-material-icon size="md">star</app-material-icon>
           <app-material-icon size="lg">star</app-material-icon>
-          <app-material-icon size="xlg">star</app-material-icon>
+          <app-material-icon size="xl">star</app-material-icon>
+          <app-material-icon size="xxl">star</app-material-icon>
         </div>
       `,
     },

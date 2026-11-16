@@ -43,10 +43,13 @@
 :host([data-variant='danger']) { color: var(--color-danger, #dc2626); }
 :host([data-variant='info']) { color: var(--color-info, #0284c7); }
 
-/* size scale: xsm|sm|md|lg|xlg = 24/28/36/42/48px; md default;
-   opsz (optical size) follows the glyph size */
-:host { --mi-h: 36px; --mi-fill: 0; --mi-wght: 400; --mi-grad: 0; --mi-opsz: 48; }
-:host(.xsm) { --mi-h: 24px; --mi-opsz: 20; }
-:host(.sm) { --mi-h: 28px; --mi-opsz: 24; }
-:host(.lg) { --mi-h: 42px; --mi-opsz: 40; }
-:host(.xlg) { --mi-h: 48px; --mi-opsz: 48; }
+/* size scale: canonical icon scale xxs|xs|sm|md|lg|xl|xxl = 12/14/16/20/24/28/36px;
+   md default; aliases xsm = xs, xlg = xl; opsz follows the glyph size */
+:host { --mi-h: 20px; --mi-fill: 0; --mi-wght: 400; --mi-grad: 0; --mi-opsz: 24; }
+:host(.xxs) { --mi-h: 12px; --mi-opsz: 20; }
+:host(.xs), :host(.xsm) { --mi-h: 14px; --mi-opsz: 20; }
+:host(.sm) { --mi-h: 16px; --mi-opsz: 24; }
+:host(.md) { --mi-h: 20px; --mi-opsz: 24; }
+:host(.lg) { --mi-h: 24px; --mi-opsz: 28; }
+:host(.xl), :host(.xlg) { --mi-h: 28px; --mi-opsz: 32; }
+:host(.xxl) { --mi-h: 36px; --mi-opsz: 40; }
