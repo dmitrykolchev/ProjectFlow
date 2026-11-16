@@ -937,7 +937,7 @@ export class AppCounterpartyDetail extends LitElement {
       type: this.formType,
       inn: this.formInn.trim() || '7700000000',
       kpp: this.formKpp.trim(),
-      city: this.formCity.trim() || 'Москва',
+      city: this.formCity.trim() || getTranslation(this.currentLang).viewTexts.counterpartyDetail.defaultCity,
       contactPerson: this.formContactPerson.trim() || '—',
       phone: this.formPhone.trim() || '—',
       email: this.formEmail.trim() || '—',

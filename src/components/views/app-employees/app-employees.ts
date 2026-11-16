@@ -544,7 +544,7 @@ export class AppEmployees extends LitElement {
     this.formCompanyId = store.companies[0]?.id || '';
     this.formEmail = '';
     this.formPhone = '';
-    this.formLocation = 'Москва';
+    this.formLocation = getTranslation(this.currentLang).viewTexts.employees.defaultLocation;
     this.formStatus = 'active';
     this.formHireDate = new Date().toISOString().slice(0, 10);
     this.formHourlyRate = 3500;
@@ -577,11 +577,11 @@ export class AppEmployees extends LitElement {
     const baseData = {
       name: this.formName.trim(),
       role: this.formRole.trim() || 'Specialist',
-      department: this.formDepartment.trim() || 'Разработка',
+      department: this.formDepartment.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultDepartment,
       companyId: this.formCompanyId || undefined,
       email: this.formEmail.trim() || 'team@projectflow.dev',
       phone: this.formPhone.trim() || '—',
-      location: this.formLocation.trim() || 'Москва',
+      location: this.formLocation.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultLocation,
       status: this.formStatus,
       hireDate: this.formHireDate || undefined,
       hourlyRate: this.formHourlyRate,

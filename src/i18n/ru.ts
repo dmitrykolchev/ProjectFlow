@@ -1063,6 +1063,8 @@ export const ru = {
       kpiDepartments: 'Отделов',
       kpiAvgRate: 'Средняя ставка',
       rateUnit: '₽/ч',
+      defaultDepartment: 'Разработка',
+      defaultLocation: 'Москва',
       searchPlaceholder: 'Поиск по ФИО, должности, отделу...',
       viewCards: 'Карточки',
       viewTable: 'Таблица',
@@ -1484,6 +1486,7 @@ export const ru = {
     },
     counterpartyDetail: {
       emptyNotFound: 'Контрагент не найден',
+      defaultCity: 'Москва',
       taxIdLabel: 'ИНН / КПП',
       membersSuffix: 'участн.',
       thIssueDue: 'Дата / Срок оплаты',

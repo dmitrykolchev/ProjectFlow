@@ -1063,6 +1063,8 @@ export const en = {
       kpiDepartments: 'Departments',
       kpiAvgRate: 'Avg Rate',
       rateUnit: '₽/h',
+    defaultDepartment: 'Development',
+    defaultLocation: 'Moscow',
       searchPlaceholder: 'Search name, role, dept...',
       viewCards: 'Cards',
       viewTable: 'Table',
@@ -1484,6 +1486,7 @@ export const en = {
     },
     counterpartyDetail: {
       emptyNotFound: 'Counterparty not found',
+      defaultCity: 'Moscow',
       taxIdLabel: 'Tax ID',
       membersSuffix: 'members',
       thIssueDue: 'Issued / Due',
