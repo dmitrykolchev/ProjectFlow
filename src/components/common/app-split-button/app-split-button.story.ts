@@ -14,6 +14,11 @@ export const meta: ComponentStoryMeta = {
     'icon-start': 'Legacy alias of start',
     '(default)': 'Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
+  childrenDoc: {
+    'app-menu-header': 'Section caption of the dropdown menu (declarative children replace the items prop)',
+    'app-menu-item': 'Menu row with label, icon, shortcut, checkable state, danger style',
+    'app-menu-divider': 'Horizontal separator between menu rows',
+  },
   propsDoc: {
     label: 'Main button caption',
     variant: 'Visual style of the main button',
