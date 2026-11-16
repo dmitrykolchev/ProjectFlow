@@ -1,22 +1,45 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-radio-group';
+import '../app-option/app-option';
+import '../app-material-icon/app-material-icon';
 
 export const meta: ComponentStoryMeta = {
   title: 'Common/RadioGroup',
   component: 'app-radio-group',
   description: 'Accessible radio selection group with standard, horizontal, and rich card layouts.',
   category: 'Common',
+  slotsDoc: {
+    '(default)': 'Declarative <app-option> children filling the option list (value, label, description, disabled, start / end graphics)',
+  },
   propsDoc: {
     label: 'Caption above the option list',
     name: 'Native radio group name (shared within a page)',
     value: 'Currently selected option value',
     options: 'Option definitions (value + label)',
+    dataSource: 'Data source for options: array, promise, or function returning an array (sync or async)',
     orientation: 'Layout direction: vertical / horizontal',
     variant: 'Visual style of the option rows',
     disabled: 'Disables all options',
   },
   stories: [
+    {
+      name: 'Declarative Options',
+      description: 'Radio group filled with declarative app-option children, including graphic elements in the start / end slots',
+      render: () => html`
+        <div style="max-width: 320px;">
+          <app-radio-group label="Declarative delivery mode" value="courier">
+            <app-option value="courier" label="Courier" description="Door to door">
+              <app-material-icon slot="start">directions_delivery</app-material-icon>
+            </app-option>
+            <app-option value="pickup" label="Pickup" description="From the branch"></app-option>
+            <app-option value="drone" label="Drone" disabled>
+              <app-material-icon slot="end">local_shipping</app-material-icon>
+            </app-option>
+          </app-radio-group>
+        </div>
+      `,
+    },
     {
       name: 'Standard & Card Layouts',
       description: 'Vertical, horizontal, and selectable card variants',
