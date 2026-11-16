@@ -32,6 +32,18 @@ export const ru = {
     days: 'дн',
     clear: 'Очистить',
     today: 'Сегодня',
+    icons: {
+      search: 'Поиск иконки...',
+      category: 'Категория',
+      family: 'Family style',
+      size: 'Размер',
+      fill: 'Fill',
+      weight: 'Weight',
+      grade: 'Grade',
+      all: 'Все категории',
+      empty: 'Ничего не найдено',
+      palette: 'Палитра Material Symbols',
+    },
   },
   navigation: {
     dashboard: 'Дашборд',

@@ -32,6 +32,18 @@ export const en = {
     days: 'd',
     clear: 'Clear',
     today: 'Today',
+    icons: {
+      search: 'Search icon...',
+      category: 'Category',
+      family: 'Family style',
+      size: 'Size',
+      fill: 'Fill',
+      weight: 'Weight',
+      grade: 'Grade',
+      all: 'All categories',
+      empty: 'Nothing found',
+      palette: 'Material Symbols palette',
+    },
   },
   navigation: {
     dashboard: 'Dashboard',

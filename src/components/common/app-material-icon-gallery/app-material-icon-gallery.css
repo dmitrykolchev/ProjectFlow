@@ -1,0 +1,109 @@
+/* Material Symbols palette — glyph grid of the self-hosted variable fonts (same axes and
+   families as <app-material-icon>), toolbar from catalog controls. */
+:host {
+  display: block;
+  color: var(--text-primary, #f8fafc);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 0.5rem;
+}
+
+.cell {
+  font: inherit;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: calc(var(--gh) + 34px);
+  padding: 0.5rem 0.25rem;
+  border: 1px solid var(--border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #f8fafc);
+  cursor: pointer;
+  outline: none;
+  transition: background var(--transition-fast, 150ms ease), border-color var(--transition-fast, 150ms ease);
+}
+
+.cell:hover {
+  background: var(--bg-hover, #e2e8f0);
+  border-color: var(--border-strong, #cbd5e1);
+}
+
+/* states — normal/hover/active/disabled are visually distinct */
+.cell:active:not(:disabled) {
+  background: var(--bg-active, #cbd5e1);
+  border-color: var(--accent-primary, #6366f1);
+}
+
+.cell:disabled {
+  border-color: var(--border-subtle, #e2e8f0);
+  background: var(--bg-subtle, #f1f5f9);
+  color: var(--text-muted, #64748b);
+  cursor: not-allowed;
+}
+
+.cell:disabled .glyph,
+.cell:disabled .name {
+  color: var(--text-muted, #64748b);
+}
+
+.cell:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-surface, #fff), 0 0 0 4px var(--accent-primary, #6366f1);
+}
+
+/* glyph = size square, Google axes from inline custom properties */
+.glyph {
+  font-variation-settings: 'FILL' var(--mi-fill), 'wght' var(--mi-wght), 'GRAD' var(--mi-grad), 'opsz' var(--mi-opsz);
+  font-size: var(--gh);
+  line-height: 1;
+  display: inline-block;
+  width: var(--gh);
+  height: var(--gh);
+  white-space: nowrap;
+  overflow: hidden;
+  direction: ltr;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  color: var(--text-primary, #f8fafc);
+}
+
+.glyph { font-family: 'Material Symbols Outlined'; }
+.glyph.f-outlined { font-family: 'Material Symbols Outlined'; }
+.glyph.f-rounded { font-family: 'Material Symbols Rounded'; }
+.glyph.f-sharp { font-family: 'Material Symbols Sharp'; }
+
+.name {
+  font-size: calc(var(--fs) * 0.8);
+  color: var(--text-secondary, #475569);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty {
+  color: var(--text-muted, #64748b);
+  font-size: var(--fs);
+}
+
+/* size scale: xsm|sm|md|lg|xlg = 24/28/36/42/48px; md default; label font-size scales
+   proportionally with the size (monotonic); opsz follows the glyph size */
+:host { --gh: 36px; --fs: 14px; --mi-opsz: 48; font-size: var(--fs); }
+:host(.xsm) { --gh: 24px; --fs: 11px; --mi-opsz: 20; }
+:host(.sm) { --gh: 28px; --fs: 12px; --mi-opsz: 24; }
+:host(.lg) { --gh: 42px; --fs: 16px; --mi-opsz: 40; }
+:host(.xlg) { --gh: 48px; --fs: 18px; --mi-opsz: 48; }
