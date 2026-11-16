@@ -6,7 +6,8 @@ import { iconDownload, iconEdit, iconTrash } from '../icons';
 export const meta: ComponentStoryMeta = {
   title: 'Common/DropdownButton',
   component: 'app-dropdown-button',
-  description: 'Action button paired with a contextual dropdown menu popover and outside-click dismissal.',
+  description:
+    'Action button paired with a contextual dropdown menu popover and outside-click dismissal. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start is a legacy alias of start. The default slot accepts declarative app-menu-item, app-menu-header, and app-menu-divider children.',
   category: 'Common',
   slotsDoc: {
     start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
