@@ -20,6 +20,7 @@ import {
   Project,
   ProjectChatMessage,
   ProjectMember,
+  ProjectRequirement,
   ProjectRole,
   SidebarGroupMode,
   Task,
@@ -42,6 +43,7 @@ import {
   initialKnowledgeArticles,
   initialPayments,
   initialProjects,
+  initialRequirements,
   initialTasks,
   initialTimeEntries,
   initialUsers,
@@ -64,6 +66,7 @@ const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
 const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
+const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -227,6 +230,7 @@ export class AppStore {
   public chatMessages: ProjectChatMessage[] = [];
   public knowledgeArticles: KnowledgeArticle[] = [];
   public documents: DocumentItem[] = [];
+  public requirements: ProjectRequirement[] = [];
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
   public detailCompanyId: string = '';
@@ -400,6 +404,11 @@ export class AppStore {
         this.documents = [...initialDocuments];
       }
 
+      const storedRequirements = localStorage.getItem(STORAGE_KEY_REQUIREMENTS);
+      this.requirements = storedRequirements
+        ? JSON.parse(storedRequirements)
+        : [...initialRequirements];
+
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
         this.activityLog = JSON.parse(storedLogs);
@@ -570,6 +579,14 @@ export class AppStore {
       } catch (err) {
         console.error(err);
       }
+    }
+  }
+
+  private saveRequirements(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_REQUIREMENTS, JSON.stringify(this.requirements));
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -1269,6 +1286,9 @@ export class AppStore {
 
     this.tasks = [newTask, ...this.tasks];
     this.saveTasks();
+    if (newTask.knowledgeArticleIds?.length) {
+      this.syncKnowledgeLinkedTasks(newTask.id, newTask.knowledgeArticleIds);
+    }
     this.logActivity('create', 'task', newTask.title, `Создана в проекте ${project?.name || ''}`, newTask.id);
     this.addNotification('success', 'Успешно', `Задача "${newTask.title}" создана`);
     this.notify();
@@ -1279,6 +1299,9 @@ export class AppStore {
     const old = this.tasks.find((t) => t.id === updated.id);
     this.tasks = this.tasks.map((t) => (t.id === updated.id ? { ...updated, updatedAt: new Date().toISOString() } : t));
     this.saveTasks();
+    if (updated.knowledgeArticleIds?.length) {
+      this.syncKnowledgeLinkedTasks(updated.id, updated.knowledgeArticleIds);
+    }
 
     if (old && old.status !== updated.status) {
       this.logActivity('status_change', 'task', updated.title, `Статус изменен с ${old.status} на ${updated.status}`, updated.id);
@@ -1959,6 +1982,11 @@ export class AppStore {
         this.syncHistory(true);
       }
     }
+    const prevReqLen = this.requirements.length;
+    this.requirements = this.requirements.filter((r) => r.projectId !== id);
+    if (this.requirements.length !== prevReqLen) {
+      this.saveRequirements();
+    }
     this.saveProjects();
     this.logActivity('delete', 'project', target.name, 'Проект удалён');
     this.addNotification('warning', 'Удалено', `Проект "${target.name}" удалён`);
@@ -2523,6 +2551,128 @@ export class AppStore {
     this.saveDocuments();
     this.logActivity('delete', 'document', target.title, `Удалён файл ${target.fileName}`, target.id);
     this.addNotification('warning', 'Документ удалён', target.title);
+    this.notify();
+  }
+
+  // --- Project Requirements & Knowledge Traceability ---
+  private syncKnowledgeLinkedTasks(taskId: string, knowledgeIds: string[]): void {
+    const idSet = new Set(knowledgeIds);
+    let changed = false;
+    this.knowledgeArticles = this.knowledgeArticles.map((art) => {
+      if (!idSet.has(art.id)) return art;
+      const existing = art.linkedTaskIds || [];
+      if (existing.includes(taskId)) return art;
+      changed = true;
+      return { ...art, linkedTaskIds: [...existing, taskId] };
+    });
+    if (changed) {
+      this.saveKnowledgeArticles();
+    }
+  }
+
+  public addKnowledgeArticlesBulk(
+    items: Array<
+      Omit<
+        KnowledgeArticle,
+        'id' | 'helpfulUserIds' | 'viewsCount' | 'revisions' | 'createdAt' | 'updatedAt' | 'verifiedAt'
+      >
+    >
+  ): KnowledgeArticle[] {
+    if (items.length === 0) return [];
+    const now = new Date().toISOString();
+    const authorFallback = this.currentUserId || this.users[0]?.id || 'user-1';
+    const created: KnowledgeArticle[] = items.map((data, idx) => ({
+      ...data,
+      authorId: data.authorId || authorFallback,
+      id: `kb-${Date.now().toString().slice(-6)}-${idx}-${Math.random().toString(36).slice(2, 5)}`,
+      helpfulUserIds: [],
+      viewsCount: 1,
+      revisions: [
+        {
+          id: `rev-${Date.now()}-${idx}`,
+          editedById: data.authorId || authorFallback,
+          editedAt: now,
+          summary: 'Автогенерация из спецификации проекта',
+        },
+      ],
+      createdAt: now,
+      updatedAt: now,
+      verifiedAt: data.status === 'verified' ? now : undefined,
+    }));
+    this.knowledgeArticles = [...created, ...this.knowledgeArticles];
+    if (created[0]) this.detailKnowledgeId = created[0].id;
+    this.saveKnowledgeArticles();
+    this.logActivity(
+      'create',
+      'knowledge',
+      `${created.length} статей`,
+      'Сформирована база знаний из спецификации проекта'
+    );
+    this.notify();
+    return created;
+  }
+
+  public addRequirement(
+    data: Omit<ProjectRequirement, 'id' | 'createdAt' | 'updatedAt'>
+  ): ProjectRequirement {
+    const now = new Date().toISOString();
+    const req: ProjectRequirement = {
+      ...data,
+      id: `req-${Date.now().toString().slice(-6)}-${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.requirements = [req, ...this.requirements];
+    this.saveRequirements();
+    this.logActivity('create', 'requirement', `${req.code} — ${req.title}`, req.type, req.id);
+    this.addNotification('success', `${req.code}`, req.title);
+    this.notify();
+    return req;
+  }
+
+  public addRequirementsBulk(
+    items: Array<Omit<ProjectRequirement, 'id' | 'createdAt' | 'updatedAt'>>
+  ): ProjectRequirement[] {
+    if (items.length === 0) return [];
+    const now = new Date().toISOString();
+    const created: ProjectRequirement[] = items.map((data, idx) => ({
+      ...data,
+      id: `req-${Date.now().toString().slice(-6)}-${idx}-${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: now,
+      updatedAt: now,
+    }));
+    this.requirements = [...created, ...this.requirements];
+    this.saveRequirements();
+    this.logActivity(
+      'create',
+      'requirement',
+      `${created.length} требований`,
+      'Импортировано из спецификации проекта'
+    );
+    this.notify();
+    return created;
+  }
+
+  public updateRequirement(updated: ProjectRequirement): void {
+    const next: ProjectRequirement = { ...updated, updatedAt: new Date().toISOString() };
+    this.requirements = this.requirements.map((r) => (r.id === next.id ? next : r));
+    this.saveRequirements();
+    this.logActivity('update', 'requirement', `${next.code} — ${next.title}`, next.status, next.id);
+    this.notify();
+  }
+
+  public deleteRequirement(id: string): void {
+    const target = this.requirements.find((r) => r.id === id);
+    if (!target) return;
+    this.requirements = this.requirements.filter((r) => r.id !== id);
+    this.tasks = this.tasks.map((tk) =>
+      tk.requirementIds?.includes(id)
+        ? { ...tk, requirementIds: tk.requirementIds.filter((rid) => rid !== id) }
+        : tk
+    );
+    this.saveRequirements();
+    this.saveTasks();
+    this.logActivity('delete', 'requirement', `${target.code} — ${target.title}`, 'Удалено требование', target.id);
     this.notify();
   }
 

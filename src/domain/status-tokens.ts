@@ -17,7 +17,9 @@ export type StatusDomain =
   | 'expense'
   | 'timeEntry'
   | 'employee'
-  | 'document';
+  | 'document'
+  | 'requirement'
+  | 'requirementPriority';
 
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
@@ -114,6 +116,19 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     review: { variant: 'warning', i18nPath: ['documents', 'statuses'] },
     approved: { variant: 'success', i18nPath: ['documents', 'statuses'] },
     archived: { variant: 'default', i18nPath: ['documents', 'statuses'] },
+  },
+  requirement: {
+    draft: { variant: 'default', i18nPath: ['requirements', 'statuses'] },
+    approved: { variant: 'info', i18nPath: ['requirements', 'statuses'] },
+    in_progress: { variant: 'warning', i18nPath: ['requirements', 'statuses'] },
+    implemented: { variant: 'primary', i18nPath: ['requirements', 'statuses'] },
+    verified: { variant: 'success', i18nPath: ['requirements', 'statuses'] },
+  },
+  requirementPriority: {
+    low: { variant: 'default', i18nPath: ['requirements', 'priorities'] },
+    medium: { variant: 'info', i18nPath: ['requirements', 'priorities'] },
+    high: { variant: 'warning', i18nPath: ['requirements', 'priorities'] },
+    critical: { variant: 'danger', i18nPath: ['requirements', 'priorities'] },
   },
 };
 

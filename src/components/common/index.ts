@@ -69,6 +69,7 @@ export type { PaginationVariant } from './app-pagination/app-pagination';
 export { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
 export { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 export { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
+export { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -118,6 +119,7 @@ import { AppPagination } from './app-pagination/app-pagination';
 import { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
 import { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 import { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
+import { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -159,6 +161,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-file-dropzone': AppFileDropzone,
   'app-document-previewer': AppDocumentPreviewer,
   'app-task-ai-panel': AppTaskAiPanel,
+  'app-project-requirements': AppProjectRequirements,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

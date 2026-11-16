@@ -47,6 +47,7 @@ import {
   iconTrash,
   iconUpload,
   iconUsers,
+  iconX,
 } from '../../common/icons';
 import {
   formatAiError,
@@ -146,6 +147,8 @@ export class AppCompanyDetail extends LitElement {
   @state() private aiPreviewLoading = false;
   @state() private aiPreviewError = '';
   @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
+  @state() private previewTagDraft = '';
+  @state() private inlineDocTagDraft = '';
 
   private unsubscribe?: () => void;
 
@@ -1042,6 +1045,7 @@ export class AppCompanyDetail extends LitElement {
                     @expand="${(e: CustomEvent<{ document: DocumentItem }>) =>
                       this.openDocPreviewModal(e.detail.document)}"
                   ></app-document-previewer>
+                  ${activeDoc ? this.renderEditableTagsBar(activeDoc, t, 'workspace') : ''}
                 </div>
               </div>
             `}
@@ -1552,6 +1556,8 @@ export class AppCompanyDetail extends LitElement {
 
           ${doc.description ? html`<p class="company-desc">${doc.description}</p>` : ''}
 
+          ${this.renderEditableTagsBar(doc, t, 'modal')}
+
           <div class="ai-doc-bar">
             <div class="ai-doc-bar-row">
               <span class="ai-doc-hint">
@@ -1640,6 +1646,105 @@ export class AppCompanyDetail extends LitElement {
           </app-button>
         </div>
       </app-modal>
+    `;
+  }
+
+  private commitTagToDoc(doc: DocumentItem, rawInput: string) {
+    const incoming = rawInput
+      .split(/[,;]+/)
+      .map((s) => s.replace(/^#/, '').trim().toLowerCase())
+      .filter(Boolean);
+    if (incoming.length === 0) return;
+
+    const merged = Array.from(new Set([...(doc.tags || []), ...incoming]));
+    const updated: DocumentItem = {
+      ...doc,
+      tags: merged,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    };
+    store.updateDocument(updated);
+    if (this.previewDoc?.id === doc.id) {
+      this.previewDoc = updated;
+    }
+  }
+
+  private removeTagFromDoc(doc: DocumentItem, tagToRemove: string) {
+    const nextTags = (doc.tags || []).filter((t) => t !== tagToRemove);
+    const updated: DocumentItem = {
+      ...doc,
+      tags: nextTags,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    };
+    store.updateDocument(updated);
+    if (this.previewDoc?.id === doc.id) {
+      this.previewDoc = updated;
+    }
+  }
+
+  private renderEditableTagsBar(
+    doc: DocumentItem,
+    t: ReturnType<typeof getTranslation>,
+    mode: 'workspace' | 'modal'
+  ) {
+    const draft = mode === 'modal' ? this.previewTagDraft : this.inlineDocTagDraft;
+    const setDraft = (val: string) => {
+      if (mode === 'modal') this.previewTagDraft = val;
+      else this.inlineDocTagDraft = val;
+    };
+
+    return html`
+      <div class="preview-tags-bar">
+        <span class="preview-tags-label">
+          ${iconTag(13)}
+          <span>${t.documents.tagsLabel}:</span>
+        </span>
+        <div class="tags-row">
+          ${doc.tags.length === 0
+            ? html`<span class="meta-label">${t.documents.noTags}</span>`
+            : doc.tags.map(
+                (tag) => html`
+                  <span class="tag-chip is-editable">
+                    <span>#${tag}</span>
+                    <button
+                      type="button"
+                      class="tag-remove-btn"
+                      title="${t.documents.removeTagTitle}"
+                      @click="${() => this.removeTagFromDoc(doc, tag)}"
+                    >
+                      ${iconX(10)}
+                    </button>
+                  </span>
+                `
+              )}
+          <span class="inline-tag-form">
+            <input
+              type="text"
+              class="inline-tag-input"
+              placeholder="${t.documents.addTagPlaceholder}"
+              .value="${draft}"
+              @input="${(e: Event) => setDraft((e.target as HTMLInputElement).value)}"
+              @keydown="${(e: KeyboardEvent) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  this.commitTagToDoc(doc, draft);
+                  setDraft('');
+                }
+              }}"
+            />
+            <button
+              type="button"
+              class="inline-tag-action is-confirm"
+              title="${t.common.add}"
+              @click="${() => {
+                this.commitTagToDoc(doc, draft);
+                setDraft('');
+              }}"
+            >
+              ${iconCheck(11)}
+            </button>
+          </span>
+        </div>
+      </div>
     `;
   }
 

@@ -31,6 +31,7 @@ import {
   iconTag,
   iconTrash,
   iconUpload,
+  iconX,
 } from '../../common/icons';
 import {
   formatAiError,
@@ -122,6 +123,11 @@ export class AppDocuments extends LitElement {
   @state() private aiPreviewLoading = false;
   @state() private aiPreviewError = '';
   @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
+
+  // Inline tag editing state
+  @state() private inlineTagEditDocId: string | null = null;
+  @state() private inlineTagDraft = '';
+  @state() private previewTagDraft = '';
 
   // Delete Confirm
   @state() private deletingDoc: DocumentItem | null = null;
@@ -483,13 +489,86 @@ export class AppDocuments extends LitElement {
                 </div>
               </div>
 
-              ${doc.tags.length > 0
-                ? html`
-                    <div class="tags-row">
-                      ${doc.tags.slice(0, 4).map((tag) => html`<span class="tag-chip">#${tag}</span>`)}
-                    </div>
+              <div class="tags-row" @click="${(e: Event) => e.stopPropagation()}">
+                ${doc.tags.map(
+                  (tag) => html`
+                    <span class="tag-chip is-editable">
+                      <span>#${tag}</span>
+                      <button
+                        type="button"
+                        class="tag-remove-btn"
+                        title="${t.documents.removeTagTitle}"
+                        @click="${(e: Event) => {
+                          e.stopPropagation();
+                          this.removeTagFromDoc(doc, tag);
+                        }}"
+                      >
+                        ${iconX(10)}
+                      </button>
+                    </span>
                   `
-                : ''}
+                )}
+                ${this.inlineTagEditDocId === doc.id
+                  ? html`
+                      <span class="inline-tag-form">
+                        <input
+                          type="text"
+                          class="inline-tag-input"
+                          placeholder="${t.documents.addTagPlaceholder}"
+                          .value="${this.inlineTagDraft}"
+                          @input="${(e: Event) => {
+                            this.inlineTagDraft = (e.target as HTMLInputElement).value;
+                          }}"
+                          @keydown="${(e: KeyboardEvent) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              this.commitTagToDoc(doc, this.inlineTagDraft);
+                              this.inlineTagDraft = '';
+                            } else if (e.key === 'Escape') {
+                              this.inlineTagEditDocId = null;
+                              this.inlineTagDraft = '';
+                            }
+                          }}"
+                        />
+                        <button
+                          type="button"
+                          class="inline-tag-action is-confirm"
+                          title="${t.common.add}"
+                          @click="${() => {
+                            this.commitTagToDoc(doc, this.inlineTagDraft);
+                            this.inlineTagDraft = '';
+                            this.inlineTagEditDocId = null;
+                          }}"
+                        >
+                          ${iconCheck(11)}
+                        </button>
+                        <button
+                          type="button"
+                          class="inline-tag-action"
+                          title="${t.common.close}"
+                          @click="${() => {
+                            this.inlineTagEditDocId = null;
+                            this.inlineTagDraft = '';
+                          }}"
+                        >
+                          ${iconX(11)}
+                        </button>
+                      </span>
+                    `
+                  : html`
+                      <button
+                        type="button"
+                        class="tag-add-btn"
+                        @click="${(e: Event) => {
+                          e.stopPropagation();
+                          this.inlineTagEditDocId = doc.id;
+                          this.inlineTagDraft = '';
+                        }}"
+                      >
+                        ${t.documents.addTagBtn}
+                      </button>
+                    `}
+              </div>
 
               <div class="card-footer">
                 <div class="uploader-info">
@@ -993,6 +1072,61 @@ export class AppDocuments extends LitElement {
 
           ${doc.description ? html`<p class="doc-desc" style="-webkit-line-clamp: unset;">${doc.description}</p>` : ''}
 
+          <div class="preview-tags-bar">
+            <span class="preview-tags-label">
+              ${iconTag(13)}
+              <span>${t.documents.tagsLabel}:</span>
+            </span>
+            <div class="tags-row" style="flex: 1;">
+              ${doc.tags.length === 0
+                ? html`<span class="meta-label">${t.documents.noTags}</span>`
+                : doc.tags.map(
+                    (tag) => html`
+                      <span class="tag-chip is-editable">
+                        <span>#${tag}</span>
+                        <button
+                          type="button"
+                          class="tag-remove-btn"
+                          title="${t.documents.removeTagTitle}"
+                          @click="${() => this.removeTagFromDoc(doc, tag)}"
+                        >
+                          ${iconX(10)}
+                        </button>
+                      </span>
+                    `
+                  )}
+              <span class="inline-tag-form">
+                <input
+                  type="text"
+                  class="inline-tag-input"
+                  placeholder="${t.documents.addTagPlaceholder}"
+                  .value="${this.previewTagDraft}"
+                  @input="${(e: Event) => {
+                    this.previewTagDraft = (e.target as HTMLInputElement).value;
+                  }}"
+                  @keydown="${(e: KeyboardEvent) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      this.commitTagToDoc(doc, this.previewTagDraft);
+                      this.previewTagDraft = '';
+                    }
+                  }}"
+                />
+                <button
+                  type="button"
+                  class="inline-tag-action is-confirm"
+                  title="${t.common.add}"
+                  @click="${() => {
+                    this.commitTagToDoc(doc, this.previewTagDraft);
+                    this.previewTagDraft = '';
+                  }}"
+                >
+                  ${iconCheck(11)}
+                </button>
+              </span>
+            </div>
+          </div>
+
           <div class="ai-doc-bar">
             <div class="ai-doc-bar-row">
               <span class="ai-doc-hint">
@@ -1189,6 +1323,38 @@ export class AppDocuments extends LitElement {
         }}"
       ></app-confirm-dialog>
     `;
+  }
+
+  private commitTagToDoc(doc: DocumentItem, rawInput: string) {
+    const incoming = rawInput
+      .split(/[,;]+/)
+      .map((s) => s.replace(/^#/, '').trim().toLowerCase())
+      .filter(Boolean);
+    if (incoming.length === 0) return;
+
+    const merged = Array.from(new Set([...(doc.tags || []), ...incoming]));
+    const updated: DocumentItem = {
+      ...doc,
+      tags: merged,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    };
+    store.updateDocument(updated);
+    if (this.previewDoc?.id === doc.id) {
+      this.previewDoc = updated;
+    }
+  }
+
+  private removeTagFromDoc(doc: DocumentItem, tagToRemove: string) {
+    const nextTags = (doc.tags || []).filter((t) => t !== tagToRemove);
+    const updated: DocumentItem = {
+      ...doc,
+      tags: nextTags,
+      updatedAt: new Date().toISOString().slice(0, 10),
+    };
+    store.updateDocument(updated);
+    if (this.previewDoc?.id === doc.id) {
+      this.previewDoc = updated;
+    }
   }
 
   private async handleQuickDropzoneSelect(e: CustomEvent<{ file: File }>) {

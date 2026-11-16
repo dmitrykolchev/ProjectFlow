@@ -210,6 +210,29 @@ export interface Project {
   counterpartyId?: string;
   budget?: number;
   members?: ProjectMember[];
+  specDocumentId?: string;
+}
+
+export type RequirementType = 'functional' | 'non_functional';
+export type RequirementPriority = 'critical' | 'high' | 'medium' | 'low';
+export type RequirementStatus = 'draft' | 'approved' | 'in_progress' | 'implemented' | 'verified';
+
+export interface ProjectRequirement {
+  id: string;
+  projectId: string;
+  code: string; // e.g., FR-01, NFR-01
+  type: RequirementType;
+  title: string;
+  description: string;
+  category: string;
+  priority: RequirementPriority;
+  status: RequirementStatus;
+  acceptanceCriteria: string[];
+  linkedKnowledgeIds: string[];
+  linkedTaskIds?: string[];
+  sourceDocumentId?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Task {
@@ -229,14 +252,27 @@ export interface Task {
   order: number;
   createdAt: string;
   updatedAt: string;
+  requirementIds?: string[];
+  knowledgeArticleIds?: string[];
   aiAnalysis?: TaskAiAnalysis;
+  aiClarifications?: TaskAiClarificationMessage[];
 }
 
 export interface TaskAiContextRef {
-  kind: 'knowledge' | 'document';
+  kind: 'knowledge' | 'document' | 'requirement';
   id: string;
   title: string;
   reason?: string;
+}
+
+export interface TaskAiClarificationMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  authorId?: string;
+  content: string;
+  createdAt: string;
+  model?: string;
+  contextSources?: TaskAiContextRef[];
 }
 
 export interface TaskAiAnalysis {
@@ -386,6 +422,7 @@ export interface ActivityLogItem {
     | 'chat'
     | 'knowledge'
     | 'document'
+    | 'requirement'
     | 'settings';
   targetId?: string;
   targetTitle: string;

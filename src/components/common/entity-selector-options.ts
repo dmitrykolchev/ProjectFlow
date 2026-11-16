@@ -1,6 +1,16 @@
 import { getTranslation } from '../../i18n';
 import { store } from '../../state/store';
-import { Company, Contract, Counterparty, Project, Task, User } from '../../types';
+import {
+  Company,
+  Contract,
+  Counterparty,
+  DocumentItem,
+  KnowledgeArticle,
+  Project,
+  ProjectRequirement,
+  Task,
+  User,
+} from '../../types';
 import { EntitySelectorOption } from './app-entity-selector/app-entity-selector';
 import { formatMoney } from './app-money/app-money';
 
@@ -170,3 +180,83 @@ export function mapContractOptions(
     };
   });
 }
+
+const DOC_STATUS_COLORS: Record<DocumentItem['status'], string> = {
+  draft: '#64748b',
+  review: '#f59e0b',
+  approved: '#10b981',
+  archived: '#475569',
+};
+
+export function mapDocumentOptions(
+  documents: DocumentItem[],
+  t: TranslationDict
+): EntitySelectorOption[] {
+  return documents.map((doc) => {
+    const proj = doc.projectId ? store.projects.find((p) => p.id === doc.projectId) : undefined;
+    const comp = doc.companyId ? store.companies.find((c) => c.id === doc.companyId) : undefined;
+    const subtitleParts = [
+      doc.fileName,
+      proj ? `[${proj.key}] ${proj.name}` : comp?.name,
+    ].filter(Boolean);
+    return {
+      value: doc.id,
+      code: doc.extension.toUpperCase(),
+      label: doc.title,
+      subtitle: subtitleParts.join(' · '),
+      meta: `v${doc.version}`,
+      badge: t.documents.categories[doc.category],
+      badgeColor: DOC_STATUS_COLORS[doc.status],
+      keywords: [doc.fileName, doc.description, ...doc.tags, proj?.name || '', comp?.name || ''].filter(Boolean),
+    };
+  });
+}
+
+const REQ_STATUS_COLORS: Record<ProjectRequirement['status'], string> = {
+  draft: '#64748b',
+  approved: '#0284c7',
+  in_progress: '#f59e0b',
+  implemented: '#8b5cf6',
+  verified: '#10b981',
+};
+
+export function mapRequirementOptions(
+  requirements: ProjectRequirement[],
+  t: TranslationDict
+): EntitySelectorOption[] {
+  return requirements.map((req) => {
+    const proj = store.projects.find((p) => p.id === req.projectId);
+    const typeLabel =
+      req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort;
+    return {
+      value: req.id,
+      code: req.code,
+      label: req.title,
+      subtitle: [typeLabel, req.category, proj ? `[${proj.key}]` : undefined].filter(Boolean).join(' · '),
+      badge: t.requirements.statuses[req.status],
+      badgeColor: REQ_STATUS_COLORS[req.status],
+      color: req.type === 'functional' ? '#0284c7' : '#8b5cf6',
+      keywords: [req.code, req.category, req.description, ...req.acceptanceCriteria].filter(Boolean),
+    };
+  });
+}
+
+export function mapKnowledgeOptions(
+  articles: KnowledgeArticle[],
+  t: TranslationDict
+): EntitySelectorOption[] {
+  return articles.map((art) => {
+    const proj = art.projectId ? store.projects.find((p) => p.id === art.projectId) : undefined;
+    const comp = art.companyId ? store.companies.find((c) => c.id === art.companyId) : undefined;
+    return {
+      value: art.id,
+      code: t.knowledgeBase.categories[art.category],
+      label: art.title,
+      subtitle: [proj ? `[${proj.key}] ${proj.name}` : comp?.name, art.summary].filter(Boolean).join(' · '),
+      badge: t.knowledgeBase.statuses[art.status],
+      badgeColor: art.status === 'verified' ? '#10b981' : '#6366f1',
+      keywords: [...art.tags, art.summary, proj?.name || '', comp?.name || ''].filter(Boolean),
+    };
+  });
+}
+

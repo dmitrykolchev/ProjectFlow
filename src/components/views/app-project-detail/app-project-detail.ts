@@ -34,6 +34,7 @@ import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-project-requirements/app-project-requirements';
 import styles from './app-project-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -369,6 +370,25 @@ export class AppProjectDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.projectDetail.metaDirectExpenses}</span>
               <span class="meta-val mono">${projectDirectExpensesRub.toLocaleString('ru-RU')} ₽</span>
             </div>
+            ${proj.specDocumentId
+              ? (() => {
+                  const specDoc = store.documents.find((d) => d.id === proj.specDocumentId);
+                  if (!specDoc) return '';
+                  return html`
+                    <div class="meta-box">
+                      <span class="meta-label">${t.viewTexts.projectDetail.specDocumentLabel}</span>
+                      <button
+                        type="button"
+                        class="link-btn"
+                        @click="${() =>
+                          store.openDocuments({ scope: specDoc.scope, projectId: proj.id })}"
+                      >
+                        ${specDoc.title}
+                      </button>
+                    </div>
+                  `;
+                })()
+              : ''}
           </div>
         </section>
 
@@ -377,6 +397,9 @@ export class AppProjectDetail extends LitElement {
           projectId="${proj.id}"
           ?hideProjectSelector="${true}"
         ></app-project-overview>
+
+        <!-- Functional & Non-Functional Requirements + AI Task Decomposition -->
+        <app-project-requirements .projectId="${proj.id}"></app-project-requirements>
 
         <!-- Full-Width Spacious Team by Roles Section -->
         <app-section-card title="${t.projectDetail.teamByRoles}" subtitle="(${members.length})">

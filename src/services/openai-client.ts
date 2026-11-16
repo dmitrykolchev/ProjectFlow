@@ -2,10 +2,16 @@ import type {
   Company,
   DocumentItem,
   KnowledgeArticle,
+  KnowledgeCategory,
   Project,
+  ProjectRequirement,
+  RequirementPriority,
+  RequirementType,
   SupportedLang,
   TaskAiAnalysis,
+  TaskAiClarificationMessage,
   TaskAiContextRef,
+  TaskPriority,
 } from '../types';
 import type { getTranslation } from '../i18n';
 
@@ -36,7 +42,7 @@ export type TaskContextMatchReason = 'direct' | 'project' | 'company' | 'keyword
 
 export interface TaskAiContextItem {
   key: string; // `${kind}:${id}`
-  kind: 'knowledge' | 'document';
+  kind: 'knowledge' | 'document' | 'requirement';
   id: string;
   title: string;
   subtitle: string;
@@ -61,6 +67,8 @@ export interface TaskContextInput {
   dueDate?: string;
   tags?: string[];
   subtasks?: { id: string; title: string; completed: boolean }[];
+  requirementIds?: string[];
+  knowledgeArticleIds?: string[];
 }
 
 export interface DocumentSummaryResult {
@@ -434,13 +442,21 @@ export function retrieveTaskContext(params: {
   companies: Company[];
   knowledgeArticles: KnowledgeArticle[];
   documents: DocumentItem[];
+  requirements?: ProjectRequirement[];
   maxAutoSelected?: number;
 }): {
   selectedItems: TaskAiContextItem[];
   allCandidates: TaskAiContextItem[];
 } {
-  const { task, projects, companies, knowledgeArticles, documents } = params;
-  const maxAuto = params.maxAutoSelected ?? 6;
+  const {
+    task,
+    projects,
+    companies,
+    knowledgeArticles,
+    documents,
+    requirements = [],
+  } = params;
+  const maxAuto = params.maxAutoSelected ?? 8;
   const project = projects.find((p) => p.id === task.projectId);
   const companyId = project?.companyId;
 
@@ -456,15 +472,81 @@ export function retrieveTaskContext(params: {
     )
   );
   const taskTagSet = new Set((task.tags || []).map((t) => t.toLowerCase()));
+  const linkedReqSet = new Set(task.requirementIds || []);
+  const linkedKbSet = new Set(task.knowledgeArticleIds || []);
+
+  // Also collect knowledge articles linked by task's direct requirements
+  const reqLinkedKbSet = new Set<string>();
+  for (const req of requirements) {
+    if (linkedReqSet.has(req.id)) {
+      for (const kbId of req.linkedKnowledgeIds || []) {
+        reqLinkedKbSet.add(kbId);
+      }
+    }
+  }
 
   const candidates: TaskAiContextItem[] = [];
+
+  for (const req of requirements) {
+    let score = 0;
+    let reason: TaskContextMatchReason = 'keyword';
+
+    if (linkedReqSet.has(req.id) || (task.id && (req.linkedTaskIds || []).includes(task.id))) {
+      score += 160;
+      reason = 'direct';
+    } else if (task.projectId && req.projectId === task.projectId) {
+      score += 55;
+      reason = 'project';
+    }
+
+    const reqTokens = new Set(
+      tokenize(
+        `${req.code} ${req.title} ${req.description} ${req.category} ${(req.acceptanceCriteria || []).join(' ')}`
+      )
+    );
+    let tokenHits = 0;
+    for (const tok of taskTokens) {
+      if (reqTokens.has(tok)) tokenHits++;
+    }
+    score += Math.min(tokenHits * 8, 40);
+
+    const proj = projects.find((p) => p.id === req.projectId);
+    const typeTag = req.type === 'functional' ? 'FR' : 'NFR';
+    const subtitle = proj ? `[${proj.key}] ${typeTag} · ${req.category}` : `${typeTag} · ${req.category}`;
+    const snippetParts = [
+      `${req.code} (${typeTag}, ${req.priority}, ${req.status})`,
+      `Category: ${req.category}`,
+      req.description,
+      req.acceptanceCriteria?.length
+        ? `Acceptance Criteria:\n${req.acceptanceCriteria.map((c) => `- ${c}`).join('\n')}`
+        : '',
+    ].filter(Boolean);
+
+    candidates.push({
+      key: `requirement:${req.id}`,
+      kind: 'requirement',
+      id: req.id,
+      title: `${req.code}: ${req.title}`,
+      subtitle,
+      tags: [typeTag.toLowerCase(), req.category.toLowerCase()],
+      snippet: snippetParts.join('\n').slice(0, 1400),
+      score,
+      reason,
+      selected: false,
+      updatedAt: req.updatedAt,
+    });
+  }
 
   for (const art of knowledgeArticles) {
     let score = 0;
     let reason: TaskContextMatchReason = 'keyword';
 
-    if (task.id && (art.linkedTaskIds || []).includes(task.id)) {
-      score += 120;
+    if (
+      linkedKbSet.has(art.id) ||
+      reqLinkedKbSet.has(art.id) ||
+      (task.id && (art.linkedTaskIds || []).includes(task.id))
+    ) {
+      score += linkedKbSet.has(art.id) ? 140 : 120;
       reason = 'direct';
     } else if (task.projectId && art.projectId === task.projectId) {
       score += 50;
@@ -773,3 +855,434 @@ export async function analyzeTaskWithContext(params: {
     updatedAt: new Date().toISOString(),
   };
 }
+
+export interface BlueprintKnowledgeDraft {
+  tempKey: string;
+  title: string;
+  summary: string;
+  content: string;
+  category: KnowledgeCategory;
+  tags: string[];
+}
+
+export interface BlueprintRequirementDraft {
+  code: string;
+  type: RequirementType;
+  title: string;
+  description: string;
+  category: string;
+  priority: RequirementPriority;
+  acceptanceCriteria: string[];
+  knowledgeKeys: string[];
+}
+
+export interface GeneratedProjectBlueprint {
+  knowledgeArticles: BlueprintKnowledgeDraft[];
+  requirements: BlueprintRequirementDraft[];
+  model: string;
+}
+
+export interface DecomposedTaskDraft {
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  estimatedHours: number;
+  tags: string[];
+  subtasks: string[];
+  requirementIds: string[];
+  knowledgeArticleIds: string[];
+}
+
+const VALID_KB_CATEGORIES = new Set<KnowledgeCategory>([
+  'architecture',
+  'runbook',
+  'decision',
+  'postmortem',
+  'client_context',
+  'onboarding',
+]);
+
+function normalizeKbCategory(raw: unknown): KnowledgeCategory {
+  const val = String(raw || '').trim().toLowerCase() as KnowledgeCategory;
+  return VALID_KB_CATEGORIES.has(val) ? val : 'architecture';
+}
+
+function normalizeReqType(raw: unknown): RequirementType {
+  const val = String(raw || '').trim().toLowerCase();
+  if (val.includes('non') || val === 'nfr' || val.includes('нефункц')) return 'non_functional';
+  return 'functional';
+}
+
+function normalizeReqPriority(raw: unknown): RequirementPriority {
+  const val = String(raw || '').trim().toLowerCase();
+  if (val === 'critical' || val === 'high' || val === 'medium' || val === 'low') return val;
+  if (val === 'urgent') return 'critical';
+  return 'medium';
+}
+
+function normalizeTaskPriority(raw: unknown): TaskPriority {
+  const val = String(raw || '').trim().toLowerCase();
+  if (val === 'urgent' || val === 'high' || val === 'medium' || val === 'low') return val;
+  if (val === 'critical') return 'urgent';
+  return 'medium';
+}
+
+export async function generateProjectBlueprintFromSpec(params: {
+  projectName: string;
+  projectKey?: string;
+  specText: string;
+  docMeta?: Partial<DocumentItem>;
+  lang: SupportedLang;
+  baseUrl?: string;
+  model?: string;
+  signal?: AbortSignal;
+}): Promise<GeneratedProjectBlueprint> {
+  const langName = params.lang === 'en' ? 'English' : 'Russian';
+  const rawDocText = params.docMeta
+    ? extractDocumentTextContext(params.docMeta)
+    : '';
+  const specCombined = [params.specText.trim(), rawDocText]
+    .filter(Boolean)
+    .join('\n\n')
+    .slice(0, 9500);
+
+  const systemPrompt = [
+    'You are a Principal Product & Solutions Architect.',
+    'Given a product specification, produce a structured Knowledge Base AND a comprehensive set of Functional (FR) and Non-Functional (NFR) requirements.',
+    `Write all human-readable titles, summaries, markdown contents, descriptions, categories, and acceptance criteria in ${langName}.`,
+    'Return ONLY a valid JSON object with exact schema:',
+    '{',
+    '  "knowledgeArticles": [',
+    '    {',
+    '      "tempKey": "kb-1",',
+    '      "title": "<concise KB article title>",',
+    '      "summary": "<1-2 sentence summary>",',
+    '      "content": "<markdown knowledge article with ## sections and concrete rules/decisions>",',
+    '      "category": "architecture" | "runbook" | "decision" | "client_context" | "onboarding",',
+    '      "tags": ["tag1", "tag2"]',
+    '    }',
+    '  ],',
+    '  "requirements": [',
+    '    {',
+    '      "code": "FR-01",',
+    '      "type": "functional" | "non_functional",',
+    '      "title": "<short clear requirement title>",',
+    '      "description": "<detailed requirement specification>",',
+    '      "category": "<domain e.g. Auth, API, Security, Performance, Billing, UX>",',
+    '      "priority": "critical" | "high" | "medium" | "low",',
+    '      "acceptanceCriteria": ["<verifiable criterion 1>", "<criterion 2>"],',
+    '      "knowledgeKeys": ["kb-1"]',
+    '    }',
+    '  ]',
+    '}',
+    'Generate 3 to 5 rich Knowledge Base articles (e.g. Architecture Overview, Domain Rules, Security & SLA Constraints) and 5 to 10 requirements (including BOTH functional FR-xx and non_functional NFR-xx items) linked via knowledgeKeys.',
+  ].join('\n');
+
+  const userPrompt = [
+    `Project Name: ${params.projectName || 'New Project'}`,
+    params.projectKey ? `Project Key: ${params.projectKey}` : '',
+    '',
+    '### PRODUCT SPECIFICATION',
+    specCombined,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const { content, model } = await chatCompletion({
+    baseUrl: params.baseUrl,
+    model: params.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.25,
+    signal: params.signal,
+  });
+
+  const parsed = extractJsonObject<{
+    knowledgeArticles?: Array<Record<string, unknown>>;
+    requirements?: Array<Record<string, unknown>>;
+  }>(content);
+
+  if (!parsed) {
+    throw new AiClientError('PARSE_ERROR', 'Could not parse project blueprint JSON');
+  }
+
+  const rawKbs = Array.isArray(parsed.knowledgeArticles) ? parsed.knowledgeArticles : [];
+  const knowledgeArticles: BlueprintKnowledgeDraft[] = rawKbs
+    .map((item, idx): BlueprintKnowledgeDraft | null => {
+      const title = String(item?.title || '').trim();
+      if (!title) return null;
+      const tempKey = String(item?.tempKey || `kb-${idx + 1}`).trim() || `kb-${idx + 1}`;
+      const summary = String(item?.summary || title).trim();
+      const body = String(item?.content || summary).trim();
+      return {
+        tempKey,
+        title,
+        summary,
+        content: body,
+        category: normalizeKbCategory(item?.category),
+        tags: sanitizeTags(item?.tags),
+      };
+    })
+    .filter((x): x is BlueprintKnowledgeDraft => Boolean(x))
+    .slice(0, 8);
+
+  const rawReqs = Array.isArray(parsed.requirements) ? parsed.requirements : [];
+  let frCounter = 1;
+  let nfrCounter = 1;
+  const requirements: BlueprintRequirementDraft[] = rawReqs
+    .map((item): BlueprintRequirementDraft | null => {
+      const title = String(item?.title || '').trim();
+      if (!title) return null;
+      const type = normalizeReqType(item?.type);
+      const defaultCode =
+        type === 'functional'
+          ? `FR-${String(frCounter++).padStart(2, '0')}`
+          : `NFR-${String(nfrCounter++).padStart(2, '0')}`;
+      const code = String(item?.code || defaultCode).trim().toUpperCase() || defaultCode;
+      const knowledgeKeys = Array.isArray(item?.knowledgeKeys)
+        ? item.knowledgeKeys.map((k) => String(k || '').trim()).filter(Boolean)
+        : [];
+      return {
+        code,
+        type,
+        title,
+        description: String(item?.description || title).trim(),
+        category: String(item?.category || 'General').trim() || 'General',
+        priority: normalizeReqPriority(item?.priority),
+        acceptanceCriteria: sanitizeStringArray(item?.acceptanceCriteria, 6),
+        knowledgeKeys,
+      };
+    })
+    .filter((x): x is BlueprintRequirementDraft => Boolean(x))
+    .slice(0, 16);
+
+  if (knowledgeArticles.length === 0 && requirements.length === 0) {
+    throw new AiClientError('PARSE_ERROR', 'Blueprint returned empty lists');
+  }
+
+  return {
+    knowledgeArticles,
+    requirements,
+    model,
+  };
+}
+
+export async function decomposeRequirementsToTasks(params: {
+  project: Project;
+  requirements: ProjectRequirement[];
+  knowledgeArticles: KnowledgeArticle[];
+  documents?: DocumentItem[];
+  lang: SupportedLang;
+  baseUrl?: string;
+  model?: string;
+  signal?: AbortSignal;
+}): Promise<{ tasks: DecomposedTaskDraft[]; model: string }> {
+  const { project, requirements, knowledgeArticles, documents = [], lang } = params;
+  const langName = lang === 'en' ? 'English' : 'Russian';
+
+  const validReqIds = new Set(requirements.map((r) => r.id));
+  const validKbIds = new Set(knowledgeArticles.map((k) => k.id));
+
+  const systemPrompt = [
+    'You are a Principal Engineering Lead decomposing functional and non-functional requirements into actionable engineering tasks.',
+    `Write all task titles, descriptions, tags, and subtasks in ${langName}.`,
+    'Every generated task MUST reference exact requirement IDs in "requirementIds" and exact knowledge article IDs in "knowledgeArticleIds" from the provided inputs.',
+    'Return ONLY a valid JSON object with exact schema:',
+    '{',
+    '  "tasks": [',
+    '    {',
+    '      "title": "<concise action-oriented task title>",',
+    '      "description": "<clear technical scope referencing requirement codes and architecture notes>",',
+    '      "priority": "urgent" | "high" | "medium" | "low",',
+    '      "estimatedHours": 8,',
+    '      "tags": ["backend", "api"],',
+    '      "subtasks": ["<subtask 1>", "<subtask 2>", "<subtask 3>"],',
+    '      "requirementIds": ["<exact requirement.id>"],',
+    '      "knowledgeArticleIds": ["<exact knowledgeArticle.id>"]',
+    '    }',
+    '  ]',
+    '}',
+    'Produce 1 to 3 focused tasks per requirement (grouped cleanly when requirements overlap, up to 10 tasks total).',
+  ].join('\n');
+
+  const reqBlock = requirements
+    .map((r) =>
+      [
+        `- id: "${r.id}" | code: ${r.code} | type: ${r.type} | priority: ${r.priority} | category: ${r.category}`,
+        `  title: ${r.title}`,
+        `  description: ${r.description}`,
+        r.acceptanceCriteria.length
+          ? `  acceptanceCriteria: ${r.acceptanceCriteria.join(' ; ')}`
+          : '',
+        r.linkedKnowledgeIds.length
+          ? `  linkedKnowledgeIds: ${r.linkedKnowledgeIds.join(', ')}`
+          : '',
+      ]
+        .filter(Boolean)
+        .join('\n')
+    )
+    .join('\n\n');
+
+  const kbBlock = knowledgeArticles
+    .filter((k) => k.projectId === project.id || requirements.some((r) => r.linkedKnowledgeIds.includes(k.id)))
+    .slice(0, 10)
+    .map((k) => `- id: "${k.id}" | title: ${k.title} | summary: ${k.summary}`)
+    .join('\n');
+
+  const docBlock = documents
+    .filter((d) => d.projectId === project.id || d.id === project.specDocumentId)
+    .slice(0, 5)
+    .map((d) => `- ${d.title} (${d.fileName}): ${d.description}`)
+    .join('\n');
+
+  const userPrompt = [
+    `Project: [${project.key}] ${project.name}`,
+    project.description ? `Project Summary: ${project.description}` : '',
+    '',
+    '### SELECTED REQUIREMENTS TO DECOMPOSE',
+    reqBlock,
+    '',
+    kbBlock ? `### PROJECT KNOWLEDGE BASE\n${kbBlock}` : '',
+    docBlock ? `### PROJECT DOCUMENTS\n${docBlock}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+
+  const { content, model } = await chatCompletion({
+    baseUrl: params.baseUrl,
+    model: params.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.25,
+    signal: params.signal,
+  });
+
+  const parsed = extractJsonObject<{ tasks?: Array<Record<string, unknown>> }>(content);
+  if (!parsed || !Array.isArray(parsed.tasks)) {
+    throw new AiClientError('PARSE_ERROR', 'Could not parse decomposed tasks JSON');
+  }
+
+  const fallbackReqIds = requirements.slice(0, 2).map((r) => r.id);
+  const fallbackKbIdsFromReqs = Array.from(
+    new Set(requirements.flatMap((r) => r.linkedKnowledgeIds || []))
+  ).filter((id) => validKbIds.has(id));
+
+  const tasks: DecomposedTaskDraft[] = parsed.tasks
+    .map((item): DecomposedTaskDraft | null => {
+      const title = String(item?.title || '').trim();
+      if (!title) return null;
+
+      const reqIds = Array.isArray(item?.requirementIds)
+        ? item.requirementIds
+            .map((id) => String(id || '').trim())
+            .filter((id) => validReqIds.has(id))
+        : [];
+      const resolvedReqIds = reqIds.length > 0 ? reqIds : fallbackReqIds;
+
+      const rawKbIds = Array.isArray(item?.knowledgeArticleIds)
+        ? item.knowledgeArticleIds
+            .map((id) => String(id || '').trim())
+            .filter((id) => validKbIds.has(id))
+        : [];
+      const reqAutoKbs = Array.from(
+        new Set(
+          requirements
+            .filter((r) => resolvedReqIds.includes(r.id))
+            .flatMap((r) => r.linkedKnowledgeIds || [])
+        )
+      ).filter((id) => validKbIds.has(id));
+      const resolvedKbIds =
+        rawKbIds.length > 0
+          ? Array.from(new Set([...rawKbIds, ...reqAutoKbs]))
+          : reqAutoKbs.length > 0
+          ? reqAutoKbs
+          : fallbackKbIdsFromReqs.slice(0, 3);
+
+      const estNum = Number(item?.estimatedHours);
+      const estimatedHours =
+        Number.isFinite(estNum) && estNum > 0 ? Math.min(Math.round(estNum), 240) : 8;
+
+      return {
+        title,
+        description: String(item?.description || title).trim(),
+        priority: normalizeTaskPriority(item?.priority),
+        estimatedHours,
+        tags: sanitizeTags(item?.tags),
+        subtasks: sanitizeStringArray(item?.subtasks, 6),
+        requirementIds: resolvedReqIds,
+        knowledgeArticleIds: resolvedKbIds,
+      };
+    })
+    .filter((x): x is DecomposedTaskDraft => Boolean(x))
+    .slice(0, 12);
+
+  return { tasks, model };
+}
+
+export async function clarifyTaskWithContext(params: {
+  task: TaskContextInput;
+  projectName?: string;
+  contextItems: TaskAiContextItem[];
+  history: TaskAiClarificationMessage[];
+  question: string;
+  lang: SupportedLang;
+  baseUrl?: string;
+  model?: string;
+  signal?: AbortSignal;
+}): Promise<{ reply: string; model: string }> {
+  const { task, projectName, contextItems, history, question, lang } = params;
+  const langName = lang === 'en' ? 'English' : 'Russian';
+
+  const systemPrompt = [
+    'You are a collaborative Senior Solutions Architect & Tech Lead working together with an engineer to clarify a task.',
+    `Respond in ${langName} clearly, practically, and concisely.`,
+    'Always ground your answers in the linked Requirements (FR/NFR), Knowledge Base articles, and Documents provided in the context. Highlight trade-offs, edge cases, acceptance criteria, and concrete implementation guidance.',
+    'Do not wrap the whole reply in markdown code fences.',
+  ].join('\n');
+
+  const taskContextBlock = [
+    task.id ? `Task ID: ${task.id}` : '',
+    `Title: ${task.title}`,
+    projectName ? `Project: ${projectName}` : '',
+    task.priority ? `Priority: ${task.priority}` : '',
+    task.description?.trim() ? `Current Description:\n${task.description.trim()}` : '',
+    task.subtasks?.length
+      ? `Current Subtasks:\n${task.subtasks.map((s) => `- [${s.completed ? 'x' : ' '}] ${s.title}`).join('\n')}`
+      : '',
+    '',
+    '### LINKED REQUIREMENTS, KNOWLEDGE BASE & DOCUMENTS',
+    formatContextForPrompt(contextItems),
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const recentHistory = history.slice(-8).map((m) => ({
+    role: m.role,
+    content: m.content,
+  }));
+
+  const messages: OpenAIChatMessage[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: `Workspace context for our collaboration:\n\n${taskContextBlock}` },
+    ...recentHistory,
+    { role: 'user', content: question.trim() },
+  ];
+
+  const { content, model } = await chatCompletion({
+    baseUrl: params.baseUrl,
+    model: params.model,
+    messages,
+    temperature: 0.35,
+    signal: params.signal,
+  });
+
+  return {
+    reply: content.replace(/^```(?:markdown|md|txt)?\s*/i, '').replace(/```\s*$/i, '').trim(),
+    model,
+  };
+}
+

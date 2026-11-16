@@ -672,6 +672,110 @@
   min-width: 0;
   position: sticky;
   top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.preview-tags-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding: 0.58rem 0.8rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.preview-tags-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  flex-shrink: 0;
+}
+
+.tags-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.tag-chip.is-editable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.14rem 0.25rem 0.14rem 0.48rem;
+  border-radius: var(--radius-xs, 4px);
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #1e293b);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.tag-remove-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.tag-remove-btn:hover {
+  color: var(--color-danger, #ef4444);
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.inline-tag-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+}
+
+.inline-tag-input {
+  width: 112px;
+  height: 22px;
+  padding: 0 0.42rem;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.45));
+  background: var(--bg-canvas, #090d16);
+  color: var(--text-primary, #f8fafc);
+  font: inherit;
+  font-size: 0.71rem;
+  outline: none;
+}
+
+.inline-tag-input:focus {
+  border-color: var(--accent-primary, #6366f1);
+}
+
+.inline-tag-action {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid var(--border-subtle, #334155);
+  background: var(--bg-surface, #111827);
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.inline-tag-action.is-confirm:hover {
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.14);
 }
 
 .note-banner {

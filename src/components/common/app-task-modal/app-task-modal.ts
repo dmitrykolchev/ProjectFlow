@@ -2,9 +2,9 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
-import { Expense, ExpenseCategory, Task, TaskAiAnalysis, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
+import { Expense, ExpenseCategory, Task, TaskAiAnalysis, TaskAiClarificationMessage, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconArrowUpRight, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
+import { iconArrowUpRight, iconBookOpen, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconLayers, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
 import '../app-confirm-dialog/app-confirm-dialog';
@@ -14,7 +14,8 @@ import '../app-input/app-input';
 import '../app-textarea/app-textarea';
 import '../app-select/app-select';
 import '../app-entity-selector/app-entity-selector';
-import { mapProjectOptions, mapUserOptions } from '../entity-selector-options';
+import { mapKnowledgeOptions, mapProjectOptions, mapRequirementOptions, mapUserOptions } from '../entity-selector-options';
+import { eventValue } from '../event-value';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
@@ -48,6 +49,9 @@ export class AppTaskModal extends LitElement {
   @state() private dropTargetSubtaskId: string | null = null;
   @state() private dropSubtaskPosition: 'before' | 'after' = 'before';
   @state() private draftAiAnalysis?: TaskAiAnalysis;
+  @state() private draftAiClarifications: TaskAiClarificationMessage[] = [];
+  @state() private requirementIds: string[] = [];
+  @state() private knowledgeArticleIds: string[] = [];
 
   // Quick Time Entry & Task Expense inline state
   @state() private taskTimeEntries: TimeEntry[] = [];
@@ -97,6 +101,20 @@ export class AppTaskModal extends LitElement {
         this.tags = [...this.editingTask.tags];
         this.subtasks = [...this.editingTask.subtasks];
         this.draftAiAnalysis = this.editingTask.aiAnalysis;
+        this.draftAiClarifications = [...(this.editingTask.aiClarifications || [])];
+        const taskId = this.editingTask.id;
+        const reqsFromLinks = store.requirements
+          .filter((r) => (r.linkedTaskIds || []).includes(taskId))
+          .map((r) => r.id);
+        const kbsFromLinks = store.knowledgeArticles
+          .filter((k) => (k.linkedTaskIds || []).includes(taskId))
+          .map((k) => k.id);
+        this.requirementIds = Array.from(
+          new Set([...(this.editingTask.requirementIds || []), ...reqsFromLinks])
+        );
+        this.knowledgeArticleIds = Array.from(
+          new Set([...(this.editingTask.knowledgeArticleIds || []), ...kbsFromLinks])
+        );
       } else {
         this.editingTask = null;
         this.taskTitle = '';
@@ -114,6 +132,9 @@ export class AppTaskModal extends LitElement {
         this.tags = ['Dev'];
         this.subtasks = [];
         this.draftAiAnalysis = undefined;
+        this.draftAiClarifications = [];
+        this.requirementIds = [];
+        this.knowledgeArticleIds = [];
       }
       this.errors = {};
       this.draggedSubtaskId = null;
@@ -159,6 +180,22 @@ export class AppTaskModal extends LitElement {
     const assigneeOptions = mapUserOptions(store.users, t);
 
     const availableTags = ['Dev', 'Frontend', 'Backend', 'Design', 'Architecture', 'Security', 'Performance', 'QA', 'API'];
+
+    const availableReqOptions = mapRequirementOptions(
+      store.requirements.filter(
+        (r) => r.projectId === this.projectId && !this.requirementIds.includes(r.id)
+      ),
+      t
+    );
+    const selectedReqs = store.requirements.filter((r) => this.requirementIds.includes(r.id));
+
+    const availableKbOptions = mapKnowledgeOptions(
+      store.knowledgeArticles.filter((k) => !this.knowledgeArticleIds.includes(k.id)),
+      t
+    );
+    const selectedKbs = store.knowledgeArticles.filter((k) =>
+      this.knowledgeArticleIds.includes(k.id)
+    );
 
     return html`
       <app-modal
@@ -208,8 +245,11 @@ export class AppTaskModal extends LitElement {
                 loggedHours: this.loggedHours,
                 tags: this.tags,
                 subtasks: this.subtasks,
+                requirementIds: this.requirementIds,
+                knowledgeArticleIds: this.knowledgeArticleIds,
               }}"
               .analysis="${this.draftAiAnalysis}"
+              .clarifications="${this.draftAiClarifications}"
               @apply-description="${(e: CustomEvent<{ description: string; mode: 'replace' | 'append' }>) => {
                 const { description, mode } = e.detail;
                 this.description =
@@ -222,6 +262,9 @@ export class AppTaskModal extends LitElement {
               }}"
               @analysis-cleared="${() => {
                 this.draftAiAnalysis = undefined;
+              }}"
+              @clarification-update="${(e: CustomEvent<{ messages: TaskAiClarificationMessage[] }>) => {
+                this.draftAiClarifications = [...e.detail.messages];
               }}"
               @add-subtask="${(e: CustomEvent<{ title: string }>) => {
                 const title = e.detail?.title?.trim();
@@ -317,6 +360,86 @@ export class AppTaskModal extends LitElement {
               .selected="${this.tags}"
               @change="${(e: CustomEvent) => (this.tags = e.detail.selected)}"
             ></app-combobox>
+          </div>
+
+          <div>
+            <app-entity-selector
+              label="${t.viewTexts.taskModal.linkedRequirementsLabel}"
+              placeholder="${t.viewTexts.taskModal.attachRequirementPlaceholder}"
+              .options="${availableReqOptions}"
+              value=""
+              @change="${(e: CustomEvent<{ value: string }>) => {
+                const reqId = eventValue(e);
+                if (reqId && !this.requirementIds.includes(reqId)) {
+                  this.requirementIds = [...this.requirementIds, reqId];
+                }
+              }}"
+            ></app-entity-selector>
+            ${selectedReqs.length > 0
+              ? html`
+                  <div class="modal-links-chips">
+                    ${selectedReqs.map(
+                      (req) => html`
+                        <span class="modal-link-chip is-req">
+                          ${iconLayers(11)}
+                          <span>${req.code} · ${req.title}</span>
+                          <button
+                            type="button"
+                            class="modal-chip-remove"
+                            title="${t.common.delete}"
+                            @click="${() => {
+                              this.requirementIds = this.requirementIds.filter((id) => id !== req.id);
+                            }}"
+                          >
+                            ${iconX(11)}
+                          </button>
+                        </span>
+                      `
+                    )}
+                  </div>
+                `
+              : ''}
+          </div>
+
+          <div>
+            <app-entity-selector
+              label="${t.viewTexts.taskModal.linkedKnowledgeLabel}"
+              placeholder="${t.viewTexts.taskModal.attachKnowledgePlaceholder}"
+              .options="${availableKbOptions}"
+              value=""
+              @change="${(e: CustomEvent<{ value: string }>) => {
+                const kbId = eventValue(e);
+                if (kbId && !this.knowledgeArticleIds.includes(kbId)) {
+                  this.knowledgeArticleIds = [...this.knowledgeArticleIds, kbId];
+                }
+              }}"
+            ></app-entity-selector>
+            ${selectedKbs.length > 0
+              ? html`
+                  <div class="modal-links-chips">
+                    ${selectedKbs.map(
+                      (kb) => html`
+                        <span class="modal-link-chip">
+                          ${iconBookOpen(11)}
+                          <span>${kb.title}</span>
+                          <button
+                            type="button"
+                            class="modal-chip-remove"
+                            title="${t.common.delete}"
+                            @click="${() => {
+                              this.knowledgeArticleIds = this.knowledgeArticleIds.filter(
+                                (id) => id !== kb.id
+                              );
+                            }}"
+                          >
+                            ${iconX(11)}
+                          </button>
+                        </span>
+                      `
+                    )}
+                  </div>
+                `
+              : ''}
           </div>
 
           <div class="col-span-2 subtasks-section">
@@ -579,6 +702,8 @@ export class AppTaskModal extends LitElement {
       return;
     }
 
+    let savedTaskId = this.editingTask?.id || '';
+
     if (this.editingTask) {
       store.updateTask({
         ...this.editingTask,
@@ -594,10 +719,13 @@ export class AppTaskModal extends LitElement {
         loggedHours: this.loggedHours,
         tags: this.tags,
         subtasks: this.subtasks,
+        requirementIds: [...this.requirementIds],
+        knowledgeArticleIds: [...this.knowledgeArticleIds],
         aiAnalysis: this.draftAiAnalysis,
+        aiClarifications: [...this.draftAiClarifications],
       });
     } else {
-      store.addTask({
+      const created = store.addTask({
         title: this.taskTitle.trim(),
         description: this.description.trim(),
         projectId: this.projectId,
@@ -610,8 +738,31 @@ export class AppTaskModal extends LitElement {
         loggedHours: this.loggedHours,
         tags: this.tags,
         subtasks: this.subtasks,
+        requirementIds: [...this.requirementIds],
+        knowledgeArticleIds: [...this.knowledgeArticleIds],
         aiAnalysis: this.draftAiAnalysis,
+        aiClarifications: [...this.draftAiClarifications],
       });
+      savedTaskId = created.id;
+    }
+
+    if (savedTaskId) {
+      const reqSet = new Set(this.requirementIds);
+      for (const req of store.requirements) {
+        const hasLink = (req.linkedTaskIds || []).includes(savedTaskId);
+        const shouldHave = reqSet.has(req.id);
+        if (shouldHave && !hasLink) {
+          store.updateRequirement({
+            ...req,
+            linkedTaskIds: [...(req.linkedTaskIds || []), savedTaskId],
+          });
+        } else if (!shouldHave && hasLink) {
+          store.updateRequirement({
+            ...req,
+            linkedTaskIds: (req.linkedTaskIds || []).filter((id) => id !== savedTaskId),
+          });
+        }
+      }
     }
 
     store.closeTaskModal();

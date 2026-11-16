@@ -9,6 +9,7 @@ import {
   ProjectChatMessage,
   Task,
   TaskAiAnalysis,
+  TaskAiClarificationMessage,
   TaskPriority,
   TaskStatus,
   TimeEntry,
@@ -22,6 +23,7 @@ import {
   iconCornerUpLeft,
   iconEdit,
   iconFolder,
+  iconLayers,
   iconMessageSquare,
   iconPin,
   iconPlus,
@@ -30,6 +32,7 @@ import {
   iconWallet,
   iconX,
 } from '../../common/icons';
+import { mapKnowledgeOptions, mapRequirementOptions } from '../../common/entity-selector-options';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-checkbox/app-checkbox';
@@ -42,8 +45,10 @@ import '../../common/app-select/app-select';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-task-ai-panel/app-task-ai-panel';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
@@ -623,6 +628,7 @@ export class AppTaskDetail extends LitElement {
             <app-task-ai-panel
               .task="${task}"
               .analysis="${task.aiAnalysis}"
+              .clarifications="${task.aiClarifications || []}"
               .timeSummary="${timeEntries
                 .slice(0, 6)
                 .map((te) => `${te.date}: ${te.hours}h (${te.category}) - ${te.description}`)
@@ -649,6 +655,9 @@ export class AppTaskDetail extends LitElement {
               }}"
               @analysis-cleared="${() => {
                 store.updateTask({ ...task, aiAnalysis: undefined });
+              }}"
+              @clarification-update="${(e: CustomEvent<{ messages: TaskAiClarificationMessage[] }>) => {
+                store.updateTask({ ...task, aiClarifications: e.detail.messages });
               }}"
               @add-subtask="${(e: CustomEvent<{ title: string }>) => {
                 const title = e.detail?.title?.trim();
@@ -754,49 +763,7 @@ export class AppTaskDetail extends LitElement {
                 </div>
             </app-section-card>
 
-            <app-section-card variant="tabbed" title="${t.navigation.knowledgeBase}">
-              <span slot="icon">${iconBookOpen(16)}</span>
-              <button
-                slot="actions"
-                type="button"
-                class="link-btn"
-                @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
-              >
-                ${iconBookOpen(14)}
-              </button>
-                ${(() => {
-                  const linkedDocs = store.knowledgeArticles.filter(
-                    (a) =>
-                      (a.linkedTaskIds || []).includes(task.id) ||
-                      a.projectId === task.projectId
-                  );
-                  if (linkedDocs.length === 0) {
-                    return html`<div style="font-size: 0.8125rem; color: var(--text-muted);">${t.knowledgeBase.emptyCatalog}</div>`;
-                  }
-                  return html`
-                    <div class="cost-list">
-                      ${linkedDocs.slice(0, 4).map(
-                        (doc) => html`
-                          <button
-                            type="button"
-                            class="link-btn"
-                            style="text-align: left; justify-content: flex-start; padding: 0.35rem 0; font-size: 0.8125rem;"
-                            @click="${() =>
-                              store.openKnowledgeBase({
-                                scope: doc.scope,
-                                projectId: doc.projectId || 'all',
-                                companyId: doc.companyId || 'all',
-                                articleId: doc.id,
-                              })}"
-                          >
-                            <span>${doc.title}</span>
-                          </button>
-                        `
-                      )}
-                    </div>
-                  `;
-                })()}
-            </app-section-card>
+            ${this.renderTraceabilitySidebarCard(task, t)}
           </aside>
         </div>
       </div>
@@ -1451,5 +1418,195 @@ export class AppTaskDetail extends LitElement {
   private removeSubtask(task: Task, subtaskId: string) {
     const next = task.subtasks.filter((s) => s.id !== subtaskId);
     store.updateTask({ ...task, subtasks: next });
+  }
+
+  private renderTraceabilitySidebarCard(
+    task: Task,
+    t: ReturnType<typeof getTranslation>
+  ) {
+    const linkedReqs = store.requirements.filter(
+      (r) =>
+        (task.requirementIds || []).includes(r.id) ||
+        (r.linkedTaskIds || []).includes(task.id)
+    );
+    const linkedKbIds = new Set(task.knowledgeArticleIds || []);
+    const linkedKbs = store.knowledgeArticles.filter(
+      (a) => linkedKbIds.has(a.id) || (a.linkedTaskIds || []).includes(task.id)
+    );
+
+    const availableReqOptions = mapRequirementOptions(
+      store.requirements.filter(
+        (r) => r.projectId === task.projectId && !linkedReqs.some((lr) => lr.id === r.id)
+      ),
+      t
+    );
+    const availableKbOptions = mapKnowledgeOptions(
+      store.knowledgeArticles.filter((a) => !linkedKbs.some((la) => la.id === a.id)),
+      t
+    );
+
+    return html`
+      <app-section-card
+        variant="tabbed"
+        title="${t.viewTexts.taskDetail.requirementsSectionTitle}"
+      >
+        <span slot="icon">${iconLayers(16)}</span>
+        <div slot="actions" style="display: flex; align-items: center; gap: 0.4rem;">
+          <button
+            type="button"
+            class="link-btn"
+            title="${t.navigation.knowledgeBase}"
+            @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
+          >
+            ${iconBookOpen(14)}
+          </button>
+        </div>
+
+        <div class="trace-sidebar-block">
+          <div class="trace-subhead">${t.viewTexts.taskDetail.linkedRequirementsLabel} (${linkedReqs.length})</div>
+          ${linkedReqs.length === 0
+            ? html`<div class="trace-empty">${t.viewTexts.taskDetail.noRequirementsLinked}</div>`
+            : html`
+                <div class="trace-link-list">
+                  ${linkedReqs.map(
+                    (req) => html`
+                      <div class="trace-link-item">
+                        <button
+                          type="button"
+                          class="trace-link-main"
+                          @click="${() => store.openProjectDetail(req.projectId)}"
+                        >
+                          <span class="trace-code ${req.type === 'non_functional' ? 'is-nfr' : ''}">${req.code}</span>
+                          <span class="trace-name" title="${req.title}">${req.title}</span>
+                        </button>
+                        <app-status-chip
+                          domain="requirement"
+                          status="${req.status}"
+                          appearance="soft"
+                          size="sm"
+                        ></app-status-chip>
+                        <button
+                          type="button"
+                          class="mini-action-btn"
+                          title="${t.common.delete}"
+                          @click="${() => this.unlinkRequirement(task, req.id)}"
+                        >
+                          ${iconX(12)}
+                        </button>
+                      </div>
+                    `
+                  )}
+                </div>
+              `}
+          ${availableReqOptions.length > 0
+            ? html`
+                <app-entity-selector
+                  size="sm"
+                  placeholder="${t.viewTexts.taskDetail.attachRequirementPlaceholder}"
+                  .options="${availableReqOptions}"
+                  value=""
+                  @change="${(e: CustomEvent<{ value: string }>) => {
+                    const id = eventValue(e);
+                    if (id) this.linkRequirement(task, id);
+                  }}"
+                ></app-entity-selector>
+              `
+            : ''}
+        </div>
+
+        <div class="trace-sidebar-block">
+          <div class="trace-subhead">${t.viewTexts.taskDetail.linkedKnowledgeLabel} (${linkedKbs.length})</div>
+          ${linkedKbs.length > 0
+            ? html`
+                <div class="trace-link-list">
+                  ${linkedKbs.map(
+                    (art) => html`
+                      <div class="trace-link-item">
+                        <button
+                          type="button"
+                          class="trace-link-main"
+                          @click="${() =>
+                            store.openKnowledgeBase({
+                              scope: art.scope,
+                              projectId: art.projectId || 'all',
+                              companyId: art.companyId || 'all',
+                              articleId: art.id,
+                            })}"
+                        >
+                          ${iconBookOpen(13)}
+                          <span class="trace-name" title="${art.title}">${art.title}</span>
+                        </button>
+                        <button
+                          type="button"
+                          class="mini-action-btn"
+                          title="${t.common.delete}"
+                          @click="${() => this.unlinkKnowledge(task, art.id)}"
+                        >
+                          ${iconX(12)}
+                        </button>
+                      </div>
+                    `
+                  )}
+                </div>
+              `
+            : ''}
+          ${availableKbOptions.length > 0
+            ? html`
+                <app-entity-selector
+                  size="sm"
+                  placeholder="${t.viewTexts.taskDetail.attachKnowledgePlaceholder}"
+                  .options="${availableKbOptions}"
+                  value=""
+                  @change="${(e: CustomEvent<{ value: string }>) => {
+                    const id = eventValue(e);
+                    if (id) this.linkKnowledge(task, id);
+                  }}"
+                ></app-entity-selector>
+              `
+            : ''}
+        </div>
+      </app-section-card>
+    `;
+  }
+
+  private linkRequirement(task: Task, reqId: string) {
+    const nextReqIds = Array.from(new Set([...(task.requirementIds || []), reqId]));
+    store.updateTask({ ...task, requirementIds: nextReqIds });
+    const req = store.requirements.find((r) => r.id === reqId);
+    if (req && !(req.linkedTaskIds || []).includes(task.id)) {
+      store.updateRequirement({
+        ...req,
+        linkedTaskIds: [...(req.linkedTaskIds || []), task.id],
+      });
+    }
+  }
+
+  private unlinkRequirement(task: Task, reqId: string) {
+    const nextReqIds = (task.requirementIds || []).filter((id) => id !== reqId);
+    store.updateTask({ ...task, requirementIds: nextReqIds });
+    const req = store.requirements.find((r) => r.id === reqId);
+    if (req && (req.linkedTaskIds || []).includes(task.id)) {
+      store.updateRequirement({
+        ...req,
+        linkedTaskIds: (req.linkedTaskIds || []).filter((id) => id !== task.id),
+      });
+    }
+  }
+
+  private linkKnowledge(task: Task, kbId: string) {
+    const nextKbIds = Array.from(new Set([...(task.knowledgeArticleIds || []), kbId]));
+    store.updateTask({ ...task, knowledgeArticleIds: nextKbIds });
+  }
+
+  private unlinkKnowledge(task: Task, kbId: string) {
+    const nextKbIds = (task.knowledgeArticleIds || []).filter((id) => id !== kbId);
+    store.updateTask({ ...task, knowledgeArticleIds: nextKbIds });
+    const art = store.knowledgeArticles.find((a) => a.id === kbId);
+    if (art && (art.linkedTaskIds || []).includes(task.id)) {
+      store.updateKnowledgeArticle({
+        ...art,
+        linkedTaskIds: (art.linkedTaskIds || []).filter((id) => id !== task.id),
+      });
+    }
   }
 }

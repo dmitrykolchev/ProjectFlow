@@ -10,6 +10,7 @@ import {
   KnowledgeArticle,
   Project,
   ProjectChatMessage,
+  ProjectRequirement,
   Task,
   TaskPriority,
   TaskStatus,
@@ -315,6 +316,7 @@ export const initialProjects: Project[] = [
     companyId: 'comp-1',
     counterpartyId: 'cp-1',
     budget: 14500000,
+    specDocumentId: 'doc-4',
     members: [
       { userId: 'user-8', role: 'pm', allocation: 50, joinedAt: '2026-01-15' },
       { userId: 'user-1', role: 'architect', allocation: 80, joinedAt: '2026-01-10' },
@@ -539,6 +541,8 @@ const featuredTasks: Task[] = [
     order: 0,
     createdAt: '2026-11-04T10:00:00Z',
     updatedAt: '2026-11-10T14:30:00Z',
+    requirementIds: ['req-101', 'req-102'],
+    knowledgeArticleIds: ['kb-101', 'kb-108'],
   },
   {
     id: 'CORE-102',
@@ -561,6 +565,8 @@ const featuredTasks: Task[] = [
     order: 1,
     createdAt: '2026-11-06T11:15:00Z',
     updatedAt: '2026-11-11T09:20:00Z',
+    requirementIds: ['req-103'],
+    knowledgeArticleIds: ['kb-102'],
   },
   {
     id: 'CORE-103',
@@ -604,6 +610,8 @@ const featuredTasks: Task[] = [
     order: 3,
     createdAt: '2026-11-10T16:00:00Z',
     updatedAt: '2026-11-10T16:00:00Z',
+    requirementIds: ['req-101'],
+    knowledgeArticleIds: ['kb-101'],
   },
   {
     id: 'MOB-201',
@@ -2809,6 +2817,111 @@ export const initialDocuments: DocumentItem[] = [
     updatedAt: '2026-09-01T09:00:00Z',
   },
 ];
+
+export const initialRequirements: ProjectRequirement[] = [
+  {
+    id: 'req-101',
+    projectId: 'proj-1',
+    code: 'FR-01',
+    type: 'functional',
+    title: 'Двухуровневое распределённое кэширование и инвалидация через Pub/Sub',
+    description:
+      'API Gateway и микросервисы Core 3.0 должны кэшировать горячие чтения в L1 (LRU in-memory) и L2 (Redis Cluster) с согласованной инвалидацией событий в пределах 50 мс.',
+    category: 'Кэширование и API',
+    priority: 'critical',
+    status: 'in_progress',
+    acceptanceCriteria: [
+      'Снижение нагрузки на PostgreSQL не менее чем на 70% при чтении карточек проектов и задач',
+      'Публикация событий инвалидации через Redis Pub/Sub с fallback TTL <= 60 сек',
+      'Все контракты gRPC-Web соответствуют OpenAPI/Protobuf схеме Gateway v2.1',
+    ],
+    linkedKnowledgeIds: ['kb-101'],
+    sourceDocumentId: 'doc-4',
+    createdAt: '2026-11-01T10:00:00Z',
+    updatedAt: '2026-11-10T14:30:00Z',
+  },
+  {
+    id: 'req-102',
+    projectId: 'proj-1',
+    code: 'NFR-01',
+    type: 'non_functional',
+    title: 'Латентность чтения p95 < 120 мс при нагрузке до 10 000 RPS',
+    description:
+      'В технологических окнах банка ПАО «Северный Капитал» критичные read-эндпоинты обязаны укладываться в SLA p95 < 120 мс и подтверждаться нагрузочным протоколом.',
+    category: 'Производительность и SLA',
+    priority: 'critical',
+    status: 'approved',
+    acceptanceCriteria: [
+      'p95 latency API Gateway <= 120 мс, p99 <= 220 мс по результатам k6/JMeter теста',
+      'Присутствует нагрузочный протокол для приёмки этапа заказчиком',
+    ],
+    linkedKnowledgeIds: ['kb-101', 'kb-108'],
+    sourceDocumentId: 'doc-4',
+    createdAt: '2026-11-01T10:30:00Z',
+    updatedAt: '2026-11-11T16:45:00Z',
+  },
+  {
+    id: 'req-103',
+    projectId: 'proj-1',
+    code: 'NFR-02',
+    type: 'non_functional',
+    title: 'Ограничение initial JS-бандла UI-библиотеки Lit до < 80 KB (gzip)',
+    description:
+      'Модульная архитектура Lit-компонентов с CSS-модулями и Rollup tree-shaking должна обеспечивать быстрый TTI без полифилов и тяжёлых фреймворков.',
+    category: 'Frontend-производительность',
+    priority: 'high',
+    status: 'in_progress',
+    acceptanceCriteria: [
+      'Суммарный initial gzip JS bundle <= 80 KB',
+      'Поддержка тем Light, Dark и Cyberpunk без FOUC при переключении',
+    ],
+    linkedKnowledgeIds: ['kb-102'],
+    sourceDocumentId: 'doc-4',
+    createdAt: '2026-11-02T09:00:00Z',
+    updatedAt: '2026-11-11T09:20:00Z',
+  },
+  {
+    id: 'req-201',
+    projectId: 'proj-2',
+    code: 'FR-01',
+    type: 'functional',
+    title: 'Оффлайн-очередь изменений задач в IndexedDB с автосинхронизацией',
+    description:
+      'Мобильный клиент должен сохранять все изменения пользователя локально при потере сети и выполнять идемпотентную синхронизацию при восстановлении соединения.',
+    category: 'Оффлайн и синхронизация',
+    priority: 'high',
+    status: 'approved',
+    acceptanceCriteria: [
+      'Фоновая синхронизация черновиков каждые 90 сек при наличии сети',
+      'Компактный неблокирующий баннер статуса синхронизации без потери введённых данных',
+    ],
+    linkedKnowledgeIds: ['kb-103', 'kb-106'],
+    sourceDocumentId: 'doc-8',
+    createdAt: '2026-10-28T12:00:00Z',
+    updatedAt: '2026-10-28T12:00:00Z',
+  },
+  {
+    id: 'req-401',
+    projectId: 'proj-4',
+    code: 'FR-01',
+    type: 'functional',
+    title: 'Почасовые витрины SLA на базе AggregatingMergeTree',
+    description:
+      'Аналитический контур должен агрегировать телеметрию событий по project_id и hour_bucket с расчётом квантиля p95 задержек.',
+    category: 'Витрины данных',
+    priority: 'high',
+    status: 'verified',
+    acceptanceCriteria: [
+      'Материализованное представление mv_sla_hourly использует AggregatingMergeTree с quantileState(0.95)',
+      'Партиционирование таблиц фактов настроено по месяцам toYYYYMM(event_time)',
+    ],
+    linkedKnowledgeIds: ['kb-105'],
+    sourceDocumentId: 'doc-7',
+    createdAt: '2026-10-30T13:15:00Z',
+    updatedAt: '2026-11-01T10:00:00Z',
+  },
+];
+
 
 
 

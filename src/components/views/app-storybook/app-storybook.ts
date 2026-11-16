@@ -42,6 +42,7 @@ import paginationMeta from '../../common/app-pagination/app-pagination.story';
 import fileDropzoneMeta from '../../common/app-file-dropzone/app-file-dropzone.story';
 import documentPreviewerMeta from '../../common/app-document-previewer/app-document-previewer.story';
 import taskAiPanelMeta from '../../common/app-task-ai-panel/app-task-ai-panel.story';
+import projectRequirementsMeta from '../../common/app-project-requirements/app-project-requirements.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -118,6 +119,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   fileDropzoneMeta,
   documentPreviewerMeta,
   taskAiPanelMeta,
+  projectRequirementsMeta,
   toastMeta,
   activityMeta,
   headerMeta,

@@ -3,7 +3,28 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { Project, ProjectRole, ProjectStatus } from '../../../types';
-import { iconChevronRight, iconEdit, iconFolder, iconKanban, iconPlus, iconTrash } from '../../common/icons';
+import {
+  iconAlertTriangle,
+  iconBookOpen,
+  iconCheck,
+  iconChevronRight,
+  iconCpu,
+  iconEdit,
+  iconFileText,
+  iconFolder,
+  iconKanban,
+  iconLayers,
+  iconPlus,
+  iconTrash,
+} from '../../common/icons';
+import { readBrowserFile, ReadFilePayload } from '../../common/document-utils';
+import { mapDocumentOptions } from '../../common/entity-selector-options';
+import {
+  extractDocumentTextContext,
+  formatAiError,
+  GeneratedProjectBlueprint,
+  generateProjectBlueprintFromSpec,
+} from '../../../services/openai-client';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -14,6 +35,9 @@ import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
+import '../../common/app-file-dropzone/app-file-dropzone';
+import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
@@ -75,6 +99,17 @@ export class AppProjects extends LitElement {
   @state() private formBudget = 5000000;
   @state() private formProgress = 0;
   @state() private formError = '';
+
+  // Spec-driven project creation & AI blueprint state
+  @state() private specInputMode: 'existing' | 'upload' | 'paste' = 'existing';
+  @state() private selectedSpecDocId = '';
+  @state() private uploadedSpecPayload: ReadFilePayload | null = null;
+  @state() private uploadedSpecNote = '';
+  @state() private pastedSpecText = '';
+  @state() private autoGenerateFromSpec = true;
+  @state() private specAiLoading = false;
+  @state() private specAiError = '';
+  @state() private generatedBlueprint: GeneratedProjectBlueprint | null = null;
 
   @state() private deletingProject: Project | null = null;
 
@@ -553,17 +588,196 @@ export class AppProjects extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
             ></app-textarea>
           </div>
+
+          ${!this.editingId ? this.renderSpecBootstrapSection(t) : ''}
         </app-form-grid>
 
         <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
+          <app-button
+            variant="ghost"
+            ?disabled="${this.specAiLoading}"
+            @click="${() => (this.modalOpen = false)}"
+          >
             ${t.common.cancel}
           </app-button>
-          <app-button variant="primary" @click="${this.handleSaveProject}">
-            ${t.common.save}
+          ${!this.editingId && this.specAiError
+            ? html`
+                <app-button
+                  variant="outline"
+                  ?disabled="${this.specAiLoading}"
+                  @click="${() => this.handleSaveProject(true)}"
+                >
+                  ${t.viewTexts.projects.createWithoutAiBtn}
+                </app-button>
+              `
+            : ''}
+          <app-button
+            variant="primary"
+            ?disabled="${this.specAiLoading}"
+            @click="${() => this.handleSaveProject(false)}"
+          >
+            ${this.specAiLoading ? t.viewTexts.projects.generatingBlueprint : t.common.save}
           </app-button>
         </div>
       </app-modal>
+    `;
+  }
+
+  private renderSpecBootstrapSection(t: ReturnType<typeof getTranslation>) {
+    const docOptions = mapDocumentOptions(store.documents, t);
+    const hasSpecInput = Boolean(this.getEffectiveSpecText().trim() || this.selectedSpecDocId);
+
+    return html`
+      <div class="col-span-2 spec-bootstrap-box">
+        <div class="spec-bootstrap-head">
+          <div class="spec-bootstrap-title">
+            ${iconFileText(16)}
+            <span>${t.viewTexts.projects.specSectionTitle}</span>
+          </div>
+          <app-segmented-switch
+            size="sm"
+            .value="${this.specInputMode}"
+            .options="${[
+              { value: 'existing', label: t.viewTexts.projects.specModeExisting },
+              { value: 'upload', label: t.viewTexts.projects.specModeUpload },
+              { value: 'paste', label: t.viewTexts.projects.specModePaste },
+            ]}"
+            @change="${(e: CustomEvent<{ value: string }>) => {
+              this.specInputMode = eventValue(e) as 'existing' | 'upload' | 'paste';
+              this.specAiError = '';
+            }}"
+          ></app-segmented-switch>
+        </div>
+
+        ${this.specInputMode === 'existing'
+          ? html`
+              <app-entity-selector
+                clearable
+                placeholder="${t.viewTexts.projects.selectSpecPlaceholder}"
+                .options="${docOptions}"
+                .value="${this.selectedSpecDocId}"
+                @change="${(e: CustomEvent<{ value: string }>) => {
+                  this.selectedSpecDocId = eventValue(e) || '';
+                  this.generatedBlueprint = null;
+                  this.specAiError = '';
+                  const doc = store.documents.find((d) => d.id === this.selectedSpecDocId);
+                  if (doc && !this.formDescription.trim() && doc.description) {
+                    this.formDescription = doc.description;
+                  }
+                }}"
+              ></app-entity-selector>
+            `
+          : this.specInputMode === 'upload'
+          ? html`
+              <app-file-dropzone
+                compact
+                selected-file-name="${this.uploadedSpecPayload?.fileName || ''}"
+                selected-file-size="${this.uploadedSpecPayload?.sizeBytes || 0}"
+                @file-selected="${this.handleSpecDropzoneSelect}"
+                @file-cleared="${() => {
+                  this.uploadedSpecPayload = null;
+                  this.uploadedSpecNote = '';
+                  this.generatedBlueprint = null;
+                }}"
+              ></app-file-dropzone>
+              ${this.uploadedSpecNote
+                ? html`<div class="spec-note">${this.uploadedSpecNote}</div>`
+                : ''}
+              ${this.uploadedSpecPayload
+                ? html`
+                    <div class="spec-note">
+                      ${t.viewTexts.projects.specFileNote(this.uploadedSpecPayload.fileName)}
+                    </div>
+                  `
+                : ''}
+            `
+          : html`
+              <app-textarea
+                label="${t.viewTexts.projects.pasteSpecLabel}"
+                placeholder="${t.viewTexts.projects.pasteSpecPlaceholder}"
+                .value="${this.pastedSpecText}"
+                rows="5"
+                @input="${(e: CustomEvent<{ value: string }>) => {
+                  this.pastedSpecText = eventValue(e);
+                  this.generatedBlueprint = null;
+                  this.specAiError = '';
+                }}"
+              ></app-textarea>
+            `}
+
+        <div class="spec-ai-controls">
+          <app-switch
+            .checked="${this.autoGenerateFromSpec}"
+            label="${t.viewTexts.projects.autoGenerateSwitch}"
+            @change="${(e: CustomEvent<{ checked: boolean }>) => {
+              this.autoGenerateFromSpec = Boolean(e.detail?.checked);
+            }}"
+          ></app-switch>
+
+          ${this.autoGenerateFromSpec && hasSpecInput
+            ? html`
+                <app-button
+                  size="sm"
+                  variant="secondary"
+                  ?disabled="${this.specAiLoading}"
+                  @click="${this.handlePreviewSpecBlueprint}"
+                >
+                  <span slot="icon-start">${iconCpu(14)}</span>
+                  <span>
+                    ${this.specAiLoading
+                      ? t.viewTexts.projects.generatingBlueprint
+                      : t.viewTexts.projects.generatePreviewBtn}
+                  </span>
+                </app-button>
+              `
+            : ''}
+        </div>
+
+        ${this.specAiError
+          ? html`
+              <div class="spec-ai-error">
+                <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                <span>${this.specAiError}</span>
+              </div>
+            `
+          : ''}
+
+        ${this.generatedBlueprint
+          ? html`
+              <div class="spec-blueprint-preview">
+                <div class="spec-blueprint-head">
+                  <span class="spec-blueprint-badge">
+                    ${iconCheck(13)}
+                    <span>${t.viewTexts.projects.blueprintReadyBadge}</span>
+                  </span>
+                  <span class="mono" style="font-size: 0.72rem; color: var(--text-muted);">
+                    ${this.generatedBlueprint.model}
+                  </span>
+                </div>
+                <div class="spec-blueprint-counts">
+                  <span class="spec-count-pill">
+                    ${iconBookOpen(12)}
+                    <span>${t.viewTexts.projects.kbGeneratedCount(this.generatedBlueprint.knowledgeArticles.length)}</span>
+                  </span>
+                  <span class="spec-count-pill">
+                    ${iconLayers(12)}
+                    <span>${t.viewTexts.projects.reqsGeneratedCount(this.generatedBlueprint.requirements.length)}</span>
+                  </span>
+                </div>
+                <div class="spec-blueprint-lists">
+                  ${this.generatedBlueprint.requirements.slice(0, 6).map(
+                    (req) => html`
+                      <div class="spec-blueprint-item">
+                        <span class="mono spec-req-code ${req.type === 'non_functional' ? 'is-nfr' : ''}">${req.code}</span>
+                        <span>${req.title}</span>
+                      </div>
+                    `
+                  )}
+                </div>
+              </div>
+            `
+          : ''}
+      </div>
     `;
   }
 
@@ -604,6 +818,15 @@ export class AppProjects extends LitElement {
     this.formBudget = 5000000;
     this.formProgress = 0;
     this.formError = '';
+    this.specInputMode = 'existing';
+    this.selectedSpecDocId = '';
+    this.uploadedSpecPayload = null;
+    this.uploadedSpecNote = '';
+    this.pastedSpecText = '';
+    this.autoGenerateFromSpec = true;
+    this.specAiLoading = false;
+    this.specAiError = '';
+    this.generatedBlueprint = null;
     this.modalOpen = true;
   }
 
@@ -623,9 +846,75 @@ export class AppProjects extends LitElement {
     this.modalOpen = true;
   }
 
-  private handleSaveProject() {
+  private async handleSpecDropzoneSelect(e: CustomEvent<{ file: File }>) {
+    const file = e.detail?.file;
+    if (!file) return;
+    const t = getTranslation(this.currentLang);
+    const payload = await readBrowserFile(file, t.viewTexts.documents.fileTooLargeNote);
+    this.uploadedSpecPayload = payload;
+    this.uploadedSpecNote = payload.truncatedNote || '';
+    this.generatedBlueprint = null;
+    this.specAiError = '';
+    const fileTitle = payload.fileName.replace(/\.[^.]+$/, '') || payload.fileName;
     if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
+      this.formName = fileTitle;
+    }
+  }
+
+  private getEffectiveSpecText(): string {
+    if (this.specInputMode === 'existing') {
+      const doc = store.documents.find((d) => d.id === this.selectedSpecDocId);
+      return doc ? extractDocumentTextContext(doc) : '';
+    }
+    if (this.specInputMode === 'upload' && this.uploadedSpecPayload) {
+      const fileTitle = this.uploadedSpecPayload.fileName.replace(/\.[^.]+$/, '') || this.uploadedSpecPayload.fileName;
+      return [
+        fileTitle,
+        this.uploadedSpecPayload.fileName,
+        this.uploadedSpecPayload.textContent || '',
+      ]
+        .filter(Boolean)
+        .join('\n');
+    }
+    return this.pastedSpecText.trim();
+  }
+
+  private async handlePreviewSpecBlueprint() {
+    const t = getTranslation(this.currentLang);
+    const specText = this.getEffectiveSpecText();
+    if (!specText.trim()) {
+      this.specAiError = t.viewTexts.ai.errors.missingSpecText;
+      return;
+    }
+
+    const endpoint = store.customization.aiEndpoint;
+    this.specAiLoading = true;
+    this.specAiError = '';
+    try {
+      const selectedDoc =
+        this.specInputMode === 'existing'
+          ? store.documents.find((d) => d.id === this.selectedSpecDocId)
+          : undefined;
+      this.generatedBlueprint = await generateProjectBlueprintFromSpec({
+        projectName: this.formName.trim() || 'New Project',
+        projectKey: this.formKey.trim().toUpperCase(),
+        specText,
+        docMeta: selectedDoc,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model: store.customization.aiModel,
+      });
+    } catch (err) {
+      this.specAiError = formatAiError(err, endpoint, t);
+    } finally {
+      this.specAiLoading = false;
+    }
+  }
+
+  private async handleSaveProject(skipAi = false) {
+    const t = getTranslation(this.currentLang);
+    if (!this.formName.trim()) {
+      this.formError = t.common.required;
       return;
     }
 
@@ -653,23 +942,159 @@ export class AppProjects extends LitElement {
         budget: Math.max(0, Number(this.formBudget) || 0),
         progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
         members: existing?.members || [],
+        specDocumentId: existing?.specDocumentId,
       });
-    } else {
-      store.addProject({
-        name: this.formName.trim(),
-        key: derivedKey,
-        description: this.formDescription.trim(),
-        color: this.formColor,
-        status: this.formStatus,
-        dueDate: this.formDueDate || new Date().toISOString().slice(0, 10),
-        companyId: this.formCompanyId || undefined,
-        counterpartyId: this.formCounterpartyId || undefined,
-        budget: Math.max(0, Number(this.formBudget) || 0),
-        progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
-        members: [],
+      this.modalOpen = false;
+      return;
+    }
+
+    const specText = this.getEffectiveSpecText();
+    let blueprint = this.generatedBlueprint;
+
+    if (!skipAi && this.autoGenerateFromSpec && specText.trim() && !blueprint) {
+      const endpoint = store.customization.aiEndpoint;
+      this.specAiLoading = true;
+      this.specAiError = '';
+      try {
+        const selectedDoc =
+          this.specInputMode === 'existing'
+            ? store.documents.find((d) => d.id === this.selectedSpecDocId)
+            : undefined;
+        blueprint = await generateProjectBlueprintFromSpec({
+          projectName: this.formName.trim(),
+          projectKey: derivedKey,
+          specText,
+          docMeta: selectedDoc,
+          lang: this.currentLang,
+          baseUrl: endpoint,
+          model: store.customization.aiModel,
+        });
+        this.generatedBlueprint = blueprint;
+      } catch (err) {
+        this.specAiError = formatAiError(err, endpoint, t);
+        this.specAiLoading = false;
+        return;
+      } finally {
+        this.specAiLoading = false;
+      }
+    }
+
+    const createdProject = store.addProject({
+      name: this.formName.trim(),
+      key: derivedKey,
+      description: this.formDescription.trim(),
+      color: this.formColor,
+      status: this.formStatus,
+      dueDate: this.formDueDate || new Date().toISOString().slice(0, 10),
+      companyId: this.formCompanyId || undefined,
+      counterpartyId: this.formCounterpartyId || undefined,
+      budget: Math.max(0, Number(this.formBudget) || 0),
+      progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
+      members: [],
+      specDocumentId:
+        this.specInputMode === 'existing' && this.selectedSpecDocId
+          ? this.selectedSpecDocId
+          : undefined,
+    });
+
+    let resolvedSpecDocId = createdProject.specDocumentId;
+
+    if (this.specInputMode === 'upload' && this.uploadedSpecPayload) {
+      const fileTitle = this.uploadedSpecPayload.fileName.replace(/\.[^.]+$/, '') || this.uploadedSpecPayload.fileName;
+      const uploadedDoc = store.addDocument({
+        title: `${this.formName.trim()} — ${fileTitle}`,
+        fileName: this.uploadedSpecPayload.fileName,
+        extension: this.uploadedSpecPayload.extension,
+        mimeType: this.uploadedSpecPayload.mimeType,
+        sizeBytes: this.uploadedSpecPayload.sizeBytes,
+        dataUrl: this.uploadedSpecPayload.dataUrl,
+        textContent: this.uploadedSpecPayload.textContent,
+        category: 'spec',
+        status: 'approved',
+        scope: 'project',
+        companyId: createdProject.companyId,
+        projectId: createdProject.id,
+        uploadedById: store.currentUserId || store.users[0]?.id || 'user-1',
+        tags: ['spec', derivedKey.toLowerCase()],
+        description: this.formDescription.trim() || fileTitle,
+        versionNote: t.viewTexts.documents.initialVersionNote,
       });
+      resolvedSpecDocId = uploadedDoc.id;
+      store.updateProject({ ...createdProject, specDocumentId: resolvedSpecDocId });
+    } else if (this.specInputMode === 'paste' && this.pastedSpecText.trim()) {
+      const pastedDoc = store.addDocument({
+        title: `${this.formName.trim()} — Spec`,
+        fileName: `${derivedKey.toLowerCase()}-spec.md`,
+        extension: 'md',
+        mimeType: 'text/markdown',
+        sizeBytes: new Blob([this.pastedSpecText]).size,
+        textContent: this.pastedSpecText.trim(),
+        category: 'spec',
+        status: 'approved',
+        scope: 'project',
+        companyId: createdProject.companyId,
+        projectId: createdProject.id,
+        uploadedById: store.currentUserId || store.users[0]?.id || 'user-1',
+        tags: ['spec', derivedKey.toLowerCase()],
+        description: this.pastedSpecText.trim().slice(0, 220),
+        versionNote: t.viewTexts.documents.initialVersionNote,
+      });
+      resolvedSpecDocId = pastedDoc.id;
+      store.updateProject({ ...createdProject, specDocumentId: resolvedSpecDocId });
+    }
+
+    if (blueprint) {
+      const authorId = store.currentUserId || store.users[0]?.id || 'user-1';
+      const createdArticles = store.addKnowledgeArticlesBulk(
+        blueprint.knowledgeArticles.map((kb) => ({
+          title: kb.title,
+          summary: kb.summary,
+          content: kb.content,
+          category: kb.category,
+          status: 'published',
+          scope: 'project',
+          projectId: createdProject.id,
+          companyId: createdProject.companyId,
+          authorId,
+          tags: Array.from(new Set([...kb.tags, derivedKey.toLowerCase()])),
+          linkedTaskIds: [],
+          pinned: false,
+        }))
+      );
+
+      const keyToId = new Map<string, string>();
+      blueprint.knowledgeArticles.forEach((draft, idx) => {
+        if (createdArticles[idx]) {
+          keyToId.set(draft.tempKey, createdArticles[idx].id);
+        }
+      });
+
+      const defaultKbIds = createdArticles.slice(0, 2).map((a) => a.id);
+
+      store.addRequirementsBulk(
+        blueprint.requirements.map((req) => {
+          const resolvedKbIds = req.knowledgeKeys
+            .map((k) => keyToId.get(k))
+            .filter((id): id is string => Boolean(id));
+          return {
+            projectId: createdProject.id,
+            sourceDocumentId: resolvedSpecDocId,
+            code: req.code,
+            type: req.type,
+            title: req.title,
+            description: req.description,
+            category: req.category,
+            priority: req.priority,
+            status: 'approved',
+            acceptanceCriteria: req.acceptanceCriteria,
+            linkedKnowledgeIds: resolvedKbIds.length > 0 ? resolvedKbIds : defaultKbIds,
+            linkedTaskIds: [],
+          };
+        })
+      );
     }
 
     this.modalOpen = false;
+    store.openProjectDetail(createdProject.id);
   }
 }
