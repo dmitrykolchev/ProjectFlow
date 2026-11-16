@@ -105,6 +105,9 @@ export const en = {
     emptyColumn: 'No tasks in this column',
     moveTo: 'Move to',
     itemsCount: 'tasks',
+    filterAllPriorities: (all: string) => `⚡ ${all} priorities`,
+    filterAllAssignees: (all: string) => `👤 ${all} assignees`,
+    subtasksProgress: (done: number, total: number) => `Subtasks: ${done}/${total}`,
   },
   gantt: {
     timelineScale: 'Timeline Scale',

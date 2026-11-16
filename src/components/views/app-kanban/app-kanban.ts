@@ -55,11 +55,11 @@ export class AppKanban extends LitElement {
             .value="${store.filterPriority}"
             @change="${(e: Event) => store.setFilterPriority((e.target as HTMLSelectElement).value)}"
           >
-            <option value="all">⚡ ${t.common.all} приоритеты</option>
-            <option value="urgent">Срочный (Urgent)</option>
-            <option value="high">Высокий (High)</option>
-            <option value="medium">Средний (Medium)</option>
-            <option value="low">Низкий (Low)</option>
+            <option value="all">${t.kanban.filterAllPriorities(t.common.all)}</option>
+            <option value="urgent">${t.priority.urgent}</option>
+            <option value="high">${t.priority.high}</option>
+            <option value="medium">${t.priority.medium}</option>
+            <option value="low">${t.priority.low}</option>
           </select>
 
           <select
@@ -67,7 +67,7 @@ export class AppKanban extends LitElement {
             .value="${store.filterAssignee}"
             @change="${(e: Event) => store.setFilterAssignee((e.target as HTMLSelectElement).value)}"
           >
-            <option value="all">👤 ${t.common.all} исполнители</option>
+            <option value="all">${t.kanban.filterAllAssignees(t.common.all)}</option>
             ${store.users.map((u) => html`<option value="${u.id}">${u.name}</option>`)}
           </select>
 
@@ -156,7 +156,7 @@ export class AppKanban extends LitElement {
 
                           ${task.subtasks.length > 0
                             ? html`
-                                <div class="progress-bar-container" title="Подзадачи: ${completedSubtasks}/${task.subtasks.length}">
+                                <div class="progress-bar-container" title="${t.kanban.subtasksProgress(completedSubtasks, task.subtasks.length)}">
                                   <div class="progress-bar-fill" style="width: ${progressPct}%"></div>
                                 </div>
                               `

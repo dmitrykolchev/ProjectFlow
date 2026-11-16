@@ -105,6 +105,9 @@ export const ru = {
     emptyColumn: 'В этой колонке нет задач',
     moveTo: 'Переместить в',
     itemsCount: 'задач',
+    filterAllPriorities: (all: string) => `⚡ ${all} приоритеты`,
+    filterAllAssignees: (all: string) => `👤 ${all} исполнители`,
+    subtasksProgress: (done: number, total: number) => `Подзадачи: ${done}/${total}`,
   },
   gantt: {
     timelineScale: 'Масштаб шкалы',
