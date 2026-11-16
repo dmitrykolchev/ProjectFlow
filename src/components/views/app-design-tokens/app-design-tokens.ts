@@ -89,20 +89,28 @@ const CATEGORIES: CategoryDef[] = [
   },
 ];
 
-// Static reference values for the four themes (source of truth: src/index.css)
-const THEME_TABLE: { token: string; light: string; dark: string; cyber: string; matrix: string }[] = [
-  { token: 'bg-canvas', light: '#f8fafc', dark: '#090d16', cyber: '#06040f', matrix: '#020603' },
-  { token: 'bg-surface', light: '#ffffff', dark: '#111827', cyber: '#0d0a1f', matrix: '#050e08' },
-  { token: 'bg-subtle', light: '#f1f5f9', dark: '#1a2438', cyber: '#1a143d', matrix: '#0c1f13' },
-  { token: 'text-primary', light: '#0f172a', dark: '#f8fafc', cyber: '#f4f6ff', matrix: '#dcfce7' },
-  { token: 'text-secondary', light: '#475569', dark: '#94a3b8', cyber: '#b8c4f0', matrix: '#86efac' },
-  { token: 'border-subtle', light: '#e2e8f0', dark: '#1e293b', cyber: '#1e2d5e', matrix: '#11331d' },
-  { token: 'border-focus', light: '#6366f1', dark: '#818cf8', cyber: '#00f0ff', matrix: '#00ff41' },
-  { token: 'accent-primary', light: '#6366f1', dark: '#6366f1', cyber: '#ff2a85', matrix: '#00ff41' },
-  { token: 'color-success', light: '#059669', dark: '#34d399', cyber: '#00ffa3', matrix: '#00ff41' },
-  { token: 'color-warning', light: '#d97706', dark: '#fbbf24', cyber: '#ffe600', matrix: '#facc15' },
-  { token: 'color-danger', light: '#dc2626', dark: '#f87171', cyber: '#ff3864', matrix: '#ff3b5c' },
-  { token: 'color-info', light: '#0284c7', dark: '#38bdf8', cyber: '#00f0ff', matrix: '#2dd4bf' },
+// Static reference values for the six themes (source of truth: src/index.css)
+const THEME_TABLE: {
+  token: string;
+  light: string;
+  dark: string;
+  cyber: string;
+  matrix: string;
+  barbie: string;
+  highContrast: string;
+}[] = [
+  { token: 'bg-canvas', light: '#f8fafc', dark: '#090d16', cyber: '#06040f', matrix: '#020603', barbie: '#fff1f7', highContrast: '#000000' },
+  { token: 'bg-surface', light: '#ffffff', dark: '#111827', cyber: '#0d0a1f', matrix: '#050e08', barbie: '#ffffff', highContrast: '#0a0a0a' },
+  { token: 'bg-subtle', light: '#f1f5f9', dark: '#1a2438', cyber: '#1a143d', matrix: '#0c1f13', barbie: '#ffe4f1', highContrast: '#171717' },
+  { token: 'text-primary', light: '#0f172a', dark: '#f8fafc', cyber: '#f4f6ff', matrix: '#dcfce7', barbie: '#4a0729', highContrast: '#ffffff' },
+  { token: 'text-secondary', light: '#475569', dark: '#94a3b8', cyber: '#b8c4f0', matrix: '#86efac', barbie: '#831843', highContrast: '#f1f5f9' },
+  { token: 'border-subtle', light: '#e2e8f0', dark: '#1e293b', cyber: '#1e2d5e', matrix: '#11331d', barbie: '#fbcfe8', highContrast: '#737373' },
+  { token: 'border-focus', light: '#6366f1', dark: '#818cf8', cyber: '#00f0ff', matrix: '#00ff41', barbie: '#d61f77', highContrast: '#fde047' },
+  { token: 'accent-primary', light: '#6366f1', dark: '#6366f1', cyber: '#ff2a85', matrix: '#00ff41', barbie: '#d61f77', highContrast: '#fde047' },
+  { token: 'color-success', light: '#059669', dark: '#34d399', cyber: '#00ffa3', matrix: '#00ff41', barbie: '#047857', highContrast: '#4ade80' },
+  { token: 'color-warning', light: '#d97706', dark: '#fbbf24', cyber: '#ffe600', matrix: '#facc15', barbie: '#b45309', highContrast: '#fde047' },
+  { token: 'color-danger', light: '#dc2626', dark: '#f87171', cyber: '#ff3864', matrix: '#ff3b5c', barbie: '#be123c', highContrast: '#ff7b7b' },
+  { token: 'color-info', light: '#0284c7', dark: '#38bdf8', cyber: '#00f0ff', matrix: '#2dd4bf', barbie: '#0369a1', highContrast: '#38bdf8' },
 ];
 
 @customElement('app-design-tokens')
@@ -170,6 +178,16 @@ export class AppDesignTokens extends LitElement {
             size="sm"
             @click="${() => store.setTheme('matrix')}"
           >Matrix</app-button>
+          <app-button
+            variant="${this.theme === 'barbie' ? 'primary' : 'outline'}"
+            size="sm"
+            @click="${() => store.setTheme('barbie')}"
+          >Barbie</app-button>
+          <app-button
+            variant="${this.theme === 'high-contrast' ? 'primary' : 'outline'}"
+            size="sm"
+            @click="${() => store.setTheme('high-contrast')}"
+          >AAA</app-button>
         </div>
       </app-page-header>
 
@@ -195,28 +213,34 @@ export class AppDesignTokens extends LitElement {
       </section>
 
       <app-section-card title="${tx.viewTexts.designTokens.sections.themeTable}">
-        <table class="theme-table">
-          <thead>
-            <tr>
-              <th>Token</th>
-              <th>Light</th>
-              <th>Dark</th>
-              <th>Cyberpunk</th>
-              <th>Matrix</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${THEME_TABLE.map((row) => html`
+        <div class="theme-table-wrap">
+          <table class="theme-table">
+            <thead>
               <tr>
-                <td><code>--${row.token}</code></td>
-                <td><span class="dot" style="background: ${row.light};"></span>${row.light}</td>
-                <td><span class="dot" style="background: ${row.dark};"></span>${row.dark}</td>
-                <td><span class="dot" style="background: ${row.cyber};"></span>${row.cyber}</td>
-                <td><span class="dot" style="background: ${row.matrix};"></span>${row.matrix}</td>
+                <th>Token</th>
+                <th>Light</th>
+                <th>Dark</th>
+                <th>Cyberpunk</th>
+                <th>Matrix</th>
+                <th>Barbie</th>
+                <th>High Contrast</th>
               </tr>
-            `)}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${THEME_TABLE.map((row) => html`
+                <tr>
+                  <td><code>--${row.token}</code></td>
+                  <td><span class="dot" style="background: ${row.light};"></span>${row.light}</td>
+                  <td><span class="dot" style="background: ${row.dark};"></span>${row.dark}</td>
+                  <td><span class="dot" style="background: ${row.cyber};"></span>${row.cyber}</td>
+                  <td><span class="dot" style="background: ${row.matrix};"></span>${row.matrix}</td>
+                  <td><span class="dot" style="background: ${row.barbie};"></span>${row.barbie}</td>
+                  <td><span class="dot" style="background: ${row.highContrast};"></span>${row.highContrast}</td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
+        </div>
       </app-section-card>
 
       <app-section-card title="${tx.viewTexts.designTokens.sections.examples}">

@@ -21,6 +21,7 @@
 
 .theme-switch {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
 }
 
@@ -81,8 +82,14 @@
 }
 
 /* Reference table */
+.theme-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
 .theme-table {
   width: 100%;
+  min-width: 720px;
   border-collapse: collapse;
   font-size: 0.85rem;
 }

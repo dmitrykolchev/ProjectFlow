@@ -10,6 +10,8 @@ import {
   iconSun,
   iconChevronLeft,
   iconChevronRight,
+  iconContrast,
+  iconHeart,
   iconTerminal,
   iconZap,
 } from '../../common/icons';
@@ -265,7 +267,11 @@ export class AppSidebar extends LitElement {
               @click="${() => store.toggleTheme()}"
               title="${t.viewTexts.sidebar.themeToggleTitle}"
             >
-              ${this.theme === 'matrix'
+              ${this.theme === 'high-contrast'
+                ? iconContrast(14)
+                : this.theme === 'barbie'
+                ? iconHeart(14)
+                : this.theme === 'matrix'
                 ? iconTerminal(14)
                 : this.theme === 'cyberpunk'
                 ? iconZap(14)
@@ -273,7 +279,11 @@ export class AppSidebar extends LitElement {
                 ? iconSun(14)
                 : iconMoon(14)}
               ${!this.collapsed
-                ? html`<span>${this.theme === 'matrix'
+                ? html`<span>${this.theme === 'high-contrast'
+                    ? 'AAA'
+                    : this.theme === 'barbie'
+                    ? 'Barbie'
+                    : this.theme === 'matrix'
                     ? 'Matrix'
                     : this.theme === 'cyberpunk'
                     ? 'Cyber'

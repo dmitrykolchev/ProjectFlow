@@ -127,6 +127,20 @@ export const THEME_DEFAULT_BASE_COLORS: Record<ThemeMode, ThemeBaseColors> = {
     accentPrimary: '#00ff41',
     borderSubtle: '#11331d',
   },
+  barbie: {
+    bgCanvas: '#fff1f7',
+    bgSurface: '#ffffff',
+    textPrimary: '#4a0729',
+    accentPrimary: '#d61f77',
+    borderSubtle: '#fbcfe8',
+  },
+  'high-contrast': {
+    bgCanvas: '#000000',
+    bgSurface: '#0a0a0a',
+    textPrimary: '#ffffff',
+    accentPrimary: '#fde047',
+    borderSubtle: '#737373',
+  },
 };
 
 const ACCENT_HEX_MAP: Record<AccentColor, string> = {
@@ -662,7 +676,12 @@ export class AppStore {
     const root = document.documentElement;
     const body = document.body;
     const theme = this.customization.theme;
-    const isDarkFamily = theme === 'dark' || theme === 'cyberpunk' || theme === 'matrix';
+    const effectiveForFamily = this.getEffectiveBaseColors(theme);
+    const isDarkFamily =
+      theme === 'dark' ||
+      theme === 'cyberpunk' ||
+      theme === 'matrix' ||
+      (theme === 'high-contrast' && getLuminance(effectiveForFamily.bgCanvas) < 0.5);
 
     // Keep theme attributes strictly on <html> so <body> never shadows :root presets or inline custom vars
     if (body) {
@@ -707,18 +726,32 @@ export class AppStore {
         root.style.setProperty('--bg-surface', bgSurface);
         root.style.setProperty(
           '--bg-surface-elevated',
-          mixHex(bgSurface, isDarkSurface ? '#ffffff' : '#ffffff', isDarkSurface ? 0.05 : 0.65)
+          theme === 'high-contrast'
+            ? adjustHex(bgSurface, isDarkSurface ? 10 : -6)
+            : mixHex(bgSurface, '#ffffff', isDarkSurface ? 0.05 : 0.65)
         );
-        root.style.setProperty('--bg-subtle', mixHex(bgSurface, bgCanvas, isDarkSurface ? 0.35 : 0.6));
+        root.style.setProperty(
+          '--bg-subtle',
+          theme === 'high-contrast'
+            ? adjustHex(bgSurface, isDarkSurface ? 14 : -10)
+            : mixHex(bgSurface, bgCanvas, isDarkSurface ? 0.35 : 0.6)
+        );
         root.style.setProperty('--bg-hover', adjustHex(bgSurface, step * 2));
         root.style.setProperty('--bg-active', adjustHex(bgSurface, step * 3));
         root.style.setProperty('--border-subtle', borderSubtle);
-        root.style.setProperty('--border-strong', adjustHex(borderSubtle, isDarkSurface ? 22 : -20));
+        root.style.setProperty('--border-strong', adjustHex(borderSubtle, isDarkSurface ? 28 : -24));
         root.style.setProperty('--scrollbar-track', mixHex(bgCanvas, bgSurface, 0.35));
-        root.style.setProperty('--scrollbar-thumb', mixHex(borderSubtle, effective.textPrimary, 0.25));
+        root.style.setProperty(
+          '--scrollbar-thumb',
+          theme === 'high-contrast'
+            ? mixHex(borderSubtle, effective.textPrimary, 0.7)
+            : mixHex(borderSubtle, effective.textPrimary, 0.25)
+        );
         root.style.setProperty(
           '--scrollbar-thumb-hover',
-          mixHex(borderSubtle, effective.accentPrimary, 0.55)
+          theme === 'high-contrast'
+            ? effective.accentPrimary
+            : mixHex(borderSubtle, effective.accentPrimary, 0.55)
         );
       }
 
@@ -726,9 +759,15 @@ export class AppStore {
         const textPrimary = effective.textPrimary;
         const bgSurface = effective.bgSurface;
         root.style.setProperty('--text-primary', textPrimary);
-        root.style.setProperty('--text-secondary', mixHex(textPrimary, bgSurface, 0.35));
-        root.style.setProperty('--text-muted', mixHex(textPrimary, bgSurface, 0.58));
-        root.style.setProperty('--text-inverse', isDarkSurface ? '#090d16' : '#ffffff');
+        root.style.setProperty(
+          '--text-secondary',
+          mixHex(textPrimary, bgSurface, theme === 'high-contrast' ? 0.12 : 0.35)
+        );
+        root.style.setProperty(
+          '--text-muted',
+          mixHex(textPrimary, bgSurface, theme === 'high-contrast' ? 0.25 : 0.58)
+        );
+        root.style.setProperty('--text-inverse', isDarkSurface ? '#000000' : '#ffffff');
       }
 
       if (overrides.accentPrimary) {
@@ -737,14 +776,18 @@ export class AppStore {
         const onAccent = getLuminance(accent) > 0.5 ? '#020603' : '#ffffff';
         root.style.setProperty('--accent-primary', accent);
         root.style.setProperty('--accent-hover', hover);
-        root.style.setProperty('--accent-soft', hexToRgba(accent, 0.16));
-        root.style.setProperty('--accent-border', hexToRgba(accent, 0.38));
+        root.style.setProperty('--accent-soft', hexToRgba(accent, theme === 'high-contrast' ? 0.2 : 0.16));
+        root.style.setProperty('--accent-border', theme === 'high-contrast' ? accent : hexToRgba(accent, 0.38));
         root.style.setProperty(
           '--accent-gradient',
           theme === 'cyberpunk'
             ? `linear-gradient(135deg, ${accent} 0%, ${mixHex(accent, '#00e5ff', 0.45)} 52%, #00e5ff 100%)`
             : theme === 'matrix'
             ? `linear-gradient(135deg, ${accent} 0%, ${mixHex(accent, '#059669', 0.55)} 100%)`
+            : theme === 'barbie'
+            ? `linear-gradient(135deg, ${adjustHex(accent, 18)} 0%, ${accent} 58%, ${mixHex(accent, '#c026d3', 0.45)} 100%)`
+            : theme === 'high-contrast'
+            ? `linear-gradient(135deg, ${accent} 0%, ${accent} 100%)`
             : `linear-gradient(135deg, ${accent} 0%, ${adjustHex(accent, -24)} 100%)`
         );
         root.style.setProperty('--border-focus', accent);
@@ -768,6 +811,9 @@ export class AppStore {
             '--accent-glow-hover',
             `0 0 22px ${hexToRgba(accent, 0.68)}, 0 0 36px ${hexToRgba(accent, 0.3)}`
           );
+        } else if (theme === 'barbie') {
+          root.style.setProperty('--accent-glow', `0 4px 14px ${hexToRgba(accent, 0.32)}`);
+          root.style.setProperty('--accent-glow-hover', `0 6px 20px ${hexToRgba(accent, 0.45)}`);
         }
       }
     } else if ((theme === 'dark' || theme === 'light') && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
@@ -800,7 +846,11 @@ export class AppStore {
     this.applyThemeAndCustomization();
     this.saveCustomization();
     const themeLabel =
-      theme === 'matrix'
+      theme === 'high-contrast'
+        ? 'тему высокой контрастности'
+        : theme === 'barbie'
+        ? 'тему Барби'
+        : theme === 'matrix'
         ? 'тему Матрица'
         : theme === 'cyberpunk'
         ? 'тему Киберпанк'
@@ -812,7 +862,7 @@ export class AppStore {
   }
 
   public toggleTheme(): void {
-    const order: ThemeMode[] = ['dark', 'light', 'cyberpunk', 'matrix'];
+    const order: ThemeMode[] = ['dark', 'light', 'cyberpunk', 'matrix', 'barbie', 'high-contrast'];
     const idx = order.indexOf(this.customization.theme);
     const next = order[(idx + 1) % order.length];
     this.setTheme(next);
@@ -888,7 +938,7 @@ export class AppStore {
   public setCustomBackgroundColor(hex: string): void {
     this.customization.backgroundPreset = 'custom';
     this.customization.customBgColor = hex;
-    if (this.customization.theme !== 'cyberpunk' && this.customization.theme !== 'matrix') {
+    if (this.customization.theme === 'dark' || this.customization.theme === 'light') {
       this.customization.theme = getLuminance(hex) < 0.5 ? 'dark' : 'light';
     }
     const theme = this.customization.theme;

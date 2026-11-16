@@ -26,7 +26,13 @@ interface BasePaletteOption {
     | 'laserCyan'
     | 'zionMainframe'
     | 'codeRain'
-    | 'redPill';
+    | 'redPill'
+    | 'malibuDream'
+    | 'bubblegumPop'
+    | 'strawberryCream'
+    | 'wcagYellowBlack'
+    | 'wcagCyanBlack'
+    | 'wcagPaperInk';
   colors: ThemeBaseColors;
 }
 
@@ -87,6 +93,34 @@ const CURATED_BASE_PALETTES: Record<ThemeMode, BasePaletteOption[]> = {
       colors: { bgCanvas: '#080305', bgSurface: '#13080c', textPrimary: '#ffe4e6', accentPrimary: '#f43f5e', borderSubtle: '#451422' },
     },
   ],
+  barbie: [
+    {
+      nameKey: 'malibuDream',
+      colors: { bgCanvas: '#fff1f7', bgSurface: '#ffffff', textPrimary: '#4a0729', accentPrimary: '#d61f77', borderSubtle: '#fbcfe8' },
+    },
+    {
+      nameKey: 'bubblegumPop',
+      colors: { bgCanvas: '#fdf4ff', bgSurface: '#ffffff', textPrimary: '#4a044e', accentPrimary: '#c026d3', borderSubtle: '#f5d0fe' },
+    },
+    {
+      nameKey: 'strawberryCream',
+      colors: { bgCanvas: '#fff5f7', bgSurface: '#ffffff', textPrimary: '#4c0519', accentPrimary: '#e11d48', borderSubtle: '#fecdd3' },
+    },
+  ],
+  'high-contrast': [
+    {
+      nameKey: 'wcagYellowBlack',
+      colors: { bgCanvas: '#000000', bgSurface: '#0a0a0a', textPrimary: '#ffffff', accentPrimary: '#fde047', borderSubtle: '#737373' },
+    },
+    {
+      nameKey: 'wcagCyanBlack',
+      colors: { bgCanvas: '#000000', bgSurface: '#0a0a0a', textPrimary: '#ffffff', accentPrimary: '#22d3ee', borderSubtle: '#737373' },
+    },
+    {
+      nameKey: 'wcagPaperInk',
+      colors: { bgCanvas: '#ffffff', bgSurface: '#ffffff', textPrimary: '#000000', accentPrimary: '#0033cc', borderSubtle: '#000000' },
+    },
+  ],
 };
 
 @customElement('app-settings')
@@ -127,6 +161,8 @@ export class AppSettings extends LitElement {
     const isLight = activeTheme === 'light';
     const isCyberpunk = activeTheme === 'cyberpunk';
     const isMatrix = activeTheme === 'matrix';
+    const isBarbie = activeTheme === 'barbie';
+    const isHighContrast = activeTheme === 'high-contrast';
 
     const effectiveBase = store.getEffectiveBaseColors(activeTheme);
     const hasOverrides = store.hasThemeOverrides(activeTheme) || this.custom.backgroundPreset === 'custom';
@@ -253,6 +289,38 @@ export class AppSettings extends LitElement {
               </div>
               <p class="option-card-desc">${t.settings.themeMatrixDesc}</p>
             </div>
+
+            <div
+              class="option-card is-barbie ${isBarbie ? 'is-active' : ''}"
+              @click="${() => store.setTheme('barbie')}"
+            >
+              <div class="theme-mini-strip">
+                <span style="background: #fff1f7;"></span>
+                <span style="background: #f472b6;"></span>
+                <span style="background: #d61f77;"></span>
+              </div>
+              <div class="option-card-header">
+                <span>${t.settings.themeBarbie}</span>
+                ${isBarbie ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.settings.themeBarbieDesc}</p>
+            </div>
+
+            <div
+              class="option-card is-high-contrast ${isHighContrast ? 'is-active' : ''}"
+              @click="${() => store.setTheme('high-contrast')}"
+            >
+              <div class="theme-mini-strip">
+                <span style="background: #000000;"></span>
+                <span style="background: #ffffff;"></span>
+                <span style="background: #fde047;"></span>
+              </div>
+              <div class="option-card-header">
+                <span>${t.settings.themeHighContrast}</span>
+                ${isHighContrast ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.settings.themeHighContrastDesc}</p>
+            </div>
           </div>
         </app-section-card>
 
@@ -322,7 +390,7 @@ export class AppSettings extends LitElement {
         </app-section-card>
 
         <!-- Background Theme Palette & Custom Color (Dark / Light) -->
-        ${!isCyberpunk && !isMatrix
+        ${isDark || isLight
           ? html`
               <app-section-card variant="panel" title="${t.settings.background}">
                 <p class="section-desc">${t.settings.backgroundDesc}</p>
@@ -382,22 +450,26 @@ export class AppSettings extends LitElement {
           : ''}
 
         <!-- Accent Colors -->
-        <app-section-card variant="panel" title="${t.settings.accentColor}">
-          <div class="accent-swatches">
-            ${accentOptions.map(
-              (acc) => html`
-                <div
-                  class="accent-swatch ${this.custom.accentColor === acc.key && !this.custom.themeOverrides?.[activeTheme]?.accentPrimary ? 'is-active' : ''}"
-                  style="background-color: ${acc.color}; --swatch-color: ${acc.color};"
-                  @click="${() => store.setAccentColor(acc.key)}"
-                  title="${acc.name}"
-                >
-                  ${this.custom.accentColor === acc.key && !this.custom.themeOverrides?.[activeTheme]?.accentPrimary ? '✓' : ''}
+        ${!isHighContrast
+          ? html`
+              <app-section-card variant="panel" title="${t.settings.accentColor}">
+                <div class="accent-swatches">
+                  ${accentOptions.map(
+                    (acc) => html`
+                      <div
+                        class="accent-swatch ${this.custom.accentColor === acc.key && !this.custom.themeOverrides?.[activeTheme]?.accentPrimary ? 'is-active' : ''}"
+                        style="background-color: ${acc.color}; --swatch-color: ${acc.color};"
+                        @click="${() => store.setAccentColor(acc.key)}"
+                        title="${acc.name}"
+                      >
+                        ${this.custom.accentColor === acc.key && !this.custom.themeOverrides?.[activeTheme]?.accentPrimary ? '✓' : ''}
+                      </div>
+                    `
+                  )}
                 </div>
-              `
-            )}
-          </div>
-        </app-section-card>
+              </app-section-card>
+            `
+          : ''}
 
         <!-- Density Mode -->
         <app-section-card variant="panel" title="${t.settings.density}">

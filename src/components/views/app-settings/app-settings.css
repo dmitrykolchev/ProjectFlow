@@ -76,6 +76,25 @@
   box-shadow: 0 0 16px rgba(0, 255, 65, 0.26), inset 0 0 12px rgba(0, 255, 65, 0.08);
 }
 
+.option-card.is-barbie {
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(219, 39, 119, 0.08));
+}
+
+.option-card.is-barbie.is-active {
+  border-color: #d61f77;
+  box-shadow: 0 0 16px rgba(214, 31, 119, 0.24), inset 0 0 12px rgba(236, 72, 153, 0.08);
+}
+
+.option-card.is-high-contrast {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.65), rgba(253, 224, 71, 0.1));
+  border-color: #737373;
+}
+
+.option-card.is-high-contrast.is-active {
+  border-color: #fde047;
+  box-shadow: 0 0 0 2px #fde047;
+}
+
 .theme-mini-strip {
   display: flex;
   align-items: center;

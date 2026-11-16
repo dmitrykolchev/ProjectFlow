@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
-import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconTerminal, iconZap } from '../../common/icons';
+import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconContrast, iconHeart, iconTerminal, iconZap } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
@@ -192,8 +192,12 @@ export class AppHeader extends LitElement {
           <button
             class="icon-action-btn"
             @click="${() => store.toggleTheme()}"
-            title="${this.theme === 'matrix'
-              ? 'Matrix → Dark'
+            title="${this.theme === 'high-contrast'
+              ? 'High Contrast → Dark'
+              : this.theme === 'barbie'
+              ? 'Barbie → High Contrast'
+              : this.theme === 'matrix'
+              ? 'Matrix → Barbie'
               : this.theme === 'cyberpunk'
               ? 'Cyberpunk → Matrix'
               : this.theme === 'dark'
@@ -201,7 +205,11 @@ export class AppHeader extends LitElement {
               : 'Light → Cyberpunk'}"
             aria-label="Toggle Theme"
           >
-            ${this.theme === 'matrix'
+            ${this.theme === 'high-contrast'
+              ? iconContrast(16)
+              : this.theme === 'barbie'
+              ? iconHeart(16)
+              : this.theme === 'matrix'
               ? iconTerminal(16)
               : this.theme === 'cyberpunk'
               ? iconZap(16)
