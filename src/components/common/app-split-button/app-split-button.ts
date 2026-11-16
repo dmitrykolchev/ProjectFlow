@@ -148,8 +148,12 @@ export class AppSplitButton extends LitElement {
           ?disabled="${this.disabled}"
           @click="${this.handlePrimaryClick}"
         >
-          <slot name="icon-start"></slot>
+          <!-- canonical slots: start / end for graphic elements; icon-start is a legacy alias -->
+          <slot name="start">
+            <slot name="icon-start"></slot>
+          </slot>
           <span>${this.label}</span>
+          <slot name="end"></slot>
         </button>
 
         <button

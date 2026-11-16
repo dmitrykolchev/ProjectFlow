@@ -33,6 +33,15 @@
   border-bottom-left-radius: var(--radius-md, 8px);
 }
 
+/* canonical slot API: start / end for graphic elements.
+   .split-main is a flex container with align-items: center, so slotted content
+   (text, SVG icon, material icon) sits centered on the vertical axis. */
+.split-main ::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .split-toggle {
   border-top-right-radius: var(--radius-md, 8px);
   border-bottom-right-radius: var(--radius-md, 8px);

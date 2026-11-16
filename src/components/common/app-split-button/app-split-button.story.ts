@@ -9,7 +9,9 @@ export const meta: ComponentStoryMeta = {
   description: 'Dual-action button combining a primary action trigger with a secondary options menu.',
   category: 'Common',
   slotsDoc: {
-    'icon-start': 'Icon rendered before the main button label',
+    start: 'Content rendered before the main label (text, SVG icon, material icon) — centered vertically',
+    end: 'Content rendered after the main label (text, SVG icon, material icon) — centered vertically',
+    'icon-start': 'Legacy alias of start',
     '(default)': 'Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children',
   },
   propsDoc: {
