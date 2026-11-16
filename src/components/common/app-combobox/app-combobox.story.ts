@@ -11,6 +11,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-option> children adding suggestions (label is the suggestion text)',
   },
+  childrenDoc: {
+    'app-option': 'Declarative suggestion (label is the suggestion text) appended to the items prop list',
+  },
   propsDoc: {
     label: 'Caption above the field',
     items: 'Suggestion item definitions (value + label)',
