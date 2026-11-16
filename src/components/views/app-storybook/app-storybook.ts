@@ -23,6 +23,9 @@ import materialIconMeta from '../../common/app-material-icon/app-material-icon.s
 import materialIconGalleryMeta from '../../common/app-material-icon-gallery/app-material-icon-gallery.story';
 import segmentedSwitchMeta from '../../common/app-segmented-switch/app-segmented-switch.story';
 import radioGroupMeta from '../../common/app-radio-group/app-radio-group.story';
+import optionMeta from '../../common/app-option/app-option.story';
+import metaItemMeta from '../../common/app-meta-item/app-meta-item.story';
+import linkMeta from '../../common/app-link/app-link.story';
 import inputMeta from '../../common/app-input/app-input.story';
 import textareaMeta from '../../common/app-textarea/app-textarea.story';
 import numberMeta from '../../common/app-number-input/app-number-input.story';
@@ -109,8 +112,11 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   entityEmblemMeta,
   materialIconMeta,
   materialIconGalleryMeta,
+  linkMeta,
   segmentedSwitchMeta,
   radioGroupMeta,
+  optionMeta,
+  metaItemMeta,
   checkboxMeta,
   switchMeta,
   inputMeta,

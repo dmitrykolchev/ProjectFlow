@@ -46,3 +46,5 @@ export const meta: ComponentStoryMeta = {
     },
   ],
 };
+
+export default meta;
