@@ -12,6 +12,8 @@ export class AppCombobox extends LitElement {
   @property({ type: Array }) selected: string[] = []; // selected tags/values
   @property({ type: String }) placeholder: string = 'Add tag or filter...';
   @property({ type: Boolean }) allowCustom: boolean = true;
+  // canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
+  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';
 
   @state() private inputValue: string = '';
   @state() private isOpen: boolean = false;
@@ -153,7 +155,7 @@ export class AppCombobox extends LitElement {
     return html`
       <div class="form-group">
         ${this.label ? html`<label>${this.label}</label>` : ''}
-        <div class="combobox-box" @click="${this.focusInput}">
+        <div class="combobox-box size-${this.size}" @click="${this.focusInput}">
           ${this.selected.map(
             (tag) => html`
               <span class="tag-item">

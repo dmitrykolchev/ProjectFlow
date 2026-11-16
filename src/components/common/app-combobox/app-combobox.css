@@ -38,6 +38,27 @@ label {
   box-shadow: 0 0 0 1px var(--accent-primary, #6366f1);
 }
 
+/* canonical control size scale (Priority E): md padding/min-height stay the historical values */
+.combobox-box.size-sm {
+  min-height: var(--control-height-sm, 30px);
+  padding: 3px 0.4rem;
+}
+
+.combobox-box.size-lg {
+  min-height: var(--control-height-lg, 44px);
+  padding: 6px 0.7rem;
+}
+
+.combobox-box.size-sm .tag-item {
+  height: 22px;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.combobox-box.size-lg .tag-item {
+  height: 30px;
+  font-size: var(--control-font-lg, 1rem);
+}
+
 .tag-item {
   display: inline-flex;
   align-items: center;
@@ -77,9 +98,19 @@ input {
   outline: none;
   color: var(--text-primary, #f8fafc);
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--control-font-md, 0.875rem);
   line-height: 1.25;
   padding: 0 0.25rem;
+}
+
+.size-sm input {
+  height: 22px;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+
+.size-lg input {
+  height: 30px;
+  font-size: var(--control-font-lg, 1rem);
 }
 
 input::placeholder {
