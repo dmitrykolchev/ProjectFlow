@@ -926,7 +926,6 @@ export const en = {
       copiedToast: 'Snippet copied to clipboard',
       copyFailedToast: 'Failed to copy snippet',
       apiSpecTitle: (component: string) => `Specification <${component}>`,
-      propsCount: (count: number) => `Total properties: ${count}`,
       noProps: 'Component properties not found',
       thProp: 'Property',
       thAttr: 'Attribute',

@@ -926,7 +926,6 @@ export const ru = {
       copiedToast: 'Сниппет скопирован в буфер обмена',
       copyFailedToast: 'Не удалось скопировать сниппет',
       apiSpecTitle: (component: string) => `Спецификация <${component}>`,
-      propsCount: (count: number) => `Всего свойств: ${count}`,
       noProps: 'Свойства компонента не найдены',
       thProp: 'Свойство',
       thAttr: 'Атрибут',

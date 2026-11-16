@@ -4,6 +4,7 @@ import { ComponentStoryMeta } from '../../../types/storybook';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { buildSnippet, getComponentProps } from '../../../domain/component-meta';
+import { iconCopy, iconRefreshCw } from '../../common/icons';
 import styles from './app-storybook.css';
 
 // Import all component story definitions
@@ -360,28 +361,38 @@ export class AppStorybook extends LitElement {
 
               <!-- Live Playground -->
               <section class="sb-section">
-                <div class="sb-section-head">
-                  <h3 class="sb-section-title">${t.viewTexts.storybook.playgroundTitle}</h3>
-                  <div class="sb-playground-actions">
-                    <button class="sb-tool-btn" @click="${() => this.resetPlayground()}">
-                      ${t.viewTexts.storybook.resetBtn}
-                    </button>
-                    <button class="sb-tool-btn" @click="${() => this.copyPlayground()}">
-                      ${t.viewTexts.storybook.copyBtn}
-                    </button>
-                  </div>
-                </div>
+                <h3 class="sb-section-title">${t.viewTexts.storybook.playgroundTitle}</h3>
                 <pre class="sb-import-line">${this.buildImportLine(meta)}</pre>
                 <div class="sb-playground-grid">
                   <div class="sb-editor-col">
                     <span class="sb-col-label">${t.viewTexts.storybook.editorLabel}</span>
-                    <textarea
-                      class="sb-code-editor"
-                      spellcheck="false"
-                      .value="${this.playgroundCode}"
-                      @input="${(e: InputEvent) =>
-                        this.handleEditorInput((e.target as HTMLTextAreaElement).value)}"
-                    ></textarea>
+                    <div class="sb-editor-box">
+                      <div class="sb-editor-actions">
+                        <button
+                          class="sb-icon-btn"
+                          title="${t.viewTexts.storybook.resetBtn}"
+                          aria-label="${t.viewTexts.storybook.resetBtn}"
+                          @click="${() => this.resetPlayground()}"
+                        >
+                          ${iconRefreshCw(15)}
+                        </button>
+                        <button
+                          class="sb-icon-btn"
+                          title="${t.viewTexts.storybook.copyBtn}"
+                          aria-label="${t.viewTexts.storybook.copyBtn}"
+                          @click="${() => this.copyPlayground()}"
+                        >
+                          ${iconCopy(14)}
+                        </button>
+                      </div>
+                      <textarea
+                        class="sb-code-editor"
+                        spellcheck="false"
+                        .value="${this.playgroundCode}"
+                        @input="${(e: InputEvent) =>
+                          this.handleEditorInput((e.target as HTMLTextAreaElement).value)}"
+                      ></textarea>
+                    </div>
                   </div>
                   <div class="sb-preview-col">
                     <span class="sb-col-label">${t.viewTexts.storybook.previewLabel}</span>
@@ -427,12 +438,7 @@ export class AppStorybook extends LitElement {
 
     return html`
       <section class="sb-section">
-        <div class="sb-section-head">
-          <h3 class="sb-section-title">${t.viewTexts.storybook.apiSpecTitle(meta.component)}</h3>
-          ${props.length > 0
-            ? html`<span class="sb-props-count">${t.viewTexts.storybook.propsCount(props.length)}</span>`
-            : ''}
-        </div>
+        <h3 class="sb-section-title">${t.viewTexts.storybook.apiSpecTitle(meta.component)}</h3>
 
         ${props.length === 0
           ? html`<p class="sb-no-props">${t.viewTexts.storybook.noProps}</p>`
