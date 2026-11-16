@@ -148,6 +148,7 @@ export class AppDocuments extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'documents' ? store.activePage : 1;
     this.documents = store.documents;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -359,7 +360,7 @@ export class AppDocuments extends LitElement {
         }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           const val = eventValue(e);
@@ -377,7 +378,7 @@ export class AppDocuments extends LitElement {
             this.projectFilter = val;
             store.setDocumentFilters({ projectId: val });
           }
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @reset="${() => {
           this.localSearch = '';
@@ -386,7 +387,7 @@ export class AppDocuments extends LitElement {
           this.statusFilter = 'all';
           this.companyFilter = 'all';
           this.projectFilter = 'all';
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setDocumentFilters({ scope: 'all', companyId: 'all', projectId: 'all' });
         }}"
       >
@@ -399,7 +400,7 @@ export class AppDocuments extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.viewMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -625,11 +626,11 @@ export class AppDocuments extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -753,11 +754,11 @@ export class AppDocuments extends LitElement {
           .page="${paged.page}"
           .pageSize="${paged.pageSize}"
           @page-change="${(e: CustomEvent<{ page: number }>) => {
-            this.currentPage = e.detail.page;
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
             this.scrollTop = 0;
           }}"
           @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
             store.setTablePageSize(e.detail.pageSize);
           }}"
         ></app-pagination>
