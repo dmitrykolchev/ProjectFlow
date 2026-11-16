@@ -15,6 +15,7 @@ import dropdownButtonMeta from '../../common/app-dropdown-button/app-dropdown-bu
 import splitButtonMeta from '../../common/app-split-button/app-split-button.story';
 import menuMeta from '../../common/app-menu/app-menu.story';
 import badgeMeta from '../../common/app-badge/app-badge.story';
+import entityEmblemMeta from '../../common/app-entity-emblem/app-entity-emblem.story';
 import materialIconMeta from '../../common/app-material-icon/app-material-icon.story';
 import materialIconGalleryMeta from '../../common/app-material-icon-gallery/app-material-icon-gallery.story';
 import segmentedSwitchMeta from '../../common/app-segmented-switch/app-segmented-switch.story';
@@ -85,6 +86,7 @@ import counterpartyDetailMeta from '../app-counterparty-detail/app-counterparty-
 import contractsMeta from '../app-contracts/app-contracts.story';
 import contractDetailMeta from '../app-contract-detail/app-contract-detail.story';
 import calculationsMeta from '../app-calculations/app-calculations.story';
+import calculationDetailMeta from '../app-calculation-detail/app-calculation-detail.story';
 import paymentsMeta from '../app-payments/app-payments.story';
 import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
 import expensesMeta from '../app-expenses/app-expenses.story';
@@ -98,6 +100,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   splitButtonMeta,
   menuMeta,
   badgeMeta,
+  entityEmblemMeta,
   materialIconMeta,
   materialIconGalleryMeta,
   segmentedSwitchMeta,
@@ -165,6 +168,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   contractsMeta,
   contractDetailMeta,
   calculationsMeta,
+  calculationDetailMeta,
   paymentsMeta,
   timeTrackingMeta,
   expensesMeta,

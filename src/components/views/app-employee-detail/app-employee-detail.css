@@ -100,6 +100,21 @@
   flex: 1;
 }
 
+.avatar-emblem-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.avatar-entity-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  border-radius: var(--radius-sm, 7px);
+  background: var(--bg-surface, #111827);
+  box-shadow: 0 0 0 2px var(--bg-surface, #111827);
+}
+
 .title-block {
   display: flex;
   flex-direction: column;

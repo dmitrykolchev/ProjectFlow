@@ -12,6 +12,7 @@ import {
   Invoice,
 } from '../../../types';
 import {
+  iconCalculator,
   iconCheck,
   iconChevronRight,
   iconEdit,
@@ -19,7 +20,6 @@ import {
   iconPlus,
   iconReceipt,
   iconSend,
-  iconTable,
   iconTrash,
   iconX,
 } from '../../common/icons';
@@ -41,6 +41,7 @@ import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-pagination/app-pagination';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-calculations.css';
 import { eventValue } from '../../common/event-value';
@@ -338,7 +339,7 @@ export class AppCalculations extends LitElement {
         title="${t.navigation.calculations}"
         subtitle="${t.viewTexts.pageSubtitles.calculations}"
       >
-        <span slot="icon">${iconTable(28)}</span>
+        <span slot="icon">${iconCalculator(28)}</span>
         <app-button
           slot="actions"
           variant="primary"
@@ -425,9 +426,9 @@ export class AppCalculations extends LitElement {
                           <button
                             type="button"
                             class="link-btn"
-                            @click="${() => (this.previewCalculation = calc)}"
+                            @click="${() => store.openCalculationDetail(calc.id)}"
                           >
-                            ${iconTable()}
+                            ${iconCalculator(15)}
                             <span>${calc.number}</span>
                           </button>
                           <div class="cell-sub">
@@ -947,15 +948,18 @@ export class AppCalculations extends LitElement {
       >
         <div class="invoice-sheet">
           <div class="sheet-top">
-            <div>
-              <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
-                ${t.viewTexts.calculations.previewTitle} № ${calc.number}
-              </div>
-              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                ${t.viewTexts.calculations.previewPeriod}:
-                <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
-                · ${t.calculations.frequencies[calc.frequency]}
-                · ${t.viewTexts.calculations.thContract}: ${ctr?.number || '—'}
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+              <app-entity-emblem entity="calculation" size="md"></app-entity-emblem>
+              <div>
+                <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
+                  ${t.viewTexts.calculations.previewTitle} № ${calc.number}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                  ${t.viewTexts.calculations.previewPeriod}:
+                  <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
+                  · ${t.calculations.frequencies[calc.frequency]}
+                  · ${t.viewTexts.calculations.thContract}: ${ctr?.number || '—'}
+                </div>
               </div>
             </div>
             <app-status-chip domain="calculation" status="${calc.status}" appearance="soft"></app-status-chip>

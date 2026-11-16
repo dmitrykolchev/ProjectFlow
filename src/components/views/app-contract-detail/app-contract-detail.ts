@@ -19,6 +19,7 @@ import {
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconCalculator,
   iconCheck,
   iconChevronLeft,
   iconClock,
@@ -50,6 +51,7 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-contract-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -561,21 +563,25 @@ export class AppContractDetail extends LitElement {
 
         <!-- Contract Overview -->
         <section class="overview-card">
-          <div class="title-block">
-            <div class="title-row">
-              <span class="contract-key">${ctr.number}</span>
-              <h1 class="contract-title">${ctr.title}</h1>
-              <app-status-chip domain="contract" status="${ctr.status}"></app-status-chip>
+          <div class="hero-identity">
+            <app-entity-emblem entity="contract" size="lg"></app-entity-emblem>
+            <div class="title-block">
+              <div class="title-row">
+                <app-entity-emblem entity="contract" variant="pill" size="sm"></app-entity-emblem>
+                <span class="contract-key">${ctr.number}</span>
+                <h1 class="contract-title">${ctr.title}</h1>
+                <app-status-chip domain="contract" status="${ctr.status}"></app-status-chip>
+              </div>
+              <div class="contract-meta-inline">
+                <span>${this.getTypeLabel(ctr.type, t)}</span>
+                <span aria-hidden="true">·</span>
+                <span class="mono">${ctr.startDate} → ${ctr.endDate}</span>
+                <span aria-hidden="true">·</span>
+                <span>${t.viewTexts.contractDetail.billingCycleLabel}: <strong>${freqLabel}</strong></span>
+                ${owner ? html`<span aria-hidden="true">·</span><span>${owner.name}</span>` : ''}
+              </div>
+              <p class="contract-desc">${ctr.description || '—'}</p>
             </div>
-            <div class="contract-meta-inline">
-              <span>${this.getTypeLabel(ctr.type, t)}</span>
-              <span aria-hidden="true">·</span>
-              <span class="mono">${ctr.startDate} → ${ctr.endDate}</span>
-              <span aria-hidden="true">·</span>
-              <span>${t.viewTexts.contractDetail.billingCycleLabel}: <strong>${freqLabel}</strong></span>
-              ${owner ? html`<span aria-hidden="true">·</span><span>${owner.name}</span>` : ''}
-            </div>
-            <p class="contract-desc">${ctr.description || '—'}</p>
           </div>
 
           <div class="progress-section">
@@ -719,9 +725,9 @@ export class AppContractDetail extends LitElement {
                               <button
                                 type="button"
                                 class="inv-num-btn"
-                                @click="${() => (this.previewCalculation = calc)}"
+                                @click="${() => store.openCalculationDetail(calc.id)}"
                               >
-                                ${iconFileText(14)}
+                                ${iconCalculator(14)}
                                 <span>${calc.number}</span>
                               </button>
                               ${linkedInv
@@ -1627,14 +1633,17 @@ export class AppContractDetail extends LitElement {
       >
         <div class="invoice-sheet">
           <div class="sheet-top">
-            <div>
-              <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
-                ${t.viewTexts.calculations.previewTitle} № ${calc.number}
-              </div>
-              <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                ${t.viewTexts.calculations.previewPeriod}: <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
-                · ${t.calculations.frequencies[calc.frequency]}
-                · ${t.viewTexts.payments.thContract}: ${ctr.number}
+            <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+              <app-entity-emblem entity="calculation" size="md"></app-entity-emblem>
+              <div>
+                <div style="font-size: 1.15rem; font-weight: 700;" class="mono">
+                  ${t.viewTexts.calculations.previewTitle} № ${calc.number}
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">
+                  ${t.viewTexts.calculations.previewPeriod}: <span class="mono">${calc.periodStart} → ${calc.periodEnd}</span>
+                  · ${t.calculations.frequencies[calc.frequency]}
+                  · ${t.viewTexts.payments.thContract}: ${ctr.number}
+                </div>
               </div>
             </div>
             <app-status-chip domain="calculation" status="${calc.status}" appearance="soft"></app-status-chip>

@@ -241,6 +241,7 @@ export class AppStore {
   public detailTaskId: string = '';
   public detailKnowledgeId: string = '';
   public detailRequirementId: string = '';
+  public detailCalculationId: string = '';
   public requirementFilterProjectId: string = 'all';
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
@@ -964,6 +965,7 @@ export class AppStore {
       view === 'contracts' ||
       view === 'contract-detail' ||
       view === 'calculations' ||
+      view === 'calculation-detail' ||
       view === 'payments'
     ) {
       return 'directory';
@@ -1060,6 +1062,8 @@ export class AppStore {
         return this.detailTaskId || undefined;
       case 'requirement-detail':
         return this.detailRequirementId || undefined;
+      case 'calculation-detail':
+        return this.detailCalculationId || undefined;
       case 'project-chat':
         return this.chatProjectId || undefined;
       default:
@@ -1109,6 +1113,9 @@ export class AppStore {
     } else if (view === 'requirement-detail') {
       if (id && this.requirements.some((r) => r.id === id)) this.detailRequirementId = id;
       else view = 'requirements';
+    } else if (view === 'calculation-detail') {
+      if (id && this.calculations.some((c) => c.id === id)) this.detailCalculationId = id;
+      else view = 'calculations';
     } else if (view === 'project-chat') {
       if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
@@ -1247,6 +1254,11 @@ export class AppStore {
       initialModal === true || initialModal === 'invoice' ? contractId : null;
     this.pendingCalculationForContractId = initialModal === 'calculation' ? contractId : null;
     this.setActiveView('contract-detail');
+  }
+
+  public openCalculationDetail(calculationId: string): void {
+    this.detailCalculationId = calculationId;
+    this.setActiveView('calculation-detail');
   }
 
   public consumePendingInvoiceModal(contractId: string): boolean {

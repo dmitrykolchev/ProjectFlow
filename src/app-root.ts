@@ -26,6 +26,7 @@ import {
   iconBookOpen,
   iconFolderOpen,
   iconGrid,
+  iconCalculator,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -66,6 +67,8 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   contracts: () => import('./components/views/app-contracts/app-contracts'),
   'contract-detail': () => import('./components/views/app-contract-detail/app-contract-detail'),
   calculations: () => import('./components/views/app-calculations/app-calculations'),
+  'calculation-detail': () =>
+    import('./components/views/app-calculation-detail/app-calculation-detail'),
   payments: () => import('./components/views/app-payments/app-payments'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
@@ -217,6 +220,8 @@ export class AppRoot extends LitElement {
           ? 'employees'
           : this.activeView === 'company-detail'
           ? 'companies'
+          : this.activeView === 'calculation-detail'
+          ? 'calculations'
           : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
@@ -335,7 +340,7 @@ export class AppRoot extends LitElement {
           <sidebar-item
             value="calculations"
             label="${t.navigation.calculations}"
-            .icon="${iconTable()}"
+            .icon="${iconCalculator()}"
           ></sidebar-item>
 
           <sidebar-item
@@ -459,6 +464,8 @@ export class AppRoot extends LitElement {
         return html`<app-contract-detail></app-contract-detail>`;
       case 'calculations':
         return html`<app-calculations></app-calculations>`;
+      case 'calculation-detail':
+        return html`<app-calculation-detail></app-calculation-detail>`;
       case 'payments':
         return html`<app-payments></app-payments>`;
       case 'time-tracking':

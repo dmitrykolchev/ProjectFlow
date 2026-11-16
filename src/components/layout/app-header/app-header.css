@@ -53,8 +53,18 @@
 }
 
 .crumb-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
   color: var(--text-primary, #f8fafc);
   font-weight: 600;
+  min-width: 0;
+}
+
+.crumb-current-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .right-zone {

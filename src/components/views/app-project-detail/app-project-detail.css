@@ -72,6 +72,14 @@
   flex-wrap: wrap;
 }
 
+.hero-identity {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  min-width: 0;
+  flex: 1;
+}
+
 .title-block {
   display: flex;
   flex-direction: column;

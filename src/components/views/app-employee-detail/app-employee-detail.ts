@@ -30,6 +30,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-employee-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -208,9 +209,13 @@ export class AppEmployeeDetail extends LitElement {
         <section class="overview-card">
           <div class="hero-top">
             <div class="hero-identity">
-              <app-avatar size="lg" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
+              <div class="avatar-emblem-wrap">
+                <app-avatar size="lg" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
+                <app-entity-emblem class="avatar-entity-badge" entity="employee" size="sm"></app-entity-emblem>
+              </div>
               <div class="title-block">
                 <div class="title-row">
+                  <app-entity-emblem entity="employee" variant="pill" size="sm"></app-entity-emblem>
                   <h1 class="emp-title">${emp.name}</h1>
                   <app-status-chip domain="employee" status="${emp.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
                 </div>

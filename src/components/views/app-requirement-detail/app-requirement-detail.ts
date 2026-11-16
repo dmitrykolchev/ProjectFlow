@@ -57,6 +57,7 @@ import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-requirement-detail.css';
 
 @customElement('app-requirement-detail')
@@ -320,44 +321,50 @@ export class AppRequirementDetail extends LitElement {
         <!-- Hero Card -->
         <section class="hero-card">
           <div class="hero-main">
-            <div class="hero-top-meta">
-              <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
-                ${req.code}
-              </span>
-              <span class="req-pill">
-                ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
-              </span>
-              ${project
-                ? html`
-                    <button
-                      type="button"
-                      class="link-btn"
-                      @click="${() => store.openProjectDetail(project.id)}"
-                    >
-                      <span class="mono">[${project.key}]</span>
-                      <span>${project.name}</span>
-                    </button>
-                  `
-                : ''}
-              <span>·</span>
-              <span>${t.viewTexts.requirementDetail.metaUpdated}: ${this.formatDateTime(req.updatedAt)}</span>
-            </div>
+            <div class="hero-identity">
+              <app-entity-emblem entity="requirement" size="lg"></app-entity-emblem>
+              <div class="hero-title-group">
+                <div class="hero-top-meta">
+                  <app-entity-emblem entity="requirement" variant="pill" size="sm"></app-entity-emblem>
+                  <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
+                    ${req.code}
+                  </span>
+                  <span class="req-pill">
+                    ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
+                  </span>
+                  ${project
+                    ? html`
+                        <button
+                          type="button"
+                          class="link-btn"
+                          @click="${() => store.openProjectDetail(project.id)}"
+                        >
+                          <span class="mono">[${project.key}]</span>
+                          <span>${project.name}</span>
+                        </button>
+                      `
+                    : ''}
+                  <span>·</span>
+                  <span>${t.viewTexts.requirementDetail.metaUpdated}: ${this.formatDateTime(req.updatedAt)}</span>
+                </div>
 
-            <div class="hero-title-row">
-              <h1 class="req-title">${req.title}</h1>
-              <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-                <app-status-chip
-                  domain="requirement"
-                  status="${req.status}"
-                  appearance="soft"
-                  size="md"
-                ></app-status-chip>
-                <app-status-chip
-                  domain="requirementPriority"
-                  status="${req.priority}"
-                  appearance="outline"
-                  size="md"
-                ></app-status-chip>
+                <div class="hero-title-row">
+                  <h1 class="req-title">${req.title}</h1>
+                  <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
+                    <app-status-chip
+                      domain="requirement"
+                      status="${req.status}"
+                      appearance="soft"
+                      size="md"
+                    ></app-status-chip>
+                    <app-status-chip
+                      domain="requirementPriority"
+                      status="${req.priority}"
+                      appearance="outline"
+                      size="md"
+                    ></app-status-chip>
+                  </div>
+                </div>
               </div>
             </div>
 

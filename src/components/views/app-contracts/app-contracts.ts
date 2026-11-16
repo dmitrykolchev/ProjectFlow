@@ -17,6 +17,7 @@ import {
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconCalculator,
   iconCheck,
   iconChevronRight,
   iconClock,
@@ -691,9 +692,9 @@ export class AppContracts extends LitElement {
                             <button
                               type="button"
                               class="contract-link-btn"
-                              @click="${() => ctr && store.openContractDetail(ctr.id)}"
+                              @click="${() => store.openCalculationDetail(calc.id)}"
                             >
-                              ${iconTable()}
+                              ${iconCalculator(15)}
                               <span>${calc.number}</span>
                             </button>
                             <div class="billing-sub">

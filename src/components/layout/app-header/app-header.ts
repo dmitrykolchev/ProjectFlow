@@ -5,6 +5,19 @@ import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
 import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconZap } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/app-entity-emblem/app-entity-emblem';
+import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
+
+const DETAIL_ENTITY_MAP: Record<string, EntityEmblemKind> = {
+  'project-detail': 'project',
+  'task-detail': 'task',
+  'requirement-detail': 'requirement',
+  'company-detail': 'company',
+  'counterparty-detail': 'counterparty',
+  'contract-detail': 'contract',
+  'calculation-detail': 'calculation',
+  'employee-detail': 'employee',
+};
 
 @customElement('app-header')
 export class AppHeader extends LitElement {
@@ -13,6 +26,11 @@ export class AppHeader extends LitElement {
   @state() private detailProjectId = store.detailProjectId;
   @state() private detailContractId = store.detailContractId;
   @state() private detailTaskId = store.detailTaskId;
+  @state() private detailRequirementId = store.detailRequirementId;
+  @state() private detailCompanyId = store.detailCompanyId;
+  @state() private detailCounterpartyId = store.detailCounterpartyId;
+  @state() private detailCalculationId = store.detailCalculationId;
+  @state() private detailEmployeeId = store.detailEmployeeId;
   @state() private searchQuery = store.searchQuery;
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
@@ -41,6 +59,11 @@ export class AppHeader extends LitElement {
     this.detailProjectId = store.detailProjectId;
     this.detailContractId = store.detailContractId;
     this.detailTaskId = store.detailTaskId;
+    this.detailRequirementId = store.detailRequirementId;
+    this.detailCompanyId = store.detailCompanyId;
+    this.detailCounterpartyId = store.detailCounterpartyId;
+    this.detailCalculationId = store.detailCalculationId;
+    this.detailEmployeeId = store.detailEmployeeId;
     this.searchQuery = store.searchQuery;
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
@@ -63,24 +86,59 @@ export class AppHeader extends LitElement {
       this.activeView === 'task-detail'
         ? store.tasks.find((tk) => tk.id === this.detailTaskId)
         : undefined;
+    const detailRequirement =
+      this.activeView === 'requirement-detail'
+        ? store.requirements.find((r) => r.id === this.detailRequirementId)
+        : undefined;
+    const detailCompany =
+      this.activeView === 'company-detail'
+        ? store.companies.find((c) => c.id === this.detailCompanyId)
+        : undefined;
+    const detailCounterparty =
+      this.activeView === 'counterparty-detail'
+        ? store.counterparties.find((c) => c.id === this.detailCounterpartyId)
+        : undefined;
+    const detailCalculation =
+      this.activeView === 'calculation-detail'
+        ? store.calculations.find((c) => c.id === this.detailCalculationId)
+        : undefined;
+    const detailEmployee =
+      this.activeView === 'employee-detail'
+        ? store.users.find((u) => u.id === this.detailEmployeeId)
+        : undefined;
 
     const viewNames: Record<string, string> = {
       dashboard: t.navigation.dashboard,
       projects: t.navigation.projects,
       'project-detail': detailProject ? `${detailProject.key} · ${detailProject.name}` : t.navigation.projects,
+      requirements: t.navigation.requirements,
+      'requirement-detail': detailRequirement
+        ? `${detailRequirement.code} · ${detailRequirement.title}`
+        : t.navigation.requirements,
       kanban: t.navigation.kanban,
       'task-detail': detailTask ? `${detailTask.id} · ${detailTask.title}` : t.navigation.kanban,
       'knowledge-base': t.navigation.knowledgeBase,
+      documents: t.navigation.documents,
       'project-chat': t.navigation.projectChat,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,
       calendar: t.navigation.calendar,
       analytics: t.navigation.analytics,
       companies: t.navigation.companies,
+      'company-detail': detailCompany ? detailCompany.name : t.navigation.companies,
       employees: t.navigation.employees,
+      'employee-detail': detailEmployee ? detailEmployee.name : t.navigation.employees,
       counterparties: t.navigation.counterparties,
+      'counterparty-detail': detailCounterparty
+        ? detailCounterparty.name
+        : t.navigation.counterparties,
       contracts: t.navigation.contracts,
       'contract-detail': detailContract ? `${detailContract.number} · ${detailContract.title}` : t.navigation.contracts,
+      calculations: t.navigation.calculations,
+      'calculation-detail': detailCalculation
+        ? detailCalculation.number
+        : t.navigation.calculations,
+      payments: t.navigation.payments,
       'time-tracking': t.navigation.timeTracking,
       expenses: t.navigation.expenses,
       settings: t.navigation.settings,
@@ -88,6 +146,8 @@ export class AppHeader extends LitElement {
       'design-tokens': t.navigation.designTokens,
       'material-icons': t.navigation.materialIcons,
     };
+
+    const detailEntity = DETAIL_ENTITY_MAP[this.activeView];
 
     return html`
       <header class="header-container">
@@ -104,7 +164,16 @@ export class AppHeader extends LitElement {
             <span class="crumb-separator">/</span>
             <span class="crumb-root">${projectName}</span>
             <span class="crumb-separator">/</span>
-            <span class="crumb-current">${viewNames[this.activeView] || this.activeView}</span>
+            <span class="crumb-current">
+              ${detailEntity
+                ? html`<app-entity-emblem
+                    entity="${detailEntity}"
+                    size="xs"
+                    .color="${detailProject?.color || ''}"
+                  ></app-entity-emblem>`
+                : ''}
+              <span class="crumb-current-text">${viewNames[this.activeView] || this.activeView}</span>
+            </span>
           </div>
         </div>
 

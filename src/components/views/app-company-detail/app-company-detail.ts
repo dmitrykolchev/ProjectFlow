@@ -28,7 +28,6 @@ import {
   iconAlertTriangle,
   iconArrowUpRight,
   iconBookOpen,
-  iconBuilding,
   iconCheck,
   iconChevronLeft,
   iconChevronRight,
@@ -60,6 +59,7 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
@@ -317,9 +317,10 @@ export class AppCompanyDetail extends LitElement {
         <section class="overview-card">
           <div class="hero-top">
             <div class="hero-identity">
-              <div class="company-emblem">${iconBuilding(24)}</div>
+              <app-entity-emblem entity="company" size="lg"></app-entity-emblem>
               <div class="title-block">
                 <div class="title-row">
+                  <app-entity-emblem entity="company" variant="pill" size="sm"></app-entity-emblem>
                   <h1 class="company-title">${company.name}</h1>
                   <app-status-chip domain="company" status="${company.status}" appearance="soft" size="sm"></app-status-chip>
                 </div>

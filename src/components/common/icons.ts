@@ -1,8 +1,8 @@
 import { html, TemplateResult } from 'lit';
 
-export function iconKanban(): TemplateResult {
+export function iconKanban(size = 18): TemplateResult {
   return html`
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <rect x="3" y="4" width="5" height="16" rx="1"/>
       <rect x="11" y="4" width="5" height="10" rx="1"/>
       <rect x="19" y="4" width="5" height="13" rx="1"/>
@@ -644,6 +644,24 @@ export function iconRefreshCw(size = 15): TemplateResult {
     </svg>
   `;
 }
+
+export function iconCalculator(size = 18): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="2" width="16" height="20" rx="2"/>
+      <line x1="8" y1="6" x2="16" y2="6"/>
+      <line x1="16" y1="14" x2="16" y2="18"/>
+      <path d="M16 10h.01"/>
+      <path d="M12 10h.01"/>
+      <path d="M8 10h.01"/>
+      <path d="M12 14h.01"/>
+      <path d="M8 14h.01"/>
+      <path d="M12 18h.01"/>
+      <path d="M8 18h.01"/>
+    </svg>
+  `;
+}
+
 
 
 

@@ -389,6 +389,7 @@ export type ActiveView =
   | 'contracts'
   | 'contract-detail'
   | 'calculations'
+  | 'calculation-detail'
   | 'payments'
   | 'projects'
   | 'project-detail'

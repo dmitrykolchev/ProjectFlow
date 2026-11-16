@@ -13,6 +13,7 @@ import {
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconCalculator,
   iconCheck,
   iconChevronLeft,
   iconChevronRight,
@@ -20,7 +21,6 @@ import {
   iconEdit,
   iconFileText,
   iconFolder,
-  iconHandshake,
   iconMessageSquare,
   iconPlus,
   iconReceipt,
@@ -40,6 +40,7 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-counterparty-detail.css';
@@ -267,9 +268,10 @@ export class AppCounterpartyDetail extends LitElement {
         <section class="overview-card">
           <div class="hero-top">
             <div class="hero-identity">
-              <div class="cp-emblem">${iconHandshake(24)}</div>
+              <app-entity-emblem entity="counterparty" size="lg"></app-entity-emblem>
               <div class="title-block">
                 <div class="title-row">
+                  <app-entity-emblem entity="counterparty" variant="pill" size="sm"></app-entity-emblem>
                   <h1 class="cp-title">${cp.name}</h1>
                   <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
                   <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
@@ -570,12 +572,28 @@ export class AppCounterpartyDetail extends LitElement {
                               <button
                                 type="button"
                                 class="link-btn mono"
-                                @click="${() => ctr && store.openContractDetail(ctr.id)}"
+                                title="${t.calculations.openCalculation}"
+                                @click="${() => store.openCalculationDetail(calc.id)}"
                               >
-                                ${calc.number}
+                                <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                                  ${iconCalculator(14)}
+                                  <span>${calc.number}</span>
+                                </span>
                               </button>
                             </td>
-                            <td>${ctr ? ctr.number : '—'}</td>
+                            <td>
+                              ${ctr
+                                ? html`
+                                    <button
+                                      type="button"
+                                      class="link-btn mono"
+                                      @click="${() => store.openContractDetail(ctr.id)}"
+                                    >
+                                      ${ctr.number}
+                                    </button>
+                                  `
+                                : '—'}
+                            </td>
                             <td class="mono">${calc.periodStart} → ${calc.periodEnd}</td>
                             <td class="mono">
                               ${calc.billableHours} ${t.viewTexts.calculations.hoursUnitShort}

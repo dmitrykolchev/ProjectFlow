@@ -35,6 +35,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-project-requirements/app-project-requirements';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-project-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -294,14 +295,18 @@ export class AppProjectDetail extends LitElement {
         <!-- Project Hero Overview -->
         <section class="overview-card">
           <div class="overview-head">
-            <div class="title-block">
-              <div class="title-row">
-                <span class="color-dot-lg" style="background: ${proj.color};"></span>
-                <span class="proj-key">${proj.key}</span>
-                <h1 class="proj-title">${proj.name}</h1>
-                <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft"></app-status-chip>
+            <div class="hero-identity">
+              <app-entity-emblem entity="project" size="lg" .color="${proj.color}"></app-entity-emblem>
+              <div class="title-block">
+                <div class="title-row">
+                  <app-entity-emblem entity="project" variant="pill" size="sm" .color="${proj.color}"></app-entity-emblem>
+                  <span class="color-dot-lg" style="background: ${proj.color};"></span>
+                  <span class="proj-key">${proj.key}</span>
+                  <h1 class="proj-title">${proj.name}</h1>
+                  <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft"></app-status-chip>
+                </div>
+                <p class="proj-desc">${proj.description || '—'}</p>
               </div>
-              <p class="proj-desc">${proj.description || '—'}</p>
             </div>
           </div>
 

@@ -50,6 +50,7 @@ import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-task-ai-panel/app-task-ai-panel';
+import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -464,45 +465,51 @@ export class AppTaskDetail extends LitElement {
         <!-- Hero Task Overview -->
         <section class="hero-card">
           <div class="hero-main">
-            <div class="hero-top-meta">
-              <span class="task-id-mono">${task.id}</span>
-              ${project
-                ? html`
-                    <span aria-hidden="true">·</span>
-                    <button
-                      type="button"
-                      class="link-btn"
-                      @click="${() => store.openProjectDetail(project.id)}"
-                    >
-                      ${project.name}
-                    </button>
-                  `
-                : ''}
-              ${task.tags.length > 0
-                ? html`
-                    <span aria-hidden="true">·</span>
-                    <span>${task.tags.join(' / ')}</span>
-                  `
-                : ''}
-              ${assignee
-                ? html`
-                    <span aria-hidden="true">·</span>
-                    <button
-                      type="button"
-                      class="link-btn"
-                      @click="${() => store.openEmployeeDetail(assignee.id)}"
-                    >
-                      ${assignee.name}
-                    </button>
-                  `
-                : ''}
-            </div>
+            <div class="hero-identity">
+              <app-entity-emblem entity="task" size="lg"></app-entity-emblem>
+              <div class="hero-title-group">
+                <div class="hero-top-meta">
+                  <app-entity-emblem entity="task" variant="pill" size="sm"></app-entity-emblem>
+                  <span class="task-id-mono">${task.id}</span>
+                  ${project
+                    ? html`
+                        <span aria-hidden="true">·</span>
+                        <button
+                          type="button"
+                          class="link-btn"
+                          @click="${() => store.openProjectDetail(project.id)}"
+                        >
+                          ${project.name}
+                        </button>
+                      `
+                    : ''}
+                  ${task.tags.length > 0
+                    ? html`
+                        <span aria-hidden="true">·</span>
+                        <span>${task.tags.join(' / ')}</span>
+                      `
+                    : ''}
+                  ${assignee
+                    ? html`
+                        <span aria-hidden="true">·</span>
+                        <button
+                          type="button"
+                          class="link-btn"
+                          @click="${() => store.openEmployeeDetail(assignee.id)}"
+                        >
+                          ${assignee.name}
+                        </button>
+                      `
+                    : ''}
+                </div>
 
-            <div class="hero-title-row">
-              <h1 class="task-title">${task.title}</h1>
-            </div>
+                <div class="hero-title-row">
+                  <h1 class="task-title">${task.title}</h1>
+                </div>
 
-            ${task.description ? html`<p class="task-desc">${task.description}</p>` : ''}
+                ${task.description ? html`<p class="task-desc">${task.description}</p>` : ''}
+              </div>
+            </div>
 
             <div class="inline-controls-strip">
               <div class="control-cell">
