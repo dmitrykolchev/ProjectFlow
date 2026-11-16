@@ -833,6 +833,21 @@ export class AppStore {
       root.style.setProperty('--scrollbar-thumb', adjustHex(base, step * 3));
       root.style.setProperty('--scrollbar-thumb-hover', adjustHex(base, step * 4.5));
     }
+
+    // canonical control size scale (docs/ComponentApiSpecs.md, Priority E) —
+    // shared by all form controls; values equal the historical fallbacks, so md visuals are unchanged
+    root.style.setProperty('--control-height-sm', '30px');
+    root.style.setProperty('--control-height-md', '38px');
+    root.style.setProperty('--control-height-lg', '44px');
+    root.style.setProperty('--control-font-sm', '0.8125rem');
+    root.style.setProperty('--control-font-md', '0.875rem');
+    root.style.setProperty('--control-font-lg', '1rem');
+    root.style.setProperty('--control-padding-x-sm', '0.65rem');
+    root.style.setProperty('--control-padding-x-md', '0.875rem');
+    root.style.setProperty('--control-padding-x-lg', '1.15rem');
+    root.style.setProperty('--control-icon-sm', '16px');
+    root.style.setProperty('--control-icon-md', '20px');
+    root.style.setProperty('--control-icon-lg', '24px');
   }
 
   public setTheme(theme: ThemeMode): void {
