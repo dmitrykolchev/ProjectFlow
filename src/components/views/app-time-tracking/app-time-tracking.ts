@@ -93,6 +93,7 @@ export class AppTimeTracking extends LitElement {
   }
 
   private syncState() {
+    this.currentPage = store.activeView === 'time-tracking' ? store.activePage : 1;
     this.entries = store.timeEntries;
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
@@ -316,13 +317,13 @@ export class AppTimeTracking extends LitElement {
         .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'project') this.projectFilter = eventValue(e);
           if (e.detail.key === 'user') this.userFilter = eventValue(e);
           if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
         }}"
       >
         <app-segmented-switch
@@ -334,7 +335,7 @@ export class AppTimeTracking extends LitElement {
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.viewMode = eventValue(e) as 'journal' | 'by-task';
-            this.currentPage = 1;
+            this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
       </app-filter-bar>
@@ -472,11 +473,11 @@ export class AppTimeTracking extends LitElement {
         .page="${paged.page}"
         .pageSize="${paged.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
@@ -613,11 +614,11 @@ export class AppTimeTracking extends LitElement {
         .page="${pagedGroups.page}"
         .pageSize="${pagedGroups.pageSize}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page;
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
         }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1;
+          this.currentPage = 1; store.setActivePage(1, false);
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
