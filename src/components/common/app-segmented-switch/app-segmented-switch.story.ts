@@ -12,6 +12,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Declarative <app-option> children filling the segments (value, label, disabled, start / end graphics)',
   },
+  childrenDoc: {
+    'app-option': 'Declarative segment (value, label, disabled, start / end slot graphics) appended to the options prop list',
+  },
   propsDoc: {
     options: 'Segment definitions (value + label)',
     dataSource: 'Data source for segments: array, promise, or function returning an array (sync or async)',
