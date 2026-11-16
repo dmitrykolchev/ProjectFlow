@@ -1,0 +1,52 @@
+/* Material Symbols — variable font; Google axes are set via font-variation-settings,
+   axis values come from --mi-* custom properties synced with props. size: glyph = app size square. */
+:host {
+  /* host = flex container, glyph centered in the box; a slot rule may override --mi-icon
+     (icon size inside a control), standalone falls back to the size scale --mi-h */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mi-icon, var(--mi-h));
+  height: var(--mi-icon, var(--mi-h));
+  font-size: var(--mi-icon, var(--mi-h));
+  line-height: normal;
+}
+
+.glyph {
+  font-variation-settings: 'FILL' var(--mi-fill), 'wght' var(--mi-wght), 'GRAD' var(--mi-grad), 'opsz' var(--mi-opsz);
+  font-size: inherit;
+  /* glyph is positioned as an image — box and line = size */
+  line-height: var(--mi-icon, var(--mi-h));
+  max-width: var(--mi-icon, var(--mi-h));
+  max-height: var(--mi-icon, var(--mi-h));
+  display: inline-block;
+  white-space: nowrap;
+  direction: ltr;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+  /* color inherit — inside a colored control slot the glyph inherits the container text color */
+  color: inherit;
+}
+
+/* Google style = variable font family (Outlined/Rounded/Sharp) */
+.glyph { font-family: 'Material Symbols Outlined'; }
+.glyph.f-outlined { font-family: 'Material Symbols Outlined'; }
+.glyph.f-rounded { font-family: 'Material Symbols Rounded'; }
+.glyph.f-sharp { font-family: 'Material Symbols Sharp'; }
+
+/* variant — color from status tokens (one token pair per variant for both themes);
+   neutral inherits the container currentColor (default) */
+:host([data-variant='primary']) { color: var(--accent-primary, #6366f1); }
+:host([data-variant='success']) { color: var(--color-success, #059669); }
+:host([data-variant='warning']) { color: var(--color-warning, #d97706); }
+:host([data-variant='danger']) { color: var(--color-danger, #dc2626); }
+:host([data-variant='info']) { color: var(--color-info, #0284c7); }
+
+/* size scale: xsm|sm|md|lg|xlg = 24/28/36/42/48px; md default;
+   opsz (optical size) follows the glyph size */
+:host { --mi-h: 36px; --mi-fill: 0; --mi-wght: 400; --mi-grad: 0; --mi-opsz: 48; }
+:host(.xsm) { --mi-h: 24px; --mi-opsz: 20; }
+:host(.sm) { --mi-h: 28px; --mi-opsz: 24; }
+:host(.lg) { --mi-h: 42px; --mi-opsz: 40; }
+:host(.xlg) { --mi-h: 48px; --mi-opsz: 48; }

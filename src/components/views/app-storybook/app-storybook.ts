@@ -13,6 +13,7 @@ import dropdownButtonMeta from '../../common/app-dropdown-button/app-dropdown-bu
 import splitButtonMeta from '../../common/app-split-button/app-split-button.story';
 import menuMeta from '../../common/app-menu/app-menu.story';
 import badgeMeta from '../../common/app-badge/app-badge.story';
+import materialIconMeta from '../../common/app-material-icon/app-material-icon.story';
 import segmentedSwitchMeta from '../../common/app-segmented-switch/app-segmented-switch.story';
 import radioGroupMeta from '../../common/app-radio-group/app-radio-group.story';
 import inputMeta from '../../common/app-input/app-input.story';
@@ -94,6 +95,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   splitButtonMeta,
   menuMeta,
   badgeMeta,
+  materialIconMeta,
   segmentedSwitchMeta,
   radioGroupMeta,
   checkboxMeta,
