@@ -973,6 +973,7 @@ export const en = {
       createWithoutAiBtn: 'Create Without AI',
     },
     companies: {
+      defaultCity: 'Moscow',
       filterAllStatuses: 'All statuses',
       filterActive: 'Active',
       filterInactive: 'Inactive',
@@ -1097,6 +1098,7 @@ export const en = {
       thStatus: 'Status',
     },
     counterparties: {
+      defaultCity: 'Moscow',
       filterAllTypes: 'All types',
       typeClient: 'Client',
       typeVendor: 'Vendor',

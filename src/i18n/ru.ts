@@ -973,6 +973,7 @@ export const ru = {
       createWithoutAiBtn: 'Создать без AI',
     },
     companies: {
+      defaultCity: 'Москва',
       filterAllStatuses: 'Все статусы',
       filterActive: 'Активная',
       filterInactive: 'Архив',
@@ -1097,6 +1098,7 @@ export const ru = {
       thStatus: 'Статус',
     },
     counterparties: {
+      defaultCity: 'Москва',
       filterAllTypes: 'Все типы',
       typeClient: 'Заказчик',
       typeVendor: 'Поставщик',

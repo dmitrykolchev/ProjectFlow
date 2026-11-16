@@ -432,7 +432,7 @@ export class AppCompanies extends LitElement {
     this.formInn = '';
     this.formKpp = '';
     this.formIndustry = '';
-    this.formCity = 'Москва';
+    this.formCity = getTranslation(this.currentLang).viewTexts.companies.defaultCity;
     this.formPhone = '';
     this.formEmail = '';
     this.formWebsite = '';
@@ -473,7 +473,7 @@ export class AppCompanies extends LitElement {
       inn: this.formInn.trim() || '7700000000',
       kpp: this.formKpp.trim(),
       industry: this.formIndustry.trim() || 'IT / Software',
-      city: this.formCity.trim() || 'Москва',
+      city: this.formCity.trim() || getTranslation(this.currentLang).viewTexts.companies.defaultCity,
       phone: this.formPhone.trim() || '—',
       email: this.formEmail.trim() || '—',
       website: this.formWebsite.trim(),
