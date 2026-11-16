@@ -5,6 +5,31 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
+/* Self-hosted Material Symbols variable fonts (Apache 2.0), Google axes FILL/GRAD/opsz/wght
+   (wght 100..700 declared); ligature glyphs by Google icon names (snake_case).
+   <app-material-icon> sets font-variation-settings from its props. */
+@font-face {
+  font-family: 'Material Symbols Outlined';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('/fonts/ms-outlined.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Material Symbols Rounded';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('/fonts/ms-rounded.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Material Symbols Sharp';
+  font-style: normal;
+  font-weight: 100 700;
+  font-display: block;
+  src: url('/fonts/ms-sharp.woff2') format('woff2');
+}
+
 :root {
   /* Common typography & spacing */
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
