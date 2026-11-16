@@ -67,6 +67,15 @@
   box-shadow: 0 0 16px rgba(0, 240, 255, 0.25), 0 0 24px rgba(255, 42, 133, 0.18);
 }
 
+.option-card.is-matrix {
+  background: linear-gradient(135deg, rgba(0, 255, 65, 0.08), rgba(5, 150, 105, 0.08));
+}
+
+.option-card.is-matrix.is-active {
+  border-color: #00ff41;
+  box-shadow: 0 0 16px rgba(0, 255, 65, 0.26), inset 0 0 12px rgba(0, 255, 65, 0.08);
+}
+
 .theme-mini-strip {
   display: flex;
   align-items: center;

@@ -662,6 +662,12 @@ export function iconCalculator(size = 18): TemplateResult {
   `;
 }
 
-
-
-
+export function iconTerminal(size = 18): TemplateResult {
+  return html`
+    <svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="16" rx="2"/>
+      <polyline points="7 15 11 11 7 7"/>
+      <line x1="13" y1="15" x2="17" y2="15"/>
+    </svg>
+  `;
+}

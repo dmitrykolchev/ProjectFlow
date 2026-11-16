@@ -13,7 +13,7 @@ export const meta: ComponentStoryMeta = {
     detailProjectId: 'Project id shown on detail pages',
     detailContractId: 'Contract id shown on detail pages',
     detailTaskId: 'Task code shown on detail pages',
-    theme: 'Current theme (dark / light / cyberpunk)',
+    theme: 'Current theme (dark / light / cyberpunk / matrix)',
     currentLang: 'UI language',
     activityCount: 'Badge count in the activity button',
     searchQuery: 'Global search text',

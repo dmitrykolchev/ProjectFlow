@@ -340,7 +340,7 @@ export interface Expense {
   createdAt: string;
 }
 
-export type ThemeMode = 'dark' | 'light' | 'cyberpunk';
+export type ThemeMode = 'dark' | 'light' | 'cyberpunk' | 'matrix';
 export type DensityMode = 'comfortable' | 'compact';
 export type AccentColor = 'indigo' | 'emerald' | 'cyan' | 'violet' | 'amber';
 export type BackgroundPreset = 'default' | 'midnight' | 'obsidian' | 'nordic' | 'forest' | 'custom';

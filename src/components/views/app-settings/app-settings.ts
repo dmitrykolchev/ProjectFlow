@@ -23,7 +23,10 @@ interface BasePaletteOption {
     | 'arcticTeal'
     | 'nightCityNeon'
     | 'acidLime'
-    | 'laserCyan';
+    | 'laserCyan'
+    | 'zionMainframe'
+    | 'codeRain'
+    | 'redPill';
   colors: ThemeBaseColors;
 }
 
@@ -70,6 +73,20 @@ const CURATED_BASE_PALETTES: Record<ThemeMode, BasePaletteOption[]> = {
       colors: { bgCanvas: '#030816', bgSurface: '#081129', textPrimary: '#eefaff', accentPrimary: '#00d9ff', borderSubtle: '#173866' },
     },
   ],
+  matrix: [
+    {
+      nameKey: 'zionMainframe',
+      colors: { bgCanvas: '#020603', bgSurface: '#050e08', textPrimary: '#dcfce7', accentPrimary: '#00ff41', borderSubtle: '#11331d' },
+    },
+    {
+      nameKey: 'codeRain',
+      colors: { bgCanvas: '#030906', bgSurface: '#07160e', textPrimary: '#d1fae5', accentPrimary: '#22c55e', borderSubtle: '#134029' },
+    },
+    {
+      nameKey: 'redPill',
+      colors: { bgCanvas: '#080305', bgSurface: '#13080c', textPrimary: '#ffe4e6', accentPrimary: '#f43f5e', borderSubtle: '#451422' },
+    },
+  ],
 };
 
 @customElement('app-settings')
@@ -109,6 +126,7 @@ export class AppSettings extends LitElement {
     const isDark = activeTheme === 'dark';
     const isLight = activeTheme === 'light';
     const isCyberpunk = activeTheme === 'cyberpunk';
+    const isMatrix = activeTheme === 'matrix';
 
     const effectiveBase = store.getEffectiveBaseColors(activeTheme);
     const hasOverrides = store.hasThemeOverrides(activeTheme) || this.custom.backgroundPreset === 'custom';
@@ -219,6 +237,22 @@ export class AppSettings extends LitElement {
               </div>
               <p class="option-card-desc">${t.settings.themeCyberpunkDesc}</p>
             </div>
+
+            <div
+              class="option-card is-matrix ${isMatrix ? 'is-active' : ''}"
+              @click="${() => store.setTheme('matrix')}"
+            >
+              <div class="theme-mini-strip">
+                <span style="background: #020603;"></span>
+                <span style="background: #050e08;"></span>
+                <span style="background: #00ff41;"></span>
+              </div>
+              <div class="option-card-header">
+                <span>${t.settings.themeMatrix}</span>
+                ${isMatrix ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.settings.themeMatrixDesc}</p>
+            </div>
           </div>
         </app-section-card>
 
@@ -288,7 +322,7 @@ export class AppSettings extends LitElement {
         </app-section-card>
 
         <!-- Background Theme Palette & Custom Color (Dark / Light) -->
-        ${!isCyberpunk
+        ${!isCyberpunk && !isMatrix
           ? html`
               <app-section-card variant="panel" title="${t.settings.background}">
                 <p class="section-desc">${t.settings.backgroundDesc}</p>

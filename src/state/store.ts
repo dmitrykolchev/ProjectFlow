@@ -120,6 +120,13 @@ export const THEME_DEFAULT_BASE_COLORS: Record<ThemeMode, ThemeBaseColors> = {
     accentPrimary: '#ff2a85',
     borderSubtle: '#1e2d5e',
   },
+  matrix: {
+    bgCanvas: '#020603',
+    bgSurface: '#050e08',
+    textPrimary: '#dcfce7',
+    accentPrimary: '#00ff41',
+    borderSubtle: '#11331d',
+  },
 };
 
 const ACCENT_HEX_MAP: Record<AccentColor, string> = {
@@ -615,7 +622,7 @@ export class AppStore {
   public getEffectiveBaseColors(theme: ThemeMode = this.customization.theme): ThemeBaseColors {
     const base = { ...THEME_DEFAULT_BASE_COLORS[theme] };
 
-    if (theme !== 'cyberpunk') {
+    if (theme === 'dark' || theme === 'light') {
       const preset = this.customization.backgroundPreset;
       if (preset && preset !== 'default') {
         if (preset === 'custom' && this.customization.customBgColor) {
@@ -655,7 +662,7 @@ export class AppStore {
     const root = document.documentElement;
     const body = document.body;
     const theme = this.customization.theme;
-    const isDarkFamily = theme === 'dark' || theme === 'cyberpunk';
+    const isDarkFamily = theme === 'dark' || theme === 'cyberpunk' || theme === 'matrix';
 
     // Keep theme attributes strictly on <html> so <body> never shadows :root presets or inline custom vars
     if (body) {
@@ -727,7 +734,7 @@ export class AppStore {
       if (overrides.accentPrimary) {
         const accent = effective.accentPrimary;
         const hover = adjustHex(accent, isDarkSurface ? 18 : -18);
-        const onAccent = getLuminance(accent) > 0.6 ? '#090d16' : '#ffffff';
+        const onAccent = getLuminance(accent) > 0.5 ? '#020603' : '#ffffff';
         root.style.setProperty('--accent-primary', accent);
         root.style.setProperty('--accent-hover', hover);
         root.style.setProperty('--accent-soft', hexToRgba(accent, 0.16));
@@ -736,6 +743,8 @@ export class AppStore {
           '--accent-gradient',
           theme === 'cyberpunk'
             ? `linear-gradient(135deg, ${accent} 0%, ${mixHex(accent, '#00e5ff', 0.45)} 52%, #00e5ff 100%)`
+            : theme === 'matrix'
+            ? `linear-gradient(135deg, ${accent} 0%, ${mixHex(accent, '#059669', 0.55)} 100%)`
             : `linear-gradient(135deg, ${accent} 0%, ${adjustHex(accent, -24)} 100%)`
         );
         root.style.setProperty('--border-focus', accent);
@@ -750,9 +759,18 @@ export class AppStore {
             '--accent-glow-hover',
             `0 0 22px rgba(0, 240, 255, 0.65), 0 0 36px ${hexToRgba(accent, 0.42)}`
           );
+        } else if (theme === 'matrix') {
+          root.style.setProperty(
+            '--accent-glow',
+            `0 0 14px ${hexToRgba(accent, 0.45)}, 0 0 26px ${hexToRgba(accent, 0.2)}`
+          );
+          root.style.setProperty(
+            '--accent-glow-hover',
+            `0 0 22px ${hexToRgba(accent, 0.68)}, 0 0 36px ${hexToRgba(accent, 0.3)}`
+          );
         }
       }
-    } else if (theme !== 'cyberpunk' && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
+    } else if ((theme === 'dark' || theme === 'light') && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
       const base = this.customization.customBgColor;
       const isDarkBg = getLuminance(base) < 0.5;
       const step = isDarkBg ? 10 : -8;
@@ -773,7 +791,7 @@ export class AppStore {
 
   public setTheme(theme: ThemeMode): void {
     this.customization.theme = theme;
-    if (theme !== 'cyberpunk' && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
+    if ((theme === 'dark' || theme === 'light') && this.customization.backgroundPreset === 'custom' && this.customization.customBgColor) {
       const customIsDark = getLuminance(this.customization.customBgColor) < 0.5;
       if ((theme === 'dark' && !customIsDark) || (theme === 'light' && customIsDark)) {
         this.customization.backgroundPreset = 'default';
@@ -782,13 +800,19 @@ export class AppStore {
     this.applyThemeAndCustomization();
     this.saveCustomization();
     const themeLabel =
-      theme === 'cyberpunk' ? 'тему Киберпанк' : theme === 'dark' ? 'тёмную тему' : 'светлую тему';
+      theme === 'matrix'
+        ? 'тему Матрица'
+        : theme === 'cyberpunk'
+        ? 'тему Киберпанк'
+        : theme === 'dark'
+        ? 'тёмную тему'
+        : 'светлую тему';
     this.logActivity('update', 'settings', 'Тема интерфейса', `Переключено на ${themeLabel}`);
     this.notify();
   }
 
   public toggleTheme(): void {
-    const order: ThemeMode[] = ['dark', 'light', 'cyberpunk'];
+    const order: ThemeMode[] = ['dark', 'light', 'cyberpunk', 'matrix'];
     const idx = order.indexOf(this.customization.theme);
     const next = order[(idx + 1) % order.length];
     this.setTheme(next);
@@ -864,7 +888,7 @@ export class AppStore {
   public setCustomBackgroundColor(hex: string): void {
     this.customization.backgroundPreset = 'custom';
     this.customization.customBgColor = hex;
-    if (this.customization.theme !== 'cyberpunk') {
+    if (this.customization.theme !== 'cyberpunk' && this.customization.theme !== 'matrix') {
       this.customization.theme = getLuminance(hex) < 0.5 ? 'dark' : 'light';
     }
     const theme = this.customization.theme;

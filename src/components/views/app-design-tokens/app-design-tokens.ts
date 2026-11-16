@@ -89,20 +89,20 @@ const CATEGORIES: CategoryDef[] = [
   },
 ];
 
-// Static reference values for the three themes (source of truth: src/index.css)
-const THEME_TABLE: { token: string; light: string; dark: string; cyber: string }[] = [
-  { token: 'bg-canvas', light: '#f8fafc', dark: '#090d16', cyber: '#06040f' },
-  { token: 'bg-surface', light: '#ffffff', dark: '#111827', cyber: '#0d0a1f' },
-  { token: 'bg-subtle', light: '#f1f5f9', dark: '#1a2438', cyber: '#1a143d' },
-  { token: 'text-primary', light: '#0f172a', dark: '#f8fafc', cyber: '#f4f6ff' },
-  { token: 'text-secondary', light: '#475569', dark: '#94a3b8', cyber: '#b8c4f0' },
-  { token: 'border-subtle', light: '#e2e8f0', dark: '#1e293b', cyber: '#1e2d5e' },
-  { token: 'border-focus', light: '#6366f1', dark: '#818cf8', cyber: '#00f0ff' },
-  { token: 'accent-primary', light: '#6366f1', dark: '#6366f1', cyber: '#ff2a85' },
-  { token: 'color-success', light: '#059669', dark: '#34d399', cyber: '#00ffa3' },
-  { token: 'color-warning', light: '#d97706', dark: '#fbbf24', cyber: '#ffe600' },
-  { token: 'color-danger', light: '#dc2626', dark: '#f87171', cyber: '#ff3864' },
-  { token: 'color-info', light: '#0284c7', dark: '#38bdf8', cyber: '#00f0ff' },
+// Static reference values for the four themes (source of truth: src/index.css)
+const THEME_TABLE: { token: string; light: string; dark: string; cyber: string; matrix: string }[] = [
+  { token: 'bg-canvas', light: '#f8fafc', dark: '#090d16', cyber: '#06040f', matrix: '#020603' },
+  { token: 'bg-surface', light: '#ffffff', dark: '#111827', cyber: '#0d0a1f', matrix: '#050e08' },
+  { token: 'bg-subtle', light: '#f1f5f9', dark: '#1a2438', cyber: '#1a143d', matrix: '#0c1f13' },
+  { token: 'text-primary', light: '#0f172a', dark: '#f8fafc', cyber: '#f4f6ff', matrix: '#dcfce7' },
+  { token: 'text-secondary', light: '#475569', dark: '#94a3b8', cyber: '#b8c4f0', matrix: '#86efac' },
+  { token: 'border-subtle', light: '#e2e8f0', dark: '#1e293b', cyber: '#1e2d5e', matrix: '#11331d' },
+  { token: 'border-focus', light: '#6366f1', dark: '#818cf8', cyber: '#00f0ff', matrix: '#00ff41' },
+  { token: 'accent-primary', light: '#6366f1', dark: '#6366f1', cyber: '#ff2a85', matrix: '#00ff41' },
+  { token: 'color-success', light: '#059669', dark: '#34d399', cyber: '#00ffa3', matrix: '#00ff41' },
+  { token: 'color-warning', light: '#d97706', dark: '#fbbf24', cyber: '#ffe600', matrix: '#facc15' },
+  { token: 'color-danger', light: '#dc2626', dark: '#f87171', cyber: '#ff3864', matrix: '#ff3b5c' },
+  { token: 'color-info', light: '#0284c7', dark: '#38bdf8', cyber: '#00f0ff', matrix: '#2dd4bf' },
 ];
 
 @customElement('app-design-tokens')
@@ -165,6 +165,11 @@ export class AppDesignTokens extends LitElement {
             size="sm"
             @click="${() => store.setTheme('cyberpunk')}"
           >Cyberpunk</app-button>
+          <app-button
+            variant="${this.theme === 'matrix' ? 'primary' : 'outline'}"
+            size="sm"
+            @click="${() => store.setTheme('matrix')}"
+          >Matrix</app-button>
         </div>
       </app-page-header>
 
@@ -197,6 +202,7 @@ export class AppDesignTokens extends LitElement {
               <th>Light</th>
               <th>Dark</th>
               <th>Cyberpunk</th>
+              <th>Matrix</th>
             </tr>
           </thead>
           <tbody>
@@ -206,6 +212,7 @@ export class AppDesignTokens extends LitElement {
                 <td><span class="dot" style="background: ${row.light};"></span>${row.light}</td>
                 <td><span class="dot" style="background: ${row.dark};"></span>${row.dark}</td>
                 <td><span class="dot" style="background: ${row.cyber};"></span>${row.cyber}</td>
+                <td><span class="dot" style="background: ${row.matrix};"></span>${row.matrix}</td>
               </tr>
             `)}
           </tbody>

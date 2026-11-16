@@ -10,6 +10,7 @@ import {
   iconSun,
   iconChevronLeft,
   iconChevronRight,
+  iconTerminal,
   iconZap,
 } from '../../common/icons';
 import { SidebarItem } from '../sidebar-item/sidebar-item';
@@ -264,9 +265,21 @@ export class AppSidebar extends LitElement {
               @click="${() => store.toggleTheme()}"
               title="${t.viewTexts.sidebar.themeToggleTitle}"
             >
-              ${this.theme === 'cyberpunk' ? iconZap(14) : this.theme === 'dark' ? iconSun(14) : iconMoon(14)}
+              ${this.theme === 'matrix'
+                ? iconTerminal(14)
+                : this.theme === 'cyberpunk'
+                ? iconZap(14)
+                : this.theme === 'dark'
+                ? iconSun(14)
+                : iconMoon(14)}
               ${!this.collapsed
-                ? html`<span>${this.theme === 'cyberpunk' ? 'Cyber' : this.theme === 'dark' ? 'Dark' : 'Light'}</span>`
+                ? html`<span>${this.theme === 'matrix'
+                    ? 'Matrix'
+                    : this.theme === 'cyberpunk'
+                    ? 'Cyber'
+                    : this.theme === 'dark'
+                    ? 'Dark'
+                    : 'Light'}</span>`
                 : ''}
             </button>
             <button
