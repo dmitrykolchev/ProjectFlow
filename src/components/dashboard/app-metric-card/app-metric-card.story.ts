@@ -8,6 +8,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-metric-card',
   description: 'Executive KPI summary card featuring tabular numerals, trend delta, and optional inline SVG sparkline.',
   category: 'Dashboard',
+  slotsDoc: {
+    icon: 'Leading icon before the metric label',
+  },
   propsDoc: {
     label: 'Metric caption',
     value: 'Main value text',

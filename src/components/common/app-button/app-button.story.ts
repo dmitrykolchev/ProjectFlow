@@ -7,6 +7,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-button',
   description: 'Interactive button with multiple semantic variants, sizes, and states.',
   category: 'Elements',
+  slotsDoc: {
+    'icon-start': 'Icon rendered before the label',
+    'icon-end': 'Icon rendered after the label',
+    '(default)': 'Button label text',
+  },
   propsDoc: {
     variant: 'Visual style: primary, secondary, outline, ghost, danger',
     size: 'Control height: sm / md / lg',

@@ -9,6 +9,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-modal',
   description: 'Customizable modal dialog with backdrop blur, customizable sizes, header, and footer actions.',
   category: 'Overlays',
+  slotsDoc: {
+    title: 'Custom header content replacing the title text',
+    '(default)': 'Modal body content',
+    footer: 'Footer area (buttons)',
+  },
   propsDoc: {
     open: 'Opens the modal (rendered through the portal)',
     title: 'Header caption',

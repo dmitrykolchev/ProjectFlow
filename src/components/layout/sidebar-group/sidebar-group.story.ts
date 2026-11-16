@@ -17,6 +17,9 @@ export const meta: ComponentStoryMeta = {
   component: 'sidebar-group',
   description: 'Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator.',
   category: 'Layout',
+  slotsDoc: {
+    '(default)': 'Sidebar items of the group',
+  },
   propsDoc: {
     groupId: 'Stable group id used by the sidebar controller',
     label: 'Group caption',

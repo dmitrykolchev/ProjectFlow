@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { buildSnippet, getComponentProps } from '../../../domain/component-meta';
+import { buildSnippet, getComponentProps, getComponentSlots } from '../../../domain/component-meta';
 import { iconCopy, iconRefreshCw } from '../../common/icons';
 import styles from './app-storybook.css';
 
@@ -472,6 +472,33 @@ export class AppStorybook extends LitElement {
                 </tbody>
               </table>
             `}
+
+        ${(() => {
+          const slots = getComponentSlots(meta.component);
+          const slotDoc = meta.slotsDoc || {};
+          if (slots.length === 0) return html`<p class="sb-no-props">${t.viewTexts.storybook.noSlots}</p>`;
+          return html`
+            <h4 class="sb-subsection-title">${t.viewTexts.storybook.slotsTitle}</h4>
+            <table class="sb-props-table">
+              <thead>
+                <tr>
+                  <th>${t.viewTexts.storybook.thSlot}</th>
+                  <th>${t.viewTexts.storybook.thDescription}</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${slots.map(
+                  (slot) => html`
+                    <tr>
+                      <td><span class="sb-prop-name">${slot === '(default)' ? slot : `"${slot}"`}</span></td>
+                      <td>${slotDoc[slot] || ''}</td>
+                    </tr>
+                  `
+                )}
+              </tbody>
+            </table>
+          `;
+        })()}
       </section>
     `;
   }

@@ -9,6 +9,10 @@ export const meta: ComponentStoryMeta = {
   description:
     'Toolbar with search input, N filter selects, optional reset button and trailing actions slot.',
   category: 'Common',
+  slotsDoc: {
+    prefix: 'Extra controls rendered before the filter selects',
+    '(default)': 'Additional controls appended after the filter selects',
+  },
   propsDoc: {
     searchValue: 'Current text of the search box',
     searchEnabled: 'Shows the search input',

@@ -9,6 +9,9 @@ export const meta: ComponentStoryMeta = {
   description:
     'Responsive grid layout wrapper for KPI cards (app-metric-card), collapsing to 2 columns on tablets and 1 on mobile.',
   category: 'Common',
+  slotsDoc: {
+    '(default)': 'Metric cards (app-metric-card elements)',
+  },
   propsDoc: {
     columns: 'Number of grid columns for the metric cards',
     variant: 'Layout style: grid / strip',

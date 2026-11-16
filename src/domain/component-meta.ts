@@ -95,3 +95,43 @@ export function buildSnippet(tag: string): string {
   if (parts.length === 0) return `<${tag}></${tag}>`;
   return `<${tag}\n${parts.map((part) => `  ${part}`).join('\n')}\n></${tag}>`;
 }
+
+interface LitTemplate {
+  strings?: readonly string[];
+  values?: readonly unknown[];
+}
+
+function collectSlots(tpl: unknown, out: string[]) {
+  if (!tpl || typeof tpl !== 'object') return;
+  const t = tpl as LitTemplate;
+  if (!Array.isArray(t.strings)) return;
+  for (const chunk of t.strings) {
+    const re = /<slot(?=[\s>])([^>]*)>/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(chunk))) {
+      const nameMatch = /(?:^|\s)name="([^"]+)"/.exec(m[1]);
+      const name = nameMatch ? nameMatch[1] : '(default)';
+      if (!out.includes(name)) out.push(name);
+    }
+  }
+  if (Array.isArray(t.values)) {
+    for (const v of t.values) {
+      if (Array.isArray(v)) collectSlots(v, out);
+      else collectSlots(v, out);
+    }
+  }
+}
+
+/** Slot names declared in the render template of a Lit custom element. */
+export function getComponentSlots(tag: string): string[] {
+  const ctor = customElements.get(tag) as CustomElementConstructor | undefined;
+  if (!ctor) return [];
+  try {
+    const el = document.createElement(tag) as unknown as { render(): LitTemplate };
+    const out: string[] = [];
+    collectSlots(el.render(), out);
+    return out;
+  } catch {
+    return [];
+  }
+}

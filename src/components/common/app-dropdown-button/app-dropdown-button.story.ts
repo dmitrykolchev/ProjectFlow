@@ -8,6 +8,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-dropdown-button',
   description: 'Action button paired with a contextual dropdown menu popover and outside-click dismissal.',
   category: 'Common',
+  slotsDoc: {
+    'icon-start': 'Icon rendered before the label',
+  },
   propsDoc: {
     label: 'Button caption',
     variant: 'Visual style of the button surface',

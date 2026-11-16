@@ -10,6 +10,10 @@ export const meta: ComponentStoryMeta = {
   description:
     'Dashed-border placeholder for empty lists and tables with icon, title, message, and optional action.',
   category: 'Feedback',
+  slotsDoc: {
+    icon: 'Illustration icon above the title',
+    action: 'Optional action button below the message',
+  },
   propsDoc: {
     title: 'Headline of the empty state',
     message: 'Secondary explanation text',

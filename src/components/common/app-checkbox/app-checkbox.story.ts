@@ -7,6 +7,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-checkbox',
   description: 'Checkbox element with checked, unchecked, indeterminate, and disabled states.',
   category: 'Inputs',
+  slotsDoc: {
+    '(default)': 'Label text next to the box (overrides the label property)',
+  },
   propsDoc: {
     checked: 'Checked state of the box',
     indeterminate: 'Mixed (partial selection) state — square dash instead of tick',

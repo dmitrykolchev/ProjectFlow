@@ -7,6 +7,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-input',
   description: 'Single-line text input field supporting labels, helpers, errors, and clear buttons.',
   category: 'Inputs',
+  slotsDoc: {
+    icon: 'Leading icon inside the field',
+  },
   propsDoc: {
     label: 'Caption above the field',
     placeholder: 'Placeholder text shown when empty',

@@ -225,6 +225,13 @@
   color: var(--text-primary, #f8fafc);
 }
 
+.sb-subsection-title {
+  margin: 0.5rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+}
+
 .sb-no-props {
   margin: 0;
   font-size: 0.8125rem;

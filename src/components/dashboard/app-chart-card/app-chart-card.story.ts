@@ -7,6 +7,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-chart-card',
   description: 'Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented donut charts, and area line trends.',
   category: 'Dashboard',
+  slotsDoc: {
+    actions: 'Controls at the right of the chart header',
+  },
   propsDoc: {
     title: 'Chart caption',
     subtitle: 'Secondary line under the caption',

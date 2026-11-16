@@ -8,6 +8,10 @@ export const meta: ComponentStoryMeta = {
   component: 'sidebar-item',
   description: 'Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode.',
   category: 'Layout',
+  slotsDoc: {
+    icon: 'Leading icon of the item',
+    '(default)': 'Item label markup (overrides the label property)',
+  },
   propsDoc: {
     value: 'View id emitted when the item is clicked',
     label: 'Item caption',

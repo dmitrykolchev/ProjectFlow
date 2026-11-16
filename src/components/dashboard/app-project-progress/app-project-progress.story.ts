@@ -8,6 +8,9 @@ export const meta: ComponentStoryMeta = {
   component: 'app-project-progress',
   description: 'Portfolio progress tracker displaying completion bars, task ratios, and click-to-open project filtering.',
   category: 'Dashboard',
+  slotsDoc: {
+    actions: 'Controls at the right of the section header',
+  },
   propsDoc: {
     title: 'Section caption',
     projects: 'Project records to render progress for',
