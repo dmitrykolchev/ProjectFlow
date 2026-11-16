@@ -7,7 +7,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/KPI Strip',
   component: 'app-kpi-strip',
   description:
-    'Responsive grid layout wrapper for KPI cards (app-metric-card), collapsing to 2 columns on tablets and 1 on mobile.',
+    'Responsive grid layout wrapper for KPI cards (app-metric-card), collapsing to 2 columns on tablets and 1 on mobile. The default slot accepts app-metric-card children.',
   category: 'Common',
   slotsDoc: {
     '(default)': 'Metric cards (app-metric-card elements)',
