@@ -11,6 +11,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     actions: 'Controls at the right of the section header',
   },
+  childrenDoc: {
+    'app-button': 'Header control placed in the actions slot at the right of the section header',
+  },
   propsDoc: {
     title: 'Section caption',
     projects: 'Project records to render progress for',
