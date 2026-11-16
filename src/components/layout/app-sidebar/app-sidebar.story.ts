@@ -19,6 +19,10 @@ export const meta: ComponentStoryMeta = {
   component: 'app-sidebar',
   description: 'Collapsible navigation sidebar composed declaratively with <sidebar-group> and <sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.',
   category: 'Layout',
+  childrenDoc: {
+    'sidebar-group': 'Collapsible navigation group container composing the sidebar menu',
+    'sidebar-item': 'Navigation item with icon, badge, and active state (inside a sidebar-group)',
+  },
   propsDoc: {
     collapsed: 'Icon-only sidebar width',
     activeValue: 'Value of the currently active item',
