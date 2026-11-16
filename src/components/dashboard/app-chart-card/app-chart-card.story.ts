@@ -5,7 +5,8 @@ import './app-chart-card';
 export const meta: ComponentStoryMeta = {
   title: 'Dashboard/ChartCard',
   component: 'app-chart-card',
-  description: 'Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented donut charts, and area line trends.',
+  description:
+    'Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented donut charts, and area line trends. The actions slot renders controls at the right of the chart header.',
   category: 'Dashboard',
   slotsDoc: {
     actions: 'Controls at the right of the chart header',
