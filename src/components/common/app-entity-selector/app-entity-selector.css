@@ -45,7 +45,7 @@ label {
   color: var(--text-primary, #f8fafc);
   cursor: pointer;
   user-select: none;
-  font-size: 0.875rem;
+  font-size: var(--control-font-md, 0.875rem);
   line-height: 1.25;
   outline: none;
   transition: border-color var(--transition-fast, 150ms ease),
@@ -57,14 +57,14 @@ label {
   min-height: var(--control-height-sm, 30px);
   height: var(--control-height-sm, 30px);
   padding: 0 0.5rem 0 0.6rem;
-  font-size: 0.8125rem;
+  font-size: var(--control-font-sm, 0.8125rem);
 }
 
 .selector-trigger.size-lg {
   min-height: var(--control-height-lg, 44px);
   height: var(--control-height-lg, 44px);
   padding: 0 0.75rem 0 0.875rem;
-  font-size: 0.9375rem;
+  font-size: var(--control-font-lg, 1rem);
 }
 
 .selector-trigger:hover:not(.is-disabled) {
