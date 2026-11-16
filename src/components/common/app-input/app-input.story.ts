@@ -10,6 +10,9 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     icon: 'Leading icon inside the field',
   },
+  childrenDoc: {
+    'app-material-icon': 'Icon rendered in the leading icon slot inside the field',
+  },
   propsDoc: {
     label: 'Caption above the field',
     placeholder: 'Placeholder text shown when empty',
