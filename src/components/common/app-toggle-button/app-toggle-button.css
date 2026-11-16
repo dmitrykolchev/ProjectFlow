@@ -54,22 +54,27 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* canonical control scale (Priority E): values equal the historical ones;
+   slotted app-material-icon inherits the control's icon size */
 .size-sm {
-  font-size: 0.8125rem;
-  padding: 0 0.65rem;
+  font-size: var(--control-font-sm, 0.8125rem);
+  padding: 0 var(--control-padding-x-sm, 0.65rem);
   height: var(--control-height-sm, 30px);
+  --mi-icon: var(--control-icon-sm, 16px);
 }
 
 .size-md {
-  font-size: 0.875rem;
-  padding: 0 0.875rem;
+  font-size: var(--control-font-md, 0.875rem);
+  padding: 0 var(--control-padding-x-md, 0.875rem);
   height: var(--control-height-md, 38px);
+  --mi-icon: var(--control-icon-md, 20px);
 }
 
 .size-lg {
-  font-size: 1rem;
-  padding: 0 1.15rem;
+  font-size: var(--control-font-lg, 1rem);
+  padding: 0 var(--control-padding-x-lg, 1.15rem);
   height: var(--control-height-lg, 44px);
+  --mi-icon: var(--control-icon-lg, 24px);
 }
 
 .icon-only.size-sm { width: var(--control-height-sm, 30px); padding: 0; }
