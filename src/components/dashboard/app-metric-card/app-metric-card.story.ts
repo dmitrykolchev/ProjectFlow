@@ -8,6 +8,21 @@ export const meta: ComponentStoryMeta = {
   component: 'app-metric-card',
   description: 'Executive KPI summary card featuring tabular numerals, trend delta, and optional inline SVG sparkline.',
   category: 'Dashboard',
+  slotsDoc: {
+    icon: 'Leading icon before the metric label',
+  },
+  propsDoc: {
+    label: 'Metric caption',
+    value: 'Main value text',
+    delta: 'Change indicator text (e.g. +12%)',
+    trend: 'Delta color semantics: neutral / up / down',
+    subtitle: 'Secondary line under the value',
+    accentColor: 'Accent color of the card edge',
+    valueColor: 'Explicit color of the value text',
+    sparkline: 'Sparkline data points (small numbers)',
+    clickable: 'Card emits a click event',
+    size: 'full = with sparkline; compact = label + value only',
+  },
   stories: [
     {
       name: 'KPI Grid Row',

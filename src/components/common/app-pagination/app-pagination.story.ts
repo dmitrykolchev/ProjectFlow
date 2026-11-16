@@ -8,6 +8,18 @@ export const meta: ComponentStoryMeta = {
   description:
     'Pagination bar with smart page buttons, range summary, and mode-aware page-size presets for dense tables vs. multi-column card grids.',
   category: 'Common',
+  propsDoc: {
+    totalItems: 'Total record count across all pages',
+    page: 'Current page number (1-based)',
+    pageSize: 'Records per page',
+    pageSizeOptions: 'Choices offered in the page-size selector',
+    layoutMode: 'Density preset for table vs card grids',
+    variant: 'Surface style',
+    compact: 'Compact rendering',
+    showPageSize: 'Shows the page-size selector',
+    showSummary: 'Shows the "records x–y of z" summary',
+    locale: 'Locale used for number formatting (defaults to UI language)',
+  },
   stories: [
     {
       name: 'Table Mode',

@@ -123,6 +123,21 @@ export const meta: ComponentStoryMeta = {
   description:
     'Searchable portal selector for large collections (tasks, employees, counterparties, contracts) with multi-token filtering, match highlighting, secondary metadata, and windowed rendering.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    value: 'Id of the currently selected entity',
+    options: 'Entity option definitions (id, label, meta)',
+    placeholder: 'Text shown when nothing is selected',
+    searchPlaceholder: 'Placeholder inside the search box of the panel',
+    size: 'Control height: sm / md / lg',
+    disabled: 'Disables the selector',
+    required: 'Marks the field as required',
+    clearable: 'Shows a clear (×) button when a value is selected',
+    showSelectedDetails: 'Renders meta details of the selected entity under the field',
+    maxVisible: 'Maximum options rendered in the panel at once',
+    error: 'Error message; renders the field in danger state',
+    hint: 'Helper text below the field',
+  },
   stories: [
     {
       name: 'Large Task Dataset (1,500 items)',

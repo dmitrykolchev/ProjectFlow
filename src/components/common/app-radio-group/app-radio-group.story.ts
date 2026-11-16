@@ -7,6 +7,15 @@ export const meta: ComponentStoryMeta = {
   component: 'app-radio-group',
   description: 'Accessible radio selection group with standard, horizontal, and rich card layouts.',
   category: 'Common',
+  propsDoc: {
+    label: 'Caption above the option list',
+    name: 'Native radio group name (shared within a page)',
+    value: 'Currently selected option value',
+    options: 'Option definitions (value + label)',
+    orientation: 'Layout direction: vertical / horizontal',
+    variant: 'Visual style of the option rows',
+    disabled: 'Disables all options',
+  },
   stories: [
     {
       name: 'Standard & Card Layouts',

@@ -8,6 +8,16 @@ export const meta: ComponentStoryMeta = {
   component: 'app-split-button',
   description: 'Dual-action button combining a primary action trigger with a secondary options menu.',
   category: 'Common',
+  slotsDoc: {
+    'icon-start': 'Icon rendered before the main button label',
+  },
+  propsDoc: {
+    label: 'Main button caption',
+    variant: 'Visual style of the main button',
+    size: 'Control height: sm / md / lg',
+    disabled: 'Disables both halves of the button',
+    items: 'Menu items opened by the arrow half',
+  },
   stories: [
     {
       name: 'Split Button Variants',

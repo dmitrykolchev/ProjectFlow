@@ -9,6 +9,10 @@ const meta: ComponentStoryMeta = {
   category: 'Common',
   description:
     'Управление функциональными (FR) и нефункциональными (NFR) требованиями проекта, генерация из спецификации, трассировка к базе знаний и декомпозиция в задачи с помощью AI.',
+  propsDoc: {
+    projectId: 'Project whose requirements are listed (empty = all projects)',
+    currentLang: 'UI language',
+  },
   stories: [
     {
       name: 'Default (CORE Project)',

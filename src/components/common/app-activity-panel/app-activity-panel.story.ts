@@ -9,6 +9,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-activity-panel',
   description: 'Slide-out drawer containing real-time chronological audit trail of all project events.',
   category: 'Feedback',
+  propsDoc: {
+    logs: 'Activity log entries rendered in the panel',
+    isOpen: 'Panel open state',
+    currentLang: 'UI language',
+  },
   stories: [
     {
       name: 'Toggle Panel',

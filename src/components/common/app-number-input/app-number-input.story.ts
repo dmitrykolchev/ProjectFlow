@@ -7,6 +7,16 @@ export const meta: ComponentStoryMeta = {
   component: 'app-number-input',
   description: 'Numeric input with increment/decrement steppers, boundaries, and optional unit indicator.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    value: 'Current numeric value',
+    min: 'Minimum allowed value',
+    max: 'Maximum allowed value',
+    step: 'Increment for the stepper buttons',
+    unit: 'Unit suffix rendered inside the field',
+    size: 'Control height: sm / md / lg',
+    disabled: 'Disables editing and steppers',
+  },
   stories: [
     {
       name: 'Default',

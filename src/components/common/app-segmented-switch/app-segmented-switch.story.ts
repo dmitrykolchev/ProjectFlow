@@ -7,6 +7,13 @@ export const meta: ComponentStoryMeta = {
   component: 'app-segmented-switch',
   description: 'Compact segmented control for switching between mutually exclusive views, timeframes, or filter modes.',
   category: 'Common',
+  propsDoc: {
+    options: 'Segment definitions (value + label)',
+    value: 'Currently selected segment value',
+    size: 'Control height: sm / md / lg',
+    fullWidth: 'Segments stretch to fill the container',
+    disabled: 'Disables all segments',
+  },
   stories: [
     {
       name: 'Timeframe & View Switchers',

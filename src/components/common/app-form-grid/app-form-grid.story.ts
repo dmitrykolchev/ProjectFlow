@@ -10,6 +10,12 @@ export const meta: ComponentStoryMeta = {
   description:
     'Two-column grid for modal form fields; collapses to one column below 640px. Slotted children keep their own classes (col-span-2 stays in view CSS).',
   category: 'Common',
+  slotsDoc: {
+    '(default)': 'Form fields laid out in the grid (full width via col-span)',
+  },
+  propsDoc: {
+    columns: 'Number of form grid columns (children span full width via col-span)',
+  },
   stories: [
     {
       name: 'Default',

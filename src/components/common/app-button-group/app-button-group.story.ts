@@ -9,6 +9,10 @@ export const meta: ComponentStoryMeta = {
   component: 'app-button-group',
   description: 'Groups related buttons or toggle buttons horizontally or vertically with seamless joined borders.',
   category: 'Common',
+  propsDoc: {
+    orientation: 'Layout direction of the group: horizontal / vertical',
+    attached: 'Shares borders between children (no gaps)',
+  },
   stories: [
     {
       name: 'Attached & Spaced Groups',

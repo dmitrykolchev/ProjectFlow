@@ -8,6 +8,13 @@ export const meta: ComponentStoryMeta = {
   description:
     'Single-value or segmented progress bar with optional percentage label; sm/md heights.',
   category: 'Common',
+  propsDoc: {
+    value: 'Current percentage (0–100)',
+    segments: 'Optional segment definitions for multi-color bars',
+    color: 'Bar fill color (CSS value / token)',
+    showLabel: 'Shows the percentage label',
+    size: 'Bar height preset',
+  },
   stories: [
     {
       name: 'Single Value',

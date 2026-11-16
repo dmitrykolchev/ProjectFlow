@@ -7,6 +7,16 @@ export const meta: ComponentStoryMeta = {
   component: 'app-textarea',
   description: 'Multiline text input with character counting, custom row limits, and auto-styling.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    placeholder: 'Placeholder text shown when empty',
+    value: 'Current textarea value',
+    rows: 'Visible row count (initial height)',
+    required: 'Marks the field as required',
+    disabled: 'Disables editing',
+    error: 'Error message; renders the field in danger state',
+    maxlength: 'Maximum character count (0 = unlimited); shows a counter when set',
+  },
   stories: [
     {
       name: 'Default',

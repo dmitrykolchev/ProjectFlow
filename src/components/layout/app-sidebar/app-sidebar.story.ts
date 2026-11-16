@@ -19,6 +19,15 @@ export const meta: ComponentStoryMeta = {
   component: 'app-sidebar',
   description: 'Collapsible navigation sidebar composed declaratively with <sidebar-group> and <sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.',
   category: 'Layout',
+  propsDoc: {
+    collapsed: 'Icon-only sidebar width',
+    activeValue: 'Value of the currently active item',
+    groupMode: 'Group behavior: single (accordion) / multiple',
+    standalone: 'Rendered outside app-root (manages its own state)',
+    theme: 'Current theme for icon accents',
+    currentLang: 'UI language',
+    selectedProjectId: 'Project filter selection shown in the projects group',
+  },
   stories: [
     {
       name: 'Multiple Groups Mode',

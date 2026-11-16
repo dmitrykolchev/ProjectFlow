@@ -10,6 +10,15 @@ export const meta: ComponentStoryMeta = {
   description:
     'Standard page header with title, subtitle, optional leading icon, and an actions zone on the right.',
   category: 'Layout',
+  slotsDoc: {
+    icon: 'Leading page icon (28px recommended)',
+    '(default)': 'Extra content under the title and subtitle',
+    actions: 'Action buttons on the right of the header',
+  },
+  propsDoc: {
+    title: 'Page caption',
+    subtitle: 'Secondary description line under the caption',
+  },
   stories: [
     {
       name: 'Default with Actions',

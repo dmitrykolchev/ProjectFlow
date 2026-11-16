@@ -7,6 +7,16 @@ export const meta: ComponentStoryMeta = {
   component: 'app-date-input',
   description: 'Fully custom-styled theme-aware Date Picker with interactive calendar popover, min/max bounds, and localization.',
   category: 'Common',
+  propsDoc: {
+    label: 'Caption above the field',
+    value: 'Selected date in YYYY-MM-DD format',
+    placeholder: 'Placeholder text shown when empty',
+    min: 'Earliest selectable date (YYYY-MM-DD)',
+    max: 'Latest selectable date (YYYY-MM-DD)',
+    required: 'Marks the field as required',
+    disabled: 'Disables editing and the calendar popover',
+    error: 'Error message; renders the field in danger state',
+  },
   stories: [
     {
       name: 'Interactive Date Pickers',

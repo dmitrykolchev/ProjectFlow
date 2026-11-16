@@ -7,6 +7,13 @@ export const meta: ComponentStoryMeta = {
   component: 'app-combobox',
   description: 'Searchable multi-tag combobox input with autocomplete and tag removal.',
   category: 'Inputs',
+  propsDoc: {
+    label: 'Caption above the field',
+    items: 'Suggestion item definitions (value + label)',
+    selected: 'Currently selected values',
+    placeholder: 'Text shown in the input when empty',
+    allowCustom: 'Typing a new value offers "+ Add" to create it',
+  },
   stories: [
     {
       name: 'Tags Selector',

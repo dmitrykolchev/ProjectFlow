@@ -8,6 +8,19 @@ export const meta: ComponentStoryMeta = {
   component: 'app-toggle-button',
   description: 'Stateful pressable button supporting soft and solid active variants, icons, and accessibility aria-pressed.',
   category: 'Common',
+  slotsDoc: {
+    'icon-start': 'Icon rendered before the label',
+    'icon-end': 'Icon rendered after the label',
+    '(default)': 'Button text',
+  },
+  propsDoc: {
+    pressed: 'Pressed (toggled) visual state',
+    variant: 'Visual style of the toggle surface',
+    size: 'Control height: sm / md / lg',
+    disabled: 'Disables interaction',
+    iconOnly: 'Renders only the icon, no text',
+    value: 'Group value emitted on toggle (for radio-style groups)',
+  },
   stories: [
     {
       name: 'Toggle States & Variants',

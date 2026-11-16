@@ -8,6 +8,11 @@ export const meta: ComponentStoryMeta = {
   description:
     'Label/value boxes in strip (1×N) or grid (2-column) layout, with mono and danger value variants.',
   category: 'Common',
+  propsDoc: {
+    items: 'Meta field definitions (label + value)',
+    columns: 'Number of columns in the grid',
+    layout: 'Rendering style: strip / grid / inline',
+  },
   stories: [
     {
       name: 'Strip Layout',
