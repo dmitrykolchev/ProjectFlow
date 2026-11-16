@@ -9,9 +9,11 @@ export const meta: ComponentStoryMeta = {
   description: 'Declarative interactive menu entry used inside <app-menu> with support for icons, shortcuts, checkmarks, danger, and disabled states.',
   category: 'Common',
   slotsDoc: {
+    start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
     '(default)': 'Item label markup (used when the label property is omitted)',
-    icon: 'Leading icon slot rendered before the label',
-    shortcut: 'Trailing shortcut hint slot rendered on the right',
+    end: 'Content rendered on the right (text, SVG icon, material icon) — centered vertically',
+    icon: 'Legacy alias of start',
+    shortcut: 'Legacy alias of end',
   },
   propsDoc: {
     value: 'Action identifier emitted in the select event detail (falls back to id)',

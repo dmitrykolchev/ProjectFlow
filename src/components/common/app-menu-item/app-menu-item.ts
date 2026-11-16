@@ -39,14 +39,19 @@ export class AppMenuItem extends LitElement {
     };
   }
 
-  private handleIconSlotChange(e: Event) {
-    const slot = e.target as HTMLSlotElement;
-    this.hasIconSlot = slot.assignedNodes({ flatten: true }).length > 0;
-  }
-
-  private handleShortcutSlotChange(e: Event) {
-    const slot = e.target as HTMLSlotElement;
-    this.hasShortcutSlot = slot.assignedNodes({ flatten: true }).length > 0;
+  private handleSlotChange() {
+    const sr = this.shadowRoot;
+    if (!sr) return;
+    const nonEmpty = (name: string) => {
+      const slot = sr.querySelector(`slot[name="${name}"]`) as HTMLSlotElement | null;
+      if (!slot) return false;
+      return slot.assignedNodes({ flatten: true }).some(
+        (n) => n.nodeType === Node.ELEMENT_NODE || (n.textContent ?? '').trim() !== ''
+      );
+    };
+    // canonical start / end slots, icon and shortcut are legacy aliases
+    this.hasIconSlot = nonEmpty('start') || nonEmpty('icon');
+    this.hasShortcutSlot = nonEmpty('end') || nonEmpty('shortcut');
   }
 
   private handleClick() {
@@ -90,11 +95,17 @@ export class AppMenuItem extends LitElement {
           ${showCustomIcon
             ? html`
                 <span class="menu-item-icon">
-                  ${this.icon ?? html`<slot name="icon" @slotchange="${this.handleIconSlotChange}"></slot>`}
+                  <!-- canonical start slot; icon is a legacy alias -->
+                  ${this.icon ??
+                    html`<slot name="start" @slotchange="${this.handleSlotChange}">
+                      <slot name="icon" @slotchange="${this.handleSlotChange}"></slot>
+                    </slot>`}
                 </span>
               `
             : html`
-                <slot name="icon" hidden @slotchange="${this.handleIconSlotChange}"></slot>
+                <slot name="start" hidden @slotchange="${this.handleSlotChange}">
+                  <slot name="icon" hidden @slotchange="${this.handleSlotChange}"></slot>
+                </slot>
                 ${isCheckableItem
                   ? html`<span class="menu-item-icon is-check">${this.checked ? iconCheck(13) : ''}</span>`
                   : ''}
@@ -107,10 +118,16 @@ export class AppMenuItem extends LitElement {
         ${showShortcut
           ? html`
               <span class="menu-shortcut">
-                ${this.shortcut || html`<slot name="shortcut" @slotchange="${this.handleShortcutSlotChange}"></slot>`}
+                <!-- canonical end slot; shortcut is a legacy alias -->
+                ${this.shortcut ||
+                  html`<slot name="end" @slotchange="${this.handleSlotChange}">
+                    <slot name="shortcut" @slotchange="${this.handleSlotChange}"></slot>
+                  </slot>`}
               </span>
             `
-          : html`<slot name="shortcut" hidden @slotchange="${this.handleShortcutSlotChange}"></slot>`}
+          : html`<slot name="end" hidden @slotchange="${this.handleSlotChange}">
+              <slot name="shortcut" hidden @slotchange="${this.handleSlotChange}"></slot>
+            </slot>`}
       </button>
     `;
   }

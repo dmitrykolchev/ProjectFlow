@@ -84,6 +84,20 @@
   flex-shrink: 0;
 }
 
+/* canonical slot API: start / default / end.
+   The item and its sections are flex containers with align-items: center, so every
+   slotted element (text, SVG icon, material icon) sits centered on the vertical axis. */
+.menu-shortcut {
+  display: inline-flex;
+  align-items: center;
+}
+
+.menu-shortcut ::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .menu-item-label {
   white-space: nowrap;
   overflow: hidden;
