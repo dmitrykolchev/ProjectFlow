@@ -6,7 +6,8 @@ import { iconDashboard, iconKanban, iconTable, iconSettings } from '../../common
 export const meta: ComponentStoryMeta = {
   title: 'Layout/SidebarItem',
   component: 'sidebar-item',
-  description: 'Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode.',
+  description:
+    'Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode. Canonical start / default / end slots carry leading graphics, label markup, and trailing content; icon is a legacy alias of start.',
   category: 'Layout',
   slotsDoc: {
     start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
