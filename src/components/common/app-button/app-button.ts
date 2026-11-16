@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import styles from './app-button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
@@ -14,21 +14,58 @@ export class AppButton extends LitElement {
   @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
   @property({ type: String }) type: 'button' | 'submit' | 'reset' = 'button';
 
+  // a button whose light DOM holds only an icon (no text) is square on its own,
+  // no need to declare icon-only explicitly
+  @state() private autoIconOnly: boolean = false;
+
   static styles = styles;
 
   render() {
+    const iconOnly = this.iconOnly || this.autoIconOnly;
     return html`
       <button
         type="${this.type}"
         ?disabled="${this.disabled || this.loading}"
-        class="variant-${this.variant} size-${this.size} ${this.iconOnly ? 'icon-only' : ''}"
+        class="variant-${this.variant} size-${this.size} ${iconOnly ? 'icon-only' : ''}"
         @click="${this.handleClick}"
       >
-        ${this.loading ? html`<div class="spinner" aria-hidden="true"></div>` : html`<slot name="icon-start"></slot>`}
-        ${!this.iconOnly ? html`<slot></slot>` : html`<slot name="icon-only"><slot></slot></slot>`}
-        <slot name="icon-end"></slot>
+        ${this.loading
+          ? html`<div class="spinner" aria-hidden="true"></div>`
+          : html`<slot name="icon-start" @slotchange="${this.handleSlotChange}"></slot>`}
+        ${!iconOnly
+          ? html`<slot @slotchange="${this.handleSlotChange}"></slot>`
+          : html`<slot name="icon-only" @slotchange="${this.handleSlotChange}"><slot></slot></slot>`}
+        <slot name="icon-end" @slotchange="${this.handleSlotChange}"></slot>
       </button>
     `;
+  }
+
+  private handleSlotChange() {
+    this.evaluateContent();
+  }
+
+  private evaluateContent() {
+    let hasIcon = false;
+    let hasText = false;
+    for (const node of Array.from(this.childNodes)) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        const slot = (node as HTMLElement).getAttribute('slot');
+        if (slot === 'icon-start' || slot === 'icon-end') {
+          hasIcon = true;
+        } else {
+          hasText = true;
+        }
+      } else if (node.nodeType === Node.TEXT_NODE) {
+        if ((node.textContent ?? '').trim() !== '') {
+          hasText = true;
+        }
+      }
+    }
+    this.autoIconOnly = hasIcon && !hasText;
+  }
+
+  protected firstUpdated() {
+    this.evaluateContent();
   }
 
   private handleClick(e: MouseEvent) {
