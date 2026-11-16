@@ -27,11 +27,16 @@ export class AppToggleButton extends LitElement {
         class="variant-${this.variant} size-${this.size} ${this.pressed ? 'is-pressed' : ''} ${iconOnly ? 'icon-only' : ''}"
         @click="${this.toggle}"
       >
-        <slot name="icon-start" @slotchange="${this.handleSlotChange}"></slot>
+        <!-- canonical slots: start / default / end; icon-start and icon-end are legacy aliases -->
+        <slot name="start" @slotchange="${this.handleSlotChange}">
+          <slot name="icon-start"></slot>
+        </slot>
         ${!iconOnly
           ? html`<slot @slotchange="${this.handleSlotChange}"></slot>`
           : html`<slot name="icon-only" @slotchange="${this.handleSlotChange}"><slot></slot></slot>`}
-        <slot name="icon-end" @slotchange="${this.handleSlotChange}"></slot>
+        <slot name="end" @slotchange="${this.handleSlotChange}">
+          <slot name="icon-end"></slot>
+        </slot>
       </button>
     `;
   }
@@ -46,7 +51,7 @@ export class AppToggleButton extends LitElement {
     for (const node of Array.from(this.childNodes)) {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const slot = (node as HTMLElement).getAttribute('slot');
-        if (slot === 'icon-start' || slot === 'icon-end') {
+        if (slot === 'start' || slot === 'end' || slot === 'icon-start' || slot === 'icon-end') {
           hasIcon = true;
         } else {
           hasText = true;

@@ -27,6 +27,15 @@ button {
               box-shadow var(--transition-fast, 150ms ease);
 }
 
+/* canonical slot API: start / default / end.
+   The button is a flex container with align-items: center, so every slotted element
+   (text, SVG icon, material icon) sits centered on the vertical axis. */
+::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 button:hover:not(:disabled) {
   background: var(--bg-hover, #223049);
   color: var(--text-primary, #f8fafc);

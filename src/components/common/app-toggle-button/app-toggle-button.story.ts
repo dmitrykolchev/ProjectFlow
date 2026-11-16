@@ -9,9 +9,11 @@ export const meta: ComponentStoryMeta = {
   description: 'Stateful pressable button supporting soft and solid active variants, icons, and accessibility aria-pressed.',
   category: 'Common',
   slotsDoc: {
-    'icon-start': 'Icon rendered before the label',
-    'icon-end': 'Icon rendered after the label',
-    '(default)': 'Button text',
+    start: 'Content rendered before the label (text, SVG icon, material icon) — centered vertically',
+    '(default)': 'Button text — centered vertically',
+    end: 'Content rendered after the label (text, SVG icon, material icon) — centered vertically',
+    'icon-start': 'Legacy alias of start',
+    'icon-end': 'Legacy alias of end',
   },
   propsDoc: {
     pressed: 'Pressed (toggled) visual state',
