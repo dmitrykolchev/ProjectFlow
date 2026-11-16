@@ -36,6 +36,10 @@
   height: var(--control-height-md, 38px);
 }
 
+.segmented-track.size-lg {
+  height: var(--control-height-lg, 44px);
+}
+
 .segmented-track.is-disabled {
   opacity: 0.55;
   pointer-events: none;
@@ -70,6 +74,11 @@
 .size-md .segment-btn {
   font-size: 0.8125rem;
   padding: 0 0.85rem;
+}
+
+.size-lg .segment-btn {
+  font-size: var(--control-font-lg, 1rem);
+  padding: 0 1.05rem;
 }
 
 .segment-btn:hover:not(:disabled):not(.is-active) {

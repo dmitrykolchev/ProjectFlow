@@ -16,6 +16,17 @@ export const meta: ComponentStoryMeta = {
   },
   stories: [
     {
+      name: 'Size Scale',
+      description: 'Canonical control size scale sm|md|lg (30/38/44px heights, md default)',
+      render: () => html`
+        <div style="display: flex; flex-direction: column; gap: 0.75rem; align-items: flex-start;">
+          <app-segmented-switch size="sm" value="a" .options="${[{ value: 'a', label: 'Первый' }, { value: 'b', label: 'Второй' }]}"></app-segmented-switch>
+          <app-segmented-switch size="md" value="a" .options="${[{ value: 'a', label: 'Первый' }, { value: 'b', label: 'Второй' }]}"></app-segmented-switch>
+          <app-segmented-switch size="lg" value="a" .options="${[{ value: 'a', label: 'Первый' }, { value: 'b', label: 'Второй' }]}"></app-segmented-switch>
+        </div>
+      `,
+    },
+    {
       name: 'Timeframe & View Switchers',
       description: 'Medium and small segmented controls',
       render: () => html`

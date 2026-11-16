@@ -12,7 +12,8 @@ export interface SegmentedOption {
 export class AppSegmentedSwitch extends LitElement {
   @property({ type: Array }) options: SegmentedOption[] = [];
   @property({ type: String }) value: string = '';
-  @property({ type: String }) size: 'sm' | 'md' = 'md';
+  // canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
+  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';
   @property({ type: Boolean, attribute: 'full-width', reflect: true }) fullWidth: boolean = false;
   @property({ type: Boolean }) disabled: boolean = false;
 
