@@ -100,3 +100,12 @@
   opacity: 0.45;
   cursor: not-allowed;
 }
+
+/* graphic elements from the canonical start / end slots of <app-option> */
+.option-slot-start,
+.option-slot-end {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}

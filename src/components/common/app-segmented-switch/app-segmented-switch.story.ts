@@ -1,20 +1,43 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-segmented-switch';
+import '../app-option/app-option';
+import '../app-material-icon/app-material-icon';
 
 export const meta: ComponentStoryMeta = {
   title: 'Common/SegmentedSwitch',
   component: 'app-segmented-switch',
   description: 'Compact segmented control for switching between mutually exclusive views, timeframes, or filter modes.',
   category: 'Common',
+  slotsDoc: {
+    '(default)': 'Declarative <app-option> children filling the segments (value, label, disabled, start / end graphics)',
+  },
   propsDoc: {
     options: 'Segment definitions (value + label)',
+    dataSource: 'Data source for segments: array, promise, or function returning an array (sync or async)',
     value: 'Currently selected segment value',
     size: 'Control height: sm / md / lg',
     fullWidth: 'Segments stretch to fill the container',
     disabled: 'Disables all segments',
   },
   stories: [
+    {
+      name: 'Declarative Options',
+      description: 'Segmented control filled with declarative app-option children, including graphic elements in the start / end slots',
+      render: () => html`
+        <div style="max-width: 360px;">
+          <app-segmented-switch full-width value="board">
+            <app-option value="board" label="Board">
+              <app-material-icon slot="start">view_kanban</app-material-icon>
+            </app-option>
+            <app-option value="list" label="List"></app-option>
+            <app-option value="archive" label="Archive" disabled>
+              <app-material-icon slot="end">archive</app-material-icon>
+            </app-option>
+          </app-segmented-switch>
+        </div>
+      `,
+    },
     {
       name: 'Size Scale',
       description: 'Canonical control size scale sm|md|lg (30/38/44px heights, md default)',
