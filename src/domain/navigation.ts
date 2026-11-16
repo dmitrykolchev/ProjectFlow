@@ -35,6 +35,7 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
   settings: 'settings',
   'design-tokens': 'design-tokens',
   storybook: 'storybook',
+  'material-icons': 'material-icons',
 };
 
 export function pathToLocation(hash: string): NavLocation | null {

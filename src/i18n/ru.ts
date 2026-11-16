@@ -69,6 +69,7 @@ export const ru = {
     activity: 'Журнал активности',
     storybook: 'Storybook компонентов',
     designTokens: 'Design Tokens',
+    materialIcons: 'Material Symbols',
     groupWorkspace: 'Рабочая область',
     groupPlanning: 'Данные и аналитика',
     groupDirectory: 'Справочники и CRM',
@@ -922,6 +923,7 @@ export const ru = {
       counterparties: 'Заказчики, поставщики, подрядчики, рейтинг надёжности и связанные договоры',
       documents: 'Корпоративная библиотека файлов: загрузка с диска, версионирование, превью и привязка к проектам, договорам и компаниям',
       designTokens: 'CSS-переменные, определяющие темы Light, Dark и Cyberpunk. Живые значения обновляются при смене темы.',
+      materialIcons: 'Палитра всех лигатур Material Symbols с поиском по имени, категории и тегам; сниппет <app-material-icon> с копированием в буфер',
     },
     sidebar: {
       themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk)',
@@ -1872,6 +1874,12 @@ export const ru = {
         action: (code: string, title: string) => `Требование ${code} «${title}» будет удалено из проекта.`,
         result: 'Связи задач с этим требованием будут очищены.',
       },
+    },
+    materialIcons: {
+      selected: 'Выбранная иконка',
+      code: 'Сниппет компонента',
+      copy: 'Скопировать',
+      copied: 'Скопировано',
     },
     designTokens: {
       categories: {
