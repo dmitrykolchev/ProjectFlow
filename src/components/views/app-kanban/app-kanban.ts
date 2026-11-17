@@ -6,6 +6,7 @@ import { getTranslation } from '../../../i18n';
 import styles from './app-kanban.css';
 import { iconClock, iconPlus } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 
 const COLUMNS: { id: TaskStatus; color: string }[] = [
   { id: 'backlog', color: '#64748b' },
@@ -162,15 +163,15 @@ export class AppKanban extends LitElement {
                               `
                             : ''}
 
-                          <div class="card-footer">
-                            <span class="date-info">
+                          <card-footer>
+                            <span slot="start" class="date-info">
                               ${iconClock(12)}
                               <span>${task.dueDate.slice(5)}</span>
                             </span>
-                            <div class="assignee-avatar" title="${assignee ? assignee.name : 'Unassigned'}">
+                            <div slot="end" class="assignee-avatar" title="${assignee ? assignee.name : 'Unassigned'}">
                               ${assignee ? assignee.avatar : '?'}
                             </div>
-                          </div>
+                          </card-footer>
                         </div>
                       `;
                     })}
