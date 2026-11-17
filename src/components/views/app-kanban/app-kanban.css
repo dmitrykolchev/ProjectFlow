@@ -21,7 +21,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
+}
+
+.filter-group app-select {
+  width: 240px;
+}
+
+.filter-group app-entity-selector {
+  width: 320px;
 }
 
 .board-container {
