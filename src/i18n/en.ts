@@ -1246,6 +1246,7 @@ export const en = {
     },
     expenses: {
       filterAllProjects: 'All projects',
+      filterAllEmployees: 'All employees',
       filterAllCategories: 'All categories',
       filterAllStatuses: 'All statuses',
       kpiActiveEntries: 'active entries',

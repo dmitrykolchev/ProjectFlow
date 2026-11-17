@@ -1246,6 +1246,7 @@ export const ru = {
     },
     expenses: {
       filterAllProjects: 'Все проекты',
+      filterAllEmployees: 'Все сотрудники',
       filterAllCategories: 'Все категории',
       filterAllStatuses: 'Все статусы',
       kpiActiveEntries: 'активных записей',

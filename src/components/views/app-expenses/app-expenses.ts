@@ -17,7 +17,8 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import { mapProjectOptions } from '../../common/entity-selector-options';
+import { mapProjectOptions, mapUserOptions } from '../../common/entity-selector-options';
+import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-expense-form/app-expense-form';
 import '../../common/app-page-header/app-page-header';
@@ -38,6 +39,7 @@ export class AppExpenses extends LitElement {
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
   @state() private projectFilter = 'all';
+  @state() private userFilter = 'all';
   @state() private categoryFilter: 'all' | ExpenseCategory = 'all';
   @state() private statusFilter: 'all' | ExpenseStatus = 'all';
   @state() private viewMode: 'registry' | 'budgets' = 'registry';
@@ -89,6 +91,7 @@ export class AppExpenses extends LitElement {
     return [...this.expenses]
       .filter((exp) => {
         if (this.projectFilter !== 'all' && exp.projectId !== this.projectFilter) return false;
+        if (this.userFilter !== 'all' && exp.userId !== this.userFilter) return false;
         if (this.categoryFilter !== 'all' && exp.category !== this.categoryFilter) return false;
         if (this.statusFilter !== 'all' && exp.status !== this.statusFilter) return false;
         if (!query) return true;
@@ -131,7 +134,12 @@ export class AppExpenses extends LitElement {
 
     const projectFilterOptions = [
       { value: 'all', label: t.viewTexts.expenses.filterAllProjects },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
+      ...mapProjectOptions(store.projects, t),
+    ];
+
+    const userFilterOptions = [
+      { value: 'all', label: t.viewTexts.expenses.filterAllEmployees },
+      ...mapUserOptions(store.users, t),
     ];
 
     const categoryOptions: { value: ExpenseCategory; label: string }[] = [
@@ -183,17 +191,19 @@ export class AppExpenses extends LitElement {
         placeholder="${t.viewTexts.expenses.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
-          { key: 'project', options: projectFilterOptions },
+          { key: 'project', type: 'entity', options: projectFilterOptions },
+          { key: 'user', type: 'entity', options: userFilterOptions },
           { key: 'category', options: categoryFilterOptions },
           { key: 'status', options: statusFilterOptions },
         ]}"
-        .values="${{ project: this.projectFilter, category: this.categoryFilter, status: this.statusFilter }}"
+        .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter, status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'project') this.projectFilter = eventValue(e);
+          if (e.detail.key === 'user') this.userFilter = eventValue(e);
           if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | ExpenseCategory;
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ExpenseStatus;
           this.currentPage = 1; store.setActivePage(1, false);
