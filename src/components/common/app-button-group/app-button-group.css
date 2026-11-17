@@ -14,9 +14,11 @@
   flex-direction: column;
 }
 
-/* vertical groups: every button stretches to the widest one so all widths match */
+/* vertical groups: every button stretches to the widest one so all widths match; the
+   --btn-width hook propagates the stretch through each child control into its shadow */
 .group.vertical ::slotted(*) {
   width: 100%;
+  --btn-width: 100%;
 }
 
 .group.attached {
