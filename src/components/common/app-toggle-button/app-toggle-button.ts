@@ -6,7 +6,7 @@ import styles from './app-toggle-button.css';
 export class AppToggleButton extends LitElement {
   @property({ type: Boolean, reflect: true }) pressed: boolean = false;
   @property({ type: String }) variant: 'soft' | 'solid' = 'soft';
-  @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';
+  @property({ type: String }) size: 'xxs' | 'sm' | 'md' | 'lg' = 'md';
   @property({ type: Boolean, reflect: true }) disabled: boolean = false;
   @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
   @property({ type: String }) value: string = '';
