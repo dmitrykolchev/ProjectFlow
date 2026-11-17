@@ -149,15 +149,10 @@
 }
 
 /* card-footer web component keeps its own chrome; the view pins it to the
-   bottom of the card and tunes the delete action hover tokens */
+   bottom of the card; the delete button declares action="delete" and app-button supplies
+   the danger hover palette */
 card-footer {
   margin-top: auto;
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .stats-row {

@@ -275,7 +275,7 @@ export class AppCompanies extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
-                  class="danger-action"
+                  action="delete"
                   title="${t.common.delete}"
                   @click="${() => (this.deletingCompany = company)}"
                 >
