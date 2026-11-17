@@ -1,0 +1,199 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: contents;
+}
+
+/* children of app-form-grid declare full-width cells the same way views do */
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.meta-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.color-swatches {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.35rem;
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+
+.color-swatch:hover {
+  transform: scale(1.1);
+}
+
+.color-swatch.is-active {
+  border-color: var(--text-primary, #ffffff);
+  box-shadow: 0 0 0 2px var(--accent-primary, #6366f1);
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+}
+
+/* spec bootstrap section styles for the extra slot (view-owned create-mode content) */
+.spec-bootstrap-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.9rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+}
+
+.spec-bootstrap-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.spec-bootstrap-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
+.spec-ai-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.spec-note {
+  font-size: 0.76rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.spec-ai-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--color-danger, #f87171);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.spec-blueprint-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-canvas, #090d16);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.spec-blueprint-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.spec-blueprint-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-success, #10b981);
+}
+
+.spec-blueprint-counts {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.spec-count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-xs, 4px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #818cf8);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+}
+
+.spec-blueprint-lists {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.spec-blueprint-lists::-webkit-scrollbar {
+  width: 5px;
+}
+
+.spec-blueprint-lists::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+.spec-blueprint-lists::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 3px;
+}
+
+.spec-blueprint-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.76rem;
+  color: var(--text-secondary, #cbd5e1);
+}
+
+.spec-req-code {
+  font-size: 0.69rem;
+  font-weight: 700;
+  padding: 0.1rem 0.38rem;
+  border-radius: var(--radius-xs, 4px);
+  background: rgba(2, 132, 199, 0.16);
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.spec-req-code.is-nfr {
+  background: rgba(139, 92, 246, 0.16);
+  color: #c084fc;
+}
