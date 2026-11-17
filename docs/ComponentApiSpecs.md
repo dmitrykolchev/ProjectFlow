@@ -455,7 +455,8 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
 - `--link-white-space` — white-space, default `normal`;
 - `--link-overflow` и `--link-text-overflow` — обрезка текста, default `visible`/`clip`;
   `.link-label` получил `min-width: 0` для shrink при ellipsis;
-- `--link-host-display` — display host-элемента, default `inline-block`.
+- `--link-host-display` — display host-элемента, default `inline-block`;
+- `--link-gap` — gap flex-контейнера inner контрола, default `0.4rem`.
 Font-size регулируется существующим `--control-font-{size}` size-правила.
 
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):
