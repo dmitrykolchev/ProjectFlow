@@ -7,11 +7,8 @@ import {
   RequirementPriority,
   RequirementStatus,
   RequirementType,
-  TaskPriority,
 } from '../../../types';
 import {
-  DecomposedTaskDraft,
-  decomposeRequirementsToTasks,
   extractDocumentTextContext,
   formatAiError,
   generateProjectBlueprintFromSpec,
@@ -19,7 +16,6 @@ import {
 import {
   iconAlertTriangle,
   iconBookOpen,
-  iconCheck,
   iconChevronRight,
   iconCpu,
   iconEdit,
@@ -32,11 +28,9 @@ import {
 import {
   mapDocumentOptions,
   mapProjectOptions,
-  mapUserOptions,
 } from '../../common/entity-selector-options';
 import { eventValue } from '../../common/event-value';
 import { paginateItems } from '../../common/paginate';
-import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/card-footer/card-footer';
 import '../../common/app-checkbox/app-checkbox';
@@ -45,15 +39,13 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
-import '../../common/app-input/app-input';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../common/app-modal/app-modal';
+import '../../common/app-decompose-form/app-decompose-form';
 import '../../common/app-requirement-form/app-requirement-form';
-import '../../common/app-number-input/app-number-input';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
@@ -94,11 +86,6 @@ export class AppRequirements extends LitElement {
   // Decompose into Tasks State & Modal
   @state() private decomposing = false;
   @state() private decomposeError = '';
-  @state() private decomposeModalOpen = false;
-  @state() private draftTasks: Array<DecomposedTaskDraft & { selected: boolean }> = [];
-  @state() private decomposeAssigneeId = store.currentUserId || store.users[0]?.id || '';
-  @state() private decomposeProjectId = store.projects[0]?.id || '';
-  @state() private decomposeModel = '';
 
   private unsubscribe?: () => void;
 
@@ -124,9 +111,6 @@ export class AppRequirements extends LitElement {
     this.tablePageSize = store.customization.tablePageSize;
     if (store.requirementFilterProjectId && store.requirementFilterProjectId !== this.projectFilter) {
       this.projectFilter = store.requirementFilterProjectId;
-    }
-    if (!store.users.some((u) => u.id === this.decomposeAssigneeId)) {
-      this.decomposeAssigneeId = store.currentUserId || store.users[0]?.id || '';
     }
 
     if (!store.projects.some((p) => p.id === this.specProjectId)) {
@@ -736,162 +720,11 @@ export class AppRequirements extends LitElement {
   }
 
   private renderDecomposeModal(t: ReturnType<typeof getTranslation>) {
-    const userOptions = mapUserOptions(store.users, t);
-    const priorityOptions = [
-      { value: 'low', label: t.priority.low },
-      { value: 'medium', label: t.priority.medium },
-      { value: 'high', label: t.priority.high },
-      { value: 'urgent', label: t.priority.urgent },
-    ];
-    const selectedCount = this.draftTasks.filter((d) => d.selected).length;
-
     return html`
-      <app-modal
-        ?open="${this.decomposeModalOpen}"
-        size="xl"
-        title="${t.viewTexts.requirements.decomposeModalTitle}"
-        @close="${() => (this.decomposeModalOpen = false)}"
-      >
-        <div class="draft-header-bar">
-          <div style="min-width: 260px; flex: 1;">
-            <app-entity-selector
-              size="sm"
-              label="${t.viewTexts.requirements.decomposeAssigneeLabel}"
-              .options="${userOptions}"
-              .value="${this.decomposeAssigneeId}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.decomposeAssigneeId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <app-badge variant="info" appearance="soft">
-              ${t.viewTexts.requirements.decomposeTasksCount(this.draftTasks.length)}
-            </app-badge>
-            ${this.decomposeModel
-              ? html`<span class="mono" style="font-size: 0.72rem; color: var(--text-muted);">${this.decomposeModel}</span>`
-              : ''}
-          </div>
-        </div>
-
-        ${this.draftTasks.length === 0
-          ? html`<app-empty-state compact title="${t.viewTexts.requirements.noDraftTasks}"></app-empty-state>`
-          : html`
-              <div class="draft-list">
-                ${this.draftTasks.map((draft, idx) => {
-                  const reqs = this.requirements.filter((r) =>
-                    draft.requirementIds.includes(r.id)
-                  );
-                  const kbs = store.knowledgeArticles.filter((k) =>
-                    draft.knowledgeArticleIds.includes(k.id)
-                  );
-                  return html`
-                    <div class="draft-card ${draft.selected ? 'is-selected' : ''}">
-                      <div class="draft-top">
-                        <app-checkbox
-                          .checked="${draft.selected}"
-                          @change="${() => {
-                            this.draftTasks = this.draftTasks.map((item, i) =>
-                              i === idx ? { ...item, selected: !item.selected } : item
-                            );
-                          }}"
-                        ></app-checkbox>
-
-                        <app-input
-                          size="sm"
-                          .value="${draft.title}"
-                          @input="${(e: CustomEvent<{ value: string }>) => {
-                            const val = eventValue(e);
-                            this.draftTasks = this.draftTasks.map((item, i) =>
-                              i === idx ? { ...item, title: val } : item
-                            );
-                          }}"
-                        ></app-input>
-
-                        <app-number-input
-                          size="sm"
-                          min="1"
-                          max="240"
-                          unit="${t.common.hours}"
-                          .value="${draft.estimatedHours}"
-                          @change="${(e: CustomEvent<{ value: number }>) => {
-                            const val = Number(eventValue(e)) || 8;
-                            this.draftTasks = this.draftTasks.map((item, i) =>
-                              i === idx ? { ...item, estimatedHours: val } : item
-                            );
-                          }}"
-                        ></app-number-input>
-
-                        <app-select
-                          size="sm"
-                          .value="${draft.priority}"
-                          .options="${priorityOptions}"
-                          @change="${(e: CustomEvent<{ value: string }>) => {
-                            const val = eventValue(e) as TaskPriority;
-                            this.draftTasks = this.draftTasks.map((item, i) =>
-                              i === idx ? { ...item, priority: val } : item
-                            );
-                          }}"
-                        ></app-select>
-                      </div>
-
-                      <app-textarea
-                        rows="2"
-                        .value="${draft.description}"
-                        @input="${(e: CustomEvent<{ value: string }>) => {
-                          const val = eventValue(e);
-                          this.draftTasks = this.draftTasks.map((item, i) =>
-                            i === idx ? { ...item, description: val } : item
-                          );
-                        }}"
-                      ></app-textarea>
-
-                      ${draft.subtasks.length > 0
-                        ? html`
-                            <div class="draft-subtasks">
-                              ${draft.subtasks.map(
-                                (st) => html`<span class="draft-subtask-chip">• ${st}</span>`
-                              )}
-                            </div>
-                          `
-                        : ''}
-
-                      <div class="req-meta-row">
-                        ${reqs.map(
-                          (r) => html`
-                            <span class="req-code-badge ${r.type === 'non_functional' ? 'is-nfr' : ''}">
-                              ${r.code}
-                            </span>
-                          `
-                        )}
-                        ${kbs.map(
-                          (kb) => html`
-                            <span class="trace-link-chip">
-                              ${iconBookOpen(11)}
-                              <span>${kb.title}</span>
-                            </span>
-                          `
-                        )}
-                      </div>
-                    </div>
-                  `;
-                })}
-              </div>
-            `}
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.decomposeModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="primary"
-            ?disabled="${selectedCount === 0}"
-            @click="${this.handleCreateSelectedTasks}"
-          >
-            <span slot="icon-start">${iconCheck(14)}</span>
-            <span>${t.viewTexts.requirements.createSelectedTasksBtn} (${selectedCount})</span>
-          </app-button>
-        </div>
-      </app-modal>
+      <app-decompose-form
+        @decompose-failed="${(e: CustomEvent<{ message: string }>) => (this.decomposeError = e.detail.message)}"
+        @saved="${() => (this.selectedReqIds = [])}"
+      ></app-decompose-form>
     `;
   }
 
@@ -1053,88 +886,13 @@ export class AppRequirements extends LitElement {
   }
 
   private async handleDecompose(reqIds: string[]) {
-    const t = getTranslation(this.currentLang);
-    const targetReqs = this.requirements.filter((r) => reqIds.includes(r.id));
-    if (targetReqs.length === 0) {
-      this.decomposeError = t.viewTexts.ai.errors.missingSelectedReqs;
-      return;
-    }
-    const projectId = targetReqs[0].projectId;
-    const project = store.projects.find((p) => p.id === projectId);
-    if (!project) return;
-
-    this.decomposeProjectId = project.id;
-    const endpoint = store.customization.aiEndpoint;
+    const form = this.shadowRoot!.querySelector('app-decompose-form');
+    if (!form) return;
+    form.requirementIds = reqIds;
     this.decomposing = true;
     this.decomposeError = '';
-    try {
-      const res = await decomposeRequirementsToTasks({
-        project,
-        requirements: targetReqs,
-        knowledgeArticles: store.knowledgeArticles,
-        documents: store.documents,
-        lang: this.currentLang,
-        baseUrl: endpoint,
-        model: store.customization.aiModel,
-      });
-
-      this.draftTasks = res.tasks.map((task) => ({ ...task, selected: true }));
-      this.decomposeModel = res.model;
-      this.decomposeModalOpen = true;
-    } catch (err) {
-      this.decomposeError = formatAiError(err, endpoint, t);
-    } finally {
-      this.decomposing = false;
-    }
+    await form.decompose();
+    this.decomposing = false;
   }
 
-  private handleCreateSelectedTasks() {
-    const selectedDrafts = this.draftTasks.filter((d) => d.selected && d.title.trim());
-    if (selectedDrafts.length === 0) return;
-
-    const today = new Date().toISOString().slice(0, 10);
-    const due = new Date(Date.now() + 14 * 86400 * 1000).toISOString().slice(0, 10);
-    const assigneeId = this.decomposeAssigneeId || store.users[0]?.id || 'user-1';
-
-    for (const draft of selectedDrafts) {
-      const targetProjId =
-        this.requirements.find((r) => draft.requirementIds.includes(r.id))?.projectId ||
-        this.decomposeProjectId;
-      const created = store.addTask({
-        title: draft.title.trim(),
-        description: draft.description.trim(),
-        status: 'todo',
-        priority: draft.priority,
-        assigneeId,
-        projectId: targetProjId,
-        tags: draft.tags,
-        startDate: today,
-        dueDate: due,
-        estimatedHours: draft.estimatedHours,
-        loggedHours: 0,
-        subtasks: draft.subtasks.map((title, idx) => ({
-          id: `st-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 5)}`,
-          title,
-          completed: false,
-        })),
-        requirementIds: [...draft.requirementIds],
-        knowledgeArticleIds: [...draft.knowledgeArticleIds],
-      });
-
-      for (const reqId of draft.requirementIds) {
-        const req = store.requirements.find((r) => r.id === reqId);
-        if (req) {
-          const nextLinkedTasks = Array.from(new Set([...(req.linkedTaskIds || []), created.id]));
-          store.updateRequirement({
-            ...req,
-            status: req.status === 'draft' || req.status === 'approved' ? 'in_progress' : req.status,
-            linkedTaskIds: nextLinkedTasks,
-          });
-        }
-      }
-    }
-
-    this.selectedReqIds = [];
-    this.decomposeModalOpen = false;
-  }
 }
