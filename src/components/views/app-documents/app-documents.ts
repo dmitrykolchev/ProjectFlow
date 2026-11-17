@@ -40,6 +40,7 @@ import {
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
@@ -571,8 +572,8 @@ export class AppDocuments extends LitElement {
                     `}
               </div>
 
-              <div class="card-footer">
-                <div class="uploader-info">
+              <card-footer>
+                <div slot="start" class="uploader-info">
                   ${uploader
                     ? html`<app-avatar size="xs" initials="${uploader.avatar}" title="${uploader.name}"></app-avatar>`
                     : ''}
@@ -580,41 +581,44 @@ export class AppDocuments extends LitElement {
                   <span class="mono">· ${doc.updatedAt.slice(0, 10)}</span>
                 </div>
 
-                <div class="card-actions">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.documents.previewTitle}"
-                    @click="${() => this.openPreviewModal(doc)}"
-                  >
-                    ${iconEye(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.documents.downloadFile}"
-                    @click="${() => downloadDocumentFile(doc)}"
-                  >
-                    ${iconDownload(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditModal(doc)}"
-                  >
-                    ${iconEdit(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn danger"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingDoc = doc)}"
-                  >
-                    ${iconTrash(14)}
-                  </button>
-                </div>
-              </div>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.documents.previewTitle}"
+                  @click="${() => this.openPreviewModal(doc)}"
+                >
+                  <span slot="start">${iconEye(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.documents.downloadFile}"
+                  @click="${() => downloadDocumentFile(doc)}"
+                >
+                  <span slot="start">${iconDownload(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.edit}"
+                  @click="${() => this.openEditModal(doc)}"
+                >
+                  <span slot="start">${iconEdit(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  class="danger-action"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingDoc = doc)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+              </card-footer>
             </article>
           `;
         })}
