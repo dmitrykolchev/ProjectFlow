@@ -322,7 +322,7 @@ export class AppCounterparties extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
-                  class="danger-action"
+                  action="delete"
                   title="${t.common.delete}"
                   @click="${() => (this.deletingItem = cp)}"
                 >
@@ -449,7 +449,7 @@ export class AppCounterparties extends LitElement {
                         <span slot="start">${iconEdit(14)}</span>
                       </app-button>
                       <app-button
-                        class="danger-action"
+                        action="delete"
                         size="sm"
                         variant="icon"
                         title="${t.common.delete}"
