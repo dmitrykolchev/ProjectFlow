@@ -9,12 +9,12 @@ import {
   iconChevronRight,
   iconEdit,
   iconFolderOpen,
-  iconLandmark,
   iconPlus,
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-bank-summary/app-bank-summary';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -230,7 +230,7 @@ export class AppCompanies extends LitElement {
                 </div>
               </div>
 
-              ${this.renderBankSummary(company, t)}
+              <app-bank-summary .accounts="${company.bankAccounts || []}"></app-bank-summary>
 
               <card-footer>
                 <div slot="start" class="stats-row">
@@ -275,7 +275,7 @@ export class AppCompanies extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
-                  class="danger-action"
+                  action="delete"
                   title="${t.common.delete}"
                   @click="${() => (this.deletingCompany = company)}"
                 >
@@ -310,34 +310,6 @@ export class AppCompanies extends LitElement {
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
-    `;
-  }
-
-  private renderBankSummary(company: Company, t: ReturnType<typeof getTranslation>) {
-    const accounts = company.bankAccounts || [];
-    const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
-    const primary = accounts.find((a) => a.isDefault) || accounts[0];
-
-    return html`
-      <div class="bank-summary-row">
-        <div class="bank-summary-left">
-          <span class="bank-summary-icon">${iconLandmark(14)}</span>
-          ${accounts.length === 0
-            ? html`<span>${t.bankAccounts.noAccountsShort}</span>`
-            : html`
-                <span class="bank-summary-name" title="${primary?.bankName || ''}">
-                  ${primary?.bankName}${accounts.length > 1 ? ` (+${accounts.length - 1})` : ''}
-                </span>
-              `}
-        </div>
-        ${currencies.length > 0
-          ? html`
-              <div class="bank-currencies">
-                ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
-              </div>
-            `
-          : ''}
-      </div>
     `;
   }
 

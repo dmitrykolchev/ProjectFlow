@@ -251,24 +251,16 @@
 
 /* requirement card icon actions are app-button web components at size sm pinned to the
    historical 28px square: the historical hover kept the subtle border unchanged for plain
-   actions, so the hover border token is pinned back (danger hover tokens come from
-   .danger-action), and the historical 6px radius replaces the canonical md radius */
+   actions, so the hover border token is pinned back (the delete button declares
+   action="delete" and the component supplies its danger hover tokens), and the historical
+   6px radius replaces the canonical md radius */
 .req-card-actions app-button {
   --control-height-sm: 28px;
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
   --btn-radius-bl: var(--radius-sm, 6px);
   --btn-radius-br: var(--radius-sm, 6px);
-}
-
-.req-card-actions app-button:not(.danger-action) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .col-span-2 {

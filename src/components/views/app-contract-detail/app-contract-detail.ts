@@ -454,7 +454,7 @@ export class AppContractDetail extends LitElement {
             </app-button>
 
             <app-button
-              class="danger-action"
+              action="delete"
               size="sm"
               variant="icon"
               title="${t.common.delete}"
@@ -705,7 +705,7 @@ export class AppContractDetail extends LitElement {
                                 ${calc.status === 'sent'
                                   ? html`
                                       <app-button
-                                        class="approve-action"
+                                        action="accept"
                                         size="sm"
                                         variant="icon"
                                         title="${t.calculations.approveCalc}"
@@ -714,7 +714,7 @@ export class AppContractDetail extends LitElement {
                                         <span slot="start">${iconCheck(14)}</span>
                                       </app-button>
                                       <app-button
-                                        class="danger-action"
+                                        action="reject"
                                         size="sm"
                                         variant="icon"
                                         title="${t.calculations.rejectCalc}"
@@ -727,7 +727,7 @@ export class AppContractDetail extends LitElement {
                                 ${calc.status === 'approved'
                                   ? html`
                                       <app-button
-                                        class="approve-action"
+                                        action="accept"
                                         size="sm"
                                         variant="icon"
                                         title="${t.calculations.createInvoiceFromCalc}"
@@ -746,7 +746,7 @@ export class AppContractDetail extends LitElement {
                                   <span slot="start">${iconEdit(14)}</span>
                                 </app-button>
                                 <app-button
-                                  class="danger-action"
+                                  action="delete"
                                   size="sm"
                                   variant="icon"
                                   title="${t.common.delete}"
@@ -960,7 +960,7 @@ export class AppContractDetail extends LitElement {
                                 ${inv.status === 'draft'
                                   ? html`
                                       <app-button
-                                        class="approve-action"
+                                        action="submit"
                                         size="sm"
                                         variant="icon"
                                         title="${t.invoices.markIssued}"
@@ -985,7 +985,7 @@ export class AppContractDetail extends LitElement {
                                 ${canRecordPayment
                                   ? html`
                                       <app-button
-                                        class="approve-action"
+                                        action="accept"
                                         size="sm"
                                         variant="icon"
                                         title="${t.payments.recordPayment}"
@@ -994,7 +994,7 @@ export class AppContractDetail extends LitElement {
                                         <span slot="start">${iconCreditCard(14)}</span>
                                       </app-button>
                                       <app-button
-                                        class="approve-action"
+                                        action="accept"
                                         size="sm"
                                         variant="icon"
                                         title="${t.invoices.markPaid}"
@@ -1013,7 +1013,7 @@ export class AppContractDetail extends LitElement {
                                   <span slot="start">${iconEdit(14)}</span>
                                 </app-button>
                                 <app-button
-                                  class="danger-action"
+                                  action="delete"
                                   size="sm"
                                   variant="icon"
                                   title="${t.common.delete}"
@@ -1128,7 +1128,7 @@ export class AppContractDetail extends LitElement {
                             <td>
                               <div class="actions-row">
                                 <app-button
-                                  class="danger-action"
+                                  action="delete"
                                   size="sm"
                                   variant="icon"
                                   title="${t.common.delete}"

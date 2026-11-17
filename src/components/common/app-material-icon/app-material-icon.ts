@@ -52,7 +52,7 @@ export class AppMaterialIcon extends LitElement {
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('size')) {
-      this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg');
+      this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg', 'xxl');
       if (typeof this.size === 'number') {
         // numeric size = nominal box in px, shared unit with SVG icons;
         // opsz axis stays inside its supported 20..48 range

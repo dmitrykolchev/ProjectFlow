@@ -174,12 +174,6 @@ card-footer {
   margin-top: auto;
 }
 
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
-}
-
 .stats-row {
   display: flex;
   align-items: center;
@@ -203,8 +197,8 @@ card-footer {
 
 /* table row icon actions are app-button web components at size sm: the historical
    hover kept the subtle border unchanged, so the hover border token is pinned back
-   for non-danger actions (the danger hover tokens come from .danger-action), and the
-   historical 6px radius replaces the canonical md radius */
+   for every action except delete (the component supplies the danger palette for
+   action="delete"), and the historical 6px radius replaces the canonical md radius */
 .card-actions app-button {
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
@@ -212,7 +206,7 @@ card-footer {
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.card-actions app-button:not(.danger-action) {
+.card-actions app-button:not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
@@ -256,40 +250,6 @@ card-footer {
 
 .data-table tr:hover td {
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
-}
-
-.bank-summary-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.5rem 0.7rem;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: var(--radius-md, 8px);
-  font-size: 0.76rem;
-  min-width: 0;
-}
-
-.bank-summary-left {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--text-secondary, #94a3b8);
-  min-width: 0;
-}
-
-.bank-summary-icon {
-  color: var(--accent-primary, #6366f1);
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-.bank-summary-name {
-  color: var(--text-primary, #f8fafc);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .bank-currencies {

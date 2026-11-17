@@ -433,7 +433,7 @@
 
 /* header and member row icon actions are app-button web components at size xs pinned to
    the historical 32px square; the historical 6px radius replaces the canonical md radius,
-   and the danger hover tokens come from .danger-action */
+   and the component supplies the danger palette for action="delete" */
 .nav-actions app-button,
 .member-row app-button {
   --control-height-xs: 32px;
@@ -441,12 +441,6 @@
   --btn-radius-tr: var(--radius-sm, 6px);
   --btn-radius-bl: var(--radius-sm, 6px);
   --btn-radius-br: var(--radius-sm, 6px);
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 .col-span-2 {
   grid-column: span 2;

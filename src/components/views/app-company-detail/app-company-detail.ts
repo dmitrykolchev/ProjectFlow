@@ -286,7 +286,7 @@ export class AppCompanyDetail extends LitElement {
               <span>${t.common.edit}</span>
             </app-button>
             <app-button
-              class="danger-action"
+              action="delete"
               size="sm"
               variant="icon"
               title="${t.common.delete}"

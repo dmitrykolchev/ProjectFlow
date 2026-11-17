@@ -260,7 +260,7 @@ export class AppCounterpartyDetail extends LitElement {
               <span>${t.common.edit}</span>
             </app-button>
             <app-button
-              class="danger-action"
+              action="delete"
               size="xs"
               variant="icon"
               title="${t.common.delete}"

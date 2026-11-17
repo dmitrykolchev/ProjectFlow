@@ -748,18 +748,6 @@ td {
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.dg-approve-action {
-  --icon-btn-hover-color: #10b981;
-  --icon-btn-hover-border: rgba(16, 185, 129, 0.45);
-  --icon-btn-hover-bg: rgba(16, 185, 129, 0.12);
-}
-
-.dg-danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
-}
-
 /* ==========================================================================
    Compact High-Density Grid Mode (:host(.is-compact))
    ========================================================================== */

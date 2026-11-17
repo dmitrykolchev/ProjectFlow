@@ -454,7 +454,7 @@ export class AppExpenses extends LitElement {
                   ${exp.status === 'pending'
                     ? html`
                         <app-button
-                          class="dg-approve-action"
+                          action="accept"
                           size="sm"
                           variant="icon"
                           title="${t.viewTexts.expenses.approveTitle}"
@@ -463,7 +463,7 @@ export class AppExpenses extends LitElement {
                           <span slot="start">${iconCheck(14)}</span>
                         </app-button>
                         <app-button
-                          class="dg-danger-action"
+                          action="reject"
                           size="sm"
                           variant="icon"
                           title="${t.viewTexts.expenses.rejectTitle}"
@@ -482,7 +482,7 @@ export class AppExpenses extends LitElement {
                     <span slot="start">${iconEdit(14)}</span>
                   </app-button>
                   <app-button
-                    class="dg-danger-action"
+                    action="delete"
                     size="sm"
                     variant="icon"
                     title="${t.common.delete}"
@@ -586,7 +586,7 @@ export class AppExpenses extends LitElement {
                       ${exp.status === 'pending'
                         ? html`
                             <app-button
-                              class="approve-action"
+                              action="accept"
                               size="sm"
                               variant="icon"
                               title="${t.viewTexts.expenses.approveTitle}"
@@ -595,7 +595,7 @@ export class AppExpenses extends LitElement {
                               <span slot="start">${iconCheck(14)}</span>
                             </app-button>
                             <app-button
-                              class="danger-action"
+                              action="reject"
                               size="sm"
                               variant="icon"
                               title="${t.viewTexts.expenses.rejectTitle}"
@@ -614,7 +614,7 @@ export class AppExpenses extends LitElement {
                           <span slot="start">${iconEdit(14)}</span>
                         </app-button>
                         <app-button
-                          class="danger-action"
+                          action="delete"
                           size="sm"
                           variant="icon"
                           title="${t.common.delete}"

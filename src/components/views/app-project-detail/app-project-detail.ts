@@ -253,7 +253,7 @@ export class AppProjectDetail extends LitElement {
             </app-button>
 
             <app-button
-              class="danger-action"
+              action="delete"
               size="xs"
               variant="icon"
               title="${t.common.delete}"
@@ -549,7 +549,7 @@ export class AppProjectDetail extends LitElement {
                                     </div>
 
                                     <app-button
-                                      class="danger-action"
+                                      action="delete"
                                       size="xs"
                                       variant="icon"
                                       title="${t.viewTexts.projectDetail.removeFromRoleTitle}"

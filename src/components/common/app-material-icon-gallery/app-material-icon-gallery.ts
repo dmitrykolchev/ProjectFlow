@@ -77,7 +77,7 @@ export class AppMaterialIconGallery extends LitElement {
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('size')) {
-      this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg');
+      this.classList.remove('xxs', 'xs', 'xsm', 'sm', 'md', 'lg', 'xl', 'xlg', 'xxl');
       if (typeof this.size === 'number') {
         // numeric size = glyph box in px; label font-size stays proportional and readable
         const px = Math.max(1, Math.round(this.size));

@@ -82,19 +82,13 @@
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.nav-actions app-button:not(.danger-action) {
+.nav-actions app-button:not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: rgba(239, 68, 68, 0.45);
-  --icon-btn-hover-bg: var(--bg-surface, #111827);
-}
-
 /* row icon actions are app-button web components at size xs pinned to the historical
-   26px square with a muted glyph; the danger hover colors only the glyph and keeps the
-   subtle border and the hover fill */
+   26px square with a muted glyph; the delete buttons declare action="delete" and the
+   component supplies the danger hover palette */
 .sm-action {
   --control-height-xs: 26px;
   --btn-radius-tl: var(--radius-sm, 6px);
@@ -103,13 +97,6 @@
   --btn-radius-br: var(--radius-sm, 6px);
   --icon-btn-border: var(--border-subtle, #1e293b);
   --icon-btn-color: var(--text-muted, #64748b);
-  --icon-btn-hover-border: var(--border-subtle, #1e293b);
-}
-
-.sm-action.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--border-subtle, #1e293b);
-  --icon-btn-hover-bg: var(--bg-hover, #1e293b);
 }
 
 /* Hero Card */

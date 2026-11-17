@@ -149,15 +149,10 @@
 }
 
 /* card-footer web component keeps its own chrome; the view pins it to the
-   bottom of the card and tunes the delete action hover tokens */
+   bottom of the card; the delete button declares action="delete" and app-button supplies
+   the danger hover palette */
 card-footer {
   margin-top: auto;
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .stats-row {
@@ -171,59 +166,6 @@ card-footer {
 .stat-pill strong {
   color: var(--text-primary, #f8fafc);
   font-family: var(--font-mono, monospace);
-}
-
-.bank-summary-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  padding: 0.5rem 0.7rem;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: var(--radius-md, 8px);
-  font-size: 0.76rem;
-  min-width: 0;
-}
-
-.bank-summary-left {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--text-secondary, #94a3b8);
-  min-width: 0;
-}
-
-.bank-summary-icon {
-  color: var(--accent-primary, #6366f1);
-  display: inline-flex;
-  flex-shrink: 0;
-}
-
-.bank-summary-name {
-  color: var(--text-primary, #f8fafc);
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.bank-currencies {
-  display: flex;
-  align-items: center;
-  gap: 0.28rem;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-}
-
-.currency-chip {
-  padding: 0.1rem 0.4rem;
-  border-radius: var(--radius-sm, 4px);
-  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
-  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
-  color: var(--accent-primary, #6366f1);
-  font-family: var(--font-mono, monospace);
-  font-size: 0.68rem;
-  font-weight: 700;
 }
 
 .col-span-2 {
