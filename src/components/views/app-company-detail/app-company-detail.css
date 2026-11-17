@@ -451,19 +451,22 @@
   color: var(--text-muted, #64748b);
 }
 
+/* table name-links are app-link web components at size md with the historical typography
+   restored through the additive link hooks of zero padding, weight 600, the inherited unitless
+   line-height 1.5, and the cell font size pinned through control-font-md; the label content is
+   wrapped in an inline-block inner span so the row-key span and the text keep the original
+   single inline formatting context with the same wrap points as the native button; the accent
+   color and the hover underline are the primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-width: 100%;
+  --control-font-md: 0.83rem;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
+.link-inner {
+  display: inline-block;
 }
 
 /* header, project row and table cell icon actions are app-button web components at size

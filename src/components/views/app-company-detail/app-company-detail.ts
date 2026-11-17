@@ -55,6 +55,7 @@ import {
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-document-previewer/app-document-previewer';
@@ -705,24 +706,30 @@ export class AppCompanyDetail extends LitElement {
                       return html`
                         <tr>
                           <td>
-                            <button
-                              type="button"
+                            <app-link
                               class="link-btn"
+                              size="md"
+                              variant="primary"
                               @click="${() => store.openProjectDetail(proj.id)}"
                             >
-                              <span class="row-key">[${proj.key}]</span> ${proj.name}
-                            </button>
+                              <span class="link-wrap"
+                                ><span class="link-inner"
+                                  ><span class="row-key">[${proj.key}]</span> ${proj.name}</span
+                                ></span
+                              >
+                            </app-link>
                           </td>
                           <td>
                             ${cp
                               ? html`
-                                  <button
-                                    type="button"
+                                  <app-link
                                     class="link-btn"
+                                    size="md"
+                                    variant="primary"
                                     @click="${() => store.openCounterpartyDetail(cp.id)}"
                                   >
-                                    ${cp.name}
-                                  </button>
+                                    <span class="link-wrap"><span class="link-inner">${cp.name}</span></span>
+                                  </app-link>
                                 `
                               : t.viewTexts.projectDetail.internalProject}
                           </td>
@@ -787,13 +794,14 @@ export class AppCompanyDetail extends LitElement {
                           <div class="emp-cell">
                             <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
                             <div class="emp-info">
-                              <button
-                                type="button"
+                              <app-link
                                 class="link-btn"
+                                size="md"
+                                variant="primary"
                                 @click="${() => store.openEmployeeDetail(emp.id)}"
                               >
-                                ${emp.name}
-                              </button>
+                                <span class="link-wrap"><span class="link-inner">${emp.name}</span></span>
+                              </app-link>
                               <span class="emp-role">${emp.role}</span>
                             </div>
                           </div>
@@ -843,25 +851,31 @@ export class AppCompanyDetail extends LitElement {
                       return html`
                         <tr>
                           <td>
-                            <button
-                              type="button"
+                            <app-link
                               class="link-btn"
+                              size="md"
+                              variant="primary"
                               @click="${() => store.openContractDetail(ctr.id)}"
                             >
-                              <span class="row-key">${ctr.number}</span> · ${ctr.title}
-                            </button>
+                              <span class="link-wrap"
+                                ><span class="link-inner"
+                                  ><span class="row-key">${ctr.number}</span> · ${ctr.title}</span
+                                ></span
+                              >
+                            </app-link>
                             ${proj ? html`<div class="emp-role">[${proj.key}] ${proj.name}</div>` : ''}
                           </td>
                           <td>
                             ${cp
                               ? html`
-                                  <button
-                                    type="button"
+                                  <app-link
                                     class="link-btn"
+                                    size="md"
+                                    variant="primary"
                                     @click="${() => store.openCounterpartyDetail(cp.id)}"
                                   >
-                                    ${cp.name}
-                                  </button>
+                                    <span class="link-wrap"><span class="link-inner">${cp.name}</span></span>
+                                  </app-link>
                                 `
                               : '—'}
                           </td>
