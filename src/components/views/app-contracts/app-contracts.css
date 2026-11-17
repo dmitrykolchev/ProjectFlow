@@ -90,7 +90,31 @@
   white-space: nowrap;
 }
 
+/* number-links are app-link web components at size md restoring the historical mono chip through
+   the additive link hooks of the mono family, weight 700, tabular numerals, the UA normal
+   line-height, nowrap, the tighter 0.45rem icon gap, the control font size pinned to 1rem as the
+   native control reset computed it, and the accent glyph with the hover chip fill and text-primary
+   color restored through link-hover-bg and link-hover-color; the host carries the historical
+   negative margins that offset the inner padding in the cell layout */
 .contract-link-btn {
+  --link-font: var(--font-mono, monospace);
+  --link-font-weight: 700;
+  --link-numeric: tabular-nums;
+  --link-line-height: normal;
+  --link-white-space: nowrap;
+  --link-gap: 0.45rem;
+  --control-font-md: 1rem;
+  --link-hover-bg: var(--bg-hover, rgba(99, 102, 241, 0.12));
+  --link-hover-color: var(--text-primary, #f8fafc);
+  margin: -0.15rem -0.25rem;
+  vertical-align: baseline;
+  --control-font-md: 0.9524rem;
+}
+
+/* the invoice cell chip is a div-as-button consumer of the same class kept native: it restores
+   the full historical rule with the inherited cell font size and line-height, mono weight 700 tabular
+   numerals, accent glyph, padding offset by negative margins, nowrap and the fast transitions */
+div.contract-link-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -106,11 +130,6 @@
   cursor: pointer;
   white-space: nowrap;
   transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
-}
-
-.contract-link-btn:hover {
-  background: var(--bg-hover, rgba(99, 102, 241, 0.12));
-  color: var(--text-primary, #f8fafc);
 }
 
 .contract-title {

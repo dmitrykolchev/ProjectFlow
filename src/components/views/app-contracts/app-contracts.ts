@@ -38,6 +38,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -522,15 +523,16 @@ export class AppContracts extends LitElement {
                       return html`
                         <tr>
                           <td>
-                            <button
-                              type="button"
+                            <app-link
                               class="contract-link-btn"
+                              size="md"
+                              variant="primary"
                               title="${t.contractDetail.openContract}"
                               @click="${() => store.openContractDetail(ctr.id)}"
                             >
-                              ${iconFileText(15)}
+                              <span slot="start">${iconFileText(15)}</span>
                               <span>${ctr.number}</span>
-                            </button>
+                            </app-link>
                             <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 0.15rem;">
                               ${this.getTypeLabel(ctr.type, t)}${ctr.billingFrequency
                                 ? ` · ${t.calculations.frequencies[ctr.billingFrequency]}`
@@ -693,14 +695,15 @@ export class AppContracts extends LitElement {
                       return html`
                         <tr>
                           <td>
-                            <button
-                              type="button"
+                            <app-link
                               class="contract-link-btn"
+                              size="md"
+                              variant="primary"
                               @click="${() => store.openCalculationDetail(calc.id)}"
                             >
-                              ${iconCalculator(15)}
+                              <span slot="start">${iconCalculator(15)}</span>
                               <span>${calc.number}</span>
-                            </button>
+                            </app-link>
                             <div class="billing-sub">
                               <span>${calc.items.length} ${t.viewTexts.calculations.itemsSuffix}</span>
                               ${calc.nonBillableHours > 0
@@ -714,13 +717,14 @@ export class AppContracts extends LitElement {
                           <td>
                             ${ctr
                               ? html`
-                                  <button
-                                    type="button"
+                                  <app-link
                                     class="contract-link-btn"
+                                    size="md"
+                                    variant="primary"
                                     @click="${() => store.openContractDetail(ctr.id)}"
                                   >
                                     <span>${ctr.number}</span>
-                                  </button>
+                                  </app-link>
                                   <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                                 `
                               : '—'}
@@ -877,13 +881,14 @@ export class AppContracts extends LitElement {
                           <td>
                             ${inv
                               ? html`
-                                  <button
-                                    type="button"
+                                  <app-link
                                     class="contract-link-btn"
+                                    size="md"
+                                    variant="primary"
                                     @click="${() => ctr && store.openContractDetail(ctr.id)}"
                                   >
                                     <span>${inv.number}</span>
-                                  </button>
+                                  </app-link>
                                   <div style="font-size: 0.72rem; color: var(--text-muted);">
                                     ${t.invoices.statuses[inv.status]}
                                   </div>
@@ -893,13 +898,14 @@ export class AppContracts extends LitElement {
                           <td>
                             ${ctr
                               ? html`
-                                  <button
-                                    type="button"
+                                  <app-link
                                     class="contract-link-btn"
+                                    size="md"
+                                    variant="primary"
                                     @click="${() => store.openContractDetail(ctr.id)}"
                                   >
                                     <span>${ctr.number}</span>
-                                  </button>
+                                  </app-link>
                                   <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                                 `
                               : '—'}
@@ -1007,13 +1013,14 @@ export class AppContracts extends LitElement {
                         <td>
                           ${ctr
                             ? html`
-                                <button
-                                  type="button"
+                                <app-link
                                   class="contract-link-btn"
+                                  size="md"
+                                  variant="primary"
                                   @click="${() => store.openContractDetail(ctr.id)}"
                                 >
                                   <span>${ctr.number}</span>
-                                </button>
+                                </app-link>
                                 <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                               `
                             : '—'}
