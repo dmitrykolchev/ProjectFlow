@@ -146,17 +146,26 @@
   color: var(--text-primary, #f8fafc);
 }
 
+/* context toggle is an app-button web component at size sm with the historical content-sized
+   look restored through the font-parity recipe: auto height, zero padding, 0.75rem font at
+   weight 400, the inherited sans family, the tighter 0.35rem gap restored through btn-gap,
+   zero border width, transparent fill, and the selected glyph color following the chip state */
 .context-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-  min-width: 0;
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0;
+  --control-padding-x-sm: 0;
+  --control-font-sm: 0.75rem;
+  --btn-line-height: 1.5;
+  --btn-font-weight: 400;
+  --btn-gap: 0.35rem;
+  --btn-border-width: 0;
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: transparent;
+}
+
+.context-chip.is-selected .context-toggle-btn {
+  --icon-btn-color: var(--text-primary, #f8fafc);
 }
 
 .context-kind-tag {
@@ -451,22 +460,33 @@
   margin-top: 0.1rem;
 }
 
+/* clarify clear is an app-button web component at size sm with the historical content-sized
+   look restored through the font-parity recipe: auto height, 0.25rem vertical and 0.5rem
+   horizontal padding, 0.72rem font at weight 400, the UA control font the native button
+   inherited, the tighter 0.3rem icon gap, the historical 6px radius, the muted glyph with the
+   danger hover copied from the original rule, and no disabled dimming (opacity 1) */
 .clarify-clear-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: transparent;
-  color: var(--text-muted, #64748b);
-  font-size: 0.72rem;
-  cursor: pointer;
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.25rem;
+  --control-padding-x-sm: 0.5rem;
+  --control-font-sm: 0.72rem;
+  --btn-font-weight: 400;
+  --icon-btn-font: Arial;
+  --btn-gap: 0.3rem;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: var(--border-subtle, #1e293b);
+  --btn-disabled-opacity: 1;
 }
 
-.clarify-clear-btn:hover:not(:disabled) {
-  color: var(--color-danger, #f87171);
-  border-color: rgba(239, 68, 68, 0.35);
+.clarify-clear-btn:hover {
+  --icon-btn-hover-bg: transparent;
+  --icon-btn-hover-color: var(--color-danger, #f87171);
+  --icon-btn-hover-border: rgba(239, 68, 68, 0.35);
 }
 
 .clarify-quick-row {
@@ -475,29 +495,32 @@
   gap: 0.4rem;
 }
 
+/* quick chips are app-button web components at size sm with the historical content-sized look
+   restored through the font-parity recipe: auto height, 0.25rem vertical and 0.6rem horizontal
+   padding, 0.73rem font at weight 500, the UA control font the native buttons inherited, the
+   historical 6px radius, the surface fill with the secondary glyph, the accent hover copied from
+   the original rule, and the disabled opacity 0.45 preserved */
 .clarify-quick-chip {
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-surface, #111827);
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.73rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease),
-              background-color var(--transition-fast, 150ms ease);
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.25rem;
+  --control-padding-x-sm: 0.6rem;
+  --control-font-sm: 0.73rem;
+  --btn-font-weight: 500;
+  --icon-btn-font: Arial;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: var(--bg-surface, #111827);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-subtle, #1e293b);
+  --btn-disabled-opacity: 0.45;
 }
 
-.clarify-quick-chip:hover:not(:disabled) {
-  border-color: var(--accent-primary, #6366f1);
-  color: var(--accent-primary, #818cf8);
-  background: var(--accent-soft, rgba(99, 102, 241, 0.1));
-}
-
-.clarify-quick-chip:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.clarify-quick-chip:hover {
+  --icon-btn-hover-bg: var(--accent-soft, rgba(99, 102, 241, 0.1));
+  --icon-btn-hover-color: var(--accent-primary, #818cf8);
+  --icon-btn-hover-border: var(--accent-primary, #6366f1);
 }
 
 .clarify-empty {
@@ -572,29 +595,35 @@
   margin-top: 0.15rem;
 }
 
+/* clarify action buttons are app-button web components at size sm with the historical
+   content-sized look restored through the font-parity recipe: auto height, 0.2rem vertical and
+   0.5rem horizontal padding, 0.7rem font at weight 600, the UA control font the native buttons
+   inherited, the tighter 0.25rem icon gap, the historical 5px radius pins, the canvas fill with
+   the secondary glyph, the accent hover copied from the original rule, and the disabled opacity
+   0.55 with the success glyph restored through btn-disabled-color */
 .clarify-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 5px;
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-canvas, #090d16);
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.7rem;
-  font-weight: 600;
-  cursor: pointer;
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.2rem;
+  --control-padding-x-sm: 0.5rem;
+  --control-font-sm: 0.7rem;
+  --btn-font-weight: 600;
+  --icon-btn-font: Arial;
+  --btn-gap: 0.25rem;
+  --btn-radius-tl: 5px;
+  --btn-radius-tr: 5px;
+  --btn-radius-bl: 5px;
+  --btn-radius-br: 5px;
+  --icon-btn-bg: var(--bg-canvas, #090d16);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-subtle, #1e293b);
+  --btn-disabled-opacity: 0.55;
+  --btn-disabled-color: var(--color-success, #10b981);
 }
 
-.clarify-action-btn:hover:not(:disabled) {
-  border-color: var(--accent-primary, #6366f1);
-  color: var(--accent-primary, #818cf8);
-}
-
-.clarify-action-btn:disabled {
-  opacity: 0.55;
-  cursor: default;
-  color: var(--color-success, #10b981);
+.clarify-action-btn:hover {
+  --icon-btn-hover-bg: var(--bg-canvas, #090d16);
+  --icon-btn-hover-color: var(--accent-primary, #818cf8);
+  --icon-btn-hover-border: var(--accent-primary, #6366f1);
 }
 
 .clarify-composer {

@@ -527,15 +527,16 @@ export class AppTaskAiPanel extends LitElement {
                         : 'DOC';
                     return html`
                       <div class="context-chip ${item.selected ? 'is-selected' : ''}">
-                        <button
-                          type="button"
+                        <app-button
                           class="context-toggle-btn"
+                          size="sm"
+                          variant="icon"
                           @click="${() => this.toggleContextKey(item.key)}"
                         >
                           <span class="context-kind-tag ${tagCls}">${tagText}</span>
                           <span class="context-title" title="${item.title}">${item.title}</span>
                           <span class="context-reason">· ${this.reasonLabel(item.reason, t)}</span>
-                        </button>
+                        </app-button>
                         <app-button
                           class="context-open-btn"
                           size="xs"
@@ -780,44 +781,48 @@ export class AppTaskAiPanel extends LitElement {
             </div>
             ${this.localClarifications.length > 0
               ? html`
-                  <button
-                    type="button"
+                  <app-button
                     class="clarify-clear-btn"
-                    ?disabled="${busy}"
+                    size="sm"
+                    variant="icon"
+                    .disabled="${busy}"
                     @click="${this.handleClearClarifications}"
                   >
-                    ${iconTrash(12)}
+                    <span slot="start">${iconTrash(12)}</span>
                     <span>${t.viewTexts.ai.clarifyClearBtn}</span>
-                  </button>
+                  </app-button>
                 `
               : ''}
           </div>
 
           <div class="clarify-quick-row">
-            <button
-              type="button"
+            <app-button
               class="clarify-quick-chip"
-              ?disabled="${busy}"
+              size="sm"
+              variant="icon"
+              .disabled="${busy}"
               @click="${() => this.handleClarifySend(t.viewTexts.ai.clarifyQuickExplain)}"
             >
-              ${t.viewTexts.ai.clarifyQuickExplain}
-            </button>
-            <button
-              type="button"
+              <span>${t.viewTexts.ai.clarifyQuickExplain}</span>
+            </app-button>
+            <app-button
               class="clarify-quick-chip"
-              ?disabled="${busy}"
+              size="sm"
+              variant="icon"
+              .disabled="${busy}"
               @click="${() => this.handleClarifySend(t.viewTexts.ai.clarifyQuickAcceptance)}"
             >
-              ${t.viewTexts.ai.clarifyQuickAcceptance}
-            </button>
-            <button
-              type="button"
+              <span>${t.viewTexts.ai.clarifyQuickAcceptance}</span>
+            </app-button>
+            <app-button
               class="clarify-quick-chip"
-              ?disabled="${busy}"
+              size="sm"
+              variant="icon"
+              .disabled="${busy}"
               @click="${() => this.handleClarifySend(t.viewTexts.ai.clarifyQuickPlan)}"
             >
-              ${t.viewTexts.ai.clarifyQuickPlan}
-            </button>
+              <span>${t.viewTexts.ai.clarifyQuickPlan}</span>
+            </app-button>
           </div>
 
           ${this.localClarifications.length === 0
@@ -850,37 +855,40 @@ export class AppTaskAiPanel extends LitElement {
                         ${!isUser
                           ? html`
                               <div class="clarify-msg-actions">
-                                <button
-                                  type="button"
+                                <app-button
                                   class="clarify-action-btn"
+                                  size="sm"
+                                  variant="icon"
                                   @click="${() => this.emitApplyDirectDescription(msg.content, 'replace')}"
                                 >
-                                  ${iconCheck(11)}
+                                  <span slot="start">${iconCheck(11)}</span>
                                   <span>${t.viewTexts.ai.clarifyUseAsDescBtn}</span>
-                                </button>
-                                <button
-                                  type="button"
+                                </app-button>
+                                <app-button
                                   class="clarify-action-btn"
+                                  size="sm"
+                                  variant="icon"
                                   @click="${() => this.emitApplyDirectDescription(msg.content, 'append')}"
                                 >
-                                  ${iconPlus(11)}
+                                  <span slot="start">${iconPlus(11)}</span>
                                   <span>${t.viewTexts.ai.clarifyAppendDescBtn}</span>
-                                </button>
+                                </app-button>
                                 ${subtaskCandidate
                                   ? html`
-                                      <button
-                                        type="button"
+                                      <app-button
                                         class="clarify-action-btn"
-                                        ?disabled="${subtaskAdded}"
+                                        size="sm"
+                                        variant="icon"
+                                        .disabled="${subtaskAdded}"
                                         @click="${() => this.emitAddSubtask(subtaskCandidate)}"
                                       >
-                                        ${iconPlus(11)}
+                                        <span slot="start">${iconPlus(11)}</span>
                                         <span>
                                           ${subtaskAdded
                                             ? t.viewTexts.ai.subtaskAddedBadge
                                             : t.viewTexts.ai.clarifyToSubtaskBtn}
                                         </span>
-                                      </button>
+                                      </app-button>
                                     `
                                   : ''}
                               </div>
