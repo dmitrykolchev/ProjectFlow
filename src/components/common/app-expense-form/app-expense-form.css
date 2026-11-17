@@ -1,0 +1,26 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: contents;
+}
+
+/* children of app-form-grid declare full-width cells the same way views do */
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.checkbox-cell {
+  display: flex;
+  align-items: center;
+  padding-top: 21.95px;
+}
