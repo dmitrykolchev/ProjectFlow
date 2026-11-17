@@ -77,8 +77,6 @@ export const ru = {
     groupsLabel: 'Группы',
     groupModeSingle: 'Одна',
     groupModeMultiple: 'Несколько',
-    groupModeSingleTitle: 'Развернута только одна группа (аккордеон)',
-    groupModeMultipleTitle: 'Можно развернуть несколько групп одновременно',
   },
   entityTypes: {
     project: 'Проект',

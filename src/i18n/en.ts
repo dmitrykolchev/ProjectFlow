@@ -77,8 +77,6 @@ export const en = {
     groupsLabel: 'Groups',
     groupModeSingle: 'Single',
     groupModeMultiple: 'Multi',
-    groupModeSingleTitle: 'Only one group expanded at a time (Accordion)',
-    groupModeMultipleTitle: 'Allow multiple groups expanded simultaneously',
   },
   entityTypes: {
     project: 'Project',

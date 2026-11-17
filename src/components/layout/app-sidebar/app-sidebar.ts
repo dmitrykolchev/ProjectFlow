@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import '../../common/app-avatar/app-avatar';
+import '../../common/app-segmented-switch/app-segmented-switch';
 import styles from './app-sidebar.css';
 import {
   iconMoon,
@@ -234,24 +235,16 @@ export class AppSidebar extends LitElement {
           ? html`
               <div class="nav-mode-bar">
                 <span class="nav-mode-label">${t.navigation.groupsLabel}</span>
-                <div class="nav-mode-switch" role="group" aria-label="${t.navigation.groupsLabel}">
-                  <button
-                    type="button"
-                    class="nav-mode-btn ${this.groupMode === 'single' ? 'is-active' : ''}"
-                    title="${t.navigation.groupModeSingleTitle}"
-                    @click="${() => this.handleModeChange('single')}"
-                  >
-                    ${t.navigation.groupModeSingle}
-                  </button>
-                  <button
-                    type="button"
-                    class="nav-mode-btn ${this.groupMode === 'multiple' ? 'is-active' : ''}"
-                    title="${t.navigation.groupModeMultipleTitle}"
-                    @click="${() => this.handleModeChange('multiple')}"
-                  >
-                    ${t.navigation.groupModeMultiple}
-                  </button>
-                </div>
+                <app-segmented-switch
+                  size="sm"
+                  full-width
+                  .options="${[
+                    { value: 'single', label: t.navigation.groupModeSingle },
+                    { value: 'multiple', label: t.navigation.groupModeMultiple },
+                  ]}"
+                  .value="${this.groupMode}"
+                  @change="${(e: CustomEvent) => this.handleModeChange(e.detail.value as SidebarGroupMode)}"
+                ></app-segmented-switch>
               </div>
             `
           : ''}
