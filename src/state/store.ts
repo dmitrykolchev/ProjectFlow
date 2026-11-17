@@ -8,6 +8,7 @@ import {
   Company,
   Contract,
   Counterparty,
+  CounterpartyContact,
   DocumentItem,
   DocumentScope,
   Expense,
@@ -409,8 +410,27 @@ export class AppStore {
         const parsedCounterparties: Counterparty[] = JSON.parse(storedCounterparties);
         this.counterparties = parsedCounterparties.map((cp) => {
           const fallback = initialCounterparties.find((icp) => icp.id === cp.id);
+          let contacts: CounterpartyContact[];
+          if (Array.isArray(cp.contacts)) {
+            contacts = cp.contacts.map((c) => ({ ...c }));
+          } else if (fallback?.contacts) {
+            contacts = fallback.contacts.map((c) => ({ ...c }));
+          } else if (cp.contactPerson && cp.contactPerson !== '—') {
+            contacts = [
+              {
+                id: `cnt-${cp.id}-1`,
+                fullName: cp.contactPerson,
+                phone: cp.phone && cp.phone !== '—' ? cp.phone : undefined,
+                email: cp.email && cp.email !== '—' ? cp.email : undefined,
+                isPrimary: true,
+              },
+            ];
+          } else {
+            contacts = [];
+          }
           return {
             ...cp,
+            contacts,
             bankAccounts: Array.isArray(cp.bankAccounts)
               ? cp.bankAccounts
               : fallback?.bankAccounts
@@ -421,6 +441,7 @@ export class AppStore {
       } else {
         this.counterparties = initialCounterparties.map((cp) => ({
           ...cp,
+          contacts: cp.contacts ? cp.contacts.map((c) => ({ ...c })) : [],
           bankAccounts: cp.bankAccounts ? cp.bankAccounts.map((b) => ({ ...b })) : [],
         }));
       }
@@ -1669,9 +1690,34 @@ export class AppStore {
   }
 
   // --- Counterparty CRUD ---
-  public addCounterparty(data: Omit<Counterparty, 'id'>): Counterparty {
-    const cp: Counterparty = {
+  private syncPrimaryContactFields<T extends Omit<Counterparty, 'id'>>(data: T): T {
+    const contacts = Array.isArray(data.contacts) ? data.contacts.map((c) => ({ ...c })) : [];
+    if (contacts.length > 0 && !contacts.some((c) => c.isPrimary)) {
+      contacts[0] = { ...contacts[0], isPrimary: true };
+    }
+    const primary = contacts.find((c) => c.isPrimary) || contacts[0];
+    if (!primary) {
+      return {
+        ...data,
+        contacts,
+        contactPerson: data.contactPerson || '—',
+        phone: data.phone || '—',
+        email: data.email || '—',
+      };
+    }
+    return {
       ...data,
+      contacts,
+      contactPerson: primary.fullName || data.contactPerson || '—',
+      phone: primary.phone || primary.additionalPhone || (data.phone && data.phone !== '—' ? data.phone : '—'),
+      email: primary.email || (data.email && data.email !== '—' ? data.email : '—'),
+    };
+  }
+
+  public addCounterparty(data: Omit<Counterparty, 'id'>): Counterparty {
+    const normalized = this.syncPrimaryContactFields(data);
+    const cp: Counterparty = {
+      ...normalized,
       id: `cp-${Date.now()}`,
     };
     this.counterparties = [cp, ...this.counterparties];
@@ -1683,7 +1729,10 @@ export class AppStore {
   }
 
   public updateCounterparty(updated: Counterparty): void {
-    this.counterparties = this.counterparties.map((c) => (c.id === updated.id ? { ...updated } : c));
+    const normalized = this.syncPrimaryContactFields(updated);
+    this.counterparties = this.counterparties.map((c) =>
+      c.id === updated.id ? { ...normalized, id: updated.id } : c
+    );
     this.saveCounterparties();
     this.logActivity('update', 'counterparty', updated.name, 'Обновлена карточка контрагента');
     this.addNotification('info', 'Контрагент обновлён', updated.name);

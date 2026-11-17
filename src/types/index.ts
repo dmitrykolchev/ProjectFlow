@@ -56,6 +56,20 @@ export interface Company {
 export type CounterpartyType = 'client' | 'vendor' | 'partner' | 'contractor';
 export type CounterpartyStatus = 'active' | 'pending' | 'blocked';
 
+export interface CounterpartyContact {
+  id: string;
+  fullName: string;
+  position?: string;
+  department?: string;
+  phone?: string;
+  additionalPhone?: string;
+  email?: string;
+  messenger?: string;
+  birthDate?: string; // YYYY-MM-DD
+  comment?: string;
+  isPrimary?: boolean;
+}
+
 export interface Counterparty {
   id: string;
   name: string;
@@ -67,6 +81,7 @@ export interface Counterparty {
   contactPerson: string;
   phone: string;
   email: string;
+  contacts?: CounterpartyContact[];
   status: CounterpartyStatus;
   rating: number;
   notes: string;

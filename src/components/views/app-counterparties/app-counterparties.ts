@@ -77,6 +77,16 @@ export class AppCounterparties extends LitElement {
         cp.inn.toLowerCase().includes(query) ||
         cp.city.toLowerCase().includes(query) ||
         cp.contactPerson.toLowerCase().includes(query) ||
+        (cp.contacts || []).some(
+          (c) =>
+            c.fullName.toLowerCase().includes(query) ||
+            (c.position || '').toLowerCase().includes(query) ||
+            (c.department || '').toLowerCase().includes(query) ||
+            (c.phone || '').toLowerCase().includes(query) ||
+            (c.additionalPhone || '').toLowerCase().includes(query) ||
+            (c.email || '').toLowerCase().includes(query) ||
+            (c.messenger || '').toLowerCase().includes(query)
+        ) ||
         (cp.bankAccounts || []).some(
           (b) =>
             b.bankName.toLowerCase().includes(query) ||
@@ -214,6 +224,13 @@ export class AppCounterparties extends LitElement {
           const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
           const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
           const cpProjects = store.projects.filter((p) => p.counterpartyId === cp.id).length;
+          const contacts = cp.contacts || [];
+          const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
+          const contactLabel = primaryContact
+            ? `${primaryContact.fullName}${contacts.length > 1 ? ` (+${contacts.length - 1})` : ''}`
+            : cp.contactPerson;
+          const contactPhone = primaryContact?.phone || cp.phone;
+          const contactEmail = primaryContact?.email || cp.email;
 
           return html`
             <article class="cp-card">
@@ -253,7 +270,7 @@ export class AppCounterparties extends LitElement {
                 </div>
                 <div class="meta-item">
                   <span class="meta-label">${t.viewTexts.counterparties.metaContact}</span>
-                  <span class="meta-value">${cp.contactPerson}</span>
+                  <span class="meta-value" title="${contacts.map((c) => c.fullName).join(', ')}">${contactLabel}</span>
                 </div>
                 <div class="meta-item">
                   <span class="meta-label">${t.viewTexts.counterparties.metaRating}</span>
@@ -261,11 +278,11 @@ export class AppCounterparties extends LitElement {
                 </div>
                 <div class="meta-item">
                   <span class="meta-label">${t.viewTexts.counterparties.labelPhone}</span>
-                  <span class="meta-value mono">${cp.phone}</span>
+                  <span class="meta-value mono">${contactPhone}</span>
                 </div>
                 <div class="meta-item">
                   <span class="meta-label">Email</span>
-                  <span class="meta-value">${cp.email}</span>
+                  <span class="meta-value">${contactEmail}</span>
                 </div>
               </div>
 
@@ -360,6 +377,8 @@ export class AppCounterparties extends LitElement {
               const accounts = cp.bankAccounts || [];
               const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
               const primaryAcc = accounts.find((a) => a.isDefault) || accounts[0];
+              const contacts = cp.contacts || [];
+              const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
 
               return html`
                 <tr>
@@ -396,8 +415,15 @@ export class AppCounterparties extends LitElement {
                         `}
                   </td>
                   <td>
-                    <div>${cp.contactPerson}</div>
-                    <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.email}</div>
+                    <div>
+                      ${primaryContact?.fullName || cp.contactPerson}
+                      ${contacts.length > 1
+                        ? html`<span class="bank-more-count">(+${contacts.length - 1})</span>`
+                        : ''}
+                    </div>
+                    <div style="font-size: 0.74rem; color: var(--text-muted);">
+                      ${primaryContact?.position ? `${primaryContact.position} · ` : ''}${primaryContact?.email || cp.email}
+                    </div>
                   </td>
                   <td><span class="rating-stars">${this.renderStars(cp.rating)}</span></td>
                   <td class="mono">${cpContracts.length} (${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix})</td>

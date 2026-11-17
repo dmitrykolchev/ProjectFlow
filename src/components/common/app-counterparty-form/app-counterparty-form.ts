@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { Counterparty, CounterpartyStatus, CounterpartyType, BankRequisite } from '../../../types';
+import { Counterparty, CounterpartyContact, CounterpartyStatus, CounterpartyType, BankRequisite } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-counterparty-form.css';
 import { eventValue } from '../event-value';
@@ -13,6 +13,7 @@ import '../app-number-input/app-number-input';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
 import '../app-bank-requisites/app-bank-requisites';
+import '../app-counterparty-contacts/app-counterparty-contacts';
 
 /**
  * Canonical counterparty create/edit form. The component owns the whole field set and
@@ -32,12 +33,10 @@ export class AppCounterpartyForm extends LitElement {
   @state() private fInn = '';
   @state() private fKpp = '';
   @state() private fCity = '';
-  @state() private fContactPerson = '';
-  @state() private fPhone = '';
-  @state() private fEmail = '';
   @state() private fStatus: CounterpartyStatus = 'active';
   @state() private fRating = 5;
   @state() private fNotes = '';
+  @state() private fContacts: CounterpartyContact[] = [];
   @state() private fBankAccounts: BankRequisite[] = [];
   @state() private formError = '';
 
@@ -86,12 +85,24 @@ export class AppCounterpartyForm extends LitElement {
       this.fInn = cp.inn;
       this.fKpp = cp.kpp || '';
       this.fCity = cp.city;
-      this.fContactPerson = cp.contactPerson;
-      this.fPhone = cp.phone;
-      this.fEmail = cp.email;
       this.fStatus = cp.status;
       this.fRating = cp.rating;
       this.fNotes = cp.notes;
+      if (Array.isArray(cp.contacts) && cp.contacts.length > 0) {
+        this.fContacts = cp.contacts.map((c) => ({ ...c }));
+      } else if (cp.contactPerson && cp.contactPerson !== '—') {
+        this.fContacts = [
+          {
+            id: `cnt-${cp.id}-1`,
+            fullName: cp.contactPerson,
+            phone: cp.phone && cp.phone !== '—' ? cp.phone : undefined,
+            email: cp.email && cp.email !== '—' ? cp.email : undefined,
+            isPrimary: true,
+          },
+        ];
+      } else {
+        this.fContacts = [];
+      }
       this.fBankAccounts = cp.bankAccounts ? cp.bankAccounts.map((b) => ({ ...b })) : [];
     } else {
       this.fName = '';
@@ -100,12 +111,10 @@ export class AppCounterpartyForm extends LitElement {
       this.fInn = '';
       this.fKpp = '';
       this.fCity = t.viewTexts.counterparties.defaultCity;
-      this.fContactPerson = '';
-      this.fPhone = '';
-      this.fEmail = '';
       this.fStatus = 'active';
       this.fRating = 5;
       this.fNotes = '';
+      this.fContacts = [];
       this.fBankAccounts = [];
     }
     this.formError = '';
@@ -117,6 +126,9 @@ export class AppCounterpartyForm extends LitElement {
       return;
     }
 
+    const contacts = this.fContacts.map((c) => ({ ...c }));
+    const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
+
     const payload = {
       name: this.fName.trim(),
       legalName: this.fLegalName.trim() || this.fName.trim(),
@@ -124,9 +136,10 @@ export class AppCounterpartyForm extends LitElement {
       inn: this.fInn.trim() || '7700000000',
       kpp: this.fKpp.trim(),
       city: this.fCity.trim() || getTranslation(this.currentLang).viewTexts.counterparties.defaultCity,
-      contactPerson: this.fContactPerson.trim() || '—',
-      phone: this.fPhone.trim() || '—',
-      email: this.fEmail.trim() || '—',
+      contactPerson: primaryContact?.fullName || '—',
+      phone: primaryContact?.phone || primaryContact?.additionalPhone || '—',
+      email: primaryContact?.email || '—',
+      contacts,
       status: this.fStatus,
       rating: Math.max(1, Math.min(5, Number(this.fRating) || 5)),
       notes: this.fNotes.trim(),
@@ -237,35 +250,9 @@ export class AppCounterpartyForm extends LitElement {
 
           <div>
             <app-input
-              label="${t.viewTexts.counterparties.labelContactPerson}"
-              .value="${this.fContactPerson}"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.fContactPerson = eventValue(e))}"
-            ></app-input>
-          </div>
-
-          <div>
-            <app-input
               label="${t.viewTexts.counterparties.labelCity}"
               .value="${this.fCity}"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fCity = eventValue(e))}"
-            ></app-input>
-          </div>
-
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelPhone}"
-              .value="${this.fPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.fPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.fEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.fEmail = eventValue(e))}"
             ></app-input>
           </div>
 
@@ -287,6 +274,16 @@ export class AppCounterpartyForm extends LitElement {
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fNotes = eventValue(e))}"
             ></app-textarea>
+          </div>
+
+          <div class="col-span-2">
+            <app-counterparty-contacts
+              editable
+              compact
+              .contacts="${this.fContacts}"
+              @contacts-change="${(e: CustomEvent<{ contacts: CounterpartyContact[] }>) =>
+                (this.fContacts = e.detail.contacts)}"
+            ></app-counterparty-contacts>
           </div>
 
           <div class="col-span-2">

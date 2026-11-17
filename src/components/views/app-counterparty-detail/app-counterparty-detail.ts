@@ -7,6 +7,7 @@ import {
   BankRequisite,
   Contract,
   Counterparty,
+  CounterpartyContact,
   Invoice,
 } from '../../../types';
 import {
@@ -25,6 +26,7 @@ import {
   iconReceipt,
   iconTable,
   iconTrash,
+  iconUsers,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
@@ -42,6 +44,8 @@ import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-bank-requisites/app-bank-requisites';
 import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
+import '../../common/app-counterparty-contacts/app-counterparty-contacts';
+import type { AppCounterpartyContacts } from '../../common/app-counterparty-contacts/app-counterparty-contacts';
 import styles from './app-counterparty-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -101,6 +105,17 @@ export class AppCounterpartyDetail extends LitElement {
 
   private openAddBankAccount() {
     const el = this.shadowRoot?.querySelector('app-bank-requisites') as AppBankRequisites | null;
+    el?.openAddEditor();
+  }
+
+  private handleContactsChange(cp: Counterparty, contacts: CounterpartyContact[]) {
+    store.updateCounterparty({ ...cp, contacts });
+  }
+
+  private openAddContactPerson() {
+    const el = this.shadowRoot?.querySelector(
+      'app-counterparty-contacts'
+    ) as AppCounterpartyContacts | null;
     el?.openAddEditor();
   }
 
@@ -196,6 +211,12 @@ export class AppCounterpartyDetail extends LitElement {
       value: c.id,
       label: c.name,
     }));
+
+    const cpContacts = cp.contacts || [];
+    const primaryContact = cpContacts.find((c) => c.isPrimary) || cpContacts[0];
+    const primaryContactLabel = primaryContact
+      ? `${primaryContact.fullName}${cpContacts.length > 1 ? ` (+${cpContacts.length - 1})` : ''}`
+      : cp.contactPerson || '—';
 
     return html`
       <div class="page-shell">
@@ -299,14 +320,40 @@ export class AppCounterpartyDetail extends LitElement {
           <app-meta-grid
             columns="3"
             .items="${[
-              { label: t.viewTexts.counterparties.labelContactPerson, value: cp.contactPerson || '—' },
-              { label: t.viewTexts.counterparties.labelPhone, value: cp.phone || '—', mono: true },
-              { label: 'Email', value: cp.email || '—' },
+              { label: t.viewTexts.counterparties.labelContactPerson, value: primaryContactLabel },
+              { label: t.viewTexts.counterparties.labelPhone, value: primaryContact?.phone || cp.phone || '—', mono: true },
+              { label: 'Email', value: primaryContact?.email || cp.email || '—' },
               { label: t.viewTexts.counterparties.labelCity, value: cp.city || '—' },
               { label: t.viewTexts.counterpartyDetail.taxIdLabel, value: `${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}`, mono: true },
+              ...(primaryContact?.position
+                ? [{ label: t.contactPersons.positionLabel, value: primaryContact.position }]
+                : []),
             ]}"
           ></app-meta-grid>
         </section>
+
+        <!-- Contact Persons -->
+        <app-section-card title="${t.contactPersons.title}" subtitle="(${cpContacts.length})">
+          <span slot="icon">${iconUsers(18)}</span>
+          <app-button
+            slot="actions"
+            size="sm"
+            variant="secondary"
+            @click="${() => this.openAddContactPerson()}"
+          >
+            <span slot="icon-start">${iconPlus(14)}</span>
+            <span>${t.contactPersons.addButton}</span>
+          </app-button>
+
+          <app-counterparty-contacts
+            editable
+            hide-header
+            confirm-delete
+            .contacts="${cpContacts}"
+            @contacts-change="${(e: CustomEvent<{ contacts: CounterpartyContact[] }>) =>
+              this.handleContactsChange(cp, e.detail.contacts)}"
+          ></app-counterparty-contacts>
+        </app-section-card>
 
         <!-- Bank Requisites -->
         <app-section-card title="${t.bankAccounts.title}" subtitle="(${(cp.bankAccounts || []).length})">

@@ -74,6 +74,7 @@ import taskAiPanelMeta from '../../common/app-task-ai-panel/app-task-ai-panel.st
 import projectRequirementsMeta from '../../common/app-project-requirements/app-project-requirements.story';
 import appDataGridColumnMeta from '../../common/app-data-grid-column/app-data-grid-column.story';
 import bankRequisitesMeta from '../../common/app-bank-requisites/app-bank-requisites.story';
+import counterpartyContactsMeta from '../../common/app-counterparty-contacts/app-counterparty-contacts.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -179,6 +180,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   projectRequirementsMeta,
   appDataGridColumnMeta,
   bankRequisitesMeta,
+  counterpartyContactsMeta,
   toastMeta,
   activityMeta,
   headerMeta,
