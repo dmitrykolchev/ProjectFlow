@@ -5,6 +5,7 @@ import { SupportedLang, Task, TaskPriority, TaskStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-gantt.css';
 import '../../common/app-button/app-button';
+import '../../common/app-segmented-switch/app-segmented-switch';
 
 const DAY_MS = 1000 * 60 * 60 * 24;
 const TODAY_STR = '2026-11-11';
@@ -584,48 +585,28 @@ export class AppGantt extends LitElement {
     return html`
       <div class="toolbar">
         <div class="toolbar-left">
-          <div class="scale-selector">
-            <button
-              type="button"
-              class="scale-btn ${this.timeScale === 'day' ? 'is-active' : ''}"
-              @click="${() => (this.timeScale = 'day')}"
-            >
-              ${t.gantt.day}
-            </button>
-            <button
-              type="button"
-              class="scale-btn ${this.timeScale === 'week' ? 'is-active' : ''}"
-              @click="${() => (this.timeScale = 'week')}"
-            >
-              ${t.gantt.week}
-            </button>
-            <button
-              type="button"
-              class="scale-btn ${this.timeScale === 'month' ? 'is-active' : ''}"
-              @click="${() => (this.timeScale = 'month')}"
-            >
-              ${t.gantt.month}
-            </button>
-          </div>
+          <app-segmented-switch
+            size="sm"
+            .options="${[
+              { value: 'day', label: t.gantt.day },
+              { value: 'week', label: t.gantt.week },
+              { value: 'month', label: t.gantt.month },
+            ]}"
+            .value="${this.timeScale}"
+            @change="${(e: CustomEvent) => (this.timeScale = e.detail.value as 'day' | 'week' | 'month')}"
+          ></app-segmented-switch>
 
           ${!this.tasksData
             ? html`
-                <div class="scale-selector">
-                  <button
-                    type="button"
-                    class="scale-btn ${this.datasetMode === 'project' ? 'is-active' : ''}"
-                    @click="${() => (this.datasetMode = 'project')}"
-                  >
-                    ${t.viewTexts.timeTracking.labelProject}
-                  </button>
-                  <button
-                    type="button"
-                    class="scale-btn ${this.datasetMode === 'large' ? 'is-active' : ''}"
-                    @click="${() => (this.datasetMode = 'large')}"
-                  >
-                    ${t.viewTexts.gantt.demoStats}
-                  </button>
-                </div>
+                <app-segmented-switch
+                  size="sm"
+                  .options="${[
+                    { value: 'project', label: t.viewTexts.timeTracking.labelProject },
+                    { value: 'large', label: t.viewTexts.gantt.demoStats },
+                  ]}"
+                  .value="${this.datasetMode}"
+                  @change="${(e: CustomEvent) => (this.datasetMode = e.detail.value as 'project' | 'large')}"
+                ></app-segmented-switch>
               `
             : ''}
         </div>
@@ -633,13 +614,13 @@ export class AppGantt extends LitElement {
         <div class="toolbar-actions">
           ${todayTimelinePx >= 0
             ? html`
-                <button
-                  type="button"
-                  class="today-btn"
+                <app-button
+                  size="sm"
+                  variant="secondary"
                   @click="${() => this.scrollToToday(todayTimelinePx)}"
                 >
                   ${t.gantt.today}
-                </button>
+                </app-button>
               `
             : ''}
           <span class="toolbar-meta">
