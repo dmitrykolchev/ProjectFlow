@@ -49,6 +49,12 @@ export const en = {
     copyCode: 'Copy',
     copiedCode: 'Copied',
   },
+  draggableList: {
+    dragHandle: 'Drag to reorder',
+    moveUp: 'Move up',
+    moveDown: 'Move down',
+    remove: 'Remove',
+  },
   navigation: {
     dashboard: 'Dashboard',
     projects: 'Projects',

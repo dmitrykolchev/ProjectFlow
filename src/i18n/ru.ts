@@ -49,6 +49,12 @@ export const ru = {
     copyCode: 'Копировать',
     copiedCode: 'Скопировано',
   },
+  draggableList: {
+    dragHandle: 'Перетащите, чтобы изменить порядок',
+    moveUp: 'Переместить выше',
+    moveDown: 'Переместить ниже',
+    remove: 'Удалить',
+  },
   navigation: {
     dashboard: 'Дашборд',
     projects: 'Проекты',

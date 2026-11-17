@@ -80,6 +80,8 @@ import analysisSummaryMeta from '../../common/app-analysis-summary/app-analysis-
 import markdownMeta from '../../common/app-markdown/app-markdown.story';
 import contextChipMeta from '../../common/app-context-chip/app-context-chip.story';
 import contextChipsListMeta from '../../common/app-context-chips-list/app-context-chips-list.story';
+import draggableListItemMeta from '../../common/app-draggable-list-item/app-draggable-list-item.story';
+import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -191,6 +193,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   markdownMeta,
   contextChipMeta,
   contextChipsListMeta,
+  draggableListItemMeta,
+  draggableListMeta,
   toastMeta,
   activityMeta,
   headerMeta,
