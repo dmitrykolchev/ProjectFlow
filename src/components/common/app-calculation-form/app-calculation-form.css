@@ -1,0 +1,249 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: contents;
+}
+
+/* children of app-form-grid declare full-width cells the same way views do */
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.calc-items-list::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.calc-items-list::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+.calc-items-list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 4px;
+}
+
+.calc-items-list::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, var(--accent-primary));
+}
+
+.micro-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.08rem 0.38rem;
+  border-radius: 4px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.micro-tag.bill {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+}
+
+.quick-term-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+/* quick term chips are app-button web components at size sm with the historical
+   content-sized look restored through the font-parity recipe: auto height, the original
+   padding and font size, the UA control font the native button inherited, weight 400, the
+   historical 6px radius, and the hover fill copied from the original .quick-term-btn:hover */
+.quick-term-btn {
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.24rem;
+  --control-padding-x-sm: 0.55rem;
+  --control-font-sm: 0.74rem;
+  --btn-font-weight: 400;
+  --icon-btn-font: Arial;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: var(--bg-subtle, #1a2438);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-strong, #334155);
+}
+
+.quick-term-btn:hover {
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--border-strong, #334155);
+}
+
+.autofill-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #273449);
+}
+
+.calc-summary-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.65rem;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+}
+
+.calc-summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.calc-summary-label {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+}
+
+.calc-summary-val {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
+.items-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.items-editor-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.calc-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 360px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.25rem;
+}
+
+.calc-editor-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+  min-width: 0;
+}
+
+.calc-editor-row.is-nonbillable {
+  border-color: var(--border-subtle, #273449);
+  background: rgba(26, 36, 56, 0.7);
+}
+
+.calc-row-top {
+  display: grid;
+  grid-template-columns: 108px minmax(0, 1fr) minmax(96px, auto) 30px;
+  gap: 0.65rem;
+  align-items: end;
+}
+
+.calc-row-top > div {
+  min-width: 0;
+}
+
+.calc-row-bottom {
+  display: grid;
+  grid-template-columns: 132px 84px 165px minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: end;
+  padding-top: 0.45rem;
+  border-top: 1px dashed var(--border-subtle, #273449);
+}
+
+.calc-row-bottom > div {
+  min-width: 0;
+}
+
+.calc-meta-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  justify-content: center;
+  min-height: 34px;
+}
+
+.calc-date-tag {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.72rem;
+  color: var(--text-secondary, #94a3b8);
+  white-space: nowrap;
+}
+
+.calc-bill-cell {
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.calc-zero-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+}
+
+.item-amount-preview {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+  white-space: nowrap;
+}
+
+.item-amount-preview.is-zero {
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
