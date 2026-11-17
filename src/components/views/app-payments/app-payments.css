@@ -94,20 +94,17 @@
   --control-font-md: 0.84rem;
 }
 
+/* counterparty name-links are app-link web components at size md restoring the historical
+   text-primary glyph through the additive link hooks of zero padding, weight 600, the inherited
+   unitless line-height 1.5, the cell font size pinned through control-font-md, and the accent
+   hover color restored through link-hover-color with the canonical underline */
 .text-link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  font: inherit;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-  cursor: pointer;
-  text-align: left;
-}
-
-.text-link-btn:hover {
-  color: var(--accent-primary, #6366f1);
-  text-decoration: underline;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --control-font-md: 0.84rem;
 }
 
 .contract-desc {
