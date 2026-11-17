@@ -77,6 +77,19 @@ export class AppContractForm extends LitElement {
     if (changed.has('open') && this.open) this.initFields();
   }
 
+  // the view owns the open flag, so every close of the form must report back to it:
+  // closing from inside the component (cancel, save, backdrop) has no view-side reset
+  // without this event, and the next open request would be a no-op on an unchanged flag
+  protected updated(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('open') && !this.open) {
+      this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    }
+  }
+
+  private closeModal() {
+    this.open = false;
+  }
+
   private initFields() {
     const t = getTranslation(this.currentLang);
     const today = new Date().toISOString().slice(0, 10);
@@ -220,7 +233,7 @@ export class AppContractForm extends LitElement {
         ?open="${this.open}"
         size="lg"
         title="${title}"
-        @close="${() => (this.open = false)}"
+        @close="${() => this.closeModal()}"
       >
         <app-form-grid>
           <div>
@@ -385,7 +398,7 @@ export class AppContractForm extends LitElement {
         </app-form-grid>
 
         <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.open = false)}">
+          <app-button variant="ghost" @click="${() => this.closeModal()}">
             ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${() => this.handleSave()}">
