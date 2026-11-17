@@ -243,8 +243,9 @@
 
 /* table row icon actions are app-button web components at size sm: the historical
    hover kept the subtle border unchanged for plain actions, so the hover border token
-   is pinned back; success and delete hovers reuse the historical colors through custom
-   properties, and the historical 6px radius replaces the canonical md radius */
+   is pinned back for every action except accept and delete (the component supplies the
+   success and danger palettes for those actions), and the historical 6px radius replaces
+   the canonical md radius */
 .actions-row app-button {
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
@@ -252,20 +253,8 @@
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.actions-row app-button:not(.success-action):not(.danger-action) {
+.actions-row app-button:not([action='accept']):not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
-}
-
-.success-action {
-  --icon-btn-hover-color: #10b981;
-  --icon-btn-hover-border: rgba(16, 185, 129, 0.45);
-  --icon-btn-hover-bg: rgba(16, 185, 129, 0.12);
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 @media (max-width: 640px) {
   :host {

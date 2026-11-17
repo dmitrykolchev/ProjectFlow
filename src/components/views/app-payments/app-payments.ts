@@ -577,7 +577,7 @@ export class AppPayments extends LitElement {
                       ${canPay
                         ? html`
                             <app-button
-                              class="success-action"
+                              action="accept"
                               size="sm"
                               variant="icon"
                               title="${t.payments.recordPayment}"
@@ -586,7 +586,7 @@ export class AppPayments extends LitElement {
                               <span slot="start">${iconCreditCard(14)}</span>
                             </app-button>
                             <app-button
-                              class="success-action"
+                              action="accept"
                               size="sm"
                               variant="icon"
                               title="${t.invoices.markPaid}"
@@ -790,7 +790,7 @@ export class AppPayments extends LitElement {
                           `
                         : ''}
                       <app-button
-                        class="danger-action"
+                        action="delete"
                         size="sm"
                         variant="icon"
                         title="${t.common.delete}"
