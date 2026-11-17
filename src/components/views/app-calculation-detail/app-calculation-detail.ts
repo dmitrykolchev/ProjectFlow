@@ -4,8 +4,6 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import {
   Calculation,
-  CalculationFrequency,
-  CalculationItem,
   CalculationStatus,
   Contract,
   Invoice,
@@ -18,7 +16,6 @@ import {
   iconEdit,
   iconFileText,
   iconFolder,
-  iconPlus,
   iconReceipt,
   iconSend,
   iconTrash,
@@ -26,20 +23,15 @@ import {
 } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
-import '../../common/app-date-input/app-date-input';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-entity-selector/app-entity-selector';
-import '../../common/app-form-grid/app-form-grid';
-import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
-import '../../common/app-number-input/app-number-input';
+import '../../common/app-calculation-form/app-calculation-form';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
-import '../../common/app-textarea/app-textarea';
 import styles from './app-calculation-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -54,15 +46,6 @@ export class AppCalculationDetail extends LitElement {
 
   @state() private confirmDeleteOpen = false;
   @state() private editModalOpen = false;
-  @state() private calcNumber = '';
-  @state() private calcFrequency: CalculationFrequency = 'monthly';
-  @state() private calcPeriodStart = '';
-  @state() private calcPeriodEnd = '';
-  @state() private calcIncludePrior = true;
-  @state() private calcStatus: CalculationStatus = 'draft';
-  @state() private calcItems: CalculationItem[] = [];
-  @state() private calcNotes = '';
-  @state() private calcError = '';
 
   private unsubscribe?: () => void;
 
@@ -519,7 +502,7 @@ export class AppCalculationDetail extends LitElement {
             `
           : ''}
 
-        ${this.renderEditModal(calc, ctr, t)}
+        ${this.renderEditModal(t)}
 
         <app-confirm-dialog
           .open="${this.confirmDeleteOpen}"
@@ -543,331 +526,20 @@ export class AppCalculationDetail extends LitElement {
   }
 
   private openEditModal(calc: Calculation) {
-    this.calcNumber = calc.number;
-    this.calcFrequency = calc.frequency;
-    this.calcPeriodStart = calc.periodStart;
-    this.calcPeriodEnd = calc.periodEnd;
-    this.calcIncludePrior = calc.includePriorUnaccounted;
-    this.calcStatus = calc.status;
-    this.calcItems = calc.items.map((item) => ({ ...item }));
-    this.calcNotes = calc.notes;
-    this.calcError = '';
     this.editModalOpen = true;
   }
 
-  private addEmptyCalcItem(billable: boolean) {
-    const date = this.calcPeriodEnd || new Date().toISOString().slice(0, 10);
-    this.calcItems = [
-      ...this.calcItems,
-      {
-        id: `ci-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-        itemType: 'manual',
-        date,
-        title: '',
-        quantity: 1,
-        unit: 'усл.',
-        billable,
-        baseRate: 0,
-        unitPrice: 0,
-        amount: 0,
-      },
-    ];
-  }
-
-  private updateCalcItem(id: string, patch: Partial<CalculationItem>) {
-    this.calcItems = this.calcItems.map((item) => {
-      if (item.id !== id) return item;
-      const next = { ...item, ...patch };
-      const qty = Math.max(0, Number(next.quantity) || 0);
-      next.quantity = qty;
-      const baseRate = Math.max(0, Number(next.baseRate) || 0);
-      next.baseRate = baseRate;
-      if (next.billable) {
-        const rate = baseRate > 0 ? baseRate : next.unit === 'ч' ? HOURLY_RATE_RUB : 0;
-        next.baseRate = rate;
-        next.unitPrice = rate;
-        next.amount = Math.round(qty * rate);
-      } else {
-        next.unitPrice = 0;
-        next.amount = 0;
-      }
-      return next;
-    });
-  }
-
-  private handleSave(calc: Calculation) {
-    const t = getTranslation(this.currentLang);
-    if (!this.calcNumber.trim()) {
-      this.calcError = t.common.required;
-      return;
-    }
-
-    const cleanItems = this.calcItems
-      .filter((i) => i.title.trim())
-      .map((i) => ({
-        ...i,
-        title: i.title.trim(),
-        unitPrice: i.billable ? i.unitPrice : 0,
-        amount: i.billable ? i.amount : 0,
-      }));
-
-    if (cleanItems.length === 0) {
-      this.calcError = t.viewTexts.calculations.addOneItemError;
-      return;
-    }
-
-    const hourItems = cleanItems.filter((i) => i.unit === 'ч');
-    const billableHours =
-      Math.round(hourItems.filter((i) => i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
-    const nonBillableHours =
-      Math.round(hourItems.filter((i) => !i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
-    const totalHours = Math.round((billableHours + nonBillableHours) * 100) / 100;
-    const billableAmount = cleanItems.filter((i) => i.billable).reduce((s, i) => s + i.amount, 0);
-
-    const approvedDate =
-      this.calcStatus === 'approved' || this.calcStatus === 'invoiced'
-        ? calc.approvedDate || new Date().toISOString().slice(0, 10)
-        : undefined;
-
-    store.updateCalculation({
-      ...calc,
-      number: this.calcNumber.trim(),
-      frequency: this.calcFrequency,
-      periodStart: this.calcPeriodStart || calc.periodStart,
-      periodEnd: this.calcPeriodEnd || calc.periodEnd,
-      includePriorUnaccounted: this.calcIncludePrior,
-      status: this.calcStatus,
-      totalHours,
-      billableHours,
-      nonBillableHours,
-      billableAmount,
-      items: cleanItems,
-      notes: this.calcNotes.trim(),
-      approvedDate,
-    });
-
-    this.editModalOpen = false;
-  }
-
-  private renderEditModal(
-    calc: Calculation,
-    ctr: Contract | undefined,
-    t: ReturnType<typeof getTranslation>
-  ) {
-    if (!this.editModalOpen) return '';
-    const currency = ctr?.currency || calc.currency;
-    const statusOptions = [
-      { value: 'draft', label: t.calculations.statuses.draft },
-      { value: 'sent', label: t.calculations.statuses.sent },
-      { value: 'approved', label: t.calculations.statuses.approved },
-      { value: 'rejected', label: t.calculations.statuses.rejected },
-      { value: 'invoiced', label: t.calculations.statuses.invoiced },
-    ];
-    const frequencyOptions = [
-      { value: 'weekly', label: t.calculations.frequencies.weekly },
-      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
-      { value: 'monthly', label: t.calculations.frequencies.monthly },
-      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
-      { value: 'custom', label: t.calculations.frequencies.custom },
-    ];
+  private renderEditModal(t: ReturnType<typeof getTranslation>) {
+    const calc = store.calculations.find((c) => c.id === this.detailCalculationId) || null;
 
     return html`
-      <app-modal
-        ?open="${this.editModalOpen}"
-        size="xl"
-        title="${t.calculations.editCalculation} · ${calc.number}"
+      <app-calculation-form
+        .open="${this.editModalOpen}"
+        .calculation="${calc}"
+        .contextTitle="${calc ? `${t.calculations.editCalculation} · ${calc.number}` : ''}"
         @close="${() => (this.editModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.calculations.labelCalcNumber}"
-              .value="${this.calcNumber}"
-              required
-              error="${this.calcError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.calcNumber = eventValue(e);
-                this.calcError = '';
-              }}"
-            ></app-input>
-          </div>
-
-          <div>
-            <app-select
-              label="${t.viewTexts.calculations.labelFrequency}"
-              .value="${this.calcFrequency}"
-              .options="${frequencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcFrequency = eventValue(e) as CalculationFrequency)}"
-            ></app-select>
-          </div>
-
-          <div>
-            <app-date-input
-              label="${t.viewTexts.calculations.labelPeriodStart}"
-              .value="${this.calcPeriodStart}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcPeriodStart = eventValue(e))}"
-            ></app-date-input>
-          </div>
-
-          <div>
-            <app-date-input
-              label="${t.viewTexts.calculations.labelPeriodEnd}"
-              .value="${this.calcPeriodEnd}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcPeriodEnd = eventValue(e))}"
-            ></app-date-input>
-          </div>
-
-          <div class="col-span-2 autofill-bar">
-            <app-checkbox
-              ?checked="${this.calcIncludePrior}"
-              label="${t.calculations.includePrior}"
-              @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                (this.calcIncludePrior = e.detail.checked)}"
-            ></app-checkbox>
-          </div>
-
-          <div class="col-span-2 items-editor">
-            <div class="items-editor-head">
-              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-                ${t.viewTexts.calculations.worksExpensesTitle} (${this.calcItems.length})
-              </span>
-              <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-                <app-button size="sm" variant="secondary" @click="${() => this.addEmptyCalcItem(true)}">
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${t.viewTexts.calculations.addBillableButton}</span>
-                </app-button>
-                <app-button size="sm" variant="ghost" @click="${() => this.addEmptyCalcItem(false)}">
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${t.viewTexts.calculations.addNonBillableButton}</span>
-                </app-button>
-              </div>
-            </div>
-
-            <div class="calc-items-list">
-              ${this.calcItems.map(
-                (item) => html`
-                  <div class="calc-editor-row ${!item.billable ? 'is-nonbillable' : ''}">
-                    <div class="calc-row-top">
-                      <div class="calc-meta-col">
-                        <span class="calc-date-tag">${item.date || '—'}</span>
-                        <span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
-                          ${item.itemType === 'expense'
-                            ? t.viewTexts.calculations.typeExpense
-                            : item.itemType === 'time_entry'
-                            ? t.viewTexts.calculations.typeWork
-                            : t.viewTexts.calculations.typeManual}
-                        </span>
-                      </div>
-                      <div>
-                        <app-input
-                          size="sm"
-                          label="${t.viewTexts.calculations.labelWorkDesc}"
-                          .value="${item.title}"
-                          @input="${(e: CustomEvent<{ value: string }>) =>
-                            this.updateCalcItem(item.id, { title: eventValue(e) })}"
-                        ></app-input>
-                      </div>
-                      <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
-                        ${formatMoney(item.billable ? item.amount : 0, currency)}
-                      </div>
-                      <app-button
-                        class="danger-action"
-                        size="xs"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
-                      >
-                        <span slot="start">${iconTrash(13)}</span>
-                      </app-button>
-                    </div>
-
-                    <div class="calc-row-bottom">
-                      <div>
-                        <app-number-input
-                          size="sm"
-                          label="${t.viewTexts.calculations.labelQty}"
-                          .value="${item.quantity}"
-                          min="0"
-                          max="10000"
-                          step="0.5"
-                          @change="${(e: CustomEvent<{ value: number }>) =>
-                            this.updateCalcItem(item.id, { quantity: eventValue(e) })}"
-                        ></app-number-input>
-                      </div>
-                      <div>
-                        <app-input
-                          size="sm"
-                          label="${t.viewTexts.calculations.labelUnit}"
-                          .value="${item.unit}"
-                          @input="${(e: CustomEvent<{ value: string }>) =>
-                            this.updateCalcItem(item.id, { unit: eventValue(e) })}"
-                        ></app-input>
-                      </div>
-                      <div>
-                        <app-number-input
-                          size="sm"
-                          label="${item.billable ? t.viewTexts.calculations.rateLabelBillable : t.viewTexts.calculations.rateLabelZero}"
-                          .value="${item.billable ? item.unitPrice : 0}"
-                          min="0"
-                          max="100000000"
-                          step="500"
-                          ?disabled="${!item.billable}"
-                          @change="${(e: CustomEvent<{ value: number }>) =>
-                            this.updateCalcItem(item.id, {
-                              baseRate: eventValue(e),
-                              unitPrice: eventValue(e),
-                            })}"
-                        ></app-number-input>
-                      </div>
-                      <div class="calc-bill-cell">
-                        <app-checkbox
-                          ?checked="${item.billable}"
-                          label="${t.viewTexts.calculations.labelBillableItem}"
-                          @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                            this.updateCalcItem(item.id, { billable: e.detail.checked })}"
-                        ></app-checkbox>
-                        ${!item.billable
-                          ? html`<span class="calc-zero-hint">${t.viewTexts.calculations.zeroHint}</span>`
-                          : ''}
-                      </div>
-                    </div>
-                  </div>
-                `
-              )}
-            </div>
-          </div>
-
-          <div>
-            <app-select
-              label="${t.viewTexts.calculations.labelCalcStatus}"
-              .value="${this.calcStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcStatus = eventValue(e) as CalculationStatus)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.calculations.labelReportNotes}"
-              .value="${this.calcNotes}"
-              rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleSave(calc)}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.editModalOpen = false)}"
+      ></app-calculation-form>
     `;
   }
 }
