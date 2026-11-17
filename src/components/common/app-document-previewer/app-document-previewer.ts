@@ -30,7 +30,8 @@ import {
   iconZoomOut,
 } from '../icons';
 import '../app-button/app-button';
-import '../app-link/app-link';
+import { eventValue } from '../event-value';
+import '../app-segmented-switch/app-segmented-switch';
 import '../app-empty-state/app-empty-state';
 import '../app-status-chip/app-status-chip';
 import styles from './app-document-previewer.css';
@@ -576,24 +577,15 @@ export class AppDocumentPreviewer extends LitElement {
           <div class="toolbar-group">
             ${isRichToggle
               ? html`
-                  <div class="mode-pills">
-                    <app-link
-                      size="md" variant="secondary"
-                      class="mode-pill ${this.textViewMode === 'rendered' ? 'is-active' : ''}"
-                      .active="${this.textViewMode === 'rendered'}"
-                      @click="${() => (this.textViewMode = 'rendered')}"
-                    >
-                      ${kind === 'csv' ? t.documents.tableView : t.documents.renderedView}
-                    </app-link>
-                    <app-link
-                      size="md" variant="secondary"
-                      class="mode-pill ${this.textViewMode === 'raw' ? 'is-active' : ''}"
-                      .active="${this.textViewMode === 'raw'}"
-                      @click="${() => (this.textViewMode = 'raw')}"
-                    >
-                      ${t.documents.rawView}
-                    </app-link>
-                  </div>
+                  <app-segmented-switch
+                    size="sm"
+                    .value="${this.textViewMode}"
+                    .options="${[
+                      { value: 'rendered', label: kind === 'csv' ? t.documents.tableView : t.documents.renderedView },
+                      { value: 'raw', label: t.documents.rawView },
+                    ]}"
+                    @change="${(e: CustomEvent<{ value: string }>) => (this.textViewMode = eventValue(e) as 'rendered' | 'raw')}"
+                  ></app-segmented-switch>
                 `
               : ''}
 
