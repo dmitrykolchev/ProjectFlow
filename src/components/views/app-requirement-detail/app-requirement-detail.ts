@@ -277,7 +277,7 @@ export class AppRequirementDetail extends LitElement {
               <span slot="start">${iconEdit(15)}</span>
             </app-button>
             <app-button
-              class="danger-action"
+              action="delete"
               size="xs"
               variant="icon"
               title="${t.common.delete}"
@@ -602,7 +602,8 @@ export class AppRequirementDetail extends LitElement {
                             <span slot="start">${iconEdit(12)}</span>
                           </app-button>
                           <app-button
-                            class="sm-action danger-action"
+                            class="sm-action"
+                            action="delete"
                             size="xs"
                             variant="icon"
                             title="${t.common.delete}"
@@ -770,7 +771,8 @@ export class AppRequirementDetail extends LitElement {
                           size="sm"
                         ></app-status-chip>
                         <app-button
-                          class="sm-action danger-action"
+                          class="sm-action"
+                          action="delete"
                           size="xs"
                           variant="icon"
                           title="${t.common.delete}"
@@ -1037,7 +1039,8 @@ export class AppRequirementDetail extends LitElement {
                     <span class="trace-item-name" title="${sourceDoc.title}">${sourceDoc.title}</span>
                   </button>
                   <app-button
-                    class="sm-action danger-action"
+                    class="sm-action"
+                    action="delete"
                     size="xs"
                     variant="icon"
                     title="${t.common.delete}"
@@ -1091,7 +1094,8 @@ export class AppRequirementDetail extends LitElement {
                           <span class="trace-item-name" title="${kb.title}">${kb.title}</span>
                         </button>
                         <app-button
-                          class="sm-action danger-action"
+                          class="sm-action"
+                          action="delete"
                           size="xs"
                           variant="icon"
                           title="${t.common.delete}"
