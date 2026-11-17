@@ -9,6 +9,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -340,13 +341,14 @@ export class AppEmployees extends LitElement {
                   <app-avatar size="md" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
                   <div class="person-info">
                     <div class="person-name">
-                      <button
-                        type="button"
+                      <app-link
                         class="person-link-btn"
+                        size="md"
+                        variant="primary"
                         @click="${() => store.openEmployeeDetail(emp.id)}"
                       >
                         ${emp.name}
-                      </button>
+                      </app-link>
                     </div>
                     <div class="person-role">${emp.role}</div>
                   </div>
@@ -467,13 +469,14 @@ export class AppEmployees extends LitElement {
                       <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
                       <div class="person-info">
                         <div class="person-name" style="font-size: 0.85rem;">
-                          <button
-                            type="button"
-                            class="person-link-btn"
+                          <app-link
+                            class="person-link-btn table-link"
+                            size="md"
+                            variant="primary"
                             @click="${() => store.openEmployeeDetail(emp.id)}"
                           >
                             ${emp.name}
-                          </button>
+                          </app-link>
                         </div>
                         <div class="person-role">${emp.role}</div>
                       </div>
