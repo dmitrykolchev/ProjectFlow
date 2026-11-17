@@ -441,7 +441,11 @@ export class AppDocuments extends LitElement {
                     v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}
                   </span>
                 </div>
-                <div class="meta-item" style="grid-column: span 2;">
+                <div class="meta-item">
+                  <span class="meta-label">${t.documents.updatedLabel}</span>
+                  <span class="meta-value mono">${doc.updatedAt.slice(0, 10)}</span>
+                </div>
+                <div class="meta-item">
                   <span class="meta-label">${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})</span>
                   ${linked.onClick
                     ? html`
@@ -474,7 +478,6 @@ export class AppDocuments extends LitElement {
                     ? html`<app-avatar size="xs" initials="${uploader.avatar}" title="${uploader.name}"></app-avatar>`
                     : ''}
                   <span class="uploader-name">${uploader?.name || doc.uploadedById}</span>
-                  <span class="mono">· ${doc.updatedAt.slice(0, 10)}</span>
                 </div>
 
                 <app-button
