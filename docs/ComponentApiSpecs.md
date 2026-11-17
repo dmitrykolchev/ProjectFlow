@@ -459,6 +459,7 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
 - `--link-gap` — gap flex-контейнера inner контрола, default `0.4rem`;
 - `--link-color` — цвет glyph поверх variant-дефолта (default = цвет variant);
 - `--link-hover-color` — hover-цвет glyph (default = базовый цвет, hover только underline);
+- `--link-hover-decoration` — hover text-decoration, default `underline`;
 - `--link-align-items` — align-items flex-контейнера, default `center`;
 - `--link-min-height` — min-height inner контрола, default `auto` (для паритета строк с
   baseline-выравниванием нативной line-box).

@@ -39,7 +39,7 @@
    Additive hooks (defaults keep every existing consumer pixel-identical):
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
    --link-width, --link-white-space, --link-overflow, --link-text-overflow,
-   --link-align-items, --link-min-height. */
+   --link-align-items, --link-min-height, --link-hover-color, --link-hover-decoration. */
 
 ::slotted(*) {
   display: inline-flex;
@@ -94,7 +94,7 @@
 }
 
 .link:hover:not(.is-disabled) {
-  text-decoration: underline;
+  text-decoration: var(--link-hover-decoration, underline);
 }
 
 .link:focus-visible {
