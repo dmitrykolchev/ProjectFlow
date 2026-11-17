@@ -12,12 +12,8 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
-import '../../common/app-input/app-input';
-import '../../common/app-number-input/app-number-input';
-import '../../common/app-select/app-select';
-import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-modal/app-modal';
+import '../../common/app-counterparty-form/app-counterparty-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -41,20 +37,7 @@ export class AppCounterparties extends LitElement {
   @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formName = '';
-  @state() private formLegalName = '';
-  @state() private formType: CounterpartyType = 'client';
-  @state() private formInn = '';
-  @state() private formKpp = '';
-  @state() private formCity = '';
-  @state() private formContactPerson = '';
-  @state() private formPhone = '';
-  @state() private formEmail = '';
-  @state() private formStatus: CounterpartyStatus = 'active';
-  @state() private formRating = 5;
-  @state() private formNotes = '';
-  @state() private formError = '';
+  @state() private editingCounterparty: Counterparty | null = null;
 
   @state() private deletingItem: Counterparty | null = null;
 
@@ -188,122 +171,12 @@ export class AppCounterparties extends LitElement {
         ? this.renderCards(filtered, t)
         : this.renderTable(filtered, t)}
 
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.counterparties.modalTitleEdit : t.viewTexts.counterparties.modalTitleCreate}"
+      <app-counterparty-form
+        .open="${this.modalOpen}"
+        .counterparty="${this.editingCounterparty}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelShortName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelLegalName}"
-              .value="${this.formLegalName}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterparties.labelType}"
-              .value="${this.formType}"
-              .options="${typeOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formType = eventValue(e) as CounterpartyType)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterparties.labelStatusCheck}"
-              .value="${this.formStatus}"
-              .options="${statusOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as CounterpartyStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelInn}"
-              .value="${this.formInn}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelKpp}"
-              .value="${this.formKpp}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelContactPerson}"
-              .value="${this.formContactPerson}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formContactPerson = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelCity}"
-              .value="${this.formCity}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelPhone}"
-              .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.counterparties.labelRating}"
-              .value="${this.formRating}"
-              min="1"
-              max="5"
-              step="1"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formRating = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.counterparties.labelNotes}"
-              .value="${this.formNotes}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSave}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-counterparty-form>
 
       <app-confirm-dialog
         .open="${Boolean(this.deletingItem)}"
@@ -558,68 +431,12 @@ export class AppCounterparties extends LitElement {
   }
 
   private openCreateModal() {
-    this.editingId = null;
-    this.formName = '';
-    this.formLegalName = '';
-    this.formType = 'client';
-    this.formInn = '';
-    this.formKpp = '';
-    this.formCity = getTranslation(this.currentLang).viewTexts.counterparties.defaultCity;
-    this.formContactPerson = '';
-    this.formPhone = '';
-    this.formEmail = '';
-    this.formStatus = 'active';
-    this.formRating = 5;
-    this.formNotes = '';
-    this.formError = '';
+    this.editingCounterparty = null;
     this.modalOpen = true;
   }
 
   private openEditModal(cp: Counterparty) {
-    this.editingId = cp.id;
-    this.formName = cp.name;
-    this.formLegalName = cp.legalName;
-    this.formType = cp.type;
-    this.formInn = cp.inn;
-    this.formKpp = cp.kpp || '';
-    this.formCity = cp.city;
-    this.formContactPerson = cp.contactPerson;
-    this.formPhone = cp.phone;
-    this.formEmail = cp.email;
-    this.formStatus = cp.status;
-    this.formRating = cp.rating;
-    this.formNotes = cp.notes;
-    this.formError = '';
+    this.editingCounterparty = cp;
     this.modalOpen = true;
-  }
-
-  private handleSave() {
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const payload = {
-      name: this.formName.trim(),
-      legalName: this.formLegalName.trim() || this.formName.trim(),
-      type: this.formType,
-      inn: this.formInn.trim() || '7700000000',
-      kpp: this.formKpp.trim(),
-      city: this.formCity.trim() || getTranslation(this.currentLang).viewTexts.counterparties.defaultCity,
-      contactPerson: this.formContactPerson.trim() || '—',
-      phone: this.formPhone.trim() || '—',
-      email: this.formEmail.trim() || '—',
-      status: this.formStatus,
-      rating: Math.max(1, Math.min(5, Number(this.formRating) || 5)),
-      notes: this.formNotes.trim(),
-    };
-
-    if (this.editingId) {
-      store.updateCounterparty({ id: this.editingId, ...payload });
-    } else {
-      store.addCounterparty(payload);
-    }
-
-    this.modalOpen = false;
   }
 }
