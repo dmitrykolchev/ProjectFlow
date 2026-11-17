@@ -492,28 +492,31 @@ export class AppEmployees extends LitElement {
                   </td>
                   <td>
                     <div class="actions-row">
-                      <button
-                        type="button"
-                        class="icon-btn"
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.viewTexts.employees.openProfileButton}"
                         @click="${() => store.openEmployeeDetail(emp.id)}"
                       >
-                        ${iconChevronRight(15)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn"
+                        <span slot="start">${iconChevronRight(15)}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.common.edit}"
                         @click="${() => this.openEditModal(emp)}"
                       >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                        <span slot="start">${iconEdit(14)}</span>
+                      </app-button>
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
+                        title="${t.common.delete}"
                         @click="${() => (this.deletingEmployee = emp)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
