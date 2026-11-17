@@ -61,6 +61,7 @@ import expenseFormMeta from '../../common/app-expense-form/app-expense-form.stor
 import documentFormMeta from '../../common/app-document-form/app-document-form.story';
 import decomposeFormMeta from '../../common/app-decompose-form/app-decompose-form.story';
 import tagsRowMeta from '../../common/app-tags-row/app-tags-row.story';
+import colorSwatchesMeta from '../../common/app-color-swatches/app-color-swatches.story';
 import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialog.story';
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
@@ -158,6 +159,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   documentFormMeta,
   decomposeFormMeta,
   tagsRowMeta,
+  colorSwatchesMeta,
   emptyStateMeta,
   kpiStripMeta,
   sectionCardMeta,
