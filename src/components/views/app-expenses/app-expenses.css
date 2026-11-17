@@ -288,3 +288,10 @@
     grid-column: span 1;
   }
 }
+
+/* the billable checkbox cell aligns its control row to the bottom of the form-grid
+   cell so the box and label sit on the same line as the neighboring input controls */
+.checkbox-cell {
+  display: flex;
+  align-items: flex-end;
+}

@@ -614,7 +614,7 @@ export class AppExpenses extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = eventValue(e))}"
             ></app-input>
           </div>
-          <div>
+          <div class="checkbox-cell">
             <app-checkbox
               label="${t.viewTexts.expenses.billableSwitch}"
               ?checked="${this.formBillable}"
