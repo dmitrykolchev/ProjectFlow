@@ -5,7 +5,6 @@ import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
   Calculation,
-  CalculationFrequency,
   CalculationStatus,
   Contract,
   ContractStatus,
@@ -43,16 +42,11 @@ import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
-import '../../common/app-entity-selector/app-entity-selector';
-import {
-  mapCompanyOptions,
-  mapCounterpartyOptions,
-  mapProjectOptions,
-  mapUserOptions,
-} from '../../common/entity-selector-options';
+
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-contract-form/app-contract-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -81,22 +75,7 @@ export class AppContracts extends LitElement {
   @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formNumber = '';
-  @state() private formTitle = '';
-  @state() private formType: ContractType = 'service';
-  @state() private formCompanyId = '';
-  @state() private formCounterpartyId = '';
-  @state() private formProjectId = '';
-  @state() private formOwnerId = '';
-  @state() private formAmount = 1000000;
-  @state() private formCurrency: 'RUB' | 'USD' | 'EUR' = 'RUB';
-  @state() private formStartDate = '';
-  @state() private formEndDate = '';
-  @state() private formStatus: ContractStatus = 'draft';
-  @state() private formBillingFrequency: CalculationFrequency = 'monthly';
-  @state() private formDescription = '';
-  @state() private formError = '';
+  @state() private editingContract: Contract | null = null;
 
   @state() private deletingContract: Contract | null = null;
 
@@ -354,15 +333,6 @@ export class AppContracts extends LitElement {
       { value: 'nda', label: 'NDA' },
     ];
 
-    const companyOptions = mapCompanyOptions(store.companies, t);
-    const counterpartyOptions = mapCounterpartyOptions(store.counterparties, t);
-    const projectOptions = mapProjectOptions(store.projects, t);
-    const ownerOptions = mapUserOptions(store.users, t);
-    const currencyOptions = [
-      { value: 'RUB', label: 'RUB (₽)' },
-      { value: 'USD', label: 'USD ($)' },
-      { value: 'EUR', label: 'EUR (€)' },
-    ];
 
     const tabOptions = [
       { value: 'contracts', label: `${t.invoices.tabContracts} (${this.contracts.length})` },
@@ -1155,147 +1125,12 @@ export class AppContracts extends LitElement {
             ></app-pagination>
           `}
 
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.contracts.modalTitleEdit : t.viewTexts.contracts.newContractButton}"
+      <app-contract-form
+        .open="${this.modalOpen}"
+        .contract="${this.editingContract}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterpartyDetail.labelContractNumber}"
-              placeholder="${t.viewTexts.contracts.ctrNumberPlaceholder}"
-              .value="${this.formNumber}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formNumber = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.contracts.labelTypeContract}"
-              .value="${this.formType}"
-              .options="${typeOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formType = eventValue(e) as ContractType)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-input
-              label="${t.viewTexts.contracts.labelSubjectModal}"
-              .value="${this.formTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formTitle = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.counterpartyDetail.labelOurCompany}"
-              .value="${this.formCompanyId}"
-              .options="${companyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.payments.thCounterparty}"
-              .value="${this.formCounterpartyId}"
-              .options="${counterpartyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.timeTracking.labelProject}"
-              placeholder="${t.viewTexts.contracts.optionNoProject}"
-              clearable
-              .value="${this.formProjectId}"
-              .options="${projectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.contracts.labelOwner}"
-              placeholder="${t.viewTexts.contracts.optionUnassignedOwner}"
-              clearable
-              .value="${this.formOwnerId}"
-              .options="${ownerOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formOwnerId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.contracts.labelContractAmount}"
-              .value="${this.formAmount}"
-              min="0"
-              step="50000"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.labelCurrency}"
-              .value="${this.formCurrency}"
-              .options="${currencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.counterpartyDetail.labelStartDate}"
-              .value="${this.formStartDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formStartDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.counterpartyDetail.labelEndDate}"
-              .value="${this.formEndDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formEndDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterparties.thStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as ContractStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterpartyDetail.labelCalcCycle}"
-              .value="${this.formBillingFrequency}"
-              .options="${frequencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formBillingFrequency = eventValue(e) as CalculationFrequency)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.contracts.labelConditions}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSave}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-contract-form>
 
       <app-confirm-dialog
         .open="${Boolean(this.deletingContract)}"
@@ -1572,76 +1407,12 @@ export class AppContracts extends LitElement {
   }
 
   private openCreateModal() {
-    const today = new Date().toISOString().slice(0, 10);
-    const yearEnd = `${new Date().getFullYear()}-12-31`;
-    this.editingId = null;
-    this.formNumber = `${getTranslation(this.currentLang).viewTexts.counterpartyDetail.ctrNumberPrefix}${new Date().getFullYear()}/${String(this.contracts.length + 1).padStart(3, '0')}`;
-    this.formTitle = '';
-    this.formType = 'service';
-    this.formCompanyId = store.companies[0]?.id || '';
-    this.formCounterpartyId = store.counterparties[0]?.id || '';
-    this.formProjectId = store.projects[0]?.id || '';
-    this.formOwnerId = store.users[0]?.id || '';
-    this.formAmount = 1500000;
-    this.formCurrency = 'RUB';
-    this.formStartDate = today;
-    this.formEndDate = yearEnd;
-    this.formStatus = 'draft';
-    this.formBillingFrequency = 'monthly';
-    this.formDescription = '';
-    this.formError = '';
+    this.editingContract = null;
     this.modalOpen = true;
   }
 
   private openEditModal(ctr: Contract) {
-    this.editingId = ctr.id;
-    this.formNumber = ctr.number;
-    this.formTitle = ctr.title;
-    this.formType = ctr.type;
-    this.formCompanyId = ctr.companyId;
-    this.formCounterpartyId = ctr.counterpartyId;
-    this.formProjectId = ctr.projectId || '';
-    this.formOwnerId = ctr.ownerId || '';
-    this.formAmount = ctr.amount;
-    this.formCurrency = ctr.currency;
-    this.formStartDate = ctr.startDate;
-    this.formEndDate = ctr.endDate;
-    this.formStatus = ctr.status;
-    this.formBillingFrequency = ctr.billingFrequency || 'monthly';
-    this.formDescription = ctr.description;
-    this.formError = '';
+    this.editingContract = ctr;
     this.modalOpen = true;
-  }
-
-  private handleSave() {
-    if (!this.formNumber.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const payload = {
-      number: this.formNumber.trim(),
-      title: this.formTitle.trim() || this.formNumber.trim(),
-      type: this.formType,
-      companyId: this.formCompanyId || store.companies[0]?.id || '',
-      counterpartyId: this.formCounterpartyId || store.counterparties[0]?.id || '',
-      projectId: this.formProjectId || undefined,
-      ownerId: this.formOwnerId || undefined,
-      amount: Math.max(0, Number(this.formAmount) || 0),
-      currency: this.formCurrency,
-      startDate: this.formStartDate || new Date().toISOString().slice(0, 10),
-      endDate: this.formEndDate || new Date().toISOString().slice(0, 10),
-      status: this.formStatus,
-      billingFrequency: this.formBillingFrequency,
-      description: this.formDescription.trim(),
-    };
-
-    if (this.editingId) {
-      store.updateContract({ id: this.editingId, ...payload });
-    } else {
-      store.addContract(payload);
-    }
-
-    this.modalOpen = false;
   }
 }
