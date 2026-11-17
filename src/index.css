@@ -88,6 +88,7 @@
   --color-info-border: rgba(2, 132, 199, 0.28);
 
   /* Density Tokens (default comfortable) */
+  --control-height-xxs: 28px;
   --control-height-xs: 24px;
   --control-height-sm: 30px;
   --control-height-md: 38px;
