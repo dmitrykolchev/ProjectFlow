@@ -18,6 +18,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
@@ -349,8 +350,8 @@ export class AppCompanies extends LitElement {
                 </div>
               </div>
 
-              <div class="card-footer">
-                <div class="stats-row">
+              <card-footer>
+                <div slot="start" class="stats-row">
                   <span class="stat-pill">
                     ${t.viewTexts.companies.staffCountLabel}: <strong>${empCount}</strong>
                   </span>
@@ -361,49 +362,53 @@ export class AppCompanies extends LitElement {
                     ${t.viewTexts.companies.contractsCountLabel}: <strong>${ctrCount}</strong>
                   </span>
                 </div>
-                <div class="card-actions">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.viewTexts.companies.documentsTitle}"
-                    @click="${() => store.openDocuments({ scope: 'company', companyId: company.id })}"
-                  >
-                    ${iconFolderOpen(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.viewTexts.companies.knowledgeBaseTitle}"
-                    @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
-                  >
-                    ${iconBookOpen(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditModal(company)}"
-                  >
-                    ${iconEdit(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn danger"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingCompany = company)}"
-                  >
-                    ${iconTrash(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.viewTexts.companies.openCardButton}"
-                    @click="${() => store.openCompanyDetail(company.id)}"
-                  >
-                    ${iconChevronRight(15)}
-                  </button>
-                </div>
-              </div>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.companies.documentsTitle}"
+                  @click="${() => store.openDocuments({ scope: 'company', companyId: company.id })}"
+                >
+                  <span slot="start">${iconFolderOpen(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.companies.knowledgeBaseTitle}"
+                  @click="${() => store.openKnowledgeBase({ scope: 'company', companyId: company.id })}"
+                >
+                  <span slot="start">${iconBookOpen(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.edit}"
+                  @click="${() => this.openEditModal(company)}"
+                >
+                  <span slot="start">${iconEdit(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  class="danger-action"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingCompany = company)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.companies.openCardButton}"
+                  @click="${() => store.openCompanyDetail(company.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+              </card-footer>
             </article>
           `;
         })}
