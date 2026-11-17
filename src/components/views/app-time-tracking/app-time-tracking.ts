@@ -28,6 +28,7 @@ import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-time-entry-form/app-time-entry-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -64,17 +65,9 @@ export class AppTimeTracking extends LitElement {
 
   // Create / Edit modal
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formProjectId = '';
-  @state() private formTaskId = '';
-  @state() private formUserId = '';
-  @state() private formDate = '';
-  @state() private formHours = 4;
-  @state() private formCategory: TimeEntryCategory = 'development';
-  @state() private formStatus: TimeEntryStatus = 'logged';
-  @state() private formBillable = true;
-  @state() private formDescription = '';
-  @state() private formError = '';
+  @state() private editingEntry: TimeEntry | null = null;
+  @state() private presetTimeProjectId: string | null = null;
+  @state() private presetTimeTaskId: string | null = null;
 
   @state() private deletingEntry: TimeEntry | null = null;
 
@@ -180,12 +173,6 @@ export class AppTimeTracking extends LitElement {
     const categoryFilterOptions = [
       { value: 'all', label: t.viewTexts.timeTracking.filterAllCategories },
       ...categoryOptions,
-    ];
-
-    const statusOptions: { value: TimeEntryStatus; label: string; color: string }[] = [
-      { value: 'logged', label: t.timeTracking.statuses.logged, color: '#64748b' },
-      { value: 'submitted', label: t.timeTracking.statuses.submitted, color: '#f59e0b' },
-      { value: 'approved', label: t.timeTracking.statuses.approved, color: '#10b981' },
     ];
 
     return html`
@@ -348,7 +335,7 @@ export class AppTimeTracking extends LitElement {
         ? this.renderJournalTable(filtered, t)
         : this.renderByTaskView(filtered, t)}
 
-      ${this.renderFormModal(t, categoryOptions, statusOptions)}
+      ${this.renderFormModal(t)}
       ${this.renderDeleteModal(t)}
     `;
   }
@@ -632,123 +619,16 @@ export class AppTimeTracking extends LitElement {
     `;
   }
 
-  private renderFormModal(
-    t: ReturnType<typeof getTranslation>,
-    categoryOptions: { value: TimeEntryCategory; label: string }[],
-    statusOptions: { value: TimeEntryStatus; label: string; color: string }[]
-  ) {
-    const projectOptions = mapProjectOptions(store.projects, t);
-
-    const taskOptions = mapTaskOptions(
-      store.tasks.filter((tk) => tk.projectId === this.formProjectId),
-      t
-    );
-
-    const userOptions = mapUserOptions(store.users, t);
-
+  private renderFormModal(t: ReturnType<typeof getTranslation>) {
     return html`
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.timeTracking.modalTitleEdit : t.viewTexts.timeTracking.modalTitleCreate}"
+      <app-time-entry-form
+        .open="${this.modalOpen}"
+        .entry="${this.editingEntry}"
+        .presetProjectId="${this.presetTimeProjectId}"
+        .presetTaskId="${this.presetTimeTaskId}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.timeTracking.labelProject}"
-              .value="${this.formProjectId}"
-              .options="${projectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formProjectId = eventValue(e);
-                const firstTask = store.tasks.find((tk) => tk.projectId === this.formProjectId);
-                this.formTaskId = firstTask?.id || '';
-                this.formError = '';
-              }}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.timeTracking.labelTask}"
-              .value="${this.formTaskId}"
-              .options="${taskOptions}"
-              error="${this.formError}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formTaskId = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.timeTracking.labelEmployee}"
-              .value="${this.formUserId}"
-              .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.timeTracking.labelDateDone}"
-              .value="${this.formDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.timeTracking.labelHoursSpent}"
-              .value="${this.formHours}"
-              min="0.25"
-              max="24"
-              step="0.5"
-              unit="${t.viewTexts.timeTracking.hoursUnit}"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formHours = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.timeTracking.labelCategory}"
-              .value="${this.formCategory}"
-              .options="${categoryOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCategory = eventValue(e) as TimeEntryCategory)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.timeTracking.statusLabel}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as TimeEntryStatus)}"
-            ></app-select>
-          </div>
-          <div class="checkbox-cell">
-            <app-checkbox
-              label="${t.viewTexts.timeTracking.billableHoursLabel}"
-              ?checked="${this.formBillable}"
-              @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
-            ></app-checkbox>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.timeTracking.labelWorkDescription}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveModal}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-time-entry-form>
     `;
   }
 
@@ -795,66 +675,15 @@ export class AppTimeTracking extends LitElement {
   }
 
   private openCreateModal(presetProjectId?: string, presetTaskId?: string) {
-    const projectId = presetProjectId || (this.projectFilter !== 'all' ? this.projectFilter : store.projects[0]?.id || '');
-    const taskId = presetTaskId || store.tasks.find((tk) => tk.projectId === projectId)?.id || '';
-    this.editingId = null;
-    this.formProjectId = projectId;
-    this.formTaskId = taskId;
-    this.formUserId = store.users[0]?.id || '';
-    this.formDate = new Date().toISOString().slice(0, 10);
-    this.formHours = 2;
-    this.formCategory = 'development';
-    this.formStatus = 'logged';
-    this.formBillable = true;
-    this.formDescription = '';
-    this.formError = '';
+    this.editingEntry = null;
+    this.presetTimeProjectId =
+      presetProjectId ?? (this.projectFilter !== 'all' ? this.projectFilter : null);
+    this.presetTimeTaskId = presetTaskId ?? null;
     this.modalOpen = true;
   }
 
   private openEditModal(entry: TimeEntry) {
-    this.editingId = entry.id;
-    this.formProjectId = entry.projectId;
-    this.formTaskId = entry.taskId;
-    this.formUserId = entry.userId;
-    this.formDate = entry.date;
-    this.formHours = entry.hours;
-    this.formCategory = entry.category;
-    this.formStatus = entry.status;
-    this.formBillable = entry.billable;
-    this.formDescription = entry.description;
-    this.formError = '';
+    this.editingEntry = entry;
     this.modalOpen = true;
-  }
-
-  private handleSaveModal() {
-    if (!this.formTaskId) {
-      this.formError = getTranslation(this.currentLang).viewTexts.timeTracking.selectTaskError;
-      return;
-    }
-
-    const payload = {
-      projectId: this.formProjectId || store.projects[0]?.id || '',
-      taskId: this.formTaskId,
-      userId: this.formUserId || store.users[0]?.id || '',
-      date: this.formDate || new Date().toISOString().slice(0, 10),
-      hours: Math.max(0.25, Number(this.formHours) || 1),
-      category: this.formCategory,
-      status: this.formStatus,
-      billable: this.formBillable,
-      description: this.formDescription.trim(),
-    };
-
-    if (this.editingId) {
-      const existing = this.entries.find((e) => e.id === this.editingId);
-      store.updateTimeEntry({
-        id: this.editingId,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        ...payload,
-      });
-    } else {
-      store.addTimeEntry(payload);
-    }
-
-    this.modalOpen = false;
   }
 }
