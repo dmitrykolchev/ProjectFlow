@@ -9,6 +9,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -376,38 +377,40 @@ export class AppEmployees extends LitElement {
                 </div>
               </div>
 
-              <div class="card-footer">
-                <div class="stats-row">
+              <card-footer>
+                <div slot="start" class="stats-row">
                   <span>${t.viewTexts.employees.projectsCountLabel}: <strong>${projCount}</strong></span>
                   <span>${t.viewTexts.employees.tasksCountLabel}: <strong>${taskCount}</strong></span>
                 </div>
-                <div class="actions-row">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.viewTexts.employees.openProfileButton}"
-                    @click="${() => store.openEmployeeDetail(emp.id)}"
-                  >
-                    ${iconChevronRight(15)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditModal(emp)}"
-                  >
-                    ${iconEdit(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn danger"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingEmployee = emp)}"
-                  >
-                    ${iconTrash(14)}
-                  </button>
-                </div>
-              </div>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.employees.openProfileButton}"
+                  @click="${() => store.openEmployeeDetail(emp.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.edit}"
+                  @click="${() => this.openEditModal(emp)}"
+                >
+                  <span slot="start">${iconEdit(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  class="danger-action"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingEmployee = emp)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+              </card-footer>
             </article>
           `;
         })}

@@ -127,14 +127,17 @@
   font-family: var(--font-mono, monospace);
 }
 
-.card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--border-subtle, #1e293b);
+/* card-footer web component keeps its own chrome; the view pins it to the
+   bottom of the card and tunes the delete action hover tokens (original danger
+   hover kept the subtle border, so the border token is pinned back) */
+card-footer {
   margin-top: auto;
+}
+
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .stats-row {
