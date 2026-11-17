@@ -271,6 +271,7 @@ export interface ProjectRequirement {
   linkedTaskIds?: string[];
   sourceDocumentId?: string;
   clarifications?: TaskAiClarificationMessage[];
+  aiAnalyses?: AnalysisSummary[];
   createdAt: string;
   updatedAt: string;
 }
@@ -294,7 +295,7 @@ export interface Task {
   updatedAt: string;
   requirementIds?: string[];
   knowledgeArticleIds?: string[];
-  aiAnalysis?: TaskAiAnalysis;
+  aiAnalyses?: AnalysisSummary[];
   aiClarifications?: TaskAiClarificationMessage[];
 }
 
@@ -303,6 +304,35 @@ export interface TaskAiContextRef {
   id: string;
   title: string;
   reason?: string;
+}
+
+export interface AnalysisDecompositionItem {
+  title: string;
+  estimatedHours?: number;
+}
+
+/**
+ * One saved AI analysis summary. A task or requirement can accumulate many
+ * summaries over time (different context, models, moments); every record keeps
+ * its author, model and creation date. Newest entries are stored first.
+ */
+export interface AnalysisSummary {
+  id: string;
+  kind: 'task' | 'requirement';
+  authorId: string;
+  model: string;
+  createdAt: string;
+  overview: string;
+  effortAssessment?: string;
+  risks: string[];
+  recommendations: string[];
+  /** Task analyses: suggested subtask titles */
+  suggestedSubtasks?: string[];
+  /** Requirement analyses: decomposition into tasks */
+  decomposition?: AnalysisDecompositionItem[];
+  /** Requirement analyses: refined requirement text */
+  clarification?: string;
+  contextSources: TaskAiContextRef[];
 }
 
 export interface TaskAiClarificationMessage {

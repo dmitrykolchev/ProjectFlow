@@ -27,6 +27,7 @@ import {
   ProjectRole,
   SidebarGroupMode,
   Task,
+  TaskAiAnalysis,
   TaskStatus,
   ThemeBaseColors,
   ThemeMode,
@@ -349,7 +350,32 @@ export class AppStore {
 
       const storedTasks = localStorage.getItem(STORAGE_KEY_TASKS);
       if (storedTasks) {
-        this.tasks = JSON.parse(storedTasks);
+        const parsedTasks: Task[] = JSON.parse(storedTasks);
+        // legacy single aiAnalysis object migrates into the first array entry
+        this.tasks = parsedTasks.map((tk) => {
+          const legacy = (tk as Task & { aiAnalysis?: TaskAiAnalysis }).aiAnalysis;
+          delete (tk as Task & { aiAnalysis?: TaskAiAnalysis }).aiAnalysis;
+          if (!legacy) return tk;
+          return {
+            ...tk,
+            aiAnalyses: [
+              ...(tk.aiAnalyses || []),
+              {
+                id: `analysis-${tk.id}-${legacy.updatedAt}`,
+                kind: 'task',
+                authorId: this.currentUserId || this.users[0]?.id || 'user-1',
+                model: legacy.model || '',
+                createdAt: legacy.updatedAt,
+                overview: legacy.overview,
+                effortAssessment: legacy.effortAssessment,
+                risks: legacy.risks,
+                recommendations: legacy.recommendations,
+                suggestedSubtasks: legacy.suggestedSubtasks,
+                contextSources: legacy.contextSources,
+              },
+            ],
+          };
+        });
       } else {
         this.tasks = [...initialTasks];
       }
