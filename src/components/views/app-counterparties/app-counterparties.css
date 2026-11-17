@@ -80,23 +80,27 @@
   text-overflow: ellipsis;
 }
 
+/* card name-links are app-link web components at size md restoring the inherited text-primary
+   glyph and the parent weight through the additive link hooks of zero padding, weight 700, the
+   inherited unitless line-height 1.5, nowrap with hidden ellipsis, and the card font size pinned
+   through control-font-md; the accent hover color is restored through link-hover-color with the
+   canonical underline */
 .cp-link-btn {
-  border: none;
-  background: transparent;
-  padding: 0;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 1rem;
 }
 
-.cp-link-btn:hover {
-  color: var(--accent-primary, #6366f1);
-  text-decoration: underline;
+/* the table cell link inherits the smaller cell weight and font size */
+.table-link {
+  --link-font-weight: 600;
+  --control-font-md: 0.83rem;
 }
 
 .cp-legal {

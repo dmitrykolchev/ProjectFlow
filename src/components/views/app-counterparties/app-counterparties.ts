@@ -10,6 +10,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
@@ -342,13 +343,14 @@ export class AppCounterparties extends LitElement {
                   <div class="cp-icon">${iconHandshake(20)}</div>
                   <div class="cp-names">
                     <div class="cp-name">
-                      <button
-                        type="button"
+                      <app-link
                         class="cp-link-btn"
+                        size="md"
+                        variant="primary"
                         @click="${() => store.openCounterpartyDetail(cp.id)}"
                       >
                         ${cp.name}
-                      </button>
+                      </app-link>
                     </div>
                     <div class="cp-legal" title="${cp.legalName}">${cp.legalName}</div>
                   </div>
@@ -478,13 +480,14 @@ export class AppCounterparties extends LitElement {
                 <tr>
                   <td>
                     <div style="font-weight: 600;">
-                      <button
-                        type="button"
-                        class="cp-link-btn"
+                      <app-link
+                        class="cp-link-btn table-link"
+                        size="md"
+                        variant="primary"
                         @click="${() => store.openCounterpartyDetail(cp.id)}"
                       >
                         ${cp.name}
-                      </button>
+                      </app-link>
                     </div>
                     <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.legalName} · ${cp.city}</div>
                   </td>
