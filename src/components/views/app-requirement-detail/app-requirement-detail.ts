@@ -3,6 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import {
+  AnalysisSummary,
   ProjectRequirement,
   RequirementPriority,
   RequirementStatus,
@@ -11,8 +12,10 @@ import {
   TaskAiClarificationMessage,
 } from '../../../types';
 import {
+  analyzeRequirementWithContext,
   clarifyRequirementWithContext,
   formatAiError,
+  TaskAiContextItem,
 } from '../../../services/openai-client';
 import {
   iconAlertTriangle,
@@ -41,6 +44,7 @@ import { eventValue } from '../../common/event-value';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
+import '../../common/app-analysis-summary/app-analysis-summary';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-selector/app-entity-selector';
@@ -91,6 +95,10 @@ export class AppRequirementDetail extends LitElement {
   @state() private decomposing = false;
   @state() private decomposeError = '';
 
+  // Requirement analysis summary state
+  @state() private reqAnalyzing = false;
+  @state() private reqAnalyzeError = '';
+
   // Edit requirement modal
   @state() private editModalOpen = false;
 
@@ -125,6 +133,7 @@ export class AppRequirementDetail extends LitElement {
         this.editingCriterionIdx = null;
         this.aiError = '';
         this.decomposeError = '';
+        this.reqAnalyzeError = '';
       }
       this.detailRequirementId = candidate;
     } else {
@@ -520,6 +529,7 @@ export class AppRequirementDetail extends LitElement {
           <div class="main-column">
             ${this.renderCriteriaCard(req, t)}
             ${this.renderLinkedTasksCard(req, linkedTasks, t)}
+            ${this.renderRequirementAnalysisCard(req, project, sourceDoc, linkedKbs, linkedTasks, t)}
             ${this.renderAiCollaborationCard(req, project, sourceDoc, linkedKbs, linkedTasks, t)}
           </div>
 
@@ -788,6 +798,216 @@ export class AppRequirementDetail extends LitElement {
             `}
       </app-section-card>
     `;
+  }
+
+  private renderRequirementAnalysisCard(
+    req: ProjectRequirement,
+    project: ReturnType<typeof store.projects.find>,
+    sourceDoc: ReturnType<typeof store.documents.find>,
+    linkedKbs: typeof store.knowledgeArticles,
+    linkedTasks: Task[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    const analyses = req.aiAnalyses || [];
+
+    return html`
+      <app-section-card
+        title="${t.viewTexts.requirementDetail.aiAnalysisTitle}"
+        subtitle="${t.viewTexts.requirementDetail.aiAnalysisSubtitle}"
+      >
+        <span slot="icon">${iconCpu(17)}</span>
+        ${analyses.length > 0
+          ? html`
+              <app-button
+                slot="actions"
+                size="sm"
+                variant="ghost"
+                @click="${() => store.updateRequirement({ ...req, aiAnalyses: [] })}"
+              >
+                ${t.viewTexts.ai.clearAnalysisBtn}
+              </app-button>
+            `
+          : ''}
+
+        <div class="ai-quick-row">
+          <app-button
+            size="sm"
+            variant="primary"
+            ?disabled="${this.reqAnalyzing}"
+            @click="${() => this.handleAnalyzeRequirement(req, project, sourceDoc, linkedKbs, linkedTasks)}"
+          >
+            ${this.reqAnalyzing ? t.viewTexts.requirementDetail.aiAnalyzing : t.viewTexts.requirementDetail.aiAnalyzeBtn}
+          </app-button>
+        </div>
+
+        ${this.reqAnalyzeError
+          ? html`
+              <div class="error-banner">
+                <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
+                <span>${this.reqAnalyzeError}</span>
+              </div>
+            `
+          : ''}
+
+        ${analyses.length === 0 && !this.reqAnalyzing
+          ? html`<p class="ai-analysis-empty">${t.viewTexts.requirementDetail.aiAnalysisEmpty}</p>`
+          : ''}
+
+        ${analyses.length > 0
+          ? html`
+              <div class="ai-summary-list">
+                ${analyses.map(
+                  (s, idx) => html`
+                    <app-analysis-summary
+                      .summary="${s}"
+                      .expanded="${idx === 0}"
+                      @apply-clarification="${(e: CustomEvent<{ mode: 'replace' | 'append'; text: string }>) => {
+                        const text = e.detail.text.trim();
+                        const nextDesc =
+                          e.detail.mode === 'replace'
+                            ? text
+                            : req.description?.trim()
+                            ? `${req.description.trim()}\n\n${text}`
+                            : text;
+                        store.updateRequirement({ ...req, description: nextDesc });
+                        store.addNotification(
+                          'success',
+                          req.code,
+                          t.viewTexts.requirementDetail.clarificationAppliedToast
+                        );
+                      }}"
+                      @create-task="${(e: CustomEvent<{ title: string; estimatedHours?: number }>) => {
+                        const today = new Date().toISOString().slice(0, 10);
+                        const due = new Date(Date.now() + 14 * 86400 * 1000).toISOString().slice(0, 10);
+                        const created = store.addTask({
+                          title: e.detail.title,
+                          description: `${req.code}: ${req.title}\n\n${req.description || ''}`.trim(),
+                          status: 'todo',
+                          priority: req.priority === 'critical' ? 'urgent' : req.priority,
+                          assigneeId: store.currentUserId || store.users[0]?.id || 'user-1',
+                          projectId: req.projectId,
+                          tags: [req.code.toLowerCase(), req.category.toLowerCase()].filter(Boolean),
+                          startDate: today,
+                          dueDate: due,
+                          estimatedHours: e.detail.estimatedHours ?? 8,
+                          loggedHours: 0,
+                          subtasks: [],
+                          requirementIds: [req.id],
+                          knowledgeArticleIds: [...(req.linkedKnowledgeIds || [])],
+                        });
+                        store.updateRequirement({
+                          ...req,
+                          linkedTaskIds: Array.from(new Set([...(req.linkedTaskIds || []), created.id])),
+                        });
+                        store.addNotification(
+                          'success',
+                          req.code,
+                          t.viewTexts.requirementDetail.taskFromDecompositionToast(e.detail.title)
+                        );
+                      }}"
+                      @delete-summary="${(e: CustomEvent<{ id: string }>) => {
+                        const next = (req.aiAnalyses || []).filter((a) => a.id !== e.detail.id);
+                        store.updateRequirement({ ...req, aiAnalyses: next });
+                        store.addNotification(
+                          'info',
+                          req.code,
+                          t.viewTexts.requirementDetail.analysisDeletedToast
+                        );
+                      }}"
+                    ></app-analysis-summary>
+                  `
+                )}
+              </div>
+            `
+          : ''}
+      </app-section-card>
+    `;
+  }
+
+  private async handleAnalyzeRequirement(
+    req: ProjectRequirement,
+    project: ReturnType<typeof store.projects.find>,
+    sourceDoc: ReturnType<typeof store.documents.find>,
+    linkedKbs: typeof store.knowledgeArticles,
+    linkedTasks: Task[]
+  ) {
+    const t = getTranslation(this.currentLang);
+    if (this.reqAnalyzing) return;
+
+    this.reqAnalyzing = true;
+    this.reqAnalyzeError = '';
+
+    const contextItems: TaskAiContextItem[] = [
+      ...linkedKbs.map((k) => ({
+        key: `knowledge:${k.id}`,
+        kind: 'knowledge' as const,
+        id: k.id,
+        title: k.title,
+        subtitle: k.summary,
+        tags: k.tags,
+        snippet: k.content.slice(0, 300),
+        score: 0,
+        reason: 'direct' as const,
+        selected: true,
+      })),
+      ...(sourceDoc
+        ? [
+            {
+              key: `document:${sourceDoc.id}`,
+              kind: 'document' as const,
+              id: sourceDoc.id,
+              title: sourceDoc.title,
+              subtitle: sourceDoc.description,
+              tags: sourceDoc.tags,
+              snippet: (sourceDoc.textContent || sourceDoc.description).slice(0, 300),
+              score: 0,
+              reason: 'project' as const,
+              selected: true,
+            },
+          ]
+        : []),
+    ];
+
+    const endpoint = store.customization.aiEndpoint;
+    try {
+      const res = await analyzeRequirementWithContext({
+        requirement: req,
+        project,
+        sourceDoc,
+        linkedKnowledge: linkedKbs,
+        linkedTasks,
+        contextItems,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model: store.customization.aiModel,
+      });
+
+      const record: AnalysisSummary = {
+        id: `analysis-${req.id}-${Date.now()}`,
+        kind: 'requirement',
+        authorId: store.currentUserId || store.users[0]?.id || 'user-1',
+        model: res.model || '',
+        createdAt: new Date().toISOString(),
+        overview: res.overview,
+        risks: res.risks,
+        recommendations: res.recommendations,
+        clarification: res.clarification,
+        decomposition: res.decomposition,
+        contextSources: contextItems.map((c) => ({
+          kind: c.kind,
+          id: c.id,
+          title: c.title,
+          reason: c.reason,
+        })),
+      };
+      const freshReq = this.requirements.find((r) => r.id === req.id) || req;
+      store.updateRequirement({ ...freshReq, aiAnalyses: [record, ...(freshReq.aiAnalyses || [])] });
+      store.addNotification('success', req.code, t.viewTexts.requirementDetail.analysisSavedToast);
+    } catch (err) {
+      this.reqAnalyzeError = formatAiError(err, endpoint, t);
+    } finally {
+      this.reqAnalyzing = false;
+    }
   }
 
   private renderAiCollaborationCard(

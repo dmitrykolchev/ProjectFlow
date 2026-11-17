@@ -467,6 +467,19 @@
   margin-bottom: 0.75rem;
 }
 
+.ai-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ai-analysis-empty {
+  margin: 0 0 0.75rem;
+  font-size: 0.825rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #94a3b8);
+}
+
 .ai-quick-chip {
   display: inline-flex;
   align-items: center;
