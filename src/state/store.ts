@@ -87,7 +87,7 @@ const defaultCustomization: UserCustomization = {
   showActivityPanel: false,
   tablePageSize: 10,
   cardGridPageSize: 6,
-  aiEndpoint: 'http://127.0.0.1:47831/v1',
+  aiEndpoint: 'http://127.0.0.1:3000/v1',
   aiModel: '',
   gridColumns: {
     id: true,

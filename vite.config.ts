@@ -87,7 +87,23 @@ export default defineConfig(() => {
       hmr: process.env.DISABLE_HMR !== 'true',
       // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
-      allowedHosts: ['scamclub.ru']
+      allowedHosts: ['scamclub.ru'],
+      // Same-origin AI endpoint: /v1/* is forwarded to the local OpenAI-compatible
+      // server, so the browser never sends a cross-origin preflight (no CORS).
+      proxy: {
+        '/v1': {
+          target: 'http://127.0.0.1:8082',
+          changeOrigin: true,
+        },
+      },
+    },
+    preview: {
+      proxy: {
+        '/v1': {
+          target: 'http://127.0.0.1:8082',
+          changeOrigin: true,
+        },
+      },
     },
   };
 });
