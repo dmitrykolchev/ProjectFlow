@@ -20,7 +20,9 @@ export type ButtonAction =
 export class AppButton extends LitElement {
   @property({ type: String }) variant: ButtonVariant = 'primary';
   @property({ type: String }) size: ButtonSize = 'md';
-  @property({ type: String }) action: ButtonAction = 'default';
+  // reflected so a view can pin a historical hover token value on one action with an
+  // [action='...'] attribute selector, without writing styling classes on the component
+  @property({ type: String, reflect: true }) action: ButtonAction = 'default';
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: Boolean }) loading: boolean = false;
   @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
