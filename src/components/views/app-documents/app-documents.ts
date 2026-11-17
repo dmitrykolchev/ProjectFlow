@@ -467,7 +467,7 @@ export class AppDocuments extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
-                  class="danger-action"
+                  action="delete"
                   title="${t.common.delete}"
                   @click="${() => (this.deletingDoc = doc)}"
                 >
@@ -477,6 +477,7 @@ export class AppDocuments extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
+                  action="edit"
                   title="${t.common.edit}"
                   @click="${() => this.openEditModal(doc)}"
                 >
@@ -495,6 +496,7 @@ export class AppDocuments extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
+                  action="view"
                   title="${t.documents.previewTitle}"
                   @click="${() => this.openPreviewModal(doc)}"
                 >
@@ -595,6 +597,7 @@ export class AppDocuments extends LitElement {
                         <app-button
                           size="sm"
                           variant="icon"
+                          action="view"
                           title="${t.documents.previewTitle}"
                           @click="${() => this.openPreviewModal(doc)}"
                         >
@@ -611,13 +614,14 @@ export class AppDocuments extends LitElement {
                         <app-button
                           size="sm"
                           variant="icon"
+                          action="edit"
                           title="${t.common.edit}"
                           @click="${() => this.openEditModal(doc)}"
                         >
                           <span slot="start">${iconEdit(14)}</span>
                         </app-button>
                         <app-button
-                          class="danger-action"
+                          action="delete"
                           size="sm"
                           variant="icon"
                           title="${t.common.delete}"

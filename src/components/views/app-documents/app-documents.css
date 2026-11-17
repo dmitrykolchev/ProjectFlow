@@ -211,12 +211,6 @@ card-footer {
   --card-footer-end-gap: 0.3rem;
 }
 
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
-}
-
 .uploader-info {
   display: flex;
   align-items: center;
@@ -241,8 +235,8 @@ card-footer {
 
 /* table row icon actions are app-button web components at size sm: the historical
    hover kept the subtle border unchanged for plain actions, so the hover border token
-   is pinned back (danger hover tokens come from .danger-action), and the historical
-   6px radius replaces the canonical md radius */
+   is pinned back for buttons without a semantic action (the component colors action
+   view / edit / delete itself), and the historical 6px radius replaces the canonical md radius */
 .card-actions app-button {
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
@@ -250,7 +244,7 @@ card-footer {
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.card-actions app-button:not(.danger-action) {
+.card-actions app-button:not([action]) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
