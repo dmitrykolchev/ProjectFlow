@@ -47,23 +47,13 @@ import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-filter-bar/app-filter-bar';
-import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../common/app-modal/app-modal';
+import '../../common/app-document-form/app-document-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-select/app-select';
-import '../../common/app-entity-selector/app-entity-selector';
-import {
-  mapCompanyOptions,
-  mapContractOptions,
-  mapCounterpartyOptions,
-  mapProjectOptions,
-  mapTaskOptions,
-  mapUserOptions,
-} from '../../common/entity-selector-options';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
@@ -90,28 +80,9 @@ export class AppDocuments extends LitElement {
 
   // Create / Edit Modal
   @state() private modalOpen = false;
-  @state() private editingDocId: string | null = null;
-  @state() private formTitle = '';
-  @state() private formFileName = '';
-  @state() private formExtension = 'txt';
-  @state() private formMimeType = 'text/plain';
-  @state() private formSizeBytes = 0;
-  @state() private formDataUrl: string | undefined = undefined;
-  @state() private formTextContent = '';
-  @state() private formTruncatedNote = '';
-  @state() private formCategory: DocumentCategory = 'spec';
-  @state() private formStatus: DocumentStatus = 'draft';
-  @state() private formScope: DocumentScope = 'company';
-  @state() private formCompanyId = '';
-  @state() private formProjectId = '';
-  @state() private formContractId = '';
-  @state() private formCounterpartyId = '';
-  @state() private formTaskId = '';
-  @state() private formUploadedById = '';
-  @state() private formTags = '';
-  @state() private formDescription = '';
-  @state() private formVersionNote = '';
-  @state() private formError = '';
+  @state() private editingDocument: DocumentItem | null = null;
+  @state() private presetDocProjectId: string | null = null;
+  @state() private presetDocCompanyId: string | null = null;
 
   // Preview & Versioning Modal
   @state() private previewDoc: DocumentItem | null = null;
@@ -120,8 +91,6 @@ export class AppDocuments extends LitElement {
   @state() private versionTruncatedNote = '';
 
   // AI Summary & Tags state
-  @state() private aiFormLoading = false;
-  @state() private aiFormError = '';
   @state() private aiPreviewLoading = false;
   @state() private aiPreviewError = '';
   @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
@@ -773,250 +742,15 @@ export class AppDocuments extends LitElement {
   }
 
   private renderFormModal(t: ReturnType<typeof getTranslation>) {
-    const categoryOptions = (Object.keys(t.documents.categories) as DocumentCategory[]).map((k) => ({
-      value: k,
-      label: t.documents.categories[k],
-    }));
-    const statusOptions = (Object.keys(t.documents.statuses) as DocumentStatus[]).map((k) => ({
-      value: k,
-      label: t.documents.statuses[k],
-    }));
-    const scopeOptions = (Object.keys(t.documents.scopes) as DocumentScope[]).map((k) => ({
-      value: k,
-      label: t.documents.scopes[k],
-    }));
-    const companyOptions = mapCompanyOptions(store.companies, t);
-    const projectOptions = mapProjectOptions(store.projects, t);
-    const contractOptions = mapContractOptions(store.contracts, t);
-    const counterpartyOptions = mapCounterpartyOptions(store.counterparties, t);
-    const taskOptions = mapTaskOptions(store.tasks, t);
-    const userOptions = mapUserOptions(store.users, t);
-
     return html`
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingDocId ? t.documents.editDocument : t.documents.uploadDocument}"
+      <app-document-form
+        .open="${this.modalOpen}"
+        .document="${this.editingDocument}"
+        .presetProjectId="${this.presetDocProjectId}"
+        .presetCompanyId="${this.presetDocCompanyId}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          ${!this.editingDocId
-            ? html`
-                <app-file-dropzone
-                  selected-file-name="${this.formFileName}"
-                  selected-file-size="${this.formSizeBytes}"
-                  @file-selected="${this.handleModalDropzoneSelect}"
-                  @file-cleared="${() => {
-                    this.formFileName = '';
-                    this.formSizeBytes = 0;
-                    this.formDataUrl = undefined;
-                    this.formTruncatedNote = '';
-                  }}"
-                ></app-file-dropzone>
-              `
-            : ''}
-
-          ${this.formTruncatedNote
-            ? html`<div class="note-banner">${this.formTruncatedNote}</div>`
-            : ''}
-
-          <app-form-grid>
-            <div>
-              <app-input
-                label="${t.documents.fieldTitle}"
-                .value="${this.formTitle}"
-                required
-                error="${this.formError}"
-                @input="${(e: CustomEvent<{ value: string }>) => {
-                  this.formTitle = eventValue(e);
-                  this.formError = '';
-                }}"
-              ></app-input>
-            </div>
-            <div>
-              <app-input
-                label="${t.documents.fieldFileName}"
-                .value="${this.formFileName}"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.formFileName = eventValue(e))}"
-              ></app-input>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldCategory}"
-                .value="${this.formCategory}"
-                .options="${categoryOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.formCategory = eventValue(e) as DocumentCategory)}"
-              ></app-select>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldStatus}"
-                .value="${this.formStatus}"
-                .options="${statusOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.formStatus = eventValue(e) as DocumentStatus)}"
-              ></app-select>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldScope}"
-                .value="${this.formScope}"
-                .options="${scopeOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.formScope = eventValue(e) as DocumentScope)}"
-              ></app-select>
-            </div>
-            <div>
-              ${this.formScope === 'company'
-                ? html`
-                    <app-entity-selector
-                      label="${t.documents.fieldCompany}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formCompanyId}"
-                      .options="${companyOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `
-                : this.formScope === 'project'
-                ? html`
-                    <app-entity-selector
-                      label="${t.documents.fieldProject}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formProjectId}"
-                      .options="${projectOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formProjectId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `
-                : this.formScope === 'contract'
-                ? html`
-                    <app-entity-selector
-                      label="${t.documents.fieldContract}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formContractId}"
-                      .options="${contractOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formContractId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `
-                : this.formScope === 'counterparty'
-                ? html`
-                    <app-entity-selector
-                      label="${t.documents.fieldCounterparty}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formCounterpartyId}"
-                      .options="${counterpartyOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `
-                : this.formScope === 'task'
-                ? html`
-                    <app-entity-selector
-                      label="${t.documents.fieldTask}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formTaskId}"
-                      .options="${taskOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `
-                : html`
-                    <app-entity-selector
-                      label="${t.documents.fieldCompany}"
-                      placeholder="${t.documents.scopeNone}"
-                      clearable
-                      .value="${this.formCompanyId}"
-                      .options="${companyOptions}"
-                      @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-                    ></app-entity-selector>
-                  `}
-            </div>
-            <div>
-              <app-entity-selector
-                label="${t.documents.fieldUploadedBy}"
-                .value="${this.formUploadedById}"
-                .options="${userOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) => (this.formUploadedById = eventValue(e))}"
-              ></app-entity-selector>
-            </div>
-            <div class="col-span-2">
-              <div class="ai-doc-bar">
-                <div class="ai-doc-bar-row">
-                  <span class="ai-doc-hint">${t.viewTexts.ai.docFormHint}</span>
-                  <app-button
-                    size="sm"
-                    variant="secondary"
-                    ?disabled="${this.aiFormLoading}"
-                    @click="${this.handleGenerateFormSummary}"
-                  >
-                    <span slot="icon-start">${iconCpu(14)}</span>
-                    <span>
-                      ${this.aiFormLoading
-                        ? t.viewTexts.ai.docGenerating
-                        : t.viewTexts.ai.docGenerateBtn}
-                    </span>
-                  </app-button>
-                </div>
-                ${this.aiFormError
-                  ? html`
-                      <div class="ai-doc-error">
-                        <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
-                        <span>${this.aiFormError}</span>
-                      </div>
-                    `
-                  : ''}
-              </div>
-            </div>
-            <div>
-              <app-input
-                label="${t.documents.fieldTags}"
-                .value="${this.formTags}"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.formTags = eventValue(e))}"
-              ></app-input>
-            </div>
-            <div class="col-span-2">
-              <app-textarea
-                label="${t.documents.fieldDescription}"
-                .value="${this.formDescription}"
-                rows="3"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-              ></app-textarea>
-            </div>
-            <div class="col-span-2">
-              <app-textarea
-                label="${t.documents.fieldTextContent}"
-                hint="${t.viewTexts.documents.charsLimitHint}"
-                .value="${this.formTextContent}"
-                rows="4"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.formTextContent = eventValue(e))}"
-              ></app-textarea>
-            </div>
-            ${!this.editingDocId
-              ? html`
-                  <div class="col-span-2">
-                    <app-input
-                      label="${t.documents.fieldVersionNote}"
-                      .value="${this.formVersionNote}"
-                      @input="${(e: CustomEvent<{ value: string }>) => (this.formVersionNote = eventValue(e))}"
-                    ></app-input>
-                  </div>
-                `
-              : ''}
-          </app-form-grid>
-        </div>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveModal}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-document-form>
     `;
   }
 
@@ -1369,31 +1103,10 @@ export class AppDocuments extends LitElement {
     const file = e.detail?.file;
     if (!file) return;
     this.openCreateModal();
-    await this.applyFileToForm(file);
-  }
-
-  private async handleModalDropzoneSelect(e: CustomEvent<{ file: File }>) {
-    const file = e.detail?.file;
-    if (!file) return;
-    await this.applyFileToForm(file);
-  }
-
-  private async applyFileToForm(file: File) {
-    const t = getTranslation(this.currentLang);
-    const payload = await readBrowserFile(file, t.viewTexts.documents.fileTooLargeNote);
-    this.formFileName = payload.fileName;
-    this.formExtension = payload.extension;
-    this.formMimeType = payload.mimeType;
-    this.formSizeBytes = payload.sizeBytes;
-    this.formDataUrl = payload.dataUrl;
-    if (payload.textContent !== undefined) {
-      this.formTextContent = payload.textContent;
-    }
-    this.formTruncatedNote = payload.truncatedNote || '';
-    if (!this.formTitle.trim()) {
-      this.formTitle = payload.fileName.replace(/\.[^.]+$/, '');
-      this.formError = '';
-    }
+    const form = this.shadowRoot!.querySelector('app-document-form');
+    if (!form) return;
+    await form.updateComplete;
+    await form.selectFile(file);
   }
 
   private async handleVersionDropzoneSelect(e: CustomEvent<{ file: File }>) {
@@ -1434,120 +1147,15 @@ export class AppDocuments extends LitElement {
   }
 
   private openCreateModal() {
-    const t = getTranslation(this.currentLang);
-    this.editingDocId = null;
-    this.formTitle = '';
-    this.formFileName = '';
-    this.formExtension = 'txt';
-    this.formMimeType = 'text/plain';
-    this.formSizeBytes = 0;
-    this.formDataUrl = undefined;
-    this.formTextContent = '';
-    this.formTruncatedNote = '';
-    this.formCategory = 'spec';
-    this.formStatus = 'draft';
-    this.formScope =
-      this.projectFilter !== 'all'
-        ? 'project'
-        : this.companyFilter !== 'all'
-        ? 'company'
-        : 'company';
-    this.formCompanyId = this.companyFilter !== 'all' ? this.companyFilter : store.companies[0]?.id || '';
-    this.formProjectId = this.projectFilter !== 'all' ? this.projectFilter : '';
-    this.formContractId = '';
-    this.formCounterpartyId = '';
-    this.formTaskId = '';
-    this.formUploadedById = store.currentUserId || store.users[0]?.id || '';
-    this.formTags = '';
-    this.formDescription = '';
-    this.formVersionNote = t.viewTexts.documents.initialVersionNote;
-    this.formError = '';
-    this.aiFormLoading = false;
-    this.aiFormError = '';
+    this.editingDocument = null;
+    this.presetDocProjectId = this.projectFilter !== 'all' ? this.projectFilter : null;
+    this.presetDocCompanyId = this.companyFilter !== 'all' ? this.companyFilter : null;
     this.modalOpen = true;
   }
 
   private openEditModal(doc: DocumentItem) {
-    this.editingDocId = doc.id;
-    this.formTitle = doc.title;
-    this.formFileName = doc.fileName;
-    this.formExtension = doc.extension;
-    this.formMimeType = doc.mimeType;
-    this.formSizeBytes = doc.sizeBytes;
-    this.formDataUrl = doc.dataUrl;
-    this.formTextContent = doc.textContent || '';
-    this.formTruncatedNote = '';
-    this.formCategory = doc.category;
-    this.formStatus = doc.status;
-    this.formScope = doc.scope;
-    this.formCompanyId = doc.companyId || '';
-    this.formProjectId = doc.projectId || '';
-    this.formContractId = doc.contractId || '';
-    this.formCounterpartyId = doc.counterpartyId || '';
-    this.formTaskId = doc.taskId || '';
-    this.formUploadedById = doc.uploadedById;
-    this.formTags = (doc.tags || []).join(', ');
-    this.formDescription = doc.description || '';
-    this.formVersionNote = '';
-    this.formError = '';
-    this.aiFormLoading = false;
-    this.aiFormError = '';
+    this.editingDocument = doc;
     this.modalOpen = true;
-  }
-
-  private async handleGenerateFormSummary() {
-    const t = getTranslation(this.currentLang);
-    if (!this.formTitle.trim() && !this.formFileName.trim() && !this.formTextContent.trim()) {
-      this.aiFormError = t.viewTexts.ai.errors.missingDocInfo;
-      return;
-    }
-
-    const endpoint = store.customization.aiEndpoint;
-    const model = store.customization.aiModel;
-    this.aiFormLoading = true;
-    this.aiFormError = '';
-
-    const linkedCompany = this.formCompanyId
-      ? store.companies.find((c) => c.id === this.formCompanyId)?.name
-      : undefined;
-    const linkedProject = this.formProjectId
-      ? store.projects.find((p) => p.id === this.formProjectId)?.name
-      : undefined;
-
-    try {
-      const result = await generateDocumentSummaryAndTags({
-        doc: {
-          title: this.formTitle.trim(),
-          fileName: this.formFileName.trim(),
-          mimeType: this.formMimeType,
-          category: this.formCategory,
-          scope: this.formScope,
-          description: this.formDescription,
-          tags: this.formTags
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
-          textContent: this.formTextContent,
-          dataUrl: this.formDataUrl,
-        },
-        linkedContext: [linkedCompany, linkedProject].filter(Boolean).join(' · ') || undefined,
-        lang: this.currentLang,
-        baseUrl: endpoint,
-        model,
-      });
-
-      if (result.summary) {
-        this.formDescription = result.summary;
-      }
-      if (result.tags.length > 0) {
-        this.formTags = result.tags.join(', ');
-      }
-      store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
-    } catch (err) {
-      this.aiFormError = formatAiError(err, endpoint, t);
-    } finally {
-      this.aiFormLoading = false;
-    }
   }
 
   private async handleGeneratePreviewSummary(doc: DocumentItem) {
@@ -1591,74 +1199,4 @@ export class AppDocuments extends LitElement {
     store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
   }
 
-  private handleSaveModal() {
-    const t = getTranslation(this.currentLang);
-    if (!this.formTitle.trim()) {
-      this.formError = t.common.required;
-      return;
-    }
-
-    const fileName =
-      this.formFileName.trim() || `${this.formTitle.trim().toLowerCase().replace(/\s+/g, '_')}.txt`;
-    const parts = fileName.split('.');
-    const ext = parts.length > 1 ? (parts.pop() || 'txt').toLowerCase() : this.formExtension || 'txt';
-    const textBytes = this.formTextContent ? new Blob([this.formTextContent]).size : 512;
-
-    const tags = this.formTags
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const linkedProject =
-      this.formScope === 'project' && this.formProjectId
-        ? store.projects.find((p) => p.id === this.formProjectId)
-        : undefined;
-    const linkedContract =
-      this.formScope === 'contract' && this.formContractId
-        ? store.contracts.find((c) => c.id === this.formContractId)
-        : undefined;
-
-    const resolvedCompanyId =
-      this.formScope === 'company' || this.formScope === 'general'
-        ? this.formCompanyId || undefined
-        : linkedProject?.companyId || linkedContract?.companyId || undefined;
-
-    const commonPayload = {
-      title: this.formTitle.trim(),
-      fileName,
-      extension: ext,
-      mimeType: this.formMimeType || 'text/plain',
-      sizeBytes: this.formSizeBytes || textBytes,
-      category: this.formCategory,
-      status: this.formStatus,
-      scope: this.formScope,
-      companyId: resolvedCompanyId,
-      projectId: this.formScope === 'project' ? this.formProjectId || undefined : undefined,
-      contractId: this.formScope === 'contract' ? this.formContractId || undefined : undefined,
-      counterpartyId: this.formScope === 'counterparty' ? this.formCounterpartyId || undefined : undefined,
-      taskId: this.formScope === 'task' ? this.formTaskId || undefined : undefined,
-      tags,
-      description: this.formDescription.trim(),
-      uploadedById: this.formUploadedById || store.currentUserId || store.users[0]?.id || 'user-1',
-      dataUrl: this.formDataUrl,
-      textContent: this.formTextContent.trim() || undefined,
-    };
-
-    if (this.editingDocId) {
-      const existing = this.documents.find((d) => d.id === this.editingDocId);
-      if (existing) {
-        store.updateDocument({
-          ...existing,
-          ...commonPayload,
-        });
-      }
-    } else {
-      store.addDocument({
-        ...commonPayload,
-        versionNote: this.formVersionNote.trim() || t.viewTexts.documents.initialVersionNote,
-      });
-    }
-
-    this.modalOpen = false;
-  }
 }
