@@ -52,6 +52,7 @@ import contractFormMeta from '../../common/app-contract-form/app-contract-form.s
 import paymentFormMeta from '../../common/app-payment-form/app-payment-form.story';
 import companyFormMeta from '../../common/app-company-form/app-company-form.story';
 import counterpartyFormMeta from '../../common/app-counterparty-form/app-counterparty-form.story';
+import employeeFormMeta from '../../common/app-employee-form/app-employee-form.story';
 import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialog.story';
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
@@ -140,6 +141,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   paymentFormMeta,
   companyFormMeta,
   counterpartyFormMeta,
+  employeeFormMeta,
   emptyStateMeta,
   kpiStripMeta,
   sectionCardMeta,
