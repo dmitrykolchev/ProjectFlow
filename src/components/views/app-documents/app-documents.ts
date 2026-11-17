@@ -442,10 +442,6 @@ export class AppDocuments extends LitElement {
                   </span>
                 </div>
                 <div class="meta-item">
-                  <span class="meta-label">${t.documents.updatedLabel}</span>
-                  <span class="meta-value mono">${doc.updatedAt.slice(0, 10)}</span>
-                </div>
-                <div class="meta-item">
                   <span class="meta-label">${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})</span>
                   ${linked.onClick
                     ? html`
@@ -459,6 +455,10 @@ export class AppDocuments extends LitElement {
                         </app-link>
                       `
                     : html`<span class="meta-value">${linked.label}</span>`}
+                </div>
+                <div class="meta-item">
+                  <span class="meta-label">${t.documents.updatedLabel}</span>
+                  <span class="meta-value mono">${doc.updatedAt.slice(0, 10)}</span>
                 </div>
               </div>
 
