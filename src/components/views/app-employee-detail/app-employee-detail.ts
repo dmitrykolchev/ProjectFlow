@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { EmployeeStatus, TimeEntryCategory, User } from '../../../types';
+import { TimeEntryCategory, User } from '../../../types';
 import {
   iconChevronLeft,
   iconChevronRight,
@@ -18,7 +18,6 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/app-input/app-input';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
@@ -27,6 +26,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-employee-form/app-employee-form';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-avatar/app-avatar';
@@ -45,17 +45,6 @@ export class AppEmployeeDetail extends LitElement {
 
   // Edit profile modal
   @state() private editModalOpen = false;
-  @state() private formName = '';
-  @state() private formRole = '';
-  @state() private formDepartment = '';
-  @state() private formCompanyId = '';
-  @state() private formEmail = '';
-  @state() private formPhone = '';
-  @state() private formLocation = '';
-  @state() private formStatus: EmployeeStatus = 'active';
-  @state() private formHireDate = '';
-  @state() private formHourlyRate = 3500;
-  @state() private formError = '';
 
   @state() private confirmDeleteOpen = false;
 
@@ -518,117 +507,15 @@ export class AppEmployeeDetail extends LitElement {
   }
 
   private renderEditModal(t: ReturnType<typeof getTranslation>) {
-    const statusOptions = [
-      { value: 'active', label: t.viewTexts.employees.statusActive, color: '#10b981' },
-      { value: 'remote', label: t.viewTexts.employees.statusRemote, color: '#0284c7' },
-      { value: 'vacation', label: t.viewTexts.employees.statusVacation, color: '#f59e0b' },
-      { value: 'onboarding', label: t.viewTexts.employees.statusOnboarding, color: '#6366f1' },
-    ];
+    const emp = store.users.find((u) => u.id === this.detailEmployeeId) || null;
 
     return html`
-      <app-modal
-        ?open="${this.editModalOpen}"
-        size="lg"
-        title="${t.viewTexts.employeeDetail.modalTitleEdit}"
+      <app-employee-form
+        .open="${this.editModalOpen}"
+        .employee="${emp}"
         @close="${() => (this.editModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelFullName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employeeDetail.labelRole}"
-              .value="${this.formRole}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelDepartment}"
-              .value="${this.formDepartment}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.employees.labelCompany}"
-              .value="${this.formCompanyId}"
-              .options="${[
-                { value: '', label: t.viewTexts.employees.optionNoCompany },
-                ...store.companies.map((c) => ({ value: c.id, label: c.name })),
-              ]}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.labelPhone}"
-              .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employeeDetail.cityLabel}"
-              .value="${this.formLocation}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterparties.thStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as EmployeeStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.employees.labelHireDate}"
-              .value="${this.formHireDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.employees.labelRate}"
-              .value="${this.formHourlyRate}"
-              min="500"
-              max="25000"
-              step="100"
-              unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = eventValue(e))}"
-            ></app-number-input>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveEdit}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.editModalOpen = false)}"
+      ></app-employee-form>
     `;
   }
 
@@ -757,41 +644,7 @@ export class AppEmployeeDetail extends LitElement {
   }
 
   private openEditModal(emp: User) {
-    this.formName = emp.name;
-    this.formRole = emp.role;
-    this.formDepartment = emp.department || '';
-    this.formCompanyId = emp.companyId || '';
-    this.formEmail = emp.email;
-    this.formPhone = emp.phone || '';
-    this.formLocation = emp.location || '';
-    this.formStatus = emp.status || 'active';
-    this.formHireDate = emp.hireDate || '';
-    this.formHourlyRate = emp.hourlyRate || 3500;
-    this.formError = '';
     this.editModalOpen = true;
-  }
-
-  private handleSaveEdit() {
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-    const existing = this.employees.find((u) => u.id === this.detailEmployeeId);
-    store.updateEmployee({
-      id: this.detailEmployeeId,
-      avatar: existing?.avatar || '',
-      name: this.formName.trim(),
-      role: this.formRole.trim() || 'Specialist',
-      department: this.formDepartment.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultDepartment,
-      companyId: this.formCompanyId || undefined,
-      email: this.formEmail.trim() || 'team@projectflow.dev',
-      phone: this.formPhone.trim() || '—',
-      location: this.formLocation.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultLocation,
-      status: this.formStatus,
-      hireDate: this.formHireDate || undefined,
-      hourlyRate: Math.max(100, Number(this.formHourlyRate) || 3500),
-    });
-    this.editModalOpen = false;
   }
 
   private openQuickTimeModal(emp: User) {
