@@ -143,14 +143,18 @@
   color: var(--text-muted, #64748b);
 }
 
-.proj-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.65rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border-subtle, #1e293b);
+/* card-footer web component keeps its own chrome; the view pins it to the bottom
+   of the card, tunes historical gap and padding-top, and overrides delete hover tokens */
+card-footer {
   margin-top: auto;
+  --card-footer-gap: 0.65rem;
+  --card-footer-padding-top: 0.75rem;
+}
+
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
+  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .footer-left-actions {
