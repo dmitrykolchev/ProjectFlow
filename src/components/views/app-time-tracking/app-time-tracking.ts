@@ -273,13 +273,11 @@ export class AppTimeTracking extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.quickDescription = eventValue(e))}"
             ></app-input>
           </div>
-          <div class="billable-toggle-wrap">
-            <app-checkbox
-              label="${t.viewTexts.timeTracking.billableSwitch}"
-              .checked="${this.quickBillable}"
-              @change="${(e: CustomEvent<{ checked: boolean }>) => (this.quickBillable = e.detail.checked)}"
-            ></app-checkbox>
-          </div>
+          <app-checkbox
+            label="${t.viewTexts.timeTracking.billableSwitch}"
+            .checked="${this.quickBillable}"
+            @change="${(e: CustomEvent<{ checked: boolean }>) => (this.quickBillable = e.detail.checked)}"
+          ></app-checkbox>
           <app-button
             variant="primary"
             size="sm"

@@ -65,18 +65,13 @@
   min-width: 0;
 }
 
-.billable-toggle-wrap {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  height: 36px;
-  padding: 0 0.65rem;
-  border-radius: var(--radius-md, 8px);
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #1e293b);
-  font-size: 0.8rem;
-  color: var(--text-secondary, #94a3b8);
-  white-space: nowrap;
+/* the billable checkbox centers its control row on the vertical center of the
+   neighboring form-grid control: the padding-top skips the label line box and the gap that
+   every labeled field reserves above its control, so grid centering lands the checkbox at
+   the same center as the input to its left */
+.quick-log-row2 app-checkbox {
+  align-self: center;
+  padding-top: 21.95px;
 }
 
 /* Toolbar */
@@ -353,14 +348,4 @@
 .col-span-2 {
     grid-column: span 1;
   }
-}
-
-/* the billable checkbox cell centers its control row on the vertical center of the
-   neighboring form-grid control: the padding-top skips the label line box and the gap that
-   every labeled field reserves above its 38px control, so the flex centering lands the
-   checkbox at the same center as the control to its left */
-.checkbox-cell {
-  display: flex;
-  align-items: center;
-  padding-top: 21.95px;
 }
