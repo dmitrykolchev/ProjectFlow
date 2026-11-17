@@ -816,7 +816,11 @@ export class AppTaskDetail extends LitElement {
       >
         <span slot="icon">${iconFileText(17)}</span>
         ${task.aiDescription?.trim()
-          ? html`<app-markdown .content="${task.aiDescription}"></app-markdown>`
+          ? html`
+              <div class="ai-desc-scroll">
+                <app-markdown .content="${task.aiDescription}"></app-markdown>
+              </div>
+            `
           : html`<app-empty-state compact title="${t.taskDetail.aiDescEmpty}"></app-empty-state>`}
       </app-section-card>
     `;

@@ -850,3 +850,28 @@
   min-width: 0;
 }
 
+/* AI additional description: capped height with an inner scrollbar */
+.ai-desc-scroll {
+  max-height: 26rem;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.ai-desc-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.ai-desc-scroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+.ai-desc-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 4px;
+}
+
+.ai-desc-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary, #6366f1);
+}
+
