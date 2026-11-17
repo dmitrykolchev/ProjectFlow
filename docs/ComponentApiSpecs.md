@@ -439,9 +439,16 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 - `--icon-btn-{bg,color,border}` и `--icon-btn-hover-{bg,color,border}` — base/hover вида `icon`;
 - `--btn-min-width`, `--btn-font-weight`, `--icon-btn-font`, `--btn-disabled-opacity`.
 
-Текстовые ghost-чипы (activity-panel) мигрируются только после font-parity: flex-контейнер и
-`--icon-btn-font` контрола меняют ширину/высоту текстового содержимого относительно нативного
-button (замерено 101x22 vs оригинал 103x19).
+Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):
+нативный `button` наследует UA-шрифт и считает текстовый блок по `line-height: normal`, поэтому
+миграция чипа даёт точный пиксель-паритет при наборе токенов на host-элементе:
+`--control-height-{size}: auto`, `--control-padding-y-{size}` и `--control-padding-x-{size}` =
+исходный padding, `--control-font-{size}` = исходный font-size, `--btn-font-weight` = исходный
+вес (обычно 400), `--icon-btn-font` = шрифт, который наследовал нативный button (в shadow DOM без
+явного `font-family` это UA-шрифт, замерен как `Arial`), плюс `--btn-border-width`,
+base/hover-токены и радиусные пины из исходного правила.
+Проверено двумя контекстами: quick-term чип 92x19 (baseline 92x19) и activity-panel чип 103x19
+(baseline 103x19), все computed-метрики идентичны.
 
 ## E1. Матрица компонентов и миграции
 
