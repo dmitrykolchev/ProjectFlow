@@ -9,12 +9,9 @@ import {
   RequirementType,
   Task,
   TaskAiClarificationMessage,
-  TaskPriority,
 } from '../../../types';
 import {
   clarifyRequirementWithContext,
-  DecomposedTaskDraft,
-  decomposeRequirementsToTasks,
   formatAiError,
 } from '../../../services/openai-client';
 import {
@@ -39,21 +36,19 @@ import {
   mapProjectOptions,
   mapRequirementOptions,
   mapTaskOptions,
-  mapUserOptions,
 } from '../../common/entity-selector-options';
 import { eventValue } from '../../common/event-value';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-decompose-form/app-decompose-form';
 import '../../common/app-requirement-form/app-requirement-form';
-import '../../common/app-number-input/app-number-input';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
@@ -95,10 +90,6 @@ export class AppRequirementDetail extends LitElement {
   // AI decompose into tasks modal
   @state() private decomposing = false;
   @state() private decomposeError = '';
-  @state() private decomposeModalOpen = false;
-  @state() private draftTasks: Array<DecomposedTaskDraft & { selected: boolean }> = [];
-  @state() private decomposeAssigneeId = store.currentUserId || store.users[0]?.id || '';
-  @state() private decomposeModel = '';
 
   // Edit requirement modal
   @state() private editModalOpen = false;
@@ -140,9 +131,6 @@ export class AppRequirementDetail extends LitElement {
       this.detailRequirementId = this.requirements[0]?.id || '';
     }
 
-    if (!store.users.some((u) => u.id === this.decomposeAssigneeId)) {
-      this.decomposeAssigneeId = store.currentUserId || store.users[0]?.id || '';
-    }
   }
 
   private getCurrentRequirement(): ProjectRequirement | null {
@@ -1202,136 +1190,10 @@ export class AppRequirementDetail extends LitElement {
   }
 
   private renderDecomposeModal(t: ReturnType<typeof getTranslation>) {
-    const userOptions = mapUserOptions(store.users, t);
-    const priorityOptions = [
-      { value: 'low', label: t.priority.low },
-      { value: 'medium', label: t.priority.medium },
-      { value: 'high', label: t.priority.high },
-      { value: 'urgent', label: t.priority.urgent },
-    ];
-    const selectedCount = this.draftTasks.filter((d) => d.selected).length;
-
     return html`
-      <app-modal
-        ?open="${this.decomposeModalOpen}"
-        size="xl"
-        title="${t.viewTexts.requirements.decomposeModalTitle}"
-        @close="${() => (this.decomposeModalOpen = false)}"
-      >
-        <div class="draft-header-bar">
-          <div style="min-width: 260px; flex: 1;">
-            <app-entity-selector
-              size="sm"
-              label="${t.viewTexts.requirements.decomposeAssigneeLabel}"
-              .options="${userOptions}"
-              .value="${this.decomposeAssigneeId}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.decomposeAssigneeId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div style="display: flex; align-items: center; gap: 0.65rem;">
-            <app-badge variant="info" appearance="soft">
-              ${t.viewTexts.requirements.decomposeTasksCount(this.draftTasks.length)}
-            </app-badge>
-            ${this.decomposeModel
-              ? html`<span class="mono" style="font-size: 0.72rem; color: var(--text-muted);">${this.decomposeModel}</span>`
-              : ''}
-          </div>
-        </div>
-
-        ${this.draftTasks.length === 0
-          ? html`<app-empty-state compact title="${t.viewTexts.requirements.noDraftTasks}"></app-empty-state>`
-          : html`
-              <div class="draft-list">
-                ${this.draftTasks.map((draft, idx) => html`
-                  <div class="draft-card ${draft.selected ? 'is-selected' : ''}">
-                    <div class="draft-top">
-                      <app-checkbox
-                        .checked="${draft.selected}"
-                        @change="${() => {
-                          this.draftTasks = this.draftTasks.map((item, i) =>
-                            i === idx ? { ...item, selected: !item.selected } : item
-                          );
-                        }}"
-                      ></app-checkbox>
-
-                      <app-input
-                        size="sm"
-                        .value="${draft.title}"
-                        @input="${(e: CustomEvent<{ value: string }>) => {
-                          const val = eventValue(e);
-                          this.draftTasks = this.draftTasks.map((item, i) =>
-                            i === idx ? { ...item, title: val } : item
-                          );
-                        }}"
-                      ></app-input>
-
-                      <app-number-input
-                        size="sm"
-                        min="1"
-                        max="240"
-                        unit="${t.common.hours}"
-                        .value="${draft.estimatedHours}"
-                        @change="${(e: CustomEvent<{ value: number }>) => {
-                          const val = Number(eventValue(e)) || 8;
-                          this.draftTasks = this.draftTasks.map((item, i) =>
-                            i === idx ? { ...item, estimatedHours: val } : item
-                          );
-                        }}"
-                      ></app-number-input>
-
-                      <app-select
-                        size="sm"
-                        .value="${draft.priority}"
-                        .options="${priorityOptions}"
-                        @change="${(e: CustomEvent<{ value: string }>) => {
-                          const val = eventValue(e) as TaskPriority;
-                          this.draftTasks = this.draftTasks.map((item, i) =>
-                            i === idx ? { ...item, priority: val } : item
-                          );
-                        }}"
-                      ></app-select>
-                    </div>
-
-                    <app-textarea
-                      rows="2"
-                      .value="${draft.description}"
-                      @input="${(e: CustomEvent<{ value: string }>) => {
-                        const val = eventValue(e);
-                        this.draftTasks = this.draftTasks.map((item, i) =>
-                          i === idx ? { ...item, description: val } : item
-                        );
-                      }}"
-                    ></app-textarea>
-
-                    ${draft.subtasks.length > 0
-                      ? html`
-                          <div class="draft-subtasks">
-                            ${draft.subtasks.map(
-                              (st) => html`<span class="draft-subtask-chip">• ${st}</span>`
-                            )}
-                          </div>
-                        `
-                      : ''}
-                  </div>
-                `)}
-              </div>
-            `}
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.decomposeModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="primary"
-            ?disabled="${selectedCount === 0}"
-            @click="${this.handleCreateSelectedTasks}"
-          >
-            <span slot="icon-start">${iconCheck(14)}</span>
-            <span>${t.viewTexts.requirements.createSelectedTasksBtn} (${selectedCount})</span>
-          </app-button>
-        </div>
-      </app-modal>
+      <app-decompose-form
+        @decompose-failed="${(e: CustomEvent<{ message: string }>) => (this.decomposeError = e.detail.message)}"
+      ></app-decompose-form>
     `;
   }
 
@@ -1544,76 +1406,15 @@ export class AppRequirementDetail extends LitElement {
   }
 
   private async handleDecomposeRequirement(req: ProjectRequirement) {
-    const t = getTranslation(this.currentLang);
-    const project = store.projects.find((p) => p.id === req.projectId);
-    if (!project) return;
-
-    const endpoint = store.customization.aiEndpoint;
+    const form = this.shadowRoot!.querySelector('app-decompose-form');
+    if (!form) return;
+    form.requirementIds = [req.id];
     this.decomposing = true;
     this.decomposeError = '';
-    try {
-      const res = await decomposeRequirementsToTasks({
-        project,
-        requirements: [req],
-        knowledgeArticles: store.knowledgeArticles,
-        documents: store.documents,
-        lang: this.currentLang,
-        baseUrl: endpoint,
-        model: store.customization.aiModel,
-      });
-
-      this.draftTasks = res.tasks.map((task) => ({ ...task, selected: true }));
-      this.decomposeModel = res.model;
-      this.decomposeModalOpen = true;
-    } catch (err) {
-      this.decomposeError = formatAiError(err, endpoint, t);
-    } finally {
-      this.decomposing = false;
-    }
+    await form.decompose();
+    this.decomposing = false;
   }
 
-  private handleCreateSelectedTasks() {
-    const req = this.getCurrentRequirement();
-    if (!req) return;
-    const selectedDrafts = this.draftTasks.filter((d) => d.selected && d.title.trim());
-    if (selectedDrafts.length === 0) return;
-
-    const today = new Date().toISOString().slice(0, 10);
-    const due = new Date(Date.now() + 14 * 86400 * 1000).toISOString().slice(0, 10);
-    const assigneeId = this.decomposeAssigneeId || store.users[0]?.id || 'user-1';
-    const createdIds: string[] = [];
-
-    for (const draft of selectedDrafts) {
-      const created = store.addTask({
-        title: draft.title.trim(),
-        description: draft.description.trim(),
-        status: 'todo',
-        priority: draft.priority,
-        assigneeId,
-        projectId: req.projectId,
-        tags: draft.tags,
-        startDate: today,
-        dueDate: due,
-        estimatedHours: draft.estimatedHours,
-        loggedHours: 0,
-        subtasks: draft.subtasks.map((title, idx) => ({
-          id: `st-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 5)}`,
-          title,
-          completed: false,
-        })),
-        requirementIds: Array.from(new Set([req.id, ...draft.requirementIds])),
-        knowledgeArticleIds: [...draft.knowledgeArticleIds],
-      });
-      createdIds.push(created.id);
-    }
-
-    store.updateRequirement({
-      ...req,
-      status: req.status === 'draft' || req.status === 'approved' ? 'in_progress' : req.status,
-      linkedTaskIds: Array.from(new Set([...(req.linkedTaskIds || []), ...createdIds])),
-    });
-    this.decomposeModalOpen = false;
-  }
 
   private openEditModal(req: ProjectRequirement) {
     this.editModalOpen = true;
