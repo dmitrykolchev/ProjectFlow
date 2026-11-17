@@ -113,22 +113,6 @@
   border-bottom: 1px solid var(--border-subtle, #1e293b);
 }
 
-.project-dropdown {
-  width: 100%;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-primary, #f8fafc);
-  padding: 0.45rem 0.65rem;
-  font-size: 0.8125rem;
-  outline: none;
-  cursor: pointer;
-}
-
-.project-dropdown:focus {
-  border-color: var(--accent-primary, #6366f1);
-}
-
 .nav-mode-bar {
   display: flex;
   align-items: center;

@@ -3,7 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { mapProjectOptions } from '../../common/entity-selector-options';
 import '../../common/app-avatar/app-avatar';
+import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import styles from './app-sidebar.css';
 import {
@@ -212,21 +214,15 @@ export class AppSidebar extends LitElement {
         ${!this.collapsed
           ? html`
               <div class="project-selector">
-                <select
-                  class="project-dropdown"
-                  @change="${(e: Event) => store.selectProject((e.target as HTMLSelectElement).value)}"
-                >
-                  <option value="all" ?selected="${this.selectedProjectId === 'all'}">
-                    ${t.common.all} ${t.navigation.projects.toLowerCase()}
-                  </option>
-                  ${store.projects.map(
-                    (p) => html`
-                      <option value="${p.id}" ?selected="${this.selectedProjectId === p.id}">
-                        ${p.key} - ${p.name}
-                      </option>
-                    `
-                  )}
-                </select>
+                <app-entity-selector
+                  size="sm"
+                  .options="${[
+                    { value: 'all', label: `${t.common.all} ${t.navigation.projects.toLowerCase()}` },
+                    ...mapProjectOptions(store.projects, t),
+                  ]}"
+                  .value="${this.selectedProjectId}"
+                  @change="${(e: CustomEvent) => store.selectProject(e.detail.value)}"
+                ></app-entity-selector>
               </div>
             `
           : ''}
