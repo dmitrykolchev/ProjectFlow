@@ -52,6 +52,7 @@ import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-requirement-form/app-requirement-form';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
@@ -101,18 +102,6 @@ export class AppRequirementDetail extends LitElement {
 
   // Edit requirement modal
   @state() private editModalOpen = false;
-  @state() private formProjectId = '';
-  @state() private formSourceDocId = '';
-  @state() private formCode = '';
-  @state() private formType: RequirementType = 'functional';
-  @state() private formCategory = '';
-  @state() private formPriority: RequirementPriority = 'high';
-  @state() private formStatus: RequirementStatus = 'approved';
-  @state() private formTitle = '';
-  @state() private formDescription = '';
-  @state() private formAcceptance = '';
-  @state() private formKnowledgeIds: string[] = [];
-  @state() private formError = '';
 
   // Delete confirm
   @state() private confirmDeleteOpen = false;
@@ -1200,183 +1189,15 @@ export class AppRequirementDetail extends LitElement {
   }
 
   private renderEditModal(t: ReturnType<typeof getTranslation>) {
-    const projectOptions = mapProjectOptions(store.projects, t);
-    const docOptions = mapDocumentOptions(store.documents, t);
-    const typeOptions = [
-      { value: 'functional', label: t.requirements.functional },
-      { value: 'non_functional', label: t.requirements.nonFunctional },
-    ];
-    const priorityOptions: Array<{ value: RequirementPriority; label: string }> = [
-      { value: 'critical', label: t.requirements.priorities.critical },
-      { value: 'high', label: t.requirements.priorities.high },
-      { value: 'medium', label: t.requirements.priorities.medium },
-      { value: 'low', label: t.requirements.priorities.low },
-    ];
-    const statusOptions: Array<{ value: RequirementStatus; label: string }> = [
-      { value: 'draft', label: t.requirements.statuses.draft },
-      { value: 'approved', label: t.requirements.statuses.approved },
-      { value: 'in_progress', label: t.requirements.statuses.in_progress },
-      { value: 'implemented', label: t.requirements.statuses.implemented },
-      { value: 'verified', label: t.requirements.statuses.verified },
-    ];
-    const kbOptions = mapKnowledgeOptions(
-      store.knowledgeArticles.filter((k) => !this.formKnowledgeIds.includes(k.id)),
-      t
-    );
-    const selectedKbs = store.knowledgeArticles.filter((k) =>
-      this.formKnowledgeIds.includes(k.id)
-    );
+    const req = store.requirements.find((r) => r.id === this.detailRequirementId) || null;
 
     return html`
-      <app-modal
-        ?open="${this.editModalOpen}"
-        size="lg"
-        title="${t.viewTexts.requirements.modalEditTitle}"
+      <app-requirement-form
+        .open="${this.editModalOpen}"
+        .requirement="${req}"
         @close="${() => (this.editModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-entity-selector
-              label="${t.requirements.projectLabel}"
-              .options="${projectOptions}"
-              .value="${this.formProjectId}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formProjectId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-input
-              label="${t.requirements.codeLabel}"
-              .value="${this.formCode}"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCode = eventValue(e).toUpperCase())}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.requirements.typeLabel}"
-              .value="${this.formType}"
-              .options="${typeOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formType = eventValue(e) as RequirementType)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-input
-              label="${t.requirements.categoryLabel}"
-              .value="${this.formCategory}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCategory = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.requirements.priorityLabel}"
-              .value="${this.formPriority}"
-              .options="${priorityOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formPriority = eventValue(e) as RequirementPriority)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.requirements.statusLabel}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as RequirementStatus)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-entity-selector
-              clearable
-              label="${t.requirements.sourceSpecLabel}"
-              .options="${docOptions}"
-              .value="${this.formSourceDocId}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formSourceDocId = eventValue(e) || '')}"
-            ></app-entity-selector>
-          </div>
-          <div class="col-span-2">
-            <app-entity-selector
-              label="${t.requirements.linkedKbLabel}"
-              placeholder="${t.viewTexts.taskDetail.attachKnowledgePlaceholder}"
-              .options="${kbOptions}"
-              value=""
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                const kbId = eventValue(e);
-                if (kbId && !this.formKnowledgeIds.includes(kbId)) {
-                  this.formKnowledgeIds = [...this.formKnowledgeIds, kbId];
-                }
-              }}"
-            ></app-entity-selector>
-            ${selectedKbs.length > 0
-              ? html`
-                  <div class="chip-list">
-                    ${selectedKbs.map(
-                      (kb) => html`
-                        <span class="trace-link-chip">
-                          ${iconBookOpen(11)}
-                          <span>${kb.title}</span>
-                          <button
-                            type="button"
-                            class="chip-remove-btn"
-                            title="${t.common.delete}"
-                            @click="${() => {
-                              this.formKnowledgeIds = this.formKnowledgeIds.filter(
-                                (id) => id !== kb.id
-                              );
-                            }}"
-                          >
-                            ${iconX(11)}
-                          </button>
-                        </span>
-                      `
-                    )}
-                  </div>
-                `
-              : ''}
-          </div>
-          <div class="col-span-2">
-            <app-input
-              label="${t.requirements.titleLabel}"
-              required
-              error="${this.formError}"
-              .value="${this.formTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formTitle = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.requirements.descriptionLabel}"
-              .value="${this.formDescription}"
-              rows="4"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.requirements.acceptanceLabel}"
-              .value="${this.formAcceptance}"
-              rows="4"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formAcceptance = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveEditModal}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.editModalOpen = false)}"
+      ></app-requirement-form>
     `;
   }
 
@@ -1795,49 +1616,6 @@ export class AppRequirementDetail extends LitElement {
   }
 
   private openEditModal(req: ProjectRequirement) {
-    this.formProjectId = req.projectId;
-    this.formSourceDocId = req.sourceDocumentId || '';
-    this.formCode = req.code;
-    this.formType = req.type;
-    this.formCategory = req.category;
-    this.formPriority = req.priority;
-    this.formStatus = req.status;
-    this.formTitle = req.title;
-    this.formDescription = req.description;
-    this.formAcceptance = req.acceptanceCriteria.join('\n');
-    this.formKnowledgeIds = [...(req.linkedKnowledgeIds || [])];
-    this.formError = '';
     this.editModalOpen = true;
-  }
-
-  private handleSaveEditModal() {
-    const t = getTranslation(this.currentLang);
-    const req = this.getCurrentRequirement();
-    if (!req) return;
-    if (!this.formTitle.trim()) {
-      this.formError = t.common.required;
-      return;
-    }
-
-    const criteria = this.formAcceptance
-      .split('\n')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    store.updateRequirement({
-      ...req,
-      projectId: this.formProjectId || req.projectId,
-      sourceDocumentId: this.formSourceDocId || undefined,
-      code: this.formCode.trim().toUpperCase() || req.code,
-      type: this.formType,
-      category: this.formCategory.trim() || req.category,
-      priority: this.formPriority,
-      status: this.formStatus,
-      title: this.formTitle.trim(),
-      description: this.formDescription.trim(),
-      acceptanceCriteria: criteria,
-      linkedKnowledgeIds: [...this.formKnowledgeIds],
-    });
-    this.editModalOpen = false;
   }
 }
