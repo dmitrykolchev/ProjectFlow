@@ -259,28 +259,26 @@ label {
   border-top: 1px solid var(--border-subtle, #1e293b);
 }
 
+/* picker footer chips are app-link web components at size md restoring the historical UA control
+   look through the additive link hooks: the UA Arial family reset by the native font shorthand, the
+   UA normal line box of 12px for the 0.75rem glyph, nowrap, padding 0.25rem 0.5rem, weight 600, and
+   the accent glyph with the accent soft hover fill restored through link-hover-bg; the inner radius
+   follows the canonical small token as the original rule did */
 .footer-link-btn {
-  background: transparent;
-  border: none;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--accent-primary, #818cf8);
-  cursor: pointer;
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--radius-sm, 4px);
+  --link-font: Arial;
+  --link-line-height: 12px;
+  --link-white-space: nowrap;
+  --link-padding: 0.25rem 0.5rem;
+  --link-font-weight: 600;
+  --control-font-md: 0.75rem;
+  --link-hover-bg: var(--accent-soft, rgba(99, 102, 241, 0.14));
 }
 
-.footer-link-btn:hover {
-  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
-}
-
+/* the clear chip is the muted variant with the neutral hover fill and text-primary glyph */
 .footer-link-btn.muted {
-  color: var(--text-muted, #64748b);
-}
-
-.footer-link-btn.muted:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+  --link-color: var(--text-muted, #64748b);
+  --link-hover-bg: var(--bg-hover, #223049);
+  --link-hover-color: var(--text-primary, #f8fafc);
 }
 
 .error-text {

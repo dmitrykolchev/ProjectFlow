@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { iconCalendar, iconChevronLeft, iconChevronRight, iconX } from '../icons';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import '../app-link/app-link';
 import styles from './app-date-input.css';
 
 @customElement('app-date-input')
@@ -263,14 +264,24 @@ export class AppDateInput extends LitElement {
         </div>
 
         <div class="picker-footer">
-          <button type="button" class="footer-link-btn" @click="${this.pickToday}">
+          <app-link
+            class="footer-link-btn"
+            size="md"
+            variant="primary"
+            @click="${this.pickToday}"
+          >
             ${t.common.today}
-          </button>
+          </app-link>
           ${!this.required
             ? html`
-                <button type="button" class="footer-link-btn muted" @click="${this.clearDate}">
+                <app-link
+                  class="footer-link-btn muted"
+                  size="md"
+                  variant="primary"
+                  @click="${this.clearDate}"
+                >
                   ${t.common.clear}
-                </button>
+                </app-link>
               `
             : ''}
         </div>
