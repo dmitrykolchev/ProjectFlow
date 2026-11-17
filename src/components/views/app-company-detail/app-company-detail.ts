@@ -10,14 +10,11 @@ import {
   isImageMimeOrExt,
   isPdfMimeOrExt,
   isTextMimeOrExt,
-  readBrowserFile,
 } from '../../common/document-utils';
 import {
   Company,
   Contract,
-  DocumentCategory,
   DocumentItem,
-  DocumentStatus,
   KnowledgeArticle,
   Project,
     User,
@@ -58,11 +55,10 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
-import '../../common/app-file-dropzone/app-file-dropzone';
-import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-modal/app-modal';
+import '../../common/app-document-form/app-document-form';
 import '../../common/app-project-form/app-project-form';
 import '../../common/app-company-form/app-company-form';
 import '../../common/app-progress-bar/app-progress-bar';
@@ -100,20 +96,6 @@ export class AppCompanyDetail extends LitElement {
 
   // Quick Upload Document modal state
   @state() private uploadDocModalOpen = false;
-  @state() private docTitle = '';
-  @state() private docFileName = '';
-  @state() private docExtension = '';
-  @state() private docMimeType = 'text/plain';
-  @state() private docSizeBytes = 0;
-  @state() private docDataUrl: string | undefined = undefined;
-  @state() private docTextContent = '';
-  @state() private docTruncatedNote = '';
-  @state() private docCategory: DocumentCategory = 'spec';
-  @state() private docStatus: DocumentStatus = 'approved';
-  @state() private docProjectId = '';
-  @state() private docTags = '';
-  @state() private docDescription = '';
-  @state() private docError = '';
 
   // Embedded Company Library & Preview Modal state
   @state() private selectedDocId = '';
@@ -1202,145 +1184,23 @@ export class AppCompanyDetail extends LitElement {
     companyProjects: Project[],
     t: ReturnType<typeof getTranslation>
   ) {
-    const categoryOpts = (
-      Object.keys(t.documents.categories) as DocumentCategory[]
-    ).map((key) => ({ value: key, label: t.documents.categories[key] }));
-
-    const statusOpts = (['draft', 'review', 'approved', 'archived'] as DocumentStatus[]).map((key) => ({
-      value: key,
-      label: t.documents.statuses[key],
-    }));
-
-    const projectOpts = [
-      { value: '', label: t.documents.scopeNone },
-      ...companyProjects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}` })),
-    ];
-
     return html`
-      <app-modal
-        ?open="${this.uploadDocModalOpen}"
-        size="lg"
-        title="${t.companyDetail.uploadDocument}"
+      <app-document-form
+        .open="${this.uploadDocModalOpen}"
+        .presetCompanyId="${company.id}"
+        .presetCategory="${'legal'}"
+        .presetStatus="${'approved'}"
+        .presetTags="${company.name.toLowerCase()}"
+        .contextTitle="${t.companyDetail.uploadDocument}"
         @close="${() => (this.uploadDocModalOpen = false)}"
-      >
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-          <app-file-dropzone
-            selected-file-name="${this.docFileName}"
-            selected-file-size="${this.docSizeBytes}"
-            @file-selected="${this.handleDropzoneFileSelected}"
-            @file-cleared="${() => {
-              this.docFileName = '';
-              this.docSizeBytes = 0;
-              this.docDataUrl = undefined;
-              this.docTruncatedNote = '';
-            }}"
-          ></app-file-dropzone>
-
-          ${this.docTruncatedNote
-            ? html`<div class="note-banner">${this.docTruncatedNote}</div>`
-            : ''}
-
-          <app-form-grid>
-            <div>
-              <app-input
-                label="${t.documents.fieldTitle}"
-                .value="${this.docTitle}"
-                required
-                error="${this.docError}"
-                @input="${(e: CustomEvent<{ value: string }>) => {
-                  this.docTitle = eventValue(e);
-                  this.docError = '';
-                }}"
-              ></app-input>
-            </div>
-            <div>
-              <app-input
-                label="${t.documents.fieldFileName}"
-                .value="${this.docFileName}"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.docFileName = eventValue(e))}"
-              ></app-input>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldCategory}"
-                .value="${this.docCategory}"
-                .options="${categoryOpts}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.docCategory = eventValue(e) as DocumentCategory)}"
-              ></app-select>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldStatus}"
-                .value="${this.docStatus}"
-                .options="${statusOpts}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.docStatus = eventValue(e) as DocumentStatus)}"
-              ></app-select>
-            </div>
-            <div>
-              <app-select
-                label="${t.documents.fieldProject}"
-                .value="${this.docProjectId}"
-                .options="${projectOpts}"
-                @change="${(e: CustomEvent<{ value: string }>) => (this.docProjectId = eventValue(e))}"
-              ></app-select>
-            </div>
-            <div class="col-span-2">
-              <div class="ai-doc-bar">
-                <div class="ai-doc-bar-row">
-                  <span class="ai-doc-hint">${t.viewTexts.ai.docFormHint}</span>
-                  <app-button
-                    size="sm"
-                    variant="secondary"
-                    ?disabled="${this.aiDocLoading}"
-                    @click="${() => this.handleGenerateUploadDocAi(company)}"
-                  >
-                    <span slot="icon-start">${iconCpu(14)}</span>
-                    <span>
-                      ${this.aiDocLoading
-                        ? t.viewTexts.ai.docGenerating
-                        : t.viewTexts.ai.docGenerateBtn}
-                    </span>
-                  </app-button>
-                </div>
-                ${this.aiDocError
-                  ? html`
-                      <div class="ai-doc-error">
-                        <span style="flex-shrink: 0;">${iconAlertTriangle(14)}</span>
-                        <span>${this.aiDocError}</span>
-                      </div>
-                    `
-                  : ''}
-              </div>
-            </div>
-            <div>
-              <app-input
-                label="${t.documents.fieldTags}"
-                .value="${this.docTags}"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.docTags = eventValue(e))}"
-              ></app-input>
-            </div>
-            <div class="col-span-2">
-              <app-textarea
-                label="${t.documents.fieldDescription}"
-                .value="${this.docDescription}"
-                rows="3"
-                @input="${(e: CustomEvent<{ value: string }>) => (this.docDescription = eventValue(e))}"
-              ></app-textarea>
-            </div>
-          </app-form-grid>
-        </div>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.uploadDocModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleSaveDocument(company)}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${(e: CustomEvent<{ document: DocumentItem }>) => {
+          this.selectedDocId = e.detail.document.id;
+          this.docTypeFilter = 'all';
+          this.docSearchQuery = '';
+          this.activeTab = 'documents';
+          this.uploadDocModalOpen = false;
+        }}"
+      ></app-document-form>
     `;
   }
 
@@ -1565,64 +1425,7 @@ export class AppCompanyDetail extends LitElement {
   }
 
   private openUploadDocModal(company: Company) {
-    this.docTitle = '';
-    this.docFileName = '';
-    this.docExtension = 'txt';
-    this.docMimeType = 'text/plain';
-    this.docSizeBytes = 0;
-    this.docDataUrl = undefined;
-    this.docTextContent = '';
-    this.docTruncatedNote = '';
-    this.docCategory = 'legal';
-    this.docStatus = 'approved';
-    this.docProjectId = '';
-    this.docTags = company.name.toLowerCase();
-    this.docDescription = '';
-    this.docError = '';
-    this.aiDocLoading = false;
-    this.aiDocError = '';
     this.uploadDocModalOpen = true;
-  }
-
-  private async handleGenerateUploadDocAi(company: Company) {
-    const t = getTranslation(this.currentLang);
-    if (!this.docTitle.trim() && !this.docFileName.trim() && !this.docTextContent.trim()) {
-      this.aiDocError = t.viewTexts.ai.errors.missingDocInfo;
-      return;
-    }
-    const endpoint = store.customization.aiEndpoint;
-    const model = store.customization.aiModel;
-    this.aiDocLoading = true;
-    this.aiDocError = '';
-    try {
-      const result = await generateDocumentSummaryAndTags({
-        doc: {
-          title: this.docTitle.trim(),
-          fileName: this.docFileName.trim(),
-          mimeType: this.docMimeType,
-          category: this.docCategory,
-          scope: this.docProjectId ? 'project' : 'company',
-          description: this.docDescription,
-          tags: this.docTags
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
-          textContent: this.docTextContent,
-          dataUrl: this.docDataUrl,
-        },
-        linkedContext: company.name,
-        lang: this.currentLang,
-        baseUrl: endpoint,
-        model,
-      });
-      if (result.summary) this.docDescription = result.summary;
-      if (result.tags.length > 0) this.docTags = result.tags.join(', ');
-      store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
-    } catch (err) {
-      this.aiDocError = formatAiError(err, endpoint, t);
-    } finally {
-      this.aiDocLoading = false;
-    }
   }
 
   private openDocPreviewModal(doc: DocumentItem) {
@@ -1670,62 +1473,5 @@ export class AppCompanyDetail extends LitElement {
     store.addNotification('success', t.viewTexts.ai.docSectionTitle, t.viewTexts.ai.docAppliedNote);
   }
 
-  private async handleDropzoneFileSelected(e: CustomEvent<{ file: File }>) {
-    const file = e.detail?.file;
-    if (!file) return;
-    const t = getTranslation(this.currentLang);
-    const payload = await readBrowserFile(file, t.viewTexts.documents.fileTooLargeNote);
-    this.docFileName = payload.fileName;
-    this.docExtension = payload.extension;
-    this.docMimeType = payload.mimeType;
-    this.docSizeBytes = payload.sizeBytes;
-    this.docDataUrl = payload.dataUrl;
-    if (payload.textContent !== undefined) {
-      this.docTextContent = payload.textContent;
-    }
-    this.docTruncatedNote = payload.truncatedNote || '';
-    if (!this.docTitle.trim()) {
-      this.docTitle = payload.fileName.replace(/\.[^.]+$/, '');
-      this.docError = '';
-    }
-  }
 
-  private handleSaveDocument(company: Company) {
-    const t = getTranslation(this.currentLang);
-    if (!this.docTitle.trim()) {
-      this.docError = t.common.required;
-      return;
-    }
-    const fileName = this.docFileName.trim() || `${this.docTitle.trim().toLowerCase().replace(/\s+/g, '_')}.txt`;
-    const parts = fileName.split('.');
-    const ext = parts.length > 1 ? (parts.pop() || 'txt').toLowerCase() : this.docExtension || 'txt';
-    const textBytes = this.docTextContent ? new Blob([this.docTextContent]).size : 512;
-
-    const created = store.addDocument({
-      title: this.docTitle.trim(),
-      fileName,
-      extension: ext,
-      mimeType: this.docMimeType || 'text/plain',
-      sizeBytes: this.docSizeBytes || textBytes,
-      category: this.docCategory,
-      status: this.docStatus,
-      scope: this.docProjectId ? 'project' : 'company',
-      companyId: company.id,
-      projectId: this.docProjectId || undefined,
-      tags: this.docTags
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      description: this.docDescription.trim(),
-      uploadedById: store.currentUserId || store.users[0]?.id || 'user-1',
-      dataUrl: this.docDataUrl,
-      textContent: this.docTextContent.trim() || undefined,
-      versionNote: t.viewTexts.documents.initialVersionNote,
-    });
-    this.selectedDocId = created.id;
-    this.docTypeFilter = 'all';
-    this.docSearchQuery = '';
-    this.activeTab = 'documents';
-    this.uploadDocModalOpen = false;
-  }
 }
