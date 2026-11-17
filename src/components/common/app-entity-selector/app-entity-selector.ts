@@ -5,6 +5,7 @@ import { getTranslation } from '../../../i18n';
 import { store } from '../../../state/store';
 import { SupportedLang } from '../../../types';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import '../app-button/app-button';
 import { DeclarativeOption, OptionDataSource, optionsFromElements, resolveDataSource } from '../app-option/app-option';
 import { iconCheck, iconChevronDown, iconSearch, iconX } from '../icons';
 import styles from './app-entity-selector.css';
@@ -352,16 +353,17 @@ export class AppEntitySelector extends LitElement {
           <span class="search-count">${filtered.length} / ${this.allOptions().length}</span>
           ${this.searchQuery
             ? html`
-                <button
-                  type="button"
+                <app-button
                   class="search-clear-btn"
+                  size="xs"
+                  variant="icon"
                   title="${t.entitySelector.resetSearch}"
                   aria-label="${t.entitySelector.resetSearch}"
                   @mousedown="${(e: MouseEvent) => e.preventDefault()}"
                   @click="${() => this.resetSearch(true)}"
                 >
-                  ${iconX(13)}
-                </button>
+                  <span slot="start">${iconX(13)}</span>
+                </app-button>
               `
             : ''}
         </div>
@@ -532,15 +534,16 @@ export class AppEntitySelector extends LitElement {
           <div class="trigger-actions">
             ${showClear
               ? html`
-                  <button
-                    type="button"
+                  <app-button
                     class="clear-btn"
+                    size="xs"
+                    variant="icon"
                     title="${t.entitySelector.clearSelection}"
                     aria-label="${t.entitySelector.clearSelection}"
                     @click="${this.handleClearClick}"
                   >
-                    ${iconX(12)}
-                  </button>
+                    <span slot="start">${iconX(12)}</span>
+                  </app-button>
                 `
               : ''}
             <span class="chevron">${iconChevronDown(14)}</span>

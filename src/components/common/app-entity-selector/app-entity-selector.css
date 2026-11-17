@@ -144,25 +144,25 @@ label {
   flex-shrink: 0;
 }
 
+/* trigger clear action is an app-button web component at size xs pinned to the historical
+   20px square with the historical 6px radius and zero border; the hover fill copies the
+   original .clear-btn:hover through custom properties */
 .clear-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-sm, 6px);
-  background: transparent;
-  color: var(--text-muted, #64748b);
-  cursor: pointer;
-  transition: color var(--transition-fast, 150ms ease),
-              background-color var(--transition-fast, 150ms ease);
+  --control-height-xs: 20px;
+  --btn-border-width: 0;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: transparent;
 }
 
 .clear-btn:hover {
-  color: var(--text-primary, #f8fafc);
-  background: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-border: transparent;
 }
 
 .chevron {
@@ -289,26 +289,26 @@ label {
   flex-shrink: 0;
 }
 
+/* search clear action is an app-button web component at size xs pinned to the historical
+   22px square with the historical 6px radius and zero border; the hover fill copies the
+   original .search-clear-btn:hover through custom properties */
 .search-clear-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 22px;
-  height: 22px;
-  padding: 0;
-  border: none;
-  border-radius: var(--radius-sm, 6px);
-  background: transparent;
-  color: var(--text-muted, #64748b);
-  cursor: pointer;
+  --control-height-xs: 22px;
+  --btn-border-width: 0;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: transparent;
   flex-shrink: 0;
-  transition: color var(--transition-fast, 150ms ease),
-              background-color var(--transition-fast, 150ms ease);
 }
 
 .search-clear-btn:hover {
-  color: var(--text-primary, #f8fafc);
-  background: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-border: transparent;
 }
 
 /* Scrollable Options List with Theme Scrollbars */
