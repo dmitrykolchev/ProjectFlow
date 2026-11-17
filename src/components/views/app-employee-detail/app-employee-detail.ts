@@ -194,14 +194,15 @@ export class AppEmployeeDetail extends LitElement {
               <span slot="icon-start">${iconEdit(14)}</span>
               <span>${t.common.edit}</span>
             </app-button>
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -304,22 +305,22 @@ export class AppEmployeeDetail extends LitElement {
                           </div>
                           <div class="row-right" @click="${(e: Event) => e.stopPropagation()}">
                             <span class="alloc-chip">${allocSum}%</span>
-                            <button
-                              type="button"
-                              class="icon-btn"
+                            <app-button
+                              size="xs"
+                              variant="icon"
                               title="${t.projectChat.title}"
                               @click="${() => store.openProjectChat(project.id)}"
                             >
-                              ${iconMessageSquare(14)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-btn"
+                              <span slot="start">${iconMessageSquare(14)}</span>
+                            </app-button>
+                            <app-button
+                              size="xs"
+                              variant="icon"
                               title="${t.projectDetail.openProject}"
                               @click="${() => store.openProjectDetail(project.id)}"
                             >
-                              ${iconChevronRight(15)}
-                            </button>
+                              <span slot="start">${iconChevronRight(15)}</span>
+                            </app-button>
                           </div>
                         </div>
                       `;
