@@ -9,7 +9,7 @@
 2. **Свойства**: `@property` с attribute в kebab-case (`full-width` ↔ `fullWidth`); массивы/объекты — `attribute: false` или JSON-attr; логические — `Boolean` + reflect, где нужен CSS-хук.
 3. **События**: только `CustomEvent` c `bubbles: true, composed: true`; detail всегда объект: `{ value }`, `{ id }`, `{ rows }`. Имена: `change`, `select`, `pick`, `close`, `confirm`, `cancel`, `remove`, `row-click`.
 4. **Слоты**: `default` для контента; именованные `actions`, `icon`, `title`; слот-контент наследует токены темы (light DOM).
-5. **Токены**: только `var(--...)` с фолбэком; высота контролов — `--control-height-sm/md/lg`; радиусы `--radius-md/lg`; тени `--shadow-sm/md`; cyberpunk-хуки `--surface-glow`, `--accent-glow` — применять на карточках.
+5. **Токены**: только `var(--...)` с фолбэком; высота контролов — `--control-height-xs/sm/md/lg`; радиусы `--radius-md/lg`; тени `--shadow-sm/md`; cyberpunk-хуки `--surface-glow`, `--accent-glow` — применять на карточках.
 6. **i18n**: компонент получает язык из store (`store.customization.language`) или prop `lang`; строки — только через `getTranslation`. Хардкод строк в template запрещён (исключение: чисто числовые форматы).
 7. **Плотность**: компоненты, содержащие таблицы/строки, читают `store.customization.density` и используют `--density-row-height`.
 8. **Portal**: любые дропдауны/поповеры — через `portalManager.mountTemplate` (как `app-select`).
@@ -412,20 +412,22 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 
 # ПРИОРИТЕТ E — унификация размеров контролов (план, решение 2026-11-16)
 
-Каноническая шкала размеров контролов **sm | md | lg** (решено пользователем). Ничего не реализуется
+Каноническая шкала размеров контролов **xs | sm | md | lg** (решено пользователем; `xs` добавлен
+2026-11-17 как плотный шаг для строк таблиц и компактных тулбаров). Ничего не реализуется
 до явного старта; фиксация контракта обязательна перед миграциями.
 
 ## E0. Канонические токены (задаются один раз на `:root` через store тем)
 
-| токен | sm | md | lg |
-|---|---|---|---|
-| `--control-height-{s,m,l}` | 30px | 38px | 44px |
-| `--control-font-{s,m,l}` | 0.8125rem (13px) | 0.875rem (14px) | 1rem (16px) |
-| `--control-padding-x-{s,m,l}` | 0.65rem | 0.875rem | 1.15rem |
-| `--control-icon-{s,m,l}` (из иконочной шкалы xxs..xxl) | 16px (sm) | 20px (md) | 24px (lg) |
+| токен | xs | sm | md | lg |
+|---|---|---|---|---|
+| `--control-height-{xs,s,m,l}` | 24px | 30px | 38px | 44px |
+| `--control-font-{xs,s,m,l}` | 0.75rem (10.5px) | 0.8125rem (13px) | 0.875rem (14px) | 1rem (16px) |
+| `--control-padding-x-{xs,s,m,l}` | 0.45rem | 0.65rem | 0.875rem | 1.15rem |
+| `--control-icon-{xs,s,m,l}` (из иконочной шкалы xxs..xxl) | 14px (xxs) | 16px (sm) | 20px (md) | 24px (lg) |
 
-Значения = текущие фолбэки `app-button`/`app-toggle-button`, поэтому md-визуал всех контролов
-остаётся пиксель в пиксель. Иконочная шкала (коммиты `cbc30c1`, `56028f7`) уже стыкуется:
+Значения sm/md/lg = текущие фолбэки `app-button`/`app-toggle-button`, поэтому md-визуал всех контролов
+остаётся пиксель в пиксель; `xs` — новый шаг, существующие контролы его не используют.
+Иконочная шкала (коммиты `cbc30c1`, `56028f7`) уже стыкуется:
 иконка sm=16px в 30px-контроле, md=20px в 38px, lg=24px в 44px; слот-правила контролов задают
 `--mi-icon` = `--control-icon-*`.
 
