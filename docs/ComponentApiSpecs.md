@@ -439,7 +439,10 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 - `--icon-btn-{bg,color,border}` и `--icon-btn-hover-{bg,color,border}` — base/hover вида `icon`;
 - `--btn-min-width`, `--btn-font-weight`, `--icon-btn-font`, `--btn-disabled-opacity`,
   `--btn-disabled-color` (disabled glyph вида `icon`, default = базовый цвет иконки);
-- `--btn-gap` — gap flex-контейнера контрола, default `0.5rem`.
+- `--btn-gap` — gap flex-контейнера контрола, default `0.5rem`;
+- `--btn-line-height` — line-height контрола, default `normal`; slotted-children наследуют
+  значение от inner-button (через slot), поэтому чипам с `font: inherit` нужен unitless
+  коэффициент оригинала (например `1.5`) для паритета высот текстовых span.
 
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):
 нативный `button` наследует UA-шрифт и считает текстовый блок по `line-height: normal`, поэтому

@@ -8,6 +8,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: var(--btn-gap, 0.5rem);
+  line-height: var(--btn-line-height, normal);
   font-family: var(--icon-btn-font, var(--font-sans, inherit));
   font-weight: var(--btn-font-weight, 500);
   min-width: var(--btn-min-width, auto);
