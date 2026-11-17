@@ -251,26 +251,24 @@
   gap: 0.35rem;
 }
 
+/* playground actions are app-button web components at size xs pinned to the historical
+   28px square with the historical 6px radius; the elevated surface fill, subtle border and
+   the accent hover border copy the original .sb-icon-btn rules through custom properties */
 .sb-icon-btn {
-  width: 28px;
-  height: 28px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-surface-elevated, #162032);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-sm, 6px);
-  color: var(--text-secondary, #94a3b8);
-  cursor: pointer;
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease),
-              border-color var(--transition-fast, 150ms ease);
+  --control-height-xs: 28px;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: var(--bg-surface-elevated, #162032);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-subtle, #334155);
 }
 
 .sb-icon-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
-  border-color: var(--accent-primary, #6366f1);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--accent-primary, #6366f1);
 }
 
 .sb-import-line {

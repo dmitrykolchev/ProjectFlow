@@ -5,6 +5,7 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { buildSnippet, getComponentProps, getComponentSlots } from '../../../domain/component-meta';
 import { iconCopy, iconRefreshCw } from '../../common/icons';
+import '../../common/app-button/app-button';
 import styles from './app-storybook.css';
 
 // Import all component story definitions
@@ -390,22 +391,26 @@ export class AppStorybook extends LitElement {
                     <span class="sb-col-label">${t.viewTexts.storybook.editorLabel}</span>
                     <div class="sb-editor-box">
                       <div class="sb-editor-actions">
-                        <button
+                        <app-button
                           class="sb-icon-btn"
+                          size="xs"
+                          variant="icon"
                           title="${t.viewTexts.storybook.resetBtn}"
                           aria-label="${t.viewTexts.storybook.resetBtn}"
                           @click="${() => this.resetPlayground()}"
                         >
-                          ${iconRefreshCw(15)}
-                        </button>
-                        <button
+                          <span slot="start">${iconRefreshCw(15)}</span>
+                        </app-button>
+                        <app-button
                           class="sb-icon-btn"
+                          size="xs"
+                          variant="icon"
                           title="${t.viewTexts.storybook.copyBtn}"
                           aria-label="${t.viewTexts.storybook.copyBtn}"
                           @click="${() => this.copyPlayground()}"
                         >
-                          ${iconCopy(14)}
-                        </button>
+                          <span slot="start">${iconCopy(14)}</span>
+                        </app-button>
                       </div>
                       <textarea
                         class="sb-code-editor"
