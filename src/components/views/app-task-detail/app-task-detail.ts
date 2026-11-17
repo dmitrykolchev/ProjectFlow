@@ -612,7 +612,7 @@ export class AppTaskDetail extends LitElement {
         <div class="detail-grid">
           <!-- Primary Column: History, Time, Expenses, Discussions -->
           <div class="main-column">
-            <app-section-card variant="tabbed">
+            <app-section-card variant="tabbed" collapsible max-height="50rem">
               <div slot="header-left">
                 <app-segmented-switch
                   size="sm"
@@ -687,7 +687,7 @@ export class AppTaskDetail extends LitElement {
 
           <!-- Right Sidebar: Subtasks & Cost Summary -->
           <aside class="side-column">
-            <app-section-card variant="tabbed" title="${t.taskDetail.subtasksTitle}">
+            <app-section-card variant="tabbed" collapsible title="${t.taskDetail.subtasksTitle}">
               <span slot="actions" class="mono-num" style="font-size: 0.8rem; color: var(--text-secondary);">
                 ${doneSubtasks}/${task.subtasks.length} (${subtaskPct}%)
               </span>
