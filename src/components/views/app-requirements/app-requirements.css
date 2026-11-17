@@ -242,28 +242,20 @@ app-button[variant="icon"] {
   gap: 0.4rem;
 }
 
-.icon-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, rgba(148, 163, 184, 0.08));
-  color: var(--text-secondary, #94a3b8);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-fast, 150ms ease);
+/* table row icon actions are app-button web components at size sm inheriting the view's
+   historical 28px subtle look from the view-level token rule; the historical hover kept
+   the border unchanged for plain actions, so the hover border token is pinned back
+   (danger hover tokens come from .danger-action), and the historical 6px radius replaces
+   the canonical md radius */
+.footer-right app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover, #1e293b);
-  color: var(--text-primary, #f8fafc);
-}
-
-.icon-btn.danger:hover {
-  color: var(--color-danger, #ef4444);
-  border-color: rgba(239, 68, 68, 0.4);
+.footer-right app-button:not(.danger-action) {
+  --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
 /* Table View */

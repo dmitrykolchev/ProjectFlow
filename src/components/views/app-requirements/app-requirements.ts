@@ -599,31 +599,32 @@ export class AppRequirements extends LitElement {
                   </td>
                   <td @click="${(e: Event) => e.stopPropagation()}">
                     <div class="footer-right">
-                      <button
-                        type="button"
-                        class="icon-btn"
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.viewTexts.requirements.decomposeSingleBtn}"
-                        ?disabled="${this.decomposing}"
+                        .disabled="${this.decomposing}"
                         @click="${() => this.handleDecompose([req.id])}"
                       >
-                        ${iconZap(13)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn"
+                        <span slot="start">${iconZap(13)}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.common.edit}"
                         @click="${() => this.openEditReqModal(req)}"
                       >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                        <span slot="start">${iconEdit(14)}</span>
+                      </app-button>
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
                         title="${t.common.delete}"
                         @click="${() => (this.deletingReq = req)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
