@@ -17,6 +17,7 @@ import {
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -226,13 +227,14 @@ export class AppEmployeeDetail extends LitElement {
                   ${company
                     ? html`
                         <span aria-hidden="true">·</span>
-                        <button
-                          type="button"
+                        <app-link
                           class="link-btn"
+                          size="md"
+                          variant="primary"
                           @click="${() => store.openCompanyDetail(company.id)}"
                         >
                           ${company.name}
-                        </button>
+                        </app-link>
                       `
                     : ''}
                   ${emp.location ? html`<span aria-hidden="true">·</span><span>${emp.location}</span>` : ''}

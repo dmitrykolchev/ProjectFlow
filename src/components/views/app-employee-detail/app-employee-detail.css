@@ -339,19 +339,15 @@
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
 
+/* the header company name-link is an app-link web component at size md with the historical
+   typography restored through the additive link hooks of zero padding, weight 600, the inherited
+   unitless line-height 1.5, and the header font size pinned through control-font-md; the accent
+   color and the hover underline are the primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-}
-
-.link-btn:hover {
-  text-decoration: underline;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --control-font-md: 0.875rem;
 }
 
 /* header and project row icon actions are app-button web components at size xs pinned
