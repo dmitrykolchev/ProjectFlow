@@ -222,25 +222,30 @@
   background: var(--bg-canvas, #090d16);
 }
 
+/* mode pills are app-link web components at size md restoring the historical segmented look
+   through the additive link hooks: the inherited line box of 15.33px pinned for the 0.73rem glyph,
+   nowrap, padding 0.28rem 0.65rem, weight 600, the font size pinned through control-font-md, zero
+   gap for the single text label, flex host display with full width inner so the segments fill the
+   wrapper, the divider of the second segment restored through the link-border-left hook, and the
+   selected segment accent fill through link-active-bg with the white glyph through link-color */
 .mode-pill {
-  border: none;
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  font: inherit;
-  font-size: 0.73rem;
-  font-weight: 600;
-  padding: 0.28rem 0.65rem;
-  cursor: pointer;
-  transition: background-color 150ms ease, color 150ms ease;
+  --link-line-height: 15.33px;
+  --link-white-space: nowrap;
+  --link-padding: 0.28rem 0.65rem;
+  --link-font-weight: 600;
+  --control-font-md: 0.73rem;
+  --link-gap: 0;
+  --link-host-display: flex;
+  --link-width: 100%;
 }
 
 .mode-pill + .mode-pill {
-  border-left: 1px solid var(--border-subtle, #334155);
+  --link-border-left: 1px solid var(--border-subtle, #334155);
 }
 
 .mode-pill.is-active {
-  background: var(--accent-primary, #6366f1);
-  color: #ffffff;
+  --link-active-bg: var(--accent-primary, #6366f1);
+  --link-color: #ffffff;
 }
 
 .toolbar-pill-info {

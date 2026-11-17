@@ -30,6 +30,7 @@ import {
   iconZoomOut,
 } from '../icons';
 import '../app-button/app-button';
+import '../app-link/app-link';
 import '../app-empty-state/app-empty-state';
 import '../app-status-chip/app-status-chip';
 import styles from './app-document-previewer.css';
@@ -576,20 +577,22 @@ export class AppDocumentPreviewer extends LitElement {
             ${isRichToggle
               ? html`
                   <div class="mode-pills">
-                    <button
-                      type="button"
+                    <app-link
+                      size="md" variant="secondary"
                       class="mode-pill ${this.textViewMode === 'rendered' ? 'is-active' : ''}"
+                      .active="${this.textViewMode === 'rendered'}"
                       @click="${() => (this.textViewMode = 'rendered')}"
                     >
                       ${kind === 'csv' ? t.documents.tableView : t.documents.renderedView}
-                    </button>
-                    <button
-                      type="button"
+                    </app-link>
+                    <app-link
+                      size="md" variant="secondary"
                       class="mode-pill ${this.textViewMode === 'raw' ? 'is-active' : ''}"
+                      .active="${this.textViewMode === 'raw'}"
                       @click="${() => (this.textViewMode = 'raw')}"
                     >
                       ${t.documents.rawView}
-                    </button>
+                    </app-link>
                   </div>
                 `
               : ''}
