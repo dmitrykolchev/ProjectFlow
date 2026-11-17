@@ -710,38 +710,39 @@ export class AppDocuments extends LitElement {
                     </td>
                     <td>
                       <div class="card-actions" style="justify-content: flex-end;">
-                        <button
-                          type="button"
-                          class="icon-btn"
+                        <app-button
+                          size="sm"
+                          variant="icon"
                           title="${t.documents.previewTitle}"
                           @click="${() => this.openPreviewModal(doc)}"
                         >
-                          ${iconEye(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
+                          <span slot="start">${iconEye(14)}</span>
+                        </app-button>
+                        <app-button
+                          size="sm"
+                          variant="icon"
                           title="${t.documents.downloadFile}"
                           @click="${() => downloadDocumentFile(doc)}"
                         >
-                          ${iconDownload(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
+                          <span slot="start">${iconDownload(14)}</span>
+                        </app-button>
+                        <app-button
+                          size="sm"
+                          variant="icon"
                           title="${t.common.edit}"
                           @click="${() => this.openEditModal(doc)}"
                         >
-                          ${iconEdit(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn danger"
+                          <span slot="start">${iconEdit(14)}</span>
+                        </app-button>
+                        <app-button
+                          class="danger-action"
+                          size="sm"
+                          variant="icon"
                           title="${t.common.delete}"
                           @click="${() => (this.deletingDoc = doc)}"
                         >
-                          ${iconTrash(14)}
-                        </button>
+                          <span slot="start">${iconTrash(14)}</span>
+                        </app-button>
                       </div>
                     </td>
                   </tr>
