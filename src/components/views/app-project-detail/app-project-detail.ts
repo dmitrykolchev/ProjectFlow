@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { ExpenseCategory, Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
+import { Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
 import {
   iconBookOpen,
   iconChevronLeft,
@@ -21,14 +21,13 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
-import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
-import { mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
+import { mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-modal/app-modal';
+import '../../common/app-expense-form/app-expense-form';
 import '../../common/app-time-entry-form/app-time-entry-form';
 import '../../common/app-project-form/app-project-form';
 import '../../dashboard/app-project-overview/app-project-overview';
@@ -89,12 +88,7 @@ export class AppProjectDetail extends LitElement {
 
   // Quick Project Expense Modal
   @state() private expenseModalOpen = false;
-  @state() private expTitle = '';
-  @state() private expTaskId = '';
-  @state() private expCategory: ExpenseCategory = 'infrastructure';
-  @state() private expAmount = 25000;
-  @state() private expVendor = '';
-  @state() private expError = '';
+  @state() private presetExpProjectId: string | null = null;
 
   // Quick Project Time Modal
   @state() private timeModalOpen = false;
@@ -723,7 +717,7 @@ export class AppProjectDetail extends LitElement {
               <app-button
                 size="sm"
                 variant="secondary"
-                @click="${() => this.openQuickExpenseModal()}"
+                @click="${() => this.openQuickExpenseModal(proj.id)}"
               >
                 <span slot="icon-start">${iconPlus(13)}</span>
                 <span>${t.viewTexts.projectDetail.expenseButton}</span>
@@ -858,13 +852,8 @@ export class AppProjectDetail extends LitElement {
     this.timeModalOpen = true;
   }
 
-  private openQuickExpenseModal() {
-    this.expTitle = '';
-    this.expTaskId = '';
-    this.expCategory = 'infrastructure';
-    this.expAmount = 25000;
-    this.expVendor = '';
-    this.expError = '';
+  private openQuickExpenseModal(projectId: string) {
+    this.presetExpProjectId = projectId;
     this.expenseModalOpen = true;
   }
 
@@ -892,104 +881,14 @@ export class AppProjectDetail extends LitElement {
     projectTasks: typeof store.tasks,
     t: ReturnType<typeof getTranslation>
   ) {
-    const taskOpts = mapTaskOptions(projectTasks, t);
-    const catOpts = [
-      { value: 'infrastructure', label: t.expenses.categories.infrastructure },
-      { value: 'software', label: t.expenses.categories.software },
-      { value: 'contractors', label: t.expenses.categories.contractors },
-      { value: 'equipment', label: t.expenses.categories.equipment },
-      { value: 'travel', label: t.expenses.categories.travel },
-      { value: 'marketing', label: t.expenses.categories.marketing },
-      { value: 'other', label: t.expenses.categories.other },
-    ];
-
     return html`
-      <app-modal
-        ?open="${this.expenseModalOpen}"
-        size="md"
-        title="${t.viewTexts.projectDetail.quickExpenseTitle(proj.key)}"
+      <app-expense-form
+        .open="${this.expenseModalOpen}"
+        .presetProjectId="${proj.id}"
+        .contextTitle="${t.viewTexts.projectDetail.quickExpenseTitle(proj.key)}"
         @close="${() => (this.expenseModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div class="col-span-2">
-            <app-input
-              label="${t.viewTexts.projectDetail.quickExpenseTitleLabel}"
-              .value="${this.expTitle}"
-              required
-              error="${this.expError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.expTitle = eventValue(e);
-                this.expError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.thCategory}"
-              .value="${this.expCategory}"
-              .options="${catOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.expCategory = eventValue(e) as ExpenseCategory)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projectDetail.labelAmountRub}"
-              .value="${this.expAmount}"
-              min="0"
-              step="1000"
-              unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.expAmount = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.expenses.labelLinkedTask}"
-              placeholder="${t.viewTexts.projectDetail.optionProjectWide}"
-              clearable
-              .value="${this.expTaskId}"
-              .options="${taskOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.expTaskId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterparties.typeVendor}"
-              .value="${this.expVendor}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.expVendor = eventValue(e))}"
-            ></app-input>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.expenseModalOpen = false)}">${t.common.cancel}</app-button>
-          <app-button
-            variant="primary"
-            @click="${() => {
-              if (!this.expTitle.trim()) {
-                this.expError = t.common.required;
-                return;
-              }
-              store.addExpense({
-                projectId: proj.id,
-                taskId: this.expTaskId || undefined,
-                userId: store.users[0]?.id || '',
-                date: new Date().toISOString().slice(0, 10),
-                title: this.expTitle.trim(),
-                category: this.expCategory,
-                amount: Math.max(0, Number(this.expAmount) || 0),
-                currency: 'RUB',
-                billable: true,
-                status: 'pending',
-                vendor: this.expVendor.trim() || undefined,
-                notes: '',
-              });
-              this.expenseModalOpen = false;
-            }}"
-          >
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.expenseModalOpen = false)}"
+      ></app-expense-form>
     `;
   }
 }
