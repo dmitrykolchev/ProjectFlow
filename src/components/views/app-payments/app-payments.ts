@@ -23,21 +23,13 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
-import '../../common/app-form-grid/app-form-grid';
-import '../../common/app-confirm-dialog/app-confirm-dialog';
-import '../../common/app-button/app-button';
-import '../../common/app-link/app-link';
-import '../../common/app-date-input/app-date-input';
-import '../../common/app-input/app-input';
-import '../../common/app-modal/app-modal';
+
+import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
-import '../../common/app-number-input/app-number-input';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-select/app-select';
-import '../../common/app-textarea/app-textarea';
 import '../../common/app-pagination/app-pagination';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-payments.css';
@@ -68,12 +60,7 @@ export class AppPayments extends LitElement {
 
   @state() private paymentModalOpen = false;
   @state() private paymentInvoiceId = '';
-  @state() private payAmount = 0;
-  @state() private payDate = '';
-  @state() private payMethod: PaymentMethod = 'bank_transfer';
-  @state() private payDocNumber = '';
-  @state() private payNotes = '';
-  @state() private payError = '';
+
   @state() private deletingPayment: InvoicePayment | null = null;
 
   private unsubscribe?: () => void;
@@ -710,193 +697,25 @@ export class AppPayments extends LitElement {
   }
 
   private renderPaymentModal(t: ReturnType<typeof getTranslation>) {
-    const payableInvoices = this.invoices.filter(
-      (i) => i.status !== 'draft' && i.status !== 'cancelled' && store.getInvoiceRemainingAmount(i) > 0
-    );
     const inv =
-      this.invoices.find((i) => i.id === this.paymentInvoiceId) || payableInvoices[0] || null;
+      this.invoices.find((i) => i.id === this.paymentInvoiceId) || null;
     if (!this.paymentModalOpen || !inv) return '';
 
-    const paidSoFar = store.getInvoicePaidAmount(inv.id);
-    const remainingBefore = store.getInvoiceRemainingAmount(inv);
-    const entered = Math.max(0, Number(this.payAmount) || 0);
-    const paidAfter = Math.round((paidSoFar + entered) * 100) / 100;
-    const remainingAfter = Math.max(0, Math.round((inv.totalAmount - paidAfter) * 100) / 100);
-    const willBeFull = remainingAfter === 0 && entered > 0;
-
-    const selectableInvoices = this.invoices.filter(
+    const payableInvoices = this.invoices.filter(
       (i) =>
         i.status !== 'draft' &&
         i.status !== 'cancelled' &&
         (store.getInvoiceRemainingAmount(i) > 0 || i.id === inv.id)
     );
 
-    const invoiceOptions = selectableInvoices.map((i) => {
-      const cp = store.counterparties.find((c) => c.id === i.counterpartyId);
-      return {
-        value: i.id,
-        label: `${i.number} (${cp?.name || '—'}) · ${t.viewTexts.payments.shortDue} ${formatMoney(
-          store.getInvoiceRemainingAmount(i),
-          i.currency
-        )}`,
-      };
-    });
-
-    const methodOptions: { value: PaymentMethod; label: string }[] = [
-      { value: 'bank_transfer', label: t.payments.methods.bank_transfer },
-      { value: 'card', label: t.payments.methods.card },
-      { value: 'cash', label: t.payments.methods.cash },
-      { value: 'offset', label: t.payments.methods.offset },
-    ];
-
     return html`
-      <app-modal
-        ?open="${this.paymentModalOpen}"
-        size="md"
-        title="${t.payments.newPayment} · ${inv.number}"
+      <app-payment-form
+        .open="${this.paymentModalOpen}"
+        .invoice="${inv}"
+        .payableInvoices="${payableInvoices}"
         @close="${() => (this.paymentModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div class="col-span-2">
-            <app-select
-              label="${t.viewTexts.payments.labelTargetInvoice}"
-              .value="${inv.id}"
-              .options="${invoiceOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                const nextInv = this.invoices.find((i) => i.id === eventValue(e));
-                if (nextInv) this.openPaymentModal(nextInv);
-              }}"
-            ></app-select>
-          </div>
-
-          <div class="col-span-2 pay-summary-card">
-            <div class="billing-stat">
-              <span class="billing-stat-label">${t.viewTexts.payments.invoiceTotalLabel}</span>
-              <span class="billing-stat-val">${formatMoney(inv.totalAmount, inv.currency)}</span>
-            </div>
-            <div class="billing-stat">
-              <span class="billing-stat-label">${t.payments.paidAmount}</span>
-              <span class="billing-stat-val" style="color: #10b981;">
-                ${formatMoney(paidSoFar, inv.currency)}
-              </span>
-            </div>
-            <div class="billing-stat">
-              <span class="billing-stat-label">${t.payments.remainingDue}</span>
-              <span class="billing-stat-val" style="color: #f59e0b;">
-                ${formatMoney(remainingBefore, inv.currency)}
-              </span>
-            </div>
-          </div>
-
-          <div>
-            <app-number-input
-              label="${t.viewTexts.payments.paymentAmountLabel(inv.currency)}"
-              .value="${this.payAmount}"
-              min="1"
-              max="100000000"
-              step="1000"
-              error="${this.payError}"
-              @change="${(e: CustomEvent<{ value: number }>) => {
-                this.payAmount = eventValue(e);
-                this.payError = '';
-              }}"
-            ></app-number-input>
-            <div class="quick-term-row" style="margin-top: 0.4rem;">
-              <button
-                type="button"
-                class="quick-term-btn"
-                @click="${() => {
-                  this.payAmount = Math.max(1, Math.round(remainingBefore * 0.25));
-                  this.payError = '';
-                }}"
-              >
-                25%
-              </button>
-              <button
-                type="button"
-                class="quick-term-btn"
-                @click="${() => {
-                  this.payAmount = Math.max(1, Math.round(remainingBefore * 0.5));
-                  this.payError = '';
-                }}"
-              >
-                50%
-              </button>
-              <button
-                type="button"
-                class="quick-term-btn"
-                @click="${() => {
-                  this.payAmount = remainingBefore;
-                  this.payError = '';
-                }}"
-              >
-                ${t.viewTexts.payments.fullDueButton}
-              </button>
-            </div>
-          </div>
-
-          <div>
-            <app-date-input
-              label="${t.payments.paymentDate}"
-              .value="${this.payDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.payDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-
-          <div>
-            <app-select
-              label="${t.payments.paymentMethod}"
-              .value="${this.payMethod}"
-              .options="${methodOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.payMethod = eventValue(e) as PaymentMethod)}"
-            ></app-select>
-          </div>
-
-          <div>
-            <app-input
-              label="${t.payments.documentNumber}"
-              placeholder="${t.viewTexts.payments.payDocPlaceholder}"
-              .value="${this.payDocNumber}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.payDocNumber = eventValue(e))}"
-            ></app-input>
-          </div>
-
-          <div class="col-span-2 pay-preview-result">
-            <span>
-              ${t.viewTexts.payments.afterPaymentLabel}
-              <strong class="mono">${formatMoney(paidAfter, inv.currency)}</strong>
-              · ${t.payments.remainingDue}:
-              <strong class="mono">${formatMoney(remainingAfter, inv.currency)}</strong>
-            </span>
-            <app-badge
-              variant="${willBeFull ? 'success' : 'warning'}"
-              appearance="soft"
-              size="sm"
-            >
-              ${willBeFull ? t.payments.fullPayment : t.payments.partialPayment}
-            </app-badge>
-          </div>
-
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.payments.notes}"
-              .value="${this.payNotes}"
-              rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.payNotes = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.paymentModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleSavePayment(inv)}">
-            ${t.payments.recordPayment}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.paymentModalOpen = false)}"
+      ></app-payment-form>
     `;
   }
 
@@ -924,41 +743,7 @@ export class AppPayments extends LitElement {
   }
 
   private openPaymentModal(inv: Invoice) {
-    const today = new Date().toISOString().slice(0, 10);
-    const remaining = store.getInvoiceRemainingAmount(inv);
-    const seq = this.payments.length + 1;
-
     this.paymentInvoiceId = inv.id;
-    this.payAmount = remaining > 0 ? remaining : inv.totalAmount;
-    this.payDate = today;
-    this.payMethod = 'bank_transfer';
-    const tx = getTranslation(this.currentLang).viewTexts.payments;
-    this.payDocNumber = `${tx.payDocPrefix}${today.slice(0, 4)}/${String(840 + seq).padStart(4, '0')}`;
-    this.payNotes = tx.payNotesTemplate(inv.number);
-    this.payError = '';
     this.paymentModalOpen = true;
-  }
-
-  private handleSavePayment(inv: Invoice) {
-    const amount = Number(this.payAmount) || 0;
-    if (amount <= 0) {
-      this.payError = getTranslation(this.currentLang).viewTexts.payments.amountError;
-      return;
-    }
-
-    store.addInvoicePayment({
-      invoiceId: inv.id,
-      contractId: inv.contractId,
-      companyId: inv.companyId,
-      counterpartyId: inv.counterpartyId,
-      amount,
-      currency: inv.currency,
-      paymentDate: this.payDate || new Date().toISOString().slice(0, 10),
-      method: this.payMethod,
-      documentNumber: this.payDocNumber,
-      notes: this.payNotes,
-    });
-
-    this.paymentModalOpen = false;
   }
 }
