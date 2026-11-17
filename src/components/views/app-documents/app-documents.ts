@@ -750,22 +750,22 @@ export class AppDocuments extends LitElement {
             </tbody>
           </table>
         </div>
-
-        <app-pagination
-          layout-mode="table"
-          .totalItems="${paged.totalItems}"
-          .page="${paged.page}"
-          .pageSize="${paged.pageSize}"
-          @page-change="${(e: CustomEvent<{ page: number }>) => {
-            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-            this.scrollTop = 0;
-          }}"
-          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-            this.currentPage = 1; store.setActivePage(1, false);
-            store.setTablePageSize(e.detail.pageSize);
-          }}"
-        ></app-pagination>
       </div>
+
+      <app-pagination
+        layout-mode="table"
+        .totalItems="${paged.totalItems}"
+        .page="${paged.page}"
+        .pageSize="${paged.pageSize}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1; store.setActivePage(1, false);
+          store.setTablePageSize(e.detail.pageSize);
+        }}"
+      ></app-pagination>
     `;
   }
 
