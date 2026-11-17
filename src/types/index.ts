@@ -295,6 +295,8 @@ export interface Task {
   updatedAt: string;
   requirementIds?: string[];
   knowledgeArticleIds?: string[];
+  /** AI-generated task description stored as markdown (applied from the AI panel) */
+  aiDescription?: string;
   aiAnalyses?: AnalysisSummary[];
   aiClarifications?: TaskAiClarificationMessage[];
 }

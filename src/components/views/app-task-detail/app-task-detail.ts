@@ -22,6 +22,7 @@ import {
   iconClock,
   iconCornerUpLeft,
   iconEdit,
+  iconFileText,
   iconFolder,
   iconLayers,
   iconMessageSquare,
@@ -51,6 +52,7 @@ import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-task-ai-panel/app-task-ai-panel';
+import '../../common/app-markdown/app-markdown';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
@@ -636,6 +638,8 @@ export class AppTaskDetail extends LitElement {
                 : this.renderDiscussionsTab(t, task, discussions)}
             </app-section-card>
 
+            ${this.renderAiDescriptionCard(task, t)}
+
             <app-task-ai-panel
               .task="${task}"
               .analyses="${task.aiAnalyses || []}"
@@ -654,11 +658,11 @@ export class AppTaskDetail extends LitElement {
                 .join(' | ')}"
               @apply-description="${(e: CustomEvent<{ description: string; mode: 'replace' | 'append' }>) => {
                 const { description, mode } = e.detail;
-                const nextDescription =
-                  mode === 'append' && task.description.trim()
-                    ? `${task.description.trim()}\n\n${description}`
+                const nextAiDescription =
+                  mode === 'append' && task.aiDescription?.trim()
+                    ? `${task.aiDescription.trim()}\n\n${description}`
                     : description;
-                store.updateTask({ ...task, description: nextDescription });
+                store.updateTask({ ...task, aiDescription: nextAiDescription });
                 store.addNotification('success', t.viewTexts.ai.taskSectionTitle, t.viewTexts.ai.descAppliedToast);
               }}"
               @analyses-update="${(e: CustomEvent<{ analyses: AnalysisSummary[] }>) => {
@@ -801,6 +805,20 @@ export class AppTaskDetail extends LitElement {
           </app-button>
         </div>
       </app-modal>
+    `;
+  }
+
+  private renderAiDescriptionCard(task: Task, t: ReturnType<typeof getTranslation>) {
+    return html`
+      <app-section-card
+        title="${t.taskDetail.aiDescTitle}"
+        subtitle="${t.taskDetail.aiDescSubtitle}"
+      >
+        <span slot="icon">${iconFileText(17)}</span>
+        ${task.aiDescription?.trim()
+          ? html`<app-markdown .content="${task.aiDescription}"></app-markdown>`
+          : html`<app-empty-state compact title="${t.taskDetail.aiDescEmpty}"></app-empty-state>`}
+      </app-section-card>
     `;
   }
 
