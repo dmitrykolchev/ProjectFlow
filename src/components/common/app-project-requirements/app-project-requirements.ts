@@ -377,22 +377,23 @@ export class AppProjectRequirements extends LitElement {
               <span slot="icon-start">${iconZap(13)}</span>
               <span>${t.viewTexts.requirements.decomposeSingleBtn}</span>
             </app-button>
-            <button
-              type="button"
-              class="icon-btn"
+            <app-button
+              size="sm"
+              variant="icon"
               title="${t.common.edit}"
               @click="${() => this.openEditReqModal(req)}"
             >
-              ${iconEdit(14)}
-            </button>
-            <button
-              type="button"
-              class="icon-btn danger"
+              <span slot="start">${iconEdit(14)}</span>
+            </app-button>
+            <app-button
+              class="danger-action"
+              size="sm"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.deletingReq = req)}"
             >
-              ${iconTrash(14)}
-            </button>
+              <span slot="start">${iconTrash(14)}</span>
+            </app-button>
           </div>
         </div>
 
