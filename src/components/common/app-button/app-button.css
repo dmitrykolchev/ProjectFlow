@@ -140,7 +140,7 @@ button:disabled {
    .icon-btn (subtle border, secondary color, hover fill). Role hovers are tuned by
    the view through the --icon-btn-hover-* custom properties on the host element. */
 .variant-icon {
-  background: transparent;
+  background: var(--icon-btn-bg, transparent);
   color: var(--icon-btn-color, var(--text-secondary, #94a3b8));
   border-color: var(--icon-btn-border, var(--border-subtle, #334155));
 }
