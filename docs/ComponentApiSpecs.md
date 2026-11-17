@@ -461,6 +461,9 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
 - `--link-hover-color` — hover-цвет glyph (default = базовый цвет, hover только underline);
 - `--link-hover-decoration` — hover text-decoration, default `underline`;
 - `--link-hover-bg` — hover background inner контрола, default `transparent`;
+- `--link-hover-transition` — transition-сегмент background-color, default
+  `background-color var(--transition-fast, 150ms) ease` (hover-fill consumers анимируются,
+  статичный рендер пиксель-идентичен).
 - `--link-align-items` — align-items flex-контейнера, default `center`;
 - `--link-min-height` — min-height inner контрола, default `auto` (для паритета строк с
   baseline-выравниванием нативной line-box).

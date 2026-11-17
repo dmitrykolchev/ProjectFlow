@@ -28,8 +28,10 @@
   text-decoration: none;
   cursor: pointer;
   user-select: none;
+  --link-hover-transition: background-color var(--transition-fast, 150ms ease);
   transition: color var(--transition-fast, 150ms ease),
-              text-decoration var(--transition-fast, 150ms ease);
+              text-decoration var(--transition-fast, 150ms ease),
+              var(--link-hover-transition, background-color var(--transition-fast, 150ms ease));
   outline: none;
 }
 
@@ -40,7 +42,7 @@
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
    --link-width, --link-white-space, --link-overflow, --link-text-overflow,
    --link-align-items, --link-min-height, --link-hover-color, --link-hover-decoration,
-   --link-hover-bg. */
+   --link-hover-bg, --link-hover-transition. */
 
 ::slotted(*) {
   display: inline-flex;
