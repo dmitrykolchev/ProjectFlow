@@ -3,9 +3,10 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronRight, iconEdit, iconHandshake, iconLandmark, iconPlus, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-bank-summary/app-bank-summary';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -286,7 +287,7 @@ export class AppCounterparties extends LitElement {
                 </div>
               </div>
 
-              ${this.renderBankSummary(cp, t)}
+              <app-bank-summary .accounts="${cp.bankAccounts || []}"></app-bank-summary>
 
               <card-footer>
                 <div slot="start" class="stats-row">
@@ -480,34 +481,6 @@ export class AppCounterparties extends LitElement {
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
-    `;
-  }
-
-  private renderBankSummary(cp: Counterparty, t: ReturnType<typeof getTranslation>) {
-    const accounts = cp.bankAccounts || [];
-    const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
-    const primary = accounts.find((a) => a.isDefault) || accounts[0];
-
-    return html`
-      <div class="bank-summary-row">
-        <div class="bank-summary-left">
-          <span class="bank-summary-icon">${iconLandmark(14)}</span>
-          ${accounts.length === 0
-            ? html`<span>${t.bankAccounts.noAccountsShort}</span>`
-            : html`
-                <span class="bank-summary-name" title="${primary?.bankName || ''}">
-                  ${primary?.bankName}${accounts.length > 1 ? ` (+${accounts.length - 1})` : ''}
-                </span>
-              `}
-        </div>
-        ${currencies.length > 0
-          ? html`
-              <div class="bank-currencies">
-                ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
-              </div>
-            `
-          : ''}
-      </div>
     `;
   }
 
