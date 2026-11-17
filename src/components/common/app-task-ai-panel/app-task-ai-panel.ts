@@ -536,14 +536,15 @@ export class AppTaskAiPanel extends LitElement {
                           <span class="context-title" title="${item.title}">${item.title}</span>
                           <span class="context-reason">· ${this.reasonLabel(item.reason, t)}</span>
                         </button>
-                        <button
-                          type="button"
+                        <app-button
                           class="context-open-btn"
+                          size="xs"
+                          variant="icon"
                           title="${item.title}"
                           @click="${() => this.openContextSource(item)}"
                         >
-                          ${iconArrowUpRight(12)}
-                        </button>
+                          <span slot="start">${iconArrowUpRight(12)}</span>
+                        </app-button>
                       </div>
                     `;
                   })}
@@ -586,14 +587,15 @@ export class AppTaskAiPanel extends LitElement {
                     ${this.generatedModel
                       ? html`<span>${t.viewTexts.ai.modelUsed}: ${this.generatedModel}</span>`
                       : ''}
-                    <button
-                      type="button"
+                    <app-button
                       class="context-open-btn"
+                      size="xs"
+                      variant="icon"
                       title="${t.common.close}"
                       @click="${() => (this.generatedDescription = '')}"
                     >
-                      ${iconX(14)}
-                    </button>
+                      <span slot="start">${iconX(14)}</span>
+                    </app-button>
                   </div>
                 </div>
                 <pre class="ai-draft-text ai-scroll-region">${this.generatedDescription}</pre>
@@ -641,9 +643,10 @@ export class AppTaskAiPanel extends LitElement {
                       : ''}
                     <span>·</span>
                     <span>${activeAnalysis.updatedAt.slice(0, 16).replace('T', ' ')}</span>
-                    <button
-                      type="button"
+                    <app-button
                       class="context-open-btn"
+                      size="xs"
+                      variant="icon"
                       title="${t.viewTexts.ai.clearAnalysisBtn}"
                       @click="${() => {
                         this.localAnalysis = undefined;
@@ -652,8 +655,8 @@ export class AppTaskAiPanel extends LitElement {
                         );
                       }}"
                     >
-                      ${iconX(14)}
-                    </button>
+                      <span slot="start">${iconX(14)}</span>
+                    </app-button>
                   </div>
                 </div>
 

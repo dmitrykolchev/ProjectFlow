@@ -200,22 +200,27 @@
   flex-shrink: 0;
 }
 
+/* context open actions are app-button web components at size xs with the historical
+   content-sized look: zero border, muted glyph, 0.1rem padding, the historical 4px radius,
+   and the hover accent fill copied from the original .context-open-btn:hover */
 .context-open-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  padding: 0.1rem;
-  color: var(--text-muted, #64748b);
-  cursor: pointer;
-  border-radius: 4px;
+  --control-height-xs: auto;
+  --icon-only-padding: 0.1rem;
+  --btn-border-width: 0;
+  --btn-radius-tl: 4px;
+  --btn-radius-tr: 4px;
+  --btn-radius-bl: 4px;
+  --btn-radius-br: 4px;
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: transparent;
   flex-shrink: 0;
 }
 
 .context-open-btn:hover {
-  color: var(--accent-primary, #818cf8);
-  background: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--accent-primary, #818cf8);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-border: transparent;
 }
 
 .context-empty-hint {
