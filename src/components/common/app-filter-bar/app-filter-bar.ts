@@ -57,11 +57,14 @@ export class AppFilterBar extends LitElement {
               <div class="select">
                 ${f.type === 'entity'
                   ? html`
+                      <!-- the control's own panel search is internal: stop its search-change so
+                           the view's bar-level text filter never receives it -->
                       <app-entity-selector
                         .value="${this.values[f.key] ?? 'all'}"
                         .options="${f.options}"
                         @change="${(e: CustomEvent<{ value: string }>) =>
                           this.emitFilter(f.key, eventValue(e))}"
+                        @search-change="${(e: Event) => e.stopPropagation()}"
                       ></app-entity-selector>
                     `
                   : html`
