@@ -444,6 +444,15 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
   значение от inner-button (через slot), поэтому чипам с `font: inherit` нужен unitless
   коэффициент оригинала (например `1.5`) для паритета высот текстовых span.
 
+Дополнительные хуки `app-link` (добавлены 2026-11-17, дефолты = прежнее поведение, story
+consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.25rem, sans, numeric normal):
+- `--link-padding` — padding inner контрола, default `0.15rem 0.25rem`;
+- `--link-font-weight` — вес шрифта, default `500`;
+- `--link-line-height` — line-height, default `1.25` (unitless);
+- `--link-font` — font-family, default `var(--font-sans, inherit)`;
+- `--link-numeric` — font-variant-numeric, default `normal`.
+Font-size регулируется существующим `--control-font-{size}` size-правила.
+
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):
 нативный `button` наследует UA-шрифт и считает текстовый блок по `line-height: normal`, поэтому
 миграция чипа даёт точный пиксель-паритет при наборе токенов на host-элементе:
