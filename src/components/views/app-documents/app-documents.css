@@ -160,16 +160,6 @@
   overflow: hidden;
 }
 
-.doc-meta-box {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 0.75rem;
-  padding: 0.68rem 0.75rem;
-  background: var(--bg-subtle, #1a2438);
-  border-radius: var(--radius-md, 8px);
-  font-size: 0.76rem;
-}
-
 .meta-item {
   display: flex;
   flex-direction: column;

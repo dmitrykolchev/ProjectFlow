@@ -40,6 +40,7 @@ import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
+import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/card-footer/card-footer';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-document-previewer/app-document-previewer';
@@ -406,6 +407,20 @@ export class AppDocuments extends LitElement {
         ${paged.items.map((doc) => {
           const uploader = store.users.find((u) => u.id === doc.uploadedById);
           const linked = this.getLinkedEntityLabel(doc, t);
+          const metaItems = [
+            { label: t.documents.fieldCategory, value: t.documents.categories[doc.category] },
+            {
+              label: `${t.documents.versionLabel} / ${t.documents.sizeLabel}`,
+              value: `v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}`,
+              mono: true,
+            },
+            {
+              label: `${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})`,
+              value: linked.label,
+              link: linked.onClick ? { label: linked.label, onClick: linked.onClick } : undefined,
+            },
+            { label: t.documents.updatedLabel, value: doc.updatedAt.slice(0, 10), mono: true },
+          ];
 
           return html`
             <article class="doc-card">
@@ -428,39 +443,7 @@ export class AppDocuments extends LitElement {
 
               <p class="doc-desc">${doc.description || '—'}</p>
 
-              <div class="doc-meta-box">
-                <div class="meta-item">
-                  <span class="meta-label">${t.documents.fieldCategory}</span>
-                  <span class="meta-value" title="${t.documents.categories[doc.category]}">
-                    ${t.documents.categories[doc.category]}
-                  </span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.documents.versionLabel} / ${t.documents.sizeLabel}</span>
-                  <span class="meta-value mono">
-                    v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}
-                  </span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})</span>
-                  ${linked.onClick
-                    ? html`
-                        <app-link
-                          class="link-btn"
-                          size="md"
-                          variant="primary"
-                          @click="${linked.onClick}"
-                        >
-                          ${linked.label}
-                        </app-link>
-                      `
-                    : html`<span class="meta-value">${linked.label}</span>`}
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.documents.updatedLabel}</span>
-                  <span class="meta-value mono">${doc.updatedAt.slice(0, 10)}</span>
-                </div>
-              </div>
+              <app-meta-grid columns="2" layout="grid" .items="${metaItems}"></app-meta-grid>
 
               <app-tags-row
                 mode="add-button"
