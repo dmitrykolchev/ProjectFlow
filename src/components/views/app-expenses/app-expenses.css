@@ -289,9 +289,12 @@
   }
 }
 
-/* the billable checkbox cell aligns its control row to the bottom of the form-grid
-   cell so the box and label sit on the same line as the neighboring input controls */
+/* the reissue checkbox cell centers its control row on the vertical center of the
+   neighboring form-grid control: the padding-top skips the label line box and the gap that
+   every labeled field reserves above its 38px control, so the flex centering lands the
+   checkbox at the same center as the control to its left */
 .checkbox-cell {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
+  padding-top: 21.95px;
 }
