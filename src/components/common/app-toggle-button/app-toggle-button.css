@@ -10,6 +10,9 @@ button {
   gap: 0.45rem;
   font-family: var(--font-sans, inherit);
   font-weight: 500;
+  /* --btn-width lets a consumer stretch the inner control (default auto keeps every
+     existing toggle content-sized and pixel-identical) */
+  width: var(--btn-width, auto);
   border: 1px solid var(--border-strong, #334155);
   background: var(--bg-surface, #111827);
   color: var(--text-secondary, #94a3b8);
