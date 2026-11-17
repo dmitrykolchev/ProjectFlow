@@ -11,6 +11,7 @@ import {
   iconCheck,
   iconChevronRight,
   iconLayers,
+  iconX,
 } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
@@ -733,6 +734,7 @@ export class AppDataGrid extends LitElement {
 
           <app-toggle-button
             size="sm"
+            title="${t.grid.sortHint}"
             ?pressed="${this.multiSortEnabled}"
             @change="${(e: CustomEvent<{ pressed: boolean }>) => {
               this.multiSortEnabled = e.detail.pressed;
@@ -740,6 +742,24 @@ export class AppDataGrid extends LitElement {
           >
             ${t.grid.multiSort}
           </app-toggle-button>
+
+          ${this.sortRules.some((r) => !this.groupByFields.includes(r.field))
+            ? html`
+                <app-button
+                  size="sm"
+                  variant="ghost"
+                  title="${t.grid.clearSorts}"
+                  @click="${() => {
+                    this.sortRules = this.sortRules.filter((r) =>
+                      this.groupByFields.includes(r.field)
+                    );
+                  }}"
+                >
+                  <span slot="icon-start">${iconX(13)}</span>
+                  <span>${t.grid.clearSorts}</span>
+                </app-button>
+              `
+            : ''}
 
           ${hasHideableCols
             ? html`
@@ -840,69 +860,6 @@ export class AppDataGrid extends LitElement {
           `
         : ''}
 
-      <!-- Multi-Column Sort Precedence Bar -->
-      ${effectiveSortRules.length > 0 || this.multiSortEnabled
-        ? html`
-            <div class="sort-bar">
-              <div class="sort-chips-row">
-                ${effectiveSortRules.length === 0
-                  ? html`<span>${t.grid.sortHint}</span>`
-                  : html`
-                      <span>${t.grid.multiSort}:</span>
-                      ${effectiveSortRules.map((rule, idx) => {
-                        const caption =
-                          this.columns.find((c) => c.field === rule.field)?.caption || rule.field;
-                        return html`
-                          <div
-                            class="sort-chip ${rule.isGroupSort ? 'is-group-sort' : ''}"
-                            @click="${() => this.toggleSortDirection(rule.field)}"
-                            title="${caption}"
-                          >
-                            <span class="sort-chip-idx">${idx + 1}.</span>
-                            ${rule.isGroupSort
-                              ? html`<span class="sort-chip-group-tag">${t.grid.groupBy}</span>`
-                              : ''}
-                            <span>${caption}</span>
-                            <span class="sort-chip-dir">${rule.direction === 'asc' ? '▲' : '▼'}</span>
-                            ${!rule.isGroupSort
-                              ? html`
-                                  <button
-                                    type="button"
-                                    class="sort-chip-remove"
-                                    aria-label="Remove sort"
-                                    @click="${(e: Event) => {
-                                      e.stopPropagation();
-                                      this.removeSortRule(rule.field);
-                                    }}"
-                                  >
-                                    ×
-                                  </button>
-                                `
-                              : ''}
-                          </div>
-                        `;
-                      })}
-                    `}
-              </div>
-
-              ${this.sortRules.some((r) => !this.groupByFields.includes(r.field))
-                ? html`
-                    <div class="bar-actions">
-                      <app-link
-                        class="bar-link-btn"
-                        size="md"
-                        variant="secondary"
-                        @click="${() => (this.sortRules = [])}"
-                      >
-                        ${t.grid.clearSorts}
-                      </app-link>
-                    </div>
-                  `
-                : ''}
-            </div>
-          `
-        : ''}
-
       <div class="table-container" @scroll="${this.handleTableScroll}">
         <table>
           <colgroup>
@@ -934,11 +891,21 @@ export class AppDataGrid extends LitElement {
                 const sortIdx = effectiveSortRules.findIndex((r) => r.field === col.field);
                 const sortRule = sortIdx !== -1 ? effectiveSortRules[sortIdx] : null;
                 const canClickSort = col.sortable || this.groupByFields.includes(col.field);
+                const sortClasses = sortRule
+                  ? `is-sorted ${sortRule.isGroupSort ? 'is-group-sort' : ''}`
+                  : '';
+                const headerTitle = sortRule
+                  ? `${col.caption} (#${sortIdx + 1}${sortRule.isGroupSort ? ` · ${t.grid.groupBy}` : ''})`
+                  : canClickSort
+                  ? `${col.caption} (${t.grid.sortHint})`
+                  : col.caption;
 
                 return html`
                   <th
                     style="width: ${width}px; text-align: ${col.align};"
-                    class="${canClickSort ? 'is-sortable' : ''} ${isDragging ? 'is-dragging' : ''} ${dropClass}"
+                    class="${canClickSort ? 'is-sortable' : ''} ${sortClasses} ${isDragging ? 'is-dragging' : ''} ${dropClass}"
+                    aria-sort="${sortRule ? (sortRule.direction === 'asc' ? 'ascending' : 'descending') : 'none'}"
+                    title="${headerTitle}"
                     draggable="${col.reorderable && !this.resizingField ? 'true' : 'false'}"
                     @click="${(e: MouseEvent) => canClickSort && this.handleSort(col.field, e.shiftKey)}"
                     @dragstart="${(e: DragEvent) => this.handleColDragStart(e, col)}"
@@ -953,11 +920,9 @@ export class AppDataGrid extends LitElement {
                       <span class="th-label">${col.caption}</span>
                       ${sortRule
                         ? html`
-                            <span class="sort-indicator">
-                              ${effectiveSortRules.length > 1
-                                ? html`<span class="sort-order-num">${sortIdx + 1}</span>`
-                                : ''}
-                              <span>${sortRule.direction === 'asc' ? '▲' : '▼'}</span>
+                            <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
+                              <span class="sort-order-num">${sortIdx + 1}</span>
+                              <span class="sort-dir-arrow">${sortRule.direction === 'asc' ? '▲' : '▼'}</span>
                             </span>
                           `
                         : ''}
@@ -1399,22 +1364,6 @@ export class AppDataGrid extends LitElement {
         this.sortRules = [...preservedGroupRules, { field, direction: 'asc' }];
       }
     }
-  }
-
-  private toggleSortDirection(field: string) {
-    const existing = this.sortRules.find((r) => r.field === field);
-    if (!existing) {
-      // Grouped field defaulted to 'asc', so clicking toggles it to 'desc'
-      this.sortRules = [...this.sortRules, { field, direction: 'desc' }];
-      return;
-    }
-    this.sortRules = this.sortRules.map((r) =>
-      r.field === field ? { ...r, direction: r.direction === 'asc' ? 'desc' : 'asc' } : r
-    );
-  }
-
-  private removeSortRule(field: string) {
-    this.sortRules = this.sortRules.filter((r) => r.field !== field);
   }
 
   private toggleGroupCollapse(path: string) {
