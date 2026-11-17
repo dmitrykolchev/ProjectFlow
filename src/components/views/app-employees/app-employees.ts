@@ -11,12 +11,8 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
-import '../../common/app-input/app-input';
-import '../../common/app-number-input/app-number-input';
-import '../../common/app-date-input/app-date-input';
-import '../../common/app-select/app-select';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-modal/app-modal';
+import '../../common/app-employee-form/app-employee-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -41,18 +37,7 @@ export class AppEmployees extends LitElement {
   @state() private tablePageSize = store.customization.tablePageSize;
 
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formName = '';
-  @state() private formRole = '';
-  @state() private formDepartment = '';
-  @state() private formCompanyId = '';
-  @state() private formEmail = '';
-  @state() private formPhone = '';
-  @state() private formLocation = '';
-  @state() private formStatus: EmployeeStatus = 'active';
-  @state() private formHireDate = '';
-  @state() private formHourlyRate = 3500;
-  @state() private formError = '';
+  @state() private editingEmployee: User | null = null;
 
   @state() private deletingEmployee: User | null = null;
 
@@ -195,110 +180,12 @@ export class AppEmployees extends LitElement {
         ? this.renderCards(filtered, t)
         : this.renderTable(filtered, t)}
 
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.employees.modalTitleEdit : t.viewTexts.employees.modalTitleCreate}"
+      <app-employee-form
+        .open="${this.modalOpen}"
+        .employee="${this.editingEmployee}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelFullName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelPosition}"
-              .value="${this.formRole}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formRole = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelDepartment}"
-              .value="${this.formDepartment}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDepartment = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.employees.labelCompany}"
-              .value="${this.formCompanyId}"
-              .options="${[
-                { value: '', label: t.viewTexts.employees.optionNoCompany },
-                ...store.companies.map((c) => ({ value: c.id, label: c.name })),
-              ]}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelPhone}"
-              .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.employees.labelLocation}"
-              .value="${this.formLocation}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLocation = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.employees.labelStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as EmployeeStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.employees.labelHireDate}"
-              .value="${this.formHireDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formHireDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.employees.labelRate}"
-              .value="${this.formHourlyRate}"
-              min="500"
-              max="25000"
-              step="100"
-              unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formHourlyRate = eventValue(e))}"
-            ></app-number-input>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSave}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-employee-form>
 
       <app-confirm-dialog
         .open="${Boolean(this.deletingEmployee)}"
@@ -547,67 +434,12 @@ export class AppEmployees extends LitElement {
   }
 
   private openCreateModal() {
-    this.editingId = null;
-    this.formName = '';
-    this.formRole = '';
-    this.formDepartment = '';
-    this.formCompanyId = store.companies[0]?.id || '';
-    this.formEmail = '';
-    this.formPhone = '';
-    this.formLocation = getTranslation(this.currentLang).viewTexts.employees.defaultLocation;
-    this.formStatus = 'active';
-    this.formHireDate = new Date().toISOString().slice(0, 10);
-    this.formHourlyRate = 3500;
-    this.formError = '';
+    this.editingEmployee = null;
     this.modalOpen = true;
   }
 
   private openEditModal(emp: User) {
-    this.editingId = emp.id;
-    this.formName = emp.name;
-    this.formRole = emp.role;
-    this.formDepartment = emp.department || '';
-    this.formCompanyId = emp.companyId || '';
-    this.formEmail = emp.email;
-    this.formPhone = emp.phone || '';
-    this.formLocation = emp.location || '';
-    this.formStatus = emp.status || 'active';
-    this.formHireDate = emp.hireDate || '';
-    this.formHourlyRate = emp.hourlyRate || 3500;
-    this.formError = '';
+    this.editingEmployee = emp;
     this.modalOpen = true;
-  }
-
-  private handleSave() {
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const baseData = {
-      name: this.formName.trim(),
-      role: this.formRole.trim() || 'Specialist',
-      department: this.formDepartment.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultDepartment,
-      companyId: this.formCompanyId || undefined,
-      email: this.formEmail.trim() || 'team@projectflow.dev',
-      phone: this.formPhone.trim() || '—',
-      location: this.formLocation.trim() || getTranslation(this.currentLang).viewTexts.employees.defaultLocation,
-      status: this.formStatus,
-      hireDate: this.formHireDate || undefined,
-      hourlyRate: this.formHourlyRate,
-    };
-
-    if (this.editingId) {
-      const existing = this.employees.find((u) => u.id === this.editingId);
-      store.updateEmployee({
-        id: this.editingId,
-        avatar: existing?.avatar || '',
-        ...baseData,
-      });
-    } else {
-      store.addEmployee(baseData);
-    }
-
-    this.modalOpen = false;
   }
 }
