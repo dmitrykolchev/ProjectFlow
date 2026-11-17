@@ -31,6 +31,7 @@ import {
 } from '../icons';
 import '../app-button/app-button';
 import { eventValue } from '../event-value';
+import '../app-toggle-button/app-toggle-button';
 import '../app-segmented-switch/app-segmented-switch';
 import '../app-empty-state/app-empty-state';
 import '../app-status-chip/app-status-chip';
@@ -429,25 +430,23 @@ export class AppDocumentPreviewer extends LitElement {
                     ? html`
                         <div class="nav-pager">
                           <app-button
-                            class="tool-icon-btn"
-                            size="sm"
+                          size="xxs"
                             variant="icon"
                             title="${t.documents.prevDoc}"
                             .disabled="${!hasPrev}"
                             @click="${() => hasPrev && this.emitSelectDocument(docList[currentIdx - 1])}"
                           >
-                            <span slot="start">${iconChevronLeft(14)}</span>
+                            <span slot="start">${iconChevronLeft('sm')}</span>
                           </app-button>
                           <span class="nav-index">${currentIdx + 1}/${docList.length}</span>
                           <app-button
-                            class="tool-icon-btn"
-                            size="sm"
+                          size="xxs"
                             variant="icon"
                             title="${t.documents.nextDoc}"
                             .disabled="${!hasNext}"
                             @click="${() => hasNext && this.emitSelectDocument(docList[currentIdx + 1])}"
                           >
-                            <span slot="start">${iconChevronRight(14)}</span>
+                            <span slot="start">${iconChevronRight('sm')}</span>
                           </app-button>
                         </div>
                       `
@@ -455,13 +454,12 @@ export class AppDocumentPreviewer extends LitElement {
                   ${this.showExpand
                     ? html`
                         <app-button
-                          class="tool-icon-btn"
-                          size="sm"
+                        size="xxs"
                           variant="icon"
                           title="${t.documents.expandPreview}"
                           @click="${() => this.emitExpand(doc)}"
                         >
-                          <span slot="start">${iconMaximize(14)}</span>
+                          <span slot="start">${iconMaximize('sm')}</span>
                         </app-button>
                       `
                     : ''}
@@ -523,18 +521,17 @@ export class AppDocumentPreviewer extends LitElement {
         <div class="toolbar-bar">
           <div class="toolbar-group">
             <app-button
-              class="tool-icon-btn"
-              size="sm"
+              size="xxs"
               variant="icon"
               title="${t.documents.zoomOut}"
               .disabled="${this.zoom <= 0.5}"
               @click="${() => (this.zoom = Math.max(0.5, +(this.zoom - 0.25).toFixed(2)))}"
             >
-              <span slot="start">${iconZoomOut(14)}</span>
+              <span slot="start">${iconZoomOut('sm')}</span>
             </app-button>
             <app-button
-              class="tool-btn mono"
-              size="sm"
+              class="mono"
+              size="xxs"
               variant="icon"
               title="${t.documents.zoomReset}"
               @click="${() => (this.zoom = 1)}"
@@ -542,27 +539,25 @@ export class AppDocumentPreviewer extends LitElement {
               <span>${pct}%</span>
             </app-button>
             <app-button
-              class="tool-icon-btn"
-              size="sm"
+              size="xxs"
               variant="icon"
               title="${t.documents.zoomIn}"
               .disabled="${this.zoom >= 2.0}"
               @click="${() => (this.zoom = Math.min(2.0, +(this.zoom + 0.25).toFixed(2)))}"
             >
-              <span slot="start">${iconZoomIn(14)}</span>
+              <span slot="start">${iconZoomIn('sm')}</span>
             </app-button>
           </div>
           <div class="toolbar-group">
-            <app-button
-              class="tool-btn ${this.checkerboardBg ? 'is-active' : ''}"
-              size="sm"
-              variant="icon"
+            <app-toggle-button
+              size="xxs"
+              ?pressed="${this.checkerboardBg}"
               title="${t.documents.toggleGridBg}"
-              @click="${() => (this.checkerboardBg = !this.checkerboardBg)}"
+              @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.checkerboardBg = e.detail.pressed)}"
             >
-              <span slot="start">${iconGrid(13)}</span>
+              <span slot="start">${iconGrid('sm')}</span>
               <span>${t.documents.toggleGridBg}</span>
-            </app-button>
+            </app-toggle-button>
           </div>
         </div>
       `;
@@ -591,24 +586,22 @@ export class AppDocumentPreviewer extends LitElement {
 
             ${showingSource
               ? html`
-                  <app-button
-                    class="tool-btn ${this.showLineNumbers ? 'is-active' : ''}"
-                    size="sm"
-                    variant="icon"
-                    @click="${() => (this.showLineNumbers = !this.showLineNumbers)}"
+                  <app-toggle-button
+                    size="xxs"
+                    ?pressed="${this.showLineNumbers}"
+                    @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.showLineNumbers = e.detail.pressed)}"
                   >
                     <span slot="start">#</span>
                     <span>${t.documents.lineNumbers}</span>
-                  </app-button>
-                  <app-button
-                    class="tool-btn ${this.wordWrap ? 'is-active' : ''}"
-                    size="sm"
-                    variant="icon"
-                    @click="${() => (this.wordWrap = !this.wordWrap)}"
+                  </app-toggle-button>
+                  <app-toggle-button
+                    size="xxs"
+                    ?pressed="${this.wordWrap}"
+                    @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.wordWrap = e.detail.pressed)}"
                   >
-                    <span slot="start">${iconWrapText(13)}</span>
+                    <span slot="start">${iconWrapText('sm')}</span>
                     <span>${t.documents.wordWrap}</span>
-                  </app-button>
+                  </app-toggle-button>
                 `
               : ''}
           </div>
@@ -616,12 +609,11 @@ export class AppDocumentPreviewer extends LitElement {
           <div class="toolbar-group">
             <span class="toolbar-pill-info">${t.documents.linesCount(lineCount)}</span>
             <app-button
-              class="tool-btn ${this.copiedContent ? 'is-active' : ''}"
-              size="sm"
+              size="xxs"
               variant="icon"
               @click="${() => this.handleCopyText(formattedText)}"
             >
-              <span slot="start">${this.copiedContent ? iconCheck(13) : iconCopy(13)}</span>
+              <span slot="start">${this.copiedContent ? iconCheck('sm') : iconCopy('sm')}</span>
               <span>
                 ${this.copiedContent
                   ? t.viewTexts.documents.copiedContent
