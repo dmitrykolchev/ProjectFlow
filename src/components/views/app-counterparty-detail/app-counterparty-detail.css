@@ -422,19 +422,30 @@
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
 
+/* table name-links are app-link web components at size md with the historical typography
+   restored through the additive link hooks of zero padding, weight 600, the inherited unitless
+   line-height 1.5, and the cell font size pinned through control-font-md; the mono class on the
+   host keeps its historical cascade where the native font shorthand reset the numerals, so the
+   inner label renders the sans family with normal numerics as the original did; the accent color
+   and the hover underline are the primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --control-font-md: 0.83rem;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
+/* the calculation link pairs a 14px icon with the number in the historical baseline-aligned
+   line box of 20.16px height, restored through flex-start alignment, the tighter 0.35rem gap
+   and the min-height pin, with the icon offset from the top by the original 1.72px */
+.icon-number-link {
+  --link-gap: 0.35rem;
+  --link-align-items: flex-start;
+  --link-min-height: 20.16px;
+}
+
+.num-icon {
+  margin-top: 1.72px;
 }
 
 /* header and project row icon actions are app-button web components at size xs pinned

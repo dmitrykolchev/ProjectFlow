@@ -32,6 +32,7 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -491,13 +492,14 @@ export class AppCounterpartyDetail extends LitElement {
                           return html`
                             <tr>
                               <td>
-                                <button
-                                  type="button"
+                                <app-link
                                   class="link-btn mono"
+                                  size="md"
+                                  variant="primary"
                                   @click="${() => ctr && store.openContractDetail(ctr.id)}"
                                 >
                                   ${inv.number}
-                                </button>
+                                </app-link>
                               </td>
                               <td>${ctr ? `${ctr.number} — ${ctr.title}` : '—'}</td>
                               <td>
@@ -570,28 +572,28 @@ export class AppCounterpartyDetail extends LitElement {
                         return html`
                           <tr>
                             <td>
-                              <button
-                                type="button"
-                                class="link-btn mono"
+                              <app-link
+                                class="link-btn mono icon-number-link"
+                                size="md"
+                                variant="primary"
                                 title="${t.calculations.openCalculation}"
                                 @click="${() => store.openCalculationDetail(calc.id)}"
                               >
-                                <span style="display: inline-flex; align-items: center; gap: 0.35rem;">
-                                  ${iconCalculator(14)}
-                                  <span>${calc.number}</span>
-                                </span>
-                              </button>
+                                <span class="num-icon" slot="start">${iconCalculator(14)}</span>
+                                <span>${calc.number}</span>
+                              </app-link>
                             </td>
                             <td>
                               ${ctr
                                 ? html`
-                                    <button
-                                      type="button"
+                                    <app-link
                                       class="link-btn mono"
+                                      size="md"
+                                      variant="primary"
                                       @click="${() => store.openContractDetail(ctr.id)}"
                                     >
                                       ${ctr.number}
-                                    </button>
+                                    </app-link>
                                   `
                                 : '—'}
                             </td>
