@@ -191,6 +191,75 @@ button:disabled {
   color: var(--btn-disabled-color, var(--icon-btn-color, var(--text-secondary, #94a3b8)));
 }
 
+/* Canonical business actions: the component owns the highlight palette so views declare
+   the semantic action instead of writing per-view hover classes. default keeps every
+   existing button pixel-identical. Icon actions reuse the historical hover fill; text
+   actions (ghost / outline / secondary) carry the action color on glyph and border,
+   while primary / danger variants keep their own solid fills. */
+.action-view,
+.action-edit,
+.action-submit {
+  --icon-btn-hover-color: var(--accent-primary, #6366f1);
+  --icon-btn-hover-border: var(--accent-border, rgba(99, 102, 241, 0.45));
+  --icon-btn-hover-bg: var(--accent-soft, rgba(99, 102, 241, 0.12));
+}
+
+.action-accept {
+  --icon-btn-hover-color: var(--color-success, #10b981);
+  --icon-btn-hover-border: var(--color-success-border, rgba(16, 185, 129, 0.45));
+  --icon-btn-hover-bg: var(--color-success-bg, rgba(16, 185, 129, 0.12));
+}
+
+.action-delete,
+.action-reject {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
+  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
+}
+
+.action-cancel {
+  --icon-btn-hover-color: var(--text-secondary, #94a3b8);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+}
+
+.action-view.variant-ghost,
+.action-view.variant-outline,
+.action-view.variant-secondary,
+.action-edit.variant-ghost,
+.action-edit.variant-outline,
+.action-edit.variant-secondary,
+.action-submit.variant-ghost,
+.action-submit.variant-outline,
+.action-submit.variant-secondary {
+  color: var(--accent-primary, #6366f1);
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
+}
+
+.action-accept.variant-ghost,
+.action-accept.variant-outline,
+.action-accept.variant-secondary {
+  color: var(--color-success, #10b981);
+  border-color: var(--color-success-border, rgba(16, 185, 129, 0.45));
+}
+
+.action-delete.variant-ghost,
+.action-delete.variant-outline,
+.action-delete.variant-secondary,
+.action-reject.variant-ghost,
+.action-reject.variant-outline,
+.action-reject.variant-secondary {
+  color: var(--color-danger, #ef4444);
+  border-color: var(--color-danger-border, rgba(239, 68, 68, 0.4));
+}
+
+.action-cancel.variant-ghost,
+.action-cancel.variant-outline,
+.action-cancel.variant-secondary {
+  color: var(--text-secondary, #94a3b8);
+  border-color: var(--border-subtle, #334155);
+}
+
 .spinner {
   width: 14px;
   height: 14px;

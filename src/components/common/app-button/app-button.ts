@@ -4,11 +4,23 @@ import styles from './app-button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'icon';
 export type ButtonSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
+// canonical business actions: the component owns the highlight color for each one,
+// views declare the semantic action instead of writing per-view hover classes
+export type ButtonAction =
+  | 'default'
+  | 'view'
+  | 'edit'
+  | 'delete'
+  | 'submit'
+  | 'cancel'
+  | 'accept'
+  | 'reject';
 
 @customElement('app-button')
 export class AppButton extends LitElement {
   @property({ type: String }) variant: ButtonVariant = 'primary';
   @property({ type: String }) size: ButtonSize = 'md';
+  @property({ type: String }) action: ButtonAction = 'default';
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: Boolean }) loading: boolean = false;
   @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
@@ -26,7 +38,7 @@ export class AppButton extends LitElement {
       <button
         type="${this.type}"
         ?disabled="${this.disabled || this.loading}"
-        class="variant-${this.variant} size-${this.size} ${iconOnly ? 'icon-only' : ''}"
+        class="variant-${this.variant} size-${this.size} action-${this.action} ${iconOnly ? 'icon-only' : ''}"
         @click="${this.handleClick}"
       >
         <!-- canonical slots: start / default / end; icon-start and icon-end are legacy aliases -->

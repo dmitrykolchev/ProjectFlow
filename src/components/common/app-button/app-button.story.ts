@@ -22,6 +22,7 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     variant: 'Visual style: primary, secondary, outline, ghost, danger, icon (compact card action)',
     size: 'Control height: sm / md / lg',
+    action: 'Business action driving the highlight color: default (neutral), view / edit / submit (accent), accept (success), delete / reject (danger), cancel (muted)',
     disabled: 'Disables interaction and dims the button',
     loading: 'Shows a spinner and blocks clicks',
     iconOnly: 'Renders only the start slot, no text; a button with only an icon becomes square automatically',
@@ -86,6 +87,42 @@ export const meta: ComponentStoryMeta = {
           <app-button variant="primary" disabled>Disabled</app-button>
           <app-button variant="secondary" loading>Saving...</app-button>
           <app-button variant="outline" loading>Loading</app-button>
+        </div>
+      `,
+    },
+    {
+      name: 'Actions',
+      description:
+        'Canonical business actions: icon row actions highlight accent for view / edit / submit, success for accept, danger for delete / reject, muted for cancel; text buttons carry the same color on glyph and border',
+      render: () => html`
+        <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap;">
+          <app-button variant="icon" size="sm" action="default">
+            <app-material-icon slot="start">more_horiz</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="view">
+            <app-material-icon slot="start">visibility</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="edit">
+            <app-material-icon slot="start">edit</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="submit">
+            <app-material-icon slot="start">send</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="accept">
+            <app-material-icon slot="start">check</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="reject">
+            <app-material-icon slot="start">close</app-material-icon>
+          </app-button>
+          <app-button variant="icon" size="sm" action="delete">
+            <app-material-icon slot="start">delete</app-material-icon>
+          </app-button>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; margin-top: 0.9rem;">
+          <app-button variant="outline" size="md" action="submit">Submit</app-button>
+          <app-button variant="outline" size="md" action="accept">Accept</app-button>
+          <app-button variant="outline" size="md" action="reject">Reject</app-button>
+          <app-button variant="outline" size="md" action="cancel">Cancel</app-button>
         </div>
       `,
     },
