@@ -44,6 +44,7 @@ import {
 import { eventValue } from '../../common/event-value';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-empty-state/app-empty-state';
@@ -335,14 +336,15 @@ export class AppRequirementDetail extends LitElement {
                   </span>
                   ${project
                     ? html`
-                        <button
-                          type="button"
+                        <app-link
                           class="link-btn"
+                          size="md"
+                          variant="primary"
                           @click="${() => store.openProjectDetail(project.id)}"
                         >
-                          <span class="mono">[${project.key}]</span>
+                          <span slot="start" class="mono">[${project.key}]</span>
                           <span>${project.name}</span>
-                        </button>
+                        </app-link>
                       `
                     : ''}
                   <span>·</span>
@@ -497,17 +499,18 @@ export class AppRequirementDetail extends LitElement {
                     `
                   : html`
                       <div class="dates-display">
-                        <button
-                          type="button"
-                          class="link-btn"
+                        <app-link
+                          class="link-btn mono-link"
+                          size="md"
+                          variant="primary"
                           @click="${() => {
                             this.draftCategory = req.category;
                             this.editingCategory = true;
                           }}"
                         >
                           <span>${req.category}</span>
-                          ${iconEdit(12)}
-                        </button>
+                          <span slot="end">${iconEdit(12)}</span>
+                        </app-link>
                       </div>
                     `}
               </div>
