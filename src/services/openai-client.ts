@@ -1,4 +1,6 @@
 import type {
+  AnalysisDecompositionItem,
+  AnalysisSummary,
   Company,
   DocumentItem,
   KnowledgeArticle,
@@ -854,6 +856,133 @@ export async function analyzeTaskWithContext(params: {
     contextSources,
     model,
     updatedAt: new Date().toISOString(),
+  };
+}
+
+export interface RequirementAnalysisResult {
+  overview: string;
+  risks: string[];
+  recommendations: string[];
+  clarification: string;
+  decomposition: AnalysisDecompositionItem[];
+  contextSources: TaskAiContextRef[];
+  model: string;
+}
+
+export async function analyzeRequirementWithContext(params: {
+  requirement: ProjectRequirement;
+  project?: Project;
+  sourceDoc?: DocumentItem;
+  linkedKnowledge: KnowledgeArticle[];
+  linkedTasks: Task[];
+  contextItems: TaskAiContextItem[];
+  lang: SupportedLang;
+  baseUrl?: string;
+  model?: string;
+  signal?: AbortSignal;
+}): Promise<RequirementAnalysisResult> {
+  const { requirement, project, sourceDoc, linkedKnowledge, linkedTasks, contextItems, lang } = params;
+  const langName = lang === 'en' ? 'English' : 'Russian';
+
+  const systemPrompt = [
+    'You are a Principal Product Analyst & Systems Architect analyzing one project requirement against the corporate Knowledge Base and Document Library.',
+    `Write all output text in ${langName}.`,
+    'Return ONLY a valid JSON object with exact schema:',
+    '{',
+    '  "overview": "<3-4 sentence executive assessment of completeness, ambiguities and dependencies referencing relevant context docs>",',
+    '  "risks": ["<ambiguity, edge case or delivery risk 1>", "<risk 2>", "<risk 3>"],',
+    '  "recommendations": ["<concrete analyst/architect action 1>", "<step 2>", "<step 3>"],',
+    '  "clarification": "<refined requirement statement: precise scope, testable acceptance criteria additions, measurable NFR thresholds>",',
+    '  "decomposition": [ { "title": "<concise actionable engineering task 1>", "estimatedHours": 8 }, { "title": "<task 2>", "estimatedHours": 4 } ]',
+    '}',
+    'Produce 2 to 6 focused decomposition tasks sized for delivery.',
+  ].join('\n');
+
+  const reqBlock = [
+    `Requirement ID: ${requirement.id}`,
+    `Code: ${requirement.code} — ${requirement.title}`,
+    `Type: ${requirement.type === 'functional' ? 'Functional (FR)' : 'Non-Functional (NFR)'} | Category: ${requirement.category} | Priority: ${requirement.priority} | Status: ${requirement.status}`,
+    project ? `Project: [${project.key}] ${project.name}` : '',
+    requirement.description?.trim() ? `Description:\n${requirement.description.trim()}` : 'Description: (none)',
+    requirement.acceptanceCriteria.length
+      ? `Current Acceptance Criteria:\n${requirement.acceptanceCriteria.map((c, idx) => `${idx + 1}. ${c}`).join('\n')}`
+      : 'Current Acceptance Criteria: None yet',
+    sourceDoc ? `Source Specification Document:\n${extractDocumentTextContext(sourceDoc).slice(0, 2600)}` : '',
+    linkedKnowledge.length
+      ? `Linked Knowledge Base Articles:\n${linkedKnowledge
+          .map((k) => `- ${k.title}: ${k.summary || k.content.slice(0, 500)}`)
+          .join('\n')}`
+      : '',
+    linkedTasks.length
+      ? `Linked Tasks:\n${linkedTasks
+          .map((tk) => `- [${tk.id}] ${tk.title} (${tk.status}, ${tk.priority}, ${tk.estimatedHours}h)`)
+          .join('\n')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n\n');
+
+  const userPrompt = [
+    'Analyze this requirement using the corporate Knowledge Base and Documents context below:',
+    '',
+    '### REQUIREMENT DETAILS',
+    reqBlock,
+    '',
+    '### KNOWLEDGE BASE & DOCUMENTS CONTEXT',
+    formatContextForPrompt(contextItems),
+  ].join('\n');
+
+  const { content, model } = await chatCompletion({
+    baseUrl: params.baseUrl,
+    model: params.model,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: userPrompt },
+    ],
+    temperature: 0.25,
+    signal: params.signal,
+  });
+
+  const parsed = extractJsonObject<{
+    overview?: unknown;
+    risks?: unknown;
+    recommendations?: unknown;
+    clarification?: unknown;
+    decomposition?: unknown;
+  }>(content);
+
+  if (parsed && typeof parsed.overview === 'string' && parsed.overview.trim()) {
+    const decomposition: AnalysisDecompositionItem[] = Array.isArray(parsed.decomposition)
+      ? parsed.decomposition
+          .filter((d) => d && typeof (d as { title?: unknown }).title === 'string' && (d as { title: string }).title.trim())
+          .slice(0, 6)
+          .map((d) => {
+            const rec = d as { title: string; estimatedHours?: unknown };
+            return {
+              title: rec.title.trim().slice(0, 120),
+              estimatedHours: typeof rec.estimatedHours === 'number' && rec.estimatedHours > 0 ? Math.round(rec.estimatedHours) : undefined,
+            };
+          })
+      : [];
+    return {
+      overview: parsed.overview.trim(),
+      risks: sanitizeStringArray(parsed.risks, 6),
+      recommendations: sanitizeStringArray(parsed.recommendations, 6),
+      clarification: typeof parsed.clarification === 'string' ? parsed.clarification.trim().slice(0, 1500) : '',
+      decomposition,
+      contextSources: contextItems.map((c) => ({ kind: c.kind, id: c.id, title: c.title, reason: c.reason })),
+      model,
+    };
+  }
+
+  return {
+    overview: content.replace(/```/g, '').trim().slice(0, 1200),
+    risks: [],
+    recommendations: [],
+    clarification: '',
+    decomposition: [],
+    contextSources: contextItems.map((c) => ({ kind: c.kind, id: c.id, title: c.title, reason: c.reason })),
+    model,
   };
 }
 
