@@ -281,14 +281,15 @@ export class AppProjectDetail extends LitElement {
               <span>${t.common.edit}</span>
             </app-button>
 
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -573,15 +574,16 @@ export class AppProjectDetail extends LitElement {
                                       ></app-number-input>
                                     </div>
 
-                                    <button
-                                      type="button"
-                                      class="icon-btn danger"
+                                    <app-button
+                                      class="danger-action"
+                                      size="xs"
+                                      variant="icon"
                                       title="${t.viewTexts.projectDetail.removeFromRoleTitle}"
                                       @click="${() =>
                                         (this.pendingRemoveMember = { userId: member.userId, role: member.role })}"
                                     >
-                                      ${iconTrash(14)}
-                                    </button>
+                                      <span slot="start">${iconTrash(14)}</span>
+                                    </app-button>
                                   </div>
                                 `;
                               })}
