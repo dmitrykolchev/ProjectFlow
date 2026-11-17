@@ -166,6 +166,12 @@ button:disabled {
   border-color: var(--icon-btn-hover-border, var(--icon-btn-hover-color, var(--text-primary, #f8fafc)));
 }
 
+/* --btn-disabled-color lets a consumer restore a historical disabled glyph color; the
+   default equals the base icon color, so every existing icon control is pixel-identical */
+.variant-icon:disabled {
+  color: var(--btn-disabled-color, var(--icon-btn-color, var(--text-secondary, #94a3b8)));
+}
+
 .spinner {
   width: 14px;
   height: 14px;

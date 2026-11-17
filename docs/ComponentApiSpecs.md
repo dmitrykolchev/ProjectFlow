@@ -437,7 +437,9 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 - `--btn-border-width` — ширина рамки базового button, default `1px`;
 - `--btn-radius-{tl,tr,bl,br}` — угловые радиусы, default `--radius-md`;
 - `--icon-btn-{bg,color,border}` и `--icon-btn-hover-{bg,color,border}` — base/hover вида `icon`;
-- `--btn-min-width`, `--btn-font-weight`, `--icon-btn-font`, `--btn-disabled-opacity`.
+- `--btn-min-width`, `--btn-font-weight`, `--icon-btn-font`, `--btn-disabled-opacity`,
+  `--btn-disabled-color` (disabled glyph вида `icon`, default = базовый цвет иконки);
+- `--btn-gap` — gap flex-контейнера контрола, default `0.5rem`.
 
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):
 нативный `button` наследует UA-шрифт и считает текстовый блок по `line-height: normal`, поэтому
