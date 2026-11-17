@@ -141,24 +141,24 @@ export class AppTimeTracking extends LitElement {
     const billablePct = totalHours > 0 ? Math.round((billableHours / totalHours) * 100) : 0;
     const estCostRub = Math.round(billableHours * HOURLY_RATE_RUB);
 
-    const projectOptions = [
+    const quickProjectOptions = mapProjectOptions(store.projects, t);
+    const userSelectOptions = mapUserOptions(store.users, t);
+
+    // filter bar entity selectors reuse the same rich option lists as the quick report
+    const projectFilterOptions = [
       { value: 'all', label: t.viewTexts.timeTracking.filterAllProjects },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
+      ...quickProjectOptions,
     ];
 
-    const quickProjectOptions = mapProjectOptions(store.projects, t);
+    const userFilterOptions = [
+      { value: 'all', label: t.viewTexts.timeTracking.filterAllEmployees },
+      ...userSelectOptions,
+    ];
 
     const quickTaskOptions = mapTaskOptions(
       store.tasks.filter((tk) => tk.projectId === this.quickProjectId),
       t
     );
-
-    const userFilterOptions = [
-      { value: 'all', label: t.viewTexts.timeTracking.filterAllEmployees },
-      ...store.users.map((u) => ({ value: u.id, label: u.name })),
-    ];
-
-    const userSelectOptions = mapUserOptions(store.users, t);
 
     const categoryOptions: { value: TimeEntryCategory; label: string }[] = [
       { value: 'development', label: t.timeTracking.categories.development },
@@ -296,8 +296,8 @@ export class AppTimeTracking extends LitElement {
         placeholder="${t.viewTexts.timeTracking.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
-          { key: 'project', options: projectOptions },
-          { key: 'user', options: userFilterOptions },
+          { key: 'project', type: 'entity', options: projectFilterOptions },
+          { key: 'user', type: 'entity', options: userFilterOptions },
           { key: 'category', options: categoryFilterOptions },
         ]}"
         .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
