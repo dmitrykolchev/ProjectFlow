@@ -596,46 +596,50 @@ export class AppContracts extends LitElement {
                           </td>
                           <td>
                             <div class="actions-row">
-                              <button
-                                type="button"
-                                class="icon-btn accent"
+                              <app-button
+                                class="accent-action"
+                                size="sm"
+                                variant="icon"
                                 title="${t.contractDetail.openContract}"
                                 @click="${() => store.openContractDetail(ctr.id)}"
                               >
-                                ${iconChevronRight(15)}
-                              </button>
-                              <button
-                                type="button"
-                                class="icon-btn accent"
+                                <span slot="start">${iconChevronRight(15)}</span>
+                              </app-button>
+                              <app-button
+                                class="accent-action"
+                                size="sm"
+                                variant="icon"
                                 title="${t.contractDetail.createCalculation}"
                                 @click="${() => store.openContractDetail(ctr.id, 'calculation')}"
                               >
-                                ${iconTable()}
-                              </button>
-                              <button
-                                type="button"
-                                class="icon-btn success"
+                                <span slot="start">${iconTable()}</span>
+                              </app-button>
+                              <app-button
+                                class="success-action"
+                                size="sm"
+                                variant="icon"
                                 title="${t.contractDetail.issueInvoice}"
                                 @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
                               >
-                                ${iconReceipt(15)}
-                              </button>
-                              <button
-                                type="button"
-                                class="icon-btn"
+                                <span slot="start">${iconReceipt(15)}</span>
+                              </app-button>
+                              <app-button
+                                size="sm"
+                                variant="icon"
                                 title="${t.common.edit}"
                                 @click="${() => this.openEditModal(ctr)}"
                               >
-                                ${iconEdit(14)}
-                              </button>
-                              <button
-                                type="button"
-                                class="icon-btn danger"
+                                <span slot="start">${iconEdit(14)}</span>
+                              </app-button>
+                              <app-button
+                                class="danger-action"
+                                size="sm"
+                                variant="icon"
                                 title="${t.common.delete}"
                                 @click="${() => (this.deletingContract = ctr)}"
                               >
-                                ${iconTrash(14)}
-                              </button>
+                                <span slot="start">${iconTrash(14)}</span>
+                              </app-button>
                             </div>
                           </td>
                         </tr>
@@ -756,58 +760,62 @@ export class AppContracts extends LitElement {
                             <div class="actions-row">
                               ${calc.status === 'draft' || calc.status === 'rejected'
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn accent"
+                                    <app-button
+                                      class="accent-action"
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.calculations.sendForApproval}"
                                       @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
                                     >
-                                      ${iconSend(14)}
-                                    </button>
+                                      <span slot="start">${iconSend(14)}</span>
+                                    </app-button>
                                   `
                                 : ''}
                               ${calc.status === 'sent'
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn success"
+                                    <app-button
+                                      class="success-action"
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.calculations.approveCalc}"
                                       @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
                                     >
-                                      ${iconCheck(14)}
-                                    </button>
-                                    <button
-                                      type="button"
-                                      class="icon-btn danger"
+                                      <span slot="start">${iconCheck(14)}</span>
+                                    </app-button>
+                                    <app-button
+                                      class="danger-action"
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.calculations.rejectCalc}"
                                       @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
                                     >
-                                      ${iconX(14)}
-                                    </button>
+                                      <span slot="start">${iconX(14)}</span>
+                                    </app-button>
                                   `
                                 : ''}
                               ${calc.status === 'approved' && ctr
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn success"
+                                    <app-button
+                                      class="success-action"
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.calculations.createInvoiceFromCalc}"
                                       @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
                                     >
-                                      ${iconReceipt(15)}
-                                    </button>
+                                      <span slot="start">${iconReceipt(15)}</span>
+                                    </app-button>
                                   `
                                 : ''}
                               ${ctr
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn"
+                                    <app-button
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.contractDetail.openContract}"
                                       @click="${() => store.openContractDetail(ctr.id)}"
                                     >
-                                      ${iconChevronRight(15)}
-                                    </button>
+                                      <span slot="start">${iconChevronRight(15)}</span>
+                                    </app-button>
                                   `
                                 : ''}
                             </div>
@@ -912,24 +920,25 @@ export class AppContracts extends LitElement {
                             <div class="actions-row">
                               ${ctr
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="icon-btn"
+                                    <app-button
+                                      size="sm"
+                                      variant="icon"
                                       title="${t.contractDetail.openContract}"
                                       @click="${() => store.openContractDetail(ctr.id)}"
                                     >
-                                      ${iconChevronRight(15)}
-                                    </button>
+                                      <span slot="start">${iconChevronRight(15)}</span>
+                                    </app-button>
                                   `
                                 : ''}
-                              <button
-                                type="button"
-                                class="icon-btn danger"
+                              <app-button
+                                class="danger-action"
+                                size="sm"
+                                variant="icon"
                                 title="${t.common.delete}"
                                 @click="${() => (this.deletingPayment = pay)}"
                               >
-                                ${iconTrash(14)}
-                              </button>
+                                <span slot="start">${iconTrash(14)}</span>
+                              </app-button>
                             </div>
                           </td>
                         </tr>
@@ -1057,58 +1066,62 @@ export class AppContracts extends LitElement {
                           <div class="actions-row">
                             ${inv.status === 'draft'
                               ? html`
-                                  <button
-                                    type="button"
-                                    class="icon-btn accent"
+                                  <app-button
+                                    class="accent-action"
+                                    size="sm"
+                                    variant="icon"
                                     title="${t.invoices.markIssued}"
                                     @click="${() => store.updateInvoiceStatus(inv.id, 'issued')}"
                                   >
-                                    ${iconFileText(14)}
-                                  </button>
+                                    <span slot="start">${iconFileText(14)}</span>
+                                  </app-button>
                                 `
                               : ''}
                             ${inv.status === 'issued'
                               ? html`
-                                  <button
-                                    type="button"
-                                    class="icon-btn accent"
+                                  <app-button
+                                    class="accent-action"
+                                    size="sm"
+                                    variant="icon"
                                     title="${t.invoices.markSent}"
                                     @click="${() => store.updateInvoiceStatus(inv.id, 'sent')}"
                                   >
-                                    ${iconSend(14)}
-                                  </button>
+                                    <span slot="start">${iconSend(14)}</span>
+                                  </app-button>
                                 `
                               : ''}
                             ${canPay
                               ? html`
-                                  <button
-                                    type="button"
-                                    class="icon-btn success"
+                                  <app-button
+                                    class="success-action"
+                                    size="sm"
+                                    variant="icon"
                                     title="${t.payments.recordPayment}"
                                     @click="${() => this.openPaymentModal(inv)}"
                                   >
-                                    ${iconCreditCard(14)}
-                                  </button>
-                                  <button
-                                    type="button"
-                                    class="icon-btn success"
+                                    <span slot="start">${iconCreditCard(14)}</span>
+                                  </app-button>
+                                  <app-button
+                                    class="success-action"
+                                    size="sm"
+                                    variant="icon"
                                     title="${t.invoices.markPaid}"
                                     @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
                                   >
-                                    ${iconCheck(14)}
-                                  </button>
+                                    <span slot="start">${iconCheck(14)}</span>
+                                  </app-button>
                                 `
                               : ''}
                             ${ctr
                               ? html`
-                                  <button
-                                    type="button"
-                                    class="icon-btn"
+                                  <app-button
+                                    size="sm"
+                                    variant="icon"
                                     title="${t.contractDetail.openContract}"
                                     @click="${() => store.openContractDetail(ctr.id)}"
                                   >
-                                    ${iconChevronRight(15)}
-                                  </button>
+                                    <span slot="start">${iconChevronRight(15)}</span>
+                                  </app-button>
                                 `
                               : ''}
                           </div>
