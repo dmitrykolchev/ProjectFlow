@@ -5,8 +5,6 @@ import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
   Calculation,
-  CalculationFrequency,
-  CalculationItem,
   CalculationStatus,
   Contract,
   ContractType,
@@ -39,7 +37,6 @@ import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
-import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -47,6 +44,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-calculation-form/app-calculation-form';
 import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-contract-form/app-contract-form';
 import '../../common/app-empty-state/app-empty-state';
@@ -76,16 +74,8 @@ export class AppContractDetail extends LitElement {
 
   // Calculation Create / Edit modal
   @state() private calcModalOpen = false;
-  @state() private editingCalcId: string | null = null;
-  @state() private calcNumber = '';
-  @state() private calcFrequency: CalculationFrequency = 'monthly';
-  @state() private calcPeriodStart = '';
-  @state() private calcPeriodEnd = '';
-  @state() private calcIncludePrior = true;
-  @state() private calcStatus: CalculationStatus = 'draft';
-  @state() private calcItems: CalculationItem[] = [];
-  @state() private calcNotes = '';
-  @state() private calcError = '';
+  @state() private editingCalculation: Calculation | null = null;
+  @state() private presetCalcContractId: string | null = null;
 
   // Preview & Delete Calculation modals
   @state() private previewCalculation: Calculation | null = null;
@@ -286,77 +276,6 @@ export class AppContractDetail extends LitElement {
       .sort((a, b) => a.date.localeCompare(b.date));
 
     return { timeEntries, expenses };
-  }
-
-  private collectItemsForPeriod(
-    contract: Contract,
-    periodStart: string,
-    periodEnd: string,
-    includePrior: boolean,
-    excludeCalcId?: string | null
-  ): CalculationItem[] {
-    if (!contract.projectId) return [];
-    const { timeEntries, expenses } = this.getUnaccountedProjectSources(contract, excludeCalcId);
-    const items: CalculationItem[] = [];
-
-    for (const te of timeEntries) {
-      const inRange = (!periodStart || te.date >= periodStart) && (!periodEnd || te.date <= periodEnd);
-      const isPrior = Boolean(periodStart && te.date < periodStart && (!periodEnd || te.date <= periodEnd));
-      if (!inRange && !(includePrior && isPrior)) continue;
-
-      const task = store.tasks.find((tk) => tk.id === te.taskId);
-      const user = store.users.find((u) => u.id === te.userId);
-      const rawRate = user?.hourlyRate || HOURLY_RATE_RUB;
-      const baseRate = this.convertAmountToCurrency(rawRate, 'RUB', contract.currency);
-      const unitPrice = te.billable ? baseRate : 0;
-      const amount = te.billable ? Math.round(te.hours * unitPrice) : 0;
-
-      items.push({
-        id: `ci-te-${te.id}`,
-        itemType: 'time_entry',
-        sourceId: te.id,
-        date: te.date,
-        taskId: te.taskId,
-        userId: te.userId,
-        title: `${te.taskId}${task ? ` · ${task.title}` : ''}${te.description ? ` — ${te.description}` : ''}`,
-        quantity: te.hours,
-        unit: 'ч',
-        billable: te.billable,
-        baseRate,
-        unitPrice,
-        amount,
-        isPriorPeriod: isPrior,
-      });
-    }
-
-    for (const ex of expenses) {
-      const inRange = (!periodStart || ex.date >= periodStart) && (!periodEnd || ex.date <= periodEnd);
-      const isPrior = Boolean(periodStart && ex.date < periodStart && (!periodEnd || ex.date <= periodEnd));
-      if (!inRange && !(includePrior && isPrior)) continue;
-
-      const baseRate = this.convertAmountToCurrency(ex.amount, ex.currency, contract.currency);
-      const unitPrice = ex.billable ? baseRate : 0;
-      const amount = ex.billable ? baseRate : 0;
-
-      items.push({
-        id: `ci-ex-${ex.id}`,
-        itemType: 'expense',
-        sourceId: ex.id,
-        date: ex.date,
-        taskId: ex.taskId,
-        userId: ex.userId,
-        title: `${ex.title}${ex.vendor ? ` (${ex.vendor})` : ''}`,
-        quantity: 1,
-        unit: 'усл.',
-        billable: ex.billable,
-        baseRate,
-        unitPrice,
-        amount,
-        isPriorPeriod: isPrior,
-      });
-    }
-
-    return items.sort((a, b) => a.date.localeCompare(b.date));
   }
 
   private getUnbilledProjectSources(contract: Contract) {
@@ -1316,321 +1235,18 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private renderCalculationFormModal(
-    ctr: Contract,
-    t: ReturnType<typeof getTranslation>
-  ) {
-    const frequencyOptions: { value: CalculationFrequency; label: string }[] = [
-      { value: 'weekly', label: t.calculations.frequencies.weekly },
-      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
-      { value: 'monthly', label: t.calculations.frequencies.monthly },
-      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
-      { value: 'custom', label: t.calculations.frequencies.custom },
-    ];
-
-    const statusOptions: { value: CalculationStatus; label: string }[] = [
-      { value: 'draft', label: t.calculations.statuses.draft },
-      { value: 'sent', label: t.calculations.statuses.sent },
-      { value: 'approved', label: t.calculations.statuses.approved },
-      { value: 'rejected', label: t.calculations.statuses.rejected },
-      { value: 'invoiced', label: t.calculations.statuses.invoiced },
-    ];
-
-    const hourItems = this.calcItems.filter((i) => i.unit === 'ч');
-    const billableHours = hourItems.filter((i) => i.billable).reduce((s, i) => s + (Number(i.quantity) || 0), 0);
-    const nonBillableHours = hourItems
-      .filter((i) => !i.billable)
-      .reduce((s, i) => s + (Number(i.quantity) || 0), 0);
-    const billableAmount = this.calcItems
-      .filter((i) => i.billable)
-      .reduce((s, i) => s + (Number(i.amount) || 0), 0);
-    const priorItemsCount = this.calcItems.filter((i) => i.isPriorPeriod).length;
-    const zeroPriceCount = this.calcItems.filter((i) => !i.billable).length;
-
+  private renderCalculationFormModal(ctr: Contract, t: ReturnType<typeof getTranslation>) {
     return html`
-      <app-modal
-        ?open="${this.calcModalOpen}"
-        size="xl"
-        title="${this.editingCalcId
+      <app-calculation-form
+        .open="${this.calcModalOpen}"
+        .calculation="${this.editingCalculation}"
+        .presetContractId="${this.presetCalcContractId ?? ctr.id}"
+        .contextTitle="${this.editingCalculation
           ? t.calculations.editCalculation
           : `${t.calculations.newCalculation} · ${ctr.number}`}"
         @close="${() => (this.calcModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.calculations.labelCalcNumber}"
-              .value="${this.calcNumber}"
-              required
-              error="${this.calcError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.calcNumber = eventValue(e);
-                this.calcError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.calculations.labelFrequency}"
-              .value="${this.calcFrequency}"
-              .options="${frequencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcFrequency = eventValue(e) as CalculationFrequency)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.calculations.labelPeriodStart}"
-              .value="${this.calcPeriodStart}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                this.calcPeriodStart = eventValue(e);
-                this.refreshCalculationItemsForPeriod(ctr);
-              }}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.calculations.labelPeriodEnd}"
-              .value="${this.calcPeriodEnd}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                this.calcPeriodEnd = eventValue(e);
-                this.refreshCalculationItemsForPeriod(ctr);
-              }}"
-            ></app-date-input>
-          </div>
-
-          <div class="col-span-2 quick-term-row">
-            <app-button
-              class="quick-term-btn"
-              size="sm"
-              variant="icon"
-              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_week')}"
-            >
-              <span>${t.viewTexts.calculations.quickThisWeek}</span>
-            </app-button>
-            <app-button
-              class="quick-term-btn"
-              size="sm"
-              variant="icon"
-              @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_week')}"
-            >
-              <span>${t.viewTexts.calculations.quickLastWeek}</span>
-            </app-button>
-            <app-button
-              class="quick-term-btn"
-              size="sm"
-              variant="icon"
-              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_month')}"
-            >
-              <span>${t.viewTexts.calculations.quickThisMonth}</span>
-            </app-button>
-            <app-button
-              class="quick-term-btn"
-              size="sm"
-              variant="icon"
-              @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_month')}"
-            >
-              <span>${t.viewTexts.calculations.quickLastMonth}</span>
-            </app-button>
-            <app-button
-              class="quick-term-btn"
-              size="sm"
-              variant="icon"
-              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_quarter')}"
-            >
-              <span>${t.viewTexts.calculations.quickThisQuarter}</span>
-            </app-button>
-          </div>
-
-          <div class="col-span-2 autofill-bar">
-            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-              <app-checkbox
-                ?checked="${this.calcIncludePrior}"
-                label="${t.calculations.includePrior}"
-                @change="${(e: CustomEvent<{ checked: boolean }>) => {
-                  this.calcIncludePrior = e.detail.checked;
-                  this.refreshCalculationItemsForPeriod(ctr);
-                }}"
-              ></app-checkbox>
-            </div>
-
-            <app-button
-              size="sm"
-              variant="secondary"
-              @click="${() => this.refreshCalculationItemsForPeriod(ctr)}"
-            >
-              <span slot="icon-start">${iconPlus(13)}</span>
-              <span>${t.calculations.collectPeriodItems}</span>
-            </app-button>
-          </div>
-
-          <div class="col-span-2 calc-summary-strip">
-            <div class="calc-summary-item">
-              <span class="calc-summary-label">${t.viewTexts.calculations.summaryItemsPrior}</span>
-              <span class="calc-summary-val">
-                ${this.calcItems.length} (${priorItemsCount})
-              </span>
-            </div>
-            <div class="calc-summary-item">
-              <span class="calc-summary-label">${t.viewTexts.calculations.summaryBillableHours}</span>
-              <span class="calc-summary-val" style="color: #10b981;">${billableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort}</span>
-            </div>
-            <div class="calc-summary-item">
-              <span class="calc-summary-label">${t.viewTexts.calculations.summaryNonBillable}</span>
-              <span class="calc-summary-val" style="color: var(--text-secondary);">
-                ${nonBillableHours.toFixed(1)}${t.viewTexts.calculations.hoursUnitShort} / ${zeroPriceCount} ${t.viewTexts.calculations.itemsSuffix}
-              </span>
-            </div>
-            <div class="calc-summary-item">
-              <span class="calc-summary-label">${t.viewTexts.calculations.summaryTotal}</span>
-              <span class="calc-summary-val">${formatMoney(billableAmount, ctr.currency)}</span>
-            </div>
-          </div>
-
-          <div class="col-span-2 items-editor">
-            <div class="items-editor-head">
-              <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);">
-                ${t.viewTexts.calculations.worksExpensesTitle} (${this.calcItems.length})
-              </span>
-              <div style="display: flex; gap: 0.45rem; flex-wrap: wrap;">
-                <app-button size="sm" variant="secondary" @click="${() => this.addEmptyCalcItem(true)}">
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${t.viewTexts.calculations.addBillableButton}</span>
-                </app-button>
-                <app-button size="sm" variant="ghost" @click="${() => this.addEmptyCalcItem(false)}">
-                  <span slot="icon-start">${iconPlus(13)}</span>
-                  <span>${t.viewTexts.calculations.addNonBillableButton}</span>
-                </app-button>
-              </div>
-            </div>
-
-            ${this.calcItems.length === 0
-              ? html`<app-empty-state
-                  compact
-                  title="${t.viewTexts.calculations.emptyEditorItems}"
-                ></app-empty-state>`
-              : html`
-                  <div class="calc-items-list">
-                    ${this.calcItems.map(
-                      (item) => html`
-                        <div class="calc-editor-row ${!item.billable ? 'is-nonbillable' : ''}">
-                          <div class="calc-row-top">
-                            <div class="calc-meta-col">
-                              <span class="calc-date-tag">${item.date || '—'}</span>
-                              ${item.isPriorPeriod
-                                ? html`<span class="micro-tag prior">${t.calculations.priorBadge}</span>`
-                                : html`<span class="micro-tag ${item.billable ? 'bill' : 'zero'}">
-                                    ${item.itemType === 'expense'
-                                      ? t.viewTexts.calculations.typeExpense
-                                      : item.itemType === 'time_entry'
-                                      ? t.viewTexts.calculations.typeWork
-                                      : t.viewTexts.calculations.typeManual}
-                                  </span>`}
-                            </div>
-                            <div>
-                              <app-input
-                                size="sm"
-                                label="${t.viewTexts.calculations.labelWorkDesc}"
-                                .value="${item.title}"
-                                @input="${(e: CustomEvent<{ value: string }>) =>
-                                  this.updateCalcItem(item.id, { title: eventValue(e) })}"
-                              ></app-input>
-                            </div>
-                            <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
-                              ${formatMoney(item.billable ? item.amount : 0, ctr.currency)}
-                            </div>
-                            <button
-                              type="button"
-                              class="icon-btn danger"
-                              title="${t.common.delete}"
-                              @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
-                            >
-                              ${iconTrash(13)}
-                            </button>
-                          </div>
-
-                          <div class="calc-row-bottom">
-                            <div>
-                              <app-number-input
-                                size="sm"
-                                label="${t.viewTexts.calculations.labelQty}"
-                                .value="${item.quantity}"
-                                min="0"
-                                max="10000"
-                                step="0.5"
-                                @change="${(e: CustomEvent<{ value: number }>) =>
-                                  this.updateCalcItem(item.id, { quantity: eventValue(e) })}"
-                              ></app-number-input>
-                            </div>
-                            <div>
-                              <app-input
-                                size="sm"
-                                label="${t.viewTexts.calculations.labelUnit}"
-                                .value="${item.unit}"
-                                @input="${(e: CustomEvent<{ value: string }>) =>
-                                  this.updateCalcItem(item.id, { unit: eventValue(e) })}"
-                              ></app-input>
-                            </div>
-                            <div>
-                              <app-number-input
-                                size="sm"
-                                label="${item.billable ? (t.viewTexts.calculations.rateLabelBillable) : t.viewTexts.calculations.rateLabelZero}"
-                                .value="${item.billable ? item.unitPrice : 0}"
-                                min="0"
-                                max="100000000"
-                                step="500"
-                                ?disabled="${!item.billable}"
-                                @change="${(e: CustomEvent<{ value: number }>) =>
-                                  this.updateCalcItem(item.id, { baseRate: eventValue(e), unitPrice: eventValue(e) })}"
-                              ></app-number-input>
-                            </div>
-                            <div class="calc-bill-cell">
-                              <app-checkbox
-                                ?checked="${item.billable}"
-                                label="${t.viewTexts.calculations.labelBillableItem}"
-                                @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                                  this.updateCalcItem(item.id, { billable: e.detail.checked })}"
-                              ></app-checkbox>
-                              ${!item.billable
-                                ? html`<span class="calc-zero-hint">${t.viewTexts.calculations.zeroHint}</span>`
-                                : ''}
-                            </div>
-                          </div>
-                        </div>
-                      `
-                    )}
-                  </div>
-                `}
-          </div>
-
-          <div>
-            <app-select
-              label="${t.viewTexts.calculations.labelCalcStatus}"
-              .value="${this.calcStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.calcStatus = eventValue(e) as CalculationStatus)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.calculations.labelReportNotes}"
-              .value="${this.calcNotes}"
-              rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.calcNotes = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.calcModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleSaveCalculation(ctr)}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.calcModalOpen = false)}"
+      ></app-calculation-form>
     `;
   }
 
@@ -2453,228 +2069,16 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private getDefaultPeriodForFrequency(freq: CalculationFrequency): { start: string; end: string } {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = now.getMonth();
-    const toIso = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-    if (freq === 'weekly') {
-      const day = now.getDay();
-      const diffToMon = (day + 6) % 7;
-      const mon = new Date(y, m, now.getDate() - diffToMon);
-      const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-      return { start: toIso(mon), end: toIso(sun) };
-    }
-    if (freq === 'biweekly') {
-      const end = new Date(y, m, now.getDate());
-      const start = new Date(y, m, now.getDate() - 13);
-      return { start: toIso(start), end: toIso(end) };
-    }
-    if (freq === 'quarterly') {
-      const qStartMonth = Math.floor(m / 3) * 3;
-      const start = new Date(y, qStartMonth, 1);
-      const end = new Date(y, qStartMonth + 3, 0);
-      return { start: toIso(start), end: toIso(end) };
-    }
-    const start = new Date(y, m, 1);
-    const end = new Date(y, m + 1, 0);
-    return { start: toIso(start), end: toIso(end) };
-  }
-
   private openCreateCalculationModal(ctr: Contract) {
-    const freq = ctr.billingFrequency || 'monthly';
-    const { start, end } = this.getDefaultPeriodForFrequency(freq);
-    const seq = this.calculations.length + 1;
-
-    const tx = getTranslation(this.currentLang).viewTexts;
-    this.editingCalcId = null;
-    this.calcNumber = `${tx.calculations.calcNumberPrefix}${new Date().getFullYear()}/${String(seq).padStart(3, '0')}`;
-    this.calcFrequency = freq;
-    this.calcPeriodStart = start;
-    this.calcPeriodEnd = end;
-    this.calcIncludePrior = true;
-    this.calcStatus = 'draft';
-    this.calcError = '';
-    this.calcNotes = tx.calculations.calcNotesTemplate(ctr.number, start, end);
-
-    this.calcItems = this.collectItemsForPeriod(ctr, start, end, true, null);
+    this.editingCalculation = null;
+    this.presetCalcContractId = ctr.id;
     this.calcModalOpen = true;
   }
 
   private openEditCalculationModal(calc: Calculation) {
-    this.editingCalcId = calc.id;
-    this.calcNumber = calc.number;
-    this.calcFrequency = calc.frequency;
-    this.calcPeriodStart = calc.periodStart;
-    this.calcPeriodEnd = calc.periodEnd;
-    this.calcIncludePrior = calc.includePriorUnaccounted;
-    this.calcStatus = calc.status;
-    this.calcItems = calc.items.map((item) => ({ ...item }));
-    this.calcNotes = calc.notes;
-    this.calcError = '';
+    this.editingCalculation = calc;
+    this.presetCalcContractId = calc.contractId;
     this.calcModalOpen = true;
-  }
-
-  private applyCalculationPeriodPreset(
-    ctr: Contract,
-    preset: 'this_week' | 'prev_week' | 'this_month' | 'prev_month' | 'this_quarter'
-  ) {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = now.getMonth();
-    const toIso = (d: Date) =>
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-
-    if (preset === 'this_week' || preset === 'prev_week') {
-      const day = now.getDay();
-      const diffToMon = (day + 6) % 7;
-      const offset = preset === 'prev_week' ? -7 : 0;
-      const mon = new Date(y, m, now.getDate() - diffToMon + offset);
-      const sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-      this.calcFrequency = 'weekly';
-      this.calcPeriodStart = toIso(mon);
-      this.calcPeriodEnd = toIso(sun);
-    } else if (preset === 'this_month' || preset === 'prev_month') {
-      const targetMonth = preset === 'prev_month' ? m - 1 : m;
-      const start = new Date(y, targetMonth, 1);
-      const end = new Date(y, targetMonth + 1, 0);
-      this.calcFrequency = 'monthly';
-      this.calcPeriodStart = toIso(start);
-      this.calcPeriodEnd = toIso(end);
-    } else {
-      const qStartMonth = Math.floor(m / 3) * 3;
-      const start = new Date(y, qStartMonth, 1);
-      const end = new Date(y, qStartMonth + 3, 0);
-      this.calcFrequency = 'quarterly';
-      this.calcPeriodStart = toIso(start);
-      this.calcPeriodEnd = toIso(end);
-    }
-
-    this.refreshCalculationItemsForPeriod(ctr);
-  }
-
-  private refreshCalculationItemsForPeriod(ctr: Contract) {
-    const collected = this.collectItemsForPeriod(
-      ctr,
-      this.calcPeriodStart,
-      this.calcPeriodEnd,
-      this.calcIncludePrior,
-      this.editingCalcId
-    );
-    const manualItems = this.calcItems.filter((i) => i.itemType === 'manual');
-    this.calcItems = [...collected, ...manualItems].sort((a, b) => a.date.localeCompare(b.date));
-  }
-
-  private addEmptyCalcItem(billable: boolean) {
-    const date = this.calcPeriodEnd || new Date().toISOString().slice(0, 10);
-    this.calcItems = [
-      ...this.calcItems,
-      {
-        id: `ci-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-        itemType: 'manual',
-        date,
-        title: '',
-        quantity: 1,
-        unit: 'усл.',
-        billable,
-        baseRate: 0,
-        unitPrice: 0,
-        amount: 0,
-      },
-    ];
-  }
-
-  private updateCalcItem(id: string, patch: Partial<CalculationItem>) {
-    this.calcItems = this.calcItems.map((item) => {
-      if (item.id !== id) return item;
-      const next = { ...item, ...patch };
-      const qty = Math.max(0, Number(next.quantity) || 0);
-      next.quantity = qty;
-      const baseRate = Math.max(0, Number(next.baseRate) || 0);
-      next.baseRate = baseRate;
-      if (next.billable) {
-        const rate = baseRate > 0 ? baseRate : next.unit === 'ч' ? HOURLY_RATE_RUB : 0;
-        next.baseRate = rate;
-        next.unitPrice = rate;
-        next.amount = Math.round(qty * rate);
-      } else {
-        next.unitPrice = 0;
-        next.amount = 0;
-      }
-      return next;
-    });
-  }
-
-  private handleSaveCalculation(ctr: Contract) {
-    if (!this.calcNumber.trim()) {
-      this.calcError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const cleanItems = this.calcItems
-      .filter((i) => i.title.trim())
-      .map((i) => ({
-        ...i,
-        title: i.title.trim(),
-        unitPrice: i.billable ? i.unitPrice : 0,
-        amount: i.billable ? i.amount : 0,
-      }));
-
-    if (cleanItems.length === 0) {
-      this.calcError = getTranslation(this.currentLang).viewTexts.calculations.addOneItemError;
-      return;
-    }
-
-    const hourItems = cleanItems.filter((i) => i.unit === 'ч');
-    const billableHours = Math.round(hourItems.filter((i) => i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
-    const nonBillableHours =
-      Math.round(hourItems.filter((i) => !i.billable).reduce((s, i) => s + i.quantity, 0) * 100) / 100;
-    const totalHours = Math.round((billableHours + nonBillableHours) * 100) / 100;
-    const billableAmount = cleanItems.filter((i) => i.billable).reduce((s, i) => s + i.amount, 0);
-
-    const existing = this.editingCalcId
-      ? this.calculations.find((c) => c.id === this.editingCalcId)
-      : undefined;
-    const approvedDate =
-      this.calcStatus === 'approved' || this.calcStatus === 'invoiced'
-        ? existing?.approvedDate || new Date().toISOString().slice(0, 10)
-        : undefined;
-
-    const payload = {
-      number: this.calcNumber.trim(),
-      contractId: ctr.id,
-      projectId: ctr.projectId,
-      companyId: ctr.companyId,
-      counterpartyId: ctr.counterpartyId,
-      frequency: this.calcFrequency,
-      periodStart: this.calcPeriodStart || new Date().toISOString().slice(0, 10),
-      periodEnd: this.calcPeriodEnd || new Date().toISOString().slice(0, 10),
-      includePriorUnaccounted: this.calcIncludePrior,
-      currency: ctr.currency,
-      status: this.calcStatus,
-      totalHours,
-      billableHours,
-      nonBillableHours,
-      billableAmount,
-      items: cleanItems,
-      notes: this.calcNotes.trim(),
-      approvedDate,
-      invoiceId: existing?.invoiceId,
-    };
-
-    if (this.editingCalcId) {
-      store.updateCalculation({
-        id: this.editingCalcId,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        ...payload,
-      });
-    } else {
-      store.addCalculation(payload);
-    }
-
-    this.calcModalOpen = false;
   }
 
   private openInvoiceFromCalculation(ctr: Contract, calc: Calculation) {
