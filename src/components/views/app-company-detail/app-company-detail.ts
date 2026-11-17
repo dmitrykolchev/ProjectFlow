@@ -41,7 +41,6 @@ import {
   iconTrash,
   iconUpload,
   iconUsers,
-  iconX,
 } from '../../common/icons';
 import {
   formatAiError,
@@ -59,6 +58,7 @@ import '../../common/app-input/app-input';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-modal/app-modal';
 import '../../common/app-document-form/app-document-form';
+import '../../common/app-tags-row/app-tags-row';
 import '../../common/app-project-form/app-project-form';
 import '../../common/app-company-form/app-company-form';
 import '../../common/app-progress-bar/app-progress-bar';
@@ -107,8 +107,6 @@ export class AppCompanyDetail extends LitElement {
   @state() private aiPreviewLoading = false;
   @state() private aiPreviewError = '';
   @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
-  @state() private previewTagDraft = '';
-  @state() private inlineDocTagDraft = '';
 
   private unsubscribe?: () => void;
 
@@ -1020,7 +1018,7 @@ export class AppCompanyDetail extends LitElement {
                     @expand="${(e: CustomEvent<{ document: DocumentItem }>) =>
                       this.openDocPreviewModal(e.detail.document)}"
                   ></app-document-previewer>
-                  ${activeDoc ? this.renderEditableTagsBar(activeDoc, t, 'workspace') : ''}
+                  ${activeDoc ? this.renderEditableTagsBar(activeDoc, t) : ''}
                 </div>
               </div>
             `}
@@ -1224,7 +1222,7 @@ export class AppCompanyDetail extends LitElement {
 
           ${doc.description ? html`<p class="company-desc">${doc.description}</p>` : ''}
 
-          ${this.renderEditableTagsBar(doc, t, 'modal')}
+          ${this.renderEditableTagsBar(doc, t)}
 
           <div class="ai-doc-bar">
             <div class="ai-doc-bar-row">
@@ -1351,67 +1349,24 @@ export class AppCompanyDetail extends LitElement {
 
   private renderEditableTagsBar(
     doc: DocumentItem,
-    t: ReturnType<typeof getTranslation>,
-    mode: 'workspace' | 'modal'
+    t: ReturnType<typeof getTranslation>
   ) {
-    const draft = mode === 'modal' ? this.previewTagDraft : this.inlineDocTagDraft;
-    const setDraft = (val: string) => {
-      if (mode === 'modal') this.previewTagDraft = val;
-      else this.inlineDocTagDraft = val;
-    };
-
     return html`
       <div class="preview-tags-bar">
         <span class="preview-tags-label">
           ${iconTag(13)}
           <span>${t.documents.tagsLabel}:</span>
         </span>
-        <div class="tags-row">
-          ${doc.tags.length === 0
-            ? html`<span class="meta-label">${t.documents.noTags}</span>`
-            : doc.tags.map(
-                (tag) => html`
-                  <span class="tag-chip is-editable">
-                    <span>#${tag}</span>
-                    <button
-                      type="button"
-                      class="tag-remove-btn"
-                      title="${t.documents.removeTagTitle}"
-                      @click="${() => this.removeTagFromDoc(doc, tag)}"
-                    >
-                      ${iconX(10)}
-                    </button>
-                  </span>
-                `
-              )}
-          <span class="inline-tag-form">
-            <input
-              type="text"
-              class="inline-tag-input"
-              placeholder="${t.documents.addTagPlaceholder}"
-              .value="${draft}"
-              @input="${(e: Event) => setDraft((e.target as HTMLInputElement).value)}"
-              @keydown="${(e: KeyboardEvent) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  this.commitTagToDoc(doc, draft);
-                  setDraft('');
-                }
-              }}"
-            />
-            <button
-              type="button"
-              class="inline-tag-action is-confirm"
-              title="${t.common.add}"
-              @click="${() => {
-                this.commitTagToDoc(doc, draft);
-                setDraft('');
-              }}"
-            >
-              ${iconCheck(11)}
-            </button>
-          </span>
-        </div>
+        <app-tags-row
+          style="flex: 1;"
+          mode="add-form"
+          showEmptyLabel
+          .tags="${doc.tags}"
+          @tag-remove="${(e: CustomEvent<{ tag: string }>) =>
+            this.removeTagFromDoc(doc, e.detail.tag)}"
+          @tag-add="${(e: CustomEvent<{ tag: string }>) =>
+            this.commitTagToDoc(doc, e.detail.tag)}"
+        ></app-tags-row>
       </div>
     `;
   }
