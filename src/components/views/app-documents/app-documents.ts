@@ -40,6 +40,7 @@ import {
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-document-previewer/app-document-previewer';
@@ -479,13 +480,14 @@ export class AppDocuments extends LitElement {
                   <span class="meta-label">${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})</span>
                   ${linked.onClick
                     ? html`
-                        <button
-                          type="button"
+                        <app-link
                           class="link-btn"
+                          size="md"
+                          variant="primary"
                           @click="${linked.onClick}"
                         >
                           ${linked.label}
-                        </button>
+                        </app-link>
                       `
                     : html`<span class="meta-value">${linked.label}</span>`}
                 </div>
@@ -688,9 +690,9 @@ export class AppDocuments extends LitElement {
                         </span>
                         ${linked.onClick
                           ? html`
-                              <button type="button" class="link-btn" @click="${linked.onClick}">
+                              <app-link class="link-btn" size="md" variant="primary" @click="${linked.onClick}">
                                 ${linked.label}
-                              </button>
+                              </app-link>
                             `
                           : html`<span>${linked.label}</span>`}
                       </div>
@@ -1060,16 +1062,17 @@ export class AppDocuments extends LitElement {
               <span class="meta-label">${t.documents.linkedToLabel}</span>
               ${linked.onClick
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => {
                         this.previewDoc = null;
                         linked.onClick?.();
                       }}"
                     >
                       ${linked.label}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-value">${linked.label}</span>`}
             </div>
