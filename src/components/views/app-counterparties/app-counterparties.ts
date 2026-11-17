@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconHandshake, iconLandmark, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -76,7 +76,13 @@ export class AppCounterparties extends LitElement {
         cp.legalName.toLowerCase().includes(query) ||
         cp.inn.toLowerCase().includes(query) ||
         cp.city.toLowerCase().includes(query) ||
-        cp.contactPerson.toLowerCase().includes(query)
+        cp.contactPerson.toLowerCase().includes(query) ||
+        (cp.bankAccounts || []).some(
+          (b) =>
+            b.bankName.toLowerCase().includes(query) ||
+            b.accountNumber.toLowerCase().includes(query) ||
+            b.currency.toLowerCase().includes(query)
+        )
       );
     });
   }
@@ -263,6 +269,8 @@ export class AppCounterparties extends LitElement {
                 </div>
               </div>
 
+              ${this.renderBankSummary(cp, t)}
+
               <card-footer>
                 <div slot="start" class="stats-row">
                   <span class="stat-pill">
@@ -337,6 +345,7 @@ export class AppCounterparties extends LitElement {
               <th>${t.viewTexts.counterparties.thCounterparty}</th>
               <th>${t.viewTexts.counterparties.thType}</th>
               <th>${t.viewTexts.counterparties.thInn}</th>
+              <th>${t.bankAccounts.thColumn}</th>
               <th>${t.viewTexts.counterparties.thContact}</th>
               <th>${t.viewTexts.counterparties.metaRating}</th>
               <th>${t.viewTexts.counterparties.thContracts}</th>
@@ -348,6 +357,9 @@ export class AppCounterparties extends LitElement {
             ${paged.items.map((cp) => {
               const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
               const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
+              const accounts = cp.bankAccounts || [];
+              const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
+              const primaryAcc = accounts.find((a) => a.isDefault) || accounts[0];
 
               return html`
                 <tr>
@@ -368,6 +380,21 @@ export class AppCounterparties extends LitElement {
                     <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
                   </td>
                   <td class="mono">${cp.inn}</td>
+                  <td>
+                    ${accounts.length === 0
+                      ? html`<span style="font-size: 0.75rem; color: var(--text-muted);">${t.bankAccounts.noAccountsShort}</span>`
+                      : html`
+                          <div class="table-bank-cell">
+                            <span class="table-bank-name">${primaryAcc?.bankName}</span>
+                            <div class="bank-currencies">
+                              ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
+                              ${accounts.length > 1
+                                ? html`<span class="bank-more-count">(${accounts.length})</span>`
+                                : ''}
+                            </div>
+                          </div>
+                        `}
+                  </td>
                   <td>
                     <div>${cp.contactPerson}</div>
                     <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.email}</div>
@@ -427,6 +454,34 @@ export class AppCounterparties extends LitElement {
           store.setTablePageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
+    `;
+  }
+
+  private renderBankSummary(cp: Counterparty, t: ReturnType<typeof getTranslation>) {
+    const accounts = cp.bankAccounts || [];
+    const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
+    const primary = accounts.find((a) => a.isDefault) || accounts[0];
+
+    return html`
+      <div class="bank-summary-row">
+        <div class="bank-summary-left">
+          <span class="bank-summary-icon">${iconLandmark(14)}</span>
+          ${accounts.length === 0
+            ? html`<span>${t.bankAccounts.noAccountsShort}</span>`
+            : html`
+                <span class="bank-summary-name" title="${primary?.bankName || ''}">
+                  ${primary?.bankName}${accounts.length > 1 ? ` (+${accounts.length - 1})` : ''}
+                </span>
+              `}
+        </div>
+        ${currencies.length > 0
+          ? html`
+              <div class="bank-currencies">
+                ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
+              </div>
+            `
+          : ''}
+      </div>
     `;
   }
 

@@ -373,7 +373,25 @@ export class AppStore {
       }
 
       const storedCompanies = localStorage.getItem(STORAGE_KEY_COMPANIES);
-      this.companies = storedCompanies ? JSON.parse(storedCompanies) : [...initialCompanies];
+      if (storedCompanies) {
+        const parsedCompanies: Company[] = JSON.parse(storedCompanies);
+        this.companies = parsedCompanies.map((c) => {
+          const fallback = initialCompanies.find((ic) => ic.id === c.id);
+          return {
+            ...c,
+            bankAccounts: Array.isArray(c.bankAccounts)
+              ? c.bankAccounts
+              : fallback?.bankAccounts
+                ? fallback.bankAccounts.map((b) => ({ ...b }))
+                : [],
+          };
+        });
+      } else {
+        this.companies = initialCompanies.map((c) => ({
+          ...c,
+          bankAccounts: c.bankAccounts ? c.bankAccounts.map((b) => ({ ...b })) : [],
+        }));
+      }
 
       const storedEmployees = localStorage.getItem(STORAGE_KEY_EMPLOYEES);
       if (storedEmployees) {
@@ -387,9 +405,25 @@ export class AppStore {
       }
 
       const storedCounterparties = localStorage.getItem(STORAGE_KEY_COUNTERPARTIES);
-      this.counterparties = storedCounterparties
-        ? JSON.parse(storedCounterparties)
-        : [...initialCounterparties];
+      if (storedCounterparties) {
+        const parsedCounterparties: Counterparty[] = JSON.parse(storedCounterparties);
+        this.counterparties = parsedCounterparties.map((cp) => {
+          const fallback = initialCounterparties.find((icp) => icp.id === cp.id);
+          return {
+            ...cp,
+            bankAccounts: Array.isArray(cp.bankAccounts)
+              ? cp.bankAccounts
+              : fallback?.bankAccounts
+                ? fallback.bankAccounts.map((b) => ({ ...b }))
+                : [],
+          };
+        });
+      } else {
+        this.counterparties = initialCounterparties.map((cp) => ({
+          ...cp,
+          bankAccounts: cp.bankAccounts ? cp.bankAccounts.map((b) => ({ ...b })) : [],
+        }));
+      }
 
       const storedContracts = localStorage.getItem(STORAGE_KEY_CONTRACTS);
       this.contracts = storedContracts ? JSON.parse(storedContracts) : [...initialContracts];

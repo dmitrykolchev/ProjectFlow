@@ -9,6 +9,7 @@ import {
   iconChevronRight,
   iconEdit,
   iconFolderOpen,
+  iconLandmark,
   iconPlus,
   iconTrash,
 } from '../../common/icons';
@@ -77,7 +78,13 @@ export class AppCompanies extends LitElement {
         c.legalName.toLowerCase().includes(query) ||
         c.inn.toLowerCase().includes(query) ||
         c.city.toLowerCase().includes(query) ||
-        c.industry.toLowerCase().includes(query)
+        c.industry.toLowerCase().includes(query) ||
+        (c.bankAccounts || []).some(
+          (b) =>
+            b.bankName.toLowerCase().includes(query) ||
+            b.accountNumber.toLowerCase().includes(query) ||
+            b.currency.toLowerCase().includes(query)
+        )
       );
     });
   }
@@ -223,6 +230,8 @@ export class AppCompanies extends LitElement {
                 </div>
               </div>
 
+              ${this.renderBankSummary(company, t)}
+
               <card-footer>
                 <div slot="start" class="stats-row">
                   <span class="stat-pill">
@@ -301,6 +310,34 @@ export class AppCompanies extends LitElement {
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
+    `;
+  }
+
+  private renderBankSummary(company: Company, t: ReturnType<typeof getTranslation>) {
+    const accounts = company.bankAccounts || [];
+    const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
+    const primary = accounts.find((a) => a.isDefault) || accounts[0];
+
+    return html`
+      <div class="bank-summary-row">
+        <div class="bank-summary-left">
+          <span class="bank-summary-icon">${iconLandmark(14)}</span>
+          ${accounts.length === 0
+            ? html`<span>${t.bankAccounts.noAccountsShort}</span>`
+            : html`
+                <span class="bank-summary-name" title="${primary?.bankName || ''}">
+                  ${primary?.bankName}${accounts.length > 1 ? ` (+${accounts.length - 1})` : ''}
+                </span>
+              `}
+        </div>
+        ${currencies.length > 0
+          ? html`
+              <div class="bank-currencies">
+                ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
+              </div>
+            `
+          : ''}
+      </div>
     `;
   }
 

@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
+import { Counterparty, CounterpartyStatus, CounterpartyType, BankRequisite } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-counterparty-form.css';
 import { eventValue } from '../event-value';
@@ -12,6 +12,7 @@ import '../app-select/app-select';
 import '../app-number-input/app-number-input';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
+import '../app-bank-requisites/app-bank-requisites';
 
 /**
  * Canonical counterparty create/edit form. The component owns the whole field set and
@@ -37,6 +38,7 @@ export class AppCounterpartyForm extends LitElement {
   @state() private fStatus: CounterpartyStatus = 'active';
   @state() private fRating = 5;
   @state() private fNotes = '';
+  @state() private fBankAccounts: BankRequisite[] = [];
   @state() private formError = '';
 
   private unsubscribe?: () => void;
@@ -90,6 +92,7 @@ export class AppCounterpartyForm extends LitElement {
       this.fStatus = cp.status;
       this.fRating = cp.rating;
       this.fNotes = cp.notes;
+      this.fBankAccounts = cp.bankAccounts ? cp.bankAccounts.map((b) => ({ ...b })) : [];
     } else {
       this.fName = '';
       this.fLegalName = '';
@@ -103,6 +106,7 @@ export class AppCounterpartyForm extends LitElement {
       this.fStatus = 'active';
       this.fRating = 5;
       this.fNotes = '';
+      this.fBankAccounts = [];
     }
     this.formError = '';
   }
@@ -126,6 +130,7 @@ export class AppCounterpartyForm extends LitElement {
       status: this.fStatus,
       rating: Math.max(1, Math.min(5, Number(this.fRating) || 5)),
       notes: this.fNotes.trim(),
+      bankAccounts: this.fBankAccounts.map((b) => ({ ...b })),
     };
 
     let saved: Counterparty;
@@ -282,6 +287,16 @@ export class AppCounterpartyForm extends LitElement {
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fNotes = eventValue(e))}"
             ></app-textarea>
+          </div>
+
+          <div class="col-span-2">
+            <app-bank-requisites
+              editable
+              compact
+              .accounts="${this.fBankAccounts}"
+              @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
+                (this.fBankAccounts = e.detail.accounts)}"
+            ></app-bank-requisites>
           </div>
         </app-form-grid>
 

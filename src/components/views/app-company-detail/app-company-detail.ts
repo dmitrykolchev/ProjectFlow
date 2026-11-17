@@ -12,12 +12,13 @@ import {
   isTextMimeOrExt,
 } from '../../common/document-utils';
 import {
+  BankRequisite,
   Company,
   Contract,
   DocumentItem,
   KnowledgeArticle,
   Project,
-    User,
+  User,
 } from '../../../types';
 import {
   iconAlertTriangle,
@@ -34,6 +35,7 @@ import {
   iconFolder,
   iconFolderOpen,
   iconGlobe,
+  iconLandmark,
   iconMessageSquare,
   iconPlus,
   iconSearch,
@@ -67,6 +69,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
+import '../../common/app-bank-requisites/app-bank-requisites';
+import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
 import { eventValue } from '../../common/event-value';
 import styles from './app-company-detail.css';
 
@@ -141,6 +145,15 @@ export class AppCompanyDetail extends LitElement {
     if (currency === 'USD') return amount * 96;
     if (currency === 'EUR') return amount * 104;
     return amount;
+  }
+
+  private handleBankAccountsChange(company: Company, bankAccounts: BankRequisite[]) {
+    store.updateCompany({ ...company, bankAccounts });
+  }
+
+  private openAddBankAccount() {
+    const el = this.shadowRoot?.querySelector('app-bank-requisites') as AppBankRequisites | null;
+    el?.openAddEditor();
   }
 
   private getScopedDocuments(
@@ -459,7 +472,30 @@ export class AppCompanyDetail extends LitElement {
     companyArticles: KnowledgeArticle[],
     t: ReturnType<typeof getTranslation>
   ) {
+    const bankAccounts = company.bankAccounts || [];
     return html`
+      <app-section-card title="${t.bankAccounts.title}" subtitle="(${bankAccounts.length})">
+        <span slot="icon">${iconLandmark(18)}</span>
+        <app-button
+          slot="actions"
+          size="sm"
+          variant="secondary"
+          @click="${() => this.openAddBankAccount()}"
+        >
+          <span slot="icon-start">${iconPlus(14)}</span>
+          <span>${t.bankAccounts.addButton}</span>
+        </app-button>
+
+        <app-bank-requisites
+          editable
+          hide-header
+          confirm-delete
+          .accounts="${bankAccounts}"
+          @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
+            this.handleBankAccountsChange(company, e.detail.accounts)}"
+        ></app-bank-requisites>
+      </app-section-card>
+
       <div class="two-col-grid">
         <app-section-card title="${t.companyDetail.projectsTab}" subtitle="(${companyProjects.length})">
           <span slot="icon">${iconFolder(18)}</span>

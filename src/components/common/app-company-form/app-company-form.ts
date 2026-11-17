@@ -1,7 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { Company, CompanyStatus } from '../../../types';
+import { Company, CompanyStatus, BankRequisite } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-company-form.css';
 import { eventValue } from '../event-value';
@@ -11,6 +11,7 @@ import '../app-input/app-input';
 import '../app-select/app-select';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
+import '../app-bank-requisites/app-bank-requisites';
 
 /**
  * Canonical company create/edit form. The component owns the whole field set and writes
@@ -36,6 +37,7 @@ export class AppCompanyForm extends LitElement {
   @state() private fDirectorId = '';
   @state() private fStatus: CompanyStatus = 'active';
   @state() private fDescription = '';
+  @state() private fBankAccounts: BankRequisite[] = [];
   @state() private formError = '';
 
   private unsubscribe?: () => void;
@@ -89,6 +91,7 @@ export class AppCompanyForm extends LitElement {
       this.fDirectorId = c.directorId || '';
       this.fStatus = c.status;
       this.fDescription = c.description;
+      this.fBankAccounts = c.bankAccounts ? c.bankAccounts.map((b) => ({ ...b })) : [];
     } else {
       this.fName = '';
       this.fLegalName = '';
@@ -102,6 +105,7 @@ export class AppCompanyForm extends LitElement {
       this.fDirectorId = store.users[0]?.id || '';
       this.fStatus = 'active';
       this.fDescription = '';
+      this.fBankAccounts = [];
     }
     this.formError = '';
   }
@@ -125,6 +129,7 @@ export class AppCompanyForm extends LitElement {
       directorId: this.fDirectorId || undefined,
       status: this.fStatus,
       description: this.fDescription.trim(),
+      bankAccounts: this.fBankAccounts.map((b) => ({ ...b })),
     };
 
     let saved: Company;
@@ -273,6 +278,16 @@ export class AppCompanyForm extends LitElement {
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fDescription = eventValue(e))}"
             ></app-textarea>
+          </div>
+
+          <div class="col-span-2">
+            <app-bank-requisites
+              editable
+              compact
+              .accounts="${this.fBankAccounts}"
+              @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
+                (this.fBankAccounts = e.detail.accounts)}"
+            ></app-bank-requisites>
           </div>
         </app-form-grid>
 

@@ -84,6 +84,7 @@ export { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
 export { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
 export { AppDataGridColumn } from './app-data-grid-column/app-data-grid-column';
 export type { DataGridCellType, DataGridCellTemplate } from './app-data-grid-column/app-data-grid-column';
+export { AppBankRequisites } from './app-bank-requisites/app-bank-requisites';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -138,6 +139,7 @@ import { AppDocumentPreviewer } from './app-document-previewer/app-document-prev
 import { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
 import { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
 import { AppDataGridColumn } from './app-data-grid-column/app-data-grid-column';
+import { AppBankRequisites } from './app-bank-requisites/app-bank-requisites';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -184,6 +186,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-task-ai-panel': AppTaskAiPanel,
   'app-project-requirements': AppProjectRequirements,
   'app-data-grid-column': AppDataGridColumn,
+  'app-bank-requisites': AppBankRequisites,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

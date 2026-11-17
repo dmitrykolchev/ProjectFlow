@@ -18,6 +18,22 @@ export interface User {
   hourlyRate?: number;
 }
 
+export type BankCurrency = 'RUB' | 'USD' | 'EUR' | 'CNY' | 'GBP' | 'KZT' | 'AED';
+
+export interface BankRequisite {
+  id: string;
+  bankName: string;
+  currency: BankCurrency;
+  accountNumber: string;
+  bik?: string;
+  corrAccount?: string;
+  swift?: string;
+  iban?: string;
+  bankAddress?: string;
+  comment?: string;
+  isDefault?: boolean;
+}
+
 export type CompanyStatus = 'active' | 'inactive';
 
 export interface Company {
@@ -34,6 +50,7 @@ export interface Company {
   directorId?: string;
   status: CompanyStatus;
   description: string;
+  bankAccounts?: BankRequisite[];
 }
 
 export type CounterpartyType = 'client' | 'vendor' | 'partner' | 'contractor';
@@ -53,6 +70,7 @@ export interface Counterparty {
   status: CounterpartyStatus;
   rating: number;
   notes: string;
+  bankAccounts?: BankRequisite[];
 }
 
 export type ContractStatus = 'draft' | 'on_approval' | 'active' | 'completed' | 'terminated';

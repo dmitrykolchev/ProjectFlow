@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
+  BankRequisite,
   Contract,
   Counterparty,
   Invoice,
@@ -18,6 +19,7 @@ import {
   iconEdit,
   iconFileText,
   iconFolder,
+  iconLandmark,
   iconMessageSquare,
   iconPlus,
   iconReceipt,
@@ -38,6 +40,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-section-card/app-section-card';
+import '../../common/app-bank-requisites/app-bank-requisites';
+import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
 import styles from './app-counterparty-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -89,6 +93,15 @@ export class AppCounterpartyDetail extends LitElement {
     if (currency === 'USD') return amount * 96;
     if (currency === 'EUR') return amount * 104;
     return amount;
+  }
+
+  private handleBankAccountsChange(cp: Counterparty, bankAccounts: BankRequisite[]) {
+    store.updateCounterparty({ ...cp, bankAccounts });
+  }
+
+  private openAddBankAccount() {
+    const el = this.shadowRoot?.querySelector('app-bank-requisites') as AppBankRequisites | null;
+    el?.openAddEditor();
   }
 
   private renderStars(rating: number): string {
@@ -294,6 +307,29 @@ export class AppCounterpartyDetail extends LitElement {
             ]}"
           ></app-meta-grid>
         </section>
+
+        <!-- Bank Requisites -->
+        <app-section-card title="${t.bankAccounts.title}" subtitle="(${(cp.bankAccounts || []).length})">
+          <span slot="icon">${iconLandmark(18)}</span>
+          <app-button
+            slot="actions"
+            size="sm"
+            variant="secondary"
+            @click="${() => this.openAddBankAccount()}"
+          >
+            <span slot="icon-start">${iconPlus(14)}</span>
+            <span>${t.bankAccounts.addButton}</span>
+          </app-button>
+
+          <app-bank-requisites
+            editable
+            hide-header
+            confirm-delete
+            .accounts="${cp.bankAccounts || []}"
+            @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
+              this.handleBankAccountsChange(cp, e.detail.accounts)}"
+          ></app-bank-requisites>
+        </app-section-card>
 
         <!-- Contracts & Linked Projects -->
         <div class="two-col-grid">
