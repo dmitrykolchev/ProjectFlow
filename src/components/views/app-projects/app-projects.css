@@ -233,31 +233,6 @@ card-footer {
   grid-column: span 2;
 }
 
-.color-swatches {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  padding-top: 0.35rem;
-}
-
-.color-swatch {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 2px solid transparent;
-  cursor: pointer;
-  transition: transform 150ms ease, border-color 150ms ease;
-}
-
-.color-swatch:hover {
-  transform: scale(1.1);
-}
-
-.color-swatch.is-active {
-  border-color: var(--text-primary, #ffffff);
-  box-shadow: 0 0 0 2px var(--accent-primary, #6366f1);
-}
 :host::-webkit-scrollbar {
   width: 6px;
 }

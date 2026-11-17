@@ -13,6 +13,7 @@ import '../app-number-input/app-number-input';
 import '../app-date-input/app-date-input';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
+import '../app-color-swatches/app-color-swatches';
 
 const PROJECT_COLOR_SWATCHES = [
   '#6366f1',
@@ -317,18 +318,11 @@ export class AppProjectForm extends LitElement {
 
           <div class="col-span-2">
             <span class="meta-label">${t.viewTexts.projects.projectColorLabel}</span>
-            <div class="color-swatches">
-              ${PROJECT_COLOR_SWATCHES.map(
-                (hex) => html`
-                  <button
-                    type="button"
-                    class="color-swatch ${this.fColor === hex ? 'is-active' : ''}"
-                    style="background: ${hex};"
-                    @click="${() => (this.fColor = hex)}"
-                  ></button>
-                `
-              )}
-            </div>
+            <app-color-swatches
+              .colors="${PROJECT_COLOR_SWATCHES}"
+              .value="${this.fColor}"
+              @change="${(e: CustomEvent) => (this.fColor = e.detail.value)}"
+            ></app-color-swatches>
           </div>
 
           <div class="col-span-2">
