@@ -20,8 +20,7 @@ import {
   DocumentStatus,
   KnowledgeArticle,
   Project,
-  ProjectStatus,
-  User,
+    User,
 } from '../../../types';
 import {
   iconAlertTriangle,
@@ -56,7 +55,6 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
-import '../../common/app-date-input/app-date-input';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
@@ -65,8 +63,8 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-modal/app-modal';
+import '../../common/app-project-form/app-project-form';
 import '../../common/app-company-form/app-company-form';
-import '../../common/app-number-input/app-number-input';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -99,14 +97,6 @@ export class AppCompanyDetail extends LitElement {
 
   // Quick Project create modal state
   @state() private projectModalOpen = false;
-  @state() private projName = '';
-  @state() private projKey = '';
-  @state() private projCounterpartyId = '';
-  @state() private projBudget = 2000000;
-  @state() private projDueDate = '';
-  @state() private projStatus: ProjectStatus = 'active';
-  @state() private projDescription = '';
-  @state() private projError = '';
 
   // Quick Upload Document modal state
   @state() private uploadDocModalOpen = false;
@@ -1189,94 +1179,21 @@ export class AppCompanyDetail extends LitElement {
   }
 
   private renderQuickProjectModal(company: Company, t: ReturnType<typeof getTranslation>) {
-    const counterpartyOpts = [
-      { value: '', label: t.viewTexts.projects.optionInternalProject },
-      ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
-    ];
-    const statusOpts = [
-      { value: 'active', label: t.projectStatuses.active, color: '#10b981' },
-      { value: 'on_hold', label: t.projectStatuses.on_hold, color: '#f59e0b' },
-      { value: 'completed', label: t.projectStatuses.completed, color: '#6366f1' },
-    ];
-
     return html`
-      <app-modal
-        ?open="${this.projectModalOpen}"
-        size="lg"
-        title="${t.viewTexts.projects.modalTitleCreate}"
+      <app-project-form
+        .open="${this.projectModalOpen}"
+        .presetCompanyId="${company.id}"
+        .presetCounterpartyId="${''}"
+        .presetStatus="${'active'}"
+        .presetKey="${`PRJ${store.projects.length + 1}`}"
+        .presetBudget="${2000000}"
+        saveLabel="${t.common.create}"
         @close="${() => (this.projectModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectName}"
-              .value="${this.projName}"
-              required
-              error="${this.projError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.projName = eventValue(e);
-                this.projError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectKey}"
-              .value="${this.projKey}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.projKey = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelCounterparty}"
-              .value="${this.projCounterpartyId}"
-              .options="${counterpartyOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.projCounterpartyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelStatus}"
-              .value="${this.projStatus}"
-              .options="${statusOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.projStatus = eventValue(e) as ProjectStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projects.labelBudgetRub}"
-              .value="${this.projBudget}"
-              min="0"
-              step="100000"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.projBudget = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.projects.labelDueDate}"
-              .value="${this.projDueDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.projDueDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.projects.labelDescription}"
-              .value="${this.projDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.projDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.projectModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleCreateProject(company)}">
-            ${t.common.create}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${(e: CustomEvent<{ project: Project }>) => {
+          this.projectModalOpen = false;
+          store.openProjectDetail(e.detail.project.id);
+        }}"
+      ></app-project-form>
     `;
   }
 
@@ -1644,37 +1561,7 @@ export class AppCompanyDetail extends LitElement {
   }
 
   private openQuickProjectModal() {
-    this.projName = '';
-    this.projKey = `PRJ${store.projects.length + 1}`;
-    this.projCounterpartyId = '';
-    this.projBudget = 2000000;
-    this.projDueDate = `${new Date().getFullYear()}-12-31`;
-    this.projStatus = 'active';
-    this.projDescription = '';
-    this.projError = '';
     this.projectModalOpen = true;
-  }
-
-  private handleCreateProject(company: Company) {
-    if (!this.projName.trim()) {
-      this.projError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-    const created = store.addProject({
-      name: this.projName.trim(),
-      key: (this.projKey.trim() || 'PRJ').toUpperCase(),
-      description: this.projDescription.trim(),
-      color: '#6366f1',
-      progress: 0,
-      dueDate: this.projDueDate || `${new Date().getFullYear()}-12-31`,
-      companyId: company.id,
-      counterpartyId: this.projCounterpartyId || undefined,
-      budget: Math.max(0, Number(this.projBudget) || 0),
-      status: this.projStatus,
-      members: [],
-    });
-    this.projectModalOpen = false;
-    store.openProjectDetail(created.id);
   }
 
   private openUploadDocModal(company: Company) {
