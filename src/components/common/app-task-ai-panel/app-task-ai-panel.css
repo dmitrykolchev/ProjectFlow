@@ -94,142 +94,22 @@
   font-weight: 600;
 }
 
-.ai-context-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  max-height: 150px;
-  overflow-y: auto;
-  padding-right: 2px;
-}
-
-.ai-context-chips::-webkit-scrollbar,
 .ai-scroll-region::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-.ai-context-chips::-webkit-scrollbar-track,
 .ai-scroll-region::-webkit-scrollbar-track {
   background: var(--scrollbar-track, var(--bg-canvas));
 }
 
-.ai-context-chips::-webkit-scrollbar-thumb,
 .ai-scroll-region::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb, var(--border-strong));
   border-radius: 4px;
 }
 
-.ai-context-chips::-webkit-scrollbar-thumb:hover,
 .ai-scroll-region::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
-}
-
-.context-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.28rem 0.55rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-surface, #111827);
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.75rem;
-  max-width: 100%;
-  transition: border-color var(--transition-fast, 150ms ease),
-              background-color var(--transition-fast, 150ms ease);
-}
-
-.context-chip.is-selected {
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
-  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
-  color: var(--text-primary, #f8fafc);
-}
-
-/* context toggle is an app-button web component at size sm with the historical content-sized
-   look restored through the font-parity recipe: auto height, zero padding, 0.75rem font at
-   weight 400, the inherited sans family, the tighter 0.35rem gap restored through btn-gap,
-   zero border width, transparent fill, and the selected glyph color following the chip state */
-.context-toggle-btn {
-  --control-height-sm: auto;
-  --control-padding-y-sm: 0;
-  --control-padding-x-sm: 0;
-  --control-font-sm: 0.75rem;
-  --btn-line-height: 1.5;
-  --btn-font-weight: 400;
-  --btn-gap: 0.35rem;
-  --btn-border-width: 0;
-  --icon-btn-bg: transparent;
-  --icon-btn-color: var(--text-secondary, #94a3b8);
-  --icon-btn-border: transparent;
-}
-
-.context-chip.is-selected .context-toggle-btn {
-  --icon-btn-color: var(--text-primary, #f8fafc);
-}
-
-.context-kind-tag {
-  font-family: var(--font-mono, monospace);
-  font-size: 0.65rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-  background: var(--bg-subtle, #1a2438);
-  color: var(--text-secondary, #94a3b8);
-  flex-shrink: 0;
-}
-
-.context-kind-tag.is-kb {
-  color: #38bdf8;
-  background: rgba(56, 189, 248, 0.12);
-}
-
-.context-kind-tag.is-doc {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.12);
-}
-
-.context-kind-tag.is-req {
-  color: #c084fc;
-  background: rgba(192, 132, 252, 0.14);
-}
-
-.context-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 240px;
-  font-weight: 500;
-}
-
-.context-reason {
-  font-size: 0.68rem;
-  color: var(--text-muted, #64748b);
-  flex-shrink: 0;
-}
-
-/* context open actions are app-button web components at size xs with the historical
-   content-sized look: zero border, muted glyph, 0.1rem padding, the historical 4px radius,
-   and the hover accent fill copied from the original .context-open-btn:hover */
-.context-open-btn {
-  --control-height-xs: auto;
-  --icon-only-padding: 0.1rem;
-  --btn-border-width: 0;
-  --btn-radius-tl: 4px;
-  --btn-radius-tr: 4px;
-  --btn-radius-bl: 4px;
-  --btn-radius-br: 4px;
-  --icon-btn-bg: transparent;
-  --icon-btn-color: var(--text-muted, #64748b);
-  --icon-btn-border: transparent;
-  flex-shrink: 0;
-}
-
-.context-open-btn:hover {
-  --icon-btn-hover-color: var(--accent-primary, #818cf8);
-  --icon-btn-hover-bg: var(--bg-hover, #223049);
-  --icon-btn-hover-border: transparent;
 }
 
 .context-empty-hint {

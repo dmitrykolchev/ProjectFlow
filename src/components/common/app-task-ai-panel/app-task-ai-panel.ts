@@ -16,7 +16,6 @@ import { SupportedLang, AnalysisSummary, TaskAiClarificationMessage } from '../.
 import { eventValue } from '../event-value';
 import {
   iconAlertTriangle,
-  iconArrowUpRight,
   iconBookOpen,
   iconCheck,
   iconCpu,
@@ -28,12 +27,14 @@ import {
   iconTrash,
   iconX,
 } from '../icons';
+import { ContextChipKind, openContextSource } from '../context-chip-data';
 import type { EntitySelectorOption } from '../app-entity-selector/app-entity-selector';
 import '../app-badge/app-badge';
 import '../app-button/app-button';
 import '../app-entity-selector/app-entity-selector';
 import '../app-section-card/app-section-card';
 import '../app-analysis-summary/app-analysis-summary';
+import '../app-context-chips-list/app-context-chips-list';
 import styles from './app-task-ai-panel.css';
 
 @customElement('app-task-ai-panel')
@@ -190,44 +191,6 @@ export class AppTaskAiPanel extends LitElement {
     this.selectedKeys = nextSelected;
     this.manualKeys = nextManual;
     this.recomputeContext(false);
-  }
-
-  private openContextSource(item: { kind: 'knowledge' | 'document' | 'requirement'; id: string }) {
-    if (item.kind === 'requirement') {
-      store.openRequirementDetail(item.id);
-      return;
-    }
-    if (item.kind === 'knowledge') {
-      const art = store.knowledgeArticles.find((a) => a.id === item.id);
-      store.openKnowledgeBase({
-        scope: art?.scope || 'all',
-        projectId: art?.projectId || 'all',
-        companyId: art?.companyId || 'all',
-        articleId: item.id,
-      });
-    } else {
-      const doc = store.documents.find((d) => d.id === item.id);
-      store.openDocuments({
-        scope: doc?.scope || 'all',
-        projectId: doc?.projectId || 'all',
-        companyId: doc?.companyId || 'all',
-      });
-    }
-  }
-
-  private reasonLabel(reason: TaskContextMatchReason, t: ReturnType<typeof getTranslation>): string {
-    switch (reason) {
-      case 'direct':
-        return t.viewTexts.ai.contextDirectMatch;
-      case 'project':
-        return t.viewTexts.ai.contextProjectMatch;
-      case 'company':
-        return t.viewTexts.ai.contextCompanyMatch;
-      case 'manual':
-        return t.viewTexts.ai.contextManualMatch;
-      default:
-        return t.viewTexts.ai.contextKeywordMatch;
-    }
   }
 
   private async handleGenerateDescription() {
@@ -530,45 +493,12 @@ export class AppTaskAiPanel extends LitElement {
           ${visibleItems.length === 0
             ? html`<div class="context-empty-hint">${t.viewTexts.ai.contextEmpty}</div>`
             : html`
-                <div class="ai-context-chips">
-                  ${visibleItems.map((item) => {
-                    const tagCls =
-                      item.kind === 'requirement'
-                        ? 'is-req'
-                        : item.kind === 'knowledge'
-                        ? 'is-kb'
-                        : 'is-doc';
-                    const tagText =
-                      item.kind === 'requirement'
-                        ? 'REQ'
-                        : item.kind === 'knowledge'
-                        ? 'KB'
-                        : 'DOC';
-                    return html`
-                      <div class="context-chip ${item.selected ? 'is-selected' : ''}">
-                        <app-button
-                          class="context-toggle-btn"
-                          size="sm"
-                          variant="icon"
-                          @click="${() => this.toggleContextKey(item.key)}"
-                        >
-                          <span class="context-kind-tag ${tagCls}">${tagText}</span>
-                          <span class="context-title" title="${item.title}">${item.title}</span>
-                          <span class="context-reason">· ${this.reasonLabel(item.reason, t)}</span>
-                        </app-button>
-                        <app-button
-                          class="context-open-btn"
-                          size="xs"
-                          variant="icon"
-                          title="${item.title}"
-                          @click="${() => this.openContextSource(item)}"
-                        >
-                          <span slot="start">${iconArrowUpRight(12)}</span>
-                        </app-button>
-                      </div>
-                    `;
-                  })}
-                </div>
+                <app-context-chips-list
+                  .items="${visibleItems}"
+                  mode="select"
+                  @chip-toggle="${(e: CustomEvent<{ key: string }>) => this.toggleContextKey(e.detail.key)}"
+                  @chip-open="${(e: CustomEvent<{ kind: ContextChipKind; id: string }>) => openContextSource(e.detail)}"
+                ></app-context-chips-list>
               `}
 
           ${attachOptions.length > 0

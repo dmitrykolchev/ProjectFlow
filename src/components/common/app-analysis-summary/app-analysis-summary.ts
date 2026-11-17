@@ -3,14 +3,10 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { AnalysisSummary } from '../../../types';
-import {
-  iconArrowUpRight,
-  iconBookOpen,
-  iconFileText,
-  iconLayers,
-  iconX,
-} from '../icons';
+import { iconX } from '../icons';
+import { ContextChipKind, openContextSource } from '../context-chip-data';
 import '../app-button/app-button';
+import '../app-context-chips-list/app-context-chips-list';
 import styles from './app-analysis-summary.css';
 
 /**
@@ -206,29 +202,17 @@ export class AppAnalysisSummary extends LitElement {
 
               ${s.contextSources.length > 0
                 ? html`
-                    <div class="ai-context-chips">
-                      ${s.contextSources.map((src) => {
-                        const srcCls =
-                          src.kind === 'requirement'
-                            ? 'is-req'
-                            : src.kind === 'knowledge'
-                            ? 'is-kb'
-                            : 'is-doc';
-                        const srcIcon =
-                          src.kind === 'requirement'
-                            ? iconLayers(11)
-                            : src.kind === 'knowledge'
-                            ? iconBookOpen(11)
-                            : iconFileText(11);
-                        return html`
-                          <span class="context-chip">
-                            <span class="context-kind-tag ${srcCls}">${srcIcon}</span>
-                            <span class="context-title">${src.title}</span>
-                            ${iconArrowUpRight(12)}
-                          </span>
-                        `;
-                      })}
-                    </div>
+                    <app-context-chips-list
+                      .items="${s.contextSources.map((src) => ({
+                        key: `${src.kind}:${src.id}`,
+                        kind: src.kind,
+                        id: src.id,
+                        title: src.title,
+                        reason: src.reason,
+                      }))}"
+                      mode="display"
+                      @chip-open="${(e: CustomEvent<{ kind: ContextChipKind; id: string }>) => openContextSource(e.detail)}"
+                    ></app-context-chips-list>
                   `
                 : ''}
             `
