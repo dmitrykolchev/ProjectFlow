@@ -136,6 +136,20 @@ button:disabled {
   filter: brightness(0.9);
 }
 
+/* compact icon action used inside card footers: exact parity with the historical
+   .icon-btn (subtle border, secondary color, hover fill). Role hovers are tuned by
+   the view through the --icon-btn-hover-* custom properties on the host element. */
+.variant-icon {
+  background: transparent;
+  color: var(--icon-btn-color, var(--text-secondary, #94a3b8));
+  border-color: var(--icon-btn-border, var(--border-subtle, #334155));
+}
+.variant-icon:hover:not(:disabled) {
+  background: var(--icon-btn-hover-bg, var(--bg-hover, #223049));
+  color: var(--icon-btn-hover-color, var(--text-primary, #f8fafc));
+  border-color: var(--icon-btn-hover-border, var(--icon-btn-hover-color, var(--text-primary, #f8fafc)));
+}
+
 .spinner {
   width: 14px;
   height: 14px;

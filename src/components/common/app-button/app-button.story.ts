@@ -20,7 +20,7 @@ export const meta: ComponentStoryMeta = {
     'app-material-icon': 'Icon rendered in the start / end slot before or after the label',
   },
   propsDoc: {
-    variant: 'Visual style: primary, secondary, outline, ghost, danger',
+    variant: 'Visual style: primary, secondary, outline, ghost, danger, icon (compact card action)',
     size: 'Control height: sm / md / lg',
     disabled: 'Disables interaction and dims the button',
     loading: 'Shows a spinner and blocks clicks',

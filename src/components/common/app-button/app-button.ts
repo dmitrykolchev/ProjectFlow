@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import styles from './app-button.css';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline';
+export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'icon';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 @customElement('app-button')
