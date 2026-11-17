@@ -74,25 +74,20 @@
   margin-right: 0.5rem;
 }
 
-.close-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-secondary, #94a3b8);
-  cursor: pointer;
-  font-size: 1.25rem;
-  line-height: 1;
-  padding: 0.35rem;
-  border-radius: var(--radius-sm, 6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
-}
-
-.close-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+/* header close action is an app-button web component at size sm: the icon-only
+   button renders as a square, the historical transparent look is tuned through
+   app-button custom properties */
+app-button.close-btn {
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-bg: transparent;
+  --icon-btn-border: transparent;
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: transparent;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
 }
 
 .modal-body {

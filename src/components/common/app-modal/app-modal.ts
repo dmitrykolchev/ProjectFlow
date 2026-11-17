@@ -1,6 +1,11 @@
 import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { getTranslation } from '../../../i18n';
+import { store } from '../../../state/store';
+import { SupportedLang } from '../../../types';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { iconX } from '../icons';
+import '../app-button/app-button';
 import styles from './app-modal.css';
 
 export type ModalSize = 'sm' | 'md' | 'lg' | 'xl';
@@ -15,16 +20,30 @@ export class AppModal extends LitElement {
   @property({ type: Object, attribute: false }) headerIcon: TemplateResult | null = null;
 
   @state() private isVisualOpen: boolean = false;
+  @state() private currentLang: SupportedLang = store.customization.language;
 
   private portalHandle: PortalHandle | null = null;
   private anchorComment: Comment | null = null;
   private closeTimer: number | null = null;
   private isMovingPortal: boolean = false;
+  private unsubscribe: (() => void) | null = null;
 
   static styles = styles;
 
+  connectedCallback() {
+    super.connectedCallback();
+    this.currentLang = store.customization.language;
+    this.unsubscribe = store.subscribe(() => {
+      this.currentLang = store.customization.language;
+    });
+  }
+
   disconnectedCallback() {
     super.disconnectedCallback();
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = null;
+    }
     if (this.isMovingPortal) return;
 
     if (this.closeTimer !== null) {
@@ -128,9 +147,16 @@ export class AppModal extends LitElement {
             ${this.hideClose
               ? ''
               : html`
-                  <button type="button" class="close-btn" @click="${this.close}" aria-label="Close">
-                    ✕
-                  </button>
+                  <app-button
+                    class="close-btn"
+                    size="sm"
+                    variant="icon"
+                    type="button"
+                    aria-label="${getTranslation(this.currentLang).common.close}"
+                    @click="${this.close}"
+                  >
+                    <span slot="start">${iconX(16)}</span>
+                  </app-button>
                 `}
           </div>
           <div class="modal-body">
