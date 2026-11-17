@@ -4,8 +4,7 @@ import { store } from '../../../state/store';
 import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
-  CalculationFrequency,
-  ContractType,
+  Contract,
   Counterparty,
   CounterpartyStatus,
   CounterpartyType,
@@ -40,6 +39,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-contract-form/app-contract-form';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-meta-grid/app-meta-grid';
@@ -75,17 +75,7 @@ export class AppCounterpartyDetail extends LitElement {
 
   // Quick Contract creation modal
   @state() private contractModalOpen = false;
-  @state() private ctrNumber = '';
-  @state() private ctrTitle = '';
-  @state() private ctrType: ContractType = 'service';
-  @state() private ctrCompanyId = '';
-  @state() private ctrProjectId = '';
-  @state() private ctrAmount = 1500000;
-  @state() private ctrCurrency: 'RUB' | 'USD' | 'EUR' = 'RUB';
-  @state() private ctrFrequency: CalculationFrequency = 'monthly';
-  @state() private ctrStartDate = '';
-  @state() private ctrEndDate = '';
-  @state() private ctrError = '';
+
 
   private unsubscribe?: () => void;
 
@@ -798,134 +788,18 @@ export class AppCounterpartyDetail extends LitElement {
     cp: Counterparty,
     t: ReturnType<typeof getTranslation>
   ) {
-    const companyOpts = store.companies.map((c) => ({ value: c.id, label: c.name }));
-    const projOpts = [
-      { value: '', label: t.viewTexts.counterpartyDetail.optionNoProject },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}`, color: p.color })),
-    ];
-    const typeOpts = [
-      { value: 'service', label: t.viewTexts.counterpartyDetail.typeService },
-      { value: 'supply', label: t.viewTexts.counterpartyDetail.typeSupply },
-      { value: 'license', label: t.viewTexts.counterpartyDetail.typeLicense },
-      { value: 'sla', label: 'SLA' },
-      { value: 'nda', label: 'NDA' },
-    ];
-    const freqOpts = [
-      { value: 'weekly', label: t.calculations.frequencies.weekly },
-      { value: 'biweekly', label: t.calculations.frequencies.biweekly },
-      { value: 'monthly', label: t.calculations.frequencies.monthly },
-      { value: 'quarterly', label: t.calculations.frequencies.quarterly },
-      { value: 'custom', label: t.calculations.frequencies.custom },
-    ];
-    const curOpts = [
-      { value: 'RUB', label: 'RUB (₽)' },
-      { value: 'USD', label: 'USD ($)' },
-      { value: 'EUR', label: 'EUR (€)' },
-    ];
-
     return html`
-      <app-modal
-        ?open="${this.contractModalOpen}"
-        size="lg"
-        title="${t.viewTexts.counterpartyDetail.quickContractTitle(cp.name)}"
+      <app-contract-form
+        .open="${this.contractModalOpen}"
+        .compact="${true}"
+        .presetCounterpartyId="${cp.id}"
+        .contextTitle="${t.viewTexts.counterpartyDetail.quickContractTitle(cp.name)}"
         @close="${() => (this.contractModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.counterpartyDetail.labelContractNumber}"
-              .value="${this.ctrNumber}"
-              required
-              error="${this.ctrError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.ctrNumber = eventValue(e);
-                this.ctrError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterparties.thType}"
-              .value="${this.ctrType}"
-              .options="${typeOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrType = eventValue(e) as ContractType)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-input
-              label="${t.viewTexts.counterpartyDetail.labelSubject}"
-              .value="${this.ctrTitle}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.ctrTitle = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.counterpartyDetail.labelOurCompany}"
-              .value="${this.ctrCompanyId}"
-              .options="${companyOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrCompanyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.timeTracking.labelProject}"
-              .value="${this.ctrProjectId}"
-              .options="${projOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrProjectId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.expenses.thAmount}"
-              .value="${this.ctrAmount}"
-              min="0"
-              step="50000"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.ctrAmount = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.labelCurrency}"
-              .value="${this.ctrCurrency}"
-              .options="${curOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.counterpartyDetail.labelStartDate}"
-              .value="${this.ctrStartDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrStartDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.counterpartyDetail.labelEndDate}"
-              .value="${this.ctrEndDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.ctrEndDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div class="col-span-2">
-            <app-select
-              label="${t.viewTexts.counterpartyDetail.labelCalcCycle}"
-              .value="${this.ctrFrequency}"
-              .options="${freqOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.ctrFrequency = eventValue(e) as CalculationFrequency)}"
-            ></app-select>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.contractModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${() => this.handleCreateContract(cp)}">
-            ${t.common.create}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${(e: CustomEvent<{ contract: Contract }>) => {
+          this.contractModalOpen = false;
+          store.openContractDetail(e.detail.contract.id);
+        }}"
+      ></app-contract-form>
     `;
   }
 
@@ -970,44 +844,6 @@ export class AppCounterpartyDetail extends LitElement {
   }
 
   private openCreateContractModal(cp: Counterparty) {
-    const today = new Date().toISOString().slice(0, 10);
-    const linkedProj = store.projects.find((p) => p.counterpartyId === cp.id);
-    this.ctrNumber = `${getTranslation(this.currentLang).viewTexts.counterpartyDetail.ctrNumberPrefix}${new Date().getFullYear()}/${String(store.contracts.length + 1).padStart(3, '0')}`;
-    this.ctrTitle = '';
-    this.ctrType = 'service';
-    this.ctrCompanyId = store.companies[0]?.id || '';
-    this.ctrProjectId = linkedProj?.id || '';
-    this.ctrAmount = 1500000;
-    this.ctrCurrency = 'RUB';
-    this.ctrFrequency = 'monthly';
-    this.ctrStartDate = today;
-    this.ctrEndDate = `${new Date().getFullYear()}-12-31`;
-    this.ctrError = '';
     this.contractModalOpen = true;
-  }
-
-  private handleCreateContract(cp: Counterparty) {
-    if (!this.ctrNumber.trim()) {
-      this.ctrError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-    const created = store.addContract({
-      number: this.ctrNumber.trim(),
-      title: this.ctrTitle.trim() || this.ctrNumber.trim(),
-      type: this.ctrType,
-      companyId: this.ctrCompanyId || store.companies[0]?.id || '',
-      counterpartyId: cp.id,
-      projectId: this.ctrProjectId || undefined,
-      ownerId: store.users[0]?.id,
-      amount: Math.max(0, Number(this.ctrAmount) || 0),
-      currency: this.ctrCurrency,
-      startDate: this.ctrStartDate || new Date().toISOString().slice(0, 10),
-      endDate: this.ctrEndDate || new Date().toISOString().slice(0, 10),
-      status: 'active',
-      billingFrequency: this.ctrFrequency,
-      description: '',
-    });
-    this.contractModalOpen = false;
-    store.openContractDetail(created.id);
   }
 }
