@@ -4,15 +4,19 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import '../../common/app-input/app-input';
 import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-button/app-button';
 import { iconSearch } from '../icons';
-import type { SelectOption } from '../../common/app-select/app-select';
+import type { EntitySelectorOption } from '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-filter-bar.css';
 import { eventValue } from '../event-value';
 
 export interface FilterDef {
   key: string;
-  options: SelectOption[];
+  // option list; the entity selector fields (code, subtitle, meta, badge, avatar) are optional
+  options: EntitySelectorOption[];
+  // control used for the filter: plain select (default) or entity selector with search
+  type?: 'select' | 'entity';
 }
 
 @customElement('app-filter-bar')
@@ -51,11 +55,23 @@ export class AppFilterBar extends LitElement {
           ${this.filters.map(
             (f) => html`
               <div class="select">
-                <app-select
-                  .value="${this.values[f.key] ?? 'all'}"
-                  .options="${f.options}"
-                  @change="${(e: CustomEvent<{ value: string }>) => this.emitFilter(f.key, eventValue(e))}"
-                ></app-select>
+                ${f.type === 'entity'
+                  ? html`
+                      <app-entity-selector
+                        .value="${this.values[f.key] ?? 'all'}"
+                        .options="${f.options}"
+                        @change="${(e: CustomEvent<{ value: string }>) =>
+                          this.emitFilter(f.key, eventValue(e))}"
+                      ></app-entity-selector>
+                    `
+                  : html`
+                      <app-select
+                        .value="${this.values[f.key] ?? 'all'}"
+                        .options="${f.options}"
+                        @change="${(e: CustomEvent<{ value: string }>) =>
+                          this.emitFilter(f.key, eventValue(e))}"
+                      ></app-select>
+                    `}
               </div>
             `
           )}

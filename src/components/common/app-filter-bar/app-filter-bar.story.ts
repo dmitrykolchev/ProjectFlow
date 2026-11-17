@@ -1,5 +1,8 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
+import { store } from '../../../state/store';
+import { getTranslation } from '../../../i18n';
+import { mapProjectOptions, mapUserOptions } from '../entity-selector-options';
 import '../app-segmented-switch/app-segmented-switch';
 import './app-filter-bar';
 
@@ -20,7 +23,7 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     searchValue: 'Current text of the search box',
     searchEnabled: 'Shows the search input',
-    filters: 'Filter definitions (id, type, options)',
+    filters: 'Filter definitions (key, options, type select | entity)',
     values: 'Current filter values keyed by filter id',
     placeholder: 'Search box placeholder',
     variant: 'Surface style: card / plain',
@@ -57,6 +60,35 @@ export const meta: ComponentStoryMeta = {
           placeholder="Search..."
           .filters="${[{ key: 'status', options: [{ value: 'all', label: 'All' }, { value: 'draft', label: 'Draft' }] }]}"
           .values="${{ status: 'draft' }}"
+        ></app-filter-bar>
+      `,
+    },
+    {
+      name: 'Entity Filters',
+      description:
+        'Filters declared with type entity render app-entity-selector controls: searchable lists with project codes, colors and employee avatars in the same bar slots',
+      render: () => html`
+        <app-filter-bar
+          placeholder="Search entries..."
+          .filters="${[
+            {
+              key: 'project',
+              type: 'entity',
+              options: [
+                { value: 'all', label: 'All projects' },
+                ...mapProjectOptions(store.projects, getTranslation(store.customization.language)),
+              ],
+            },
+            {
+              key: 'user',
+              type: 'entity',
+              options: [
+                { value: 'all', label: 'All employees' },
+                ...mapUserOptions(store.users, getTranslation(store.customization.language)),
+              ],
+            },
+          ]}"
+          .values="${{ project: store.projects[0]?.id || 'all', user: 'all' }}"
         ></app-filter-bar>
       `,
     },
