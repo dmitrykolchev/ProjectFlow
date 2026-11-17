@@ -1,0 +1,114 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.14rem 0.48rem;
+  border-radius: var(--radius-xs, 4px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.tag-chip.is-editable {
+  padding-right: 0.25rem;
+}
+
+.tag-remove-btn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted, #64748b);
+  cursor: pointer;
+  padding: 0.05rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.tag-remove-btn:hover {
+  color: var(--color-danger, #ef4444);
+  background: rgba(239, 68, 68, 0.14);
+}
+
+.tag-add-btn {
+  border: 1px dashed var(--border-strong, #334155);
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  font: inherit;
+  font-size: 0.69rem;
+  font-weight: 600;
+  padding: 0.13rem 0.46rem;
+  border-radius: var(--radius-xs, 4px);
+  cursor: pointer;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+}
+
+.tag-add-btn:hover {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #818cf8);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.1));
+}
+
+.inline-tag-form {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.22rem;
+}
+
+.inline-tag-input {
+  width: 112px;
+  height: 22px;
+  padding: 0 0.42rem;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.45));
+  background: var(--bg-canvas, #090d16);
+  color: var(--text-primary, #f8fafc);
+  font: inherit;
+  font-size: 0.71rem;
+  outline: none;
+}
+
+.inline-tag-input:focus {
+  border-color: var(--accent-primary, #6366f1);
+}
+
+.inline-tag-action {
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-xs, 4px);
+  border: 1px solid var(--border-subtle, #334155);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.inline-tag-action.is-confirm:hover {
+  color: #34d399;
+  border-color: rgba(16, 185, 129, 0.45);
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.inline-tag-action:hover {
+  color: var(--text-primary, #f8fafc);
+  background: var(--bg-hover, #223049);
+}
+
+.tags-empty {
+  font-size: 0.67rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
