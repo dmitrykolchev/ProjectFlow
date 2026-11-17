@@ -426,38 +426,41 @@ export class AppDocumentPreviewer extends LitElement {
                   ${docList.length > 1 && currentIdx >= 0
                     ? html`
                         <div class="nav-pager">
-                          <button
-                            type="button"
+                          <app-button
                             class="tool-icon-btn"
+                            size="sm"
+                            variant="icon"
                             title="${t.documents.prevDoc}"
-                            ?disabled="${!hasPrev}"
+                            .disabled="${!hasPrev}"
                             @click="${() => hasPrev && this.emitSelectDocument(docList[currentIdx - 1])}"
                           >
-                            ${iconChevronLeft(14)}
-                          </button>
+                            <span slot="start">${iconChevronLeft(14)}</span>
+                          </app-button>
                           <span class="nav-index">${currentIdx + 1}/${docList.length}</span>
-                          <button
-                            type="button"
+                          <app-button
                             class="tool-icon-btn"
+                            size="sm"
+                            variant="icon"
                             title="${t.documents.nextDoc}"
-                            ?disabled="${!hasNext}"
+                            .disabled="${!hasNext}"
                             @click="${() => hasNext && this.emitSelectDocument(docList[currentIdx + 1])}"
                           >
-                            ${iconChevronRight(14)}
-                          </button>
+                            <span slot="start">${iconChevronRight(14)}</span>
+                          </app-button>
                         </div>
                       `
                     : ''}
                   ${this.showExpand
                     ? html`
-                        <button
-                          type="button"
+                        <app-button
                           class="tool-icon-btn"
+                          size="sm"
+                          variant="icon"
                           title="${t.documents.expandPreview}"
                           @click="${() => this.emitExpand(doc)}"
                         >
-                          ${iconMaximize(14)}
-                        </button>
+                          <span slot="start">${iconMaximize(14)}</span>
+                        </app-button>
                       `
                     : ''}
                   <app-button
@@ -517,15 +520,16 @@ export class AppDocumentPreviewer extends LitElement {
       return html`
         <div class="toolbar-bar">
           <div class="toolbar-group">
-            <button
-              type="button"
+            <app-button
               class="tool-icon-btn"
+              size="sm"
+              variant="icon"
               title="${t.documents.zoomOut}"
-              ?disabled="${this.zoom <= 0.5}"
+              .disabled="${this.zoom <= 0.5}"
               @click="${() => (this.zoom = Math.max(0.5, +(this.zoom - 0.25).toFixed(2)))}"
             >
-              ${iconZoomOut(14)}
-            </button>
+              <span slot="start">${iconZoomOut(14)}</span>
+            </app-button>
             <button
               type="button"
               class="tool-btn mono"
@@ -534,15 +538,16 @@ export class AppDocumentPreviewer extends LitElement {
             >
               ${pct}%
             </button>
-            <button
-              type="button"
+            <app-button
               class="tool-icon-btn"
+              size="sm"
+              variant="icon"
               title="${t.documents.zoomIn}"
-              ?disabled="${this.zoom >= 2.0}"
+              .disabled="${this.zoom >= 2.0}"
               @click="${() => (this.zoom = Math.min(2.0, +(this.zoom + 0.25).toFixed(2)))}"
             >
-              ${iconZoomIn(14)}
-            </button>
+              <span slot="start">${iconZoomIn(14)}</span>
+            </app-button>
           </div>
           <div class="toolbar-group">
             <button

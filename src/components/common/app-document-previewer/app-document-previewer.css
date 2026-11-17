@@ -185,35 +185,28 @@
   cursor: not-allowed;
 }
 
+/* toolbar icon actions are app-button web components at size sm pinned to the historical
+   28px square with a 6px radius; hover keeps the subtle border unchanged, the active state
+   and the disabled opacity copy the historical values through custom properties */
 .tool-icon-btn {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #334155);
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
-}
-
-.tool-icon-btn:hover:not(:disabled) {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+  --control-height-sm: 28px;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-subtle, #334155);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+  --btn-disabled-opacity: 0.4;
 }
 
 .tool-icon-btn.is-active {
-  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
-  color: var(--accent-primary, #6366f1);
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.4));
-}
-
-.tool-icon-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  --icon-btn-bg: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  --icon-btn-color: var(--accent-primary, #6366f1);
+  --icon-btn-border: var(--accent-border, rgba(99, 102, 241, 0.4));
 }
 
 .mode-pills {
