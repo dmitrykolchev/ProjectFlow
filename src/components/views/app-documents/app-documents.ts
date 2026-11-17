@@ -31,7 +31,6 @@ import {
   iconTag,
   iconTrash,
   iconUpload,
-  iconX,
 } from '../../common/icons';
 import {
   formatAiError,
@@ -51,6 +50,7 @@ import '../../common/app-input/app-input';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../common/app-modal/app-modal';
 import '../../common/app-document-form/app-document-form';
+import '../../common/app-tags-row/app-tags-row';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -95,10 +95,6 @@ export class AppDocuments extends LitElement {
   @state() private aiPreviewError = '';
   @state() private aiPreviewSuggestion: { summary: string; tags: string[]; model?: string } | null = null;
 
-  // Inline tag editing state
-  @state() private inlineTagEditDocId: string | null = null;
-  @state() private inlineTagDraft = '';
-  @state() private previewTagDraft = '';
 
   // Delete Confirm
   @state() private deletingDoc: DocumentItem | null = null;
@@ -462,86 +458,15 @@ export class AppDocuments extends LitElement {
                 </div>
               </div>
 
-              <div class="tags-row" @click="${(e: Event) => e.stopPropagation()}">
-                ${doc.tags.map(
-                  (tag) => html`
-                    <span class="tag-chip is-editable">
-                      <span>#${tag}</span>
-                      <button
-                        type="button"
-                        class="tag-remove-btn"
-                        title="${t.documents.removeTagTitle}"
-                        @click="${(e: Event) => {
-                          e.stopPropagation();
-                          this.removeTagFromDoc(doc, tag);
-                        }}"
-                      >
-                        ${iconX(10)}
-                      </button>
-                    </span>
-                  `
-                )}
-                ${this.inlineTagEditDocId === doc.id
-                  ? html`
-                      <span class="inline-tag-form">
-                        <input
-                          type="text"
-                          class="inline-tag-input"
-                          placeholder="${t.documents.addTagPlaceholder}"
-                          .value="${this.inlineTagDraft}"
-                          @input="${(e: Event) => {
-                            this.inlineTagDraft = (e.target as HTMLInputElement).value;
-                          }}"
-                          @keydown="${(e: KeyboardEvent) => {
-                            if (e.key === 'Enter') {
-                              e.preventDefault();
-                              this.commitTagToDoc(doc, this.inlineTagDraft);
-                              this.inlineTagDraft = '';
-                            } else if (e.key === 'Escape') {
-                              this.inlineTagEditDocId = null;
-                              this.inlineTagDraft = '';
-                            }
-                          }}"
-                        />
-                        <button
-                          type="button"
-                          class="inline-tag-action is-confirm"
-                          title="${t.common.add}"
-                          @click="${() => {
-                            this.commitTagToDoc(doc, this.inlineTagDraft);
-                            this.inlineTagDraft = '';
-                            this.inlineTagEditDocId = null;
-                          }}"
-                        >
-                          ${iconCheck(11)}
-                        </button>
-                        <button
-                          type="button"
-                          class="inline-tag-action"
-                          title="${t.common.close}"
-                          @click="${() => {
-                            this.inlineTagEditDocId = null;
-                            this.inlineTagDraft = '';
-                          }}"
-                        >
-                          ${iconX(11)}
-                        </button>
-                      </span>
-                    `
-                  : html`
-                      <button
-                        type="button"
-                        class="tag-add-btn"
-                        @click="${(e: Event) => {
-                          e.stopPropagation();
-                          this.inlineTagEditDocId = doc.id;
-                          this.inlineTagDraft = '';
-                        }}"
-                      >
-                        ${t.documents.addTagBtn}
-                      </button>
-                    `}
-              </div>
+              <app-tags-row
+                mode="add-button"
+                .tags="${doc.tags}"
+                @click="${(e: Event) => e.stopPropagation()}"
+                @tag-remove="${(e: CustomEvent<{ tag: string }>) =>
+                  this.removeTagFromDoc(doc, e.detail.tag)}"
+                @tag-add="${(e: CustomEvent<{ tag: string }>) =>
+                  this.commitTagToDoc(doc, e.detail.tag)}"
+              ></app-tags-row>
 
               <card-footer>
                 <div slot="start" class="uploader-info">
@@ -819,54 +744,16 @@ export class AppDocuments extends LitElement {
               ${iconTag(13)}
               <span>${t.documents.tagsLabel}:</span>
             </span>
-            <div class="tags-row" style="flex: 1;">
-              ${doc.tags.length === 0
-                ? html`<span class="meta-label">${t.documents.noTags}</span>`
-                : doc.tags.map(
-                    (tag) => html`
-                      <span class="tag-chip is-editable">
-                        <span>#${tag}</span>
-                        <button
-                          type="button"
-                          class="tag-remove-btn"
-                          title="${t.documents.removeTagTitle}"
-                          @click="${() => this.removeTagFromDoc(doc, tag)}"
-                        >
-                          ${iconX(10)}
-                        </button>
-                      </span>
-                    `
-                  )}
-              <span class="inline-tag-form">
-                <input
-                  type="text"
-                  class="inline-tag-input"
-                  placeholder="${t.documents.addTagPlaceholder}"
-                  .value="${this.previewTagDraft}"
-                  @input="${(e: Event) => {
-                    this.previewTagDraft = (e.target as HTMLInputElement).value;
-                  }}"
-                  @keydown="${(e: KeyboardEvent) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      this.commitTagToDoc(doc, this.previewTagDraft);
-                      this.previewTagDraft = '';
-                    }
-                  }}"
-                />
-                <button
-                  type="button"
-                  class="inline-tag-action is-confirm"
-                  title="${t.common.add}"
-                  @click="${() => {
-                    this.commitTagToDoc(doc, this.previewTagDraft);
-                    this.previewTagDraft = '';
-                  }}"
-                >
-                  ${iconCheck(11)}
-                </button>
-              </span>
-            </div>
+            <app-tags-row
+              style="flex: 1;"
+              mode="add-form"
+              showEmptyLabel
+              .tags="${doc.tags}"
+              @tag-remove="${(e: CustomEvent<{ tag: string }>) =>
+                this.removeTagFromDoc(doc, e.detail.tag)}"
+              @tag-add="${(e: CustomEvent<{ tag: string }>) =>
+                this.commitTagToDoc(doc, e.detail.tag)}"
+            ></app-tags-row>
           </div>
 
           <div class="ai-doc-bar">
