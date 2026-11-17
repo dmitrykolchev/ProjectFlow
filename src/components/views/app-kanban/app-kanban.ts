@@ -5,7 +5,10 @@ import { Task, TaskPriority, TaskStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-kanban.css';
 import { iconClock, iconPlus } from '../../common/icons';
+import { mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-button/app-button';
+import '../../common/app-select/app-select';
+import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/card-footer/card-footer';
 
 const COLUMNS: { id: TaskStatus; color: string }[] = [
@@ -51,26 +54,28 @@ export class AppKanban extends LitElement {
     return html`
       <div class="toolbar">
         <div class="filter-group">
-          <select
-            class="filter-select"
+          <app-select
+            size="sm"
+            .options="${[
+              { value: 'all', label: t.kanban.filterAllPriorities(t.common.all) },
+              { value: 'urgent', label: t.priority.urgent },
+              { value: 'high', label: t.priority.high },
+              { value: 'medium', label: t.priority.medium },
+              { value: 'low', label: t.priority.low },
+            ]}"
             .value="${store.filterPriority}"
-            @change="${(e: Event) => store.setFilterPriority((e.target as HTMLSelectElement).value)}"
-          >
-            <option value="all">${t.kanban.filterAllPriorities(t.common.all)}</option>
-            <option value="urgent">${t.priority.urgent}</option>
-            <option value="high">${t.priority.high}</option>
-            <option value="medium">${t.priority.medium}</option>
-            <option value="low">${t.priority.low}</option>
-          </select>
+            @change="${(e: CustomEvent) => store.setFilterPriority(e.detail.value)}"
+          ></app-select>
 
-          <select
-            class="filter-select"
+          <app-entity-selector
+            size="sm"
+            .options="${[
+              { value: 'all', label: t.kanban.filterAllAssignees(t.common.all) },
+              ...mapUserOptions(store.users, t),
+            ]}"
             .value="${store.filterAssignee}"
-            @change="${(e: Event) => store.setFilterAssignee((e.target as HTMLSelectElement).value)}"
-          >
-            <option value="all">${t.kanban.filterAllAssignees(t.common.all)}</option>
-            ${store.users.map((u) => html`<option value="${u.id}">${u.name}</option>`)}
-          </select>
+            @change="${(e: CustomEvent) => store.setFilterAssignee(e.detail.value)}"
+          ></app-entity-selector>
 
           ${store.filterPriority !== 'all' || store.filterAssignee !== 'all' || store.searchQuery
             ? html`

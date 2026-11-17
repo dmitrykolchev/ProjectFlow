@@ -24,21 +24,6 @@
   flex-wrap: wrap;
 }
 
-.filter-select {
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-sm, 6px);
-  color: var(--text-primary, #f8fafc);
-  padding: 0.35rem 0.65rem;
-  font-size: 0.8125rem;
-  outline: none;
-  cursor: pointer;
-}
-
-.filter-select:focus {
-  border-color: var(--accent-primary, #6366f1);
-}
-
 .board-container {
   flex: 1;
   display: flex;
