@@ -503,28 +503,31 @@ export class AppCounterparties extends LitElement {
                   </td>
                   <td>
                     <div class="card-actions">
-                      <button
-                        type="button"
-                        class="icon-btn"
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.viewTexts.counterparties.openCardButton}"
                         @click="${() => store.openCounterpartyDetail(cp.id)}"
                       >
-                        ${iconChevronRight(15)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn"
+                        <span slot="start">${iconChevronRight(15)}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.common.edit}"
                         @click="${() => this.openEditModal(cp)}"
                       >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                        <span slot="start">${iconEdit(14)}</span>
+                      </app-button>
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
+                        title="${t.common.delete}"
                         @click="${() => (this.deletingItem = cp)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
