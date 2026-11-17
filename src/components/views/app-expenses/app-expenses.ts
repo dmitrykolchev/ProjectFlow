@@ -329,40 +329,43 @@ export class AppExpenses extends LitElement {
                     <div class="actions-row">
                       ${exp.status === 'pending'
                         ? html`
-                            <button
-                              type="button"
-                              class="icon-btn approve"
+                            <app-button
+                              class="approve-action"
+                              size="sm"
+                              variant="icon"
                               title="${t.viewTexts.expenses.approveTitle}"
                               @click="${() => store.updateExpense({ ...exp, status: 'approved' })}"
                             >
-                              ${iconCheck(14)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-btn danger"
+                              <span slot="start">${iconCheck(14)}</span>
+                            </app-button>
+                            <app-button
+                              class="danger-action"
+                              size="sm"
+                              variant="icon"
                               title="${t.viewTexts.expenses.rejectTitle}"
                               @click="${() => store.updateExpense({ ...exp, status: 'rejected' })}"
                             >
-                              ${iconX(14)}
-                            </button>
+                              <span slot="start">${iconX(14)}</span>
+                            </app-button>
                           `
                         : ''}
-                      <button
-                        type="button"
-                        class="icon-btn"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditModal(exp)}"
-                      >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingExpense = exp)}"
-                      >
-                        ${iconTrash(14)}
-                      </button>
+                        <app-button
+                          size="sm"
+                          variant="icon"
+                          title="${t.common.edit}"
+                          @click="${() => this.openEditModal(exp)}"
+                        >
+                          <span slot="start">${iconEdit(14)}</span>
+                        </app-button>
+                        <app-button
+                          class="danger-action"
+                          size="sm"
+                          variant="icon"
+                          title="${t.common.delete}"
+                          @click="${() => (this.deletingExpense = exp)}"
+                        >
+                          <span slot="start">${iconTrash(14)}</span>
+                        </app-button>
                     </div>
                   </td>
                 </tr>
