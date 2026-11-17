@@ -76,6 +76,7 @@ import appDataGridColumnMeta from '../../common/app-data-grid-column/app-data-gr
 import bankRequisitesMeta from '../../common/app-bank-requisites/app-bank-requisites.story';
 import counterpartyContactsMeta from '../../common/app-counterparty-contacts/app-counterparty-contacts.story';
 import bankSummaryMeta from '../../common/app-bank-summary/app-bank-summary.story';
+import analysisSummaryMeta from '../../common/app-analysis-summary/app-analysis-summary.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -183,6 +184,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   bankRequisitesMeta,
   counterpartyContactsMeta,
   bankSummaryMeta,
+  analysisSummaryMeta,
   toastMeta,
   activityMeta,
   headerMeta,
