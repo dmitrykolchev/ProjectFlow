@@ -8,8 +8,6 @@ import { iconClock, iconPlus } from '../../common/icons';
 import { mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-button/app-button';
 import '../../common/app-select/app-select';
-import '../../common/app-option/app-option';
-import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/card-footer/card-footer';
 
@@ -59,22 +57,15 @@ export class AppKanban extends LitElement {
           <app-select
             size="sm"
             .value="${store.filterPriority}"
+            .options="${[
+              { value: 'all', label: t.kanban.filterAllPriorities(t.common.all) },
+              { value: 'low', label: t.priority.low, color: '#64748b' },
+              { value: 'medium', label: t.priority.medium, color: '#0284c7' },
+              { value: 'high', label: t.priority.high, color: '#f59e0b' },
+              { value: 'urgent', label: t.priority.urgent, color: '#ef4444' },
+            ]}"
             @change="${(e: CustomEvent) => store.setFilterPriority(e.detail.value)}"
-          >
-            <app-option value="all" label="${t.kanban.filterAllPriorities(t.common.all)}"></app-option>
-            <app-option value="urgent" label="${t.priority.urgent}">
-              <app-status-chip slot="start" domain="priority" status="urgent" dot></app-status-chip>
-            </app-option>
-            <app-option value="high" label="${t.priority.high}">
-              <app-status-chip slot="start" domain="priority" status="high" dot></app-status-chip>
-            </app-option>
-            <app-option value="medium" label="${t.priority.medium}">
-              <app-status-chip slot="start" domain="priority" status="medium" dot></app-status-chip>
-            </app-option>
-            <app-option value="low" label="${t.priority.low}">
-              <app-status-chip slot="start" domain="priority" status="low" dot></app-status-chip>
-            </app-option>
-          </app-select>
+          ></app-select>
 
           <app-entity-selector
             size="sm"
