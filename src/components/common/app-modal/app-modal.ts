@@ -137,7 +137,7 @@ export class AppModal extends LitElement {
 
   render() {
     return html`
-      <div class="modal-backdrop ${this.isVisualOpen ? 'is-open' : ''}" @click="${this.handleBackdropClick}">
+      <div class="modal-backdrop ${this.isVisualOpen ? 'is-open' : ''}">
         <div class="modal-card size-${this.size}" @click="${(e: MouseEvent) => e.stopPropagation()}">
           <div class="modal-header">
             <h3 class="modal-title">
@@ -168,12 +168,6 @@ export class AppModal extends LitElement {
         </div>
       </div>
     `;
-  }
-
-  private handleBackdropClick(e: MouseEvent) {
-    if (e.target === e.currentTarget) {
-      this.close();
-    }
   }
 
   private close() {
