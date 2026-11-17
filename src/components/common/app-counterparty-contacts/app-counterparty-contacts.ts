@@ -395,7 +395,7 @@ export class AppCounterpartyContacts extends LitElement {
                   <app-button
                     size="sm"
                     variant="icon"
-                    class="danger-action"
+                    action="delete"
                     title="${t.common.delete}"
                     @click="${() => this.requestDelete(contact)}"
                   >
