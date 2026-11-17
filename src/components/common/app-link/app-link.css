@@ -16,6 +16,7 @@
   width: var(--link-width, auto);
   padding: var(--link-padding, 0.15rem 0.25rem);
   border: var(--link-border, none);
+  border-left: var(--link-border-left, none);
   border-radius: var(--radius-sm, 6px);
   background: transparent;
   font-family: var(--link-font, var(--font-sans, inherit));
@@ -42,7 +43,8 @@
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
    --link-width, --link-white-space, --link-overflow, --link-text-overflow,
    --link-align-items, --link-min-height, --link-hover-color, --link-hover-decoration,
-   --link-hover-bg, --link-hover-transition, --link-border, --link-active-bg. */
+   --link-hover-bg, --link-hover-transition, --link-border, --link-border-left,
+   --link-active-bg. */
 
 ::slotted(*) {
   display: inline-flex;

@@ -462,7 +462,9 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
 - `--link-hover-decoration` — hover text-decoration, default `underline`;
 - `--link-hover-bg` — hover background inner контрола, default `transparent`;
 - `--link-border` — border inner контрола, default `none` (для паритета исторических
-  chip-контролов с прозрачной рамкой).
+  chip-контролов с прозрачной рамкой);
+- `--link-border-left` — левый border inner контрола, default `none` (для паритета
+  segmented-разделителя между соседними сегментами).
 - `--link-hover-transition` — transition-сегмент background-color, default
   `background-color var(--transition-fast, 150ms) ease` (hover-fill consumers анимируются,
   статичный рендер пиксель-идентичен).
