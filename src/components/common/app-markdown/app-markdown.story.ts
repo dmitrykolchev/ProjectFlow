@@ -38,12 +38,18 @@ export const meta: ComponentStoryMeta = {
   category: 'Common',
   propsDoc: {
     content: 'Markdown source text; empty content renders nothing',
+    children: 'Markdown declared directly as light-DOM children (slot capture); the content property wins when both are set',
   },
   stories: [
     {
       name: 'Full Document',
       description: 'Headings, bold and inline code, quote, bullet and numbered lists, fenced ts code block with copy button',
       render: () => html`<app-markdown .content="${FULL_DOC}"></app-markdown>`,
+    },
+    {
+      name: 'Declarative Slot',
+      description: 'Markdown declared directly as light-DOM children of the component, captured through the slot',
+      render: () => html`<app-markdown>${FULL_DOC}</app-markdown>`,
     },
     {
       name: 'Checklist',

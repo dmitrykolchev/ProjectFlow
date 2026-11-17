@@ -12,7 +12,8 @@ import styles from './app-markdown.css';
  * Canonical markdown renderer web component: headings, paragraphs, quotes,
  * bullet / numbered lists, checklists (display-only checkboxes) and fenced
  * code blocks with a copy action. The markdown source is passed as the
- * `content` property; the component owns its prose styling.
+ * `content` property or declared directly as light-DOM children; the
+ * component owns its prose styling.
  */
 @customElement('app-markdown')
 export class AppMarkdown extends LitElement {
@@ -20,6 +21,8 @@ export class AppMarkdown extends LitElement {
 
   @state() private currentLang = store.customization.language;
   @state() private copiedBlockKey: string | null = null;
+  // markdown declared as light-DOM children, captured from the slot
+  @state() private slottedText = '';
 
   private unsubscribe?: () => void;
 
@@ -38,6 +41,12 @@ export class AppMarkdown extends LitElement {
     if (this.unsubscribe) this.unsubscribe();
   }
 
+  private handleSlotChange(e: Event) {
+    const slot = e.target as HTMLSlotElement;
+    const text = slot.assignedNodes().reduce((acc, node) => acc + (node.textContent || ''), '');
+    this.slottedText = text.trim();
+  }
+
   private async copySnippet(key: string, text: string) {
     try {
       await navigator.clipboard?.writeText(text);
@@ -52,11 +61,13 @@ export class AppMarkdown extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const blocks = parseMarkdownBlocks(this.content || '');
+    const source = this.content || this.slottedText;
+    const blocks = parseMarkdownBlocks(source);
 
-    if (blocks.length === 0) return html``;
+    if (blocks.length === 0) return html`<slot @slotchange="${(e: Event) => this.handleSlotChange(e)}"></slot>`;
 
     return html`
+      <slot @slotchange="${(e: Event) => this.handleSlotChange(e)}"></slot>
       <div class="prose">
         ${blocks.map((block, bIdx) => {
           switch (block.type) {

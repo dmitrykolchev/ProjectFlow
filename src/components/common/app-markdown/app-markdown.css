@@ -6,6 +6,11 @@
   display: block;
 }
 
+/* light-DOM markdown children are captured as text, not rendered raw */
+slot {
+  display: none;
+}
+
 .prose {
   display: flex;
   flex-direction: column;
