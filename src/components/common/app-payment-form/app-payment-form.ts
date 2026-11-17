@@ -60,6 +60,19 @@ export class AppPaymentForm extends LitElement {
     if (changed.has('open') && this.open) this.initFields(this.invoice);
   }
 
+  // the view owns the open flag, so every close of the form must report back to it:
+  // closing from inside the component (cancel, save, backdrop) has no view-side reset
+  // without this event, and the next open request would be a no-op on an unchanged flag
+  protected updated(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('open') && !this.open) {
+      this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    }
+  }
+
+  private closeModal() {
+    this.open = false;
+  }
+
   private initFields(inv: Invoice | null) {
     if (!inv) return;
     const t = getTranslation(this.currentLang);
@@ -144,7 +157,7 @@ export class AppPaymentForm extends LitElement {
         ?open="${this.open}"
         size="md"
         title="${t.payments.newPayment} · ${inv.number}"
-        @close="${() => (this.open = false)}"
+        @close="${() => this.closeModal()}"
       >
         <app-form-grid>
           ${this.payableInvoices.length > 1
@@ -286,7 +299,7 @@ export class AppPaymentForm extends LitElement {
         </app-form-grid>
 
         <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.open = false)}">
+          <app-button variant="ghost" @click="${() => this.closeModal()}">
             ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${() => this.handleSave()}">
