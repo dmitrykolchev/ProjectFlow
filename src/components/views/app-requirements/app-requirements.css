@@ -229,12 +229,6 @@ app-button[variant="icon"] {
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: rgba(239, 68, 68, 0.4);
-  --icon-btn-hover-bg: var(--bg-hover, #1e293b);
-}
-
 .footer-left,
 .footer-right {
   display: flex;
@@ -244,9 +238,9 @@ app-button[variant="icon"] {
 
 /* table row icon actions are app-button web components at size sm inheriting the view's
    historical 28px subtle look from the view-level token rule; the historical hover kept
-   the border unchanged for plain actions, so the hover border token is pinned back
-   (danger hover tokens come from .danger-action), and the historical 6px radius replaces
-   the canonical md radius */
+   the border unchanged for plain actions, so the hover border token is pinned back for
+   every action except delete (the component supplies the danger palette for
+   action="delete"), and the historical 6px radius replaces the canonical md radius */
 .footer-right app-button {
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
@@ -254,7 +248,7 @@ app-button[variant="icon"] {
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.footer-right app-button:not(.danger-action) {
+.footer-right app-button:not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
