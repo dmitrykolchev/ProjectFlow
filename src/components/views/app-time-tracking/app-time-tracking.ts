@@ -567,7 +567,7 @@ export class AppTimeTracking extends LitElement {
                   ${entry.status !== 'approved'
                     ? html`
                         <app-button
-                          class="dg-approve-action"
+                          action="accept"
                           size="sm"
                           variant="icon"
                           title="${t.viewTexts.timeTracking.approveEntryTitle}"
@@ -586,7 +586,7 @@ export class AppTimeTracking extends LitElement {
                     <span slot="start">${iconEdit(14)}</span>
                   </app-button>
                   <app-button
-                    class="dg-danger-action"
+                    action="delete"
                     size="sm"
                     variant="icon"
                     title="${t.common.delete}"
@@ -687,7 +687,7 @@ export class AppTimeTracking extends LitElement {
                       ${entry.status !== 'approved'
                         ? html`
                             <app-button
-                              class="approve-action"
+                              action="accept"
                               size="sm"
                               variant="icon"
                               title="${t.viewTexts.timeTracking.approveEntryTitle}"
@@ -706,7 +706,7 @@ export class AppTimeTracking extends LitElement {
                         <span slot="start">${iconEdit(14)}</span>
                       </app-button>
                       <app-button
-                        class="danger-action"
+                        action="delete"
                         size="sm"
                         variant="icon"
                         title="${t.common.delete}"
@@ -848,7 +848,7 @@ export class AppTimeTracking extends LitElement {
                             <span slot="start">${iconEdit(14)}</span>
                           </app-button>
                           <app-button
-                            class="danger-action"
+                            action="delete"
                             size="sm"
                             variant="icon"
                             title="${t.common.delete}"
