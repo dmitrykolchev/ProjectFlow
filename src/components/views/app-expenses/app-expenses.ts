@@ -26,6 +26,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
+import '../app-data-grid/app-data-grid';
+import '../../common/app-data-grid-column/app-data-grid-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-expenses.css';
 import { eventValue } from '../../common/event-value';
@@ -42,7 +44,7 @@ export class AppExpenses extends LitElement {
   @state() private userFilter = 'all';
   @state() private categoryFilter: 'all' | ExpenseCategory = 'all';
   @state() private statusFilter: 'all' | ExpenseStatus = 'all';
-  @state() private viewMode: 'registry' | 'budgets' = 'registry';
+  @state() private viewMode: 'registry' | 'grid' | 'budgets' = 'registry';
   @state() private currentPage = 1;
   @state() private tablePageSize = store.customization.tablePageSize;
   @state() private cardPageSize = store.customization.cardGridPageSize;
@@ -214,10 +216,11 @@ export class AppExpenses extends LitElement {
           .value="${this.viewMode}"
           .options="${[
             { value: 'registry', label: t.expenses.viewRegistry },
+            { value: 'grid', label: t.expenses.viewGrid },
             { value: 'budgets', label: t.expenses.viewBudgets },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewMode = eventValue(e) as 'registry' | 'budgets';
+            this.viewMode = eventValue(e) as 'registry' | 'grid' | 'budgets';
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
@@ -227,10 +230,272 @@ export class AppExpenses extends LitElement {
         ? this.renderBudgetsView(t)
         : filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.expenses.emptyNoExpenses}"></app-empty-state>`
+        : this.viewMode === 'grid'
+        ? this.renderGridView(filtered, t)
         : this.renderRegistryTable(filtered, t)}
 
       ${this.renderFormModal(t)}
       ${this.renderDeleteModal(t)}
+    `;
+  }
+
+  private renderGridView(
+    filtered: Expense[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    return html`
+      <div class="data-grid-frame">
+        <app-data-grid
+          .rows="${filtered as unknown as Record<string, unknown>[]}"
+          .selectable="${false}"
+          export-filename="projectflow_expenses"
+          empty-text="${t.viewTexts.expenses.emptyNoExpenses}"
+        >
+          <app-data-grid-column
+            field="date"
+            caption="${t.viewTexts.expenses.thDate}"
+            width="115"
+            min-width="95"
+            sortable
+            groupable
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`<span class="dg-mono">${exp.date}</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="title"
+            caption="${t.viewTexts.expenses.thExpenseVendor}"
+            width="270"
+            min-width="180"
+            sortable
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <div class="dg-stack">
+                  <span class="dg-title">${exp.title}</span>
+                  <span class="dg-sub">${exp.vendor || '—'}${exp.notes ? ` · ${exp.notes}` : ''}</span>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="projectId"
+            caption="${t.viewTexts.expenses.thProjectTask}"
+            width="190"
+            sortable
+            groupable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return store.projects.find((p) => p.id === exp.projectId)?.name || exp.projectId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              const proj = store.projects.find((p) => p.id === exp.projectId);
+              const task = exp.taskId ? store.tasks.find((tk) => tk.id === exp.taskId) : undefined;
+              return html`
+                <div class="dg-stack">
+                  ${proj
+                    ? html`
+                        <span class="dg-dot-row">
+                          <span class="dg-dot" style="background: ${proj.color};"></span>
+                          <span class="dg-mono">${proj.key}</span>
+                          <span>${proj.name}</span>
+                        </span>
+                      `
+                    : html`<span>—</span>`}
+                  ${exp.taskId
+                    ? html`
+                        <app-link
+                          class="dg-link"
+                          size="sm"
+                          variant="primary"
+                          @click="${() => {
+                            if (task) store.openTaskDetail(task.id);
+                          }}"
+                        >
+                          <span class="dg-task-key">${exp.taskId}</span>
+                        </app-link>
+                      `
+                    : ''}
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="category"
+            caption="${t.viewTexts.expenses.thCategory}"
+            width="175"
+            sortable
+            groupable
+            .groupFormatter="${(val: unknown) =>
+              t.expenses.categories[String(val) as ExpenseCategory] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <app-badge variant="default" appearance="soft" size="sm">
+                  ${t.expenses.categories[exp.category]}
+                </app-badge>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="userId"
+            caption="${t.viewTexts.expenses.thOwner}"
+            width="165"
+            sortable
+            groupable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return store.users.find((u) => u.id === exp.userId)?.name || exp.userId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              const user = store.users.find((u) => u.id === exp.userId);
+              return html`
+                <div class="dg-user">
+                  <span class="dg-avatar-sm">${user?.avatar || '??'}</span>
+                  <span>${user?.name || exp.userId}</span>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="amount"
+            caption="${t.viewTexts.expenses.thAmount}"
+            width="150"
+            sortable
+            align="right"
+            .sortValue="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return this.toRub(exp.amount, exp.currency);
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <div class="dg-stack" style="align-items: flex-end;">
+                  <span class="dg-amount">${formatMoney(exp.amount, exp.currency)}</span>
+                  ${exp.billable
+                    ? html`<span class="dg-billable-sub">${t.viewTexts.expenses.billableSub}</span>`
+                    : ''}
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="billable"
+            caption="${t.viewTexts.expenses.billableSwitch}"
+            width="135"
+            sortable
+            groupable
+            hidden
+            .groupFormatter="${(val: unknown) =>
+              String(val) === 'true'
+                ? t.viewTexts.expenses.billableSub
+                : t.viewTexts.timeTracking.badgeInternalShort}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <app-badge
+                  variant="${exp.billable ? 'info' : 'default'}"
+                  appearance="soft"
+                  size="sm"
+                >
+                  ${exp.billable
+                    ? t.viewTexts.expenses.billableSub
+                    : t.viewTexts.timeTracking.badgeInternalShort}
+                </app-badge>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="status"
+            caption="${t.viewTexts.expenses.thStatus}"
+            width="145"
+            sortable
+            groupable
+            cell-type="status"
+            .groupFormatter="${(val: unknown) =>
+              t.expenses.statuses[String(val) as ExpenseStatus] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <app-status-chip
+                  domain="expense"
+                  status="${exp.status}"
+                  appearance="soft"
+                  size="sm"
+                ></app-status-chip>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="_actions"
+            caption=""
+            width="135"
+            min-width="110"
+            align="right"
+            resizable="false"
+            reorderable="false"
+            hideable="false"
+            exportable="false"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <div class="dg-actions">
+                  ${exp.status === 'pending'
+                    ? html`
+                        <app-button
+                          class="dg-approve-action"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.expenses.approveTitle}"
+                          @click="${() => store.updateExpense({ ...exp, status: 'approved' })}"
+                        >
+                          <span slot="start">${iconCheck(14)}</span>
+                        </app-button>
+                        <app-button
+                          class="dg-danger-action"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.expenses.rejectTitle}"
+                          @click="${() => store.updateExpense({ ...exp, status: 'rejected' })}"
+                        >
+                          <span slot="start">${iconX(14)}</span>
+                        </app-button>
+                      `
+                    : ''}
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(exp)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    class="dg-danger-action"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingExpense = exp)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+        </app-data-grid>
+      </div>
     `;
   }
 

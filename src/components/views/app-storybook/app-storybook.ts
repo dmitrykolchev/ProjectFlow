@@ -72,6 +72,7 @@ import fileDropzoneMeta from '../../common/app-file-dropzone/app-file-dropzone.s
 import documentPreviewerMeta from '../../common/app-document-previewer/app-document-previewer.story';
 import taskAiPanelMeta from '../../common/app-task-ai-panel/app-task-ai-panel.story';
 import projectRequirementsMeta from '../../common/app-project-requirements/app-project-requirements.story';
+import appDataGridColumnMeta from '../../common/app-data-grid-column/app-data-grid-column.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -89,7 +90,6 @@ import kanbanMeta from '../app-kanban/app-kanban.story';
 import taskDetailMeta from '../app-task-detail/app-task-detail.story';
 import ganttMeta from '../app-gantt/app-gantt.story';
 import dataGridMeta from '../app-data-grid/app-data-grid.story';
-import dataGridColumnMeta from '../data-grid-column/data-grid-column.story';
 import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
@@ -176,6 +176,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   documentPreviewerMeta,
   taskAiPanelMeta,
   projectRequirementsMeta,
+  appDataGridColumnMeta,
   toastMeta,
   activityMeta,
   headerMeta,
@@ -192,7 +193,6 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   taskDetailMeta,
   ganttMeta,
   dataGridMeta,
-  dataGridColumnMeta,
   calendarMeta,
   analyticsMeta,
   projectsMeta,

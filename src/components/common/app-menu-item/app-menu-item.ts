@@ -92,24 +92,19 @@ export class AppMenuItem extends LitElement {
         @click="${this.handleClick}"
       >
         <span class="menu-item-left">
-          ${showCustomIcon
-            ? html`
-                <span class="menu-item-icon">
-                  <!-- canonical start slot; icon is a legacy alias -->
-                  ${this.icon ??
-                    html`<slot name="start" @slotchange="${this.handleSlotChange}">
-                      <slot name="icon" @slotchange="${this.handleSlotChange}"></slot>
-                    </slot>`}
-                </span>
-              `
-            : html`
-                <slot name="start" hidden @slotchange="${this.handleSlotChange}">
-                  <slot name="icon" hidden @slotchange="${this.handleSlotChange}"></slot>
-                </slot>
-                ${isCheckableItem
-                  ? html`<span class="menu-item-icon is-check">${this.checked ? iconCheck(13) : ''}</span>`
-                  : ''}
-              `}
+          <span class="menu-item-icon ${!showCustomIcon && isCheckableItem ? 'is-check' : ''}">
+            ${showCustomIcon
+              ? this.icon ??
+                html`<slot name="start" @slotchange="${this.handleSlotChange}">
+                  <slot name="icon" @slotchange="${this.handleSlotChange}"></slot>
+                </slot>`
+              : html`
+                  <slot name="start" hidden @slotchange="${this.handleSlotChange}">
+                    <slot name="icon" hidden @slotchange="${this.handleSlotChange}"></slot>
+                  </slot>
+                  ${isCheckableItem && this.checked ? iconCheck(13) : ''}
+                `}
+          </span>
           <span class="menu-item-label">
             ${this.label || html`<slot></slot>`}
           </span>

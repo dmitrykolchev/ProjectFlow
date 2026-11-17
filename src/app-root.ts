@@ -45,7 +45,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   grid: () =>
     Promise.all([
       import('./components/views/app-data-grid/app-data-grid'),
-      import('./components/views/data-grid-column/data-grid-column'),
+      import('./components/common/app-data-grid-column/app-data-grid-column'),
     ]),
   calendar: () => import('./components/views/app-calendar/app-calendar'),
   analytics: () => import('./components/views/app-analytics/app-analytics'),
@@ -418,14 +418,14 @@ export class AppRoot extends LitElement {
       case 'grid':
         return html`
           <app-data-grid>
-            <data-grid-column field="id" header="${t.grid.columns.id}" width="110" min-width="80" sortable cell-type="key"></data-grid-column>
-            <data-grid-column field="title" header="${t.grid.columns.title}" width="310" min-width="180" sortable cell-type="title"></data-grid-column>
-            <data-grid-column field="status" header="${t.grid.columns.status}" width="145" sortable groupable cell-type="status"></data-grid-column>
-            <data-grid-column field="priority" header="${t.grid.columns.priority}" width="135" sortable groupable cell-type="priority"></data-grid-column>
-            <data-grid-column field="assigneeId" header="${t.grid.columns.assignee}" width="155" sortable groupable cell-type="assignee"></data-grid-column>
-            <data-grid-column field="dates" header="${t.grid.columns.dates}" width="150" sortable cell-type="dates"></data-grid-column>
-            <data-grid-column field="progress" header="${t.grid.columns.progress}" width="140" sortable cell-type="progress"></data-grid-column>
-            <data-grid-column field="tags" header="${t.grid.columns.tags}" width="180" cell-type="tags"></data-grid-column>
+            <app-data-grid-column field="id" caption="${t.grid.columns.id}" width="110" min-width="80" sortable cell-type="key"></app-data-grid-column>
+            <app-data-grid-column field="title" caption="${t.grid.columns.title}" width="310" min-width="180" sortable cell-type="title"></app-data-grid-column>
+            <app-data-grid-column field="status" caption="${t.grid.columns.status}" width="145" sortable groupable cell-type="status"></app-data-grid-column>
+            <app-data-grid-column field="priority" caption="${t.grid.columns.priority}" width="135" sortable groupable cell-type="priority"></app-data-grid-column>
+            <app-data-grid-column field="assigneeId" caption="${t.grid.columns.assignee}" width="155" sortable groupable cell-type="assignee"></app-data-grid-column>
+            <app-data-grid-column field="dates" caption="${t.grid.columns.dates}" width="150" sortable cell-type="dates"></app-data-grid-column>
+            <app-data-grid-column field="progress" caption="${t.grid.columns.progress}" width="140" sortable cell-type="progress"></app-data-grid-column>
+            <app-data-grid-column field="tags" caption="${t.grid.columns.tags}" width="180" cell-type="tags"></app-data-grid-column>
           </app-data-grid>
         `;
       case 'calendar':

@@ -49,6 +49,8 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
+import '../app-data-grid/app-data-grid';
+import '../../common/app-data-grid-column/app-data-grid-column';
 import styles from './app-requirements.css';
 
 @customElement('app-requirements')
@@ -61,7 +63,7 @@ export class AppRequirements extends LitElement {
   @state() private typeFilter: 'all' | RequirementType = 'all';
   @state() private priorityFilter: 'all' | RequirementPriority = 'all';
   @state() private statusFilter: 'all' | RequirementStatus = 'all';
-  @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private displayMode: 'cards' | 'table' | 'grid' = 'cards';
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -272,9 +274,10 @@ export class AppRequirements extends LitElement {
           .options="${[
             { value: 'cards', label: t.viewTexts.requirements.viewCards },
             { value: 'table', label: t.viewTexts.requirements.viewTable },
+            { value: 'grid', label: t.viewTexts.requirements.viewGrid },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
+            this.displayMode = eventValue(e) as 'cards' | 'table' | 'grid';
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
@@ -343,6 +346,8 @@ export class AppRequirements extends LitElement {
           `
         : this.displayMode === 'cards'
         ? this.renderCards(filtered, t)
+        : this.displayMode === 'grid'
+        ? this.renderGridView(filtered, t)
         : this.renderTable(filtered, t)}
 
       ${this.renderReqModal(t)}
@@ -486,6 +491,239 @@ export class AppRequirements extends LitElement {
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
+    `;
+  }
+
+  private renderGridView(list: ProjectRequirement[], t: ReturnType<typeof getTranslation>) {
+    return html`
+      <div class="data-grid-frame">
+        <app-data-grid
+          .rows="${list as unknown as Record<string, unknown>[]}"
+          .selectable="${true}"
+          .selectedKeys="${this.selectedReqIds}"
+          export-filename="projectflow_requirements"
+          empty-text="${t.viewTexts.requirements.emptyNoReqs}"
+          @selection-change="${(e: CustomEvent<{ selectedIds: string[] }>) => {
+            this.selectedReqIds = e.detail.selectedIds;
+          }}"
+          @row-click="${(e: CustomEvent<{ row: ProjectRequirement }>) => {
+            if (e.detail.row?.id) store.openRequirementDetail(e.detail.row.id);
+          }}"
+        >
+          <app-button
+            slot="bulk-actions"
+            size="sm"
+            variant="primary"
+            ?disabled="${this.selectedReqIds.length === 0 || this.decomposing}"
+            @click="${() => this.handleDecompose(this.selectedReqIds)}"
+          >
+            <span slot="icon-start">${iconCpu(14)}</span>
+            <span>
+              ${this.decomposing
+                ? t.viewTexts.requirements.decomposingBtn
+                : t.viewTexts.requirements.decomposeSelectedBtn}
+            </span>
+          </app-button>
+
+          <app-data-grid-column
+            field="code"
+            caption="${t.viewTexts.requirements.thCode}"
+            width="115"
+            min-width="90"
+            sortable
+            resizable="false"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <span class="dg-code-chip ${req.type === 'non_functional' ? 'is-nfr' : ''}">
+                  ${req.code}
+                </span>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="title"
+            caption="${t.viewTexts.requirements.thRequirement}"
+            width="300"
+            min-width="180"
+            sortable
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <div class="dg-stack">
+                  <span class="dg-title">${req.title}</span>
+                  <span class="dg-sub">
+                    ${req.category} · ${t.viewTexts.requirements.criteriaCount(req.acceptanceCriteria.length)}
+                  </span>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="projectId"
+            caption="${t.viewTexts.requirements.thProject}"
+            width="180"
+            sortable
+            groupable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return store.projects.find((p) => p.id === req.projectId)?.name || req.projectId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              const proj = store.projects.find((p) => p.id === req.projectId);
+              return proj
+                ? html`
+                    <span class="dg-dot-row">
+                      <span class="dg-dot" style="background: ${proj.color};"></span>
+                      <span class="dg-mono">${proj.key}</span>
+                      <span>${proj.name}</span>
+                    </span>
+                  `
+                : html`<span>—</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="type"
+            caption="${t.viewTexts.requirements.thType}"
+            width="110"
+            sortable
+            groupable
+            .groupFormatter="${(val: unknown) =>
+              String(val) === 'functional' ? t.requirements.functional : t.requirements.nonFunctional}"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <span class="dg-type-tag">
+                  ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
+                </span>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="category"
+            caption="${t.requirements.categoryLabel}"
+            width="165"
+            sortable
+            groupable
+            hidden
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="priority"
+            caption="${t.viewTexts.requirements.thPriority}"
+            width="135"
+            sortable
+            groupable
+            cell-type="priority"
+            .groupFormatter="${(val: unknown) =>
+              (t.requirements.priorities as Record<string, string>)[String(val)] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <app-status-chip
+                  domain="requirementPriority"
+                  status="${req.priority}"
+                  appearance="outline"
+                  size="sm"
+                ></app-status-chip>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="status"
+            caption="${t.viewTexts.requirements.thStatus}"
+            width="145"
+            sortable
+            groupable
+            cell-type="status"
+            .groupFormatter="${(val: unknown) =>
+              (t.requirements.statuses as Record<string, string>)[String(val)] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <app-status-chip
+                  domain="requirement"
+                  status="${req.status}"
+                  appearance="soft"
+                  size="sm"
+                ></app-status-chip>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="traceability"
+            caption="${t.viewTexts.requirements.thTraceability}"
+            width="135"
+            sortable
+            align="center"
+            .sortValue="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return this.getLinkedTasksForReq(req).length;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              const linkedTasks = this.getLinkedTasksForReq(req);
+              return html`
+                <span class="dg-mono">
+                  ${(req.linkedKnowledgeIds || []).length} / ${linkedTasks.length}
+                </span>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="_actions"
+            caption=""
+            width="125"
+            min-width="105"
+            align="right"
+            resizable="false"
+            reorderable="false"
+            hideable="false"
+            exportable="false"
+            .template="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
+              return html`
+                <div class="dg-actions">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.requirements.decomposeSingleBtn}"
+                    .disabled="${this.decomposing}"
+                    @click="${() => this.handleDecompose([req.id])}"
+                  >
+                    <span slot="start">${iconZap(13)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditReqModal(req)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    class="dg-danger-action"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingReq = req)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+        </app-data-grid>
+      </div>
     `;
   }
 

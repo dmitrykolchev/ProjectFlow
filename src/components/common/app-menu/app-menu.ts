@@ -44,11 +44,13 @@ export class AppMenu extends LitElement {
               @click="${() => this.selectItem(item)}"
             >
               <span class="menu-item-left">
-                ${item.icon
-                  ? html`<span class="menu-item-icon">${item.icon}</span>`
-                  : item.checked !== undefined
-                  ? html`<span class="menu-item-icon" style="width: 14px;">${item.checked ? iconCheck(13) : ''}</span>`
-                  : ''}
+                <span class="menu-item-icon">
+                  ${item.icon
+                    ? item.icon
+                    : item.checked !== undefined && item.checked
+                    ? iconCheck(13)
+                    : ''}
+                </span>
                 <span class="menu-item-label">${item.label || ''}</span>
               </span>
               ${item.shortcut ? html`<span class="menu-shortcut">${item.shortcut}</span>` : ''}

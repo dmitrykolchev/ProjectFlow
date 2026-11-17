@@ -365,6 +365,7 @@ export const en = {
     estimatedCost: 'Labor Value',
     entriesCount: 'Time Entries',
     viewJournal: 'Time Log',
+    viewGrid: 'Grid',
     viewByTask: 'By Task',
     categories: {
       development: 'Development',
@@ -390,6 +391,7 @@ export const en = {
     pendingCount: 'Pending Approval',
     billableAmount: 'Client Billable',
     viewRegistry: 'Expense Registry',
+    viewGrid: 'Grid',
     viewBudgets: 'By Project & Budget',
     categories: {
       infrastructure: 'Cloud & Infrastructure',
@@ -1475,6 +1477,7 @@ export const en = {
       filterAllStatuses: 'All statuses',
       viewCards: 'Cards',
       viewTable: 'Table',
+      viewGrid: 'Grid',
       openDetailBtn: 'Open Requirement',
       allRequirementsBtn: 'All Requirements',
       criteriaCount: (n: number) => `Criteria: ${n}`,

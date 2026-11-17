@@ -365,6 +365,7 @@ export const ru = {
     estimatedCost: 'Расчётная стоимость',
     entriesCount: 'Записей в журнале',
     viewJournal: 'Журнал записей',
+    viewGrid: 'Грид',
     viewByTask: 'По задачам',
     categories: {
       development: 'Разработка',
@@ -390,6 +391,7 @@ export const ru = {
     pendingCount: 'На согласовании',
     billableAmount: 'К перевыставлению',
     viewRegistry: 'Реестр расходов',
+    viewGrid: 'Грид',
     viewBudgets: 'По проектам и бюджету',
     categories: {
       infrastructure: 'Инфраструктура и облако',
@@ -1475,6 +1477,7 @@ export const ru = {
       filterAllStatuses: 'Все статусы',
       viewCards: 'Карточки',
       viewTable: 'Таблица',
+      viewGrid: 'Грид',
       openDetailBtn: 'Открыть требование',
       allRequirementsBtn: 'Все требования',
       criteriaCount: (n: number) => `Критерии: ${n}`,

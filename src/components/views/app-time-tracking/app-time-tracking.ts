@@ -34,6 +34,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
+import '../app-data-grid/app-data-grid';
+import '../../common/app-data-grid-column/app-data-grid-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-time-tracking.css';
 import { eventValue } from '../../common/event-value';
@@ -49,7 +51,7 @@ export class AppTimeTracking extends LitElement {
   @state() private projectFilter = 'all';
   @state() private userFilter = 'all';
   @state() private categoryFilter: 'all' | TimeEntryCategory = 'all';
-  @state() private viewMode: 'journal' | 'by-task' = 'journal';
+  @state() private viewMode: 'journal' | 'grid' | 'by-task' = 'journal';
   @state() private currentPage = 1;
   @state() private tablePageSize = store.customization.tablePageSize;
 
@@ -317,10 +319,11 @@ export class AppTimeTracking extends LitElement {
           .value="${this.viewMode}"
           .options="${[
             { value: 'journal', label: t.timeTracking.viewJournal },
+            { value: 'grid', label: t.timeTracking.viewGrid },
             { value: 'by-task', label: t.timeTracking.viewByTask },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewMode = eventValue(e) as 'journal' | 'by-task';
+            this.viewMode = eventValue(e) as 'journal' | 'grid' | 'by-task';
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
@@ -330,10 +333,273 @@ export class AppTimeTracking extends LitElement {
         ? html`<app-empty-state title="${t.viewTexts.timeTracking.emptyNoEntries}"></app-empty-state>`
         : this.viewMode === 'journal'
         ? this.renderJournalTable(filtered, t)
+        : this.viewMode === 'grid'
+        ? this.renderGridView(filtered, t)
         : this.renderByTaskView(filtered, t)}
 
       ${this.renderFormModal(t)}
       ${this.renderDeleteModal(t)}
+    `;
+  }
+
+  private renderGridView(
+    filtered: TimeEntry[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    return html`
+      <div class="data-grid-frame">
+        <app-data-grid
+          .rows="${filtered as unknown as Record<string, unknown>[]}"
+          .selectable="${false}"
+          export-filename="projectflow_time_entries"
+          empty-text="${t.viewTexts.timeTracking.emptyNoEntries}"
+        >
+          <app-data-grid-column
+            field="date"
+            caption="${t.viewTexts.timeTracking.labelDate}"
+            width="115"
+            min-width="95"
+            sortable
+            groupable
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`<span class="dg-mono">${entry.date}</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="taskId"
+            caption="${t.viewTexts.timeTracking.thTaskProject}"
+            width="280"
+            min-width="180"
+            sortable
+            groupable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return store.tasks.find((tk) => tk.id === entry.taskId)?.title || entry.taskId;
+            }}"
+            .groupFormatter="${(val: unknown) => {
+              const taskId = String(val || '');
+              const task = store.tasks.find((tk) => tk.id === taskId);
+              return task ? `${taskId} · ${task.title}` : taskId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              const task = store.tasks.find((tk) => tk.id === entry.taskId);
+              const proj = store.projects.find((p) => p.id === entry.projectId);
+              return html`
+                <div class="dg-stack">
+                  <app-link
+                    class="dg-link"
+                    size="md"
+                    variant="primary"
+                    @click="${() => {
+                      if (task) store.openTaskDetail(task.id);
+                    }}"
+                  >
+                    <span class="dg-task-key" slot="start">${entry.taskId}</span>
+                    <span>${task?.title || t.viewTexts.timeTracking.removedTask}</span>
+                  </app-link>
+                  ${proj
+                    ? html`
+                        <span class="dg-dot-row dg-sub">
+                          <span class="dg-dot" style="background: ${proj.color};"></span>
+                          <span>${proj.name}</span>
+                        </span>
+                      `
+                    : ''}
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="projectId"
+            caption="${t.viewTexts.timeTracking.labelProject}"
+            width="175"
+            sortable
+            groupable
+            hidden
+            .sortValue="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return store.projects.find((p) => p.id === entry.projectId)?.name || entry.projectId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              const proj = store.projects.find((p) => p.id === entry.projectId);
+              return proj
+                ? html`
+                    <span class="dg-dot-row">
+                      <span class="dg-dot" style="background: ${proj.color};"></span>
+                      <span>${proj.name}</span>
+                    </span>
+                  `
+                : html`<span>—</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="userId"
+            caption="${t.viewTexts.timeTracking.labelEmployee}"
+            width="180"
+            sortable
+            groupable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return store.users.find((u) => u.id === entry.userId)?.name || entry.userId;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              const user = store.users.find((u) => u.id === entry.userId);
+              return html`
+                <div class="dg-user">
+                  <span class="dg-avatar-sm">${user?.avatar || '??'}</span>
+                  <span>${user?.name || entry.userId}</span>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="category"
+            caption="${t.viewTexts.timeTracking.thCategory}"
+            width="150"
+            sortable
+            groupable
+            .groupFormatter="${(val: unknown) =>
+              t.timeTracking.categories[String(val) as TimeEntryCategory] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`
+                <app-badge variant="default" appearance="soft" size="sm">
+                  ${t.timeTracking.categories[entry.category]}
+                </app-badge>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="description"
+            caption="${t.viewTexts.timeTracking.thDescription}"
+            width="240"
+            sortable
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`<span class="dg-sub" style="font-size: 0.78rem; color: var(--text-secondary);">${entry.description || '—'}</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="hours"
+            caption="${t.viewTexts.timeTracking.labelHours}"
+            width="95"
+            sortable
+            align="right"
+            resizable="false"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`<span class="dg-hours">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>`;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="billable"
+            caption="${t.viewTexts.timeTracking.thBilling}"
+            width="125"
+            sortable
+            groupable
+            .groupFormatter="${(val: unknown) =>
+              String(val) === 'true'
+                ? t.viewTexts.timeTracking.badgeBillableShort
+                : t.viewTexts.timeTracking.badgeInternalShort}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`
+                <app-badge
+                  variant="${entry.billable ? 'info' : 'default'}"
+                  appearance="soft"
+                  size="sm"
+                >
+                  ${entry.billable
+                    ? t.viewTexts.timeTracking.badgeBillableShort
+                    : t.viewTexts.timeTracking.badgeInternalShort}
+                </app-badge>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="status"
+            caption="${t.viewTexts.timeTracking.statusLabel}"
+            width="140"
+            sortable
+            groupable
+            cell-type="status"
+            .groupFormatter="${(val: unknown) =>
+              t.timeTracking.statuses[String(val) as TimeEntryStatus] || String(val)}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`
+                <app-status-chip
+                  domain="timeEntry"
+                  status="${entry.status}"
+                  appearance="soft"
+                  size="sm"
+                ></app-status-chip>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
+            field="_actions"
+            caption=""
+            width="115"
+            min-width="100"
+            align="right"
+            resizable="false"
+            reorderable="false"
+            hideable="false"
+            exportable="false"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return html`
+                <div class="dg-actions">
+                  ${entry.status !== 'approved'
+                    ? html`
+                        <app-button
+                          class="dg-approve-action"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.timeTracking.approveEntryTitle}"
+                          @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
+                        >
+                          <span slot="start">${iconCheck(14)}</span>
+                        </app-button>
+                      `
+                    : ''}
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(entry)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    class="dg-danger-action"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingEntry = entry)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+        </app-data-grid>
+      </div>
     `;
   }
 

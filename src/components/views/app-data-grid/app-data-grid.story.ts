@@ -2,7 +2,7 @@ import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import { Task } from '../../../types';
 import './app-data-grid';
-import '../data-grid-column/data-grid-column';
+import '../../common/app-data-grid-column/app-data-grid-column';
 
 function buildVirtualStoryRows(count: number): Record<string, unknown>[] {
   const statuses = ['backlog', 'todo', 'in_progress', 'review', 'done'] as const;
@@ -48,50 +48,50 @@ const VIRTUAL_DEMO_ROWS = buildVirtualStoryRows(1500);
 export const meta: ComponentStoryMeta = {
   title: 'Views/DataGrid',
   component: 'app-data-grid',
-  description: 'Declarative enterprise data grid composed with <data-grid-column>, supporting virtual row scrolling, multi-column sorting, multi-level hierarchical grouping (dropdown & drag-to-group), column drag reorder, and column resize.',
+  description: 'Universal declarative enterprise data grid composed with <app-data-grid-column>, supporting virtual row scrolling, group-first multi-column sorting, multi-level hierarchical grouping, column visibility (hidden), custom templates, drag reorder, and column resize.',
   category: 'Views',
   childrenDoc: {
-    'data-grid-column': 'Column definition child (field, header, width, sortable, groupable, cell-type) composing the grid',
+    'app-data-grid-column': 'Declarative column config child (field, caption, width, resizable, hidden, sortable, groupable, template, sortValue)',
   },
   stories: [
     {
       name: 'Interactive Declarative Data Grid',
-      description: 'Drag column headers to reorder or into the group bar; Shift+Click or toggle Multi-sort for multi-column sorting',
+      description: 'Composed with <app-data-grid-column> using caption, sortable, groupable, resizable, and hidden',
       render: () => html`
         <div style="height: 540px; width: 100%; display: flex; flex-direction: column; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
           <app-data-grid>
-            <data-grid-column field="id" header="Код" width="105" min-width="80" sortable cell-type="key"></data-grid-column>
-            <data-grid-column field="title" header="Задача" width="280" min-width="160" sortable cell-type="title"></data-grid-column>
-            <data-grid-column field="status" header="Статус" width="140" sortable groupable cell-type="status"></data-grid-column>
-            <data-grid-column field="priority" header="Приоритет" width="130" sortable groupable cell-type="priority"></data-grid-column>
-            <data-grid-column field="assigneeId" header="Исполнитель" width="150" sortable groupable cell-type="assignee"></data-grid-column>
-            <data-grid-column field="dates" header="Сроки" width="145" sortable cell-type="dates"></data-grid-column>
-            <data-grid-column field="progress" header="Прогресс" width="140" sortable cell-type="progress"></data-grid-column>
-            <data-grid-column field="tags" header="Теги" width="170" cell-type="tags"></data-grid-column>
+            <app-data-grid-column field="id" caption="Код" width="105" min-width="80" sortable resizable="false" cell-type="key"></app-data-grid-column>
+            <app-data-grid-column field="title" caption="Задача" width="280" min-width="160" sortable cell-type="title"></app-data-grid-column>
+            <app-data-grid-column field="status" caption="Статус" width="140" sortable groupable cell-type="status"></app-data-grid-column>
+            <app-data-grid-column field="priority" caption="Приоритет" width="130" sortable groupable cell-type="priority"></app-data-grid-column>
+            <app-data-grid-column field="assigneeId" caption="Исполнитель" width="150" sortable groupable cell-type="assignee"></app-data-grid-column>
+            <app-data-grid-column field="dates" caption="Сроки" width="145" sortable cell-type="dates"></app-data-grid-column>
+            <app-data-grid-column field="progress" caption="Прогресс" width="140" sortable cell-type="progress"></app-data-grid-column>
+            <app-data-grid-column field="tags" caption="Теги" width="170" hidden cell-type="tags"></app-data-grid-column>
           </app-data-grid>
         </div>
       `,
     },
     {
-      name: 'Multi-Level Grouping & Multi-Column Sorting',
-      description: 'Preconfigured with group-by="status,priority" and sort-by="priority:desc,dates:asc"',
+      name: 'Group-First Multi-Level Grouping & Multi-Column Sorting',
+      description: 'Grouped columns (status, priority) sort automatically first in precedence order, followed by remaining sort rules (dates:asc)',
       render: () => html`
         <div style="height: 540px; width: 100%; display: flex; flex-direction: column; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
           <app-data-grid group-by="status,priority" sort-by="priority:desc,dates:asc">
-            <data-grid-column field="id" header="Код" width="105" min-width="80" sortable cell-type="key"></data-grid-column>
-            <data-grid-column field="title" header="Задача" width="280" min-width="160" sortable cell-type="title"></data-grid-column>
-            <data-grid-column field="status" header="Статус" width="140" sortable groupable cell-type="status"></data-grid-column>
-            <data-grid-column field="priority" header="Приоритет" width="130" sortable groupable cell-type="priority"></data-grid-column>
-            <data-grid-column field="assigneeId" header="Исполнитель" width="150" sortable groupable cell-type="assignee"></data-grid-column>
-            <data-grid-column field="dates" header="Сроки" width="145" sortable cell-type="dates"></data-grid-column>
-            <data-grid-column field="progress" header="Прогресс" width="140" sortable cell-type="progress"></data-grid-column>
+            <app-data-grid-column field="id" caption="Код" width="105" min-width="80" sortable cell-type="key"></app-data-grid-column>
+            <app-data-grid-column field="title" caption="Задача" width="280" min-width="160" sortable cell-type="title"></app-data-grid-column>
+            <app-data-grid-column field="status" caption="Статус" width="140" sortable groupable cell-type="status"></app-data-grid-column>
+            <app-data-grid-column field="priority" caption="Приоритет" width="130" sortable groupable cell-type="priority"></app-data-grid-column>
+            <app-data-grid-column field="assigneeId" caption="Исполнитель" width="150" sortable groupable cell-type="assignee"></app-data-grid-column>
+            <app-data-grid-column field="dates" caption="Сроки" width="145" sortable cell-type="dates"></app-data-grid-column>
+            <app-data-grid-column field="progress" caption="Прогресс" width="140" sortable cell-type="progress"></app-data-grid-column>
           </app-data-grid>
         </div>
       `,
     },
     {
       name: 'Virtual Scroll (1,500 Rows + Grouping)',
-      description: 'High-volume virtualized scrolling combined with multi-level grouping and multi-column sorting',
+      description: 'High-volume virtualized scrolling combined with multi-level grouping and group-first multi-column sorting',
       render: () => html`
         <div style="height: 540px; width: 100%; display: flex; flex-direction: column; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
           <app-data-grid
@@ -100,14 +100,14 @@ export const meta: ComponentStoryMeta = {
             group-by="status,priority"
             sort-by="dates:asc,id:asc"
           >
-            <data-grid-column field="id" header="Код" width="110" min-width="85" sortable cell-type="key"></data-grid-column>
-            <data-grid-column field="title" header="Задача" width="300" min-width="160" sortable cell-type="title"></data-grid-column>
-            <data-grid-column field="status" header="Статус" width="140" sortable groupable cell-type="status"></data-grid-column>
-            <data-grid-column field="priority" header="Приоритет" width="130" sortable groupable cell-type="priority"></data-grid-column>
-            <data-grid-column field="assigneeId" header="Исполнитель" width="150" sortable groupable cell-type="assignee"></data-grid-column>
-            <data-grid-column field="dates" header="Сроки" width="145" sortable cell-type="dates"></data-grid-column>
-            <data-grid-column field="progress" header="Прогресс" width="140" sortable cell-type="progress"></data-grid-column>
-            <data-grid-column field="tags" header="Теги" width="170" cell-type="tags"></data-grid-column>
+            <app-data-grid-column field="id" caption="Код" width="110" min-width="85" sortable cell-type="key"></app-data-grid-column>
+            <app-data-grid-column field="title" caption="Задача" width="300" min-width="160" sortable cell-type="title"></app-data-grid-column>
+            <app-data-grid-column field="status" caption="Статус" width="140" sortable groupable cell-type="status"></app-data-grid-column>
+            <app-data-grid-column field="priority" caption="Приоритет" width="130" sortable groupable cell-type="priority"></app-data-grid-column>
+            <app-data-grid-column field="assigneeId" caption="Исполнитель" width="150" sortable groupable cell-type="assignee"></app-data-grid-column>
+            <app-data-grid-column field="dates" caption="Сроки" width="145" sortable cell-type="dates"></app-data-grid-column>
+            <app-data-grid-column field="progress" caption="Прогресс" width="140" sortable cell-type="progress"></app-data-grid-column>
+            <app-data-grid-column field="tags" caption="Теги" width="170" cell-type="tags"></app-data-grid-column>
           </app-data-grid>
         </div>
       `,

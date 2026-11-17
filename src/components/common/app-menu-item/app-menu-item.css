@@ -68,13 +68,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 16px;
+  height: 16px;
   opacity: 0.85;
   flex-shrink: 0;
-}
-
-.menu-item-icon.is-check {
-  width: 14px;
-  height: 14px;
 }
 
 .menu-item-icon ::slotted(*) {

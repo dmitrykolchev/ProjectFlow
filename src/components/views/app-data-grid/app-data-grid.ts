@@ -19,8 +19,8 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-pagination/app-pagination';
-import { DataGridColumn } from '../data-grid-column/data-grid-column';
-import '../data-grid-column/data-grid-column';
+import { AppDataGridColumn, DataGridCellTemplate } from '../../common/app-data-grid-column/app-data-grid-column';
+import '../../common/app-data-grid-column/app-data-grid-column';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
 
 export interface GridSortRule {
@@ -28,19 +28,26 @@ export interface GridSortRule {
   direction: 'asc' | 'desc';
 }
 
+interface EffectiveSortRule extends GridSortRule {
+  isGroupSort: boolean;
+}
+
 interface ColumnConfig {
   field: string;
-  header: string;
+  caption: string;
   width: number;
   minWidth: number;
   sortable: boolean;
   groupable: boolean;
   resizable: boolean;
   reorderable: boolean;
-  visible: boolean;
+  hidden: boolean;
+  hideable: boolean;
+  exportable: boolean;
   align: 'left' | 'center' | 'right';
   cellType: string;
-  renderer?: (row: Record<string, unknown>, value: unknown) => unknown;
+  template?: DataGridCellTemplate;
+  sortValue?: (row: Record<string, unknown>, value: unknown) => string | number;
   groupFormatter?: (value: unknown) => string;
 }
 
@@ -49,14 +56,24 @@ const PRIORITY_ORDER: Record<string, number> = {
   medium: 2,
   high: 3,
   urgent: 4,
+  critical: 5,
 };
 
 const STATUS_ORDER: Record<string, number> = {
   backlog: 1,
+  draft: 1,
   todo: 2,
+  logged: 2,
+  pending: 2,
   in_progress: 3,
+  submitted: 3,
+  approved: 3,
   review: 4,
+  implemented: 4,
+  reimbursed: 4,
   done: 5,
+  verified: 5,
+  rejected: 6,
 };
 
 const ROW_HEIGHT_COMFORTABLE = 42;
@@ -83,8 +100,12 @@ type VirtualRowItem =
 @customElement('app-data-grid')
 export class AppDataGrid extends LitElement {
   @property({ type: Array }) rows?: Record<string, unknown>[];
+  @property({ type: String, attribute: 'row-key' }) rowKey: string = 'id';
+  @property({ type: Array }) selectedKeys?: string[];
   @property({ type: Boolean }) selectable: boolean = true;
   @property({ type: Boolean }) virtual: boolean = true;
+  @property({ type: String, attribute: 'empty-text' }) emptyText: string = '';
+  @property({ type: String, attribute: 'export-filename' }) exportFilename: string = 'projectflow_export';
   /** Comma-separated fields for multi-level grouping, e.g. "status,priority" */
   @property({ type: String, attribute: 'group-by' }) groupBy: string = '';
   /** Comma-separated rules for multi-column sorting, e.g. "priority:desc,dates:asc" */
@@ -129,6 +150,7 @@ export class AppDataGrid extends LitElement {
   private resizeStartX = 0;
   private resizeStartWidth = 0;
 
+  private defaultHiddenByField = new Map<string, boolean>();
   private unsubscribe?: () => void;
   private tableResizeObserver?: ResizeObserver;
   private scrollRafId: number | null = null;
@@ -215,21 +237,32 @@ export class AppDataGrid extends LitElement {
 
     return html`
       <div class="column-menu-popover" style="${popoverStyle}">
-        ${this.columns.map((col) => {
-          const isVisible = !this.hiddenColumns.has(col.field);
-          return html`
-            <app-checkbox
-              ?checked="${isVisible}"
-              label="${col.header}"
-              @change="${() => this.toggleColumnVisibility(col.field)}"
-            ></app-checkbox>
-          `;
-        })}
+        ${this.columns
+          .filter((col) => col.hideable && col.caption.trim() !== '')
+          .map((col) => {
+            const isVisible = !this.hiddenColumns.has(col.field);
+            return html`
+              <app-checkbox
+                ?checked="${isVisible}"
+                label="${col.caption}"
+                @change="${() => this.toggleColumnVisibility(col.field)}"
+              ></app-checkbox>
+            `;
+          })}
       </div>
     `;
   }
 
   willUpdate(changed: Map<PropertyKey, unknown>) {
+    if (changed.has('selectedKeys') && this.selectedKeys !== undefined) {
+      const incoming = new Set(this.selectedKeys);
+      const same =
+        incoming.size === this.selectedIds.size &&
+        Array.from(incoming).every((id) => this.selectedIds.has(id));
+      if (!same) {
+        this.selectedIds = incoming;
+      }
+    }
     if (changed.has('groupBy')) {
       this.groupByFields = this.groupBy
         .split(',')
@@ -319,7 +352,9 @@ export class AppDataGrid extends LitElement {
   }
 
   private syncState() {
-    this.currentPage = store.activeView === 'grid' ? store.activePage : 1;
+    if (this.rows === undefined && store.activeView === 'grid') {
+      this.currentPage = store.activePage;
+    }
     this.storeTasks = store.getFilteredTasks();
     this.currentLang = store.customization.language;
     this.currentDensity = store.customization.density;
@@ -328,28 +363,57 @@ export class AppDataGrid extends LitElement {
   }
 
   private readSlottedColumns() {
-    const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
+    const slot = this.shadowRoot?.querySelector('.columns-slot-hidden > slot') as HTMLSlotElement | null;
     if (!slot) return;
 
     const assigned = slot
       .assignedElements({ flatten: true })
-      .filter((el) => el.tagName.toLowerCase() === 'data-grid-column') as DataGridColumn[];
+      .filter((el) => {
+        const tag = el.tagName.toLowerCase();
+        return tag === 'app-data-grid-column' || tag === 'data-grid-column';
+      }) as (AppDataGridColumn & {
+        caption?: string;
+        header?: string;
+        visible?: boolean;
+        hideable?: boolean;
+        exportable?: boolean;
+        template?: DataGridCellTemplate;
+        renderer?: DataGridCellTemplate;
+        sortValue?: (row: Record<string, unknown>, value: unknown) => string | number;
+        getEffectiveCaption?: () => string;
+        getEffectiveHidden?: () => boolean;
+        getEffectiveTemplate?: () => DataGridCellTemplate | undefined;
+      })[];
 
-    const parsed: ColumnConfig[] = assigned.map((col) => ({
-      field: col.field,
-      header: col.header || col.field,
-      width: col.width || 150,
-      minWidth: col.minWidth || 70,
-      sortable: col.sortable,
-      groupable: col.groupable,
-      resizable: col.resizable,
-      reorderable: col.reorderable,
-      visible: col.visible,
-      align: col.align || 'left',
-      cellType: col.cellType || 'text',
-      renderer: col.renderer,
-      groupFormatter: col.groupFormatter,
-    }));
+    const parsed: ColumnConfig[] = assigned.map((col) => {
+      const caption = col.getEffectiveCaption
+        ? col.getEffectiveCaption()
+        : col.caption || col.header || col.field;
+      const isHidden = col.getEffectiveHidden
+        ? col.getEffectiveHidden()
+        : Boolean(col.hidden) || col.visible === false;
+      const tpl = col.getEffectiveTemplate
+        ? col.getEffectiveTemplate()
+        : col.template ?? col.renderer;
+      return {
+        field: col.field,
+        caption,
+        width: col.width || 150,
+        minWidth: col.minWidth || 70,
+        sortable: Boolean(col.sortable),
+        groupable: Boolean(col.groupable),
+        resizable: col.resizable !== false,
+        reorderable: col.reorderable !== false,
+        hidden: isHidden,
+        hideable: col.hideable !== false && col.field !== '_actions',
+        exportable: col.exportable !== false && col.field !== '_actions',
+        align: col.align || 'left',
+        cellType: col.cellType || 'text',
+        template: tpl,
+        sortValue: col.sortValue,
+        groupFormatter: col.groupFormatter,
+      };
+    });
 
     this.columns = parsed;
 
@@ -359,15 +423,20 @@ export class AppDataGrid extends LitElement {
     this.columnOrder = [...keptOrder, ...addedFields];
 
     const widths = { ...this.columnWidths };
+    const nextHidden = new Set(this.hiddenColumns);
     for (const c of parsed) {
       if (!widths[c.field]) {
         widths[c.field] = c.width;
       }
-      if (!c.visible) {
-        this.hiddenColumns.add(c.field);
+      const prevDefault = this.defaultHiddenByField.get(c.field);
+      if (prevDefault === undefined || prevDefault !== c.hidden) {
+        this.defaultHiddenByField.set(c.field, c.hidden);
+        if (c.hidden) nextHidden.add(c.field);
+        else nextHidden.delete(c.field);
       }
     }
     this.columnWidths = widths;
+    this.hiddenColumns = nextHidden;
   }
 
   private get orderedVisibleColumns(): ColumnConfig[] {
@@ -380,11 +449,60 @@ export class AppDataGrid extends LitElement {
     return this.rows ?? (this.storeTasks as unknown as Record<string, unknown>[]);
   }
 
+  private resolveFieldValue(row: Record<string, unknown>, field: string): unknown {
+    if (!field) return undefined;
+    if (field in row) return row[field];
+    if (!field.includes('.')) return undefined;
+    return field.split('.').reduce<unknown>((acc, part) => {
+      if (acc && typeof acc === 'object' && part in (acc as Record<string, unknown>)) {
+        return (acc as Record<string, unknown>)[part];
+      }
+      return undefined;
+    }, row);
+  }
+
+  private getRowId(row: Record<string, unknown>, fallbackIndex = 0): string {
+    const raw = this.resolveFieldValue(row, this.rowKey) ?? row.id;
+    return raw !== undefined && raw !== null && raw !== '' ? String(raw) : `row-${fallbackIndex}`;
+  }
+
+  /**
+   * Group columns MUST be sorted first in group hierarchy order, followed by
+   * all remaining active sort rules.
+   */
+  private getEffectiveSortRules(): EffectiveSortRule[] {
+    const rules: EffectiveSortRule[] = [];
+    const seenGroupFields = new Set<string>();
+
+    for (const gField of this.groupByFields) {
+      if (seenGroupFields.has(gField)) continue;
+      seenGroupFields.add(gField);
+      const explicit = this.sortRules.find((r) => r.field === gField);
+      rules.push({
+        field: gField,
+        direction: explicit ? explicit.direction : 'asc',
+        isGroupSort: true,
+      });
+    }
+
+    for (const rule of this.sortRules) {
+      if (!seenGroupFields.has(rule.field)) {
+        rules.push({
+          ...rule,
+          isGroupSort: false,
+        });
+      }
+    }
+
+    return rules;
+  }
+
   private getSortedRows(): Record<string, unknown>[] {
     const allRows = this.activeRows;
-    if (this.sortRules.length === 0) return [...allRows];
+    const effectiveRules = this.getEffectiveSortRules();
+    if (effectiveRules.length === 0) return [...allRows];
     return [...allRows].sort((a, b) => {
-      for (const rule of this.sortRules) {
+      for (const rule of effectiveRules) {
         const cmp = this.compareByField(a, b, rule.field);
         if (cmp !== 0) {
           return rule.direction === 'asc' ? cmp : -cmp;
@@ -401,7 +519,7 @@ export class AppDataGrid extends LitElement {
     if (this.groupByFields.length === 0) {
       return sortedRows.map((row, idx) => ({
         kind: 'data',
-        key: String(row.id || `row-${idx}`),
+        key: this.getRowId(row, idx),
         row,
       }));
     }
@@ -413,19 +531,17 @@ export class AppDataGrid extends LitElement {
       const groups = new Map<string, Record<string, unknown>[]>();
 
       for (const row of subset) {
-        const key = String(row[field] ?? '—');
+        const key = String(this.resolveFieldValue(row, field) ?? '—');
         if (!groups.has(key)) groups.set(key, []);
         groups.get(key)!.push(row);
       }
 
-      let entries = Array.from(groups.entries());
       const fieldSort = this.sortRules.find((r) => r.field === field);
-      if (fieldSort) {
-        entries = entries.sort(([, rowsA], [, rowsB]) => {
-          const cmp = this.compareByField(rowsA[0], rowsB[0], field);
-          return fieldSort.direction === 'asc' ? cmp : -cmp;
-        });
-      }
+      const dir = fieldSort ? fieldSort.direction : 'asc';
+      const entries = Array.from(groups.entries()).sort(([, rowsA], [, rowsB]) => {
+        const cmp = this.compareByField(rowsA[0], rowsB[0], field);
+        return dir === 'asc' ? cmp : -cmp;
+      });
 
       const hasChildLevel = level + 1 < this.groupByFields.length;
 
@@ -441,7 +557,7 @@ export class AppDataGrid extends LitElement {
           key: `grp:${groupPath}`,
           level,
           groupPath,
-          fieldLabel: groupCol?.header || field,
+          fieldLabel: groupCol?.caption || field,
           displayLabel,
           count: groupRows.length,
           isCollapsed,
@@ -455,7 +571,7 @@ export class AppDataGrid extends LitElement {
               const row = groupRows[i];
               items.push({
                 kind: 'data',
-                key: `${groupPath}|${String(row.id || i)}`,
+                key: `${groupPath}|${this.getRowId(row, i)}`,
                 row,
               });
             }
@@ -511,6 +627,7 @@ export class AppDataGrid extends LitElement {
     const activeCols = this.orderedVisibleColumns;
     const allRows = this.activeRows;
     const sortedRows = this.getSortedRows();
+    const effectiveSortRules = this.getEffectiveSortRules();
 
     const isGrouped = this.groupByFields.length > 0;
     const virtualItems = this.virtual ? this.buildVirtualItems(sortedRows, t) : [];
@@ -526,14 +643,17 @@ export class AppDataGrid extends LitElement {
     const selectionScope = this.virtual || isGrouped ? sortedRows : paginatedRows;
     const allCurrentSelected =
       selectionScope.length > 0 &&
-      selectionScope.every((r) => this.selectedIds.has(String(r.id || '')));
-    const someCurrentSelected = selectionScope.some((r) =>
-      this.selectedIds.has(String(r.id || ''))
+      selectionScope.every((r, i) => this.selectedIds.has(this.getRowId(r, i)));
+    const someCurrentSelected = selectionScope.some((r, i) =>
+      this.selectedIds.has(this.getRowId(r, i))
     );
 
     const availableGroupCols = this.columns.filter(
       (c) => c.groupable && !this.groupByFields.includes(c.field)
     );
+
+    const hasHideableCols = this.columns.some((c) => c.hideable && c.caption.trim() !== '');
+    const isTaskStoreMode = this.rows === undefined;
 
     return html`
       <div class="columns-slot-hidden">
@@ -545,14 +665,18 @@ export class AppDataGrid extends LitElement {
           ${this.selectable && this.selectedIds.size > 0
             ? html`
                 <span class="bulk-badge">${this.selectedIds.size} ${t.grid.selected}</span>
-                <app-button size="sm" variant="secondary" @click="${this.bulkMarkDone}">
-                  <span slot="icon-start">${iconCheck(14)}</span>
-                  <span>${t.grid.markDone}</span>
-                </app-button>
-                <app-button size="sm" variant="danger" @click="${this.bulkDelete}">
-                  <span slot="icon-start">${iconTrash(14)}</span>
-                  <span>${t.grid.deleteSelected}</span>
-                </app-button>
+                ${isTaskStoreMode
+                  ? html`
+                      <app-button size="sm" variant="secondary" @click="${this.bulkMarkDone}">
+                        <span slot="icon-start">${iconCheck(14)}</span>
+                        <span>${t.grid.markDone}</span>
+                      </app-button>
+                      <app-button size="sm" variant="danger" @click="${this.bulkDelete}">
+                        <span slot="icon-start">${iconTrash(14)}</span>
+                        <span>${t.grid.deleteSelected}</span>
+                      </app-button>
+                    `
+                  : html`<slot name="bulk-actions"></slot>`}
               `
             : html`
                 <span style="font-size: 0.8125rem; color: var(--text-muted, #64748b);">
@@ -565,6 +689,8 @@ export class AppDataGrid extends LitElement {
         </div>
 
         <div class="toolbar-right">
+          <slot name="toolbar-actions"></slot>
+
           ${this.columns.some((c) => c.groupable)
             ? html`
                 <div class="group-select-wrap">
@@ -584,7 +710,7 @@ export class AppDataGrid extends LitElement {
                   >
                     <option value="">${t.grid.addGroup}</option>
                     ${availableGroupCols.map(
-                      (c) => html`<option value="${c.field}">${c.header}</option>`
+                      (c) => html`<option value="${c.field}">${c.caption}</option>`
                     )}
                   </select>
                 </div>
@@ -596,7 +722,10 @@ export class AppDataGrid extends LitElement {
             ?pressed="${this.virtual}"
             @change="${(e: CustomEvent<{ pressed: boolean }>) => {
               this.virtual = e.detail.pressed;
-              this.currentPage = 1; store.setActivePage(1, false);
+              this.currentPage = 1;
+              if (isTaskStoreMode && store.activeView === 'grid') {
+                store.setActivePage(1, false);
+              }
             }}"
           >
             ${t.grid.virtualMode}
@@ -612,14 +741,18 @@ export class AppDataGrid extends LitElement {
             ${t.grid.multiSort}
           </app-toggle-button>
 
-          <app-button
-            class="column-visibility-btn"
-            size="sm"
-            variant="outline"
-            @click="${this.toggleColumnMenu}"
-          >
-            ${t.grid.columnVisibility}
-          </app-button>
+          ${hasHideableCols
+            ? html`
+                <app-button
+                  class="column-visibility-btn"
+                  size="sm"
+                  variant="outline"
+                  @click="${this.toggleColumnMenu}"
+                >
+                  ${t.grid.columnVisibility}
+                </app-button>
+              `
+            : ''}
 
           <app-button size="sm" variant="secondary" @click="${this.exportCsv}">
             <span slot="icon-start">${iconDownload(14)}</span>
@@ -629,119 +762,130 @@ export class AppDataGrid extends LitElement {
       </div>
 
       <!-- Multi-Level Drag-to-Group Dropbar -->
-      <div
-        class="group-dropbar ${this.isGroupDropOver ? 'is-drag-over' : ''}"
-        @dragover="${this.handleGroupBarDragOver}"
-        @dragleave="${() => (this.isGroupDropOver = false)}"
-        @drop="${this.handleGroupBarDrop}"
-      >
-        <div class="group-chips-row">
-          <span>${iconLayers(13)}</span>
-          ${this.groupByFields.length > 0
-            ? html`
-                <span>${t.grid.groupBy}:</span>
-                ${this.groupByFields.map((field, index) => {
-                  const header = this.columns.find((c) => c.field === field)?.header || field;
-                  return html`
-                    ${index > 0
-                      ? html`<span class="group-level-sep">${iconChevronRight(12)}</span>`
-                      : ''}
-                    <div
-                      class="group-chip-wrap"
-                      draggable="true"
-                      @dragstart="${(e: DragEvent) => this.handleGroupChipDragStart(e, field)}"
-                      @dragover="${(e: DragEvent) => this.handleGroupChipDragOver(e, field)}"
-                      @drop="${(e: DragEvent) => this.handleGroupChipDrop(e, field)}"
-                      @dragend="${() => (this.draggingGroupChip = null)}"
-                    >
-                      <app-badge
-                        variant="primary"
-                        removable
-                        @remove="${() => this.removeGroupField(field)}"
-                      >
-                        ${index + 1}. ${header}
-                      </app-badge>
-                    </div>
-                  `;
-                })}
-              `
-            : html`<span>${t.grid.dragHint}</span>`}
-        </div>
-
-        ${this.groupByFields.length > 0
-          ? html`
-              <div class="bar-actions">
-                <app-link
-                  class="bar-link-btn"
-                  size="md"
-                  variant="secondary"
-                  @click="${() => (this.collapsedGroups = new Set())}"
-                >
-                  ${t.grid.expandAll}
-                </app-link>
-                <app-link
-                  class="bar-link-btn"
-                  size="md"
-                  variant="secondary"
-                  @click="${() => this.collapseAllGroups(sortedRows)}"
-                >
-                  ${t.grid.collapseAll}
-                </app-link>
-                <app-link
-                  class="bar-link-btn"
-                  size="md"
-                  variant="secondary"
-                  @click="${() => {
-                    this.groupByFields = [];
-                    this.collapsedGroups = new Set();
-                  }}"
-                >
-                  ${t.grid.clearGroups}
-                </app-link>
+      ${this.columns.some((c) => c.groupable) || this.groupByFields.length > 0
+        ? html`
+            <div
+              class="group-dropbar ${this.isGroupDropOver ? 'is-drag-over' : ''}"
+              @dragover="${this.handleGroupBarDragOver}"
+              @dragleave="${() => (this.isGroupDropOver = false)}"
+              @drop="${this.handleGroupBarDrop}"
+            >
+              <div class="group-chips-row">
+                <span>${iconLayers(13)}</span>
+                ${this.groupByFields.length > 0
+                  ? html`
+                      <span>${t.grid.groupBy}:</span>
+                      ${this.groupByFields.map((field, index) => {
+                        const caption = this.columns.find((c) => c.field === field)?.caption || field;
+                        return html`
+                          ${index > 0
+                            ? html`<span class="group-level-sep">${iconChevronRight(12)}</span>`
+                            : ''}
+                          <div
+                            class="group-chip-wrap"
+                            draggable="true"
+                            @dragstart="${(e: DragEvent) => this.handleGroupChipDragStart(e, field)}"
+                            @dragover="${(e: DragEvent) => this.handleGroupChipDragOver(e, field)}"
+                            @drop="${(e: DragEvent) => this.handleGroupChipDrop(e, field)}"
+                            @dragend="${() => (this.draggingGroupChip = null)}"
+                          >
+                            <app-badge
+                              variant="primary"
+                              removable
+                              @remove="${() => this.removeGroupField(field)}"
+                            >
+                              ${index + 1}. ${caption}
+                            </app-badge>
+                          </div>
+                        `;
+                      })}
+                    `
+                  : html`<span>${t.grid.dragHint}</span>`}
               </div>
-            `
-          : ''}
-      </div>
+
+              ${this.groupByFields.length > 0
+                ? html`
+                    <div class="bar-actions">
+                      <app-link
+                        class="bar-link-btn"
+                        size="md"
+                        variant="secondary"
+                        @click="${() => (this.collapsedGroups = new Set())}"
+                      >
+                        ${t.grid.expandAll}
+                      </app-link>
+                      <app-link
+                        class="bar-link-btn"
+                        size="md"
+                        variant="secondary"
+                        @click="${() => this.collapseAllGroups(sortedRows)}"
+                      >
+                        ${t.grid.collapseAll}
+                      </app-link>
+                      <app-link
+                        class="bar-link-btn"
+                        size="md"
+                        variant="secondary"
+                        @click="${() => {
+                          this.groupByFields = [];
+                          this.collapsedGroups = new Set();
+                        }}"
+                      >
+                        ${t.grid.clearGroups}
+                      </app-link>
+                    </div>
+                  `
+                : ''}
+            </div>
+          `
+        : ''}
 
       <!-- Multi-Column Sort Precedence Bar -->
-      ${this.sortRules.length > 0 || this.multiSortEnabled
+      ${effectiveSortRules.length > 0 || this.multiSortEnabled
         ? html`
             <div class="sort-bar">
               <div class="sort-chips-row">
-                ${this.sortRules.length === 0
+                ${effectiveSortRules.length === 0
                   ? html`<span>${t.grid.sortHint}</span>`
                   : html`
                       <span>${t.grid.multiSort}:</span>
-                      ${this.sortRules.map((rule, idx) => {
-                        const header =
-                          this.columns.find((c) => c.field === rule.field)?.header || rule.field;
+                      ${effectiveSortRules.map((rule, idx) => {
+                        const caption =
+                          this.columns.find((c) => c.field === rule.field)?.caption || rule.field;
                         return html`
                           <div
-                            class="sort-chip"
+                            class="sort-chip ${rule.isGroupSort ? 'is-group-sort' : ''}"
                             @click="${() => this.toggleSortDirection(rule.field)}"
-                            title="${header}"
+                            title="${caption}"
                           >
                             <span class="sort-chip-idx">${idx + 1}.</span>
-                            <span>${header}</span>
+                            ${rule.isGroupSort
+                              ? html`<span class="sort-chip-group-tag">${t.grid.groupBy}</span>`
+                              : ''}
+                            <span>${caption}</span>
                             <span class="sort-chip-dir">${rule.direction === 'asc' ? '▲' : '▼'}</span>
-                            <button
-                              type="button"
-                              class="sort-chip-remove"
-                              aria-label="Remove sort"
-                              @click="${(e: Event) => {
-                                e.stopPropagation();
-                                this.removeSortRule(rule.field);
-                              }}"
-                            >
-                              ×
-                            </button>
+                            ${!rule.isGroupSort
+                              ? html`
+                                  <button
+                                    type="button"
+                                    class="sort-chip-remove"
+                                    aria-label="Remove sort"
+                                    @click="${(e: Event) => {
+                                      e.stopPropagation();
+                                      this.removeSortRule(rule.field);
+                                    }}"
+                                  >
+                                    ×
+                                  </button>
+                                `
+                              : ''}
                           </div>
                         `;
                       })}
                     `}
               </div>
 
-              ${this.sortRules.length > 0
+              ${this.sortRules.some((r) => !this.groupByFields.includes(r.field))
                 ? html`
                     <div class="bar-actions">
                       <app-link
@@ -787,15 +931,16 @@ export class AppDataGrid extends LitElement {
                 const isDragging = this.draggingField === col.field;
                 const dropClass =
                   this.dropTargetField === col.field ? `drop-${this.dropPosition}` : '';
-                const sortIdx = this.sortRules.findIndex((r) => r.field === col.field);
-                const sortRule = sortIdx !== -1 ? this.sortRules[sortIdx] : null;
+                const sortIdx = effectiveSortRules.findIndex((r) => r.field === col.field);
+                const sortRule = sortIdx !== -1 ? effectiveSortRules[sortIdx] : null;
+                const canClickSort = col.sortable || this.groupByFields.includes(col.field);
 
                 return html`
                   <th
                     style="width: ${width}px; text-align: ${col.align};"
-                    class="${col.sortable ? 'is-sortable' : ''} ${isDragging ? 'is-dragging' : ''} ${dropClass}"
+                    class="${canClickSort ? 'is-sortable' : ''} ${isDragging ? 'is-dragging' : ''} ${dropClass}"
                     draggable="${col.reorderable && !this.resizingField ? 'true' : 'false'}"
-                    @click="${(e: MouseEvent) => col.sortable && this.handleSort(col.field, e.shiftKey)}"
+                    @click="${(e: MouseEvent) => canClickSort && this.handleSort(col.field, e.shiftKey)}"
                     @dragstart="${(e: DragEvent) => this.handleColDragStart(e, col)}"
                     @dragover="${(e: DragEvent) => this.handleColDragOver(e, col)}"
                     @dragleave="${() => {
@@ -805,11 +950,11 @@ export class AppDataGrid extends LitElement {
                     @dragend="${this.handleColDragEnd}"
                   >
                     <div class="th-content">
-                      <span class="th-label">${col.header}</span>
+                      <span class="th-label">${col.caption}</span>
                       ${sortRule
                         ? html`
                             <span class="sort-indicator">
-                              ${this.sortRules.length > 1
+                              ${effectiveSortRules.length > 1
                                 ? html`<span class="sort-order-num">${sortIdx + 1}</span>`
                                 : ''}
                               <span>${sortRule.direction === 'asc' ? '▲' : '▼'}</span>
@@ -840,7 +985,7 @@ export class AppDataGrid extends LitElement {
                       colspan="${activeCols.length + (this.selectable ? 1 : 0)}"
                       style="text-align: center; padding: 3rem; color: var(--text-muted, #64748b);"
                     >
-                      ${t.grid.noMatchingRecords}
+                      ${this.emptyText || t.grid.noMatchingRecords}
                     </td>
                   </tr>
                 `
@@ -848,7 +993,7 @@ export class AppDataGrid extends LitElement {
               ? this.renderVirtualizedBody(virtualItems, activeCols, t)
               : isGrouped
               ? this.renderGroupLevel(sortedRows, 0, '', activeCols, t)
-              : paginatedRows.map((row) => this.renderDataRow(row, activeCols, t))}
+              : paginatedRows.map((row, idx) => this.renderDataRow(row, activeCols, t, idx))}
           </tbody>
         </table>
       </div>
@@ -864,11 +1009,17 @@ export class AppDataGrid extends LitElement {
                 .page="${safePage}"
                 .pageSize="${this.rowsPerPage}"
                 @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+                  this.currentPage = e.detail.page;
+                  if (isTaskStoreMode && store.activeView === 'grid') {
+                    store.setActivePage(e.detail.page);
+                  }
                 }}"
                 @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
                   this.rowsPerPage = e.detail.pageSize;
-                  this.currentPage = 1; store.setActivePage(1, false);
+                  this.currentPage = 1;
+                  if (isTaskStoreMode && store.activeView === 'grid') {
+                    store.setActivePage(1, false);
+                  }
                   store.setTablePageSize(e.detail.pageSize);
                 }}"
               ></app-pagination>
@@ -923,7 +1074,7 @@ export class AppDataGrid extends LitElement {
       ${topPx > 0
         ? html`<tr class="virtual-spacer-row" aria-hidden="true" style="height: ${topPx}px;"><td colspan="${colSpan}"></td></tr>`
         : ''}
-      ${slice.map((item) => {
+      ${slice.map((item, idx) => {
         if (item.kind === 'group') {
           const levelClass = `level-${Math.min(item.level, 3)}`;
           const indentPx = 14 + item.level * 22;
@@ -942,7 +1093,7 @@ export class AppDataGrid extends LitElement {
             </tr>
           `;
         }
-        return this.renderDataRow(item.row, activeCols, t);
+        return this.renderDataRow(item.row, activeCols, t, idx);
       })}
       ${bottomPx > 0
         ? html`<tr class="virtual-spacer-row" aria-hidden="true" style="height: ${bottomPx}px;"><td colspan="${colSpan}"></td></tr>`
@@ -962,21 +1113,19 @@ export class AppDataGrid extends LitElement {
     const groups = new Map<string, Record<string, unknown>[]>();
 
     for (const row of rows) {
-      const raw = row[field];
+      const raw = this.resolveFieldValue(row, field);
       const key = String(raw ?? '—');
       if (!groups.has(key)) groups.set(key, []);
       groups.get(key)!.push(row);
     }
 
-    // Order group headers using active sort rule for this field if present
-    let entries = Array.from(groups.entries());
+    // Order group headers using group column sort rule (defaults to ascending)
     const fieldSort = this.sortRules.find((r) => r.field === field);
-    if (fieldSort) {
-      entries = entries.sort(([, rowsA], [, rowsB]) => {
-        const cmp = this.compareByField(rowsA[0], rowsB[0], field);
-        return fieldSort.direction === 'asc' ? cmp : -cmp;
-      });
-    }
+    const dir = fieldSort ? fieldSort.direction : 'asc';
+    const entries = Array.from(groups.entries()).sort(([, rowsA], [, rowsB]) => {
+      const cmp = this.compareByField(rowsA[0], rowsB[0], field);
+      return dir === 'asc' ? cmp : -cmp;
+    });
 
     const colSpan = activeCols.length + (this.selectable ? 1 : 0);
     const hasChildLevel = level + 1 < this.groupByFields.length;
@@ -997,7 +1146,7 @@ export class AppDataGrid extends LitElement {
               <span class="group-chevron ${!isCollapsed ? 'is-expanded' : ''}">
                 ${iconChevronRight(14)}
               </span>
-              <span class="group-field-label">${groupCol?.header || field}:</span>
+              <span class="group-field-label">${groupCol?.caption || field}:</span>
               <span>${displayLabel}</span>
               <app-badge size="sm" variant="neutral">${groupRows.length}</app-badge>
             </div>
@@ -1006,7 +1155,7 @@ export class AppDataGrid extends LitElement {
         ${!isCollapsed
           ? hasChildLevel
             ? this.renderGroupLevel(groupRows, level + 1, groupPath, activeCols, t)
-            : groupRows.map((row) => this.renderDataRow(row, activeCols, t))
+            : groupRows.map((row, idx) => this.renderDataRow(row, activeCols, t, idx))
           : ''}
       `;
     });
@@ -1015,16 +1164,20 @@ export class AppDataGrid extends LitElement {
   private renderDataRow(
     row: Record<string, unknown>,
     activeCols: ColumnConfig[],
-    t: ReturnType<typeof getTranslation>
+    t: ReturnType<typeof getTranslation>,
+    rowIdx: number = 0
   ) {
-    const rowId = String(row.id || '');
+    const rowId = this.getRowId(row, rowIdx);
     const isChecked = this.selectable && this.selectedIds.has(rowId);
 
     return html`
-      <tr class="data-row ${isChecked ? 'is-selected' : ''}">
+      <tr
+        class="data-row ${isChecked ? 'is-selected' : ''}"
+        @click="${(e: MouseEvent) => this.handleRowClick(e, row, rowId)}"
+      >
         ${this.selectable
           ? html`
-              <td class="select-col">
+              <td class="select-col" @click="${(e: Event) => e.stopPropagation()}">
                 <app-checkbox
                   ?checked="${isChecked}"
                   @change="${() => this.toggleRowSelect(rowId)}"
@@ -1034,10 +1187,10 @@ export class AppDataGrid extends LitElement {
           : ''}
 
         ${activeCols.map((col) => {
-          const val = row[col.field];
+          const val = this.resolveFieldValue(row, col.field);
           return html`
             <td style="text-align: ${col.align};">
-              ${col.renderer ? col.renderer(row, val) : this.renderBuiltInCell(col, row, val, t)}
+              ${col.template ? col.template(row, val) : this.renderBuiltInCell(col, row, val, t)}
             </td>
           `;
         })}
@@ -1152,7 +1305,7 @@ export class AppDataGrid extends LitElement {
     if (field === 'priority') {
       return (t.priority as Record<string, string>)[value] || value;
     }
-    if (field === 'assigneeId') {
+    if (field === 'assigneeId' || field === 'userId') {
       return store.users.find((u) => u.id === value)?.name || t.taskModal.unassigned;
     }
     if (field === 'projectId') {
@@ -1162,41 +1315,65 @@ export class AppDataGrid extends LitElement {
   }
 
   private getSortValue(row: Record<string, unknown>, field: string): string | number {
-    if (field === 'dates') {
-      return String(row.dueDate || '');
+    const col = this.columns.find((c) => c.field === field);
+    const val = this.resolveFieldValue(row, field);
+
+    if (col?.sortValue) {
+      return col.sortValue(row, val);
     }
-    if (field === 'priority') {
-      const key = String(row.priority || '');
+    if (field === 'dates' || col?.cellType === 'dates') {
+      return String(row.dueDate || val || '');
+    }
+    if (col?.cellType === 'priority') {
+      const key = String(val || '');
       if (key in PRIORITY_ORDER) return PRIORITY_ORDER[key];
     }
-    if (field === 'status') {
-      const key = String(row.status || '');
+    if (col?.cellType === 'status') {
+      const key = String(val || '');
       if (key in STATUS_ORDER) return STATUS_ORDER[key];
     }
-    if (field === 'progress') {
+    if (col?.cellType === 'progress') {
       const task = row as unknown as Task;
       if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
         return task.subtasks.filter((s) => s.completed).length / task.subtasks.length;
       }
-      if (typeof row.progress === 'number') return row.progress;
+      if (typeof val === 'number') return val;
       return task.status === 'done' ? 1 : 0;
     }
-    const v = row[field];
-    if (typeof v === 'number') return v;
-    return String(v ?? '').toLowerCase();
+    if (typeof val === 'number') return val;
+    if (typeof val === 'boolean') return val ? 1 : 0;
+    return String(val ?? '').toLowerCase();
   }
 
   private compareByField(a: Record<string, unknown>, b: Record<string, unknown>, field: string): number {
     const valA = this.getSortValue(a, field);
     const valB = this.getSortValue(b, field);
-    if (valA < valB) return -1;
-    if (valA > valB) return 1;
-    return 0;
+    if (typeof valA === 'number' && typeof valB === 'number') {
+      return valA - valB;
+    }
+    return String(valA).localeCompare(String(valB), undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    });
   }
 
   private handleSort(field: string, shiftKey: boolean) {
     const isMulti = shiftKey || this.multiSortEnabled;
+    const isGroupedField = this.groupByFields.includes(field);
     const existingIdx = this.sortRules.findIndex((r) => r.field === field);
+
+    if (isGroupedField) {
+      const currDir = existingIdx !== -1 ? this.sortRules[existingIdx].direction : 'asc';
+      const nextDir: 'asc' | 'desc' = currDir === 'asc' ? 'desc' : 'asc';
+      const next = [...this.sortRules];
+      if (existingIdx === -1) {
+        next.push({ field, direction: nextDir });
+      } else {
+        next[existingIdx] = { field, direction: nextDir };
+      }
+      this.sortRules = next;
+      return;
+    }
 
     if (isMulti) {
       const next = [...this.sortRules];
@@ -1209,19 +1386,28 @@ export class AppDataGrid extends LitElement {
       }
       this.sortRules = next;
     } else {
-      if (existingIdx !== -1 && this.sortRules.length === 1) {
-        if (this.sortRules[0].direction === 'asc') {
-          this.sortRules = [{ field, direction: 'desc' }];
+      // Keep any explicit sort directions on grouped columns while toggling/replacing the clicked rule
+      const preservedGroupRules = this.sortRules.filter((r) => this.groupByFields.includes(r.field));
+      const nonGroupRules = this.sortRules.filter((r) => !this.groupByFields.includes(r.field));
+      if (nonGroupRules.length === 1 && nonGroupRules[0].field === field) {
+        if (nonGroupRules[0].direction === 'asc') {
+          this.sortRules = [...preservedGroupRules, { field, direction: 'desc' }];
         } else {
-          this.sortRules = [];
+          this.sortRules = [...preservedGroupRules];
         }
       } else {
-        this.sortRules = [{ field, direction: 'asc' }];
+        this.sortRules = [...preservedGroupRules, { field, direction: 'asc' }];
       }
     }
   }
 
   private toggleSortDirection(field: string) {
+    const existing = this.sortRules.find((r) => r.field === field);
+    if (!existing) {
+      // Grouped field defaulted to 'asc', so clicking toggles it to 'desc'
+      this.sortRules = [...this.sortRules, { field, direction: 'desc' }];
+      return;
+    }
     this.sortRules = this.sortRules.map((r) =>
       r.field === field ? { ...r, direction: r.direction === 'asc' ? 'desc' : 'asc' } : r
     );
@@ -1245,7 +1431,7 @@ export class AppDataGrid extends LitElement {
       const field = this.groupByFields[level];
       const map = new Map<string, Record<string, unknown>[]>();
       for (const r of subset) {
-        const key = String(r[field] ?? '—');
+        const key = String(this.resolveFieldValue(r, field) ?? '—');
         if (!map.has(key)) map.set(key, []);
         map.get(key)!.push(r);
       }
@@ -1395,26 +1581,73 @@ export class AppDataGrid extends LitElement {
   };
 
   // --- Selection & Actions ---
+  private handleRowClick(e: MouseEvent, row: Record<string, unknown>, rowId: string) {
+    if (this.rows === undefined) return;
+    const path = e.composedPath();
+    const isInteractive = path.some((node) => {
+      if (!(node instanceof Element)) return false;
+      const tag = node.tagName.toLowerCase();
+      return (
+        tag === 'button' ||
+        tag === 'a' ||
+        tag === 'input' ||
+        tag === 'select' ||
+        tag === 'textarea' ||
+        tag === 'app-button' ||
+        tag === 'app-checkbox' ||
+        tag === 'app-link' ||
+        node.hasAttribute('data-no-row-click')
+      );
+    });
+    if (isInteractive) return;
+    this.dispatchEvent(
+      new CustomEvent('row-click', {
+        detail: { row, id: rowId },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   private handleRowTitleClick(task: Task) {
     if (this.rows === undefined && task.id) {
       store.openTaskDetail(task.id);
     } else {
       this.dispatchEvent(
-        new CustomEvent('row-click', { detail: { row: task }, bubbles: true, composed: true })
+        new CustomEvent('row-click', {
+          detail: { row: task, id: this.getRowId(task as unknown as Record<string, unknown>) },
+          bubbles: true,
+          composed: true,
+        })
       );
     }
   }
 
+  private emitSelectionChange() {
+    const selectedIds = Array.from(this.selectedIds);
+    const selectedRows = this.activeRows.filter((r, i) =>
+      this.selectedIds.has(this.getRowId(r, i))
+    );
+    this.dispatchEvent(
+      new CustomEvent('selection-change', {
+        detail: { selectedIds, selectedRows },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   private toggleSelectAll(rows: Record<string, unknown>[]) {
     const allSelected =
-      rows.length > 0 && rows.every((r) => this.selectedIds.has(String(r.id || '')));
+      rows.length > 0 && rows.every((r, i) => this.selectedIds.has(this.getRowId(r, i)));
     const next = new Set(this.selectedIds);
     if (allSelected) {
-      rows.forEach((r) => next.delete(String(r.id || '')));
+      rows.forEach((r, i) => next.delete(this.getRowId(r, i)));
     } else {
-      rows.forEach((r) => next.add(String(r.id || '')));
+      rows.forEach((r, i) => next.add(this.getRowId(r, i)));
     }
     this.selectedIds = next;
+    this.emitSelectionChange();
   }
 
   private toggleRowSelect(id: string) {
@@ -1422,6 +1655,7 @@ export class AppDataGrid extends LitElement {
     if (next.has(id)) next.delete(id);
     else next.add(id);
     this.selectedIds = next;
+    this.emitSelectionChange();
   }
 
   private cycleStatus(task: Task) {
@@ -1434,6 +1668,7 @@ export class AppDataGrid extends LitElement {
   private bulkMarkDone() {
     store.bulkUpdateStatus(Array.from(this.selectedIds), 'done');
     this.selectedIds = new Set();
+    this.emitSelectionChange();
   }
 
   private bulkDelete() {
@@ -1445,6 +1680,7 @@ export class AppDataGrid extends LitElement {
     store.bulkDeleteTasks(Array.from(this.selectedIds));
     this.selectedIds = new Set();
     this.confirmBulkDeleteOpen = false;
+    this.emitSelectionChange();
   }
 
   private toggleColumnVisibility(field: string) {
@@ -1455,11 +1691,11 @@ export class AppDataGrid extends LitElement {
   }
 
   private exportCsv() {
-    const cols = this.orderedVisibleColumns;
-    const headers = cols.map((c) => `"${c.header.replace(/"/g, '""')}"`);
+    const cols = this.orderedVisibleColumns.filter((c) => c.exportable);
+    const headers = cols.map((c) => `"${c.caption.replace(/"/g, '""')}"`);
     const rows = this.activeRows.map((row) =>
       cols.map((c) => {
-        const val = row[c.field];
+        const val = this.resolveFieldValue(row, c.field);
         const str = Array.isArray(val) ? val.join('; ') : String(val ?? '');
         return `"${str.replace(/"/g, '""')}"`;
       })
@@ -1469,7 +1705,7 @@ export class AppDataGrid extends LitElement {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `projectflow_export_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `${this.exportFilename || 'projectflow_export'}_${new Date().toISOString().slice(0, 10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
     const t = getTranslation(this.currentLang);

@@ -82,6 +82,8 @@ export { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
 export { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 export { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
 export { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
+export { AppDataGridColumn } from './app-data-grid-column/app-data-grid-column';
+export type { DataGridCellType, DataGridCellTemplate } from './app-data-grid-column/app-data-grid-column';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -135,6 +137,7 @@ import { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
 import { AppDocumentPreviewer } from './app-document-previewer/app-document-previewer';
 import { AppTaskAiPanel } from './app-task-ai-panel/app-task-ai-panel';
 import { AppProjectRequirements } from './app-project-requirements/app-project-requirements';
+import { AppDataGridColumn } from './app-data-grid-column/app-data-grid-column';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -180,6 +183,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-document-previewer': AppDocumentPreviewer,
   'app-task-ai-panel': AppTaskAiPanel,
   'app-project-requirements': AppProjectRequirements,
+  'app-data-grid-column': AppDataGridColumn,
 } as const;
 
 export function getRegisteredUiElements(): string[] {
