@@ -1415,21 +1415,46 @@ export class AppContractDetail extends LitElement {
           </div>
 
           <div class="col-span-2 quick-term-row">
-            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_week')}">
-              ${t.viewTexts.calculations.quickThisWeek}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_week')}">
-              ${t.viewTexts.calculations.quickLastWeek}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_month')}">
-              ${t.viewTexts.calculations.quickThisMonth}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_month')}">
-              ${t.viewTexts.calculations.quickLastMonth}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_quarter')}">
-              ${t.viewTexts.calculations.quickThisQuarter}
-            </button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_week')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisWeek}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_week')}"
+            >
+              <span>${t.viewTexts.calculations.quickLastWeek}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_month')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisMonth}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyCalculationPeriodPreset(ctr, 'prev_month')}"
+            >
+              <span>${t.viewTexts.calculations.quickLastMonth}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyCalculationPeriodPreset(ctr, 'this_quarter')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisQuarter}</span>
+            </app-button>
           </div>
 
           <div class="col-span-2 autofill-bar">
@@ -1922,13 +1947,14 @@ export class AppContractDetail extends LitElement {
             <div class="quick-term-row" style="margin-top: 0.35rem;">
               ${[7, 14, 30].map(
                 (days) => html`
-                  <button
-                    type="button"
+                  <app-button
                     class="quick-term-btn"
+                    size="sm"
+                    variant="icon"
                     @click="${() => this.applyDueDateOffset(days)}"
                   >
-                    +${days} ${t.viewTexts.contractDetail.daysSuffix}
-                  </button>
+                    <span>+${days} ${t.viewTexts.contractDetail.daysSuffix}</span>
+                  </app-button>
                 `
               )}
             </div>
@@ -2446,36 +2472,39 @@ export class AppContractDetail extends LitElement {
               }}"
             ></app-number-input>
             <div class="quick-term-row" style="margin-top: 0.4rem;">
-              <button
-                type="button"
+              <app-button
                 class="quick-term-btn"
+                size="sm"
+                variant="icon"
                 @click="${() => {
                   this.payAmount = Math.max(1, Math.round(remainingBefore * 0.25));
                   this.payError = '';
                 }}"
               >
-                25%
-              </button>
-              <button
-                type="button"
+                <span>25%</span>
+              </app-button>
+              <app-button
                 class="quick-term-btn"
+                size="sm"
+                variant="icon"
                 @click="${() => {
                   this.payAmount = Math.max(1, Math.round(remainingBefore * 0.5));
                   this.payError = '';
                 }}"
               >
-                50%
-              </button>
-              <button
-                type="button"
+                <span>50%</span>
+              </app-button>
+              <app-button
                 class="quick-term-btn"
+                size="sm"
+                variant="icon"
                 @click="${() => {
                   this.payAmount = remainingBefore;
                   this.payError = '';
                 }}"
               >
-                ${t.viewTexts.payments.fullDueButton}
-              </button>
+                <span>${t.viewTexts.payments.fullDueButton}</span>
+              </app-button>
             </div>
           </div>
 

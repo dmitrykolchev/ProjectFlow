@@ -423,19 +423,30 @@
   flex-wrap: wrap;
 }
 
+/* quick term chips are app-button web components at size sm with the historical
+   content-sized look restored through the font-parity recipe: auto height, the original
+   padding and font size, the UA control font the native button inherited, weight 400, the
+   historical 6px radius, and the hover fill copied from the original .quick-term-btn:hover */
 .quick-term-btn {
-  padding: 0.24rem 0.55rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-strong, #334155);
-  background: var(--bg-subtle, #1a2438);
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.74rem;
-  cursor: pointer;
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.24rem;
+  --control-padding-x-sm: 0.55rem;
+  --control-font-sm: 0.74rem;
+  --btn-font-weight: 400;
+  --icon-btn-font: Arial;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: var(--bg-subtle, #1a2438);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-strong, #334155);
 }
 
 .quick-term-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--border-strong, #334155);
 }
 
 .autofill-bar {
