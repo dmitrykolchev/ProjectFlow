@@ -328,8 +328,9 @@
 
 /* reader header icon actions are app-button web components at size xs pinned to the
    historical 32px square with a 7px radius; hover keeps the subtle border unchanged for
-   plain actions, the pinned state and the delete hover reuse the historical colors
-   through custom properties */
+   plain actions, the pinned state reuses the historical accent colors through custom
+   properties, and the delete button declares action="delete" so the component supplies
+   the danger hover palette */
 .reader-actions app-button {
   --control-height-xs: 32px;
   --btn-radius-tl: 7px;
@@ -339,7 +340,7 @@
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.reader-actions app-button:not(.danger-action) {
+.reader-actions app-button:not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
@@ -347,12 +348,6 @@
   --icon-btn-color: var(--accent-primary, #6366f1);
   --icon-btn-border: var(--accent-border, rgba(99, 102, 241, 0.4));
   --icon-btn-bg: var(--accent-soft, rgba(99, 102, 241, 0.14));
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: rgba(239, 68, 68, 0.35);
-  --icon-btn-hover-bg: transparent;
 }
 
 /* Article Body */
