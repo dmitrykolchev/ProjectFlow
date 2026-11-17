@@ -55,6 +55,7 @@ import counterpartyFormMeta from '../../common/app-counterparty-form/app-counter
 import employeeFormMeta from '../../common/app-employee-form/app-employee-form.story';
 import projectFormMeta from '../../common/app-project-form/app-project-form.story';
 import requirementFormMeta from '../../common/app-requirement-form/app-requirement-form.story';
+import calculationFormMeta from '../../common/app-calculation-form/app-calculation-form.story';
 import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialog.story';
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
@@ -146,6 +147,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   employeeFormMeta,
   projectFormMeta,
   requirementFormMeta,
+  calculationFormMeta,
   emptyStateMeta,
   kpiStripMeta,
   sectionCardMeta,
