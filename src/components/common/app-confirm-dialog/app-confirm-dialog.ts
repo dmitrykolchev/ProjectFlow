@@ -1,8 +1,9 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import '../../common/app-modal/app-modal';
 import '../../common/app-button/app-button';
 import { iconAlertTriangle, iconCheck, iconInfo } from '../icons';
+import styles from './app-confirm-dialog.css';
 
 export type ConfirmVariant = 'info' | 'success' | 'warning' | 'danger';
 
@@ -25,45 +26,7 @@ export class AppConfirmDialog extends LitElement {
   @property({ type: String }) cancelLabel: string = '';
   @property({ type: String }) size: 'sm' | 'md' | 'lg' | 'xl' = 'sm';
 
-  static styles = css`
-    :host {
-      display: contents;
-    }
-
-    .section-label {
-      margin: 0 0 0.4rem;
-      text-transform: uppercase;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      color: var(--text-secondary, #94a3b8);
-    }
-
-    .action-text {
-      margin: 0;
-      color: var(--text-primary, #f8fafc);
-      line-height: 1.5;
-      font-size: 0.9rem;
-    }
-
-    .result-box {
-      border-left: 3px solid var(--confirm-color, var(--accent-primary, #6366f1));
-      background: var(--bg-subtle, #1a2438);
-      border-radius: var(--radius-sm, 6px);
-      padding: 0.75rem 1rem;
-      color: var(--text-secondary, #94a3b8);
-      line-height: 1.5;
-      font-size: 0.9rem;
-    }
-
-    /* Exact match of original .confirm-text */
-    .confirm-text {
-      margin: 0;
-      color: var(--text-secondary, #94a3b8);
-      line-height: 1.5;
-      font-size: 0.9rem;
-    }
-  `;
+  static styles = styles;
 
   render() {
     const hasSections = Boolean(this.action || this.result);
