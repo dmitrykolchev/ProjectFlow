@@ -85,6 +85,31 @@ slot[name='icon']::slotted(*) {
   min-width: 0;
 }
 
+/* capped body height: the inner scrollbar activates when content overflows */
+.section-body.is-limited {
+  max-height: var(--body-max, none);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.section-body.is-limited::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.section-body.is-limited::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+.section-body.is-limited::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 4px;
+}
+
+.section-body.is-limited::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, var(--accent-primary));
+}
+
 /* Plain variant — exact match of analytics-style card with bordered text header */
 .section-card.plain {
   padding: 1.25rem 1.5rem;

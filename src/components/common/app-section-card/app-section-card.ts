@@ -10,6 +10,8 @@ export class AppSectionCard extends LitElement {
   @property({ type: String }) variant: 'default' | 'plain' | 'panel' | 'tabbed' = 'default';
   @property({ type: Boolean, attribute: 'collapsible' }) collapsible: boolean = false;
   @property({ type: Boolean, reflect: true }) collapsed: boolean = false;
+  // CSS length ('26rem', '320px', ...): caps the section body height and activates its scrollbar
+  @property({ type: String, attribute: 'max-height' }) maxHeight: string = '';
 
   static styles = styles;
 
@@ -40,7 +42,12 @@ export class AppSectionCard extends LitElement {
             ${this.collapsible ? html`<span class="chevron ${this.collapsed ? 'is-collapsed' : ''}">${iconChevronDown(16)}</span>` : ''}
           </div>
         </div>
-        ${!this.collapsed ? html`<div class="section-body"><slot></slot></div>` : ''}
+        ${!this.collapsed
+          ? html`<div
+              class="section-body ${this.maxHeight ? 'is-limited' : ''}"
+              style="${this.maxHeight ? `--body-max: ${this.maxHeight};` : ''}"
+            ><slot></slot></div>`
+          : ''}
       </section>
     `;
   }

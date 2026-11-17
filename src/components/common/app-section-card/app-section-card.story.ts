@@ -27,6 +27,7 @@ export const meta: ComponentStoryMeta = {
     variant: 'Surface style: default / plain / elevated',
     collapsible: 'Enables collapse toggle in the header',
     collapsed: 'Current collapsed state (only for collapsible sections)',
+    maxHeight: "CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow",
   },
   stories: [
     {
@@ -49,6 +50,23 @@ export const meta: ComponentStoryMeta = {
         <app-section-card collapsible title="Billing Summary">
           <div style="padding: 0.5rem; color: var(--text-secondary); font-size: 0.85rem;">
             Click the header to collapse/expand this section.
+          </div>
+        </app-section-card>
+      `,
+    },
+    {
+      name: 'Capped Height',
+      description:
+        'max-height caps the body and activates the inner scrollbar — for long histories (task change log, analysis history). Combined with collapsible the whole card collapses from the header.',
+      render: () => html`
+        <app-section-card collapsible max-height="12rem" title="Change History" subtitle="36 entries">
+          <app-badge slot="header-left" size="sm" variant="info">36</app-badge>
+          <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+            ${Array.from({ length: 36 }, (_, i) => html`
+              <div style="font-size: 0.8rem; color: var(--text-secondary); padding: 0.25rem 0.5rem; background: var(--bg-subtle, #1a2438); border-radius: 6px;">
+                #${36 - i} · status moved to ${i % 3 === 0 ? 'in_progress' : i % 3 === 1 ? 'review' : 'done'} · 2026-11-${String((i % 28) + 1).padStart(2, '0')}
+              </div>
+            `)}
           </div>
         </app-section-card>
       `,
