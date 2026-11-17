@@ -791,8 +791,8 @@ export class AppCounterpartyDetail extends LitElement {
     return html`
       <app-contract-form
         .open="${this.contractModalOpen}"
-        .compact="${true}"
         .presetCounterpartyId="${cp.id}"
+        .presetStatus="${'active'}"
         .contextTitle="${t.viewTexts.counterpartyDetail.quickContractTitle(cp.name)}"
         @close="${() => (this.contractModalOpen = false)}"
         @saved="${(e: CustomEvent<{ contract: Contract }>) => {
