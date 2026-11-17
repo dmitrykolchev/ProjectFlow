@@ -128,22 +128,20 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* task name-links are app-link web components at size md restoring the historical text-primary
+   glyph through the additive link hooks of zero padding, weight 600, the inherited unitless
+   line-height 1.5, the tighter 0.45rem icon gap, the accent hover color without underline
+   restored through link-hover-color and link-hover-decoration, and the cell font size pinned
+   through control-font-md; the key chip rides in the start slot centered on the wrapped title */
 .task-link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--text-primary, #f8fafc);
-  font: inherit;
-  font-weight: 600;
-  text-align: left;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-
-.task-link-btn:hover {
-  color: var(--accent-primary, #6366f1);
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-gap: 0.45rem;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --link-hover-decoration: none;
+  --control-font-md: 0.83rem;
 }
 
 .task-key-chip {

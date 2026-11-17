@@ -16,6 +16,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-date-input/app-date-input';
@@ -383,16 +384,17 @@ export class AppTimeTracking extends LitElement {
                 <tr>
                   <td class="mono" style="white-space: nowrap;">${entry.date}</td>
                   <td>
-                    <button
-                      type="button"
+                    <app-link
                       class="task-link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => {
                         if (task) store.openTaskDetail(task.id);
                       }}"
                     >
-                      <span class="task-key-chip">${entry.taskId}</span>
+                      <span class="task-key-chip" slot="start">${entry.taskId}</span>
                       <span>${task?.title || (t.viewTexts.timeTracking.removedTask)}</span>
-                    </button>
+                    </app-link>
                     <div class="project-sub">
                       ${proj
                         ? html`<span class="dot" style="background: ${proj.color};"></span><span>${proj.name}</span>`
@@ -518,16 +520,17 @@ export class AppTimeTracking extends LitElement {
             <div class="task-group-card">
               <div class="task-group-head">
                 <div class="task-group-left">
-                  <button
-                    type="button"
+                  <app-link
                     class="task-link-btn"
+                    size="md"
+                    variant="primary"
                     @click="${() => {
                       if (task) store.openTaskDetail(task.id);
                     }}"
                   >
-                    <span class="task-key-chip">${taskId}</span>
+                    <span class="task-key-chip" slot="start">${taskId}</span>
                     <span>${task?.title || taskId}</span>
-                  </button>
+                  </app-link>
                   <div class="project-sub">
                     ${proj
                       ? html`<span class="dot" style="background: ${proj.color};"></span><span>${proj.name}</span>`
