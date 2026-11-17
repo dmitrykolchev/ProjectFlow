@@ -450,7 +450,11 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
 - `--link-font-weight` — вес шрифта, default `500`;
 - `--link-line-height` — line-height, default `1.25` (unitless);
 - `--link-font` — font-family, default `var(--font-sans, inherit)`;
-- `--link-numeric` — font-variant-numeric, default `normal`.
+- `--link-numeric` — font-variant-numeric, default `normal`;
+- `--link-width` — width inner контрола, default `auto`;
+- `--link-white-space` — white-space, default `normal`;
+- `--link-overflow` и `--link-text-overflow` — обрезка текста, default `visible`/`clip`;
+  `.link-label` получил `min-width: 0` для shrink при ellipsis.
 Font-size регулируется существующим `--control-font-{size}` size-правила.
 
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):

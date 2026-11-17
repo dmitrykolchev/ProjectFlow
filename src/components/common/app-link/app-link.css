@@ -12,6 +12,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
+  width: var(--link-width, auto);
   padding: var(--link-padding, 0.15rem 0.25rem);
   border: none;
   border-radius: var(--radius-sm, 6px);
@@ -20,6 +21,9 @@
   font-weight: var(--link-font-weight, 500);
   line-height: var(--link-line-height, 1.25);
   font-variant-numeric: var(--link-numeric, normal);
+  white-space: var(--link-white-space, normal);
+  overflow: var(--link-overflow, visible);
+  text-overflow: var(--link-text-overflow, clip);
   text-decoration: none;
   cursor: pointer;
   user-select: none;
@@ -27,6 +31,13 @@
               text-decoration var(--transition-fast, 150ms ease);
   outline: none;
 }
+
+/* canonical slot API: start / default / end.
+   The link is a flex container with align-items: center, so every slotted element
+   (text, SVG icon, material icon) sits centered on the vertical axis.
+   Additive hooks (defaults keep every existing consumer pixel-identical):
+   --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
+   --link-width, --link-white-space, --link-overflow, --link-text-overflow. */
 
 ::slotted(*) {
   display: inline-flex;
@@ -37,6 +48,7 @@
 .link-label {
   display: inline-flex;
   align-items: center;
+  min-width: 0;
 }
 
 /* canonical control size scale (Priority E): fonts from the root tokens */
