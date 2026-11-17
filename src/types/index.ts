@@ -162,15 +162,21 @@ export type InvoiceStatus =
   | 'cancelled';
 
 export type PaymentMethod = 'bank_transfer' | 'card' | 'cash' | 'offset';
+export type PaymentDirection = 'incoming' | 'outgoing';
 
 export interface InvoicePayment {
   id: string;
+  direction: PaymentDirection;
   invoiceId: string;
   contractId: string;
   companyId: string;
   counterpartyId: string;
+  companyBankAccountId?: string;
+  counterpartyBankAccountId?: string;
+  companyBankSnapshot?: string;
+  counterpartyBankSnapshot?: string;
   amount: number;
-  currency: 'RUB' | 'USD' | 'EUR';
+  currency: BankCurrency;
   paymentDate: string; // YYYY-MM-DD
   method: PaymentMethod;
   documentNumber: string;

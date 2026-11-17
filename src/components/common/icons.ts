@@ -788,4 +788,12 @@ export function iconLandmark(size: number | IconSize = 18): TemplateResult {
   `;
 }
 
-
+export function iconArrowDownLeft(size: number | IconSize = 16): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="17" y1="7" x2="7" y2="17"/>
+      <polyline points="17 17 7 17 7 7"/>
+    </svg>
+  `;
+}

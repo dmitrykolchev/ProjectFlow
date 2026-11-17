@@ -4,19 +4,25 @@ import styles from './app-money.css';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 
-const CURRENCY_SYMBOL: Record<'RUB' | 'USD' | 'EUR', string> = {
+import { BankCurrency } from '../../../types';
+
+const CURRENCY_SYMBOL: Record<BankCurrency, string> = {
   RUB: '₽',
   USD: '$',
   EUR: '€',
+  CNY: '¥',
+  GBP: '£',
+  KZT: '₸',
+  AED: 'AED',
 };
 
-export function formatMoney(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
-  const symbol = CURRENCY_SYMBOL[currency];
+export function formatMoney(amount: number, currency: BankCurrency = 'RUB'): string {
+  const symbol = CURRENCY_SYMBOL[currency] || currency;
   return `${amount.toLocaleString(getTranslation(store.customization.language).common.locale)} ${symbol}`;
 }
 
-export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR' = 'RUB'): string {
-  const symbol = CURRENCY_SYMBOL[currency];
+export function formatMoneyShort(amount: number, currency: BankCurrency = 'RUB'): string {
+  const symbol = CURRENCY_SYMBOL[currency] || currency;
   if (Math.abs(amount) >= 1_000_000) {
     return `${(amount / 1_000_000).toFixed(2)}M ${symbol}`;
   }
@@ -29,7 +35,7 @@ export function formatMoneyShort(amount: number, currency: 'RUB' | 'USD' | 'EUR'
 @customElement('app-money')
 export class AppMoney extends LitElement {
   @property({ type: Number }) amount: number = 0;
-  @property({ type: String }) currency: 'RUB' | 'USD' | 'EUR' = 'RUB';
+  @property({ type: String }) currency: BankCurrency = 'RUB';
   @property({ type: String }) format: 'full' | 'short' = 'full';
 
   static styles = styles;

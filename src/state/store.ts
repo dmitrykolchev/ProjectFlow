@@ -3,6 +3,7 @@ import {
   ActiveView,
   ActivityLogItem,
   BackgroundPreset,
+  BankRequisite,
   Calculation,
   CalculationStatus,
   Company,
@@ -18,6 +19,7 @@ import {
   KnowledgeArticle,
   KnowledgeScope,
   NotificationItem,
+  PaymentDirection,
   Project,
   ProjectChatMessage,
   ProjectMember,
@@ -456,7 +458,44 @@ export class AppStore {
       this.invoices = storedInvoices ? JSON.parse(storedInvoices) : [...initialInvoices];
 
       const storedPayments = localStorage.getItem(STORAGE_KEY_PAYMENTS);
-      this.payments = storedPayments ? JSON.parse(storedPayments) : [...initialPayments];
+      if (storedPayments) {
+        const parsedPayments: Partial<InvoicePayment>[] = JSON.parse(storedPayments);
+        this.payments = parsedPayments.map((raw) => {
+          const fallback = initialPayments.find((p) => p.id === raw.id);
+          const direction: PaymentDirection =
+            raw.direction === 'incoming' || raw.direction === 'outgoing'
+              ? raw.direction
+              : fallback?.direction || this.inferPaymentDirection(raw.counterpartyId);
+          const companyId = raw.companyId || fallback?.companyId || this.companies[0]?.id || '';
+          const counterpartyId = raw.counterpartyId || fallback?.counterpartyId || '';
+          const currency = raw.currency || fallback?.currency || 'RUB';
+          const company = this.companies.find((c) => c.id === companyId);
+          const cp = this.counterparties.find((c) => c.id === counterpartyId);
+          const companyBankAccountId = this.resolveBankAccountId(
+            company?.bankAccounts,
+            raw.companyBankAccountId || fallback?.companyBankAccountId,
+            currency
+          );
+          const counterpartyBankAccountId = this.resolveBankAccountId(
+            cp?.bankAccounts,
+            raw.counterpartyBankAccountId || fallback?.counterpartyBankAccountId,
+            currency
+          );
+          return {
+            ...(raw as InvoicePayment),
+            direction,
+            invoiceId: raw.invoiceId ?? fallback?.invoiceId ?? '',
+            contractId: raw.contractId ?? fallback?.contractId ?? '',
+            companyId,
+            counterpartyId,
+            companyBankAccountId,
+            counterpartyBankAccountId,
+            currency,
+          };
+        });
+      } else {
+        this.payments = initialPayments.map((p) => ({ ...p }));
+      }
 
       this.syncOverdueInvoices(false);
 
@@ -1942,16 +1981,30 @@ export class AppStore {
     if (status === 'paid') {
       const remaining = this.getInvoiceRemainingAmount(existing);
       if (remaining > 0) {
+        const direction = this.inferPaymentDirection(existing.counterpartyId);
+        const company = this.companies.find((c) => c.id === existing.companyId);
+        const cp = this.counterparties.find((c) => c.id === existing.counterpartyId);
         this.addInvoicePayment({
+          direction,
           invoiceId: existing.id,
           contractId: existing.contractId,
           companyId: existing.companyId,
           counterpartyId: existing.counterpartyId,
+          companyBankAccountId: this.resolveBankAccountId(
+            company?.bankAccounts,
+            undefined,
+            existing.currency
+          ),
+          counterpartyBankAccountId: this.resolveBankAccountId(
+            cp?.bankAccounts,
+            undefined,
+            existing.currency
+          ),
           amount: remaining,
           currency: existing.currency,
           paymentDate: today,
           method: 'bank_transfer',
-          documentNumber: `ПП-${today.slice(0, 4)}/AUTO-${existing.number.slice(-3)}`,
+          documentNumber: `${direction === 'outgoing' ? 'ИСХ' : 'ПП'}-${today.slice(0, 4)}/AUTO-${existing.number.slice(-3)}`,
           notes: `Полная оплата счёта ${existing.number}`,
         });
         return;
@@ -2117,10 +2170,101 @@ export class AppStore {
     }
   }
 
-  public addInvoicePayment(data: Omit<InvoicePayment, 'id' | 'createdAt'>): InvoicePayment {
+  public inferPaymentDirection(counterpartyId?: string): PaymentDirection {
+    if (!counterpartyId) return 'incoming';
+    const cp = this.counterparties.find((c) => c.id === counterpartyId);
+    if (cp && (cp.type === 'vendor' || cp.type === 'contractor')) {
+      return 'outgoing';
+    }
+    return 'incoming';
+  }
+
+  public resolveBankAccountId(
+    accounts: BankRequisite[] | undefined,
+    preferredId?: string,
+    currency?: string
+  ): string | undefined {
+    if (!accounts || accounts.length === 0) return undefined;
+    if (preferredId && accounts.some((a) => a.id === preferredId)) {
+      return preferredId;
+    }
+    if (currency) {
+      const defaultMatching = accounts.find((a) => a.isDefault && a.currency === currency);
+      if (defaultMatching) return defaultMatching.id;
+      const anyMatching = accounts.find((a) => a.currency === currency);
+      if (anyMatching) return anyMatching.id;
+    }
+    return accounts.find((a) => a.isDefault)?.id || accounts[0].id;
+  }
+
+  public formatBankRequisiteShort(acc: BankRequisite): string {
+    const clean = acc.accountNumber.replace(/\s+/g, '');
+    const tail = clean.length >= 4 ? `•••• ${clean.slice(-4)}` : clean;
+    return `${acc.bankName} · ${acc.currency} · ${tail}`;
+  }
+
+  public getPaymentCompanyAccount(payment: InvoicePayment): BankRequisite | undefined {
+    const company = this.companies.find((c) => c.id === payment.companyId);
+    if (!company?.bankAccounts || company.bankAccounts.length === 0) return undefined;
+    if (payment.companyBankAccountId) {
+      const exact = company.bankAccounts.find((a) => a.id === payment.companyBankAccountId);
+      if (exact) return exact;
+    }
+    return undefined;
+  }
+
+  public getPaymentCounterpartyAccount(payment: InvoicePayment): BankRequisite | undefined {
+    const cp = this.counterparties.find((c) => c.id === payment.counterpartyId);
+    if (!cp?.bankAccounts || cp.bankAccounts.length === 0) return undefined;
+    if (payment.counterpartyBankAccountId) {
+      const exact = cp.bankAccounts.find((a) => a.id === payment.counterpartyBankAccountId);
+      if (exact) return exact;
+    }
+    return undefined;
+  }
+
+  public getPaymentCompanyRequisitesLabel(payment: InvoicePayment): string {
+    const acc = this.getPaymentCompanyAccount(payment);
+    if (acc) return this.formatBankRequisiteShort(acc);
+    return payment.companyBankSnapshot || '';
+  }
+
+  public getPaymentCounterpartyRequisitesLabel(payment: InvoicePayment): string {
+    const acc = this.getPaymentCounterpartyAccount(payment);
+    if (acc) return this.formatBankRequisiteShort(acc);
+    return payment.counterpartyBankSnapshot || '';
+  }
+
+  public addInvoicePayment(
+    data: Omit<InvoicePayment, 'id' | 'createdAt' | 'direction'> & { direction?: PaymentDirection }
+  ): InvoicePayment {
     const amount = Math.max(0.01, Math.round((Number(data.amount) || 0) * 100) / 100);
+    const direction: PaymentDirection =
+      data.direction || this.inferPaymentDirection(data.counterpartyId);
+    const company = this.companies.find((c) => c.id === data.companyId);
+    const cp = this.counterparties.find((c) => c.id === data.counterpartyId);
+    const companyBankAccountId = this.resolveBankAccountId(
+      company?.bankAccounts,
+      data.companyBankAccountId,
+      data.currency
+    );
+    const counterpartyBankAccountId = this.resolveBankAccountId(
+      cp?.bankAccounts,
+      data.counterpartyBankAccountId,
+      data.currency
+    );
+    const compAcc = company?.bankAccounts?.find((a) => a.id === companyBankAccountId);
+    const cpAcc = cp?.bankAccounts?.find((a) => a.id === counterpartyBankAccountId);
+
     const payment: InvoicePayment = {
       ...data,
+      direction,
+      companyBankAccountId,
+      counterpartyBankAccountId,
+      companyBankSnapshot:
+        data.companyBankSnapshot || (compAcc ? this.formatBankRequisiteShort(compAcc) : undefined),
+      counterpartyBankSnapshot:
+        data.counterpartyBankSnapshot || (cpAcc ? this.formatBankRequisiteShort(cpAcc) : undefined),
       amount,
       documentNumber: data.documentNumber.trim(),
       notes: data.notes.trim(),
@@ -2129,21 +2273,40 @@ export class AppStore {
     };
     this.payments = [payment, ...this.payments];
     this.savePayments();
-    this.reconcileInvoiceAfterPayments(payment.invoiceId);
+    if (payment.invoiceId) {
+      this.reconcileInvoiceAfterPayments(payment.invoiceId);
+    }
 
-    const inv = this.invoices.find((i) => i.id === payment.invoiceId);
-    const sym = payment.currency === 'USD' ? '$' : payment.currency === 'EUR' ? '€' : '₽';
+    const inv = payment.invoiceId ? this.invoices.find((i) => i.id === payment.invoiceId) : undefined;
+    const sym =
+      payment.currency === 'USD'
+        ? '$'
+        : payment.currency === 'EUR'
+        ? '€'
+        : payment.currency === 'CNY'
+        ? '¥'
+        : payment.currency === 'GBP'
+        ? '£'
+        : payment.currency === 'KZT'
+        ? '₸'
+        : payment.currency === 'AED'
+        ? 'AED'
+        : '₽';
     const isFull = inv ? inv.status === 'paid' : false;
+    const dirPrefix = direction === 'outgoing' ? 'Исходящий платёж' : 'Входящий платёж';
+    const targetName = inv
+      ? `${inv.number}${payment.documentNumber ? ` · ${payment.documentNumber}` : ''}`
+      : payment.documentNumber || company?.name || payment.id;
     this.logActivity(
       'create',
       'payment',
-      inv ? `${inv.number}${payment.documentNumber ? ` · ${payment.documentNumber}` : ''}` : payment.invoiceId,
-      `${isFull ? 'Полная оплата' : 'Частичный платёж'}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      targetName,
+      `${dirPrefix}${compAcc ? ` (${compAcc.bankName})` : ''}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.addNotification(
       'success',
-      isFull ? 'Счёт полностью оплачен' : 'Платёж зафиксирован',
-      `${inv?.number || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      isFull ? 'Счёт полностью оплачен' : `${dirPrefix} зафиксирован`,
+      `${inv?.number || company?.name || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.notify();
     return payment;
@@ -2154,14 +2317,31 @@ export class AppStore {
     if (!target) return;
     this.payments = this.payments.filter((p) => p.id !== paymentId);
     this.savePayments();
-    this.reconcileInvoiceAfterPayments(target.invoiceId, 'sent');
+    if (target.invoiceId) {
+      this.reconcileInvoiceAfterPayments(target.invoiceId, 'sent');
+    }
 
-    const inv = this.invoices.find((i) => i.id === target.invoiceId);
-    const sym = target.currency === 'USD' ? '$' : target.currency === 'EUR' ? '€' : '₽';
+    const inv = target.invoiceId ? this.invoices.find((i) => i.id === target.invoiceId) : undefined;
+    const sym =
+      target.currency === 'USD'
+        ? '$'
+        : target.currency === 'EUR'
+        ? '€'
+        : target.currency === 'CNY'
+        ? '¥'
+        : target.currency === 'GBP'
+        ? '£'
+        : target.currency === 'KZT'
+        ? '₸'
+        : target.currency === 'AED'
+        ? 'AED'
+        : '₽';
     this.logActivity(
       'delete',
       'payment',
-      inv ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}` : target.invoiceId,
+      inv
+        ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}`
+        : target.documentNumber || target.id,
       `Удалён платёж на ${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
     );
     this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`);

@@ -16,6 +16,8 @@ import {
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconArrowDownLeft,
+  iconArrowUpRight,
   iconCalculator,
   iconCheck,
   iconChevronRight,
@@ -23,12 +25,12 @@ import {
   iconCreditCard,
   iconEdit,
   iconFileText,
+  iconLandmark,
   iconPlus,
   iconReceipt,
   iconSend,
   iconTable,
   iconTrash,
-  iconWallet,
   iconX,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
@@ -241,13 +243,19 @@ export class AppContracts extends LitElement {
         if (!query) return true;
         const inv = this.invoices.find((i) => i.id === pay.invoiceId);
         const ctr = this.contracts.find((c) => c.id === pay.contractId);
-        const cp = store.counterparties.find((c) => c.id === pay.counterpartyId)?.name.toLowerCase() || '';
+        const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
+        const comp = store.companies.find((c) => c.id === pay.companyId);
+        const compReq = store.getPaymentCompanyRequisitesLabel(pay).toLowerCase();
+        const cpReq = store.getPaymentCounterpartyRequisitesLabel(pay).toLowerCase();
         return (
           pay.documentNumber.toLowerCase().includes(query) ||
           pay.notes.toLowerCase().includes(query) ||
           (inv?.number.toLowerCase().includes(query) ?? false) ||
           (ctr?.number.toLowerCase().includes(query) ?? false) ||
-          cp.includes(query)
+          (comp?.name.toLowerCase().includes(query) ?? false) ||
+          (cp?.name.toLowerCase().includes(query) ?? false) ||
+          compReq.includes(query) ||
+          cpReq.includes(query)
         );
       });
   }
@@ -812,7 +820,9 @@ export class AppContracts extends LitElement {
                   <thead>
                     <tr>
                       <th>${t.payments.paymentDate}</th>
+                      <th>${t.viewTexts.payments.thDirection}</th>
                       <th>${t.payments.documentNumber}</th>
+                      <th>${t.viewTexts.payments.thCompanyRequisites}</th>
                       <th>${t.viewTexts.payments.thInvoice}</th>
                       <th>${t.viewTexts.payments.thContract}</th>
                       <th>${t.viewTexts.payments.thCounterparty}</th>
@@ -824,17 +834,53 @@ export class AppContracts extends LitElement {
                   </thead>
                   <tbody>
                     ${pagedPayments.items.map((pay) => {
-                      const inv = this.invoices.find((i) => i.id === pay.invoiceId);
-                      const ctr = this.contracts.find((c) => c.id === pay.contractId);
-                      const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
+                      const inv = pay.invoiceId ? this.invoices.find((i) => i.id === pay.invoiceId) : undefined;
+                      const ctr = pay.contractId ? this.contracts.find((c) => c.id === pay.contractId) : undefined;
+                      const cp = pay.counterpartyId ? store.counterparties.find((c) => c.id === pay.counterpartyId) : undefined;
+                      const comp = store.companies.find((c) => c.id === pay.companyId);
+                      const compReq = store.getPaymentCompanyRequisitesLabel(pay);
+                      const cpReq = store.getPaymentCounterpartyRequisitesLabel(pay);
+                      const isOutgoing = pay.direction === 'outgoing';
                       return html`
                         <tr>
                           <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                          <td>
+                            <app-status-chip
+                              domain="paymentDirection"
+                              status="${pay.direction}"
+                              appearance="soft"
+                              size="sm"
+                            ></app-status-chip>
+                          </td>
                           <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                            <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                              ${iconWallet(14)}
+                            <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                              <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
+                                ${isOutgoing ? iconArrowUpRight(14) : iconArrowDownLeft(14)}
+                              </span>
                               <span>${pay.documentNumber || '—'}</span>
                             </div>
+                          </td>
+                          <td>
+                            ${comp
+                              ? html`
+                                  <app-link
+                                    class="contract-link-btn"
+                                    size="md"
+                                    variant="primary"
+                                    @click="${() => store.openCompanyDetail(comp.id)}"
+                                  >
+                                    <span>${comp.name}</span>
+                                  </app-link>
+                                `
+                              : '—'}
+                            ${compReq
+                              ? html`
+                                  <div class="contract-desc mono" style="display: flex; align-items: center; gap: 0.25rem;" title="${compReq}">
+                                    ${iconLandmark(11)}
+                                    <span>${compReq}</span>
+                                  </div>
+                                `
+                              : ''}
                           </td>
                           <td>
                             ${inv
@@ -851,7 +897,7 @@ export class AppContracts extends LitElement {
                                     ${t.invoices.statuses[inv.status]}
                                   </div>
                                 `
-                              : '—'}
+                              : html`<span style="font-size: 0.75rem; color: var(--text-muted);">${t.viewTexts.payments.standalonePayment}</span>`}
                           </td>
                           <td>
                             ${ctr
@@ -868,7 +914,12 @@ export class AppContracts extends LitElement {
                                 `
                               : '—'}
                           </td>
-                          <td>${cp?.name || '—'}</td>
+                          <td>
+                            <div>${cp?.name || '—'}</div>
+                            ${cpReq
+                              ? html`<div class="contract-desc mono" title="${cpReq}">${cpReq}</div>`
+                              : ''}
+                          </td>
                           <td>
                             <app-badge variant="default" appearance="soft" size="sm">
                               ${t.payments.methods[pay.method]}
@@ -877,8 +928,8 @@ export class AppContracts extends LitElement {
                           <td style="color: var(--text-secondary); max-width: 240px;">
                             ${pay.notes || '—'}
                           </td>
-                          <td class="amount-cell" style="color: var(--color-success, #10b981);">
-                            +${formatMoney(pay.amount, pay.currency)}
+                          <td class="amount-cell" style="color: ${isOutgoing ? '#f59e0b' : 'var(--color-success, #10b981)'};">
+                            ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
                           </td>
                           <td>
                             <div class="actions-row">

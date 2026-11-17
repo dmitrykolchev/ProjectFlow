@@ -123,6 +123,21 @@
   margin-top: 0.18rem;
 }
 
+.req-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .mono {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
@@ -133,6 +148,14 @@
   font-variant-numeric: tabular-nums;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.amount-cell.incoming {
+  color: #10b981;
+}
+
+.amount-cell.outgoing {
+  color: #f59e0b;
 }
 
 .due-tag {

@@ -4,26 +4,28 @@ import { store } from '../../../state/store';
 import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
 import {
+  BankCurrency,
   Contract,
   Invoice,
   InvoicePayment,
-  InvoiceStatus,
+  PaymentDirection,
   PaymentMethod,
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconArrowDownLeft,
+  iconArrowUpRight,
   iconCheck,
   iconChevronRight,
   iconClock,
   iconCreditCard,
+  iconLandmark,
   iconReceipt,
   iconTrash,
-  iconWallet,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
-
 import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
@@ -34,6 +36,16 @@ import '../../common/app-pagination/app-pagination';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-payments.css';
 import { eventValue } from '../../common/event-value';
+
+const RUB_RATES: Record<BankCurrency, number> = {
+  RUB: 1,
+  USD: 96,
+  EUR: 104,
+  CNY: 13.4,
+  GBP: 122,
+  KZT: 0.2,
+  AED: 26.2,
+};
 
 @customElement('app-payments')
 export class AppPayments extends LitElement {
@@ -52,6 +64,8 @@ export class AppPayments extends LitElement {
     | 'due_soon'
     | 'partially_paid'
     | 'paid' = 'all';
+  @state() private directionFilter: 'all' | PaymentDirection = 'all';
+  @state() private companyFilter = 'all';
   @state() private methodFilter: 'all' | PaymentMethod = 'all';
   @state() private counterpartyFilter = 'all';
   @state() private contractFilter = 'all';
@@ -88,11 +102,8 @@ export class AppPayments extends LitElement {
     this.tablePageSize = store.customization.tablePageSize;
   }
 
-
-  private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
-    if (currency === 'USD') return amount * 96;
-    if (currency === 'EUR') return amount * 104;
-    return amount;
+  private toRub(amount: number, currency: BankCurrency): number {
+    return amount * (RUB_RATES[currency] || 1);
   }
 
   private renderDueControlTag(inv: Invoice, t: ReturnType<typeof getTranslation>) {
@@ -157,6 +168,7 @@ export class AppPayments extends LitElement {
     return this.invoices
       .filter((inv) => inv.status !== 'draft' && inv.status !== 'cancelled')
       .filter((inv) => {
+        if (this.companyFilter !== 'all' && inv.companyId !== this.companyFilter) return false;
         if (this.contractFilter !== 'all' && inv.contractId !== this.contractFilter) return false;
         if (this.counterpartyFilter !== 'all' && inv.counterpartyId !== this.counterpartyFilter)
           return false;
@@ -172,10 +184,12 @@ export class AppPayments extends LitElement {
         if (!query) return true;
         const ctr = this.contracts.find((c) => c.id === inv.contractId);
         const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
+        const comp = store.companies.find((c) => c.id === inv.companyId);
         return (
           inv.number.toLowerCase().includes(query) ||
           inv.notes.toLowerCase().includes(query) ||
           (ctr?.number.toLowerCase().includes(query) ?? false) ||
+          (comp?.name.toLowerCase().includes(query) ?? false) ||
           (cp?.name.toLowerCase().includes(query) ?? false)
         );
       })
@@ -191,6 +205,8 @@ export class AppPayments extends LitElement {
     return [...this.payments]
       .sort((a, b) => (b.paymentDate + b.createdAt).localeCompare(a.paymentDate + a.createdAt))
       .filter((pay) => {
+        if (this.directionFilter !== 'all' && pay.direction !== this.directionFilter) return false;
+        if (this.companyFilter !== 'all' && pay.companyId !== this.companyFilter) return false;
         if (this.methodFilter !== 'all' && pay.method !== this.methodFilter) return false;
         if (this.contractFilter !== 'all' && pay.contractId !== this.contractFilter) return false;
         if (this.counterpartyFilter !== 'all' && pay.counterpartyId !== this.counterpartyFilter)
@@ -200,12 +216,22 @@ export class AppPayments extends LitElement {
         const inv = this.invoices.find((i) => i.id === pay.invoiceId);
         const ctr = this.contracts.find((c) => c.id === pay.contractId);
         const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
+        const comp = store.companies.find((c) => c.id === pay.companyId);
+        const compReq = store.getPaymentCompanyRequisitesLabel(pay).toLowerCase();
+        const cpReq = store.getPaymentCounterpartyRequisitesLabel(pay).toLowerCase();
+        const compAccNum = store.getPaymentCompanyAccount(pay)?.accountNumber.toLowerCase() || '';
+        const cpAccNum = store.getPaymentCounterpartyAccount(pay)?.accountNumber.toLowerCase() || '';
         return (
           pay.documentNumber.toLowerCase().includes(query) ||
           pay.notes.toLowerCase().includes(query) ||
           (inv?.number.toLowerCase().includes(query) ?? false) ||
           (ctr?.number.toLowerCase().includes(query) ?? false) ||
-          (cp?.name.toLowerCase().includes(query) ?? false)
+          (comp?.name.toLowerCase().includes(query) ?? false) ||
+          (cp?.name.toLowerCase().includes(query) ?? false) ||
+          compReq.includes(query) ||
+          cpReq.includes(query) ||
+          compAccNum.includes(query) ||
+          cpAccNum.includes(query)
         );
       });
   }
@@ -216,8 +242,14 @@ export class AppPayments extends LitElement {
     const activeInvoices = this.invoices.filter(
       (i) => i.status !== 'draft' && i.status !== 'cancelled'
     );
-    const totalPaidRub = activeInvoices.reduce(
-      (s, i) => s + this.toRub(store.getInvoicePaidAmount(i.id), i.currency),
+    const incomingPayments = this.payments.filter((p) => p.direction === 'incoming');
+    const outgoingPayments = this.payments.filter((p) => p.direction === 'outgoing');
+    const incomingRub = incomingPayments.reduce(
+      (s, p) => s + this.toRub(p.amount, p.currency),
+      0
+    );
+    const outgoingRub = outgoingPayments.reduce(
+      (s, p) => s + this.toRub(p.amount, p.currency),
       0
     );
     const totalRemainingRub = activeInvoices.reduce(
@@ -228,13 +260,6 @@ export class AppPayments extends LitElement {
       (i) => store.getInvoiceDueControl(i).state === 'overdue'
     );
     const overdueRub = overdueInvoices.reduce(
-      (s, i) => s + this.toRub(store.getInvoiceRemainingAmount(i), i.currency),
-      0
-    );
-    const dueSoonInvoices = activeInvoices.filter(
-      (i) => store.getInvoiceDueControl(i).state === 'due_soon'
-    );
-    const dueSoonRub = dueSoonInvoices.reduce(
       (s, i) => s + this.toRub(store.getInvoiceRemainingAmount(i), i.currency),
       0
     );
@@ -263,6 +288,17 @@ export class AppPayments extends LitElement {
       { value: 'paid', label: t.invoices.statuses.paid, color: '#10b981' },
     ];
 
+    const directionFilterOptions = [
+      { value: 'all', label: t.viewTexts.payments.filterAllDirections },
+      { value: 'incoming', label: t.viewTexts.payments.filterIncomingOnly, color: '#10b981' },
+      { value: 'outgoing', label: t.viewTexts.payments.filterOutgoingOnly, color: '#f59e0b' },
+    ];
+
+    const companyOptions = [
+      { value: 'all', label: t.viewTexts.payments.filterAllCompanies },
+      ...store.companies.map((c) => ({ value: c.id, label: c.name })),
+    ];
+
     const methodFilterOptions = [
       { value: 'all', label: t.viewTexts.payments.filterAllMethods },
       { value: 'bank_transfer', label: t.payments.methods.bank_transfer },
@@ -287,54 +323,98 @@ export class AppPayments extends LitElement {
         subtitle="${t.viewTexts.pageSubtitles.payments}"
       >
         <span slot="icon">${iconCreditCard(28)}</span>
-        ${payableInvoices.length > 0
-          ? html`
-              <app-button
-                slot="actions"
-                variant="primary"
-                size="md"
-                @click="${() => this.openPaymentModal(payableInvoices[0])}"
-              >
-                <span slot="icon-start">${iconCreditCard(16)}</span>
-                <span>${t.payments.recordPayment}</span>
-              </app-button>
-            `
-          : ''}
+        <app-button
+          slot="actions"
+          variant="primary"
+          size="md"
+          @click="${() =>
+            this.openPaymentModal(
+              this.viewTab === 'due_control' ? payableInvoices[0] || null : null
+            )}"
+        >
+          <span slot="icon-start">${iconCreditCard(16)}</span>
+          <span>${t.payments.recordPayment}</span>
+        </app-button>
       </app-page-header>
 
       <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.payments.paidAmount} (RUB)" value="${formatMoney(totalPaidRub, 'RUB')}" valueColor="#10b981" subtitle="${this.payments.length} ${t.viewTexts.payments.kpiRecordedPayments}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.payments.remainingDue} (RUB)" value="${formatMoney(totalRemainingRub, 'RUB')}" valueColor="var(--accent-primary, #6366f1)" subtitle="${payableInvoices.length} ${t.viewTexts.payments.kpiOpenInvoices}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.payments.overdueAlert}" value="${formatMoney(overdueRub, 'RUB')}" valueColor="${overdueRub > 0 ? '#ef4444' : ''}" subtitle="${overdueInvoices.length} ${t.viewTexts.payments.kpiOverdueInvoices}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.payments.kpiDueWithin5}" value="${formatMoney(dueSoonRub, 'RUB')}" valueColor="${dueSoonRub > 0 ? '#f59e0b' : ''}" subtitle="${dueSoonInvoices.length} ${t.viewTexts.payments.kpiDueSoonInvoices}"></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.viewTexts.payments.kpiIncomingTotal}"
+          value="${formatMoney(incomingRub, 'RUB')}"
+          valueColor="#10b981"
+          subtitle="${incomingPayments.length} ${t.viewTexts.payments.kpiIncomingHint}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.viewTexts.payments.kpiOutgoingTotal}"
+          value="${formatMoney(outgoingRub, 'RUB')}"
+          valueColor="#f59e0b"
+          subtitle="${outgoingPayments.length} ${t.viewTexts.payments.kpiOutgoingHint}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.payments.remainingDue} (RUB)"
+          value="${formatMoney(totalRemainingRub, 'RUB')}"
+          valueColor="var(--accent-primary, #6366f1)"
+          subtitle="${payableInvoices.length} ${t.viewTexts.payments.kpiOpenInvoices}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.payments.overdueAlert}"
+          value="${formatMoney(overdueRub, 'RUB')}"
+          valueColor="${overdueRub > 0 ? '#ef4444' : ''}"
+          subtitle="${overdueInvoices.length} ${t.viewTexts.payments.kpiOverdueInvoices}"
+        ></app-metric-card>
       </app-kpi-strip>
 
       <app-filter-bar
         variant="bare"
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 210px;"
+        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 190px;"
         placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
         .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'first', options: this.viewTab === 'due_control' ? dueFilterOptions : methodFilterOptions },
-          { key: 'counterparty', options: counterpartyOptions },
-          { key: 'contract', options: contractOptions },
-        ]}"
-        .values="${{
-          first: this.viewTab === 'due_control' ? this.dueFilter : this.methodFilter,
-          counterparty: this.counterpartyFilter,
-          contract: this.contractFilter,
-        }}"
+        .filters="${this.viewTab === 'due_control'
+          ? [
+              { key: 'due', options: dueFilterOptions },
+              { key: 'company', options: companyOptions },
+              { key: 'counterparty', options: counterpartyOptions },
+              { key: 'contract', options: contractOptions },
+            ]
+          : [
+              { key: 'direction', options: directionFilterOptions },
+              { key: 'company', options: companyOptions },
+              { key: 'method', options: methodFilterOptions },
+              { key: 'counterparty', options: counterpartyOptions },
+            ]}"
+        .values="${this.viewTab === 'due_control'
+          ? {
+              due: this.dueFilter,
+              company: this.companyFilter,
+              counterparty: this.counterpartyFilter,
+              contract: this.contractFilter,
+            }
+          : {
+              direction: this.directionFilter,
+              company: this.companyFilter,
+              method: this.methodFilter,
+              counterparty: this.counterpartyFilter,
+            }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
           this.localSearch = eventValue(e);
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'first') {
-            if (this.viewTab === 'due_control') {
-              this.dueFilter = eventValue(e) as typeof this.dueFilter;
-            } else {
-              this.methodFilter = eventValue(e) as 'all' | PaymentMethod;
-            }
+          if (e.detail.key === 'due') {
+            this.dueFilter = eventValue(e) as typeof this.dueFilter;
+          }
+          if (e.detail.key === 'direction') {
+            this.directionFilter = eventValue(e) as 'all' | PaymentDirection;
+          }
+          if (e.detail.key === 'company') {
+            this.companyFilter = eventValue(e);
+          }
+          if (e.detail.key === 'method') {
+            this.methodFilter = eventValue(e) as 'all' | PaymentMethod;
           }
           if (e.detail.key === 'counterparty') this.counterpartyFilter = eventValue(e);
           if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
@@ -356,7 +436,7 @@ export class AppPayments extends LitElement {
         ? this.renderDueControlTable(filteredDueInvoices, t)
         : this.renderLedgerTable(filteredLedger, t)}
 
-      ${this.renderPaymentModal(t)}
+      ${this.renderPaymentModal(payableInvoices)}
       ${this.renderDeletePaymentModal(t)}
     `;
   }
@@ -392,6 +472,7 @@ export class AppPayments extends LitElement {
             ${paged.items.map((inv) => {
               const ctr = this.contracts.find((c) => c.id === inv.contractId);
               const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
+              const comp = store.companies.find((c) => c.id === inv.companyId);
               const invPaid = store.getInvoicePaidAmount(inv.id);
               const invRemaining = store.getInvoiceRemainingAmount(inv);
               const payPct =
@@ -414,7 +495,7 @@ export class AppPayments extends LitElement {
                       <span>${inv.number}</span>
                     </app-link>
                     <div class="cell-sub">
-                      ${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
+                      ${comp ? `${comp.name} · ` : ''}${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
                     </div>
                   </td>
                   <td>
@@ -568,10 +649,11 @@ export class AppPayments extends LitElement {
           <thead>
             <tr>
               <th>${t.payments.paymentDate}</th>
+              <th>${t.viewTexts.payments.thDirection}</th>
               <th>${t.payments.documentNumber}</th>
-              <th>${t.viewTexts.payments.thInvoice}</th>
-              <th>${t.viewTexts.payments.thContract}</th>
+              <th>${t.viewTexts.payments.thCompanyRequisites}</th>
               <th>${t.viewTexts.payments.thCounterparty}</th>
+              <th>${t.viewTexts.payments.thInvoice}</th>
               <th>${t.payments.paymentMethod}</th>
               <th>${t.payments.notes}</th>
               <th>${t.viewTexts.payments.thAmount}</th>
@@ -580,48 +662,56 @@ export class AppPayments extends LitElement {
           </thead>
           <tbody>
             ${paged.items.map((pay) => {
-              const inv = this.invoices.find((i) => i.id === pay.invoiceId);
-              const ctr = this.contracts.find((c) => c.id === pay.contractId);
-              const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
+              const inv = pay.invoiceId ? this.invoices.find((i) => i.id === pay.invoiceId) : undefined;
+              const ctr = pay.contractId ? this.contracts.find((c) => c.id === pay.contractId) : undefined;
+              const cp = pay.counterpartyId
+                ? store.counterparties.find((c) => c.id === pay.counterpartyId)
+                : undefined;
+              const comp = store.companies.find((c) => c.id === pay.companyId);
+              const compReqLabel = store.getPaymentCompanyRequisitesLabel(pay);
+              const cpReqLabel = store.getPaymentCounterpartyRequisitesLabel(pay);
+              const isOutgoing = pay.direction === 'outgoing';
 
               return html`
                 <tr>
                   <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                  <td>
+                    <app-status-chip
+                      domain="paymentDirection"
+                      status="${pay.direction}"
+                      appearance="soft"
+                      size="sm"
+                    ></app-status-chip>
+                  </td>
                   <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                    <div style="display: inline-flex; align-items: center; gap: 0.4rem;">
-                      ${iconWallet(14)}
+                    <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
+                      <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
+                        ${isOutgoing ? iconArrowUpRight(14) : iconArrowDownLeft(14)}
+                      </span>
                       <span>${pay.documentNumber || '—'}</span>
                     </div>
                   </td>
                   <td>
-                    ${inv
+                    ${comp
                       ? html`
                           <app-link
-                            class="link-btn"
+                            class="text-link-btn"
                             size="md"
                             variant="primary"
-                            @click="${() => ctr && store.openContractDetail(ctr.id)}"
+                            @click="${() => store.openCompanyDetail(comp.id)}"
                           >
-                            <span>${inv.number}</span>
+                            ${comp.name}
                           </app-link>
-                          <div class="cell-sub">${t.invoices.statuses[inv.status]}</div>
                         `
                       : '—'}
-                  </td>
-                  <td>
-                    ${ctr
+                    ${compReqLabel
                       ? html`
-                          <app-link
-                            class="link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openContractDetail(ctr.id)}"
-                          >
-                            <span>${ctr.number}</span>
-                          </app-link>
-                          <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
+                          <div class="req-sub" title="${compReqLabel}">
+                            ${iconLandmark(11)}
+                            <span>${compReqLabel}</span>
+                          </div>
                         `
-                      : '—'}
+                      : html`<div class="cell-sub">${t.viewTexts.payments.noBankAccountOption}</div>`}
                   </td>
                   <td>
                     ${cp
@@ -636,6 +726,43 @@ export class AppPayments extends LitElement {
                           </app-link>
                         `
                       : '—'}
+                    ${cpReqLabel
+                      ? html`
+                          <div class="req-sub" title="${cpReqLabel}">
+                            ${iconLandmark(11)}
+                            <span>${cpReqLabel}</span>
+                          </div>
+                        `
+                      : ''}
+                  </td>
+                  <td>
+                    ${inv
+                      ? html`
+                          <app-link
+                            class="link-btn"
+                            size="md"
+                            variant="primary"
+                            @click="${() => ctr && store.openContractDetail(ctr.id)}"
+                          >
+                            <span>${inv.number}</span>
+                          </app-link>
+                          ${ctr
+                            ? html`<div class="contract-desc" title="${ctr.title}">${ctr.number}</div>`
+                            : ''}
+                        `
+                      : ctr
+                      ? html`
+                          <app-link
+                            class="link-btn"
+                            size="md"
+                            variant="primary"
+                            @click="${() => store.openContractDetail(ctr.id)}"
+                          >
+                            <span>${ctr.number}</span>
+                          </app-link>
+                          <div class="cell-sub">${t.viewTexts.payments.standalonePayment}</div>
+                        `
+                      : html`<span class="cell-sub">${t.viewTexts.payments.standalonePayment}</span>`}
                   </td>
                   <td>
                     <app-badge variant="default" appearance="soft" size="sm">
@@ -645,8 +772,8 @@ export class AppPayments extends LitElement {
                   <td style="color: var(--text-secondary); max-width: 240px;">
                     ${pay.notes || '—'}
                   </td>
-                  <td class="amount-cell" style="color: #10b981;">
-                    +${formatMoney(pay.amount, pay.currency)}
+                  <td class="amount-cell ${isOutgoing ? 'outgoing' : 'incoming'}">
+                    ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
                   </td>
                   <td>
                     <div class="actions-row">
@@ -696,23 +823,24 @@ export class AppPayments extends LitElement {
     `;
   }
 
-  private renderPaymentModal(t: ReturnType<typeof getTranslation>) {
-    const inv =
-      this.invoices.find((i) => i.id === this.paymentInvoiceId) || null;
-    if (!this.paymentModalOpen || !inv) return '';
+  private renderPaymentModal(payableInvoices: Invoice[]) {
+    if (!this.paymentModalOpen) return '';
+    const inv = this.paymentInvoiceId
+      ? this.invoices.find((i) => i.id === this.paymentInvoiceId) || null
+      : null;
 
-    const payableInvoices = this.invoices.filter(
-      (i) =>
-        i.status !== 'draft' &&
-        i.status !== 'cancelled' &&
-        (store.getInvoiceRemainingAmount(i) > 0 || i.id === inv.id)
-    );
+    const modalInvoices = inv && !payableInvoices.some((i) => i.id === inv.id)
+      ? [inv, ...payableInvoices]
+      : payableInvoices;
 
     return html`
       <app-payment-form
         .open="${this.paymentModalOpen}"
         .invoice="${inv}"
-        .payableInvoices="${payableInvoices}"
+        .payableInvoices="${modalInvoices}"
+        .defaultDirection="${this.directionFilter === 'outgoing' ? 'outgoing' : 'incoming'}"
+        .defaultCompanyId="${this.companyFilter !== 'all' ? this.companyFilter : ''}"
+        .defaultCounterpartyId="${this.counterpartyFilter !== 'all' ? this.counterpartyFilter : ''}"
         @close="${() => (this.paymentModalOpen = false)}"
         @saved="${() => (this.paymentModalOpen = false)}"
       ></app-payment-form>
@@ -742,8 +870,8 @@ export class AppPayments extends LitElement {
     `;
   }
 
-  private openPaymentModal(inv: Invoice) {
-    this.paymentInvoiceId = inv.id;
+  private openPaymentModal(inv: Invoice | null) {
+    this.paymentInvoiceId = inv?.id || '';
     this.paymentModalOpen = true;
   }
 }

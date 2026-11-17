@@ -16,18 +16,21 @@ import {
   Company,
   Contract,
   DocumentItem,
+  InvoicePayment,
   KnowledgeArticle,
   Project,
   User,
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconArrowDownLeft,
   iconArrowUpRight,
   iconBookOpen,
   iconCheck,
   iconChevronLeft,
   iconChevronRight,
   iconCpu,
+  iconCreditCard,
   iconDownload,
   iconEdit,
   iconEye,
@@ -43,6 +46,7 @@ import {
   iconTrash,
   iconUpload,
   iconUsers,
+  iconWallet,
 } from '../../common/icons';
 import {
   formatAiError,
@@ -70,6 +74,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-bank-requisites/app-bank-requisites';
+import '../../common/app-payment-form/app-payment-form';
 import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
 import { eventValue } from '../../common/event-value';
 import styles from './app-company-detail.css';
@@ -79,6 +84,7 @@ type CompanyDetailTab =
   | 'projects'
   | 'employees'
   | 'contracts'
+  | 'payments'
   | 'documents'
   | 'knowledge';
 
@@ -97,6 +103,9 @@ export class AppCompanyDetail extends LitElement {
 
   // Quick Project create modal state
   @state() private projectModalOpen = false;
+
+  // Quick Payment modal state
+  @state() private paymentModalOpen = false;
 
   // Quick Upload Document modal state
   @state() private uploadDocModalOpen = false;
@@ -203,6 +212,9 @@ export class AppCompanyDetail extends LitElement {
     const companyContracts = store.contracts.filter((c) => c.companyId === company.id);
     const companyContractIds = new Set(companyContracts.map((c) => c.id));
     const companyInvoices = store.invoices.filter((i) => companyContractIds.has(i.contractId));
+    const companyPayments = store.payments
+      .filter((p) => p.companyId === company.id)
+      .sort((a, b) => (b.paymentDate + b.createdAt).localeCompare(a.paymentDate + a.createdAt));
     const companyDocs = this.getScopedDocuments(company.id, companyProjects, companyContracts);
     const companyArticles = this.getScopedKnowledge(company.id, companyProjects);
 
@@ -403,6 +415,7 @@ export class AppCompanyDetail extends LitElement {
               { value: 'projects', label: `${t.companyDetail.projectsTab} (${companyProjects.length})` },
               { value: 'employees', label: `${t.companyDetail.employeesTab} (${companyEmployees.length})` },
               { value: 'contracts', label: `${t.companyDetail.contractsTab} (${companyContracts.length})` },
+              { value: 'payments', label: `${t.companyDetail.paymentsTab} (${companyPayments.length})` },
               { value: 'documents', label: `${t.companyDetail.documentsTab} (${companyDocs.length})` },
               { value: 'knowledge', label: `${t.companyDetail.knowledgeTab} (${companyArticles.length})` },
             ]}"
@@ -416,6 +429,7 @@ export class AppCompanyDetail extends LitElement {
           companyProjects,
           companyEmployees,
           companyContracts,
+          companyPayments,
           companyDocs,
           companyArticles,
           t
@@ -425,6 +439,7 @@ export class AppCompanyDetail extends LitElement {
       ${this.renderEditModal(t)}
       ${this.renderDeleteModal(company, t)}
       ${this.renderQuickProjectModal(company, t)}
+      ${this.renderPaymentModal(company, companyContracts)}
       ${this.renderUploadDocModal(company, companyProjects, t)}
       ${this.renderPreviewModal(t)}
     `;
@@ -435,6 +450,7 @@ export class AppCompanyDetail extends LitElement {
     companyProjects: Project[],
     companyEmployees: User[],
     companyContracts: Contract[],
+    companyPayments: InvoicePayment[],
     companyDocs: DocumentItem[],
     companyArticles: KnowledgeArticle[],
     t: ReturnType<typeof getTranslation>
@@ -456,6 +472,8 @@ export class AppCompanyDetail extends LitElement {
         return this.renderEmployeesSection(companyEmployees, t);
       case 'contracts':
         return this.renderContractsSection(companyContracts, t);
+      case 'payments':
+        return this.renderPaymentsSection(company, companyPayments, t);
       case 'documents':
         return this.renderDocumentsSection(company, companyDocs, t);
       case 'knowledge':
@@ -887,6 +905,150 @@ export class AppCompanyDetail extends LitElement {
               </div>
             `}
       </app-section-card>
+    `;
+  }
+
+  private renderPaymentsSection(
+    _company: Company,
+    companyPayments: InvoicePayment[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    return html`
+      <app-section-card title="${t.companyDetail.paymentsTab}" subtitle="(${companyPayments.length})">
+        <span slot="icon">${iconWallet(18)}</span>
+        <app-button
+          slot="actions"
+          size="sm"
+          variant="primary"
+          @click="${() => (this.paymentModalOpen = true)}"
+        >
+          <span slot="icon-start">${iconCreditCard(14)}</span>
+          <span>${t.companyDetail.recordCompanyPayment}</span>
+        </app-button>
+
+        ${companyPayments.length === 0
+          ? html`<app-empty-state compact title="${t.companyDetail.noPayments}"></app-empty-state>`
+          : html`
+              <div class="table-scroll">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>${t.payments.paymentDate}</th>
+                      <th>${t.viewTexts.payments.thDirection}</th>
+                      <th>${t.payments.documentNumber}</th>
+                      <th>${t.viewTexts.payments.labelCompanyBankAccount}</th>
+                      <th>${t.viewTexts.payments.thCounterparty}</th>
+                      <th>${t.viewTexts.payments.thContract}</th>
+                      <th>${t.payments.paymentMethod}</th>
+                      <th>${t.viewTexts.payments.thAmount}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${companyPayments.map((pay) => {
+                      const cp = pay.counterpartyId
+                        ? store.counterparties.find((c) => c.id === pay.counterpartyId)
+                        : undefined;
+                      const ctr = pay.contractId
+                        ? store.contracts.find((c) => c.id === pay.contractId)
+                        : undefined;
+                      const inv = pay.invoiceId
+                        ? store.invoices.find((i) => i.id === pay.invoiceId)
+                        : undefined;
+                      const compReq = store.getPaymentCompanyRequisitesLabel(pay);
+                      const cpReq = store.getPaymentCounterpartyRequisitesLabel(pay);
+                      const isOutgoing = pay.direction === 'outgoing';
+                      return html`
+                        <tr>
+                          <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                          <td>
+                            <app-status-chip
+                              domain="paymentDirection"
+                              status="${pay.direction}"
+                              appearance="soft"
+                              size="sm"
+                            ></app-status-chip>
+                          </td>
+                          <td class="mono" style="font-weight: 700; white-space: nowrap;">
+                            <span style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                              <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
+                                ${isOutgoing ? iconArrowUpRight(13) : iconArrowDownLeft(13)}
+                              </span>
+                              <span>${pay.documentNumber || '—'}</span>
+                            </span>
+                          </td>
+                          <td class="mono" style="font-size: 0.78rem; color: var(--text-secondary);">
+                            ${compReq
+                              ? html`<span style="display: inline-flex; align-items: center; gap: 0.28rem;">${iconLandmark(12)}<span>${compReq}</span></span>`
+                              : t.viewTexts.payments.noBankAccountOption}
+                          </td>
+                          <td>
+                            ${cp
+                              ? html`
+                                  <app-link
+                                    class="link-btn"
+                                    size="md"
+                                    variant="primary"
+                                    @click="${() => store.openCounterpartyDetail(cp.id)}"
+                                  >
+                                    <span class="link-wrap"><span class="link-inner">${cp.name}</span></span>
+                                  </app-link>
+                                `
+                              : '—'}
+                            ${cpReq ? html`<div class="emp-role mono">${cpReq}</div>` : ''}
+                          </td>
+                          <td>
+                            ${ctr
+                              ? html`
+                                  <app-link
+                                    class="link-btn"
+                                    size="md"
+                                    variant="primary"
+                                    @click="${() => store.openContractDetail(ctr.id)}"
+                                  >
+                                    <span class="link-wrap"><span class="link-inner">${inv ? inv.number : ctr.number}</span></span>
+                                  </app-link>
+                                  <div class="emp-role">${ctr.number}</div>
+                                `
+                              : html`<span class="emp-role">${t.viewTexts.payments.standalonePayment}</span>`}
+                          </td>
+                          <td>
+                            <app-badge variant="default" appearance="soft" size="sm">
+                              ${t.payments.methods[pay.method]}
+                            </app-badge>
+                          </td>
+                          <td class="mono" style="font-weight: 700; white-space: nowrap; color: ${isOutgoing ? '#f59e0b' : '#10b981'};">
+                            ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
+                          </td>
+                        </tr>
+                      `;
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            `}
+      </app-section-card>
+    `;
+  }
+
+  private renderPaymentModal(company: Company, companyContracts: Contract[]) {
+    if (!this.paymentModalOpen) return '';
+    const companyContractIds = new Set(companyContracts.map((c) => c.id));
+    const payableInvoices = store.invoices.filter(
+      (i) =>
+        (i.companyId === company.id || companyContractIds.has(i.contractId)) &&
+        i.status !== 'draft' &&
+        i.status !== 'cancelled' &&
+        store.getInvoiceRemainingAmount(i) > 0
+    );
+    return html`
+      <app-payment-form
+        .open="${this.paymentModalOpen}"
+        .invoice="${null}"
+        .payableInvoices="${payableInvoices}"
+        .defaultCompanyId="${company.id}"
+        @close="${() => (this.paymentModalOpen = false)}"
+        @saved="${() => (this.paymentModalOpen = false)}"
+      ></app-payment-form>
     `;
   }
 

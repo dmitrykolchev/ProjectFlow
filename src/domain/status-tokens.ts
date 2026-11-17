@@ -14,6 +14,7 @@ export type StatusDomain =
   | 'calculation'
   | 'invoice'
   | 'payment'
+  | 'paymentDirection'
   | 'expense'
   | 'timeEntry'
   | 'employee'
@@ -93,6 +94,10 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     partial: { variant: 'warning' },
     paid: { variant: 'success' },
     overdue: { variant: 'danger' },
+  },
+  paymentDirection: {
+    incoming: { variant: 'success', i18nPath: ['payments', 'directions'] },
+    outgoing: { variant: 'warning', i18nPath: ['payments', 'directions'] },
   },
   expense: {
     pending: { variant: 'warning', i18nPath: ['expenses', 'statuses'] },

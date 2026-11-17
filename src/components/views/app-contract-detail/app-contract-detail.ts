@@ -15,6 +15,8 @@ import {
 } from '../../../types';
 import {
   iconAlertTriangle,
+  iconArrowDownLeft,
+  iconArrowUpRight,
   iconCalculator,
   iconCheck,
   iconChevronLeft,
@@ -23,6 +25,7 @@ import {
   iconEdit,
   iconFileText,
   iconFolder,
+  iconLandmark,
   iconPlus,
   iconReceipt,
   iconSend,
@@ -1033,20 +1036,16 @@ export class AppContractDetail extends LitElement {
         <app-section-card title="${t.payments.sectionTitle}" subtitle="(${contractPayments.length})">
           <span slot="icon">${iconWallet(18)}</span>
 
-          ${payableContractInvoices.length > 0
-            ? html`
-                <div slot="actions">
-                  <app-button
-                    size="sm"
-                    variant="secondary"
-                    @click="${() => this.openPaymentModal(payableContractInvoices[0])}"
-                  >
-                    <span slot="icon-start">${iconCreditCard(14)}</span>
-                    <span>${t.payments.recordPayment}</span>
-                  </app-button>
-                </div>
-              `
-            : ''}
+          <div slot="actions">
+            <app-button
+              size="sm"
+              variant="secondary"
+              @click="${() => this.openPaymentModal(payableContractInvoices[0] || null)}"
+            >
+              <span slot="icon-start">${iconCreditCard(14)}</span>
+              <span>${t.payments.recordPayment}</span>
+            </app-button>
+          </div>
 
           ${contractPayments.length === 0
             ? html`<app-empty-state compact title="${t.payments.noContractPayments}"></app-empty-state>`
@@ -1056,7 +1055,9 @@ export class AppContractDetail extends LitElement {
                     <thead>
                       <tr>
                         <th>${t.payments.paymentDate}</th>
+                        <th>${t.viewTexts.payments.thDirection}</th>
                         <th>${t.payments.documentNumber}</th>
+                        <th>${t.viewTexts.payments.thCompanyRequisites}</th>
                         <th>${t.viewTexts.payments.thInvoice}</th>
                         <th>${t.payments.paymentMethod}</th>
                         <th>${t.payments.notes}</th>
@@ -1066,12 +1067,41 @@ export class AppContractDetail extends LitElement {
                     </thead>
                     <tbody>
                       ${contractPayments.map((pay) => {
-                        const inv = contractInvoices.find((i) => i.id === pay.invoiceId);
+                        const inv = pay.invoiceId
+                          ? contractInvoices.find((i) => i.id === pay.invoiceId)
+                          : undefined;
+                        const comp = store.companies.find((c) => c.id === pay.companyId);
+                        const compReq = store.getPaymentCompanyRequisitesLabel(pay);
+                        const isOutgoing = pay.direction === 'outgoing';
                         return html`
                           <tr>
                             <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                            <td>
+                              <app-status-chip
+                                domain="paymentDirection"
+                                status="${pay.direction}"
+                                appearance="soft"
+                                size="sm"
+                              ></app-status-chip>
+                            </td>
                             <td class="mono" style="font-weight: 600; white-space: nowrap;">
-                              ${pay.documentNumber || '—'}
+                              <div style="display: inline-flex; align-items: center; gap: 0.3rem;">
+                                <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
+                                  ${isOutgoing ? iconArrowUpRight(13) : iconArrowDownLeft(13)}
+                                </span>
+                                <span>${pay.documentNumber || '—'}</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div>${comp?.name || '—'}</div>
+                              ${compReq
+                                ? html`
+                                    <div class="mono" style="font-size: 0.72rem; color: var(--text-muted); display: inline-flex; align-items: center; gap: 0.25rem;">
+                                      ${iconLandmark(11)}
+                                      <span>${compReq}</span>
+                                    </div>
+                                  `
+                                : ''}
                             </td>
                             <td>
                               ${inv
@@ -1084,7 +1114,7 @@ export class AppContractDetail extends LitElement {
                                       ${inv.number}
                                     </button>
                                   `
-                                : '—'}
+                                : html`<span style="font-size: 0.74rem; color: var(--text-muted);">${t.viewTexts.payments.standalonePayment}</span>`}
                             </td>
                             <td>
                               <app-badge variant="default" appearance="soft" size="sm">
@@ -1092,8 +1122,8 @@ export class AppContractDetail extends LitElement {
                               </app-badge>
                             </td>
                             <td style="color: var(--text-secondary);">${pay.notes || '—'}</td>
-                            <td class="mono" style="font-weight: 700; color: #10b981; white-space: nowrap;">
-                              +${formatMoney(pay.amount, pay.currency)}
+                            <td class="mono" style="font-weight: 700; color: ${isOutgoing ? '#f59e0b' : '#10b981'}; white-space: nowrap;">
+                              ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
                             </td>
                             <td>
                               <div class="actions-row">
@@ -1870,7 +1900,9 @@ export class AppContractDetail extends LitElement {
                       <thead>
                         <tr>
                           <th>${t.payments.paymentDate}</th>
+                          <th>${t.viewTexts.payments.thDirection}</th>
                           <th>${t.payments.documentNumber}</th>
+                          <th>${t.viewTexts.payments.thCompanyRequisites}</th>
                           <th>${t.payments.paymentMethod}</th>
                           <th>${t.payments.notes}</th>
                           <th>${t.viewTexts.expenses.thAmount}</th>
@@ -1878,15 +1910,28 @@ export class AppContractDetail extends LitElement {
                         </tr>
                       </thead>
                       <tbody>
-                        ${invPayments.map(
-                          (pay) => html`
+                        ${invPayments.map((pay) => {
+                          const compReq = store.getPaymentCompanyRequisitesLabel(pay);
+                          const isOutgoing = pay.direction === 'outgoing';
+                          return html`
                             <tr>
                               <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
+                              <td>
+                                <app-status-chip
+                                  domain="paymentDirection"
+                                  status="${pay.direction}"
+                                  appearance="soft"
+                                  size="sm"
+                                ></app-status-chip>
+                              </td>
                               <td class="mono" style="white-space: nowrap;">${pay.documentNumber || '—'}</td>
+                              <td class="mono" style="font-size: 0.75rem; color: var(--text-secondary);">
+                                ${compReq || '—'}
+                              </td>
                               <td>${t.payments.methods[pay.method]}</td>
                               <td style="color: var(--text-secondary);">${pay.notes || '—'}</td>
-                              <td class="mono" style="color: #10b981; font-weight: 700; white-space: nowrap;">
-                                +${formatMoney(pay.amount, pay.currency)}
+                              <td class="mono" style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; font-weight: 700; white-space: nowrap;">
+                                ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
                               </td>
                               <td>
                                 <button
@@ -1899,8 +1944,8 @@ export class AppContractDetail extends LitElement {
                                 </button>
                               </td>
                             </tr>
-                          `
-                        )}
+                          `;
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -1991,16 +2036,19 @@ export class AppContractDetail extends LitElement {
     const payableInvoices = contractInvoices.filter(
       (i) => store.getInvoiceRemainingAmount(i) > 0 || i.id === this.paymentInvoiceId
     );
-    const inv =
-      contractInvoices.find((i) => i.id === this.paymentInvoiceId) || payableInvoices[0] || null;
-
-    if (!this.paymentModalOpen || !inv) return '';
+    if (!this.paymentModalOpen) return '';
+    const inv = this.paymentInvoiceId
+      ? contractInvoices.find((i) => i.id === this.paymentInvoiceId) || null
+      : null;
 
     return html`
       <app-payment-form
         .open="${this.paymentModalOpen}"
         .invoice="${inv}"
         .payableInvoices="${payableInvoices}"
+        .defaultDirection="${store.inferPaymentDirection(ctr.counterpartyId)}"
+        .defaultCompanyId="${ctr.companyId}"
+        .defaultCounterpartyId="${ctr.counterpartyId}"
         @close="${() => (this.paymentModalOpen = false)}"
         @saved="${() => (this.paymentModalOpen = false)}"
       ></app-payment-form>
@@ -2032,8 +2080,8 @@ export class AppContractDetail extends LitElement {
     `;
   }
 
-  private openPaymentModal(inv: Invoice) {
-    this.paymentInvoiceId = inv.id;
+  private openPaymentModal(inv: Invoice | null) {
+    this.paymentInvoiceId = inv?.id || '';
     this.paymentModalOpen = true;
   }
 
