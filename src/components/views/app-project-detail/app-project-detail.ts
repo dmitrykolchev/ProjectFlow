@@ -24,13 +24,13 @@ import '../../common/app-input/app-input';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
-import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import { mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-project-form/app-project-form';
 import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
@@ -62,16 +62,6 @@ const ROLE_COLORS: Record<ProjectRole, string> = {
   devops: '#f97316',
 };
 
-const PROJECT_COLOR_SWATCHES = [
-  '#6366f1',
-  '#10b981',
-  '#f59e0b',
-  '#06b6d4',
-  '#ec4899',
-  '#8b5cf6',
-  '#ef4444',
-];
-
 const TASK_STATUS_COLORS: Record<TaskStatus, string> = {
   backlog: '#64748b',
   todo: '#3b82f6',
@@ -93,17 +83,6 @@ export class AppProjectDetail extends LitElement {
 
   // Edit modal
   @state() private modalOpen = false;
-  @state() private formName = '';
-  @state() private formKey = '';
-  @state() private formDescription = '';
-  @state() private formColor = '#6366f1';
-  @state() private formStatus: ProjectStatus = 'active';
-  @state() private formDueDate = '';
-  @state() private formCompanyId = '';
-  @state() private formCounterpartyId = '';
-  @state() private formBudget = 5000000;
-  @state() private formProgress = 0;
-  @state() private formError = '';
 
   @state() private confirmDeleteOpen = false;
   @state() private pendingRemoveMember: { userId: string; role: ProjectRole } | null = null;
@@ -804,136 +783,15 @@ export class AppProjectDetail extends LitElement {
   }
 
   private renderEditModal(t: ReturnType<typeof getTranslation>) {
-    const statusOptions = [
-      { value: 'planning', label: t.projectStatuses.planning, color: '#0284c7' },
-      { value: 'active', label: t.projectStatuses.active, color: '#10b981' },
-      { value: 'on_hold', label: t.projectStatuses.on_hold, color: '#f59e0b' },
-      { value: 'completed', label: t.projectStatuses.completed, color: '#6366f1' },
-    ];
-    const companyOptions = [
-      { value: '', label: t.viewTexts.projects.optionNoCompany },
-      ...store.companies.map((c) => ({ value: c.id, label: c.name })),
-    ];
-    const counterpartyOptions = [
-      { value: '', label: t.viewTexts.projectDetail.internalProject },
-      ...store.counterparties.map((c) => ({ value: c.id, label: c.name })),
-    ];
+    const proj = store.projects.find((p) => p.id === this.detailProjectId) || null;
 
     return html`
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${t.viewTexts.projects.modalTitleEdit}"
+      <app-project-form
+        .open="${this.modalOpen}"
+        .project="${proj}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectKey}"
-              .value="${this.formKey}"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formKey = eventValue(e).toUpperCase())}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as ProjectStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.projectDetail.metaDueDate}"
-              .value="${this.formDueDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDueDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projectDetail.metaCompany}"
-              .value="${this.formCompanyId}"
-              .options="${companyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelCounterparty}"
-              .value="${this.formCounterpartyId}"
-              .options="${counterpartyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projects.labelBudgetRub}"
-              .value="${this.formBudget}"
-              min="0"
-              step="100000"
-              unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formBudget = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projects.labelProgressPct}"
-              .value="${this.formProgress}"
-              min="0"
-              max="100"
-              step="5"
-              unit="%"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formProgress = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div class="col-span-2">
-            <span class="meta-label">${t.viewTexts.projects.projectColorLabel}</span>
-            <div class="color-swatches">
-              ${PROJECT_COLOR_SWATCHES.map(
-                (hex) => html`
-                  <button
-                    type="button"
-                    class="color-swatch ${this.formColor === hex ? 'is-active' : ''}"
-                    style="background: ${hex};"
-                    @click="${() => (this.formColor = hex)}"
-                  ></button>
-                `
-              )}
-            </div>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.projects.labelDescription}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveProject}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-project-form>
     `;
   }
 
@@ -993,53 +851,7 @@ export class AppProjectDetail extends LitElement {
   }
 
   private openEditModal(proj: Project) {
-    this.formName = proj.name;
-    this.formKey = proj.key;
-    this.formDescription = proj.description;
-    this.formColor = proj.color;
-    this.formStatus = proj.status || 'active';
-    this.formDueDate = proj.dueDate;
-    this.formCompanyId = proj.companyId || '';
-    this.formCounterpartyId = proj.counterpartyId || '';
-    this.formBudget = proj.budget || 0;
-    this.formProgress = proj.progress;
-    this.formError = '';
     this.modalOpen = true;
-  }
-
-  private handleSaveProject() {
-    const existing = this.projects.find((p) => p.id === this.detailProjectId);
-    if (!existing) return;
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const derivedKey =
-      this.formKey.trim().toUpperCase() ||
-      this.formName
-        .trim()
-        .replace(/[^A-Za-zА-Яа-я0-9]/g, '')
-        .slice(0, 4)
-        .toUpperCase() ||
-      existing.key;
-
-    store.updateProject({
-      id: existing.id,
-      name: this.formName.trim(),
-      key: derivedKey,
-      description: this.formDescription.trim(),
-      color: this.formColor,
-      status: this.formStatus,
-      dueDate: this.formDueDate || existing.dueDate,
-      companyId: this.formCompanyId || undefined,
-      counterpartyId: this.formCounterpartyId || undefined,
-      budget: Math.max(0, Number(this.formBudget) || 0),
-      progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
-      members: existing.members || [],
-    });
-
-    this.modalOpen = false;
   }
 
   private openQuickTimeModal(projectId: string) {
