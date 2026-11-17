@@ -504,34 +504,36 @@ export class AppPayments extends LitElement {
                     <div class="actions-row">
                       ${canPay
                         ? html`
-                            <button
-                              type="button"
-                              class="icon-btn success"
+                            <app-button
+                              class="success-action"
+                              size="sm"
+                              variant="icon"
                               title="${t.payments.recordPayment}"
                               @click="${() => this.openPaymentModal(inv)}"
                             >
-                              ${iconCreditCard(14)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-btn success"
+                              <span slot="start">${iconCreditCard(14)}</span>
+                            </app-button>
+                            <app-button
+                              class="success-action"
+                              size="sm"
+                              variant="icon"
                               title="${t.invoices.markPaid}"
                               @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
                             >
-                              ${iconCheck(14)}
-                            </button>
+                              <span slot="start">${iconCheck(14)}</span>
+                            </app-button>
                           `
                         : ''}
                       ${ctr
                         ? html`
-                            <button
-                              type="button"
-                              class="icon-btn"
+                            <app-button
+                              size="sm"
+                              variant="icon"
                               title="${t.contractDetail.openContract}"
                               @click="${() => store.openContractDetail(ctr.id)}"
                             >
-                              ${iconChevronRight(15)}
-                            </button>
+                              <span slot="start">${iconChevronRight(15)}</span>
+                            </app-button>
                           `
                         : ''}
                     </div>
@@ -656,24 +658,25 @@ export class AppPayments extends LitElement {
                     <div class="actions-row">
                       ${ctr
                         ? html`
-                            <button
-                              type="button"
-                              class="icon-btn"
+                            <app-button
+                              size="sm"
+                              variant="icon"
                               title="${t.contractDetail.openContract}"
                               @click="${() => store.openContractDetail(ctr.id)}"
                             >
-                              ${iconChevronRight(15)}
-                            </button>
+                              <span slot="start">${iconChevronRight(15)}</span>
+                            </app-button>
                           `
                         : ''}
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
                         title="${t.common.delete}"
                         @click="${() => (this.deletingPayment = pay)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
