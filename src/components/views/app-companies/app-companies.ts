@@ -19,10 +19,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/card-footer/card-footer';
-import '../../common/app-input/app-input';
-import '../../common/app-select/app-select';
-import '../../common/app-textarea/app-textarea';
-import '../../common/app-modal/app-modal';
+import '../../common/app-company-form/app-company-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -43,20 +40,7 @@ export class AppCompanies extends LitElement {
   @state() private cardPageSize = store.customization.cardGridPageSize;
 
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formName = '';
-  @state() private formLegalName = '';
-  @state() private formInn = '';
-  @state() private formKpp = '';
-  @state() private formIndustry = '';
-  @state() private formCity = '';
-  @state() private formPhone = '';
-  @state() private formEmail = '';
-  @state() private formWebsite = '';
-  @state() private formDirectorId = '';
-  @state() private formStatus: CompanyStatus = 'active';
-  @state() private formDescription = '';
-  @state() private formError = '';
+  @state() private editingCompany: Company | null = null;
 
   @state() private deletingCompany: Company | null = null;
 
@@ -111,11 +95,6 @@ export class AppCompanies extends LitElement {
       { value: 'inactive', label: t.viewTexts.companies.filterInactive, color: '#64748b' },
     ];
 
-    const directorOptions = [
-      { value: '', label: t.viewTexts.companies.optionUnassignedDirector },
-      ...store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
-    ];
-
     return html`
       <app-page-header
         title="${t.viewTexts.companies.pageTitle}"
@@ -155,118 +134,12 @@ export class AppCompanies extends LitElement {
         ? html`<app-empty-state title="${t.viewTexts.companies.emptyNoCompanies}"></app-empty-state>`
         : this.renderCardsGrid(filtered, t)}
 
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.companies.modalTitleEdit : t.viewTexts.companies.modalTitleCreate}"
+      <app-company-form
+        .open="${this.modalOpen}"
+        .company="${this.editingCompany}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelShortName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelLegalName}"
-              .value="${this.formLegalName}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelInn}"
-              .value="${this.formInn}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelKpp}"
-              .value="${this.formKpp}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaIndustry}"
-              .value="${this.formIndustry}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formIndustry = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaCity}"
-              .value="${this.formCity}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaPhone}"
-              .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.companies.metaDirector}"
-              .value="${this.formDirectorId}"
-              .options="${directorOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDirectorId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.companies.labelStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as CompanyStatus)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-input
-              label="${t.viewTexts.companies.labelWebsite}"
-              .value="${this.formWebsite}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formWebsite = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.companies.labelDescription}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSave}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-company-form>
 
       <app-confirm-dialog
         .open="${Boolean(this.deletingCompany)}"
@@ -432,68 +305,12 @@ export class AppCompanies extends LitElement {
   }
 
   private openCreateModal() {
-    this.editingId = null;
-    this.formName = '';
-    this.formLegalName = '';
-    this.formInn = '';
-    this.formKpp = '';
-    this.formIndustry = '';
-    this.formCity = getTranslation(this.currentLang).viewTexts.companies.defaultCity;
-    this.formPhone = '';
-    this.formEmail = '';
-    this.formWebsite = '';
-    this.formDirectorId = store.users[0]?.id || '';
-    this.formStatus = 'active';
-    this.formDescription = '';
-    this.formError = '';
+    this.editingCompany = null;
     this.modalOpen = true;
   }
 
   private openEditModal(company: Company) {
-    this.editingId = company.id;
-    this.formName = company.name;
-    this.formLegalName = company.legalName;
-    this.formInn = company.inn;
-    this.formKpp = company.kpp || '';
-    this.formIndustry = company.industry;
-    this.formCity = company.city;
-    this.formPhone = company.phone;
-    this.formEmail = company.email;
-    this.formWebsite = company.website || '';
-    this.formDirectorId = company.directorId || '';
-    this.formStatus = company.status;
-    this.formDescription = company.description;
-    this.formError = '';
+    this.editingCompany = company;
     this.modalOpen = true;
-  }
-
-  private handleSave() {
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const payload = {
-      name: this.formName.trim(),
-      legalName: this.formLegalName.trim() || this.formName.trim(),
-      inn: this.formInn.trim() || '7700000000',
-      kpp: this.formKpp.trim(),
-      industry: this.formIndustry.trim() || 'IT / Software',
-      city: this.formCity.trim() || getTranslation(this.currentLang).viewTexts.companies.defaultCity,
-      phone: this.formPhone.trim() || '—',
-      email: this.formEmail.trim() || '—',
-      website: this.formWebsite.trim(),
-      directorId: this.formDirectorId || undefined,
-      status: this.formStatus,
-      description: this.formDescription.trim(),
-    };
-
-    if (this.editingId) {
-      store.updateCompany({ id: this.editingId, ...payload });
-    } else {
-      store.addCompany(payload);
-    }
-
-    this.modalOpen = false;
   }
 }
