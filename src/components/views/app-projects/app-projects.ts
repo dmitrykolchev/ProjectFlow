@@ -28,20 +28,15 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
-import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/card-footer/card-footer';
-import '../../common/app-input/app-input';
-import '../../common/app-number-input/app-number-input';
-import '../../common/app-date-input/app-date-input';
-import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-switch/app-switch';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-modal/app-modal';
+import '../../common/app-project-form/app-project-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -63,16 +58,6 @@ const ALL_PROJECT_ROLES: ProjectRole[] = [
   'devops',
 ];
 
-const PROJECT_COLOR_SWATCHES = [
-  '#6366f1',
-  '#10b981',
-  '#f59e0b',
-  '#06b6d4',
-  '#ec4899',
-  '#8b5cf6',
-  '#ef4444',
-];
-
 @customElement('app-projects')
 export class AppProjects extends LitElement {
   @state() private projects: Project[] = store.projects;
@@ -88,19 +73,8 @@ export class AppProjects extends LitElement {
 
   // Create / edit modal
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formName = '';
-  @state() private formKey = '';
-  @state() private formDescription = '';
-  @state() private formColor = '#6366f1';
-  @state() private formStatus: ProjectStatus = 'active';
-  @state() private formDueDate = '';
-  @state() private formCompanyId = '';
-  @state() private formCounterpartyId = '';
-  @state() private formBudget = 5000000;
-  @state() private formProgress = 0;
-  @state() private formError = '';
-
+  @state() private editingProject: Project | null = null;
+  @state() private skipAiNext = false;
   // Spec-driven project creation & AI blueprint state
   @state() private specInputMode: 'existing' | 'upload' | 'paste' = 'existing';
   @state() private selectedSpecDocId = '';
@@ -488,142 +462,29 @@ export class AppProjects extends LitElement {
     ];
 
     return html`
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.projects.modalTitleEdit : t.viewTexts.projects.modalTitleCreate}"
+      <app-project-form
+        .open="${this.modalOpen}"
+        .project="${this.editingProject}"
+        .saveDisabled="${this.specAiLoading}"
+        saveLabel="${this.specAiLoading ? t.viewTexts.projects.generatingBlueprint : t.common.save}"
+        .beforeSave="${(data: { name: string; key: string }) => this.runSpecAiBeforeSave(data)}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.projects.labelProjectKey}"
-              placeholder="CORE"
-              .value="${this.formKey}"
-              @input="${(e: CustomEvent<{ value: string }>) =>
-                (this.formKey = eventValue(e).toUpperCase())}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions.filter((o) => o.value !== 'all')}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as ProjectStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.projects.labelDueDate}"
-              .value="${this.formDueDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDueDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelCompany}"
-              .value="${this.formCompanyId}"
-              .options="${companyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCompanyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.projects.labelCounterparty}"
-              .value="${this.formCounterpartyId}"
-              .options="${counterpartyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formCounterpartyId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projects.labelBudgetRub}"
-              .value="${this.formBudget}"
-              min="0"
-              step="100000"
-              unit="₽"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formBudget = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.projects.labelProgressPct}"
-              .value="${this.formProgress}"
-              min="0"
-              max="100"
-              step="5"
-              unit="%"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formProgress = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div class="col-span-2">
-            <span class="meta-label">${t.viewTexts.projects.projectColorLabel}</span>
-            <div class="color-swatches">
-              ${PROJECT_COLOR_SWATCHES.map(
-                (hex) => html`
-                  <button
-                    type="button"
-                    class="color-swatch ${this.formColor === hex ? 'is-active' : ''}"
-                    style="background: ${hex};"
-                    @click="${() => (this.formColor = hex)}"
-                  ></button>
-                `
-              )}
-            </div>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.projects.labelDescription}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-
-          ${!this.editingId ? this.renderSpecBootstrapSection(t) : ''}
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button
-            variant="ghost"
-            ?disabled="${this.specAiLoading}"
-            @click="${() => (this.modalOpen = false)}"
-          >
-            ${t.common.cancel}
-          </app-button>
-          ${!this.editingId && this.specAiError
-            ? html`
-                <app-button
-                  variant="outline"
-                  ?disabled="${this.specAiLoading}"
-                  @click="${() => this.handleSaveProject(true)}"
-                >
-                  ${t.viewTexts.projects.createWithoutAiBtn}
-                </app-button>
-              `
-            : ''}
-          <app-button
-            variant="primary"
-            ?disabled="${this.specAiLoading}"
-            @click="${() => this.handleSaveProject(false)}"
-          >
-            ${this.specAiLoading ? t.viewTexts.projects.generatingBlueprint : t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${(e: CustomEvent<{ project: Project }>) => this.handleProjectSaved(e)}"
+        .extraContent="${!this.editingProject ? this.renderSpecBootstrapSection(t) : null}"
+        .footerExtra="${!this.editingProject && this.specAiError
+          ? html`
+              <app-button
+                variant="outline"
+                ?disabled="${this.specAiLoading}"
+                @click="${() => {
+                  this.skipAiNext = true;
+                  (this.shadowRoot!.querySelector('app-project-form') as any).save();
+                }}"
+              >
+                ${t.viewTexts.projects.createWithoutAiBtn}
+              </app-button>`
+          : null}"
+      ></app-project-form>
     `;
   }
 
@@ -665,9 +526,8 @@ export class AppProjects extends LitElement {
                   this.generatedBlueprint = null;
                   this.specAiError = '';
                   const doc = store.documents.find((d) => d.id === this.selectedSpecDocId);
-                  if (doc && !this.formDescription.trim() && doc.description) {
-                    this.formDescription = doc.description;
-                  }
+                  const form = this.shadowRoot!.querySelector('app-project-form') as any;
+                  if (doc && form) form.setDescriptionIfEmpty(doc.description || '');
                 }}"
               ></app-entity-selector>
             `
@@ -810,18 +670,7 @@ export class AppProjects extends LitElement {
   }
 
   private openCreateModal() {
-    this.editingId = null;
-    this.formName = '';
-    this.formKey = '';
-    this.formDescription = '';
-    this.formColor = '#6366f1';
-    this.formStatus = 'planning';
-    this.formDueDate = `${new Date().getFullYear()}-12-31`;
-    this.formCompanyId = store.companies[0]?.id || '';
-    this.formCounterpartyId = store.counterparties[0]?.id || '';
-    this.formBudget = 5000000;
-    this.formProgress = 0;
-    this.formError = '';
+    this.editingProject = null;
     this.specInputMode = 'existing';
     this.selectedSpecDocId = '';
     this.uploadedSpecPayload = null;
@@ -831,22 +680,12 @@ export class AppProjects extends LitElement {
     this.specAiLoading = false;
     this.specAiError = '';
     this.generatedBlueprint = null;
+    this.skipAiNext = false;
     this.modalOpen = true;
   }
 
   private openEditModal(proj: Project) {
-    this.editingId = proj.id;
-    this.formName = proj.name;
-    this.formKey = proj.key;
-    this.formDescription = proj.description;
-    this.formColor = proj.color;
-    this.formStatus = proj.status || 'active';
-    this.formDueDate = proj.dueDate;
-    this.formCompanyId = proj.companyId || '';
-    this.formCounterpartyId = proj.counterpartyId || '';
-    this.formBudget = proj.budget || 0;
-    this.formProgress = proj.progress;
-    this.formError = '';
+    this.editingProject = proj;
     this.modalOpen = true;
   }
 
@@ -860,9 +699,8 @@ export class AppProjects extends LitElement {
     this.generatedBlueprint = null;
     this.specAiError = '';
     const fileTitle = payload.fileName.replace(/\.[^.]+$/, '') || payload.fileName;
-    if (!this.formName.trim()) {
-      this.formName = fileTitle;
-    }
+    const form = this.shadowRoot!.querySelector('app-project-form') as any;
+    if (form) form.ensureName(fileTitle);
   }
 
   private getEffectiveSpecText(): string {
@@ -900,8 +738,8 @@ export class AppProjects extends LitElement {
           ? store.documents.find((d) => d.id === this.selectedSpecDocId)
           : undefined;
       this.generatedBlueprint = await generateProjectBlueprintFromSpec({
-        projectName: this.formName.trim() || 'New Project',
-        projectKey: this.formKey.trim().toUpperCase(),
+        projectName: (this.shadowRoot!.querySelector('app-project-form') as any).fieldData().name.trim() || 'New Project',
+        projectKey: (this.shadowRoot!.querySelector('app-project-form') as any).fieldData().key.trim().toUpperCase(),
         specText,
         docMeta: selectedDoc,
         lang: this.currentLang,
@@ -915,98 +753,62 @@ export class AppProjects extends LitElement {
     }
   }
 
-  private async handleSaveProject(skipAi = false) {
+  private async runSpecAiBeforeSave(data: { name: string; key: string }): Promise<boolean> {
     const t = getTranslation(this.currentLang);
-    if (!this.formName.trim()) {
-      this.formError = t.common.required;
-      return;
+    if (this.skipAiNext) {
+      this.skipAiNext = false;
+      return true;
     }
-
-    const derivedKey =
-      this.formKey.trim().toUpperCase() ||
-      this.formName
-        .trim()
-        .replace(/[^A-Za-zА-Яа-я0-9]/g, '')
-        .slice(0, 4)
-        .toUpperCase() ||
-      'PROJ';
-
-    if (this.editingId) {
-      const existing = this.projects.find((p) => p.id === this.editingId);
-      store.updateProject({
-        id: this.editingId,
-        name: this.formName.trim(),
-        key: derivedKey,
-        description: this.formDescription.trim(),
-        color: this.formColor,
-        status: this.formStatus,
-        dueDate: this.formDueDate || new Date().toISOString().slice(0, 10),
-        companyId: this.formCompanyId || undefined,
-        counterpartyId: this.formCounterpartyId || undefined,
-        budget: Math.max(0, Number(this.formBudget) || 0),
-        progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
-        members: existing?.members || [],
-        specDocumentId: existing?.specDocumentId,
-      });
-      this.modalOpen = false;
-      return;
-    }
+    if (this.editingProject) return true;
 
     const specText = this.getEffectiveSpecText();
-    let blueprint = this.generatedBlueprint;
+    if (this.generatedBlueprint) return true;
+    if (!this.autoGenerateFromSpec || !specText.trim()) return true;
 
-    if (!skipAi && this.autoGenerateFromSpec && specText.trim() && !blueprint) {
-      const endpoint = store.customization.aiEndpoint;
-      this.specAiLoading = true;
-      this.specAiError = '';
-      try {
-        const selectedDoc =
-          this.specInputMode === 'existing'
-            ? store.documents.find((d) => d.id === this.selectedSpecDocId)
-            : undefined;
-        blueprint = await generateProjectBlueprintFromSpec({
-          projectName: this.formName.trim(),
-          projectKey: derivedKey,
-          specText,
-          docMeta: selectedDoc,
-          lang: this.currentLang,
-          baseUrl: endpoint,
-          model: store.customization.aiModel,
-        });
-        this.generatedBlueprint = blueprint;
-      } catch (err) {
-        this.specAiError = formatAiError(err, endpoint, t);
-        this.specAiLoading = false;
-        return;
-      } finally {
-        this.specAiLoading = false;
-      }
+    const endpoint = store.customization.aiEndpoint;
+    this.specAiLoading = true;
+    this.specAiError = '';
+    try {
+      const selectedDoc =
+        this.specInputMode === 'existing'
+          ? store.documents.find((d) => d.id === this.selectedSpecDocId)
+          : undefined;
+      this.generatedBlueprint = await generateProjectBlueprintFromSpec({
+        projectName: data.name,
+        projectKey: data.key,
+        specText,
+        docMeta: selectedDoc,
+        lang: this.currentLang,
+        baseUrl: endpoint,
+        model: store.customization.aiModel,
+      });
+    } catch (err) {
+      this.specAiError = formatAiError(err, endpoint, t);
+      return false;
+    } finally {
+      this.specAiLoading = false;
     }
+    return true;
+  }
 
-    const createdProject = store.addProject({
-      name: this.formName.trim(),
-      key: derivedKey,
-      description: this.formDescription.trim(),
-      color: this.formColor,
-      status: this.formStatus,
-      dueDate: this.formDueDate || new Date().toISOString().slice(0, 10),
-      companyId: this.formCompanyId || undefined,
-      counterpartyId: this.formCounterpartyId || undefined,
-      budget: Math.max(0, Number(this.formBudget) || 0),
-      progress: Math.max(0, Math.min(100, Number(this.formProgress) || 0)),
-      members: [],
-      specDocumentId:
-        this.specInputMode === 'existing' && this.selectedSpecDocId
-          ? this.selectedSpecDocId
-          : undefined,
-    });
+  private handleProjectSaved(e: CustomEvent<{ project: Project }>) {
+    const t = getTranslation(this.currentLang);
+    this.modalOpen = false;
+    if (this.editingProject) return;
 
+    const createdProject = e.detail.project;
+    const derivedKey = createdProject.key;
     let resolvedSpecDocId = createdProject.specDocumentId;
+
+    if (this.specInputMode === 'existing' && this.selectedSpecDocId) {
+      resolvedSpecDocId = this.selectedSpecDocId;
+      store.updateProject({ ...createdProject, specDocumentId: resolvedSpecDocId });
+    }
 
     if (this.specInputMode === 'upload' && this.uploadedSpecPayload) {
       const fileTitle = this.uploadedSpecPayload.fileName.replace(/\.[^.]+$/, '') || this.uploadedSpecPayload.fileName;
       const uploadedDoc = store.addDocument({
-        title: `${this.formName.trim()} — ${fileTitle}`,
+        title: `${createdProject.name} — ${fileTitle}`,
         fileName: this.uploadedSpecPayload.fileName,
         extension: this.uploadedSpecPayload.extension,
         mimeType: this.uploadedSpecPayload.mimeType,
@@ -1020,14 +822,14 @@ export class AppProjects extends LitElement {
         projectId: createdProject.id,
         uploadedById: store.currentUserId || store.users[0]?.id || 'user-1',
         tags: ['spec', derivedKey.toLowerCase()],
-        description: this.formDescription.trim() || fileTitle,
+        description: createdProject.description.trim() || fileTitle,
         versionNote: t.viewTexts.documents.initialVersionNote,
       });
       resolvedSpecDocId = uploadedDoc.id;
       store.updateProject({ ...createdProject, specDocumentId: resolvedSpecDocId });
     } else if (this.specInputMode === 'paste' && this.pastedSpecText.trim()) {
       const pastedDoc = store.addDocument({
-        title: `${this.formName.trim()} — Spec`,
+        title: `${createdProject.name} — Spec`,
         fileName: `${derivedKey.toLowerCase()}-spec.md`,
         extension: 'md',
         mimeType: 'text/markdown',
@@ -1047,6 +849,7 @@ export class AppProjects extends LitElement {
       store.updateProject({ ...createdProject, specDocumentId: resolvedSpecDocId });
     }
 
+    const blueprint = this.generatedBlueprint;
     if (blueprint) {
       const authorId = store.currentUserId || store.users[0]?.id || 'user-1';
       const createdArticles = store.addKnowledgeArticlesBulk(
@@ -1098,7 +901,6 @@ export class AppProjects extends LitElement {
       );
     }
 
-    this.modalOpen = false;
     store.openProjectDetail(createdProject.id);
   }
 }
