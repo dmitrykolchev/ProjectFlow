@@ -253,14 +253,15 @@ export class AppCounterpartyDetail extends LitElement {
               <span slot="icon-start">${iconEdit(14)}</span>
               <span>${t.common.edit}</span>
             </app-button>
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -422,14 +423,14 @@ export class AppCounterpartyDetail extends LitElement {
                             <span class="mono" style="font-size: 0.78rem; width: 34px; text-align: right;">
                               ${proj.progress}%
                             </span>
-                            <button
-                              type="button"
-                              class="icon-btn"
+                            <app-button
+                              size="xs"
+                              variant="icon"
                               title="${t.projectChat.title}"
                               @click="${() => store.openProjectChat(proj.id)}"
                             >
-                              ${iconMessageSquare(14)}
-                            </button>
+                              <span slot="start">${iconMessageSquare(14)}</span>
+                            </app-button>
                           </div>
                         </div>
                       `;
