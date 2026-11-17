@@ -1,10 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconArrowUpRight, iconBookOpen, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconLayers, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
+import { iconArrowUpRight, iconBookOpen, iconClock, iconLayers, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
 import '../app-confirm-dialog/app-confirm-dialog';
@@ -19,7 +18,7 @@ import { eventValue } from '../event-value';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
-import '../app-checkbox/app-checkbox';
+import '../app-draggable-list/app-draggable-list';
 
 @customElement('app-task-modal')
 export class AppTaskModal extends LitElement {
@@ -44,9 +43,6 @@ export class AppTaskModal extends LitElement {
   @state() private subtasks: { id: string; title: string; completed: boolean }[] = [];
   @state() private newSubtaskText: string = '';
   @state() private errors: Record<string, string> = {};
-  @state() private draggedSubtaskId: string | null = null;
-  @state() private dropTargetSubtaskId: string | null = null;
-  @state() private dropSubtaskPosition: 'before' | 'after' = 'before';
   @state() private draftSubtaskTitle = '';
   @state() private requirementIds: string[] = [];
   @state() private knowledgeArticleIds: string[] = [];
@@ -131,8 +127,6 @@ export class AppTaskModal extends LitElement {
         this.knowledgeArticleIds = [];
       }
       this.errors = {};
-      this.draggedSubtaskId = null;
-      this.dropTargetSubtaskId = null;
       this.quickTimeHours = 1.5;
       this.quickTimeCategory = 'development';
       this.quickTimeDesc = '';
@@ -390,75 +384,15 @@ export class AppTaskModal extends LitElement {
 
           <div class="col-span-2 subtasks-section">
             <div class="section-title">${t.taskModal.subtasksLabel} (${this.subtasks.filter((s) => s.completed).length}/${this.subtasks.length})</div>
-            <div class="subtask-list">
-              ${repeat(
-                this.subtasks,
-                (sub) => sub.id,
-                (sub, index) => {
-                  const isDragging = this.draggedSubtaskId === sub.id;
-                  const isDropTarget =
-                    this.dropTargetSubtaskId === sub.id && this.draggedSubtaskId !== sub.id;
-                  const dropClass = isDropTarget
-                    ? this.dropSubtaskPosition === 'after'
-                      ? 'is-drop-after'
-                      : 'is-drop-before'
-                    : '';
-
-                  return html`
-                    <div
-                      class="subtask-item ${isDragging ? 'is-dragging' : ''} ${dropClass}"
-                      draggable="true"
-                      @dragstart="${(e: DragEvent) => this.handleSubtaskDragStart(e, sub.id)}"
-                      @dragover="${(e: DragEvent) => this.handleSubtaskDragOver(e, sub.id)}"
-                      @dragleave="${() => this.handleSubtaskDragLeave(sub.id)}"
-                      @drop="${(e: DragEvent) => this.handleSubtaskDrop(e, sub.id)}"
-                      @dragend="${this.handleSubtaskDragEnd}"
-                    >
-                      <span class="subtask-drag-handle" title="${t.taskModal.dragSubtask}">
-                        ${iconGripVertical(14)}
-                      </span>
-                      <span class="subtask-order">${index + 1}.</span>
-                      <app-checkbox
-                        ?checked="${sub.completed}"
-                        @change="${() => this.toggleSubtask(sub.id)}"
-                      ></app-checkbox>
-                      <span class="subtask-title ${sub.completed ? 'is-done' : ''}">${sub.title}</span>
-                      <div class="subtask-actions">
-                        <button
-                          type="button"
-                          class="subtask-action-btn"
-                          ?disabled="${index === 0}"
-                          @click="${() => this.moveSubtask(index, -1)}"
-                          title="${t.taskModal.moveSubtaskUp}"
-                          aria-label="${t.taskModal.moveSubtaskUp}"
-                        >
-                          ${iconChevronUp(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="subtask-action-btn"
-                          ?disabled="${index === this.subtasks.length - 1}"
-                          @click="${() => this.moveSubtask(index, 1)}"
-                          title="${t.taskModal.moveSubtaskDown}"
-                          aria-label="${t.taskModal.moveSubtaskDown}"
-                        >
-                          ${iconChevronDown(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="subtask-action-btn subtask-remove"
-                          @click="${() => this.requestRemoveSubtask(sub.id)}"
-                          title="${t.taskModal.removeSubtask}"
-                          aria-label="${t.taskModal.removeSubtask}"
-                        >
-                          ${iconX(14)}
-                        </button>
-                      </div>
-                    </div>
-                  `;
-                }
-              )}
-            </div>
+            <app-draggable-list
+              .items="${this.subtasks.map((s) => ({ value: s.id, label: s.title, checked: s.completed }))}"
+              @item-toggle="${(e: CustomEvent<{ value: string }>) => this.toggleSubtask(e.detail.value)}"
+              @item-remove="${(e: CustomEvent<{ value: string }>) => this.requestRemoveSubtask(e.detail.value)}"
+              @list-reorder="${(e: CustomEvent<{ items: { value: string; label: string; checked?: boolean }[] }>) => {
+                const byId = new Map(this.subtasks.map((s) => [s.id, s]));
+                this.subtasks = e.detail.items.map((it) => byId.get(it.value)!).filter(Boolean);
+              }}"
+            ></app-draggable-list>
             <div class="add-subtask-row">
               <app-input
                 class="add-subtask-input-field"
@@ -571,75 +505,6 @@ export class AppTaskModal extends LitElement {
       this.subtasks = this.subtasks.filter((s) => s.id !== id);
     }
     this.confirmRemoveSubtaskId = null;
-  }
-
-  private moveSubtask(index: number, delta: -1 | 1) {
-    const targetIndex = index + delta;
-    if (targetIndex < 0 || targetIndex >= this.subtasks.length) return;
-    const next = [...this.subtasks];
-    const [moved] = next.splice(index, 1);
-    next.splice(targetIndex, 0, moved);
-    this.subtasks = next;
-  }
-
-  private handleSubtaskDragStart(e: DragEvent, id: string) {
-    this.draggedSubtaskId = id;
-    if (e.dataTransfer) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', id);
-    }
-  }
-
-  private handleSubtaskDragOver(e: DragEvent, targetId: string) {
-    if (!this.draggedSubtaskId) return;
-    e.preventDefault();
-    if (e.dataTransfer) {
-      e.dataTransfer.dropEffect = 'move';
-    }
-    if (this.draggedSubtaskId === targetId) {
-      this.dropTargetSubtaskId = null;
-      return;
-    }
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    const pos: 'before' | 'after' = e.clientY < rect.top + rect.height / 2 ? 'before' : 'after';
-    this.dropTargetSubtaskId = targetId;
-    this.dropSubtaskPosition = pos;
-  }
-
-  private handleSubtaskDragLeave(targetId: string) {
-    if (this.dropTargetSubtaskId === targetId) {
-      this.dropTargetSubtaskId = null;
-    }
-  }
-
-  private handleSubtaskDrop(e: DragEvent, targetId: string) {
-    e.preventDefault();
-    const sourceId = this.draggedSubtaskId || e.dataTransfer?.getData('text/plain') || null;
-    const position = this.dropSubtaskPosition;
-    this.draggedSubtaskId = null;
-    this.dropTargetSubtaskId = null;
-
-    if (!sourceId || sourceId === targetId) return;
-
-    const next = [...this.subtasks];
-    const fromIndex = next.findIndex((s) => s.id === sourceId);
-    if (fromIndex === -1) return;
-    const [moved] = next.splice(fromIndex, 1);
-    let insertIndex = next.findIndex((s) => s.id === targetId);
-    if (insertIndex === -1) {
-      next.push(moved);
-    } else {
-      if (position === 'after') {
-        insertIndex += 1;
-      }
-      next.splice(insertIndex, 0, moved);
-    }
-    this.subtasks = next;
-  }
-
-  private handleSubtaskDragEnd() {
-    this.draggedSubtaskId = null;
-    this.dropTargetSubtaskId = null;
   }
 
   private handleSave() {
@@ -786,7 +651,7 @@ export class AppTaskModal extends LitElement {
                         <span class="record-val">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
                         <button
                           type="button"
-                          class="subtask-action-btn subtask-remove"
+                          class="record-action-btn record-remove"
                           title="${t.common.delete}"
                           @click="${() => this.handleDeleteQuickTime(entry)}"
                         >
@@ -870,7 +735,7 @@ export class AppTaskModal extends LitElement {
                         <span class="record-val">${exp.amount.toLocaleString(t.common.locale)} ${sym}</span>
                         <button
                           type="button"
-                          class="subtask-action-btn subtask-remove"
+                          class="record-action-btn record-remove"
                           title="${t.common.delete}"
                           @click="${() => store.deleteExpense(exp.id)}"
                         >
