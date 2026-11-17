@@ -530,14 +530,15 @@ export class AppDocumentPreviewer extends LitElement {
             >
               <span slot="start">${iconZoomOut(14)}</span>
             </app-button>
-            <button
-              type="button"
+            <app-button
               class="tool-btn mono"
+              size="sm"
+              variant="icon"
               title="${t.documents.zoomReset}"
               @click="${() => (this.zoom = 1)}"
             >
-              ${pct}%
-            </button>
+              <span>${pct}%</span>
+            </app-button>
             <app-button
               class="tool-icon-btn"
               size="sm"
@@ -550,15 +551,16 @@ export class AppDocumentPreviewer extends LitElement {
             </app-button>
           </div>
           <div class="toolbar-group">
-            <button
-              type="button"
+            <app-button
               class="tool-btn ${this.checkerboardBg ? 'is-active' : ''}"
+              size="sm"
+              variant="icon"
               title="${t.documents.toggleGridBg}"
               @click="${() => (this.checkerboardBg = !this.checkerboardBg)}"
             >
-              ${iconGrid(13)}
+              <span slot="start">${iconGrid(13)}</span>
               <span>${t.documents.toggleGridBg}</span>
-            </button>
+            </app-button>
           </div>
         </div>
       `;
@@ -594,40 +596,43 @@ export class AppDocumentPreviewer extends LitElement {
 
             ${showingSource
               ? html`
-                  <button
-                    type="button"
+                  <app-button
                     class="tool-btn ${this.showLineNumbers ? 'is-active' : ''}"
+                    size="sm"
+                    variant="icon"
                     @click="${() => (this.showLineNumbers = !this.showLineNumbers)}"
                   >
-                    <span>#</span>
+                    <span slot="start">#</span>
                     <span>${t.documents.lineNumbers}</span>
-                  </button>
-                  <button
-                    type="button"
+                  </app-button>
+                  <app-button
                     class="tool-btn ${this.wordWrap ? 'is-active' : ''}"
+                    size="sm"
+                    variant="icon"
                     @click="${() => (this.wordWrap = !this.wordWrap)}"
                   >
-                    ${iconWrapText(13)}
+                    <span slot="start">${iconWrapText(13)}</span>
                     <span>${t.documents.wordWrap}</span>
-                  </button>
+                  </app-button>
                 `
               : ''}
           </div>
 
           <div class="toolbar-group">
             <span class="toolbar-pill-info">${t.documents.linesCount(lineCount)}</span>
-            <button
-              type="button"
+            <app-button
               class="tool-btn ${this.copiedContent ? 'is-active' : ''}"
+              size="sm"
+              variant="icon"
               @click="${() => this.handleCopyText(formattedText)}"
             >
-              ${this.copiedContent ? iconCheck(13) : iconCopy(13)}
+              <span slot="start">${this.copiedContent ? iconCheck(13) : iconCopy(13)}</span>
               <span>
                 ${this.copiedContent
                   ? t.viewTexts.documents.copiedContent
                   : t.viewTexts.documents.copyContent}
               </span>
-            </button>
+            </app-button>
           </div>
         </div>
       `;

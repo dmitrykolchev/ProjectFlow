@@ -152,37 +152,42 @@
   flex-wrap: wrap;
 }
 
+/* toolbar text chips are app-button web components at size sm pinned to the historical
+   28px height with the font-parity recipe: zero vertical padding, 0.55rem horizontal,
+   0.74rem font at weight 600, the tighter 0.3rem icon gap restored through btn-gap, the
+   historical 6px radius, transparent fill with the subtle border, and the hover fill copied
+   from the original .tool-btn:hover; the mono chip restores its monospace family */
 .tool-btn {
-  height: 28px;
-  padding: 0 0.55rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #334155);
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  font: inherit;
-  font-size: 0.74rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
+  --control-height-sm: 28px;
+  --control-padding-y-sm: 0;
+  --control-padding-x-sm: 0.55rem;
+  --control-font-sm: 0.74rem;
+  --btn-font-weight: 600;
+  --btn-gap: 0.3rem;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-subtle, #334155);
+  --btn-disabled-opacity: 0.45;
 }
 
-.tool-btn:hover:not(:disabled) {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+.tool-btn:hover {
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
 .tool-btn.is-active {
-  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
-  color: var(--accent-primary, #6366f1);
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.4));
+  --icon-btn-bg: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  --icon-btn-color: var(--accent-primary, #6366f1);
+  --icon-btn-border: var(--accent-border, rgba(99, 102, 241, 0.4));
 }
 
-.tool-btn:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.tool-btn.mono {
+  --icon-btn-font: var(--font-mono, monospace);
 }
 
 /* toolbar icon actions are app-button web components at size sm pinned to the historical
