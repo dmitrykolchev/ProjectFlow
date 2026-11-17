@@ -10,7 +10,8 @@
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric. */
 .link {
   display: inline-flex;
-  align-items: center;
+  align-items: var(--link-align-items, center);
+  min-height: var(--link-min-height, auto);
   gap: var(--link-gap, 0.4rem);
   width: var(--link-width, auto);
   padding: var(--link-padding, 0.15rem 0.25rem);
@@ -37,7 +38,8 @@
    (text, SVG icon, material icon) sits centered on the vertical axis.
    Additive hooks (defaults keep every existing consumer pixel-identical):
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
-   --link-width, --link-white-space, --link-overflow, --link-text-overflow. */
+   --link-width, --link-white-space, --link-overflow, --link-text-overflow,
+   --link-align-items, --link-min-height. */
 
 ::slotted(*) {
   display: inline-flex;
