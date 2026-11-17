@@ -166,6 +166,11 @@ export const en = {
     virtualMode: 'Virtual scroll',
     paginatedMode: 'Paginated',
     showingRows: 'Rendered rows',
+    standardMode: 'Standard',
+    compactMode: 'Compact',
+    densitySwitchTitle: 'Grid row density',
+    sortGroupHint: 'Group-priority sort',
+    groupableColumnHint: 'Drag column to group dropbar',
     columns: {
       id: 'Key',
       title: 'Task',

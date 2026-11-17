@@ -166,6 +166,11 @@ export const ru = {
     virtualMode: 'Виртуальный скролл',
     paginatedMode: 'Постранично',
     showingRows: 'Отображено строк',
+    standardMode: 'Стандартный',
+    compactMode: 'Компактный',
+    densitySwitchTitle: 'Плотность строк таблицы',
+    sortGroupHint: 'Приоритетная сортировка группы',
+    groupableColumnHint: 'Можно перетащить в область группировки',
     columns: {
       id: 'Код',
       title: 'Задача',

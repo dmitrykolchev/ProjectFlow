@@ -20,6 +20,8 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-pagination/app-pagination';
+import '../../common/app-segmented-switch/app-segmented-switch';
+import { eventValue } from '../../common/event-value';
 import { AppDataGridColumn, DataGridCellTemplate } from '../../common/app-data-grid-column/app-data-grid-column';
 import '../../common/app-data-grid-column/app-data-grid-column';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
@@ -78,7 +80,7 @@ const STATUS_ORDER: Record<string, number> = {
 };
 
 const ROW_HEIGHT_COMFORTABLE = 42;
-const ROW_HEIGHT_COMPACT = 36;
+const ROW_HEIGHT_COMPACT = 30;
 const ROW_OVERSCAN = 8;
 
 type VirtualRowItem =
@@ -111,6 +113,8 @@ export class AppDataGrid extends LitElement {
   @property({ type: String, attribute: 'group-by' }) groupBy: string = '';
   /** Comma-separated rules for multi-column sorting, e.g. "priority:desc,dates:asc" */
   @property({ type: String, attribute: 'sort-by' }) sortBy: string = '';
+  /** Compact high-density grid mode with tighter rows and cells */
+  @property({ type: Boolean }) compact?: boolean;
 
   @state() private storeTasks: Task[] = [];
   @state() private columns: ColumnConfig[] = [];
@@ -134,6 +138,7 @@ export class AppDataGrid extends LitElement {
   @state() private columnMenuMaxHeight: number = 280;
   @state() private currentLang = store.customization.language;
   @state() private currentDensity = store.customization.density;
+  @state() private localCompact: boolean | null = null;
 
   // Virtual scroll window state
   @state() private visStartRow: number = 0;
@@ -271,6 +276,9 @@ export class AppDataGrid extends LitElement {
         .filter(Boolean);
       this.collapsedGroups = new Set();
     }
+    if (changed.has('compact')) {
+      this.localCompact = null;
+    }
     if (changed.has('sortBy')) {
       const parsed = this.sortBy
         .split(',')
@@ -308,6 +316,9 @@ export class AppDataGrid extends LitElement {
   }
 
   updated(changed: Map<PropertyKey, unknown>) {
+    this.classList.toggle('is-compact', this.isCompactMode);
+    this.style.setProperty('--grid-row-height', `${this.rowHeightPx}px`);
+
     if (
       changed.has('sortRules') ||
       changed.has('groupByFields') ||
@@ -315,7 +326,9 @@ export class AppDataGrid extends LitElement {
       changed.has('rows') ||
       changed.has('storeTasks') ||
       changed.has('collapsedGroups') ||
-      changed.has('currentDensity')
+      changed.has('currentDensity') ||
+      changed.has('compact') ||
+      changed.has('localCompact')
     ) {
       if (changed.has('sortRules') || changed.has('groupByFields') || changed.has('virtual')) {
         const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
@@ -348,8 +361,12 @@ export class AppDataGrid extends LitElement {
     }
   }
 
+  private get isCompactMode(): boolean {
+    return this.localCompact ?? this.compact ?? (this.currentDensity === 'compact');
+  }
+
   private get rowHeightPx(): number {
-    return this.currentDensity === 'compact' ? ROW_HEIGHT_COMPACT : ROW_HEIGHT_COMFORTABLE;
+    return this.isCompactMode ? ROW_HEIGHT_COMPACT : ROW_HEIGHT_COMFORTABLE;
   }
 
   private syncState() {
@@ -718,6 +735,19 @@ export class AppDataGrid extends LitElement {
               `
             : ''}
 
+          <app-segmented-switch
+            size="sm"
+            title="${t.grid.densitySwitchTitle}"
+            .value="${this.isCompactMode ? 'compact' : 'standard'}"
+            .options="${[
+              { value: 'standard', label: t.grid.standardMode },
+              { value: 'compact', label: t.grid.compactMode },
+            ]}"
+            @change="${(e: CustomEvent) => {
+              this.localCompact = eventValue(e) === 'compact';
+            }}"
+          ></app-segmented-switch>
+
           <app-toggle-button
             size="sm"
             ?pressed="${this.virtual}"
@@ -809,13 +839,21 @@ export class AppDataGrid extends LitElement {
                             @drop="${(e: DragEvent) => this.handleGroupChipDrop(e, field)}"
                             @dragend="${() => (this.draggingGroupChip = null)}"
                           >
-                            <app-badge
-                              variant="primary"
-                              removable
-                              @remove="${() => this.removeGroupField(field)}"
-                            >
-                              ${index + 1}. ${caption}
-                            </app-badge>
+                            <span class="group-chip">
+                              <span class="group-chip-index">${index + 1}</span>
+                              <span class="group-chip-label">${caption}</span>
+                              <button
+                                type="button"
+                                class="group-chip-remove"
+                                aria-label="${t.grid.clearGroups}"
+                                @click="${(e: Event) => {
+                                  e.stopPropagation();
+                                  this.removeGroupField(field);
+                                }}"
+                              >
+                                ${iconX(11)}
+                              </button>
+                            </span>
                           </div>
                         `;
                       })}
@@ -863,7 +901,9 @@ export class AppDataGrid extends LitElement {
       <div class="table-container" @scroll="${this.handleTableScroll}">
         <table>
           <colgroup>
-            ${this.selectable ? html`<col style="width: 46px;" />` : ''}
+            ${this.selectable
+              ? html`<col style="width: ${this.isCompactMode ? 38 : 46}px;" />`
+              : ''}
             ${activeCols.map((col) => {
               const width = this.columnWidths[col.field] || col.width;
               return html`<col style="width: ${width}px;" />`;
@@ -873,7 +913,10 @@ export class AppDataGrid extends LitElement {
             <tr>
               ${this.selectable
                 ? html`
-                    <th class="select-col" style="width: 46px;">
+                    <th
+                      class="select-col"
+                      style="width: ${this.isCompactMode ? 38 : 46}px;"
+                    >
                       <app-checkbox
                         ?checked="${allCurrentSelected}"
                         ?indeterminate="${!allCurrentSelected && someCurrentSelected}"
@@ -890,12 +933,13 @@ export class AppDataGrid extends LitElement {
                   this.dropTargetField === col.field ? `drop-${this.dropPosition}` : '';
                 const sortIdx = effectiveSortRules.findIndex((r) => r.field === col.field);
                 const sortRule = sortIdx !== -1 ? effectiveSortRules[sortIdx] : null;
-                const canClickSort = col.sortable || this.groupByFields.includes(col.field);
+                const isGroupedCol = this.groupByFields.includes(col.field);
+                const canClickSort = col.sortable || isGroupedCol;
                 const sortClasses = sortRule
                   ? `is-sorted ${sortRule.isGroupSort ? 'is-group-sort' : ''}`
                   : '';
                 const headerTitle = sortRule
-                  ? `${col.caption} (#${sortIdx + 1}${sortRule.isGroupSort ? ` · ${t.grid.groupBy}` : ''})`
+                  ? `${col.caption} [${sortIdx + 1}]${sortRule.isGroupSort ? ` · ${t.grid.sortGroupHint}` : ''}`
                   : canClickSort
                   ? `${col.caption} (${t.grid.sortHint})`
                   : col.caption;
@@ -916,13 +960,47 @@ export class AppDataGrid extends LitElement {
                     @drop="${(e: DragEvent) => this.handleColDrop(e, col)}"
                     @dragend="${this.handleColDragEnd}"
                   >
-                    <div class="th-content">
-                      <span class="th-label">${col.caption}</span>
-                      ${sortRule
+                    <div class="th-content align-${col.align}">
+                      <div class="th-main">
+                        <span class="th-label">${col.caption}</span>
+                        ${sortRule
+                          ? html`
+                              <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
+                                <svg
+                                  class="sort-dir-arrow"
+                                  width="8"
+                                  height="8"
+                                  viewBox="0 0 10 10"
+                                  aria-hidden="true"
+                                >
+                                  ${sortRule.direction === 'asc'
+                                    ? html`<polygon points="5,2 9,7.5 1,7.5" fill="currentColor" />`
+                                    : html`<polygon points="5,8 9,2.5 1,2.5" fill="currentColor" />`}
+                                </svg>
+                                <span class="sort-order-num">[${sortIdx + 1}]</span>
+                              </span>
+                            `
+                          : ''}
+                      </div>
+                      ${(col.groupable || isGroupedCol) && col.caption.trim() !== ''
                         ? html`
-                            <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
-                              <span class="sort-order-num">${sortIdx + 1}</span>
-                              <span class="sort-dir-arrow">${sortRule.direction === 'asc' ? '▲' : '▼'}</span>
+                            <span
+                              class="th-group-icon ${isGroupedCol ? 'is-grouped' : ''}"
+                              title="${isGroupedCol ? t.grid.sortGroupHint : t.grid.groupableColumnHint}"
+                            >
+                              <svg
+                                width="12"
+                                height="12"
+                                viewBox="0 0 16 16"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.4"
+                                aria-hidden="true"
+                              >
+                                <rect x="2" y="2.5" width="12" height="11" rx="1.75" />
+                                <line x1="2" y1="6.2" x2="14" y2="6.2" />
+                                <line x1="6.5" y1="6.2" x2="6.5" y2="13.5" />
+                              </svg>
                             </span>
                           `
                         : ''}

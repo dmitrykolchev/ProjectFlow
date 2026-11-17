@@ -112,6 +112,29 @@ export const meta: ComponentStoryMeta = {
         </div>
       `,
     },
+    {
+      name: 'Compact Grid Mode (High Density)',
+      description: 'Compact high-density row layout (30px rows, tighter padding) with group-first multi-column sort indicators',
+      render: () => html`
+        <div style="height: 540px; width: 100%; display: flex; flex-direction: column; border: 1px solid var(--border-subtle, #334155); border-radius: var(--radius-lg, 12px); overflow: hidden;">
+          <app-data-grid
+            .rows="${VIRTUAL_DEMO_ROWS}"
+            compact
+            virtual
+            group-by="status,priority"
+            sort-by="dates:asc,id:asc"
+          >
+            <app-data-grid-column field="id" caption="Код" width="105" min-width="80" sortable cell-type="key"></app-data-grid-column>
+            <app-data-grid-column field="title" caption="Задача" width="290" min-width="160" sortable cell-type="title"></app-data-grid-column>
+            <app-data-grid-column field="status" caption="Статус" width="130" sortable groupable cell-type="status"></app-data-grid-column>
+            <app-data-grid-column field="priority" caption="Приоритет" width="125" sortable groupable cell-type="priority"></app-data-grid-column>
+            <app-data-grid-column field="assigneeId" caption="Исполнитель" width="140" sortable groupable cell-type="assignee"></app-data-grid-column>
+            <app-data-grid-column field="dates" caption="Сроки" width="135" sortable cell-type="dates"></app-data-grid-column>
+            <app-data-grid-column field="progress" caption="Прогресс" width="130" sortable cell-type="progress"></app-data-grid-column>
+          </app-data-grid>
+        </div>
+      `,
+    },
   ],
 };
 
