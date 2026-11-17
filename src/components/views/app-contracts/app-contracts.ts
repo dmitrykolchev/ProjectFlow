@@ -565,7 +565,7 @@ export class AppContracts extends LitElement {
                           <td>
                             <div class="actions-row">
                               <app-button
-                                class="accent-action"
+                                action="view"
                                 size="sm"
                                 variant="icon"
                                 title="${t.contractDetail.openContract}"
@@ -574,7 +574,7 @@ export class AppContracts extends LitElement {
                                 <span slot="start">${iconChevronRight(15)}</span>
                               </app-button>
                               <app-button
-                                class="accent-action"
+                                action="submit"
                                 size="sm"
                                 variant="icon"
                                 title="${t.contractDetail.createCalculation}"
@@ -583,7 +583,7 @@ export class AppContracts extends LitElement {
                                 <span slot="start">${iconTable()}</span>
                               </app-button>
                               <app-button
-                                class="success-action"
+                                action="accept"
                                 size="sm"
                                 variant="icon"
                                 title="${t.contractDetail.issueInvoice}"
@@ -600,7 +600,7 @@ export class AppContracts extends LitElement {
                                 <span slot="start">${iconEdit(14)}</span>
                               </app-button>
                               <app-button
-                                class="danger-action"
+                                action="delete"
                                 size="sm"
                                 variant="icon"
                                 title="${t.common.delete}"
@@ -731,7 +731,7 @@ export class AppContracts extends LitElement {
                               ${calc.status === 'draft' || calc.status === 'rejected'
                                 ? html`
                                     <app-button
-                                      class="accent-action"
+                                      action="submit"
                                       size="sm"
                                       variant="icon"
                                       title="${t.calculations.sendForApproval}"
@@ -744,7 +744,7 @@ export class AppContracts extends LitElement {
                               ${calc.status === 'sent'
                                 ? html`
                                     <app-button
-                                      class="success-action"
+                                      action="accept"
                                       size="sm"
                                       variant="icon"
                                       title="${t.calculations.approveCalc}"
@@ -753,7 +753,7 @@ export class AppContracts extends LitElement {
                                       <span slot="start">${iconCheck(14)}</span>
                                     </app-button>
                                     <app-button
-                                      class="danger-action"
+                                      action="reject"
                                       size="sm"
                                       variant="icon"
                                       title="${t.calculations.rejectCalc}"
@@ -766,7 +766,7 @@ export class AppContracts extends LitElement {
                               ${calc.status === 'approved' && ctr
                                 ? html`
                                     <app-button
-                                      class="success-action"
+                                      action="accept"
                                       size="sm"
                                       variant="icon"
                                       title="${t.calculations.createInvoiceFromCalc}"
@@ -946,7 +946,7 @@ export class AppContracts extends LitElement {
                                   `
                                 : ''}
                               <app-button
-                                class="danger-action"
+                                action="delete"
                                 size="sm"
                                 variant="icon"
                                 title="${t.common.delete}"
@@ -1083,7 +1083,7 @@ export class AppContracts extends LitElement {
                             ${inv.status === 'draft'
                               ? html`
                                   <app-button
-                                    class="accent-action"
+                                    action="submit"
                                     size="sm"
                                     variant="icon"
                                     title="${t.invoices.markIssued}"
@@ -1096,7 +1096,7 @@ export class AppContracts extends LitElement {
                             ${inv.status === 'issued'
                               ? html`
                                   <app-button
-                                    class="accent-action"
+                                    action="submit"
                                     size="sm"
                                     variant="icon"
                                     title="${t.invoices.markSent}"
@@ -1109,7 +1109,7 @@ export class AppContracts extends LitElement {
                             ${canPay
                               ? html`
                                   <app-button
-                                    class="success-action"
+                                    action="accept"
                                     size="sm"
                                     variant="icon"
                                     title="${t.payments.recordPayment}"
@@ -1118,7 +1118,7 @@ export class AppContracts extends LitElement {
                                     <span slot="start">${iconCreditCard(14)}</span>
                                   </app-button>
                                   <app-button
-                                    class="success-action"
+                                    action="accept"
                                     size="sm"
                                     variant="icon"
                                     title="${t.invoices.markPaid}"
