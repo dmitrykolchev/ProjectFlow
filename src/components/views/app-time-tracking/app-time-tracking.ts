@@ -24,6 +24,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-switch/app-switch';
+import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
@@ -722,15 +723,12 @@ export class AppTimeTracking extends LitElement {
                 (this.formStatus = eventValue(e) as TimeEntryStatus)}"
             ></app-select>
           </div>
-          <div style="display: flex; align-items: flex-end;">
-            <div class="switch-field" style="width: 100%;">
-              <span>${t.viewTexts.timeTracking.billableHoursLabel}</span>
-              <app-switch
-                size="sm"
-                ?checked="${this.formBillable}"
-                @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
-              ></app-switch>
-            </div>
+          <div>
+            <app-checkbox
+              label="${t.viewTexts.timeTracking.billableHoursLabel}"
+              ?checked="${this.formBillable}"
+              @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
+            ></app-checkbox>
           </div>
           <div class="col-span-2">
             <app-textarea
