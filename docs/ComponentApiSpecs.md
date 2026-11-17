@@ -443,6 +443,9 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 - `--btn-line-height` — line-height контрола, default `normal`; slotted-children наследуют
   значение от inner-button (через slot), поэтому чипам с `font: inherit` нужен unitless
   коэффициент оригинала (например `1.5`) для паритета высот текстовых span.
+- `--btn-width` — width inner контрола, default `auto` (content-sized); тот же хук разделён
+  с `app-toggle-button`; вертикальные `app-button-group` растягивают детей через
+  `width: 100%` на host и `--btn-width: 100%` на inner.
 
 Дополнительные хуки `app-link` (добавлены 2026-11-17, дефолты = прежнее поведение, story
 consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.25rem, sans, numeric normal):

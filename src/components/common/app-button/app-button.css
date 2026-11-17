@@ -12,6 +12,9 @@ button {
   font-family: var(--icon-btn-font, var(--font-sans, inherit));
   font-weight: var(--btn-font-weight, 500);
   min-width: var(--btn-min-width, auto);
+  /* --btn-width lets a consumer stretch the inner control (default auto keeps every
+     existing button content-sized and pixel-identical) */
+  width: var(--btn-width, auto);
   border-style: solid;
   border-width: var(--btn-border-width, 1px);
   border-color: transparent;
