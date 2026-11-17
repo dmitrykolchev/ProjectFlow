@@ -60,6 +60,7 @@ import timeEntryFormMeta from '../../common/app-time-entry-form/app-time-entry-f
 import expenseFormMeta from '../../common/app-expense-form/app-expense-form.story';
 import documentFormMeta from '../../common/app-document-form/app-document-form.story';
 import decomposeFormMeta from '../../common/app-decompose-form/app-decompose-form.story';
+import tagsRowMeta from '../../common/app-tags-row/app-tags-row.story';
 import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialog.story';
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
@@ -156,6 +157,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   expenseFormMeta,
   documentFormMeta,
   decomposeFormMeta,
+  tagsRowMeta,
   emptyStateMeta,
   kpiStripMeta,
   sectionCardMeta,
