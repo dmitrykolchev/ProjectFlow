@@ -352,8 +352,8 @@
 
 /* header and project row icon actions are app-button web components at size xs pinned
    to the historical 32px square; hover keeps the subtle border unchanged for plain
-   actions, danger hover tokens come from .danger-action, and the historical 6px radius
-   replaces the canonical md radius */
+   actions, the component supplies the danger palette for action="delete", and the
+   historical 6px radius replaces the canonical md radius */
 .nav-actions app-button,
 .row-right app-button {
   --control-height-xs: 32px;
@@ -363,15 +363,9 @@
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.nav-actions app-button:not(.danger-action),
-.row-right app-button:not(.danger-action) {
+.nav-actions app-button:not([action='delete']),
+.row-right app-button:not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
-}
-
-.danger-action {
-  --icon-btn-hover-color: var(--color-danger, #ef4444);
-  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
-  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 .col-span-2 {
   grid-column: span 2;
