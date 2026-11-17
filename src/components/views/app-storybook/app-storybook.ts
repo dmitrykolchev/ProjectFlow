@@ -78,6 +78,8 @@ import counterpartyContactsMeta from '../../common/app-counterparty-contacts/app
 import bankSummaryMeta from '../../common/app-bank-summary/app-bank-summary.story';
 import analysisSummaryMeta from '../../common/app-analysis-summary/app-analysis-summary.story';
 import markdownMeta from '../../common/app-markdown/app-markdown.story';
+import contextChipMeta from '../../common/app-context-chip/app-context-chip.story';
+import contextChipsListMeta from '../../common/app-context-chips-list/app-context-chips-list.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -187,6 +189,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   bankSummaryMeta,
   analysisSummaryMeta,
   markdownMeta,
+  contextChipMeta,
+  contextChipsListMeta,
   toastMeta,
   activityMeta,
   headerMeta,

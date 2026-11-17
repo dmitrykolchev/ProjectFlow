@@ -1,0 +1,39 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+}
+
+.chips-list {
+  display: grid;
+  /* two equal columns of chips */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.4rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.chips-list > app-context-chip {
+  min-width: 0;
+}
+
+.chips-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.chips-list::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+.chips-list::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 4px;
+}
+
+.chips-list::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary, #6366f1);
+}

@@ -1,0 +1,118 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+  transition: border-color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease);
+}
+
+.chip.is-selected {
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
+}
+
+/* the chip body is a plain block: in select mode it toggles selection on click */
+.chip-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.3rem 0.45rem;
+  text-align: left;
+}
+
+.chip-body.is-clickable {
+  cursor: pointer;
+}
+
+.kind-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-xs, 4px);
+  flex-shrink: 0;
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.kind-icon.is-kb {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.14);
+}
+
+.kind-icon.is-doc {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.14);
+}
+
+.kind-icon.is-req {
+  color: #c084fc;
+  background: rgba(192, 132, 252, 0.16);
+}
+
+.chip-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.chip-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-primary, #f8fafc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip-meta {
+  font-size: 0.66rem;
+  line-height: 1.25;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chip.is-selected .chip-title {
+  color: var(--accent-primary, #6366f1);
+}
+
+/* the single open action is an app-button at size xs with the content-sized look:
+   zero border, transparent fill, muted glyph, 4px radius and the hover accent fill */
+.chip-open {
+  --control-height-xs: auto;
+  --icon-only-padding: 0.15rem;
+  --btn-border-width: 0;
+  --btn-radius-tl: 4px;
+  --btn-radius-tr: 4px;
+  --btn-radius-bl: 4px;
+  --btn-radius-br: 4px;
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: transparent;
+  flex-shrink: 0;
+  margin-right: 0.2rem;
+}
+
+.chip-open:hover {
+  --icon-btn-hover-color: var(--accent-primary, #818cf8);
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-border: transparent;
+}
