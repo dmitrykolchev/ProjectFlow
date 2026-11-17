@@ -71,28 +71,27 @@
   flex-wrap: wrap;
 }
 
-.icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-surface, #111827);
-  color: var(--text-secondary, #94a3b8);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-fast, 150ms ease);
+/* header and calc editor row icon actions are app-button web components at size xs
+   pinned to the historical 34px square with the canonical md radius; the historical
+   surface fill and subtle border are reproduced through custom properties, plain hover
+   keeps the border unchanged, and the danger hover keeps the fill while coloring the
+   glyph and the border */
+.nav-actions app-button,
+.calc-row-top app-button {
+  --control-height-xs: 34px;
+  --icon-btn-bg: var(--bg-surface, #111827);
+  --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover, #1e293b);
-  color: var(--text-primary, #f8fafc);
+.nav-actions app-button:not(.danger-action),
+.calc-row-top app-button:not(.danger-action) {
+  --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
-.icon-btn.danger:hover {
-  color: var(--color-danger, #ef4444);
-  border-color: rgba(239, 68, 68, 0.45);
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: rgba(239, 68, 68, 0.45);
+  --icon-btn-hover-bg: var(--bg-surface, #111827);
 }
 
 .overview-card {

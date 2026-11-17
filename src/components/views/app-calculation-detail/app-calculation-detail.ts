@@ -246,14 +246,15 @@ export class AppCalculationDetail extends LitElement {
               <span>${t.common.edit}</span>
             </app-button>
 
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -765,14 +766,15 @@ export class AppCalculationDetail extends LitElement {
                       <div class="item-amount-preview ${!item.billable ? 'is-zero' : ''}">
                         ${formatMoney(item.billable ? item.amount : 0, currency)}
                       </div>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                      <app-button
+                        class="danger-action"
+                        size="xs"
+                        variant="icon"
                         title="${t.common.delete}"
                         @click="${() => (this.calcItems = this.calcItems.filter((i) => i.id !== item.id))}"
                       >
-                        ${iconTrash(13)}
-                      </button>
+                        <span slot="start">${iconTrash(13)}</span>
+                      </app-button>
                     </div>
 
                     <div class="calc-row-bottom">
