@@ -213,15 +213,26 @@
   font-variant-numeric: tabular-nums;
 }
 
-.req-card-footer {
+/* card-footer web component keeps its own chrome; the view pins it to the bottom
+   of the card and tunes historical gaps. Card icon actions match the historical
+   28px icon-btn with subtle background via app-button custom properties. */
+card-footer {
   margin-top: auto;
-  padding-top: 0.65rem;
-  border-top: 1px solid var(--border-subtle, #1e293b);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
+  --card-footer-gap: 0.5rem;
+  --card-footer-start-gap: 0.4rem;
+  --card-footer-end-gap: 0.4rem;
+}
+
+app-button[variant="icon"] {
+  --control-height-sm: 28px;
+  --icon-btn-bg: var(--bg-subtle, rgba(148, 163, 184, 0.08));
+  --icon-btn-border: var(--border-subtle, #1e293b);
+}
+
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: rgba(239, 68, 68, 0.4);
+  --icon-btn-hover-bg: var(--bg-hover, #1e293b);
 }
 
 .footer-left,

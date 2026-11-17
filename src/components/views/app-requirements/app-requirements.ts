@@ -40,6 +40,7 @@ import { eventValue } from '../../common/event-value';
 import { paginateItems } from '../../common/paginate';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-empty-state/app-empty-state';
@@ -455,8 +456,8 @@ export class AppRequirements extends LitElement {
                 </span>
               </div>
 
-              <div class="req-card-footer" @click="${(e: Event) => e.stopPropagation()}">
-                <div class="footer-left">
+              <card-footer @click="${(e: Event) => e.stopPropagation()}">
+                <div slot="start" class="footer-left">
                   <app-button
                     size="sm"
                     variant="primary"
@@ -476,25 +477,26 @@ export class AppRequirements extends LitElement {
                   </app-button>
                 </div>
 
-                <div class="footer-right">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditReqModal(req)}"
-                  >
-                    ${iconEdit(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn danger"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingReq = req)}"
-                  >
-                    ${iconTrash(14)}
-                  </button>
-                </div>
-              </div>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.edit}"
+                  @click="${() => this.openEditReqModal(req)}"
+                >
+                  <span slot="start">${iconEdit(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  class="danger-action"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingReq = req)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+              </card-footer>
             </article>
           `;
         })}
