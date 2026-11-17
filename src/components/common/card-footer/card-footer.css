@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--card-footer-gap, 0.75rem);
-  padding-top: 0.65rem;
+  padding-top: var(--card-footer-padding-top, 0.65rem);
   border-top: 1px solid var(--border-subtle, #1e293b);
 }
 
