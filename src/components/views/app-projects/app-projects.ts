@@ -423,30 +423,31 @@ export class AppProjects extends LitElement {
                   </td>
                   <td @click="${(e: Event) => e.stopPropagation()}">
                     <div class="actions-row">
-                      <button
-                        type="button"
-                        class="icon-btn"
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.projectDetail.openProject}"
                         @click="${() => store.openProjectDetail(proj.id)}"
                       >
-                        ${iconChevronRight(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn"
+                        <span slot="start">${iconChevronRight(14)}</span>
+                      </app-button>
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.common.edit}"
                         @click="${() => this.openEditModal(proj)}"
                       >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                        <span slot="start">${iconEdit(14)}</span>
+                      </app-button>
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
                         title="${t.common.delete}"
                         @click="${() => (this.deletingProject = proj)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
