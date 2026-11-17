@@ -15,19 +15,11 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-filter-bar/app-filter-bar';
-import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import '../../common/app-input/app-input';
-import '../../common/app-number-input/app-number-input';
-import '../../common/app-date-input/app-date-input';
-import '../../common/app-select/app-select';
-import '../../common/app-entity-selector/app-entity-selector';
-import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
-import '../../common/app-checkbox/app-checkbox';
-import '../../common/app-textarea/app-textarea';
+import { mapProjectOptions } from '../../common/entity-selector-options';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-modal/app-modal';
+import '../../common/app-expense-form/app-expense-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -55,20 +47,9 @@ export class AppExpenses extends LitElement {
 
   // Form modal
   @state() private modalOpen = false;
-  @state() private editingId: string | null = null;
-  @state() private formTitle = '';
-  @state() private formProjectId = '';
-  @state() private formTaskId = '';
-  @state() private formUserId = '';
-  @state() private formDate = '';
-  @state() private formCategory: ExpenseCategory = 'infrastructure';
-  @state() private formAmount = 15000;
-  @state() private formCurrency: 'RUB' | 'USD' | 'EUR' = 'RUB';
-  @state() private formBillable = true;
-  @state() private formStatus: ExpenseStatus = 'pending';
-  @state() private formVendor = '';
-  @state() private formNotes = '';
-  @state() private formError = '';
+  @state() private editingExpense: Expense | null = null;
+  @state() private presetExpenseProjectId: string | null = null;
+  @state() private presetExpenseTaskId: string | null = null;
 
   @state() private deletingExpense: Expense | null = null;
 
@@ -238,7 +219,7 @@ export class AppExpenses extends LitElement {
         ? html`<app-empty-state title="${t.viewTexts.expenses.emptyNoExpenses}"></app-empty-state>`
         : this.renderRegistryTable(filtered, t)}
 
-      ${this.renderFormModal(t, categoryOptions, statusOptions)}
+      ${this.renderFormModal(t)}
       ${this.renderDeleteModal(t)}
     `;
   }
@@ -494,152 +475,16 @@ export class AppExpenses extends LitElement {
     `;
   }
 
-  private renderFormModal(
-    t: ReturnType<typeof getTranslation>,
-    categoryOptions: { value: ExpenseCategory; label: string }[],
-    statusOptions: { value: ExpenseStatus; label: string; color: string }[]
-  ) {
-    const projectOptions = mapProjectOptions(store.projects, t);
-
-    const taskOptions = mapTaskOptions(
-      store.tasks.filter((tk) => tk.projectId === this.formProjectId),
-      t
-    );
-
-    const userOptions = mapUserOptions(store.users, t);
-    const currencyOptions = [
-      { value: 'RUB', label: 'RUB (₽)' },
-      { value: 'USD', label: 'USD ($)' },
-      { value: 'EUR', label: 'EUR (€)' },
-    ];
-
+  private renderFormModal(t: ReturnType<typeof getTranslation>) {
     return html`
-      <app-modal
-        ?open="${this.modalOpen}"
-        size="lg"
-        title="${this.editingId ? t.viewTexts.expenses.modalTitleEdit : t.viewTexts.expenses.modalTitleCreate}"
+      <app-expense-form
+        .open="${this.modalOpen}"
+        .expense="${this.editingExpense}"
+        .presetProjectId="${this.presetExpenseProjectId}"
+        .presetTaskId="${this.presetExpenseTaskId}"
         @close="${() => (this.modalOpen = false)}"
-      >
-        <app-form-grid>
-          <div class="col-span-2">
-            <app-input
-              label="${t.viewTexts.expenses.labelExpenseTitle}"
-              placeholder="${t.viewTexts.expenses.placeholderExpenseTitle}"
-              .value="${this.formTitle}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formTitle = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.expenses.labelProject}"
-              .value="${this.formProjectId}"
-              .options="${projectOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                this.formProjectId = eventValue(e);
-                this.formTaskId = '';
-              }}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.expenses.labelLinkedTask}"
-              placeholder="${t.viewTexts.expenses.optionNoTask}"
-              clearable
-              .value="${this.formTaskId}"
-              .options="${taskOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formTaskId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.thCategory}"
-              .value="${this.formCategory}"
-              .options="${categoryOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCategory = eventValue(e) as ExpenseCategory)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.expenses.labelSubmittedBy}"
-              .value="${this.formUserId}"
-              .options="${userOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formUserId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.expenses.thAmount}"
-              .value="${this.formAmount}"
-              min="0"
-              step="500"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.formAmount = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.labelCurrency}"
-              .value="${this.formCurrency}"
-              .options="${currencyOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formCurrency = eventValue(e) as 'RUB' | 'USD' | 'EUR')}"
-            ></app-select>
-          </div>
-          <div>
-            <app-date-input
-              label="${t.viewTexts.expenses.labelDate}"
-              .value="${this.formDate}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDate = eventValue(e))}"
-            ></app-date-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.expenses.thStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as ExpenseStatus)}"
-            ></app-select>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.expenses.labelVendor}"
-              placeholder="Yandex Cloud, JetBrains..."
-              .value="${this.formVendor}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div class="checkbox-cell">
-            <app-checkbox
-              label="${t.viewTexts.expenses.billableSwitch}"
-              ?checked="${this.formBillable}"
-              @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
-            ></app-checkbox>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.expenses.labelNotes}"
-              .value="${this.formNotes}"
-              rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formNotes = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.modalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveModal}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-expense-form>
     `;
   }
 
@@ -666,74 +511,16 @@ export class AppExpenses extends LitElement {
     `;
   }
 
-  private openCreateModal(presetProjectId?: string) {
-    this.editingId = null;
-    this.formTitle = '';
-    this.formProjectId = presetProjectId || (this.projectFilter !== 'all' ? this.projectFilter : store.projects[0]?.id || '');
-    this.formTaskId = '';
-    this.formUserId = store.users[0]?.id || '';
-    this.formDate = new Date().toISOString().slice(0, 10);
-    this.formCategory = 'infrastructure';
-    this.formAmount = 15000;
-    this.formCurrency = 'RUB';
-    this.formBillable = true;
-    this.formStatus = 'pending';
-    this.formVendor = '';
-    this.formNotes = '';
-    this.formError = '';
+  private openCreateModal(presetProjectId?: string, presetTaskId?: string) {
+    this.editingExpense = null;
+    this.presetExpenseProjectId =
+      presetProjectId ?? (this.projectFilter !== 'all' ? this.projectFilter : null);
+    this.presetExpenseTaskId = presetTaskId ?? null;
     this.modalOpen = true;
   }
 
   private openEditModal(exp: Expense) {
-    this.editingId = exp.id;
-    this.formTitle = exp.title;
-    this.formProjectId = exp.projectId;
-    this.formTaskId = exp.taskId || '';
-    this.formUserId = exp.userId;
-    this.formDate = exp.date;
-    this.formCategory = exp.category;
-    this.formAmount = exp.amount;
-    this.formCurrency = exp.currency;
-    this.formBillable = exp.billable;
-    this.formStatus = exp.status;
-    this.formVendor = exp.vendor || '';
-    this.formNotes = exp.notes;
-    this.formError = '';
+    this.editingExpense = exp;
     this.modalOpen = true;
-  }
-
-  private handleSaveModal() {
-    if (!this.formTitle.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-
-    const payload = {
-      title: this.formTitle.trim(),
-      projectId: this.formProjectId || store.projects[0]?.id || '',
-      taskId: this.formTaskId || undefined,
-      userId: this.formUserId || store.users[0]?.id || '',
-      date: this.formDate || new Date().toISOString().slice(0, 10),
-      category: this.formCategory,
-      amount: Math.max(0, Number(this.formAmount) || 0),
-      currency: this.formCurrency,
-      billable: this.formBillable,
-      status: this.formStatus,
-      vendor: this.formVendor.trim() || undefined,
-      notes: this.formNotes.trim(),
-    };
-
-    if (this.editingId) {
-      const existing = this.expenses.find((e) => e.id === this.editingId);
-      store.updateExpense({
-        id: this.editingId,
-        createdAt: existing?.createdAt || new Date().toISOString(),
-        ...payload,
-      });
-    } else {
-      store.addExpense(payload);
-    }
-
-    this.modalOpen = false;
   }
 }
