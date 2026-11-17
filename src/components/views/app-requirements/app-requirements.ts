@@ -161,7 +161,7 @@ export class AppRequirements extends LitElement {
 
     const projectOptions = [
       { value: 'all', label: t.viewTexts.requirements.filterAllProjects },
-      ...store.projects.map((p) => ({ value: p.id, label: `[${p.key}] ${p.name}` })),
+      ...mapProjectOptions(store.projects, t),
     ];
 
     const typeOptions = [
@@ -239,7 +239,7 @@ export class AppRequirements extends LitElement {
         placeholder="${t.viewTexts.requirements.searchPlaceholder}"
         .searchValue="${this.localSearch}"
         .filters="${[
-          { key: 'project', options: projectOptions },
+          { key: 'project', type: 'entity', options: projectOptions },
           { key: 'type', options: typeOptions },
           { key: 'priority', options: priorityOptions },
           { key: 'status', options: statusOptions },
