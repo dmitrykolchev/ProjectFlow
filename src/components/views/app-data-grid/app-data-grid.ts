@@ -939,7 +939,7 @@ export class AppDataGrid extends LitElement {
                   ? `is-sorted ${sortRule.isGroupSort ? 'is-group-sort' : ''}`
                   : '';
                 const headerTitle = sortRule
-                  ? `${col.caption} [${sortIdx + 1}]${sortRule.isGroupSort ? ` · ${t.grid.sortGroupHint}` : ''}`
+                  ? `${col.caption} ${sortRule.direction === 'asc' ? '↑' : '↓'} [${sortIdx + 1}]${sortRule.isGroupSort ? ` · ${t.grid.sortGroupHint}` : ''}`
                   : canClickSort
                   ? `${col.caption} (${t.grid.sortHint})`
                   : col.caption;
@@ -966,17 +966,41 @@ export class AppDataGrid extends LitElement {
                         ${sortRule
                           ? html`
                               <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
-                                <svg
-                                  class="sort-dir-arrow"
-                                  width="8"
-                                  height="8"
-                                  viewBox="0 0 10 10"
-                                  aria-hidden="true"
-                                >
-                                  ${sortRule.direction === 'asc'
-                                    ? html`<polygon points="5,2 9,7.5 1,7.5" fill="currentColor" />`
-                                    : html`<polygon points="5,8 9,2.5 1,2.5" fill="currentColor" />`}
-                                </svg>
+                                ${sortRule.direction === 'asc'
+                                  ? html`
+                                      <svg
+                                        class="sort-dir-arrow is-asc"
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                      >
+                                        <line x1="8" y1="13" x2="8" y2="3" />
+                                        <polyline points="4 7 8 3 12 7" />
+                                      </svg>
+                                    `
+                                  : html`
+                                      <svg
+                                        class="sort-dir-arrow is-desc"
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 16 16"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2.2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        aria-hidden="true"
+                                      >
+                                        <line x1="8" y1="3" x2="8" y2="13" />
+                                        <polyline points="4 9 8 13 12 9" />
+                                      </svg>
+                                    `}
                                 <span class="sort-order-num">[${sortIdx + 1}]</span>
                               </span>
                             `
