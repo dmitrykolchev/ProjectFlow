@@ -66,15 +66,15 @@
 
 /* variants */
 .variant-primary {
-  color: var(--accent-primary, #6366f1);
+  color: var(--link-color, var(--accent-primary, #6366f1));
 }
 
 .variant-secondary {
-  color: var(--text-secondary, #94a3b8);
+  color: var(--link-color, var(--text-secondary, #94a3b8));
 }
 
 .variant-danger {
-  color: var(--color-danger, #ef4444);
+  color: var(--link-color, var(--color-danger, #ef4444));
 }
 
 .link:hover:not(.is-disabled) {
