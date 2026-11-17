@@ -14,7 +14,6 @@ import {
 } from '../../common/document-utils';
 import {
   Company,
-  CompanyStatus,
   Contract,
   DocumentCategory,
   DocumentItem,
@@ -66,6 +65,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-input/app-input';
 import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-modal/app-modal';
+import '../../common/app-company-form/app-company-form';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
@@ -94,19 +94,6 @@ export class AppCompanyDetail extends LitElement {
 
   // Edit Company modal state
   @state() private editModalOpen = false;
-  @state() private formName = '';
-  @state() private formLegalName = '';
-  @state() private formInn = '';
-  @state() private formKpp = '';
-  @state() private formIndustry = '';
-  @state() private formCity = '';
-  @state() private formPhone = '';
-  @state() private formEmail = '';
-  @state() private formWebsite = '';
-  @state() private formDirectorId = '';
-  @state() private formStatus: CompanyStatus = 'active';
-  @state() private formDescription = '';
-  @state() private formError = '';
 
   @state() private confirmDeleteOpen = false;
 
@@ -1168,127 +1155,15 @@ export class AppCompanyDetail extends LitElement {
   }
 
   private renderEditModal(t: ReturnType<typeof getTranslation>) {
-    const statusOptions = [
-      { value: 'active', label: t.viewTexts.companies.filterActive, color: '#10b981' },
-      { value: 'inactive', label: t.viewTexts.companies.filterInactive, color: '#64748b' },
-    ];
-    const directorOptions = [
-      { value: '', label: t.viewTexts.companies.optionUnassignedDirector },
-      ...store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
-    ];
+    const company = store.companies.find((c) => c.id === this.detailCompanyId) || null;
 
     return html`
-      <app-modal
-        ?open="${this.editModalOpen}"
-        size="lg"
-        title="${t.viewTexts.companyDetail.editCompanyModalTitle}"
+      <app-company-form
+        .open="${this.editModalOpen}"
+        .company="${company}"
         @close="${() => (this.editModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelShortName}"
-              .value="${this.formName}"
-              required
-              error="${this.formError}"
-              @input="${(e: CustomEvent<{ value: string }>) => {
-                this.formName = eventValue(e);
-                this.formError = '';
-              }}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelLegalName}"
-              .value="${this.formLegalName}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formLegalName = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelInn}"
-              .value="${this.formInn}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formInn = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelKpp}"
-              .value="${this.formKpp}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formKpp = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaIndustry}"
-              .value="${this.formIndustry}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formIndustry = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaCity}"
-              .value="${this.formCity}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formCity = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.metaPhone}"
-              .value="${this.formPhone}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formPhone = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="Email"
-              type="email"
-              .value="${this.formEmail}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formEmail = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-input
-              label="${t.viewTexts.companies.labelWebsite}"
-              .value="${this.formWebsite}"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formWebsite = eventValue(e))}"
-            ></app-input>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.companies.metaDirector}"
-              .value="${this.formDirectorId}"
-              .options="${directorOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.formDirectorId = eventValue(e))}"
-            ></app-select>
-          </div>
-          <div>
-            <app-select
-              label="${t.viewTexts.companies.labelStatus}"
-              .value="${this.formStatus}"
-              .options="${statusOptions}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.formStatus = eventValue(e) as CompanyStatus)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.companies.labelDescription}"
-              .value="${this.formDescription}"
-              rows="3"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.formDescription = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.editModalOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button variant="primary" @click="${this.handleSaveEdit}">
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.editModalOpen = false)}"
+      ></app-company-form>
     `;
   }
 
@@ -1765,43 +1640,7 @@ export class AppCompanyDetail extends LitElement {
   }
 
   private openEditModal(company: Company) {
-    this.formName = company.name;
-    this.formLegalName = company.legalName;
-    this.formInn = company.inn;
-    this.formKpp = company.kpp || '';
-    this.formIndustry = company.industry;
-    this.formCity = company.city;
-    this.formPhone = company.phone;
-    this.formEmail = company.email;
-    this.formWebsite = company.website || '';
-    this.formDirectorId = company.directorId || '';
-    this.formStatus = company.status;
-    this.formDescription = company.description;
-    this.formError = '';
     this.editModalOpen = true;
-  }
-
-  private handleSaveEdit() {
-    if (!this.formName.trim()) {
-      this.formError = getTranslation(this.currentLang).common.required;
-      return;
-    }
-    store.updateCompany({
-      id: this.detailCompanyId,
-      name: this.formName.trim(),
-      legalName: this.formLegalName.trim() || this.formName.trim(),
-      inn: this.formInn.trim() || '7700000000',
-      kpp: this.formKpp.trim(),
-      industry: this.formIndustry.trim() || 'IT / Software',
-      city: this.formCity.trim() || '—',
-      phone: this.formPhone.trim() || '—',
-      email: this.formEmail.trim() || '—',
-      website: this.formWebsite.trim(),
-      directorId: this.formDirectorId || undefined,
-      status: this.formStatus,
-      description: this.formDescription.trim(),
-    });
-    this.editModalOpen = false;
   }
 
   private openQuickProjectModal() {
