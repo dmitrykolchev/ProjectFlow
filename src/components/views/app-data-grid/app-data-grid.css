@@ -120,22 +120,23 @@
   margin-left: auto;
 }
 
+/* toolbar text chips are app-link web components at size md restoring the historical UA control
+   look through the additive link hooks: the UA Arial family reset by the native font shorthand,
+   the UA normal line box of 12px for the 0.75rem Arial glyph, the transparent one pixel frame that
+   adds two pixels to the historical box through link-border, nowrap, the font size pinned through
+   control-font-md, weight 500 as the secondary variant glyph, the hover chip fill and text-primary
+   color restored through link-hover-bg and link-hover-color, and baseline vertical alignment for the
+   flex bar row */
 .bar-link-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.75rem;
-  font-weight: 500;
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-sm, 6px);
-  cursor: pointer;
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
-}
-
-.bar-link-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+  --link-font: Arial;
+  --link-line-height: 12px;
+  --link-border: 1px solid transparent;
+  --link-white-space: nowrap;
+  --link-padding: 0.2rem 0.5rem;
+  --control-font-md: 0.75rem;
+  --link-hover-bg: var(--bg-hover, #223049);
+  --link-hover-color: var(--text-primary, #f8fafc);
+  vertical-align: baseline;
 }
 
 .sort-bar {

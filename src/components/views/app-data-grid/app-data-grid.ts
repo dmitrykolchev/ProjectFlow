@@ -13,6 +13,7 @@ import {
   iconLayers,
 } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-badge/app-badge';
 import '../../common/app-toggle-button/app-toggle-button';
@@ -670,30 +671,33 @@ export class AppDataGrid extends LitElement {
         ${this.groupByFields.length > 0
           ? html`
               <div class="bar-actions">
-                <button
-                  type="button"
+                <app-link
                   class="bar-link-btn"
+                  size="md"
+                  variant="secondary"
                   @click="${() => (this.collapsedGroups = new Set())}"
                 >
                   ${t.grid.expandAll}
-                </button>
-                <button
-                  type="button"
+                </app-link>
+                <app-link
                   class="bar-link-btn"
+                  size="md"
+                  variant="secondary"
                   @click="${() => this.collapseAllGroups(sortedRows)}"
                 >
                   ${t.grid.collapseAll}
-                </button>
-                <button
-                  type="button"
+                </app-link>
+                <app-link
                   class="bar-link-btn"
+                  size="md"
+                  variant="secondary"
                   @click="${() => {
                     this.groupByFields = [];
                     this.collapsedGroups = new Set();
                   }}"
                 >
                   ${t.grid.clearGroups}
-                </button>
+                </app-link>
               </div>
             `
           : ''}
@@ -740,13 +744,14 @@ export class AppDataGrid extends LitElement {
               ${this.sortRules.length > 0
                 ? html`
                     <div class="bar-actions">
-                      <button
-                        type="button"
+                      <app-link
                         class="bar-link-btn"
+                        size="md"
+                        variant="secondary"
                         @click="${() => (this.sortRules = [])}"
                       >
                         ${t.grid.clearSorts}
-                      </button>
+                      </app-link>
                     </div>
                   `
                 : ''}
