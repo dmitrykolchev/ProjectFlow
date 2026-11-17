@@ -344,7 +344,7 @@ export class AppCalculations extends LitElement {
                             ${calc.status === 'draft' || calc.status === 'rejected'
                               ? html`
                                   <app-button
-                                    class="accent-action"
+                                    action="submit"
                                     size="sm"
                                     variant="icon"
                                     title="${t.calculations.sendForApproval}"
@@ -357,7 +357,7 @@ export class AppCalculations extends LitElement {
                             ${calc.status === 'sent'
                               ? html`
                                   <app-button
-                                    class="success-action"
+                                    action="accept"
                                     size="sm"
                                     variant="icon"
                                     title="${t.calculations.approveCalc}"
@@ -366,7 +366,7 @@ export class AppCalculations extends LitElement {
                                     <span slot="start">${iconCheck(14)}</span>
                                   </app-button>
                                   <app-button
-                                    class="danger-action"
+                                    action="reject"
                                     size="sm"
                                     variant="icon"
                                     title="${t.calculations.rejectCalc}"
@@ -379,7 +379,7 @@ export class AppCalculations extends LitElement {
                             ${calc.status === 'approved' && ctr
                               ? html`
                                   <app-button
-                                    class="success-action"
+                                    action="accept"
                                     size="sm"
                                     variant="icon"
                                     title="${t.calculations.createInvoiceFromCalc}"
@@ -410,7 +410,7 @@ export class AppCalculations extends LitElement {
                                 `
                               : ''}
                             <app-button
-                              class="danger-action"
+                              action="delete"
                               size="sm"
                               variant="icon"
                               title="${t.common.delete}"
