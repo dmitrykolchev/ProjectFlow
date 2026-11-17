@@ -255,8 +255,13 @@
   line-height: 1.45;
 }
 
-.ai-draft-card,
-.ai-analysis-card {
+.ai-summary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ai-draft-card {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -308,105 +313,6 @@
   align-items: center;
   gap: 0.5rem;
   flex-wrap: wrap;
-}
-
-.ai-analysis-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.ai-analysis-block {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.75rem 0.85rem;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: var(--radius-md, 8px);
-  min-width: 0;
-}
-
-.ai-analysis-block.is-full {
-  grid-column: span 2;
-}
-
-.ai-analysis-block.is-risk {
-  border-left: 3px solid var(--color-warning, #f59e0b);
-}
-
-.ai-analysis-block.is-rec {
-  border-left: 3px solid var(--color-success, #10b981);
-}
-
-.ai-block-title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--text-secondary, #94a3b8);
-}
-
-.ai-block-text {
-  margin: 0;
-  font-size: 0.825rem;
-  line-height: 1.55;
-  color: var(--text-primary, #f8fafc);
-}
-
-.ai-bullet-list {
-  margin: 0;
-  padding-left: 1.1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: var(--text-primary, #f8fafc);
-}
-
-.ai-subtasks-suggest {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.ai-subtask-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.35rem 0.55rem;
-  border-radius: var(--radius-sm, 6px);
-  background: var(--bg-canvas, #090d16);
-  border: 1px solid var(--border-subtle, #1e293b);
-  font-size: 0.8rem;
-  color: var(--text-primary, #f8fafc);
-}
-
-.ai-subtask-name {
-  min-width: 0;
-  flex: 1;
-}
-
-.ai-subtask-added {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  color: var(--color-success, #10b981);
-  flex-shrink: 0;
-}
-
-@media (max-width: 720px) {
-  .ai-analysis-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .ai-analysis-block.is-full {
-    grid-column: span 1;
-  }
 }
 
 /* Collaborative Human + AI Clarification Box */

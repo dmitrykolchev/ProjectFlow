@@ -9,7 +9,6 @@ import {
   ExpenseCategory,
   ProjectChatMessage,
   Task,
-  TaskAiAnalysis,
   TaskAiClarificationMessage,
   TaskPriority,
   TaskStatus,
@@ -337,19 +336,6 @@ export class AppTaskDetail extends LitElement {
     const discussions = store.chatMessages
       .filter((m) => m.taskRefId === task.id)
       .sort((a, b) => (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0));
-    // newest analysis summary feeds the panel in its raw analysis shape
-    const latestAnalysis = task.aiAnalyses?.length
-      ? {
-          overview: task.aiAnalyses[0].overview,
-          effortAssessment: task.aiAnalyses[0].effortAssessment || '',
-          risks: task.aiAnalyses[0].risks,
-          recommendations: task.aiAnalyses[0].recommendations,
-          suggestedSubtasks: task.aiAnalyses[0].suggestedSubtasks || [],
-          contextSources: task.aiAnalyses[0].contextSources,
-          model: task.aiAnalyses[0].model,
-          updatedAt: task.aiAnalyses[0].createdAt,
-        }
-      : undefined;
     const activityItems = store.activityLog.filter(
       (log) =>
         log.targetId === task.id ||
@@ -652,7 +638,7 @@ export class AppTaskDetail extends LitElement {
 
             <app-task-ai-panel
               .task="${task}"
-              .analysis="${latestAnalysis}"
+              .analyses="${task.aiAnalyses || []}"
               .clarifications="${task.aiClarifications || []}"
               .timeSummary="${timeEntries
                 .slice(0, 6)
@@ -675,24 +661,8 @@ export class AppTaskDetail extends LitElement {
                 store.updateTask({ ...task, description: nextDescription });
                 store.addNotification('success', t.viewTexts.ai.taskSectionTitle, t.viewTexts.ai.descAppliedToast);
               }}"
-              @analysis-complete="${(e: CustomEvent<{ analysis: TaskAiAnalysis }>) => {
-                const record: AnalysisSummary = {
-                  id: `analysis-${task.id}-${Date.now()}`,
-                  kind: 'task',
-                  authorId: store.currentUserId || store.users[0]?.id || 'user-1',
-                  model: e.detail.analysis.model || '',
-                  createdAt: e.detail.analysis.updatedAt,
-                  overview: e.detail.analysis.overview,
-                  effortAssessment: e.detail.analysis.effortAssessment,
-                  risks: e.detail.analysis.risks,
-                  recommendations: e.detail.analysis.recommendations,
-                  suggestedSubtasks: e.detail.analysis.suggestedSubtasks,
-                  contextSources: e.detail.analysis.contextSources,
-                };
-                store.updateTask({ ...task, aiAnalyses: [record, ...(task.aiAnalyses || [])] });
-              }}"
-              @analysis-cleared="${() => {
-                store.updateTask({ ...task, aiAnalyses: [] });
+              @analyses-update="${(e: CustomEvent<{ analyses: AnalysisSummary[] }>) => {
+                store.updateTask({ ...task, aiAnalyses: e.detail.analyses });
               }}"
               @clarification-update="${(e: CustomEvent<{ messages: TaskAiClarificationMessage[] }>) => {
                 store.updateTask({ ...task, aiClarifications: e.detail.messages });

@@ -1,11 +1,15 @@
 import { html } from 'lit';
 import { initialTasks } from '../../../state/mock-data';
 import { ComponentStoryMeta } from '../../../types/storybook';
+import { AnalysisSummary } from '../../../types';
 import './app-task-ai-panel';
 
 const sampleTask = initialTasks[0];
 
-const sampleAnalysis = {
+const sampleAnalysis: AnalysisSummary = {
+  id: 'story-analysis-1',
+  kind: 'task',
+  authorId: 'user-1',
   overview:
     'Задача критична для снижения задержек чтения на уровне L2 кэша. По архитектуре проекта CORE и документации из базы знаний требуется соблюдение TTL-политик и защиты от cache stampede.',
   effortAssessment:
@@ -27,7 +31,7 @@ const sampleAnalysis = {
     { kind: 'document' as const, id: 'doc-1', title: 'Техническое задание Core Platform v2' },
   ],
   model: 'local-openai-compatible',
-  updatedAt: '2026-03-18T14:30:00.000Z',
+  createdAt: '2026-03-18T14:30:00.000Z',
 };
 
 export const meta: ComponentStoryMeta = {
@@ -38,7 +42,7 @@ export const meta: ComponentStoryMeta = {
     'Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиотеки документов, генерация структурированного описания и контекстный анализ рисков, трудоёмкости и подзадач через OpenAI-совместимый API.',
   propsDoc: {
     task: 'Task being analyzed',
-    analysis: 'AI analysis result (summary, risks, recommendations)',
+    analyses: 'Saved analysis summaries, newest first; the panel renders each as app-analysis-summary',
     clarifications: 'Clarification Q&A items',
     compact: 'Reduced layout for embedding inside modals',
     timeSummary: 'Time-tracking summary rendered next to the analysis',
@@ -52,7 +56,7 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <app-task-ai-panel
           .task="${sampleTask}"
-          .analysis="${sampleAnalysis}"
+          .analyses="${[sampleAnalysis]}"
         ></app-task-ai-panel>
       `,
     },

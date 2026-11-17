@@ -12,7 +12,7 @@ import {
   TaskContextMatchReason,
 } from '../../../services/openai-client';
 import { store } from '../../../state/store';
-import { SupportedLang, TaskAiAnalysis, TaskAiClarificationMessage } from '../../../types';
+import { SupportedLang, AnalysisSummary, TaskAiClarificationMessage } from '../../../types';
 import { eventValue } from '../event-value';
 import {
   iconAlertTriangle,
@@ -33,12 +33,13 @@ import '../app-badge/app-badge';
 import '../app-button/app-button';
 import '../app-entity-selector/app-entity-selector';
 import '../app-section-card/app-section-card';
+import '../app-analysis-summary/app-analysis-summary';
 import styles from './app-task-ai-panel.css';
 
 @customElement('app-task-ai-panel')
 export class AppTaskAiPanel extends LitElement {
   @property({ type: Object }) task?: TaskContextInput;
-  @property({ type: Object }) analysis?: TaskAiAnalysis;
+  @property({ attribute: false }) analyses: AnalysisSummary[] = [];
   @property({ type: Array }) clarifications: TaskAiClarificationMessage[] = [];
   @property({ type: Boolean }) compact = false;
   @property({ type: String }) timeSummary = '';
@@ -55,7 +56,7 @@ export class AppTaskAiPanel extends LitElement {
   @state() private errorMessage = '';
   @state() private generatedDescription = '';
   @state() private generatedModel = '';
-  @state() private localAnalysis?: TaskAiAnalysis;
+  @state() private localAnalyses: AnalysisSummary[] = [];
   @state() private localClarifications: TaskAiClarificationMessage[] = [];
   @state() private clarifyInput = '';
   @state() private clarifyLoading = false;
@@ -68,6 +69,7 @@ export class AppTaskAiPanel extends LitElement {
     super.connectedCallback();
     this.currentLang = store.customization.language;
     this.localClarifications = [...(this.clarifications || [])];
+    this.localAnalyses = [...(this.analyses || [])];
     this.lastTaskId = this.task?.id || '';
     this.recomputeContext(true);
     this.unsubscribe = store.subscribe(() => {
@@ -93,13 +95,13 @@ export class AppTaskAiPanel extends LitElement {
         this.lastTaskId = nextTaskId;
         this.generatedDescription = '';
         this.errorMessage = '';
-        this.localAnalysis = this.analysis;
+        this.localAnalyses = [...(this.analyses || [])];
         this.localClarifications = [...(this.clarifications || [])];
         this.clarifyInput = '';
       }
     }
-    if (changedProps.has('analysis')) {
-      this.localAnalysis = this.analysis;
+    if (changedProps.has('analyses')) {
+      this.localAnalyses = [...(this.analyses || [])];
     }
     if (changedProps.has('clarifications')) {
       this.localClarifications = [...(this.clarifications || [])];
@@ -286,19 +288,37 @@ export class AppTaskAiPanel extends LitElement {
         baseUrl: endpoint,
         model,
       });
-      this.localAnalysis = result;
-      this.dispatchEvent(
-        new CustomEvent<{ analysis: TaskAiAnalysis }>('analysis-complete', {
-          detail: { analysis: result },
-          bubbles: true,
-          composed: true,
-        })
-      );
+      const record: AnalysisSummary = {
+        id: `analysis-${this.task?.id || 'new'}-${Date.now()}`,
+        kind: 'task',
+        authorId: store.currentUserId || store.users[0]?.id || 'user-1',
+        model: result.model || '',
+        createdAt: result.updatedAt,
+        overview: result.overview,
+        effortAssessment: result.effortAssessment,
+        risks: result.risks,
+        recommendations: result.recommendations,
+        suggestedSubtasks: result.suggestedSubtasks,
+        contextSources: result.contextSources,
+      };
+      const next = [record, ...this.localAnalyses];
+      this.localAnalyses = next;
+      this.emitAnalysesUpdate(next);
     } catch (err) {
       this.errorMessage = formatAiError(err, endpoint, t);
     } finally {
       this.loadingMode = 'none';
     }
+  }
+
+  private emitAnalysesUpdate(analyses: AnalysisSummary[]): void {
+    this.dispatchEvent(
+      new CustomEvent<{ analyses: AnalysisSummary[] }>('analyses-update', {
+        detail: { analyses },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 
   private emitClarifications(messages: TaskAiClarificationMessage[]) {
@@ -440,7 +460,6 @@ export class AppTaskAiPanel extends LitElement {
   private renderContent(t: ReturnType<typeof getTranslation>) {
     const visibleItems = this.visibleContextItems;
     const selectedCount = this.selectedContextItems.length;
-    const activeAnalysis = this.localAnalysis ?? this.analysis;
     const busy = this.loadingMode !== 'none' || this.clarifyLoading;
 
     const attachOptions: EntitySelectorOption[] = this.contextItems
@@ -633,138 +652,24 @@ export class AppTaskAiPanel extends LitElement {
             `
           : ''}
 
-        ${activeAnalysis
+        ${this.localAnalyses.length > 0
           ? html`
-              <div class="ai-analysis-card">
-                <div class="ai-card-head">
-                  <span class="ai-card-title">${t.viewTexts.ai.analysisOverview}</span>
-                  <div class="ai-card-meta">
-                    ${activeAnalysis.model
-                      ? html`<span>${t.viewTexts.ai.modelUsed}: ${activeAnalysis.model}</span>`
-                      : ''}
-                    <span>·</span>
-                    <span>${activeAnalysis.updatedAt.slice(0, 16).replace('T', ' ')}</span>
-                    <app-button
-                      class="context-open-btn"
-                      size="xs"
-                      variant="icon"
-                      title="${t.viewTexts.ai.clearAnalysisBtn}"
-                      @click="${() => {
-                        this.localAnalysis = undefined;
-                        this.dispatchEvent(
-                          new CustomEvent('analysis-cleared', { bubbles: true, composed: true })
-                        );
+              <div class="ai-summary-list">
+                ${this.localAnalyses.map((s, idx) => {
+                  const addedTitles = (this.task?.subtasks || []).map((x) => x.title);
+                  return html`
+                    <app-analysis-summary
+                      .summary="${s}"
+                      .expanded="${idx === 0}"
+                      .addedTitles="${addedTitles}"
+                      @delete-summary="${(e: CustomEvent<{ id: string }>) => {
+                        const next = this.localAnalyses.filter((a) => a.id !== e.detail.id);
+                        this.localAnalyses = next;
+                        this.emitAnalysesUpdate(next);
                       }}"
-                    >
-                      <span slot="start">${iconX(14)}</span>
-                    </app-button>
-                  </div>
-                </div>
-
-                <div class="ai-analysis-grid">
-                  <div class="ai-analysis-block is-full">
-                    <span class="ai-block-title">${t.viewTexts.ai.analysisOverview}</span>
-                    <p class="ai-block-text">${activeAnalysis.overview}</p>
-                  </div>
-
-                  ${activeAnalysis.effortAssessment
-                    ? html`
-                        <div class="ai-analysis-block is-full">
-                          <span class="ai-block-title">${t.viewTexts.ai.analysisEffort}</span>
-                          <p class="ai-block-text">${activeAnalysis.effortAssessment}</p>
-                        </div>
-                      `
-                    : ''}
-
-                  ${activeAnalysis.risks.length > 0
-                    ? html`
-                        <div class="ai-analysis-block is-risk">
-                          <span class="ai-block-title">${t.viewTexts.ai.analysisRisks}</span>
-                          <ul class="ai-bullet-list">
-                            ${activeAnalysis.risks.map((r) => html`<li>${r}</li>`)}
-                          </ul>
-                        </div>
-                      `
-                    : ''}
-
-                  ${activeAnalysis.recommendations.length > 0
-                    ? html`
-                        <div class="ai-analysis-block is-rec">
-                          <span class="ai-block-title">${t.viewTexts.ai.analysisRecommendations}</span>
-                          <ul class="ai-bullet-list">
-                            ${activeAnalysis.recommendations.map((rec) => html`<li>${rec}</li>`)}
-                          </ul>
-                        </div>
-                      `
-                    : ''}
-
-                  ${activeAnalysis.suggestedSubtasks.length > 0
-                    ? html`
-                        <div class="ai-analysis-block is-full">
-                          <span class="ai-block-title">${t.viewTexts.ai.analysisSuggestedSubtasks}</span>
-                          <div class="ai-subtasks-suggest">
-                            ${activeAnalysis.suggestedSubtasks.map((subTitle) => {
-                              const already = this.isSubtaskAlreadyPresent(subTitle);
-                              return html`
-                                <div class="ai-subtask-row">
-                                  <span class="ai-subtask-name">${subTitle}</span>
-                                  ${already
-                                    ? html`
-                                        <span class="ai-subtask-added">
-                                          ${iconCheck(13)}
-                                          <span>${t.viewTexts.ai.subtaskAddedBadge}</span>
-                                        </span>
-                                      `
-                                    : html`
-                                        <app-button
-                                          size="sm"
-                                          variant="secondary"
-                                          @click="${() => this.emitAddSubtask(subTitle)}"
-                                        >
-                                          ${t.viewTexts.ai.addSubtaskBtn}
-                                        </app-button>
-                                      `}
-                                </div>
-                              `;
-                            })}
-                          </div>
-                        </div>
-                      `
-                    : ''}
-                </div>
-
-                ${activeAnalysis.contextSources.length > 0
-                  ? html`
-                      <div class="ai-context-chips">
-                        ${activeAnalysis.contextSources.map((src) => {
-                          const srcCls =
-                            src.kind === 'requirement'
-                              ? 'is-req'
-                              : src.kind === 'knowledge'
-                              ? 'is-kb'
-                              : 'is-doc';
-                          const srcIcon =
-                            src.kind === 'requirement'
-                              ? iconLayers(11)
-                              : src.kind === 'knowledge'
-                              ? iconBookOpen(11)
-                              : iconFileText(11);
-                          return html`
-                            <button
-                              type="button"
-                              class="context-chip is-selected"
-                              style="cursor: pointer;"
-                              @click="${() => this.openContextSource(src)}"
-                            >
-                              <span class="context-kind-tag ${srcCls}">${srcIcon}</span>
-                              <span class="context-title">${src.title}</span>
-                              ${iconArrowUpRight(12)}
-                            </button>
-                          `;
-                        })}
-                      </div>
-                    `
-                  : ''}
+                    ></app-analysis-summary>
+                  `;
+                })}
               </div>
             `
           : ''}
