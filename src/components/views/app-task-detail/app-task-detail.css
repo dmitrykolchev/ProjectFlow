@@ -642,34 +642,6 @@
 }
 
 /* Subtasks Sidebar */
-.subtask-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-}
-
-.subtask-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.5rem 0.65rem;
-  border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
-}
-
-.subtask-item.is-done .subtask-title {
-  text-decoration: line-through;
-  color: var(--text-muted, #64748b);
-}
-
-.subtask-title {
-  font-size: 0.825rem;
-  color: var(--text-primary, #f8fafc);
-  overflow-wrap: anywhere;
-}
-
 .subtask-add-row {
   display: flex;
   align-items: center;

@@ -37,7 +37,7 @@ import { mapKnowledgeOptions, mapRequirementOptions } from '../../common/entity-
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/app-checkbox/app-checkbox';
+import '../../common/app-draggable-list/app-draggable-list';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
@@ -697,28 +697,15 @@ export class AppTaskDetail extends LitElement {
                 ${task.subtasks.length === 0
                   ? html`<div style="font-size: 0.8125rem; color: var(--text-muted);">${t.common.empty}</div>`
                   : html`
-                      <div class="subtask-list">
-                        ${task.subtasks.map(
-                          (sub) => html`
-                            <div class="subtask-item ${sub.completed ? 'is-done' : ''}">
-                              <app-checkbox
-                                ?checked="${sub.completed}"
-                                @change="${() => this.toggleSubtask(task, sub.id)}"
-                              >
-                                <span class="subtask-title">${sub.title}</span>
-                              </app-checkbox>
-                              <button
-                                type="button"
-                                class="mini-action-btn"
-                                title="${t.common.delete}"
-                                @click="${() => this.removeSubtask(task, sub.id)}"
-                              >
-                                ${iconX(13)}
-                              </button>
-                            </div>
-                          `
-                        )}
-                      </div>
+                      <app-draggable-list
+                        .items="${task.subtasks.map((s) => ({ value: s.id, label: s.title, checked: s.completed }))}"
+                        @item-toggle="${(e: CustomEvent<{ value: string }>) => this.toggleSubtask(task, e.detail.value)}"
+                        @item-remove="${(e: CustomEvent<{ value: string }>) => this.removeSubtask(task, e.detail.value)}"
+                        @list-reorder="${(e: CustomEvent<{ items: { value: string; label: string; checked?: boolean }[] }>) => {
+                          const byId = new Map(task.subtasks.map((s) => [s.id, s]));
+                          store.updateTask({ ...task, subtasks: e.detail.items.map((it) => byId.get(it.value)!).filter(Boolean) });
+                        }}"
+                      ></app-draggable-list>
                     `}
 
                 <div class="subtask-add-row">
