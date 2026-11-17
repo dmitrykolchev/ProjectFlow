@@ -45,6 +45,10 @@ export const en = {
       palette: 'Material Symbols palette',
     },
   },
+  markdown: {
+    copyCode: 'Copy',
+    copiedCode: 'Copied',
+  },
   navigation: {
     dashboard: 'Dashboard',
     projects: 'Projects',

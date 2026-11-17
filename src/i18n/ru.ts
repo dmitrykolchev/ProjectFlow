@@ -45,6 +45,10 @@ export const ru = {
       palette: 'Палитра Material Symbols',
     },
   },
+  markdown: {
+    copyCode: 'Копировать',
+    copiedCode: 'Скопировано',
+  },
   navigation: {
     dashboard: 'Дашборд',
     projects: 'Проекты',
