@@ -451,14 +451,15 @@ export class AppTaskDetail extends LitElement {
               <span>${t.taskDetail.openFullModal}</span>
             </app-button>
 
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
