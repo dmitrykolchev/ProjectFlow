@@ -752,7 +752,6 @@ export class AppDocuments extends LitElement {
         </div>
 
         <app-pagination
-          variant="bare"
           layout-mode="table"
           .totalItems="${paged.totalItems}"
           .page="${paged.page}"
