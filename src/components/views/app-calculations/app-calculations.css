@@ -89,25 +89,18 @@
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
 
+/* table name-links are app-link web components at size md with the historical typography
+   restored through the additive link hooks of zero padding, weight 700, the inherited unitless
+   line-height 1.5, the mono family with tabular numerals, and the cell font size pinned
+   through control-font-md; the 0.4rem icon gap, accent color and hover underline are the
+   canonical defaults */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  font: inherit;
-  font-weight: 700;
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-primary, #6366f1);
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.link-btn:hover {
-  text-decoration: underline;
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
 }
 
 .text-link-btn {
