@@ -11,7 +11,9 @@ button {
   font-family: var(--icon-btn-font, var(--font-sans, inherit));
   font-weight: var(--btn-font-weight, 500);
   min-width: var(--btn-min-width, auto);
-  border: 1px solid transparent;
+  border-style: solid;
+  border-width: var(--btn-border-width, 1px);
+  border-color: transparent;
   border-top-left-radius: var(--btn-radius-tl, var(--radius-md, 8px));
   border-top-right-radius: var(--btn-radius-tr, var(--radius-md, 8px));
   border-bottom-left-radius: var(--btn-radius-bl, var(--radius-md, 8px));
@@ -56,25 +58,25 @@ button:disabled {
    xs is the dense step below sm for table rows and compact toolbars */
 .size-xs {
   font-size: var(--control-font-xs, 0.75rem);
-  padding: 0 var(--control-padding-x-xs, 0.45rem);
+  padding: var(--control-padding-y-xs, 0) var(--control-padding-x-xs, 0.45rem);
   height: var(--control-height-xs, 24px);
   --mi-icon: var(--control-icon-xs, 14px);
 }
 .size-sm {
   font-size: var(--control-font-sm, 0.8125rem);
-  padding: 0 var(--control-padding-x-sm, 0.65rem);
+  padding: var(--control-padding-y-sm, 0) var(--control-padding-x-sm, 0.65rem);
   height: var(--control-height-sm, 30px);
   --mi-icon: var(--control-icon-sm, 16px);
 }
 .size-md {
   font-size: var(--control-font-md, 0.875rem);
-  padding: 0 var(--control-padding-x-md, 0.875rem);
+  padding: var(--control-padding-y-md, 0) var(--control-padding-x-md, 0.875rem);
   height: var(--control-height-md, 38px);
   --mi-icon: var(--control-icon-md, 20px);
 }
 .size-lg {
   font-size: var(--control-font-lg, 1rem);
-  padding: 0 var(--control-padding-x-lg, 1.15rem);
+  padding: var(--control-padding-y-lg, 0) var(--control-padding-x-lg, 1.15rem);
   height: var(--control-height-lg, 44px);
   --mi-icon: var(--control-icon-lg, 24px);
 }

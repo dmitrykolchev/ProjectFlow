@@ -431,6 +431,18 @@ Props: `page`, `totalPages`, `rowsPerPage`, `total`; event `change → { page, r
 иконка sm=16px в 30px-контроле, md=20px в 38px, lg=24px в 44px; слот-правила контролов задают
 `--mi-icon` = `--control-icon-*`.
 
+Дополнительные хуки `app-button` (добавлены 2026-11-17, дефолты = прежнее поведение, все
+существующие consumers пиксель в пиксель):
+- `--control-padding-y-{xs,s,m,l}` — вертикальный padding size-правила, default `0`;
+- `--btn-border-width` — ширина рамки базового button, default `1px`;
+- `--btn-radius-{tl,tr,bl,br}` — угловые радиусы, default `--radius-md`;
+- `--icon-btn-{bg,color,border}` и `--icon-btn-hover-{bg,color,border}` — base/hover вида `icon`;
+- `--btn-min-width`, `--btn-font-weight`, `--icon-btn-font`, `--btn-disabled-opacity`.
+
+Текстовые ghost-чипы (activity-panel) мигрируются только после font-parity: flex-контейнер и
+`--icon-btn-font` контрола меняют ширину/высоту текстового содержимого относительно нативного
+button (замерено 101x22 vs оригинал 103x19).
+
 ## E1. Матрица компонентов и миграции
 
 | компонент | сейчас | цель |
