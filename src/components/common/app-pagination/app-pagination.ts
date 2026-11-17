@@ -5,6 +5,7 @@ import { getTranslation } from '../../../i18n';
 import { SupportedLang } from '../../../types';
 import { iconChevronLeft, iconChevronRight, iconDashboard, iconTable } from '../icons';
 import '../app-select/app-select';
+import '../app-button/app-button';
 import { SelectOption } from '../app-select/app-select';
 import { eventValue } from '../event-value';
 import {
@@ -155,6 +156,7 @@ export class AppPagination extends LitElement {
                   <span class="page-size-label">${perPageLabel}</span>
                   <div class="page-size-select">
                     <app-select
+                      size="sm"
                       .value="${String(safeSize)}"
                       .options="${selectOptions}"
                       @change="${(e: CustomEvent<{ value: string }>) =>
@@ -166,43 +168,49 @@ export class AppPagination extends LitElement {
             : ''}
 
           <div class="pages-nav">
-            <button
-              type="button"
+            <app-button
               class="page-btn nav-arrow"
+              size="sm"
+              variant="icon"
+              type="button"
               ?disabled="${safePage <= 1 || total === 0}"
               title="${t.pagination.prev}"
               aria-label="${t.pagination.prev}"
               @click="${() => this.emitPageChange(safePage - 1, totalPages)}"
             >
-              ${iconChevronLeft(15)}
-            </button>
+              <span slot="start">${iconChevronLeft(15)}</span>
+            </app-button>
 
             ${tokens.map((tok) =>
               typeof tok === 'number'
                 ? html`
-                    <button
+                    <app-button
+                      class="page-btn page-num ${tok === safePage ? 'is-active' : ''}"
+                      size="sm"
+                      variant="icon"
                       type="button"
-                      class="page-btn ${tok === safePage ? 'is-active' : ''}"
                       aria-label="${t.pagination.goToPage(tok)}"
                       aria-current="${tok === safePage ? 'page' : 'false'}"
                       @click="${() => this.emitPageChange(tok, totalPages)}"
                     >
-                      ${tok}
-                    </button>
+                      <span>${tok}</span>
+                    </app-button>
                   `
                 : html`<span class="page-ellipsis" aria-hidden="true">…</span>`
             )}
 
-            <button
-              type="button"
+            <app-button
               class="page-btn nav-arrow"
+              size="sm"
+              variant="icon"
+              type="button"
               ?disabled="${safePage >= totalPages || total === 0}"
               title="${t.pagination.next}"
               aria-label="${t.pagination.next}"
               @click="${() => this.emitPageChange(safePage + 1, totalPages)}"
             >
-              ${iconChevronRight(15)}
-            </button>
+              <span slot="start">${iconChevronRight(15)}</span>
+            </app-button>
           </div>
         </div>
       </nav>

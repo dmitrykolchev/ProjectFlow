@@ -23,18 +23,36 @@
   box-shadow: var(--shadow-sm), var(--surface-glow, none);
 }
 
-/* canonical control scale (Priority E): surface mode uses the canonical md button size;
-   compact mode keeps the historical local 32px token */
-.pagination-bar {
-  --pg-btn-size: var(--control-height-md, 38px);
-  --pg-font: var(--control-font-md, 0.875rem);
-  --pg-select-h: var(--control-height-md, 38px);
+/* canonical control scale (Priority E): page buttons are app-button web components at
+   size sm; the historical page-btn look is tuned through app-button custom properties */
+app-button.page-btn {
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-bg: transparent;
+  --icon-btn-border: transparent;
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-border: var(--border-strong, #334155);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-font: var(--font-mono, monospace);
+  --btn-font-weight: 600;
+  --btn-min-width: var(--control-height-sm, 30px);
+  --btn-disabled-opacity: 0.38;
 }
 
-.pagination-bar.is-compact {
-  --pg-btn-size: 32px;
-  --pg-font: 0.8rem;
-  --pg-select-h: 32px;
+app-button.page-btn.nav-arrow {
+  --icon-btn-bg: var(--bg-subtle, #1a2438);
+  --icon-btn-border: var(--border-subtle, #1e293b);
+  --icon-btn-color: var(--text-primary, #f8fafc);
+}
+
+app-button.page-btn.is-active {
+  --icon-btn-bg: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  --icon-btn-border: var(--accent-border, var(--accent-primary, #6366f1));
+  --icon-btn-color: var(--accent-primary, #818cf8);
+  --btn-font-weight: 700;
+  /* hover keeps the active look so active buttons do not repaint on pointer */
+  --icon-btn-hover-bg: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  --icon-btn-hover-border: var(--accent-border, var(--accent-primary, #6366f1));
+  --icon-btn-hover-color: var(--accent-primary, #818cf8);
 }
 
 .pagination-bar.is-bare {
@@ -104,7 +122,6 @@
 
 .page-size-select {
   width: 78px;
-  --control-height-md: var(--pg-select-h, 32px);
 }
 
 .pages-nav {
@@ -113,66 +130,12 @@
   gap: 0.25rem;
 }
 
-.page-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: var(--pg-btn-size, 38px);
-  height: var(--pg-btn-size, 38px);
-  padding: 0 0.45rem;
-  border-radius: var(--radius-md, 8px);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  font-family: var(--font-mono, monospace);
-  font-size: var(--pg-font, 0.875rem);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast, 150ms ease),
-              border-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
-}
-
-.page-btn.nav-arrow {
-  border-color: var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
-  color: var(--text-primary, #f8fafc);
-  padding: 0;
-  width: 32px;
-}
-
-.page-btn:hover:not(:disabled):not(.is-active) {
-  background: var(--bg-hover, #223049);
-  border-color: var(--border-strong, #334155);
-  color: var(--text-primary, #f8fafc);
-}
-
-.page-btn.is-active {
-  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
-  border-color: var(--accent-border, var(--accent-primary, #6366f1));
-  color: var(--accent-primary, #818cf8);
-  font-weight: 700;
-}
-
-.page-btn:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 2px var(--bg-surface, #111827), 0 0 0 4px var(--accent-primary, #6366f1);
-}
-
-.page-btn:disabled {
-  opacity: 0.38;
-  cursor: not-allowed;
-}
-
 .page-ellipsis {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-width: 24px;
-  height: 32px;
+  height: var(--control-height-sm, 30px);
   color: var(--text-muted, #64748b);
   font-size: 0.8rem;
   user-select: none;
