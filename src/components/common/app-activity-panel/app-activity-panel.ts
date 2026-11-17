@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { ActivityLogItem } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import '../app-button/app-button';
 import styles from './app-activity-panel.css';
 
 @customElement('app-activity-panel')
@@ -83,14 +84,24 @@ export class AppActivityPanel extends LitElement {
             <div class="header-actions">
               ${this.logs.length > 0
                 ? html`
-                    <button class="icon-btn" @click="${() => store.clearActivityLog()}">
-                      ${t.activity.clearAll}
-                    </button>
+                    <app-button
+                      class="chip-action"
+                      size="sm"
+                      variant="icon"
+                      @click="${() => store.clearActivityLog()}"
+                    >
+                      <span>${t.activity.clearAll}</span>
+                    </app-button>
                   `
                 : ''}
-              <button class="icon-btn" @click="${() => store.toggleActivityPanel()}">
-                ✕
-              </button>
+              <app-button
+                class="chip-action"
+                size="sm"
+                variant="icon"
+                @click="${() => store.toggleActivityPanel()}"
+              >
+                <span>✕</span>
+              </app-button>
             </div>
           </div>
           <div class="drawer-body">

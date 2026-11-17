@@ -63,21 +63,32 @@
   gap: 0.5rem;
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  color: var(--text-muted, #64748b);
-  cursor: pointer;
-  padding: 0.25rem 0.4rem;
-  font-size: 0.8125rem;
-  border-radius: var(--radius-sm, 6px);
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
+/* header chips are app-button web components at size sm with the historical content-sized
+   look restored through the font-parity recipe: auto height, 0.25rem vertical and 0.4rem
+   horizontal padding, 0.8125rem font at weight 400, the UA control font the native buttons
+   inherited, zero border width, the historical 6px radius, and the hover fill copied from
+   the original .icon-btn:hover */
+.header-actions app-button {
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.25rem;
+  --control-padding-x-sm: 0.4rem;
+  --control-font-sm: 0.8125rem;
+  --btn-font-weight: 400;
+  --icon-btn-font: Arial;
+  --btn-border-width: 0;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: transparent;
+  --icon-btn-color: var(--text-muted, #64748b);
+  --icon-btn-border: transparent;
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+.header-actions app-button:hover {
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: transparent;
 }
 
 .drawer-body {
