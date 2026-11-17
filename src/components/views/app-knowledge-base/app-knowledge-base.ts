@@ -23,6 +23,7 @@ import {
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
@@ -663,27 +664,29 @@ export class AppKnowledgeBase extends LitElement {
           ${proj
             ? html`
                 <span aria-hidden="true">/</span>
-                <button
-                  type="button"
+                <app-link
                   class="link-btn"
+                  size="md"
+                  variant="primary"
                   @click="${() => store.openProjectDetail(proj.id)}"
                 >
-                  ${iconFolder(13)}
+                  <span slot="start">${iconFolder(13)}</span>
                   <span>${proj.key} · ${proj.name}</span>
-                </button>
+                </app-link>
               `
             : ''}
           ${comp
             ? html`
                 <span aria-hidden="true">/</span>
-                <button
-                  type="button"
+                <app-link
                   class="link-btn"
+                  size="md"
+                  variant="primary"
                   @click="${() => store.openCompanyDetail(comp.id)}"
                 >
-                  ${iconBuilding(13)}
+                  <span slot="start">${iconBuilding(13)}</span>
                   <span>${comp.name}</span>
-                </button>
+                </app-link>
               `
             : ''}
           <span aria-hidden="true">·</span>
@@ -744,13 +747,14 @@ export class AppKnowledgeBase extends LitElement {
               ${kb.authorLabel}:
               ${author
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openEmployeeDetail(author.id)}"
                     >
                       ${author.name}
-                    </button>
+                    </app-link>
                   `
                 : article.authorId}
             </span>
@@ -759,13 +763,14 @@ export class AppKnowledgeBase extends LitElement {
                   <span aria-hidden="true">·</span>
                   <span>
                     ${kb.reviewerLabel}:
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openEmployeeDetail(reviewer.id)}"
                     >
                       ${reviewer.name}
-                    </button>
+                    </app-link>
                   </span>
                 `
               : ''}
