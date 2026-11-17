@@ -79,6 +79,20 @@
   color: var(--link-color, var(--color-danger, #ef4444));
 }
 
+/* --link-hover-color lets a consumer restore a historical hover glyph color; the default
+   equals the variant color, so every existing consumer is pixel-identical */
+.variant-primary:hover:not(.is-disabled) {
+  color: var(--link-hover-color, var(--link-color, var(--accent-primary, #6366f1)));
+}
+
+.variant-secondary:hover:not(.is-disabled) {
+  color: var(--link-hover-color, var(--link-color, var(--text-secondary, #94a3b8)));
+}
+
+.variant-danger:hover:not(.is-disabled) {
+  color: var(--link-hover-color, var(--link-color, var(--color-danger, #ef4444)));
+}
+
 .link:hover:not(.is-disabled) {
   text-decoration: underline;
 }
