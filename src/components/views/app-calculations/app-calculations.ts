@@ -461,13 +461,14 @@ export class AppCalculations extends LitElement {
                         <td>
                           ${cp
                             ? html`
-                                <button
-                                  type="button"
+                                <app-link
                                   class="text-link-btn"
+                                  size="md"
+                                  variant="primary"
                                   @click="${() => store.openCounterpartyDetail(cp.id)}"
                                 >
                                   ${cp.name}
-                                </button>
+                                </app-link>
                               `
                             : '—'}
                         </td>
