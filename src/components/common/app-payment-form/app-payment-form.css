@@ -1,0 +1,102 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: contents;
+}
+
+/* children of app-form-grid declare full-width cells the same way views do */
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* the three money lines of the invoice summary card copied from the payment views */
+.pay-summary-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #273449);
+}
+
+.billing-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.billing-stat-label {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+}
+
+.billing-stat-val {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
+.quick-term-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+/* quick term chips are app-button web components at size sm with the historical
+   content-sized look restored through the font-parity recipe: auto height, the original
+   padding and font size, the UA control font the native button inherited, weight 400, the
+   historical 6px radius, and the hover fill copied from the original quick term hover */
+.quick-term-btn {
+  --control-height-sm: auto;
+  --control-padding-y-sm: 0.24rem;
+  --control-padding-x-sm: 0.55rem;
+  --control-font-sm: 0.74rem;
+  --btn-font-weight: 400;
+  --icon-btn-font: Arial;
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-bg: var(--bg-subtle, #1a2438);
+  --icon-btn-color: var(--text-secondary, #94a3b8);
+  --icon-btn-border: var(--border-strong, #334155);
+}
+
+.quick-term-btn:hover {
+  --icon-btn-hover-bg: var(--bg-hover, #223049);
+  --icon-btn-hover-color: var(--text-primary, #f8fafc);
+  --icon-btn-hover-border: var(--border-strong, #334155);
+}
+
+.pay-preview-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #273449);
+  font-size: 0.82rem;
+  color: var(--text-secondary, #94a3b8);
+}
