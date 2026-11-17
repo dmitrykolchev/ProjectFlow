@@ -302,14 +302,15 @@ export class AppCompanyDetail extends LitElement {
               <span slot="icon-start">${iconEdit(14)}</span>
               <span>${t.common.edit}</span>
             </app-button>
-            <button
-              type="button"
-              class="icon-btn danger"
+            <app-button
+              class="danger-action"
+              size="sm"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -547,14 +548,14 @@ export class AppCompanyDetail extends LitElement {
                           <span class="mono" style="font-size: 0.78rem; width: 34px; text-align: right;">
                             ${proj.progress}%
                           </span>
-                          <button
-                            type="button"
-                            class="icon-btn"
+                          <app-button
+                            size="sm"
+                            variant="icon"
                             title="${t.projectChat.title}"
                             @click="${() => store.openProjectChat(proj.id)}"
                           >
-                            ${iconMessageSquare(14)}
-                          </button>
+                            <span slot="start">${iconMessageSquare(14)}</span>
+                          </app-button>
                         </div>
                       </div>
                     `;
@@ -741,14 +742,14 @@ export class AppCompanyDetail extends LitElement {
                             <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
                           </td>
                           <td style="text-align: right;">
-                            <button
-                              type="button"
-                              class="icon-btn"
+                            <app-button
+                              size="sm"
+                              variant="icon"
                               title="${t.projectChat.title}"
                               @click="${() => store.openProjectChat(proj.id)}"
                             >
-                              ${iconMessageSquare(14)}
-                            </button>
+                              <span slot="start">${iconMessageSquare(14)}</span>
+                            </app-button>
                           </td>
                         </tr>
                       `;
@@ -1078,25 +1079,25 @@ export class AppCompanyDetail extends LitElement {
           </div>
         </div>
         <div class="row-right" @click="${(e: Event) => e.stopPropagation()}">
-          <button
-            type="button"
-            class="icon-btn"
+          <app-button
+            size="sm"
+            variant="icon"
             title="${t.documents.previewTitle}"
             @click="${() => {
               this.selectedDocId = doc.id;
               this.openDocPreviewModal(doc);
             }}"
           >
-            ${iconEye(14)}
-          </button>
-          <button
-            type="button"
-            class="icon-btn"
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
             title="${t.documents.downloadFile}"
             @click="${() => downloadDocumentFile(doc)}"
           >
-            ${iconDownload(14)}
-          </button>
+            <span slot="start">${iconDownload(14)}</span>
+          </app-button>
         </div>
       </div>
     `;
