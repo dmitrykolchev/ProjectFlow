@@ -26,6 +26,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
@@ -416,14 +417,15 @@ export class AppPayments extends LitElement {
               return html`
                 <tr>
                   <td>
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => ctr && store.openContractDetail(ctr.id)}"
                     >
-                      ${iconReceipt(15)}
+                      <span slot="start">${iconReceipt(15)}</span>
                       <span>${inv.number}</span>
-                    </button>
+                    </app-link>
                     <div class="cell-sub">
                       ${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
                     </div>
@@ -431,13 +433,14 @@ export class AppPayments extends LitElement {
                   <td>
                     ${ctr
                       ? html`
-                          <button
-                            type="button"
+                          <app-link
                             class="link-btn"
+                            size="md"
+                            variant="primary"
                             @click="${() => store.openContractDetail(ctr.id)}"
                           >
                             <span>${ctr.number}</span>
-                          </button>
+                          </app-link>
                           <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                         `
                       : '—'}
@@ -605,13 +608,14 @@ export class AppPayments extends LitElement {
                   <td>
                     ${inv
                       ? html`
-                          <button
-                            type="button"
+                          <app-link
                             class="link-btn"
+                            size="md"
+                            variant="primary"
                             @click="${() => ctr && store.openContractDetail(ctr.id)}"
                           >
                             <span>${inv.number}</span>
-                          </button>
+                          </app-link>
                           <div class="cell-sub">${t.invoices.statuses[inv.status]}</div>
                         `
                       : '—'}
@@ -619,13 +623,14 @@ export class AppPayments extends LitElement {
                   <td>
                     ${ctr
                       ? html`
-                          <button
-                            type="button"
+                          <app-link
                             class="link-btn"
+                            size="md"
+                            variant="primary"
                             @click="${() => store.openContractDetail(ctr.id)}"
                           >
                             <span>${ctr.number}</span>
-                          </button>
+                          </app-link>
                           <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
                         `
                       : '—'}
