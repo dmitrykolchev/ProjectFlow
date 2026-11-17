@@ -25,6 +25,7 @@ import {
   iconX,
 } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-date-input/app-date-input';
@@ -272,13 +273,14 @@ export class AppCalculationDetail extends LitElement {
                   ${ctr
                     ? html`
                         <span aria-hidden="true">·</span>
-                        <button
-                          type="button"
-                          class="link-btn"
+                        <app-link
+                          class="link-btn hdr-link"
+                          size="md"
+                          variant="primary"
                           @click="${() => store.openContractDetail(ctr.id)}"
                         >
                           <span class="mono">${ctr.number}</span>
-                        </button>
+                        </app-link>
                       `
                     : ''}
                 </div>
@@ -340,13 +342,14 @@ export class AppCalculationDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.calculations.partySupplier}</span>
               ${company
                 ? html`
-                    <button
-                      type="button"
-                      class="link-btn"
+                    <app-link
+                      class="link-btn meta-link"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCompanyDetail(company.id)}"
                     >
                       ${company.name}
-                    </button>
+                    </app-link>
                     <span class="kpi-hint mono">${t.viewTexts.calculations.innLabel}: ${company.inn}</span>
                   `
                 : html`<span class="meta-val">—</span>`}
@@ -356,13 +359,14 @@ export class AppCalculationDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.calculations.partyClientApproval}</span>
               ${cp
                 ? html`
-                    <button
-                      type="button"
-                      class="link-btn"
+                    <app-link
+                      class="link-btn meta-link"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCounterpartyDetail(cp.id)}"
                     >
                       ${cp.name}
-                    </button>
+                    </app-link>
                     <span class="kpi-hint mono">${t.viewTexts.calculations.innLabel}: ${cp.inn}</span>
                   `
                 : html`<span class="meta-val">—</span>`}
@@ -372,14 +376,15 @@ export class AppCalculationDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.calculationDetail.linkedProjectLabel}</span>
               ${project
                 ? html`
-                    <button
-                      type="button"
-                      class="link-btn"
+                    <app-link
+                      class="link-btn meta-link"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openProjectDetail(project.id)}"
                     >
-                      <span class="mono">[${project.key}]</span>
+                      <span slot="start" class="mono">[${project.key}]</span>
                       <span>${project.name}</span>
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">—</span>`}
             </div>
@@ -388,13 +393,14 @@ export class AppCalculationDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.calculationDetail.linkedInvoiceLabel}</span>
               ${linkedInv && ctr
                 ? html`
-                    <button
-                      type="button"
-                      class="link-btn"
+                    <app-link
+                      class="link-btn meta-link"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openContractDetail(ctr.id)}"
                     >
                       <span class="mono">${linkedInv.number}</span>
-                    </button>
+                    </app-link>
                     <span class="kpi-hint mono">${formatMoney(linkedInv.totalAmount, linkedInv.currency)}</span>
                   `
                 : html`<span class="kpi-hint">${t.viewTexts.calculationDetail.notInvoicedYet}</span>`}
@@ -460,13 +466,14 @@ export class AppCalculationDetail extends LitElement {
                             <td>
                               ${item.taskId
                                 ? html`
-                                    <button
-                                      type="button"
-                                      class="link-btn"
+                                    <app-link
+                                      class="link-btn task-link"
+                                      size="md"
+                                      variant="primary"
                                       @click="${() => store.openTaskDetail(item.taskId!)}"
                                     >
                                       ${item.title}
-                                    </button>
+                                    </app-link>
                                   `
                                 : item.title}
                             </td>

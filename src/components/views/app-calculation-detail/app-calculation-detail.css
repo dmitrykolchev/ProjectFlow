@@ -245,22 +245,31 @@
   word-break: break-word;
 }
 
+/* name-links are app-link web components at size md with the historical typography restored
+   through the additive link hooks of zero padding, weight 600, the inherited unitless
+   line-height 1.5, and the tighter 0.35rem icon gap; the accent color and hover underline are
+   the primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  text-align: left;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-gap: 0.35rem;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
+/* header contract link keeps the header block font size */
+.hdr-link {
+  --control-font-md: 0.8125rem;
+}
+
+/* meta box links fill the stretched host width at the meta box font size */
+.meta-link {
+  --control-font-md: 1rem;
+  --link-width: 100%;
+}
+
+/* item table links keep the table cell font size */
+.task-link {
+  --control-font-md: 0.84rem;
 }
 
 .mono {
