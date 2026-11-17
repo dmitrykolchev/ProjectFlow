@@ -38,6 +38,7 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-checkbox/app-checkbox';
@@ -608,13 +609,14 @@ export class AppContractDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.contractDetail.metaSupplier}</span>
               ${company
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCompanyDetail(company.id)}"
                     >
                       ${company.name}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">—</span>`}
             </div>
@@ -622,13 +624,14 @@ export class AppContractDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.contractDetail.metaClient}</span>
               ${counterparty
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCounterpartyDetail(counterparty.id)}"
                     >
                       ${counterparty.name}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">—</span>`}
             </div>
@@ -636,13 +639,14 @@ export class AppContractDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.contractDetail.metaLinkedProject}</span>
               ${project
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openProjectDetail(project.id)}"
                     >
                       [${project.key}] ${project.name}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">—</span>`}
             </div>
@@ -1234,13 +1238,14 @@ export class AppContractDetail extends LitElement {
                 <span class="party-role">${t.viewTexts.contractDetail.partyClientPayer}</span>
                 ${counterparty
                   ? html`
-                      <button
-                        type="button"
+                      <app-link
                         class="link-btn"
+                        size="md"
+                        variant="primary"
                         @click="${() => store.openCounterpartyDetail(counterparty.id)}"
                       >
                         ${counterparty.legalName || counterparty.name}
-                      </button>
+                      </app-link>
                     `
                   : html`<span class="party-name">—</span>`}
                 <span class="party-sub mono">
