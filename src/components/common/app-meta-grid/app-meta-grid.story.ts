@@ -17,7 +17,7 @@ export const meta: ComponentStoryMeta = {
     'app-meta-item': 'Declarative meta box (label, value, mono, danger, start / end slot graphics) appended to the items prop list',
   },
   propsDoc: {
-    items: 'Meta field definitions (label + value)',
+    items: 'Meta field definitions (label + value, mono / danger variants, title tooltip, link { label, onClick })',
     columns: 'Number of columns in the grid',
     layout: 'Rendering style: strip / grid / inline',
   },
@@ -63,6 +63,26 @@ export const meta: ComponentStoryMeta = {
             { label: 'Director', value: 'Alexey Morozov' },
             { label: 'Phone', value: '+7 495 123-45-67', mono: true },
             { label: 'Email', value: 'contact@company.ru', mono: true },
+          ]}"
+        ></app-meta-grid>
+      `,
+    },
+    {
+      name: 'Link Item',
+      description:
+        'A box whose value is an interactive app-link running the view callback, filling its column with ellipsis like a meta value',
+      render: () => html`
+        <app-meta-grid
+          layout="grid"
+          .items="${[
+            { label: 'Category', value: 'Technical specifications and ADR' },
+            { label: 'Version / Size', value: 'v2 · 6.3 KB', mono: true },
+            {
+              label: 'Linked to (Project)',
+              value: '[CORE] Core Platform 3.0',
+              link: { label: '[CORE] Core Platform 3.0', onClick: () => console.log('link clicked') },
+            },
+            { label: 'Updated', value: '2026-11-13', mono: true },
           ]}"
         ></app-meta-grid>
       `,

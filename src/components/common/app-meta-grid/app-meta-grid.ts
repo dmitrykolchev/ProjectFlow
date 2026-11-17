@@ -1,6 +1,7 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import styles from './app-meta-grid.css';
+import '../app-link/app-link';
 import { DeclarativeMetaItem, metaItemsFromElements } from '../app-meta-item/app-meta-item';
 
 export interface MetaItem {
@@ -8,6 +9,10 @@ export interface MetaItem {
   value: string;
   mono?: boolean;
   danger?: boolean;
+  // tooltip for values that can overflow their column, defaults to the value text
+  title?: string;
+  // interactive value: canonical app-link running the view's own callback
+  link?: { label: string; onClick?: () => void };
   // cloned graphic content from the canonical start / end slots of <app-meta-item>
   start?: Node[];
   end?: Node[];
@@ -45,10 +50,27 @@ export class AppMetaGrid extends LitElement {
           (item) => html`
             <div class="meta-box">
               <span class="meta-label">${item.label}</span>
-              <span
-                class="meta-value ${item.mono ? 'mono' : ''} ${item.danger ? 'danger' : ''}"
-                >${item.start ? html`<span class="item-slot-start">${item.start}</span>` : ''}${item.value}${item.end ? html`<span class="item-slot-end">${item.end}</span>` : ''}</span
-              >
+              ${item.link
+                ? html`
+                    <app-link
+                      size="md"
+                      variant="primary"
+                      title="${item.link.label}"
+                      @click="${() => item.link?.onClick?.()}"
+                      >${item.link.label}</app-link
+                    >
+                  `
+                : html`
+                    <span
+                      class="meta-value ${item.mono ? 'mono' : ''} ${item.danger ? 'danger' : ''}"
+                      title="${item.title ?? item.value}"
+                      >${item.start
+                        ? html`<span class="item-slot-start">${item.start}</span>`
+                        : ''}${item.value}${item.end
+                        ? html`<span class="item-slot-end">${item.end}</span>`
+                        : ''}</span
+                    >
+                  `}
             </div>
           `
         )}

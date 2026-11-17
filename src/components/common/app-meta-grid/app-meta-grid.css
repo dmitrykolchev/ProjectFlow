@@ -84,6 +84,19 @@
   color: var(--color-danger, #f87171);
 }
 
+/* interactive value: canonical app-link fills its box like a meta value,
+   driven entirely by the component's documented --link-* hooks */
+app-link {
+  --link-host-display: block;
+  --link-width: 100%;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+}
+
 /* graphic elements from the canonical start / end slots of <app-meta-item> */
 .item-slot-start,
 .item-slot-end {
