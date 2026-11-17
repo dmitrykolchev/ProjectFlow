@@ -290,22 +290,23 @@ export class AppRequirementDetail extends LitElement {
                   : t.viewTexts.requirements.decomposeSingleBtn}
               </span>
             </app-button>
-            <button
-              type="button"
-              class="icon-btn"
+            <app-button
+              size="xs"
+              variant="icon"
               title="${t.common.edit}"
               @click="${() => this.openEditModal(req)}"
             >
-              ${iconEdit(15)}
-            </button>
-            <button
-              type="button"
-              class="icon-btn danger"
+              <span slot="start">${iconEdit(15)}</span>
+            </app-button>
+            <app-button
+              class="danger-action"
+              size="xs"
+              variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
             >
-              ${iconTrash(15)}
-            </button>
+              <span slot="start">${iconTrash(15)}</span>
+            </app-button>
           </div>
         </div>
 
@@ -608,25 +609,27 @@ export class AppRequirementDetail extends LitElement {
                         `
                       : html`
                           <span class="criterion-text">${criterion}</span>
-                          <button
-                            type="button"
-                            class="icon-btn-sm"
+                          <app-button
+                            class="sm-action"
+                            size="xs"
+                            variant="icon"
                             title="${t.common.edit}"
                             @click="${() => {
                               this.editingCriterionIdx = idx;
                               this.editingCriterionText = criterion;
                             }}"
                           >
-                            ${iconEdit(12)}
-                          </button>
-                          <button
-                            type="button"
-                            class="icon-btn-sm danger"
+                            <span slot="start">${iconEdit(12)}</span>
+                          </app-button>
+                          <app-button
+                            class="sm-action danger-action"
+                            size="xs"
+                            variant="icon"
                             title="${t.common.delete}"
                             @click="${() => this.removeCriterion(req, idx)}"
                           >
-                            ${iconX(12)}
-                          </button>
+                            <span slot="start">${iconX(12)}</span>
+                          </app-button>
                         `}
                   </div>
                 `)}
@@ -786,14 +789,15 @@ export class AppRequirementDetail extends LitElement {
                           appearance="outline"
                           size="sm"
                         ></app-status-chip>
-                        <button
-                          type="button"
-                          class="icon-btn-sm danger"
+                        <app-button
+                          class="sm-action danger-action"
+                          size="xs"
+                          variant="icon"
                           title="${t.common.delete}"
                           @click="${() => this.unlinkTask(req, tk.id)}"
                         >
-                          ${iconX(12)}
-                        </button>
+                          <span slot="start">${iconX(12)}</span>
+                        </app-button>
                       </div>
                     </div>
                   `;
@@ -1052,15 +1056,16 @@ export class AppRequirementDetail extends LitElement {
                     ${iconFileText(14)}
                     <span class="trace-item-name" title="${sourceDoc.title}">${sourceDoc.title}</span>
                   </button>
-                  <button
-                    type="button"
-                    class="icon-btn-sm danger"
+                  <app-button
+                    class="sm-action danger-action"
+                    size="xs"
+                    variant="icon"
                     title="${t.common.delete}"
                     @click="${() =>
                       store.updateRequirement({ ...req, sourceDocumentId: undefined })}"
                   >
-                    ${iconX(12)}
-                  </button>
+                    <span slot="start">${iconX(12)}</span>
+                  </app-button>
                 </div>
               `
             : html`<div class="trace-empty">${t.viewTexts.requirementDetail.noSourceSpec}</div>`}
@@ -1105,9 +1110,10 @@ export class AppRequirementDetail extends LitElement {
                           ${iconBookOpen(13)}
                           <span class="trace-item-name" title="${kb.title}">${kb.title}</span>
                         </button>
-                        <button
-                          type="button"
-                          class="icon-btn-sm danger"
+                        <app-button
+                          class="sm-action danger-action"
+                          size="xs"
+                          variant="icon"
                           title="${t.common.delete}"
                           @click="${() =>
                             store.updateRequirement({
@@ -1117,8 +1123,8 @@ export class AppRequirementDetail extends LitElement {
                               ),
                             })}"
                         >
-                          ${iconX(12)}
-                        </button>
+                          <span slot="start">${iconX(12)}</span>
+                        </app-button>
                       </div>
                     `
                   )}
