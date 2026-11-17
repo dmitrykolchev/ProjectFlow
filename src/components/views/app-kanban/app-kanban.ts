@@ -8,6 +8,8 @@ import { iconClock, iconPlus } from '../../common/icons';
 import { mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-button/app-button';
 import '../../common/app-select/app-select';
+import '../../common/app-option/app-option';
+import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/card-footer/card-footer';
 
@@ -56,16 +58,23 @@ export class AppKanban extends LitElement {
         <div class="filter-group">
           <app-select
             size="sm"
-            .options="${[
-              { value: 'all', label: t.kanban.filterAllPriorities(t.common.all) },
-              { value: 'urgent', label: t.priority.urgent },
-              { value: 'high', label: t.priority.high },
-              { value: 'medium', label: t.priority.medium },
-              { value: 'low', label: t.priority.low },
-            ]}"
             .value="${store.filterPriority}"
             @change="${(e: CustomEvent) => store.setFilterPriority(e.detail.value)}"
-          ></app-select>
+          >
+            <app-option value="all" label="${t.kanban.filterAllPriorities(t.common.all)}"></app-option>
+            <app-option value="urgent" label="${t.priority.urgent}">
+              <app-status-chip slot="start" domain="priority" status="urgent" dot></app-status-chip>
+            </app-option>
+            <app-option value="high" label="${t.priority.high}">
+              <app-status-chip slot="start" domain="priority" status="high" dot></app-status-chip>
+            </app-option>
+            <app-option value="medium" label="${t.priority.medium}">
+              <app-status-chip slot="start" domain="priority" status="medium" dot></app-status-chip>
+            </app-option>
+            <app-option value="low" label="${t.priority.low}">
+              <app-status-chip slot="start" domain="priority" status="low" dot></app-status-chip>
+            </app-option>
+          </app-select>
 
           <app-entity-selector
             size="sm"
