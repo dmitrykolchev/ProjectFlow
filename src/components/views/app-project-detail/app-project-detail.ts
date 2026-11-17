@@ -19,6 +19,7 @@ import {
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-input/app-input';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -324,13 +325,14 @@ export class AppProjectDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.projectDetail.metaCompany}</span>
               ${company
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCompanyDetail(company.id)}"
                     >
                       ${company.name}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">—</span>`}
             </div>
@@ -338,13 +340,14 @@ export class AppProjectDetail extends LitElement {
               <span class="meta-label">${t.viewTexts.projectDetail.metaCounterparty}</span>
               ${counterparty
                 ? html`
-                    <button
-                      type="button"
+                    <app-link
                       class="link-btn"
+                      size="md"
+                      variant="primary"
                       @click="${() => store.openCounterpartyDetail(counterparty.id)}"
                     >
                       ${counterparty.name}
-                    </button>
+                    </app-link>
                   `
                 : html`<span class="meta-val">${t.viewTexts.projectDetail.internalProject}</span>`}
             </div>
@@ -383,14 +386,15 @@ export class AppProjectDetail extends LitElement {
                   return html`
                     <div class="meta-box">
                       <span class="meta-label">${t.viewTexts.projectDetail.specDocumentLabel}</span>
-                      <button
-                        type="button"
+                      <app-link
                         class="link-btn"
+                        size="md"
+                        variant="primary"
                         @click="${() =>
                           store.openDocuments({ scope: specDoc.scope, projectId: proj.id })}"
                       >
                         ${specDoc.title}
-                      </button>
+                      </app-link>
                     </div>
                   `;
                 })()
@@ -519,14 +523,14 @@ export class AppProjectDetail extends LitElement {
                                       </div>
                                       <div class="member-info">
                                         <div class="member-name">
-                                          <button
-                                            type="button"
-                                            class="link-btn"
-                                            style="color: inherit;"
+                                          <app-link
+                                            class="link-btn member-link"
+                                            size="md"
+                                            variant="primary"
                                             @click="${() => store.openEmployeeDetail(user.id)}"
                                           >
                                             ${user.name}
-                                          </button>
+                                          </app-link>
                                         </div>
                                         <div class="member-sub">
                                           ${user.role}${user.department ? ` · ${user.department}` : ''} · ${t.viewTexts.projectDetail.sinceWord} ${member.joinedAt}

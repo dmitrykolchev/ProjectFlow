@@ -174,23 +174,26 @@
   white-space: nowrap;
 }
 
+/* meta-box name-links are app-link web components at size md restoring the historical block
+   filling label through the additive link hooks: inner width 100 percent, zero padding, weight
+   600, the inherited unitless line-height 1.5, nowrap with hidden ellipsis, and the meta box
+   font size pinned through control-font-md; the accent color and hover underline are the
+   primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: left;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  --link-width: 100%;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 1rem;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
+/* member links keep their inherited text-primary glyph and the smaller member block font */
+.member-link {
+  --link-color: var(--text-primary, #f8fafc);
+  --control-font-md: 0.9rem;
 }
 
 .mono {
