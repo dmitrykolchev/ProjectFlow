@@ -23,7 +23,7 @@ import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
-import '../../common/app-switch/app-switch';
+import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -274,12 +274,11 @@ export class AppTimeTracking extends LitElement {
             ></app-input>
           </div>
           <div class="billable-toggle-wrap">
-            <span>${t.viewTexts.timeTracking.billableSwitch}</span>
-            <app-switch
-              size="sm"
-              ?checked="${this.quickBillable}"
+            <app-checkbox
+              label="${t.viewTexts.timeTracking.billableSwitch}"
+              .checked="${this.quickBillable}"
               @change="${(e: CustomEvent<{ checked: boolean }>) => (this.quickBillable = e.detail.checked)}"
-            ></app-switch>
+            ></app-checkbox>
           </div>
           <app-button
             variant="primary"
