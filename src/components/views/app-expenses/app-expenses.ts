@@ -24,7 +24,7 @@ import '../../common/app-date-input/app-date-input';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
-import '../../common/app-switch/app-switch';
+import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
@@ -614,15 +614,12 @@ export class AppExpenses extends LitElement {
               @input="${(e: CustomEvent<{ value: string }>) => (this.formVendor = eventValue(e))}"
             ></app-input>
           </div>
-          <div style="display: flex; align-items: flex-end;">
-            <div class="switch-field" style="width: 100%;">
-              <span>${t.viewTexts.expenses.billableSwitch}</span>
-              <app-switch
-                size="sm"
-                ?checked="${this.formBillable}"
-                @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
-              ></app-switch>
-            </div>
+          <div>
+            <app-checkbox
+              label="${t.viewTexts.expenses.billableSwitch}"
+              ?checked="${this.formBillable}"
+              @change="${(e: CustomEvent<{ checked: boolean }>) => (this.formBillable = e.detail.checked)}"
+            ></app-checkbox>
           </div>
           <div class="col-span-2">
             <app-textarea

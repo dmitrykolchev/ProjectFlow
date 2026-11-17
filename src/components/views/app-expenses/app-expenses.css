@@ -276,17 +276,6 @@
   grid-column: span 2;
 }
 
-.switch-field {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.65rem 0.85rem;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: var(--radius-md, 8px);
-  font-size: 0.85rem;
-  color: var(--text-primary, #f8fafc);
-}
 @media (max-width: 640px) {
   :host {
     padding: 1rem;
