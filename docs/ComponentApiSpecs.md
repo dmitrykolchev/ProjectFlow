@@ -468,7 +468,9 @@ consumers пиксель в пиксель: fw 500, lh 1.25, padding 0.15rem/0.2
   статичный рендер пиксель-идентичен).
 - `--link-align-items` — align-items flex-контейнера, default `center`;
 - `--link-min-height` — min-height inner контрола, default `auto` (для паритета строк с
-  baseline-выравниванием нативной line-box).
+  baseline-выравниванием нативной line-box);
+- `active: boolean` (reflect) additive property, default `false`; inner получает класс
+  `is-active`, fill — через хук `--link-active-bg` (default `transparent`).
 Font-size регулируется существующим `--control-font-{size}` size-правила.
 
 Рецепт font-parity для текстовых ghost-чипов (зафиксирован 2026-11-17, новых хуков не требует):

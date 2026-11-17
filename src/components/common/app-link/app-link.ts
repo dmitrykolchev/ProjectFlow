@@ -13,11 +13,14 @@ export class AppLink extends LitElement {
   @property({ type: String }) variant: LinkVariant = 'primary';
   @property({ type: String }) size: LinkSize = 'md';
   @property({ type: Boolean }) disabled: boolean = false;
+  // additive active state for segmented pill consumers; default false keeps every
+  // existing consumer pixel-identical, the fill comes from the --link-active-bg hook
+  @property({ type: Boolean, reflect: true }) active: boolean = false;
 
   static styles = styles;
 
   render() {
-    const classes = `link variant-${this.variant} size-${this.size} ${this.disabled ? 'is-disabled' : ''}`;
+    const classes = `link variant-${this.variant} size-${this.size} ${this.disabled ? 'is-disabled' : ''} ${this.active ? 'is-active' : ''}`;
     // canonical slots: start / default / end, centered on the vertical axis
     const content = html`
       <slot name="start"></slot>

@@ -42,7 +42,7 @@
    --link-padding, --link-font-weight, --link-line-height, --link-font, --link-numeric,
    --link-width, --link-white-space, --link-overflow, --link-text-overflow,
    --link-align-items, --link-min-height, --link-hover-color, --link-hover-decoration,
-   --link-hover-bg, --link-hover-transition, --link-border. */
+   --link-hover-bg, --link-hover-transition, --link-border, --link-active-bg. */
 
 ::slotted(*) {
   display: inline-flex;
@@ -99,6 +99,10 @@
 .link:hover:not(.is-disabled) {
   background: var(--link-hover-bg, transparent);
   text-decoration: var(--link-hover-decoration, underline);
+}
+
+.link.is-active {
+  background: var(--link-active-bg, transparent);
 }
 
 .link:focus-visible {
