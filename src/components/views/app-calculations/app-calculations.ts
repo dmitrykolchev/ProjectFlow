@@ -730,21 +730,46 @@ export class AppCalculations extends LitElement {
           </div>
 
           <div class="col-span-2 quick-term-row">
-            <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_week')}">
-              ${t.viewTexts.calculations.quickThisWeek}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'prev_week')}">
-              ${t.viewTexts.calculations.quickLastWeek}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_month')}">
-              ${t.viewTexts.calculations.quickThisMonth}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'prev_month')}">
-              ${t.viewTexts.calculations.quickLastMonth}
-            </button>
-            <button type="button" class="quick-term-btn" @click="${() => this.applyPeriodPreset(ctr, 'this_quarter')}">
-              ${t.viewTexts.calculations.quickThisQuarter}
-            </button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyPeriodPreset(ctr, 'this_week')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisWeek}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyPeriodPreset(ctr, 'prev_week')}"
+            >
+              <span>${t.viewTexts.calculations.quickLastWeek}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyPeriodPreset(ctr, 'this_month')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisMonth}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyPeriodPreset(ctr, 'prev_month')}"
+            >
+              <span>${t.viewTexts.calculations.quickLastMonth}</span>
+            </app-button>
+            <app-button
+              class="quick-term-btn"
+              size="sm"
+              variant="icon"
+              @click="${() => this.applyPeriodPreset(ctr, 'this_quarter')}"
+            >
+              <span>${t.viewTexts.calculations.quickThisQuarter}</span>
+            </app-button>
           </div>
 
           <div class="col-span-2 autofill-bar">
