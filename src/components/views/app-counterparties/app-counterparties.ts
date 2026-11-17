@@ -10,6 +10,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
+import '../../common/card-footer/card-footer';
 import '../../common/app-input/app-input';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
@@ -387,8 +388,8 @@ export class AppCounterparties extends LitElement {
                 </div>
               </div>
 
-              <div class="card-footer">
-                <div class="stats-row">
+              <card-footer>
+                <div slot="start" class="stats-row">
                   <span class="stat-pill">
                     ${t.viewTexts.counterparties.contractsCountLabel}: <strong>${cpContracts.length}</strong>
                   </span>
@@ -399,33 +400,35 @@ export class AppCounterparties extends LitElement {
                     ${t.viewTexts.counterparties.sumLabel}: <strong>${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix}</strong>
                   </span>
                 </div>
-                <div class="card-actions">
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.viewTexts.counterparties.openCardButton}"
-                    @click="${() => store.openCounterpartyDetail(cp.id)}"
-                  >
-                    ${iconChevronRight(15)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditModal(cp)}"
-                  >
-                    ${iconEdit(14)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn danger"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingItem = cp)}"
-                  >
-                    ${iconTrash(14)}
-                  </button>
-                </div>
-              </div>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.counterparties.openCardButton}"
+                  @click="${() => store.openCounterpartyDetail(cp.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.edit}"
+                  @click="${() => this.openEditModal(cp)}"
+                >
+                  <span slot="start">${iconEdit(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  class="danger-action"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingItem = cp)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+              </card-footer>
             </article>
           `;
         })}
