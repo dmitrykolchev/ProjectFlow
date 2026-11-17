@@ -336,15 +336,34 @@
               border-color var(--transition-fast, 150ms ease);
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
+/* header and table row icon actions are app-button web components at size sm: the
+   historical hover kept the subtle border unchanged for plain actions, so the hover
+   border token is pinned back; approve and delete hovers reuse the historical colors
+   through custom properties, and the historical 6px radius replaces the canonical md
+   radius. The .icon-btn rules above stay for the modal editors */
+.nav-actions app-button,
+.actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.icon-btn.approve:hover {
-  color: #10b981;
-  border-color: rgba(16, 185, 129, 0.45);
-  background: rgba(16, 185, 129, 0.12);
+.nav-actions app-button:not(.approve-action):not(.danger-action),
+.actions-row app-button:not(.approve-action):not(.danger-action) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+.approve-action {
+  --icon-btn-hover-color: #10b981;
+  --icon-btn-hover-border: rgba(16, 185, 129, 0.45);
+  --icon-btn-hover-bg: rgba(16, 185, 129, 0.12);
+}
+
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: var(--color-danger-border, rgba(239, 68, 68, 0.4));
+  --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
 
 .icon-btn.danger:hover {
