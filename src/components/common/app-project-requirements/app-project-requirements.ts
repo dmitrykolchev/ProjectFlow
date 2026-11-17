@@ -386,7 +386,7 @@ export class AppProjectRequirements extends LitElement {
               <span slot="start">${iconEdit(14)}</span>
             </app-button>
             <app-button
-              class="danger-action"
+              action="delete"
               size="sm"
               variant="icon"
               title="${t.common.delete}"
