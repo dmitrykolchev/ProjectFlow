@@ -8,8 +8,9 @@ button {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-sans, inherit);
-  font-weight: 500;
+  font-family: var(--icon-btn-font, var(--font-sans, inherit));
+  font-weight: var(--btn-font-weight, 500);
+  min-width: var(--btn-min-width, auto);
   border: 1px solid transparent;
   border-top-left-radius: var(--btn-radius-tl, var(--radius-md, 8px));
   border-top-right-radius: var(--btn-radius-tr, var(--radius-md, 8px));
@@ -44,7 +45,7 @@ button:active:not(:disabled) {
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: var(--btn-disabled-opacity, 0.5);
   cursor: not-allowed;
   pointer-events: none;
 }
