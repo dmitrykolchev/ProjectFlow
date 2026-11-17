@@ -433,32 +433,34 @@ export class AppTimeTracking extends LitElement {
                     <div class="actions-row">
                       ${entry.status !== 'approved'
                         ? html`
-                            <button
-                              type="button"
-                              class="icon-btn approve"
+                            <app-button
+                              class="approve-action"
+                              size="sm"
+                              variant="icon"
                               title="${t.viewTexts.timeTracking.approveEntryTitle}"
                               @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
                             >
-                              ${iconCheck(14)}
-                            </button>
+                              <span slot="start">${iconCheck(14)}</span>
+                            </app-button>
                           `
                         : ''}
-                      <button
-                        type="button"
-                        class="icon-btn"
+                      <app-button
+                        size="sm"
+                        variant="icon"
                         title="${t.common.edit}"
                         @click="${() => this.openEditModal(entry)}"
                       >
-                        ${iconEdit(14)}
-                      </button>
-                      <button
-                        type="button"
-                        class="icon-btn danger"
+                        <span slot="start">${iconEdit(14)}</span>
+                      </app-button>
+                      <app-button
+                        class="danger-action"
+                        size="sm"
+                        variant="icon"
                         title="${t.common.delete}"
                         @click="${() => (this.deletingEntry = entry)}"
                       >
-                        ${iconTrash(14)}
-                      </button>
+                        <span slot="start">${iconTrash(14)}</span>
+                      </app-button>
                     </div>
                   </td>
                 </tr>
@@ -583,22 +585,23 @@ export class AppTimeTracking extends LitElement {
                         ></app-status-chip>
                       </span>
                       <div class="actions-row">
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          title="${t.common.edit}"
-                          @click="${() => this.openEditModal(entry)}"
-                        >
-                          ${iconEdit(14)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn danger"
-                          title="${t.common.delete}"
-                          @click="${() => (this.deletingEntry = entry)}"
-                        >
-                          ${iconTrash(14)}
-                        </button>
+                          <app-button
+                            size="sm"
+                            variant="icon"
+                            title="${t.common.edit}"
+                            @click="${() => this.openEditModal(entry)}"
+                          >
+                            <span slot="start">${iconEdit(14)}</span>
+                          </app-button>
+                          <app-button
+                            class="danger-action"
+                            size="sm"
+                            variant="icon"
+                            title="${t.common.delete}"
+                            @click="${() => (this.deletingEntry = entry)}"
+                          >
+                            <span slot="start">${iconTrash(14)}</span>
+                          </app-button>
                       </div>
                     </div>
                   `;
