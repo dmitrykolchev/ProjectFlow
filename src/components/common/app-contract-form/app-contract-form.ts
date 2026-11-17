@@ -24,18 +24,19 @@ import '../app-button/app-button';
 /**
  * Canonical contract create/edit form. The component owns the whole field set and
  * writes to the store itself; views open it by setting `open` plus the edit target
- * (`contract`) or the creation presets. `compact` hides the fields a quick contract
- * does not carry (counterparty when preset, owner, status, conditions) and creates
- * the contract as active. A `saved` event carries the written contract so views can
- * navigate to it.
+ * (`contract`) or the creation presets (`presetCounterpartyId`, `presetProjectId`,
+ * `presetStatus` for a quick contract that starts active, `contextTitle`). Every
+ * opening shows the same fourteen fields. A `saved` event carries the written
+ * contract so views can navigate to it.
  */
 @customElement('app-contract-form')
 export class AppContractForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
   @property({ attribute: false }) contract: Contract | null = null;
-  @property({ type: Boolean }) compact: boolean = false;
   @property({ type: String }) presetCounterpartyId: string = '';
   @property({ type: String }) presetProjectId: string = '';
+  /** status a newly created contract starts with, active for quick openings */
+  @property({ type: String }) presetStatus: ContractStatus = 'draft';
   /** modal title override for context-bound openings (quick contract of a counterparty) */
   @property({ type: String }) contextTitle: string = '';
 
@@ -130,8 +131,7 @@ export class AppContractForm extends LitElement {
       this.fCurrency = 'RUB';
       this.fStartDate = today;
       this.fEndDate = `${year}-12-31`;
-      // quick contracts of a counterparty are created active, full forms start as draft
-      this.fStatus = this.compact ? 'active' : 'draft';
+      this.fStatus = this.presetStatus;
       this.fFrequency = 'monthly';
       this.fDescription = '';
     }
@@ -222,13 +222,7 @@ export class AppContractForm extends LitElement {
     const projectOptions = mapProjectOptions(store.projects, t);
     const ownerOptions = mapUserOptions(store.users, t);
 
-    // compact quick forms carry no free counterparty choice, owner, status or conditions
-    const showCounterparty = !this.compact;
-    const showOwner = !this.compact;
-    const showStatus = !this.compact;
-    const showConditions = !this.compact;
-
-    return html`
+   return html`
       <app-modal
         ?open="${this.open}"
         size="lg"
@@ -278,19 +272,15 @@ export class AppContractForm extends LitElement {
             ></app-entity-selector>
           </div>
 
-          ${showCounterparty
-            ? html`
-                <div>
-                  <app-entity-selector
-                    label="${t.viewTexts.payments.thCounterparty}"
-                    .value="${this.fCounterpartyId}"
-                    .options="${counterpartyOptions}"
-                    @change="${(e: CustomEvent<{ value: string }>) =>
-                      (this.fCounterpartyId = eventValue(e))}"
-                  ></app-entity-selector>
-                </div>
-              `
-            : ''}
+          <div>
+            <app-entity-selector
+              label="${t.viewTexts.payments.thCounterparty}"
+              .value="${this.fCounterpartyId}"
+              .options="${counterpartyOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.fCounterpartyId = eventValue(e))}"
+            ></app-entity-selector>
+          </div>
 
           <div>
             <app-entity-selector
@@ -304,21 +294,17 @@ export class AppContractForm extends LitElement {
             ></app-entity-selector>
           </div>
 
-          ${showOwner
-            ? html`
-                <div>
-                  <app-entity-selector
-                    label="${t.viewTexts.contracts.labelOwner}"
-                    placeholder="${t.viewTexts.contracts.optionUnassignedOwner}"
-                    clearable
-                    .value="${this.fOwnerId}"
-                    .options="${ownerOptions}"
-                    @change="${(e: CustomEvent<{ value: string }>) =>
-                      (this.fOwnerId = eventValue(e))}"
-                  ></app-entity-selector>
-                </div>
-              `
-            : ''}
+          <div>
+            <app-entity-selector
+              label="${t.viewTexts.contracts.labelOwner}"
+              placeholder="${t.viewTexts.contracts.optionUnassignedOwner}"
+              clearable
+              .value="${this.fOwnerId}"
+              .options="${ownerOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.fOwnerId = eventValue(e))}"
+            ></app-entity-selector>
+          </div>
 
           <div>
             <app-number-input
@@ -358,21 +344,17 @@ export class AppContractForm extends LitElement {
             ></app-date-input>
           </div>
 
-          ${showStatus
-            ? html`
-                <div>
-                  <app-select
-                    label="${t.viewTexts.counterparties.thStatus}"
-                    .value="${this.fStatus}"
-                    .options="${statusOptions}"
-                    @change="${(e: CustomEvent<{ value: string }>) =>
-                      (this.fStatus = eventValue(e) as ContractStatus)}"
-                  ></app-select>
-                </div>
-              `
-            : ''}
+          <div>
+            <app-select
+              label="${t.viewTexts.counterparties.thStatus}"
+              .value="${this.fStatus}"
+              .options="${statusOptions}"
+              @change="${(e: CustomEvent<{ value: string }>) =>
+                (this.fStatus = eventValue(e) as ContractStatus)}"
+            ></app-select>
+          </div>
 
-          <div class="${showStatus ? '' : 'col-span-2'}">
+          <div>
             <app-select
               label="${t.viewTexts.counterpartyDetail.labelCalcCycle}"
               .value="${this.fFrequency}"
@@ -382,19 +364,14 @@ export class AppContractForm extends LitElement {
             ></app-select>
           </div>
 
-          ${showConditions
-            ? html`
-                <div class="col-span-2">
-                  <app-textarea
-                    label="${t.viewTexts.contracts.labelConditions}"
-                    .value="${this.fDescription}"
-                    rows="3"
-                    @input="${(e: CustomEvent<{ value: string }>) =>
-                      (this.fDescription = eventValue(e))}"
-                  ></app-textarea>
-                </div>
-              `
-            : ''}
+          <div class="col-span-2">
+            <app-textarea
+              label="${t.viewTexts.contracts.labelConditions}"
+              .value="${this.fDescription}"
+              rows="3"
+              @input="${(e: CustomEvent<{ value: string }>) => (this.fDescription = eventValue(e))}"
+            ></app-textarea>
+          </div>
         </app-form-grid>
 
         <div slot="footer">
