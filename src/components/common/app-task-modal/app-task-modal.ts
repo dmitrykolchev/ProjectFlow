@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
-import { Expense, ExpenseCategory, Task, TaskAiAnalysis, TaskAiClarificationMessage, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
+import { Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { iconArrowUpRight, iconBookOpen, iconChevronDown, iconChevronUp, iconClock, iconGripVertical, iconLayers, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
@@ -20,7 +20,6 @@ import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
 import '../app-checkbox/app-checkbox';
-import '../app-task-ai-panel/app-task-ai-panel';
 
 @customElement('app-task-modal')
 export class AppTaskModal extends LitElement {
@@ -48,8 +47,7 @@ export class AppTaskModal extends LitElement {
   @state() private draggedSubtaskId: string | null = null;
   @state() private dropTargetSubtaskId: string | null = null;
   @state() private dropSubtaskPosition: 'before' | 'after' = 'before';
-  @state() private draftAiAnalysis?: TaskAiAnalysis;
-  @state() private draftAiClarifications: TaskAiClarificationMessage[] = [];
+  @state() private draftSubtaskTitle = '';
   @state() private requirementIds: string[] = [];
   @state() private knowledgeArticleIds: string[] = [];
 
@@ -100,8 +98,6 @@ export class AppTaskModal extends LitElement {
         this.loggedHours = this.editingTask.loggedHours;
         this.tags = [...this.editingTask.tags];
         this.subtasks = [...this.editingTask.subtasks];
-        this.draftAiAnalysis = this.editingTask.aiAnalysis;
-        this.draftAiClarifications = [...(this.editingTask.aiClarifications || [])];
         const taskId = this.editingTask.id;
         const reqsFromLinks = store.requirements
           .filter((r) => (r.linkedTaskIds || []).includes(taskId))
@@ -131,8 +127,6 @@ export class AppTaskModal extends LitElement {
         this.loggedHours = 0;
         this.tags = ['Dev'];
         this.subtasks = [];
-        this.draftAiAnalysis = undefined;
-        this.draftAiClarifications = [];
         this.requirementIds = [];
         this.knowledgeArticleIds = [];
       }
@@ -227,54 +221,6 @@ export class AppTaskModal extends LitElement {
               rows="3"
               @input="${(e: Event) => { const v = this.readVal(e); if (v !== undefined) this.description = String(v); }}"
             ></app-textarea>
-          </div>
-
-          <div class="col-span-2">
-            <app-task-ai-panel
-              compact
-              .task="${{
-                id: this.editingTask?.id,
-                title: this.taskTitle,
-                description: this.description,
-                projectId: this.projectId,
-                status: this.status,
-                priority: this.priority,
-                startDate: this.startDate,
-                dueDate: this.dueDate,
-                estimatedHours: this.estimatedHours,
-                loggedHours: this.loggedHours,
-                tags: this.tags,
-                subtasks: this.subtasks,
-                requirementIds: this.requirementIds,
-                knowledgeArticleIds: this.knowledgeArticleIds,
-              }}"
-              .analysis="${this.draftAiAnalysis}"
-              .clarifications="${this.draftAiClarifications}"
-              @apply-description="${(e: CustomEvent<{ description: string; mode: 'replace' | 'append' }>) => {
-                const { description, mode } = e.detail;
-                this.description =
-                  mode === 'append' && this.description.trim()
-                    ? `${this.description.trim()}\n\n${description}`
-                    : description;
-              }}"
-              @analysis-complete="${(e: CustomEvent<{ analysis: TaskAiAnalysis }>) => {
-                this.draftAiAnalysis = e.detail.analysis;
-              }}"
-              @analysis-cleared="${() => {
-                this.draftAiAnalysis = undefined;
-              }}"
-              @clarification-update="${(e: CustomEvent<{ messages: TaskAiClarificationMessage[] }>) => {
-                this.draftAiClarifications = [...e.detail.messages];
-              }}"
-              @add-subtask="${(e: CustomEvent<{ title: string }>) => {
-                const title = e.detail?.title?.trim();
-                if (!title) return;
-                this.subtasks = [
-                  ...this.subtasks,
-                  { id: `sub-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`, title, completed: false },
-                ];
-              }}"
-            ></app-task-ai-panel>
           </div>
 
           <div>
@@ -721,8 +667,6 @@ export class AppTaskModal extends LitElement {
         subtasks: this.subtasks,
         requirementIds: [...this.requirementIds],
         knowledgeArticleIds: [...this.knowledgeArticleIds],
-        aiAnalysis: this.draftAiAnalysis,
-        aiClarifications: [...this.draftAiClarifications],
       });
     } else {
       const created = store.addTask({
@@ -740,8 +684,6 @@ export class AppTaskModal extends LitElement {
         subtasks: this.subtasks,
         requirementIds: [...this.requirementIds],
         knowledgeArticleIds: [...this.knowledgeArticleIds],
-        aiAnalysis: this.draftAiAnalysis,
-        aiClarifications: [...this.draftAiClarifications],
       });
       savedTaskId = created.id;
     }
