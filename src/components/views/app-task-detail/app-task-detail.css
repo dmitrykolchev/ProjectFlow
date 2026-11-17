@@ -124,21 +124,29 @@
   color: var(--text-primary, #f8fafc);
 }
 
+/* name-links are app-link web components at size md with the historical typography restored
+   through the additive link hooks of zero padding, weight 600, the inherited unitless
+   line-height 1.5, the tighter 0.3rem icon gap, and the context font size pinned through
+   control-font-md; the accent color and hover underline are the primary variant */
 .link-btn {
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--accent-primary, #6366f1);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-gap: 0.3rem;
+  --control-font-md: 0.8125rem;
 }
 
-.link-btn:hover {
-  text-decoration: underline;
+/* the time-entry employee link keeps its historical text-primary glyph and table font size */
+.text-primary-link {
+  --link-color: var(--text-primary, #f8fafc);
+  --control-font-md: 0.825rem;
+}
+
+/* the knowledge base icon-only link inherits the sidebar block font size and has no text
+   label, so the icon gap is zeroed to keep the historical 14px square */
+.kb-icon-link {
+  --control-font-md: 1rem;
+  --link-gap: 0;
 }
 
 .hero-title-row {

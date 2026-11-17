@@ -35,6 +35,7 @@ import {
 import { mapKnowledgeOptions, mapRequirementOptions } from '../../common/entity-selector-options';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
+import '../../common/app-link/app-link';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-date-input/app-date-input';
 import '../../common/app-input/app-input';
@@ -475,13 +476,14 @@ export class AppTaskDetail extends LitElement {
                   ${project
                     ? html`
                         <span aria-hidden="true">·</span>
-                        <button
-                          type="button"
+                        <app-link
                           class="link-btn"
+                          size="md"
+                          variant="primary"
                           @click="${() => store.openProjectDetail(project.id)}"
                         >
                           ${project.name}
-                        </button>
+                        </app-link>
                       `
                     : ''}
                   ${task.tags.length > 0
@@ -493,13 +495,14 @@ export class AppTaskDetail extends LitElement {
                   ${assignee
                     ? html`
                         <span aria-hidden="true">·</span>
-                        <button
-                          type="button"
+                        <app-link
                           class="link-btn"
+                          size="md"
+                          variant="primary"
                           @click="${() => store.openEmployeeDetail(assignee.id)}"
                         >
                           ${assignee.name}
-                        </button>
+                        </app-link>
                       `
                     : ''}
                 </div>
@@ -979,14 +982,14 @@ export class AppTaskDetail extends LitElement {
                         <td>
                           ${user
                             ? html`
-                                <button
-                                  type="button"
-                                  class="link-btn"
-                                  style="color: var(--text-primary);"
+                                <app-link
+                                  class="link-btn text-primary-link"
+                                  size="md"
+                                  variant="primary"
                                   @click="${() => store.openEmployeeDetail(user.id)}"
                                 >
                                   ${user.name}
-                                </button>
+                                </app-link>
                               `
                             : te.userId}
                         </td>
@@ -1460,14 +1463,15 @@ export class AppTaskDetail extends LitElement {
       >
         <span slot="icon">${iconLayers(16)}</span>
         <div slot="actions" style="display: flex; align-items: center; gap: 0.4rem;">
-          <button
-            type="button"
-            class="link-btn"
+          <app-link
+            class="link-btn kb-icon-link"
+            size="md"
+            variant="primary"
             title="${t.navigation.knowledgeBase}"
             @click="${() => store.openKnowledgeBase({ scope: 'project', projectId: task.projectId })}"
           >
-            ${iconBookOpen(14)}
-          </button>
+            <span slot="start">${iconBookOpen(14)}</span>
+          </app-link>
         </div>
 
         <div class="trace-sidebar-block">
