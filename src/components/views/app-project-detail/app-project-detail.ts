@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { ExpenseCategory, Project, ProjectRole, ProjectStatus, TaskStatus, TimeEntryCategory } from '../../../types';
+import { ExpenseCategory, Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
 import {
   iconBookOpen,
   iconChevronLeft,
@@ -27,9 +27,9 @@ import '../../common/app-number-input/app-number-input';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
 import { mapTaskOptions, mapUserOptions } from '../../common/entity-selector-options';
-import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
+import '../../common/app-time-entry-form/app-time-entry-form';
 import '../../common/app-project-form/app-project-form';
 import '../../dashboard/app-project-overview/app-project-overview';
 import '../../common/app-empty-state/app-empty-state';
@@ -98,11 +98,8 @@ export class AppProjectDetail extends LitElement {
 
   // Quick Project Time Modal
   @state() private timeModalOpen = false;
-  @state() private timeTaskId = '';
-  @state() private timeUserId = '';
-  @state() private timeHours = 2;
-  @state() private timeCategory: TimeEntryCategory = 'development';
-  @state() private timeDesc = '';
+  @state() private presetQuickProjectId: string | null = null;
+  @state() private presetQuickTaskId: string | null = null;
 
   @state() private timeEntriesVersion = store.timeEntries.length;
   @state() private expensesVersion = store.expenses.length;
@@ -856,11 +853,8 @@ export class AppProjectDetail extends LitElement {
 
   private openQuickTimeModal(projectId: string) {
     const firstTask = store.tasks.find((tk) => tk.projectId === projectId);
-    this.timeTaskId = firstTask?.id || '';
-    this.timeUserId = store.users[0]?.id || '';
-    this.timeHours = 2;
-    this.timeCategory = 'development';
-    this.timeDesc = '';
+    this.presetQuickProjectId = projectId;
+    this.presetQuickTaskId = firstTask?.id || null;
     this.timeModalOpen = true;
   }
 
@@ -879,96 +873,17 @@ export class AppProjectDetail extends LitElement {
     projectTasks: typeof store.tasks,
     t: ReturnType<typeof getTranslation>
   ) {
-    const taskOpts = mapTaskOptions(projectTasks, t);
-    const userOpts = mapUserOptions(store.users, t);
-    const catOpts = [
-      { value: 'development', label: t.timeTracking.categories.development },
-      { value: 'design', label: t.timeTracking.categories.design },
-      { value: 'testing', label: t.timeTracking.categories.testing },
-      { value: 'research', label: t.timeTracking.categories.research },
-      { value: 'devops', label: t.timeTracking.categories.devops },
-      { value: 'meeting', label: t.timeTracking.categories.meeting },
-      { value: 'management', label: t.timeTracking.categories.management },
-    ];
+    const firstTask = projectTasks[0];
 
     return html`
-      <app-modal
-        ?open="${this.timeModalOpen}"
-        size="md"
-        title="${t.viewTexts.projectDetail.quickTimeTitle(proj.key)}"
+      <app-time-entry-form
+        .open="${this.timeModalOpen}"
+        .presetProjectId="${proj.id}"
+        .presetTaskId="${firstTask?.id || null}"
+        .contextTitle="${t.viewTexts.projectDetail.quickTimeTitle(proj.key)}"
         @close="${() => (this.timeModalOpen = false)}"
-      >
-        <app-form-grid>
-          <div class="col-span-2">
-            <app-entity-selector
-              label="${t.viewTexts.projectDetail.labelProjectTask}"
-              .value="${this.timeTaskId}"
-              .options="${taskOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.timeTaskId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-entity-selector
-              label="${t.viewTexts.timeTracking.labelEmployee}"
-              .value="${this.timeUserId}"
-              .options="${userOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) => (this.timeUserId = eventValue(e))}"
-            ></app-entity-selector>
-          </div>
-          <div>
-            <app-number-input
-              label="${t.viewTexts.timeTracking.labelHours}"
-              .value="${this.timeHours}"
-              min="0.25"
-              max="24"
-              step="0.5"
-              unit="${t.viewTexts.timeTracking.hoursUnit}"
-              @change="${(e: CustomEvent<{ value: number }>) => (this.timeHours = eventValue(e))}"
-            ></app-number-input>
-          </div>
-          <div class="col-span-2">
-            <app-select
-              label="${t.viewTexts.timeTracking.labelCategory}"
-              .value="${this.timeCategory}"
-              .options="${catOpts}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                (this.timeCategory = eventValue(e) as TimeEntryCategory)}"
-            ></app-select>
-          </div>
-          <div class="col-span-2">
-            <app-textarea
-              label="${t.viewTexts.projectDetail.quickNotesLabel}"
-              .value="${this.timeDesc}"
-              rows="2"
-              @input="${(e: CustomEvent<{ value: string }>) => (this.timeDesc = eventValue(e))}"
-            ></app-textarea>
-          </div>
-        </app-form-grid>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.timeModalOpen = false)}">${t.common.cancel}</app-button>
-          <app-button
-            variant="primary"
-            ?disabled="${!this.timeTaskId || this.timeHours <= 0}"
-            @click="${() => {
-              if (!this.timeTaskId) return;
-              store.addTimeEntry({
-                projectId: proj.id,
-                taskId: this.timeTaskId,
-                userId: this.timeUserId || store.users[0]?.id || '',
-                date: new Date().toISOString().slice(0, 10),
-                hours: this.timeHours,
-                billable: true,
-                category: this.timeCategory,
-                status: 'logged',
-                description: this.timeDesc.trim(),
-              });
-              this.timeModalOpen = false;
-            }}"
-          >
-            ${t.common.save}
-          </app-button>
-        </div>
-      </app-modal>
+        @saved="${() => (this.timeModalOpen = false)}"
+      ></app-time-entry-form>
     `;
   }
 
