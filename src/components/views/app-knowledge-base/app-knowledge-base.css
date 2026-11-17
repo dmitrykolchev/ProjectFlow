@@ -332,34 +332,33 @@
   flex-wrap: wrap;
 }
 
-.icon-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 7px;
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: transparent;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+/* reader header icon actions are app-button web components at size xs pinned to the
+   historical 32px square with a 7px radius; hover keeps the subtle border unchanged for
+   plain actions, the pinned state and the delete hover reuse the historical colors
+   through custom properties */
+.reader-actions app-button {
+  --control-height-xs: 32px;
+  --btn-radius-tl: 7px;
+  --btn-radius-tr: 7px;
+  --btn-radius-bl: 7px;
+  --btn-radius-br: 7px;
+  --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.icon-btn:hover {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
-  color: var(--text-primary);
+.reader-actions app-button:not(.danger-action) {
+  --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 
-.icon-btn.is-active {
-  color: var(--accent-primary, #6366f1);
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.4));
-  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+.pin-action.is-active {
+  --icon-btn-color: var(--accent-primary, #6366f1);
+  --icon-btn-border: var(--accent-border, rgba(99, 102, 241, 0.4));
+  --icon-btn-bg: var(--accent-soft, rgba(99, 102, 241, 0.14));
 }
 
-.icon-btn.danger:hover {
-  color: var(--color-danger, #ef4444);
-  border-color: rgba(239, 68, 68, 0.35);
+.danger-action {
+  --icon-btn-hover-color: var(--color-danger, #ef4444);
+  --icon-btn-hover-border: rgba(239, 68, 68, 0.35);
+  --icon-btn-hover-bg: transparent;
 }
 
 /* Article Body */

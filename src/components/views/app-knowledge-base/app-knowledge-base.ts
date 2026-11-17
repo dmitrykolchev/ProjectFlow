@@ -691,14 +691,15 @@ export class AppKnowledgeBase extends LitElement {
         </div>
 
         <div class="reader-actions">
-          <button
-            type="button"
-            class="icon-btn ${article.pinned ? 'is-active' : ''}"
+          <app-button
+            class="pin-action ${article.pinned ? 'is-active' : ''}"
+            size="xs"
+            variant="icon"
             title="${article.pinned ? kb.unpinArticle : kb.pinArticle}"
             @click="${() => store.togglePinKnowledgeArticle(article.id)}"
           >
-            ${iconPin(15)}
-          </button>
+            <span slot="start">${iconPin(15)}</span>
+          </app-button>
 
           <app-button
             size="sm"
@@ -718,14 +719,15 @@ export class AppKnowledgeBase extends LitElement {
             <span>${t.common.edit}</span>
           </app-button>
 
-          <button
-            type="button"
-            class="icon-btn danger"
+          <app-button
+            class="danger-action"
+            size="xs"
+            variant="icon"
             title="${t.common.delete}"
             @click="${() => (this.deletingArticle = article)}"
           >
-            ${iconTrash(15)}
-          </button>
+            <span slot="start">${iconTrash(15)}</span>
+          </app-button>
         </div>
       </div>
 
