@@ -723,7 +723,7 @@ export class AppTimeTracking extends LitElement {
                 (this.formStatus = eventValue(e) as TimeEntryStatus)}"
             ></app-select>
           </div>
-          <div>
+          <div class="checkbox-cell">
             <app-checkbox
               label="${t.viewTexts.timeTracking.billableHoursLabel}"
               ?checked="${this.formBillable}"
