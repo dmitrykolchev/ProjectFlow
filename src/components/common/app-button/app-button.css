@@ -81,21 +81,23 @@ button:disabled {
   --mi-icon: var(--control-icon-lg, 24px);
 }
 
+/* --icon-only-padding lets a consumer restore a historical content-sized icon button
+   padding (default 0 keeps every existing icon-only control pixel-identical) */
 .icon-only.size-xs {
   width: var(--control-height-xs, 24px);
-  padding: 0;
+  padding: var(--icon-only-padding, 0);
 }
 .icon-only.size-sm {
   width: var(--control-height-sm, 30px);
-  padding: 0;
+  padding: var(--icon-only-padding, 0);
 }
 .icon-only.size-md {
   width: var(--control-height-md, 38px);
-  padding: 0;
+  padding: var(--icon-only-padding, 0);
 }
 .icon-only.size-lg {
   width: var(--control-height-lg, 44px);
-  padding: 0;
+  padding: var(--icon-only-padding, 0);
 }
 
 /* Variants */
