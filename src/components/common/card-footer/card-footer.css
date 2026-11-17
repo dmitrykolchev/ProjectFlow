@@ -1,0 +1,42 @@
+/* Card footer row: start actions aligned to the left edge of the card,
+   end actions aligned to the right edge. Visual parity with the historical
+   .card-footer used in list-view cards (border-top, padding-top). Chrome on
+   :host ignores padding and margin with adopted stylesheets, so the chrome
+   lives on the inner row; views keep margin-top: auto on the host element. */
+:host {
+  display: block;
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
+.footer-start {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: flex-start;
+}
+
+.footer-end {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  justify-content: flex-end;
+}
+
+/* card action buttons follow the historical icon-btn radius */
+::slotted(app-button) {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
