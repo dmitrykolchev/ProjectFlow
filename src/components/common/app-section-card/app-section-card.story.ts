@@ -57,10 +57,14 @@ export const meta: ComponentStoryMeta = {
     {
       name: 'Capped Height',
       description:
-        'max-height caps the body and activates the inner scrollbar — for long histories (task change log, analysis history). Combined with collapsible the whole card collapses from the header.',
+        'max-height caps the body and activates the inner scrollbar — for long histories (task change log, analysis history). Combined with collapsible the whole card collapses from the header; controls in the header slots (actions, header-left) stay clickable and do not toggle the section.',
       render: () => html`
         <app-section-card collapsible max-height="12rem" title="Change History" subtitle="36 entries">
           <app-badge slot="header-left" size="sm" variant="info">36</app-badge>
+          <div slot="actions" style="display: flex; gap: 0.4rem;">
+            <app-button size="sm" variant="secondary">Refresh</app-button>
+            <app-button size="sm" variant="primary">Export</app-button>
+          </div>
           <div style="display: flex; flex-direction: column; gap: 0.4rem;">
             ${Array.from({ length: 36 }, (_, i) => html`
               <div style="font-size: 0.8rem; color: var(--text-secondary); padding: 0.25rem 0.5rem; background: var(--bg-subtle, #1a2438); border-radius: 6px;">

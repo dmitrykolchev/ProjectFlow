@@ -23,7 +23,7 @@ export class AppSectionCard extends LitElement {
           role="${this.collapsible ? 'button' : 'presentation'}"
           tabindex="${this.collapsible ? 0 : -1}"
           aria-expanded="${this.collapsible && !this.collapsed ? 'true' : 'false'}"
-          @click="${this.handleToggle}"
+          @click="${(e: MouseEvent) => this.handleToggle(e)}"
           @keydown="${(e: KeyboardEvent) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
@@ -52,8 +52,13 @@ export class AppSectionCard extends LitElement {
     `;
   }
 
-  private handleToggle() {
+  private handleToggle(e?: MouseEvent) {
     if (!this.collapsible) return;
+    // clicks on controls in the header slots must not toggle the section
+    if (e) {
+      const slots = this.shadowRoot?.querySelectorAll('slot[name="actions"], slot[name="header-left"]');
+      if (slots && e.composedPath().some((el) => el === slots[0] || el === slots[1])) return;
+    }
     this.collapsed = !this.collapsed;
     this.dispatchEvent(
       new CustomEvent('toggle', {
