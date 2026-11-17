@@ -57,6 +57,7 @@ import projectFormMeta from '../../common/app-project-form/app-project-form.stor
 import requirementFormMeta from '../../common/app-requirement-form/app-requirement-form.story';
 import calculationFormMeta from '../../common/app-calculation-form/app-calculation-form.story';
 import timeEntryFormMeta from '../../common/app-time-entry-form/app-time-entry-form.story';
+import expenseFormMeta from '../../common/app-expense-form/app-expense-form.story';
 import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialog.story';
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
@@ -150,6 +151,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   requirementFormMeta,
   calculationFormMeta,
   timeEntryFormMeta,
+  expenseFormMeta,
   emptyStateMeta,
   kpiStripMeta,
   sectionCardMeta,
