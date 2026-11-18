@@ -113,25 +113,6 @@
   border-bottom: 1px solid var(--border-subtle, #1e293b);
 }
 
-.nav-mode-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding: 0.55rem 0.85rem;
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  flex-shrink: 0;
-}
-
-.nav-mode-label {
-  font-size: 0.6875rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
-}
-
 .nav-list {
   flex: 1;
   padding: 0.6rem 0.65rem;

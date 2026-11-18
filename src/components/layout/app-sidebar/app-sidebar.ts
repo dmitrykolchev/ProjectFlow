@@ -6,7 +6,6 @@ import { getTranslation } from '../../../i18n';
 import { mapProjectOptions } from '../../common/entity-selector-options';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-entity-selector/app-entity-selector';
-import '../../common/app-segmented-switch/app-segmented-switch';
 import styles from './app-sidebar.css';
 import {
   iconMoon,
@@ -156,29 +155,6 @@ export class AppSidebar extends LitElement {
     store.toggleSidebarGroup(groupId, expanded);
   }
 
-  private handleModeChange(mode: SidebarGroupMode) {
-    if (this.groupMode === mode) return;
-
-    if (this.standalone) {
-      this.groupMode = mode;
-      if (mode === 'single' && this.expandedGroups.length > 1) {
-        const groups = this.getSlottedGroups();
-        const activeGroup = groups.find((g) => g.hasActive);
-        const activeId = activeGroup ? activeGroup.groupId || activeGroup.label : this.expandedGroups[0];
-        this.expandedGroups = activeId ? [activeId] : [];
-      } else if (mode === 'single' && this.expandedGroups.length === 0) {
-        const groups = this.getSlottedGroups();
-        if (groups.length > 0) {
-          this.expandedGroups = [groups[0].groupId || groups[0].label];
-        }
-      }
-      this.syncSlottedItems();
-      return;
-    }
-
-    store.setSidebarGroupMode(mode);
-  }
-
   private handleCollapseSidebar() {
     if (this.standalone) {
       this.collapsed = !this.collapsed;
@@ -190,7 +166,6 @@ export class AppSidebar extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
-    const hasGroups = this.getSlottedGroups().length > 0 || !this.standalone;
 
     return html`
       <button
@@ -223,24 +198,6 @@ export class AppSidebar extends LitElement {
                   .value="${this.selectedProjectId}"
                   @change="${(e: CustomEvent) => store.selectProject(e.detail.value)}"
                 ></app-entity-selector>
-              </div>
-            `
-          : ''}
-
-        ${!this.collapsed && hasGroups
-          ? html`
-              <div class="nav-mode-bar">
-                <span class="nav-mode-label">${t.navigation.groupsLabel}</span>
-                <app-segmented-switch
-                  size="sm"
-                  full-width
-                  .options="${[
-                    { value: 'single', label: t.navigation.groupModeSingle },
-                    { value: 'multiple', label: t.navigation.groupModeMultiple },
-                  ]}"
-                  .value="${this.groupMode}"
-                  @change="${(e: CustomEvent) => this.handleModeChange(e.detail.value as SidebarGroupMode)}"
-                ></app-segmented-switch>
               </div>
             `
           : ''}
