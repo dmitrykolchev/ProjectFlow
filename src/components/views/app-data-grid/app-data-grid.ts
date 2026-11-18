@@ -640,6 +640,75 @@ export class AppDataGrid extends LitElement {
     }
   };
 
+  private renderSortIndicator(field: string, rules: EffectiveSortRule[], t: ReturnType<typeof getTranslation>) {
+    const sortIdx = rules.findIndex((r) => r.field === field);
+    if (sortIdx === -1) return '';
+    const sortRule = rules[sortIdx];
+    return html`
+      <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
+        ${sortRule.direction === 'asc'
+          ? html`
+              <svg
+                class="sort-dir-arrow is-asc"
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="8" y1="13" x2="8" y2="3" />
+                <polyline points="4 7 8 3 12 7" />
+              </svg>
+            `
+          : html`
+              <svg
+                class="sort-dir-arrow is-desc"
+                width="12"
+                height="12"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <line x1="8" y1="3" x2="8" y2="13" />
+                <polyline points="4 9 8 13 12 9" />
+              </svg>
+            `}
+        <span class="sort-order-num">[${sortIdx + 1}]</span>
+      </span>
+    `;
+  }
+
+  private renderGroupIcon(isGroupedCol: boolean, t: ReturnType<typeof getTranslation>) {
+    return html`
+      <span
+        class="th-group-icon ${isGroupedCol ? 'is-grouped' : ''}"
+        title="${isGroupedCol ? t.grid.sortGroupHint : t.grid.groupableColumnHint}"
+      >
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.4"
+          aria-hidden="true"
+        >
+          <rect x="2" y="2.5" width="12" height="11" rx="1.75" />
+          <line x1="2" y1="6.2" x2="14" y2="6.2" />
+          <line x1="6.5" y1="6.2" x2="6.5" y2="13.5" />
+        </svg>
+      </span>
+    `;
+  }
+
   render() {
     const t = getTranslation(this.currentLang);
     const activeCols = this.orderedVisibleColumns;
@@ -842,6 +911,8 @@ export class AppDataGrid extends LitElement {
                             <span class="group-chip">
                               <span class="group-chip-index">${index + 1}</span>
                               <span class="group-chip-label">${caption}</span>
+                              ${this.renderSortIndicator(field, effectiveSortRules, t)}
+                              ${this.renderGroupIcon(true, t)}
                               <button
                                 type="button"
                                 class="group-chip-remove"
@@ -963,70 +1034,10 @@ export class AppDataGrid extends LitElement {
                     <div class="th-content align-${col.align}">
                       <div class="th-main">
                         <span class="th-label">${col.caption}</span>
-                        ${sortRule
-                          ? html`
-                              <span class="sort-indicator ${sortRule.isGroupSort ? 'is-group-sort' : ''}">
-                                ${sortRule.direction === 'asc'
-                                  ? html`
-                                      <svg
-                                        class="sort-dir-arrow is-asc"
-                                        width="12"
-                                        height="12"
-                                        viewBox="0 0 16 16"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        aria-hidden="true"
-                                      >
-                                        <line x1="8" y1="13" x2="8" y2="3" />
-                                        <polyline points="4 7 8 3 12 7" />
-                                      </svg>
-                                    `
-                                  : html`
-                                      <svg
-                                        class="sort-dir-arrow is-desc"
-                                        width="12"
-                                        height="12"
-                                        viewBox="0 0 16 16"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2.2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        aria-hidden="true"
-                                      >
-                                        <line x1="8" y1="3" x2="8" y2="13" />
-                                        <polyline points="4 9 8 13 12 9" />
-                                      </svg>
-                                    `}
-                                <span class="sort-order-num">[${sortIdx + 1}]</span>
-                              </span>
-                            `
-                          : ''}
+                        ${this.renderSortIndicator(col.field, effectiveSortRules, t)}
                       </div>
                       ${(col.groupable || isGroupedCol) && col.caption.trim() !== ''
-                        ? html`
-                            <span
-                              class="th-group-icon ${isGroupedCol ? 'is-grouped' : ''}"
-                              title="${isGroupedCol ? t.grid.sortGroupHint : t.grid.groupableColumnHint}"
-                            >
-                              <svg
-                                width="12"
-                                height="12"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="1.4"
-                                aria-hidden="true"
-                              >
-                                <rect x="2" y="2.5" width="12" height="11" rx="1.75" />
-                                <line x1="2" y1="6.2" x2="14" y2="6.2" />
-                                <line x1="6.5" y1="6.2" x2="6.5" y2="13.5" />
-                              </svg>
-                            </span>
-                          `
+                        ? this.renderGroupIcon(isGroupedCol, t)
                         : ''}
                     </div>
                     ${col.resizable
