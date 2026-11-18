@@ -45,7 +45,9 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
-  min-height: 1rem;
+  /* ghost label: real caption text keeps the row in layout (identical to
+     app-input's label line), the visible caption lives inside the switch */
+  visibility: hidden;
 }
 
 .switch-box {
@@ -57,6 +59,12 @@
   border: 1px solid var(--border-subtle, #334155);
   border-radius: var(--radius-md, 8px);
   padding: 0 0.75rem;
+}
+
+/* activity indicator: plain switch spanning the full row, no label row, no frame */
+.active-switch {
+  display: flex;
+  width: 100%;
 }
 
 .error-banner {

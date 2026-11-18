@@ -258,7 +258,7 @@ export class AppDirectoryRecordModal extends LitElement {
     if (field.type === 'boolean') {
       return html`
         <div class="switch-field">
-          <label></label>
+          <label>${label}</label>
           <div class="switch-box">
             <app-switch
               label="${label}"
@@ -403,17 +403,15 @@ export class AppDirectoryRecordModal extends LitElement {
           </div>
 
           <div class="col-span-2">
-            <div class="switch-field">
-              <label></label>
-              <div class="switch-box">
-                <app-switch
-                  label="${t.viewTexts.directories.fieldIsActiveLabel}"
-                  .checked="${this.formIsActive}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) => {
-                    this.formIsActive = Boolean(e.detail?.checked);
-                  }}"
-                ></app-switch>
-              </div>
+            <div class="col-span-2">
+              <app-switch
+                class="active-switch"
+                label="${t.viewTexts.directories.fieldIsActiveLabel}"
+                .checked="${this.formIsActive}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) => {
+                  this.formIsActive = Boolean(e.detail?.checked);
+                }}"
+              ></app-switch>
             </div>
           </div>
 
