@@ -27,6 +27,7 @@ import {
   iconFolderOpen,
   iconGrid,
   iconCalculator,
+  iconUser,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -73,6 +74,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
+  'profile-settings': () => import('./components/views/app-profile-settings/app-profile-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
   'design-tokens': () => import('./components/views/app-design-tokens/app-design-tokens'),
   'material-icons': () => import('./components/views/app-material-icons/app-material-icons'),
@@ -380,6 +382,12 @@ export class AppRoot extends LitElement {
             label="${t.navigation.settings}"
             .icon="${iconSettings()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="profile-settings"
+            label="${t.navigation.profileSettings}"
+            .icon="${iconUser()}"
+          ></sidebar-item>
         </sidebar-group>
       </app-sidebar>
 
@@ -474,6 +482,8 @@ export class AppRoot extends LitElement {
         return html`<app-expenses></app-expenses>`;
       case 'settings':
         return html`<app-settings></app-settings>`;
+      case 'profile-settings':
+        return html`<app-profile-settings></app-profile-settings>`;
       case 'storybook':
         return html`<app-storybook></app-storybook>`;
       case 'design-tokens':
