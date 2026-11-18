@@ -160,6 +160,7 @@ export class AppReminders extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const templates = store.getRecurrenceTemplates();
+    const useEnNames = t.common.locale.startsWith('en');
 
     const overdueCount = this.reminders.filter((r) => store.isReminderOverdue(r)).length;
     const dueCount = store.getDueRemindersCount();
@@ -367,7 +368,7 @@ export class AppReminders extends LitElement {
                 const entityInfo = store.getReminderEntityInfo(rem.entityType, rem.entityId);
                 const tpl = templates.find((item) => item.code === rem.recurrence.templateCode);
                 const tplLabel = tpl
-                  ? this.currentLang === 'en' && tpl.nameEn
+                  ? useEnNames && tpl.nameEn
                     ? tpl.nameEn
                     : tpl.name
                   : t.reminders.recUnits[rem.recurrence.unit];

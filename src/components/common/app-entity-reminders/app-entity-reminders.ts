@@ -90,6 +90,7 @@ export class AppEntityReminders extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const templates = store.getRecurrenceTemplates();
+    const useEnNames = t.common.locale.startsWith('en');
     const activeCount = this.reminders.filter((r) => r.status === 'active' || r.status === 'snoozed').length;
 
     return html`
@@ -130,7 +131,7 @@ export class AppEntityReminders extends LitElement {
                   });
                   const tpl = templates.find((item) => item.code === rem.recurrence.templateCode);
                   const tplLabel = tpl
-                    ? this.currentLang === 'en' && tpl.nameEn
+                    ? useEnNames && tpl.nameEn
                       ? tpl.nameEn
                       : tpl.name
                     : t.reminders.recUnits[rem.recurrence.unit];

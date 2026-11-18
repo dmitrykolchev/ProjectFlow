@@ -401,6 +401,7 @@ export class AppReminderForm extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const isEdit = Boolean(this.reminder);
+    const useEnNames = t.common.locale.startsWith('en');
     const entityTypeOptions = REMINDER_ENTITY_TYPES.map((et) => ({
       value: et,
       label: t.entityTypes[et] || et,
@@ -419,7 +420,7 @@ export class AppReminderForm extends LitElement {
 
     const templateOptions = store.getRecurrenceTemplates().map((rec) => ({
       value: rec.code,
-      label: this.currentLang === 'en' && rec.nameEn ? rec.nameEn : rec.name,
+      label: useEnNames && rec.nameEn ? rec.nameEn : rec.name,
     }));
 
     const unitOptions: Array<{ value: RecurrenceUnit; label: string }> = (
