@@ -502,33 +502,6 @@ export class AppSettings extends LitElement {
           </div>
         </app-section-card>
 
-        <!-- Language -->
-        <app-section-card variant="panel" title="${t.settings.language}">
-          <div class="options-grid">
-            <div
-              class="option-card ${this.custom.language === 'ru' ? 'is-active' : ''}"
-              @click="${() => store.setLanguage('ru')}"
-            >
-              <div class="option-card-header">
-                <span>${t.settings.langRu}</span>
-                ${this.custom.language === 'ru' ? '✓' : ''}
-              </div>
-              <p class="option-card-desc">${t.viewTexts.settings.langRuDesc}</p>
-            </div>
-
-            <div
-              class="option-card ${this.custom.language === 'en' ? 'is-active' : ''}"
-              @click="${() => store.setLanguage('en')}"
-            >
-              <div class="option-card-header">
-                <span>${t.settings.langEn}</span>
-                ${this.custom.language === 'en' ? '✓' : ''}
-              </div>
-              <p class="option-card-desc">${t.viewTexts.settings.langEnDesc}</p>
-            </div>
-          </div>
-        </app-section-card>
-
         <!-- Default View -->
         <app-section-card variant="panel" title="${t.settings.defaultView}">
           <div class="options-grid">
