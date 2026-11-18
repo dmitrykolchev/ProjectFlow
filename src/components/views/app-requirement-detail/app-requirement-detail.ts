@@ -1040,6 +1040,15 @@ export class AppRequirementDetail extends LitElement {
             `
           : ''}
 
+        <div class="ai-budget-chip">
+          ${t.viewTexts.requirementDetail.aiBudgetChip(
+            store.todayUsage().requests,
+            store.customization.aiBudget.dailyRequests,
+            store.todayUsage().tokens,
+            store.customization.aiBudget.dailyTokens
+          )}
+        </div>
+
         <div class="ai-quick-row">
           <button
             type="button"
