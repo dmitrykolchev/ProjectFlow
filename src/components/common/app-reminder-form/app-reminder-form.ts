@@ -406,13 +406,13 @@ export class AppReminderForm extends LitElement {
       label: t.entityTypes[et] || et,
     }));
     const entityOptions = store.getReminderEntityOptions(this.fEntityType).map((o) => ({
-      id: o.value,
+      value: o.value,
       label: o.label,
       subtitle: o.subtitle,
     }));
 
     const userSelectorOptions = store.users.map((u) => ({
-      id: u.id,
+      value: u.id,
       label: u.name,
       subtitle: u.role,
     }));
