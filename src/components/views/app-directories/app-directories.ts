@@ -43,6 +43,8 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-directory-record-modal/app-directory-record-modal';
+import '../../common/app-table-scroll/app-table-scroll';
+import '../../common/app-table-scroll-column/app-table-scroll-column';
 import styles from './app-directories.css';
 
 type SchemaFilter = 'all' | 'simple' | 'extended';
@@ -275,41 +277,6 @@ export class AppDirectories extends LitElement {
       const valB = String(b[this.sortBy] ?? '');
       return valA.localeCompare(valB) * dirSign;
     });
-  }
-
-  private toggleSort(col: SortColumn) {
-    if (this.sortBy === col) {
-      this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
-    } else {
-      this.sortBy = col;
-      this.sortDir = 'asc';
-    }
-    this.currentPage = 1;
-  }
-
-  private formatCellValue(
-    field: DirectoryFieldDef,
-    value: string | number | boolean | undefined,
-    t: TranslationType
-  ) {
-    if (value === undefined || value === null || value === '') {
-      return html`<span style="color: var(--text-muted);">—</span>`;
-    }
-    if (field.type === 'boolean') {
-      return value
-        ? html`<span class="bool-yes">${t.viewTexts.directories.boolYes}</span>`
-        : html`<span class="bool-no">${t.viewTexts.directories.boolNo}</span>`;
-    }
-    if (field.type === 'select') {
-      const opt = field.options?.find((o) => o.value === String(value));
-      return opt ? this.getOptionLabel(opt, t) : String(value);
-    }
-    if (field.type === 'number') {
-      const num = typeof value === 'number' ? value : parseFloat(String(value));
-      if (Number.isNaN(num)) return String(value);
-      return num.toLocaleString(t.common.locale, { maximumFractionDigits: 6 });
-    }
-    return String(value);
   }
 
   private exportDirectory(format: 'csv' | 'json', dir: DirectoryDefinition, t: TranslationType) {
@@ -596,11 +563,6 @@ export class AppDirectories extends LitElement {
     `;
   }
 
-  private renderSortArrow(col: SortColumn) {
-    if (this.sortBy !== col) return '';
-    return html`<span>${this.sortDir === 'asc' ? '↑' : '↓'}</span>`;
-  }
-
   private renderRecordsWorkspace(dir: DirectoryDefinition, t: TranslationType) {
     const tableFields = dir.fields.filter((f) => f.showInTable !== false);
     const dimensionField = dir.fields.find((f) => f.key === 'dimension');
@@ -677,138 +639,127 @@ export class AppDirectories extends LitElement {
         </span>
       </div>
 
-      ${filtered.length === 0
-        ? html`
-            <div style="padding: 2rem;">
-              <app-empty-state
-                compact
-                title="${t.viewTexts.directories.emptyRecords}"
-              ></app-empty-state>
-            </div>
+      <app-table-scroll
+        .rows="${paged.items as unknown as Record<string, unknown>[]}"
+        sort-by="${this.sortBy}"
+        sort-dir="${this.sortDir}"
+        active-key="isActive"
+        empty-title="${t.viewTexts.directories.emptyRecords}"
+        locale="${t.common.locale}"
+        @sort-change="${(e: CustomEvent<{ field: string; dir: 'asc' | 'desc' }>) => {
+          this.sortBy = e.detail.field as SortColumn;
+          this.sortDir = e.detail.dir;
+          this.currentPage = 1;
+        }}"
+      >
+        <app-table-scroll-column
+          field="code"
+          label="${t.viewTexts.directories.thCode}"
+          code
+          sortable
+        ></app-table-scroll-column>
+        <app-table-scroll-column
+          field="name"
+          label="${t.viewTexts.directories.thName}"
+          sortable
+          .cellRender="${(row: Record<string, unknown>) => {
+            const rec = row as unknown as DirectoryRecord;
+            return html`
+              <div class="cell-name-main">${rec.name}</div>
+              ${rec.description
+                ? html`<div class="cell-name-desc">${rec.description}</div>`
+                : ''}
+            `;
+          }}"
+        ></app-table-scroll-column>
+        <app-table-scroll-column
+          field="nameEn"
+          label="${t.viewTexts.directories.thNameEn}"
+          sortable
+        ></app-table-scroll-column>
+        ${tableFields.map(
+          (field) => html`
+            <app-table-scroll-column
+              field="${field.key}"
+              label="${this.getFieldLabel(field, t)}"
+              type="${field.type}"
+              align="${field.align || 'left'}"
+              yes-label="${t.viewTexts.directories.boolYes}"
+              no-label="${t.viewTexts.directories.boolNo}"
+              ?mono="${Boolean(field.mono)}"
+              .options="${(field.options || []).map((o) => ({
+                value: o.value,
+                label: this.getOptionLabel(o, t),
+              }))}"
+              .valueFn="${(row: Record<string, unknown>) =>
+                (row as unknown as DirectoryRecord).extra?.[field.key]}"
+            ></app-table-scroll-column>
           `
-        : html`
-            <div class="table-scroll">
-              <table class="records-table">
-                <thead>
-                  <tr>
-                    <th>
-                      <button
-                        type="button"
-                        class="sort-btn ${this.sortBy === 'code' ? 'is-sorted' : ''}"
-                        @click="${() => this.toggleSort('code')}"
-                      >
-                        <span>${t.viewTexts.directories.thCode}</span>
-                        ${this.renderSortArrow('code')}
-                      </button>
-                    </th>
-                    <th>
-                      <button
-                        type="button"
-                        class="sort-btn ${this.sortBy === 'name' ? 'is-sorted' : ''}"
-                        @click="${() => this.toggleSort('name')}"
-                      >
-                        <span>${t.viewTexts.directories.thName}</span>
-                        ${this.renderSortArrow('name')}
-                      </button>
-                    </th>
-                    <th>
-                      <button
-                        type="button"
-                        class="sort-btn ${this.sortBy === 'nameEn' ? 'is-sorted' : ''}"
-                        @click="${() => this.toggleSort('nameEn')}"
-                      >
-                        <span>${t.viewTexts.directories.thNameEn}</span>
-                        ${this.renderSortArrow('nameEn')}
-                      </button>
-                    </th>
-                    ${tableFields.map(
-                      (field) => html`
-                        <th class="${field.align === 'right' ? 'align-right' : field.align === 'center' ? 'align-center' : ''}">
-                          ${this.getFieldLabel(field, t)}
-                        </th>
-                      `
-                    )}
-                    <th class="align-right">
-                      <button
-                        type="button"
-                        class="sort-btn ${this.sortBy === 'sortOrder' ? 'is-sorted' : ''}"
-                        @click="${() => this.toggleSort('sortOrder')}"
-                      >
-                        <span>${t.viewTexts.directories.thSortOrder}</span>
-                        ${this.renderSortArrow('sortOrder')}
-                      </button>
-                    </th>
-                    <th class="align-center">${t.viewTexts.directories.thActive}</th>
-                    <th class="align-right">${t.viewTexts.directories.thActions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${paged.items.map(
-                    (rec) => html`
-                      <tr class="${rec.isActive ? '' : 'is-inactive'}">
-                        <td class="cell-code">${rec.code}</td>
-                        <td>
-                          <div class="cell-name-main">${rec.name}</div>
-                          ${rec.description
-                            ? html`<div class="cell-name-desc">${rec.description}</div>`
-                            : ''}
-                        </td>
-                        <td>${rec.nameEn || '—'}</td>
-                        ${tableFields.map(
-                          (field) => html`
-                            <td
-                              class="${field.mono ? 'cell-mono' : ''} ${field.align === 'right'
-                                ? 'align-right'
-                                : field.align === 'center'
-                                ? 'align-center'
-                                : ''}"
-                            >
-                              ${this.formatCellValue(field, rec.extra?.[field.key], t)}
-                            </td>
-                          `
-                        )}
-                        <td class="align-right cell-mono">${rec.sortOrder}</td>
-                        <td class="align-center">
-                          <app-switch
-                            .checked="${rec.isActive}"
-                            @change="${() => store.toggleDirectoryRecordActive(dir.id, rec.id)}"
-                          ></app-switch>
-                        </td>
-                        <td class="align-right">
-                          <div class="row-actions">
-                            <button
-                              type="button"
-                              class="icon-action-btn"
-                              title="${t.viewTexts.directories.actionEdit}"
-                              @click="${() => this.openEditRecordModal(rec)}"
-                            >
-                              ${iconEdit(15)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-action-btn"
-                              title="${t.viewTexts.directories.actionDuplicate}"
-                              @click="${() => this.handleDuplicateRecord(dir, rec, t)}"
-                            >
-                              ${iconCopy(14)}
-                            </button>
-                            <button
-                              type="button"
-                              class="icon-action-btn is-danger"
-                              title="${t.viewTexts.directories.actionDelete}"
-                              @click="${() => (this.confirmDeleteRecord = rec)}"
-                            >
-                              ${iconTrash(15)}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    `
-                  )}
-                </tbody>
-              </table>
-            </div>
+        )}
+        <app-table-scroll-column
+          field="sortOrder"
+          label="${t.viewTexts.directories.thSortOrder}"
+          type="number"
+          align="right"
+          mono
+          sortable
+        ></app-table-scroll-column>
+        <app-table-scroll-column
+          field="isActive"
+          label="${t.viewTexts.directories.thActive}"
+          align="center"
+          .cellRender="${(row: Record<string, unknown>) => {
+            const rec = row as unknown as DirectoryRecord;
+            return html`
+              <app-switch
+                .checked="${rec.isActive}"
+                @change="${() => store.toggleDirectoryRecordActive(dir.id, rec.id)}"
+              ></app-switch>
+            `;
+          }}"
+        ></app-table-scroll-column>
+        <app-table-scroll-column
+          field="actions"
+          label="${t.viewTexts.directories.thActions}"
+          align="right"
+          .cellRender="${(row: Record<string, unknown>) => {
+            const rec = row as unknown as DirectoryRecord;
+            return html`
+              <div class="row-actions">
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  action="delete"
+                  title="${t.viewTexts.directories.actionDelete}"
+                  @click="${() => (this.confirmDeleteRecord = rec)}"
+                >
+                  <span slot="start">${iconTrash(15)}</span>
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.directories.actionDuplicate}"
+                  @click="${() => this.handleDuplicateRecord(dir, rec, t)}"
+                >
+                  <span slot="start">${iconCopy(14)}</span>
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  action="edit"
+                  title="${t.viewTexts.directories.actionEdit}"
+                  @click="${() => this.openEditRecordModal(rec)}"
+                >
+                  <span slot="start">${iconEdit(15)}</span>
+                </app-button>
+              </div>
+            `;
+          }}"
+        ></app-table-scroll-column>
+      </app-table-scroll>
 
+      ${filtered.length > 0
+        ? html`
             <div class="table-footer">
               <app-pagination
                 variant="bare"
@@ -825,7 +776,8 @@ export class AppDirectories extends LitElement {
                 }}"
               ></app-pagination>
             </div>
-          `}
+          `
+        : ''}
     `;
   }
 
