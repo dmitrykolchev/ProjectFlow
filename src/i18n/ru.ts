@@ -177,7 +177,6 @@ export const ru = {
     fieldTags: 'Теги (через запятую)',
     fieldTagsPlaceholder: 'оплата, продление, SLA...',
     fieldTemplate: 'Шаблон из справочника',
-    openDirectoryBtn: 'Справочник шаблонов',
     fieldUnit: 'Периодичность',
     fieldInterval: 'Интервал (каждые N)',
     fieldDaysOfWeek: 'Дни недели',

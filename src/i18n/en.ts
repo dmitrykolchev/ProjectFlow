@@ -177,7 +177,6 @@ export const en = {
     fieldTags: 'Tags (comma-separated)',
     fieldTagsPlaceholder: 'billing, renewal, SLA...',
     fieldTemplate: 'Recurrence template (Directory)',
-    openDirectoryBtn: 'Manage templates',
     fieldUnit: 'Frequency unit',
     fieldInterval: 'Repeat every N',
     fieldDaysOfWeek: 'Days of week',

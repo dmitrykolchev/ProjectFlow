@@ -21,7 +21,6 @@ import {
   iconBell,
   iconBellRing,
   iconCalendar,
-  iconDatabase,
   iconPlus,
   iconRepeat,
   iconTrash,
@@ -38,7 +37,6 @@ import '../app-entity-selector/app-entity-selector';
 import type { AppEntitySelector } from '../app-entity-selector/app-entity-selector';
 import '../app-switch/app-switch';
 import '../app-button/app-button';
-import '../app-link/app-link';
 
 const REMINDER_ENTITY_TYPES: ReminderEntityType[] = [
   'company',
@@ -343,11 +341,6 @@ export class AppReminderForm extends LitElement {
   private removeRule(id: string) {
     if (this.fRules.length <= 1) return;
     this.fRules = this.fRules.filter((r) => r.id !== id);
-  }
-
-  private openTemplatesDirectory() {
-    this.closeModal();
-    store.openDirectory('recurrence_templates');
   }
 
   private handleSave() {
@@ -688,14 +681,6 @@ export class AppReminderForm extends LitElement {
                 <span class="section-title-icon">${iconRepeat(16)}</span>
                 <span>${t.reminders.sectionRecurrence}</span>
               </span>
-              <app-link
-                variant="muted"
-                size="sm"
-                @click="${() => this.openTemplatesDirectory()}"
-              >
-                <span slot="icon-start">${iconDatabase(14)}</span>
-                <span>${t.reminders.openDirectoryBtn}</span>
-              </app-link>
             </div>
 
             <div class="template-row">
