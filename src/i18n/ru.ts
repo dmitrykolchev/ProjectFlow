@@ -169,6 +169,7 @@ export const ru = {
     fieldEntityObject: 'Связанный объект системы',
     fieldNoEntityHint: 'Личное напоминание без привязки к объекту',
     fieldDueAt: 'Дата и время срабатывания',
+    fieldTimeLabel: 'Время',
     fieldPriority: 'Приоритет',
     fieldStatus: 'Статус',
     fieldOwner: 'Владелец',

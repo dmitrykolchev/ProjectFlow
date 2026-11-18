@@ -560,7 +560,7 @@ export class AppReminderForm extends LitElement {
                 ></app-date-input>
                 <app-input
                   type="time"
-                  label="&nbsp;"
+                  label="${t.reminders.fieldTimeLabel}"
                   .value="${this.fDueTime}"
                   @input="${(e: Event) => (this.fDueTime = eventValue(e))}"
                 ></app-input>

@@ -169,6 +169,7 @@ export const en = {
     fieldEntityObject: 'Target system object',
     fieldNoEntityHint: 'Personal reminder without entity binding',
     fieldDueAt: 'Due date & time',
+    fieldTimeLabel: 'Time',
     fieldPriority: 'Priority',
     fieldStatus: 'Status',
     fieldOwner: 'Owner',
