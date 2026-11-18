@@ -35,6 +35,7 @@ import '../app-textarea/app-textarea';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-entity-selector/app-entity-selector';
+import type { AppEntitySelector } from '../app-entity-selector/app-entity-selector';
 import '../app-switch/app-switch';
 import '../app-button/app-button';
 import '../app-link/app-link';
@@ -294,6 +295,28 @@ export class AppReminderForm extends LitElement {
 
   private removeAssignee(userId: string) {
     this.fAssigneeIds = this.fAssigneeIds.filter((id) => id !== userId);
+  }
+
+  private addRuleRecipient(ruleId: string, userId: string) {
+    if (!userId) return;
+    this.fRules = this.fRules.map((r) =>
+      r.id === ruleId
+        ? {
+            ...r,
+            recipientUserIds: r.recipientUserIds?.includes(userId)
+              ? r.recipientUserIds
+              : [...(r.recipientUserIds || []), userId],
+          }
+        : r
+    );
+  }
+
+  private removeRuleRecipient(ruleId: string, userId: string) {
+    this.fRules = this.fRules.map((r) =>
+      r.id === ruleId
+        ? { ...r, recipientUserIds: (r.recipientUserIds || []).filter((id) => id !== userId) }
+        : r
+    );
   }
 
   private addNotificationRule() {
@@ -615,9 +638,14 @@ export class AppReminderForm extends LitElement {
               <div class="col-span-2">
                 <app-entity-selector
                   label="${t.reminders.fieldAssignees}"
-                  value=""
+                  .value="${''}"
                   .options="${userSelectorOptions}"
-                  @change="${(e: Event) => this.addAssignee(eventValue(e))}"
+                  @change="${(e: Event) => {
+                    const picked = eventValue(e);
+                    this.addAssignee(picked);
+                    // the picker is a chip feeder: reset it so the next pick starts clean
+                    (e.composedPath()[0] as AppEntitySelector).value = '';
+                  }}"
                 ></app-entity-selector>
                 ${this.fAssigneeIds.length > 0
                   ? html`
@@ -917,15 +945,35 @@ export class AppReminderForm extends LitElement {
                         ? html`
                             <app-entity-selector
                               size="sm"
-                              .value="${rule.recipientUserIds?.[0] || ''}"
+                              .value="${''}"
                               .options="${userSelectorOptions}"
                               @change="${(e: Event) => {
-                                const val = eventValue(e);
-                                this.updateRule(rule.id, {
-                                  recipientUserIds: val ? [val] : [],
-                                });
+                                const picked = eventValue(e);
+                                this.addRuleRecipient(rule.id, picked);
+                                (e.composedPath()[0] as AppEntitySelector).value = '';
                               }}"
                             ></app-entity-selector>
+                            ${(rule.recipientUserIds || []).length > 0
+                              ? html`
+                                  <div class="chip-list">
+                                    ${(rule.recipientUserIds || []).map((uid) => {
+                                      const user = store.users.find((u) => u.id === uid);
+                                      return html`
+                                        <span class="assignee-chip">
+                                          <span>${user?.name || uid}</span>
+                                          <button
+                                            type="button"
+                                            class="chip-remove-btn"
+                                            @click="${() => this.removeRuleRecipient(rule.id, uid)}"
+                                          >
+                                            ${iconX(12)}
+                                          </button>
+                                        </span>
+                                      `;
+                                    })}
+                                  </div>
+                                `
+                              : ''}
                           `
                         : ''}
                     </div>
