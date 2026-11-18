@@ -1668,6 +1668,11 @@ export const en = {
       aiPlaceholder: 'Ask AI: check missing edge cases, refine acceptance criteria, evaluate NFR trade-offs...',
       aiSendBtn: 'Ask AI',
       aiThinking: 'AI is reviewing requirement...',
+      aiBudgetChip: (reqUsed: number, reqLimit: number, tokUsed: number, tokLimit: number) => {
+        const reqPart = reqLimit > 0 ? `${reqUsed}/${reqLimit}` : `${reqUsed} / ∞`;
+        const tokPart = tokLimit > 0 ? `${tokUsed}/${tokLimit}` : `${tokUsed} / ∞`;
+        return `Today's budget: requests ${reqPart} · tokens ${tokPart}`;
+      },
       aiEmpty: 'Ask a question about this requirement — AI uses the source spec, Knowledge Base, and linked tasks.',
       aiQuickCompleteness: 'Check completeness & gaps',
       aiQuickCriteria: 'Refine acceptance criteria',
@@ -2150,6 +2155,18 @@ export const en = {
       testConnectionBtn: 'Test Connection',
       testingConnection: 'Testing...',
       resetEndpointBtn: 'Default',
+      budgetTitle: 'Daily AI request budget',
+      budgetDesc:
+        'Limits on requests and tokens per day. A value of 0 means no limit.',
+      reqLimitLabel: 'Requests per day',
+      reqLimitHint: '0 — unlimited number of requests',
+      tokLimitLabel: 'Tokens per day',
+      tokLimitHint: '0 — unlimited tokens',
+      usageToday: (req: number, tok: number) =>
+        `Used today: requests ${req} · tokens ${tok}`,
+      budgetExhaustedTag: 'Budget exhausted',
+      busyLabel: (count: number) =>
+        count > 1 ? `AI is processing requests (${count})…` : 'AI is processing a request…',
       connectionOk: (count: number, firstModel: string) =>
         count > 0
           ? `Connected · models found: ${count} (active: ${firstModel})`
@@ -2226,10 +2243,17 @@ export const en = {
         http: (status: number, msg: string) => `AI server error (HTTP ${status}): ${msg}`,
         empty: 'The model returned an empty response.',
         parse: 'Could not parse structured model output.',
+        aborted: 'The request to the AI server was interrupted (300 s timeout). The model is taking too long — try again.',
         missingTaskTitle: 'Enter a task title before generating or analyzing.',
         missingDocInfo: 'Upload a file or fill in the document title and content first.',
         missingSpecText: 'Select a document, upload a file, or paste specification text first.',
         missingSelectedReqs: 'Select at least one requirement to decompose.',
+        budgetExceeded: (reqUsed: number, reqLimit: number, tokUsed: number, tokLimit: number) => {
+          const parts: string[] = [];
+          if (reqLimit > 0) parts.push(`request limit: ${reqUsed}/${reqLimit}`);
+          if (tokLimit > 0) parts.push(`token limit: ${tokUsed}/${tokLimit}`);
+          return `Daily AI budget exhausted (${parts.join(' · ')}). Change the limits in Settings.`;
+        },
       },
     },
   },

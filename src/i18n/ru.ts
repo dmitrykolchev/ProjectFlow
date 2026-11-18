@@ -1668,6 +1668,11 @@ export const ru = {
       aiPlaceholder: 'Спросите AI: какие сценарии не учтены, как сформулировать NFR или проверить критерии приёмки...',
       aiSendBtn: 'Спросить AI',
       aiThinking: 'AI анализирует требование...',
+      aiBudgetChip: (reqUsed: number, reqLimit: number, tokUsed: number, tokLimit: number) => {
+        const reqPart = reqLimit > 0 ? `${reqUsed}/${reqLimit}` : `${reqUsed} / ∞`;
+        const tokPart = tokLimit > 0 ? `${tokUsed}/${tokLimit}` : `${tokUsed} / ∞`;
+        return `Бюджет сегодня: запросы ${reqPart} · токены ${tokPart}`;
+      },
       aiEmpty: 'Задайте вопрос по требованию — AI учитывает исходную спецификацию, базу знаний и связанные задачи.',
       aiQuickCompleteness: 'Проверить полноту и пробелы',
       aiQuickCriteria: 'Улучшить критерии приёмки',
@@ -2150,6 +2155,18 @@ export const ru = {
       testConnectionBtn: 'Проверить подключение',
       testingConnection: 'Проверка...',
       resetEndpointBtn: 'По умолчанию',
+      budgetTitle: 'Дневной бюджет AI-запросов',
+      budgetDesc:
+        'Лимиты на количество запросов и токенов в сутки. Значение 0 означает отсутствие ограничений.',
+      reqLimitLabel: 'Запросов в сутки',
+      reqLimitHint: '0 — без ограничений по количеству запросов',
+      tokLimitLabel: 'Токенов в сутки',
+      tokLimitHint: '0 — без ограничений по токенам',
+      usageToday: (req: number, tok: number) =>
+        `Использовано сегодня: запросов ${req} · токенов ${tok}`,
+      budgetExhaustedTag: 'Бюджет исчерпан',
+      busyLabel: (count: number) =>
+        count > 1 ? `AI выполняет запросы (${count})…` : 'AI выполняет запрос…',
       connectionOk: (count: number, firstModel: string) =>
         count > 0
           ? `Подключено · найдено моделей: ${count} (активная: ${firstModel})`
@@ -2226,10 +2243,17 @@ export const ru = {
           http: (status: number, msg: string) => `Ошибка AI-сервера (HTTP ${status}): ${msg}`,
           empty: 'Модель вернула пустой ответ.',
           parse: 'Не удалось разобрать структурированный ответ модели.',
+          aborted: 'Запрос к AI-серверу был прерван (тайм-аут 300 с). Модель отвечает слишком долго — попробуйте снова.',
           missingTaskTitle: 'Укажите название задачи перед генерацией или анализом.',
           missingDocInfo: 'Загрузите файл или заполните название и текст документа.',
           missingSpecText: 'Выберите документ, загрузите файл или вставьте текст спецификации.',
           missingSelectedReqs: 'Выберите хотя бы одно требование для декомпозиции.',
+          budgetExceeded: (reqUsed: number, reqLimit: number, tokUsed: number, tokLimit: number) => {
+            const parts: string[] = [];
+            if (reqLimit > 0) parts.push(`лимит запросов: ${reqUsed}/${reqLimit}`);
+            if (tokLimit > 0) parts.push(`лимит токенов: ${tokUsed}/${tokLimit}`);
+            return `Дневной бюджет AI исчерпан (${parts.join(' · ')}). Измените лимит в Настройках.`;
+          },
         },
       },
   },
