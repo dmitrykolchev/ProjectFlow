@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { iconCopy } from '../icons';
-import { parseMarkdownBlocks, renderInlineMarkdown } from '../markdown';
+import { parseMarkdownBlocks, renderInlineMarkdown, MarkdownCell } from '../markdown';
 import '../app-button/app-button';
 import '../app-checkbox/app-checkbox';
 import styles from './app-markdown.css';
@@ -105,6 +105,34 @@ export class AppMarkdown extends LitElement {
                   )}
                 </ul>
               `;
+            case 'table': {
+              const alignClass = (align: MarkdownCell['align']) =>
+                align === 'center' ? 'cell-center' : align === 'right' ? 'cell-right' : '';
+              return html`
+                <div class="table-wrap">
+                  <table class="prose-table">
+                    <thead>
+                      <tr>
+                        ${(block.header || []).map(
+                          (cell) => html`<th class="${alignClass(cell.align)}">${renderInlineMarkdown(cell.text)}</th>`
+                        )}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      ${(block.rows || []).map(
+                        (row) => html`
+                          <tr>
+                            ${row.map(
+                              (cell) => html`<td class="${alignClass(cell.align)}">${renderInlineMarkdown(cell.text)}</td>`
+                            )}
+                          </tr>
+                        `
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              `;
+            }
             case 'code': {
               const key = `md-${bIdx}`;
               const isCopied = this.copiedBlockKey === key;

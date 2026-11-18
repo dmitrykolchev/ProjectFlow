@@ -30,6 +30,17 @@ const CHECKLIST_DOC = `## Acceptance checklist
 - [ ] **Audit** logging for admin overrides
 `;
 
+const TABLE_DOC = `## Rate card
+
+| Role | Rate | Hours |
+|---|---|:---:|
+| **Lead** | 2400 ₽/h | 160 |
+| Senior | 1800 ₽/h | 320 |
+| Middle | \`1200 ₽/h\` | 640 |
+
+Totals are aligned right in the third column.
+`;
+
 export const meta: ComponentStoryMeta = {
   title: 'Common/Markdown',
   component: 'app-markdown',
@@ -55,6 +66,11 @@ export const meta: ComponentStoryMeta = {
       name: 'Checklist',
       description: 'Display-only checklist rows with checked / unchecked states',
       render: () => html`<app-markdown .content="${CHECKLIST_DOC}"></app-markdown>`,
+    },
+    {
+      name: 'Table',
+      description: 'GFM pipe table with header row, per-column alignment (default left, center via :---:) and inline markup in cells',
+      render: () => html`<app-markdown .content="${TABLE_DOC}"></app-markdown>`,
     },
     {
       name: 'Plain Paragraphs',

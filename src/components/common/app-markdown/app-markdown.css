@@ -110,6 +110,50 @@ slot {
   line-height: 1.55;
 }
 
+.table-wrap {
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: 8px;
+  overflow-x: auto;
+  background: var(--bg-surface, #111827);
+}
+
+.prose-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.prose-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-subtle, rgba(15, 23, 42, 0.65));
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.prose-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  color: var(--text-secondary);
+}
+
+.prose-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.prose-table th.cell-center,
+.prose-table td.cell-center {
+  text-align: center;
+}
+
+.prose-table th.cell-right,
+.prose-table td.cell-right {
+  text-align: right;
+}
+
 .code-block-wrap {
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: 8px;

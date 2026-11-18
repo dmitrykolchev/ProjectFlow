@@ -1,16 +1,46 @@
 import { html, TemplateResult } from 'lit';
 
+export interface MarkdownCell {
+  text: string;
+  align: 'left' | 'center' | 'right';
+}
+
 export interface MarkdownBlock {
-  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code';
+  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table';
   text?: string;
   lang?: string;
   items?: { text: string; checked?: boolean }[];
+  header?: MarkdownCell[];
+  rows?: MarkdownCell[][];
+}
+
+/** GFM pipe-table row: `| a | b |` — cells split on pipes, outer pipes stripped. */
+function splitTableRow(trimmed: string): string[] {
+  let body = trimmed;
+  if (body.startsWith('|')) body = body.slice(1);
+  if (body.endsWith('|')) body = body.slice(0, -1);
+  return body.split('|').map((cell) => cell.trim());
+}
+
+/** Separator row `|---|:-:|` marks a table; per-cell colons set the alignment. */
+function isTableSeparator(trimmed: string): boolean {
+  if (!trimmed.startsWith('|') || trimmed.length < 3) return false;
+  const cells = splitTableRow(trimmed);
+  return cells.length > 0 && cells.every((cell) => /^:?-+:?$/.test(cell));
+}
+
+function cellAlignsFromSeparator(trimmed: string): MarkdownCell['align'][] {
+  return splitTableRow(trimmed).map((cell) => {
+    if (cell.startsWith(':') && cell.endsWith(':')) return 'center';
+    if (cell.endsWith(':')) return 'right';
+    return 'left';
+  });
 }
 
 /**
  * Split raw markdown into top-level blocks: headings, paragraphs, quotes,
- * bullet / numbered lists, checklists and fenced code. Inline markup is left
- * intact for `renderInlineMarkdown`.
+ * bullet / numbered lists, checklists, fenced code and GFM pipe tables.
+ * Inline markup is left intact for `renderInlineMarkdown`.
  */
 export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
   const lines = (raw || '').split('\n');
@@ -96,6 +126,24 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       continue;
     }
 
+    if (trimmed.startsWith('|') && i + 1 < lines.length && isTableSeparator(lines[i + 1].trim())) {
+      const aligns = cellAlignsFromSeparator(lines[i + 1].trim());
+      const headerCells = splitTableRow(trimmed);
+      const header: MarkdownCell[] = headerCells.map((text, cIdx) => ({
+        text,
+        align: aligns[cIdx] || 'left',
+      }));
+      i += 2;
+      const rows: MarkdownCell[][] = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        const cells = splitTableRow(lines[i].trim());
+        rows.push(cells.map((text, cIdx) => ({ text, align: aligns[cIdx] || 'left' })));
+        i += 1;
+      }
+      blocks.push({ type: 'table', header, rows });
+      continue;
+    }
+
     const paraLines: string[] = [trimmed];
     i += 1;
     while (
@@ -104,6 +152,7 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       !lines[i].trim().startsWith('#') &&
       !lines[i].trim().startsWith('>') &&
       !lines[i].trim().startsWith('```') &&
+      !lines[i].trim().startsWith('|') &&
       !/^[-*] /.test(lines[i].trim()) &&
       !/^\d+\. /.test(lines[i].trim())
     ) {
