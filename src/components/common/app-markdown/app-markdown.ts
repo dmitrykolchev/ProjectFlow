@@ -3,14 +3,16 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { iconCopy } from '../icons';
-import { parseMarkdownBlocks, renderInlineMarkdown, MarkdownCell } from '../markdown';
+import { parseMarkdownBlocks, renderInlineMarkdown, renderMath, MarkdownCell } from '../markdown';
 import '../app-button/app-button';
 import '../app-checkbox/app-checkbox';
 import styles from './app-markdown.css';
+import katexStyles from './katex.css';
 
 /**
  * Canonical markdown renderer web component: headings, paragraphs, quotes,
- * bullet / numbered lists, checklists (display-only checkboxes) and fenced
+ * bullet / numbered lists, checklists (display-only checkboxes), GFM pipe
+ * tables, LaTeX math (KaTeX, inline `$...$` and display `$$...$$`) and fenced
  * code blocks with a copy action. The markdown source is passed as the
  * `content` property or declared directly as light-DOM children; the
  * component owns its prose styling.
@@ -26,7 +28,7 @@ export class AppMarkdown extends LitElement {
 
   private unsubscribe?: () => void;
 
-  static styles = styles;
+  static styles = [styles, katexStyles];
 
   connectedCallback() {
     super.connectedCallback();
@@ -105,6 +107,8 @@ export class AppMarkdown extends LitElement {
                   )}
                 </ul>
               `;
+            case 'math':
+              return html`<div class="math-block">${renderMath(block.text || '', true)}</div>`;
             case 'table': {
               const alignClass = (align: MarkdownCell['align']) =>
                 align === 'center' ? 'cell-center' : align === 'right' ? 'cell-right' : '';

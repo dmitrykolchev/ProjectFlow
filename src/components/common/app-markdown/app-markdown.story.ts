@@ -41,11 +41,23 @@ const TABLE_DOC = `## Rate card
 Totals are aligned right in the third column.
 `;
 
+const MATH_DOC = `## Sizing model
+
+Inline math: utilization $\\rho = \\lambda / \\mu$ stays below 1, and the mean
+response time is $T = \\frac{1}{\\mu - \\lambda}$ milliseconds.
+
+$$
+T = \\frac{1}{\\mu - \\lambda}
+$$
+
+Bracket fence form: \\[ \\sum_{i=1}^{n} i = \\frac{n(n+1)}{2} \\]
+`;
+
 export const meta: ComponentStoryMeta = {
   title: 'Common/Markdown',
   component: 'app-markdown',
   description:
-    'Canonical markdown renderer: headings, paragraphs, quotes, bullet / numbered lists, checklists (display-only) and fenced code blocks with a copy action. Markdown source is passed as the content property.',
+    'Canonical markdown renderer: headings, paragraphs, quotes, bullet / numbered lists, checklists (display-only), GFM pipe tables, LaTeX math via KaTeX and fenced code blocks with a copy action. Markdown source is passed as the content property.',
   category: 'Common',
   propsDoc: {
     content: 'Markdown source text; empty content renders nothing',
@@ -71,6 +83,11 @@ export const meta: ComponentStoryMeta = {
       name: 'Table',
       description: 'GFM pipe table with header row, per-column alignment (default left, center via :---:) and inline markup in cells',
       render: () => html`<app-markdown .content="${TABLE_DOC}"></app-markdown>`,
+    },
+    {
+      name: 'Math',
+      description: 'KaTeX LaTeX: inline $...$ inside prose, display $$...$$ fence and \\[ ... \\] fence, fonts bundled offline',
+      render: () => html`<app-markdown .content="${MATH_DOC}"></app-markdown>`,
     },
     {
       name: 'Plain Paragraphs',

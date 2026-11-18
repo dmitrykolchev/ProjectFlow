@@ -1,4 +1,6 @@
 import { html, TemplateResult } from 'lit';
+import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import { renderToString } from 'katex';
 
 export interface MarkdownCell {
   text: string;
@@ -6,7 +8,7 @@ export interface MarkdownCell {
 }
 
 export interface MarkdownBlock {
-  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table';
+  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table' | 'math';
   text?: string;
   lang?: string;
   items?: { text: string; checked?: boolean }[];
@@ -38,6 +40,45 @@ function cellAlignsFromSeparator(trimmed: string): MarkdownCell['align'][] {
 }
 
 /**
+ * Display math fence `$$ ... $$` / `\[ ... \]`: a single-line fence closes on
+ * the same line, otherwise lines are collected up to the closing delimiter.
+ */
+function readMathFence(
+  lines: string[],
+  start: number,
+  open: string,
+  close: string
+): { text: string; next: number } {
+  const first = lines[start].trim().slice(open.length);
+  if (first.endsWith(close) && first.length > close.length) {
+    return { text: first.slice(0, -close.length), next: start + 1 };
+  }
+  const mathLines: string[] = [];
+  let j = start + 1;
+  while (j < lines.length && !lines[j].trim().endsWith(close)) {
+    mathLines.push(lines[j]);
+    j += 1;
+  }
+  if (j < lines.length) {
+    const last = lines[j].trim();
+    mathLines.push(last.length > close.length ? last.slice(0, -close.length) : '');
+    j += 1;
+  }
+  return { text: mathLines.join('\n'), next: j };
+}
+
+/** Render LaTeX through KaTeX (offline, no throw on invalid input). */
+export function renderMath(latex: string, displayMode: boolean): TemplateResult {
+  try {
+    return html`<span class="${displayMode ? 'math-display' : 'math-inline'}">${unsafeHTML(
+      renderToString(latex, { displayMode, throwOnError: false })
+    )}</span>`;
+  } catch {
+    return html`<code>${latex}</code>`;
+  }
+}
+
+/**
  * Split raw markdown into top-level blocks: headings, paragraphs, quotes,
  * bullet / numbered lists, checklists, fenced code and GFM pipe tables.
  * Inline markup is left intact for `renderInlineMarkdown`.
@@ -66,6 +107,20 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       }
       i += 1;
       blocks.push({ type: 'code', lang, text: codeLines.join('\n') });
+      continue;
+    }
+
+    if (trimmed.startsWith('$$')) {
+      const fence = readMathFence(lines, i, '$$', '$$');
+      blocks.push({ type: 'math', text: fence.text });
+      i = fence.next;
+      continue;
+    }
+
+    if (trimmed.startsWith('\\[')) {
+      const fence = readMathFence(lines, i, '\\[', '\\]');
+      blocks.push({ type: 'math', text: fence.text });
+      i = fence.next;
       continue;
     }
 
@@ -153,6 +208,8 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       !lines[i].trim().startsWith('>') &&
       !lines[i].trim().startsWith('```') &&
       !lines[i].trim().startsWith('|') &&
+      !lines[i].trim().startsWith('$$') &&
+      !lines[i].trim().startsWith('\\[') &&
       !/^[-*] /.test(lines[i].trim()) &&
       !/^\d+\. /.test(lines[i].trim())
     ) {
@@ -165,15 +222,21 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
   return blocks;
 }
 
-/** Inline markdown: `code` spans and **bold** runs become elements, the rest stays text. */
+/** Inline markdown: `code` spans, **bold** runs and `$...$` / `\( ... \)` math become elements. */
 export function renderInlineMarkdown(text: string): (string | TemplateResult)[] {
-  const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+  const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\$[^$\n]+\$|\\\([^)]*\\\))/g);
   return tokens.map((part) => {
     if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
       return html`<code>${part.slice(1, -1)}</code>`;
     }
     if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
       return html`<strong>${part.slice(2, -2)}</strong>`;
+    }
+    if (part.startsWith('$') && part.endsWith('$') && part.length >= 3) {
+      return renderMath(part.slice(1, -1), false);
+    }
+    if (part.startsWith('\\(') && part.endsWith('\\)') && part.length >= 4) {
+      return renderMath(part.slice(2, -2), false);
     }
     return part;
   });

@@ -110,6 +110,16 @@ slot {
   line-height: 1.55;
 }
 
+.math-block {
+  overflow-x: auto;
+  padding: 0.2rem 0;
+  color: var(--text-primary);
+}
+
+.math-block .katex-display {
+  margin: 0.15rem 0;
+}
+
 .table-wrap {
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: 8px;
