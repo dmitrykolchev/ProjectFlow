@@ -144,6 +144,7 @@ export class AppHeader extends LitElement {
       'time-tracking': t.navigation.timeTracking,
       expenses: t.navigation.expenses,
       settings: t.navigation.settings,
+      'profile-settings': t.profileSettings.crumbLabel,
       storybook: t.navigation.storybook,
       'design-tokens': t.navigation.designTokens,
       'material-icons': t.navigation.materialIcons,

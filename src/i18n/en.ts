@@ -265,6 +265,7 @@ export const en = {
     thLogged: 'Logged',
   },
   profileSettings: {
+    crumbLabel: 'Profile',
     subtitle: 'Personal user parameters: regional and business settings for working with the app',
     profileCardTitle: 'User card',
     profileCardDesc: 'Name and role of the current account — from the employee directory',
