@@ -208,6 +208,7 @@ export const en = {
     actionComplete: 'Complete',
     actionAdvanceCycle: 'Complete Cycle → Next',
     actionSnooze: 'Snooze',
+    snoozeOneHourBtn: '+1h',
     actionPause: 'Pause',
     actionResume: 'Resume',
     actionTestNotify: 'Test Notification',

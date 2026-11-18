@@ -208,6 +208,7 @@ export const ru = {
     actionComplete: 'Выполнить',
     actionAdvanceCycle: 'Выполнить этап → След.',
     actionSnooze: 'Отложить',
+    snoozeOneHourBtn: '+1 ч',
     actionPause: 'Пауза',
     actionResume: 'Возобновить',
     actionTestNotify: 'Тест уведомления',

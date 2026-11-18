@@ -220,7 +220,7 @@ export class AppEntityReminders extends LitElement {
                                   @click="${() => this.snoozeOneHour(rem)}"
                                 >
                                   <span slot="icon-start">${iconClock(13)}</span>
-                                  <span>+1h</span>
+                                  <span>${t.reminders.snoozeOneHourBtn}</span>
                                 </app-button>
                                 ${isRecurring
                                   ? html`
