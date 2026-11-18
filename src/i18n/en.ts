@@ -78,7 +78,7 @@ export const en = {
     settings: 'Settings',
     profileSettings: 'Profile Settings',
     activity: 'Activity Log',
-    storybook: 'Component Storybook',
+    storybook: 'Storybook',
     designTokens: 'Design Tokens',
     materialIcons: 'Material Symbols',
     groupWorkspace: 'Workspace',

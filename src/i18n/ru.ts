@@ -78,7 +78,7 @@ export const ru = {
     settings: 'Настройки',
     profileSettings: 'Настройки профиля',
     activity: 'Журнал активности',
-    storybook: 'Storybook компонентов',
+    storybook: 'Storybook',
     designTokens: 'Design Tokens',
     materialIcons: 'Material Symbols',
     groupWorkspace: 'Рабочая область',
