@@ -109,7 +109,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.22rem 0.45rem 0.22rem 0.28rem;
+  padding: 0.22rem 0.45rem;
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #334155);
   border-radius: var(--radius-sm, 6px);
