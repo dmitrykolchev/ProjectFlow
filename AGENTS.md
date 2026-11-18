@@ -153,6 +153,25 @@ render() {
   Нативные input/change события из shadow DOM не имеют `detail` — прямой
   `e.detail.value` падает с TypeError.
 
+**Универсальное выравнивание контролов (ghost label):**
+
+Контролы без собственного лейбла-строки (app-switch и т.п.) выравниваются по
+сетке формы через **призрачный лейбл**: реальная строка `<label>` с тем же
+текстом и той же типографией, что у `app-input` (`font-size 0.8125rem`,
+`font-weight 500`), но с `visibility: hidden` — она участвует в лайауте и
+держит высоту лейбл-строки, оставаясь невидимой. Кэпшен контрола — стандартный
+(`label` свойство контрола, видимость внутри). Никаких магических
+`min-height`/px-чисел: выравнивание по верху `input-wrapper` получается
+само собой, rem-база не важна.
+
+- Шаблон boolean-поля: `<div class="switch-field"><label>${label}</label><div
+  class="switch-box"><app-switch label="${label}" ...>`; `.switch-field` — flex
+  column с тем же `gap`, что у form-group `app-input`; `.switch-box` —
+  `height: var(--control-height-md)` + фон/рамка/радиус как у `.input-wrapper`.
+- Индикатор активности записи («Запись активна») — исключение: чистый
+  `app-switch` на всю строку (`col-span-2`, `width: 100%`), **без** ghost-лейбла
+  и **без** рамки/бокса.
+
 ## 5. Confirm-диалоги
 
 - **Нативный `confirm()` запрещён везде.** Только `app-confirm-dialog`.
