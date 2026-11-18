@@ -49,6 +49,7 @@ import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-document-form/app-document-form';
 import '../../common/app-modal/app-modal';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-project-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -829,6 +830,8 @@ export class AppProjectDetail extends LitElement {
 
         <!-- Project Document Library (including Time Entry & Expense attachments) -->
         ${this.renderProjectDocumentsSection(proj, t)}
+
+        <app-entity-reminders entity-type="project" .entityId="${proj.id}"></app-entity-reminders>
       </div>
 
       ${this.renderEditModal(t)}

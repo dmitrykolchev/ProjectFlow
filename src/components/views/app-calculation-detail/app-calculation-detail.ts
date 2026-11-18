@@ -32,6 +32,7 @@ import '../../common/app-calculation-form/app-calculation-form';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-calculation-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -501,6 +502,8 @@ export class AppCalculationDetail extends LitElement {
               </app-section-card>
             `
           : ''}
+
+        <app-entity-reminders entity-type="calculation" .entityId="${calc.id}"></app-entity-reminders>
 
         ${this.renderEditModal(t)}
 

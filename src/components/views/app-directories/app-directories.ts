@@ -80,6 +80,7 @@ const MODULE_ROUTE_MAP: Record<string, ActiveView> = {
   expenses: 'expenses',
   documents: 'documents',
   knowledgeBase: 'knowledge-base',
+  reminders: 'reminders',
 };
 
 @customElement('app-directories')

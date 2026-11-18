@@ -45,6 +45,7 @@ import '../../common/app-section-card/app-section-card';
 import '../../common/app-bank-requisites/app-bank-requisites';
 import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
 import '../../common/app-counterparty-contacts/app-counterparty-contacts';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import type { AppCounterpartyContacts } from '../../common/app-counterparty-contacts/app-counterparty-contacts';
 import styles from './app-counterparty-detail.css';
 import { eventValue } from '../../common/event-value';
@@ -686,6 +687,8 @@ export class AppCounterpartyDetail extends LitElement {
                 </div>
               `}
         </app-section-card>
+
+        <app-entity-reminders entity-type="counterparty" .entityId="${cp.id}"></app-entity-reminders>
       </div>
 
       ${this.renderEditModal(t)}

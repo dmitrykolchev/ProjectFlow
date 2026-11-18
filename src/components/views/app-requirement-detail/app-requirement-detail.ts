@@ -59,6 +59,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-requirement-detail.css';
 
 @customElement('app-requirement-detail')
@@ -536,6 +537,7 @@ export class AppRequirementDetail extends LitElement {
           <aside class="side-column">
             ${this.renderTraceabilitySidebarCard(req, sourceDoc, linkedKbs, t)}
             ${this.renderCoverageSidebarCard(req, linkedTasks, doneTasks, completionPct, totalEst, totalLogged, t)}
+            <app-entity-reminders entity-type="requirement" .entityId="${req.id}"></app-entity-reminders>
           </aside>
         </div>
       </div>

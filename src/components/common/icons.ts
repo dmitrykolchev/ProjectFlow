@@ -896,4 +896,76 @@ export function iconFacebookLogo(size: number | IconSize = 18): TemplateResult {
   `;
 }
 
+export function iconRepeat(size: number | IconSize = 16): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="17 1 21 5 17 9"/>
+      <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+      <polyline points="7 23 3 19 7 15"/>
+      <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+    </svg>
+  `;
+}
+
+export function iconPause(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="6" y="4" width="4" height="16" rx="1"/>
+      <rect x="14" y="4" width="4" height="16" rx="1"/>
+    </svg>
+  `;
+}
+
+export function iconPlay(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="6 3 20 12 6 21 6 3"/>
+    </svg>
+  `;
+}
+
+export function iconBellRing(size: number | IconSize = 16): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+      <path d="M4 2C2.8 3.7 2 5.7 2 8"/>
+      <path d="M22 8c0-2.3-.8-4.3-2-6"/>
+    </svg>
+  `;
+}
+
+export function iconMail(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+    </svg>
+  `;
+}
+
+export function iconSmartphone(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+      <line x1="12" y1="18" x2="12.01" y2="18"/>
+    </svg>
+  `;
+}
+
+export function iconLink(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+    </svg>
+  `;
+}
 

@@ -59,6 +59,7 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-task-ai-panel/app-task-ai-panel';
 import '../../common/app-markdown/app-markdown';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
 import { downloadDocumentFile } from '../../common/document-utils';
@@ -781,6 +782,8 @@ export class AppTaskDetail extends LitElement {
             </app-section-card>
 
             ${this.renderTraceabilitySidebarCard(task, t)}
+
+            <app-entity-reminders entity-type="task" .entityId="${task.id}"></app-entity-reminders>
           </aside>
         </div>
       </div>

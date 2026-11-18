@@ -28,6 +28,7 @@ import {
   iconGrid,
   iconCalculator,
   iconDatabase,
+  iconBell,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -59,6 +60,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
   'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
   documents: () => import('./components/views/app-documents/app-documents'),
+  reminders: () => import('./components/views/app-reminders/app-reminders'),
   companies: () => import('./components/views/app-companies/app-companies'),
   'company-detail': () => import('./components/views/app-company-detail/app-company-detail'),
   employees: () => import('./components/views/app-employees/app-employees'),
@@ -92,6 +94,7 @@ export class AppRoot extends LitElement {
   @state() private chatCount = store.chatMessages.length;
   @state() private knowledgeCount = store.knowledgeArticles.length;
   @state() private documentCount = store.documents.length;
+  @state() private dueRemindersCount = store.getDueRemindersCount();
   @state() private isAuthenticated = store.isAuthenticated;
   @state() private loadedViews: Set<ActiveView> = new Set();
 
@@ -121,6 +124,7 @@ export class AppRoot extends LitElement {
     this.chatCount = store.chatMessages.length;
     this.knowledgeCount = store.knowledgeArticles.length;
     this.documentCount = store.documents.length;
+    this.dueRemindersCount = store.getDueRemindersCount();
     this.isAuthenticated = store.isAuthenticated;
     if (this.isAuthenticated) {
       this.ensureViewLoaded(this.activeView);
@@ -305,6 +309,13 @@ export class AppRoot extends LitElement {
             badge="${String(this.documentCount)}"
             .icon="${iconFolderOpen()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="reminders"
+            label="${t.navigation.reminders}"
+            badge="${this.dueRemindersCount > 0 ? String(this.dueRemindersCount) : ''}"
+            .icon="${iconBell()}"
+          ></sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
@@ -467,6 +478,8 @@ export class AppRoot extends LitElement {
         return html`<app-knowledge-base></app-knowledge-base>`;
       case 'documents':
         return html`<app-documents></app-documents>`;
+      case 'reminders':
+        return html`<app-reminders></app-reminders>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
       case 'company-detail':

@@ -85,6 +85,8 @@ import contextChipsListMeta from '../../common/app-context-chips-list/app-contex
 import draggableListItemMeta from '../../common/app-draggable-list-item/app-draggable-list-item.story';
 import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
 import directoryRecordModalMeta from '../../common/app-directory-record-modal/app-directory-record-modal.story';
+import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.story';
+import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
@@ -128,6 +130,7 @@ import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
 import profileSettingsMeta from '../app-profile-settings/app-profile-settings.story';
 import directoriesMeta from '../app-directories/app-directories.story';
+import remindersMeta from '../app-reminders/app-reminders.story';
 import authMeta from '../app-auth/app-auth.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
@@ -175,6 +178,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   expenseFormMeta,
   documentFormMeta,
   decomposeFormMeta,
+  reminderFormMeta,
   tagsRowMeta,
   colorSwatchesMeta,
   emptyStateMeta,
@@ -205,6 +209,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   draggableListItemMeta,
   draggableListMeta,
   directoryRecordModalMeta,
+  entityRemindersMeta,
   tableScrollMeta,
   toastMeta,
   activityMeta,
@@ -243,6 +248,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   calculationDetailMeta,
   paymentsMeta,
   directoriesMeta,
+  remindersMeta,
   timeTrackingMeta,
   expensesMeta,
   settingsMeta,

@@ -352,6 +352,113 @@ export function createInitialDirectories(): DirectoryDefinition[] {
         }),
       ],
     },
+    {
+      id: 'recurrence_templates',
+      code: 'DICT_RECURRENCE_TEMPLATES',
+      group: 'operations',
+      schemaType: 'extended',
+      catalogKey: 'recurrence_templates',
+      usedInKeys: ['reminders', 'contracts', 'payments'],
+      isSystem: true,
+      fields: [
+        {
+          key: 'unit',
+          labelKey: 'recurrenceUnit',
+          type: 'select',
+          required: true,
+          showInTable: true,
+          defaultValue: 'week',
+          options: [
+            { value: 'none', labelKey: 'recUnitNone' },
+            { value: 'day', labelKey: 'unitDay' },
+            { value: 'week', labelKey: 'unitWeek' },
+            { value: 'month', labelKey: 'unitMonth' },
+            { value: 'quarter', labelKey: 'unitQuarter' },
+            { value: 'year', labelKey: 'unitYear' },
+          ],
+        },
+        {
+          key: 'interval',
+          labelKey: 'recurrenceInterval',
+          type: 'number',
+          required: true,
+          mono: true,
+          align: 'right',
+          showInTable: true,
+          min: 1,
+          max: 365,
+          step: 1,
+          defaultValue: 1,
+        },
+        {
+          key: 'defaultLeadMinutes',
+          labelKey: 'defaultLeadMinutes',
+          type: 'number',
+          required: true,
+          mono: true,
+          align: 'right',
+          showInTable: true,
+          min: 0,
+          step: 15,
+          defaultValue: 30,
+        },
+        {
+          key: 'skipWeekends',
+          labelKey: 'skipWeekends',
+          type: 'boolean',
+          align: 'center',
+          showInTable: true,
+          defaultValue: false,
+        },
+        {
+          key: 'isRecurring',
+          labelKey: 'isRecurringTemplate',
+          type: 'boolean',
+          align: 'center',
+          showInTable: true,
+          defaultValue: true,
+        },
+      ],
+      updatedAt: BASE_TIME,
+      records: [
+        rec('rect-1', 'ONCE', 'Разовое (без повтора)', 'One-time (No repeat)', 10, {
+          description: 'Срабатывает один раз в указанную дату и время',
+          extra: { unit: 'none', interval: 1, defaultLeadMinutes: 30, skipWeekends: false, isRecurring: false },
+        }),
+        rec('rect-2', 'DAILY', 'Ежедневно', 'Daily', 20, {
+          description: 'Повторяется каждый календарный день',
+          extra: { unit: 'day', interval: 1, defaultLeadMinutes: 15, skipWeekends: false, isRecurring: true },
+        }),
+        rec('rect-3', 'WEEKDAYS', 'По рабочим дням (Пн–Пт)', 'Weekdays (Mon–Fri)', 30, {
+          description: 'Только в будние дни с переносом выходных',
+          extra: { unit: 'week', interval: 1, defaultLeadMinutes: 15, skipWeekends: true, isRecurring: true },
+        }),
+        rec('rect-4', 'WEEKLY', 'Еженедельно', 'Weekly', 40, {
+          description: 'Регулярное еженедельное напоминание в выбранные дни',
+          extra: { unit: 'week', interval: 1, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
+        }),
+        rec('rect-5', 'BIWEEKLY', 'Раз в 2 недели (спринт)', 'Biweekly (Sprint)', 50, {
+          description: 'Синхронизация по 2-недельным спринтам и проверкам',
+          extra: { unit: 'week', interval: 2, defaultLeadMinutes: 120, skipWeekends: false, isRecurring: true },
+        }),
+        rec('rect-6', 'MONTHLY', 'Ежемесячно', 'Monthly', 60, {
+          description: 'Закрытие периода, сверка актов, оплата и отчётность',
+          extra: { unit: 'month', interval: 1, defaultLeadMinutes: 1440, skipWeekends: true, isRecurring: true },
+        }),
+        rec('rect-7', 'QUARTERLY', 'Ежеквартально', 'Quarterly', 70, {
+          description: 'Квартальные бюджеты, налоги, SLA-отчёты и продления',
+          extra: { unit: 'quarter', interval: 1, defaultLeadMinutes: 4320, skipWeekends: true, isRecurring: true },
+        }),
+        rec('rect-8', 'YEARLY', 'Ежегодно', 'Yearly / Annual', 80, {
+          description: 'Продление лицензий, договоров, доменов и сертификатов',
+          extra: { unit: 'year', interval: 1, defaultLeadMinutes: 10080, skipWeekends: false, isRecurring: true },
+        }),
+        rec('rect-9', 'CUSTOM', 'Своё правило интервала', 'Custom Schedule', 90, {
+          description: 'Произвольный шаг, дни недели, число месяца и лимит повторов',
+          extra: { unit: 'day', interval: 3, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
+        }),
+      ],
+    },
 
     // =========================================================================
     // 3. FINANCE & BILLING

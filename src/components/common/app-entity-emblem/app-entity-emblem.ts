@@ -3,14 +3,19 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import {
+  iconBell,
   iconBuilding,
   iconCalculator,
+  iconCreditCard,
   iconFileText,
   iconFolder,
   iconHandshake,
   iconKanban,
   iconLayers,
+  iconReceipt,
   iconUser,
+  iconUsers,
+  iconWallet,
 } from '../icons';
 import styles from './app-entity-emblem.css';
 
@@ -20,8 +25,14 @@ export type EntityEmblemKind =
   | 'requirement'
   | 'company'
   | 'counterparty'
+  | 'contact'
   | 'contract'
   | 'calculation'
+  | 'invoice'
+  | 'payment'
+  | 'document'
+  | 'expense'
+  | 'reminder'
   | 'employee';
 
 @customElement('app-entity-emblem')
@@ -88,10 +99,22 @@ export class AppEntityEmblem extends LitElement {
         return iconBuilding(iconSize);
       case 'counterparty':
         return iconHandshake(iconSize);
+      case 'contact':
+        return iconUsers(iconSize);
       case 'contract':
         return iconFileText(iconSize);
       case 'calculation':
         return iconCalculator(iconSize);
+      case 'invoice':
+        return iconReceipt(iconSize);
+      case 'payment':
+        return iconCreditCard(iconSize);
+      case 'document':
+        return iconFileText(iconSize);
+      case 'expense':
+        return iconWallet(iconSize);
+      case 'reminder':
+        return iconBell(iconSize);
       case 'employee':
       default:
         return iconUser(iconSize);

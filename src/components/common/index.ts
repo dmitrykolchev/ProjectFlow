@@ -94,6 +94,8 @@ export {
   type AttachmentsChangeDetail,
 } from './app-project-attachments/app-project-attachments';
 export { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
+export { AppReminderForm } from './app-reminder-form/app-reminder-form';
+export { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 export { AppTableScroll, type SortDirection, type SortChangeDetail } from './app-table-scroll/app-table-scroll';
 export {
   AppTableScrollColumn,
@@ -161,6 +163,8 @@ import { AppBankRequisites } from './app-bank-requisites/app-bank-requisites';
 import { AppCounterpartyContacts } from './app-counterparty-contacts/app-counterparty-contacts';
 import { AppProjectAttachments } from './app-project-attachments/app-project-attachments';
 import { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
+import { AppReminderForm } from './app-reminder-form/app-reminder-form';
+import { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 import { AppTableScroll } from './app-table-scroll/app-table-scroll';
 import { AppTableScrollColumn } from './app-table-scroll-column/app-table-scroll-column';
 
@@ -214,6 +218,8 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-counterparty-contacts': AppCounterpartyContacts,
   'app-project-attachments': AppProjectAttachments,
   'app-directory-record-modal': AppDirectoryRecordModal,
+  'app-reminder-form': AppReminderForm,
+  'app-entity-reminders': AppEntityReminders,
   'app-table-scroll': AppTableScroll,
   'app-table-scroll-column': AppTableScrollColumn,
 } as const;

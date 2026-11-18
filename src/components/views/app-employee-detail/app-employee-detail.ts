@@ -28,6 +28,7 @@ import '../../common/app-meta-grid/app-meta-grid';
 import '../../common/app-avatar/app-avatar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-employee-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -492,6 +493,8 @@ export class AppEmployeeDetail extends LitElement {
                 </div>
               `}
         </app-section-card>
+
+        <app-entity-reminders entity-type="employee" .entityId="${emp.id}"></app-entity-reminders>
       </div>
 
       ${this.renderEditModal(t)}

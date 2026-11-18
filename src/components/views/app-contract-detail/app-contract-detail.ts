@@ -54,6 +54,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import styles from './app-contract-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -1250,6 +1251,8 @@ export class AppContractDetail extends LitElement {
                 `}
           </app-section-card>
         </div>
+
+        <app-entity-reminders entity-type="contract" .entityId="${ctr.id}"></app-entity-reminders>
       </div>
 
       ${this.renderCalculationFormModal(ctr, t)}

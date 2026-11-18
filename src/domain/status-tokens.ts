@@ -20,7 +20,9 @@ export type StatusDomain =
   | 'employee'
   | 'document'
   | 'requirement'
-  | 'requirementPriority';
+  | 'requirementPriority'
+  | 'reminder'
+  | 'reminderPriority';
 
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
@@ -134,6 +136,19 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     medium: { variant: 'info', i18nPath: ['requirements', 'priorities'] },
     high: { variant: 'warning', i18nPath: ['requirements', 'priorities'] },
     critical: { variant: 'danger', i18nPath: ['requirements', 'priorities'] },
+  },
+  reminder: {
+    active: { variant: 'primary', i18nPath: ['reminders', 'statuses'] },
+    snoozed: { variant: 'warning', i18nPath: ['reminders', 'statuses'] },
+    completed: { variant: 'success', i18nPath: ['reminders', 'statuses'] },
+    paused: { variant: 'default', i18nPath: ['reminders', 'statuses'] },
+    cancelled: { variant: 'danger', i18nPath: ['reminders', 'statuses'] },
+  },
+  reminderPriority: {
+    low: { variant: 'default', i18nPath: ['priority'] },
+    medium: { variant: 'info', i18nPath: ['priority'] },
+    high: { variant: 'warning', i18nPath: ['priority'] },
+    urgent: { variant: 'danger', i18nPath: ['priority'] },
   },
 };
 

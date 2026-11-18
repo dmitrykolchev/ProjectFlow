@@ -75,6 +75,7 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-bank-requisites/app-bank-requisites';
 import '../../common/app-payment-form/app-payment-form';
+import '../../common/app-entity-reminders/app-entity-reminders';
 import type { AppBankRequisites } from '../../common/app-bank-requisites/app-bank-requisites';
 import { eventValue } from '../../common/event-value';
 import styles from './app-company-detail.css';
@@ -673,6 +674,8 @@ export class AppCompanyDetail extends LitElement {
       </div>
 
       ${this.renderKnowledgeSection(company, companyArticles, t)}
+
+      <app-entity-reminders entity-type="company" .entityId="${company.id}"></app-entity-reminders>
     `;
   }
 

@@ -465,6 +465,7 @@ export type ActiveView =
   | 'calculation-detail'
   | 'payments'
   | 'directories'
+  | 'reminders'
   | 'projects'
   | 'project-detail'
   | 'requirements'
@@ -498,6 +499,7 @@ export interface ActivityLogItem {
     | 'invoice'
     | 'payment'
     | 'directory'
+    | 'reminder'
     | 'time_entry'
     | 'expense'
     | 'chat'
@@ -746,5 +748,94 @@ export interface AuthAccountCredential {
   totpSecret: string;
   recoveryCodes: string[];
 }
+
+// --- Universal Entity-Linked Reminders ---
+export type ReminderEntityType =
+  | 'company'
+  | 'counterparty'
+  | 'contact'
+  | 'contract'
+  | 'employee'
+  | 'invoice'
+  | 'calculation'
+  | 'payment'
+  | 'project'
+  | 'task'
+  | 'document'
+  | 'requirement'
+  | 'expense'
+  | 'none';
+
+export type ReminderStatus = 'active' | 'snoozed' | 'completed' | 'paused' | 'cancelled';
+export type ReminderPriority = 'low' | 'medium' | 'high' | 'urgent';
+
+export type RecurrenceUnit = 'none' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
+export type RecurrenceEndType = 'never' | 'until_date' | 'max_occurrences';
+
+export interface ReminderRecurrence {
+  templateCode: string; // references code in DICT_RECURRENCE_TEMPLATES directory
+  unit: RecurrenceUnit;
+  interval: number;
+  daysOfWeek?: number[]; // 1=Mon .. 7=Sun
+  dayOfMonth?: number; // 1..31
+  skipWeekends?: boolean;
+  endType: RecurrenceEndType;
+  endDate?: string; // YYYY-MM-DD
+  maxOccurrences?: number;
+  occurrenceCount: number;
+}
+
+export type ReminderNotificationChannel =
+  | 'in_app'
+  | 'toast'
+  | 'email'
+  | 'push'
+  | 'telegram'
+  | 'webhook';
+
+export type ReminderLeadUnit = 'at_time' | 'minutes' | 'hours' | 'days' | 'weeks';
+export type ReminderRecipientMode = 'owner' | 'assignees' | 'custom_users';
+
+export interface ReminderNotificationRule {
+  id: string;
+  channel: ReminderNotificationChannel;
+  offsetValue: number;
+  offsetUnit: ReminderLeadUnit;
+  recipientMode: ReminderRecipientMode;
+  recipientUserIds?: string[];
+  customMessage?: string;
+  enabled: boolean;
+}
+
+export interface ReminderNotificationConfig {
+  rules: ReminderNotificationRule[];
+  soundEnabled: boolean;
+  requireAck: boolean;
+  quietHoursRespect: boolean;
+  repeatNagMinutes: number; // 0 = off, 15, 30, 60
+  escalationUserId?: string;
+}
+
+export interface Reminder {
+  id: string;
+  title: string;
+  description: string;
+  entityType: ReminderEntityType;
+  entityId?: string;
+  dueAt: string; // YYYY-MM-DDTHH:mm
+  snoozedUntil?: string;
+  status: ReminderStatus;
+  priority: ReminderPriority;
+  ownerId: string;
+  assigneeIds: string[];
+  recurrence: ReminderRecurrence;
+  notifications: ReminderNotificationConfig;
+  tags: string[];
+  lastTriggeredAt?: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 
 

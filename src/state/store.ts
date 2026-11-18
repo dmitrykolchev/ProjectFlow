@@ -33,6 +33,10 @@ import {
   ProjectMember,
   ProjectRequirement,
   ProjectRole,
+  RecurrenceUnit,
+  Reminder,
+  ReminderEntityType,
+  ReminderRecurrence,
   SidebarGroupMode,
   Task,
   TaskAiAnalysis,
@@ -55,6 +59,7 @@ import {
   initialKnowledgeArticles,
   initialPayments,
   initialProjects,
+  initialReminders,
   initialRequirements,
   initialTasks,
   initialTimeEntries,
@@ -83,6 +88,7 @@ const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
 const STORAGE_KEY_DIRECTORIES = 'projectflow_directories_v1';
+const STORAGE_KEY_REMINDERS = 'projectflow_reminders_v1';
 const STORAGE_KEY_AUTH_SESSION = 'projectflow_auth_session_v1';
 const STORAGE_KEY_TRUSTED_DEVICES = 'projectflow_trusted_2fa_v1';
 const STORAGE_KEY_AUTH_ACCOUNTS = 'projectflow_auth_accounts_v1';
@@ -275,6 +281,7 @@ export class AppStore {
   public documents: DocumentItem[] = [];
   public requirements: ProjectRequirement[] = [];
   public directories: DirectoryDefinition[] = [];
+  public reminders: Reminder[] = [];
   public activeDirectoryId: string = 'activity_types';
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
@@ -675,6 +682,20 @@ export class AppStore {
         this.activeDirectoryId = this.directories[0]?.id || 'activity_types';
       }
 
+      const storedReminders = localStorage.getItem(STORAGE_KEY_REMINDERS);
+      this.reminders = storedReminders
+        ? JSON.parse(storedReminders)
+        : initialReminders.map((r) => ({
+            ...r,
+            recurrence: { ...r.recurrence, daysOfWeek: r.recurrence.daysOfWeek ? [...r.recurrence.daysOfWeek] : undefined },
+            notifications: {
+              ...r.notifications,
+              rules: r.notifications.rules.map((rule) => ({ ...rule })),
+            },
+            assigneeIds: [...r.assigneeIds],
+            tags: [...r.tags],
+          }));
+
       const storedUsage = localStorage.getItem(STORAGE_KEY_USAGE);
       if (storedUsage) {
         const parsed: AiUsageDay[] = JSON.parse(storedUsage);
@@ -739,6 +760,7 @@ export class AppStore {
       this.knowledgeArticles = [...initialKnowledgeArticles];
       this.documents = [...initialDocuments];
       this.directories = createInitialDirectories();
+      this.reminders = [...initialReminders];
       this.initAuthState();
     }
   }
@@ -876,6 +898,14 @@ export class AppStore {
   private saveDirectories(): void {
     try {
       localStorage.setItem(STORAGE_KEY_DIRECTORIES, JSON.stringify(this.directories));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveReminders(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_REMINDERS, JSON.stringify(this.reminders));
     } catch (e) {
       console.error(e);
     }
@@ -1299,6 +1329,7 @@ export class AppStore {
       view === 'project-chat' ||
       view === 'knowledge-base' ||
       view === 'documents' ||
+      view === 'reminders' ||
       view === 'task-detail' ||
       view === 'kanban' ||
       view === 'gantt' ||
@@ -3993,7 +4024,643 @@ export class AppStore {
     this.saveAuthSession(null);
     this.notify();
   }
+
+  // --- Universal Entity-Linked Reminders, Recurrence & Notification Rules ---
+
+  public formatLocalDateTime(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  }
+
+  public parseLocalDateTime(value: string): Date {
+    if (!value) return new Date();
+    const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(value.trim());
+    if (m) {
+      return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5]), 0, 0);
+    }
+    const dOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+    if (dOnly) {
+      return new Date(Number(dOnly[1]), Number(dOnly[2]) - 1, Number(dOnly[3]), 9, 0, 0, 0);
+    }
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+  }
+
+  public getEffectiveReminderDueAt(rem: Reminder): string {
+    return rem.status === 'snoozed' && rem.snoozedUntil ? rem.snoozedUntil : rem.dueAt;
+  }
+
+  public isReminderOverdue(rem: Reminder): boolean {
+    if (rem.status !== 'active' && rem.status !== 'snoozed') return false;
+    const dueMs = this.parseLocalDateTime(this.getEffectiveReminderDueAt(rem)).getTime();
+    return dueMs < Date.now();
+  }
+
+  public isReminderDueToday(rem: Reminder): boolean {
+    if (rem.status !== 'active' && rem.status !== 'snoozed') return false;
+    const targetDay = this.getEffectiveReminderDueAt(rem).slice(0, 10);
+    return targetDay === this.todayKey();
+  }
+
+  public getDueRemindersCount(): number {
+    const endOfToday = `${this.todayKey()}T23:59`;
+    return this.reminders.filter((r) => {
+      if (r.status !== 'active' && r.status !== 'snoozed') return false;
+      return this.getEffectiveReminderDueAt(r) <= endOfToday;
+    }).length;
+  }
+
+  public getRecurrenceTemplates(): DirectoryRecord[] {
+    const dir = this.directories.find((d) => d.id === 'recurrence_templates');
+    if (!dir) return [];
+    return [...dir.records]
+      .filter((r) => r.isActive)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+  }
+
+  public calculateNextReminderDueAt(
+    baseDueAt: string,
+    rec: ReminderRecurrence
+  ): string | null {
+    if (!rec || rec.unit === 'none') return null;
+    const interval = Math.max(1, Math.round(rec.interval || 1));
+    const current = this.parseLocalDateTime(baseDueAt);
+    const next = new Date(current.getTime());
+
+    const shiftWeekendIfNeeded = (d: Date) => {
+      if (!rec.skipWeekends) return;
+      const day = d.getDay(); // 0=Sun, 6=Sat
+      if (day === 6) d.setDate(d.getDate() + 2);
+      else if (day === 0) d.setDate(d.getDate() + 1);
+    };
+
+    switch (rec.unit as RecurrenceUnit) {
+      case 'minute':
+        next.setMinutes(next.getMinutes() + interval);
+        break;
+      case 'hour':
+        next.setHours(next.getHours() + interval);
+        shiftWeekendIfNeeded(next);
+        break;
+      case 'day':
+        next.setDate(next.getDate() + interval);
+        shiftWeekendIfNeeded(next);
+        break;
+      case 'week': {
+        const rawDays = (rec.daysOfWeek && rec.daysOfWeek.length > 0
+          ? rec.daysOfWeek
+          : rec.skipWeekends
+          ? [1, 2, 3, 4, 5]
+          : []
+        )
+          .filter((d) => d >= 1 && d <= 7)
+          .sort((a, b) => a - b);
+
+        if (rawDays.length > 0) {
+          const curIsoDay = current.getDay() === 0 ? 7 : current.getDay();
+          const laterThisWeek = rawDays.find((d) => d > curIsoDay);
+          if (laterThisWeek !== undefined && interval === 1) {
+            next.setDate(next.getDate() + (laterThisWeek - curIsoDay));
+          } else if (laterThisWeek !== undefined && interval > 1) {
+            const firstSelected = rawDays[0];
+            next.setDate(next.getDate() + (7 - curIsoDay) + (interval - 1) * 7 + firstSelected);
+          } else {
+            const firstSelected = rawDays[0];
+            next.setDate(next.getDate() + (7 - curIsoDay) + (interval - 1) * 7 + firstSelected);
+          }
+        } else {
+          next.setDate(next.getDate() + interval * 7);
+          shiftWeekendIfNeeded(next);
+        }
+        break;
+      }
+      case 'month': {
+        const targetDay = rec.dayOfMonth && rec.dayOfMonth >= 1 && rec.dayOfMonth <= 31
+          ? rec.dayOfMonth
+          : current.getDate();
+        next.setDate(1);
+        next.setMonth(next.getMonth() + interval);
+        const maxInMonth = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+        next.setDate(Math.min(targetDay, maxInMonth));
+        shiftWeekendIfNeeded(next);
+        break;
+      }
+      case 'quarter': {
+        const targetDay = current.getDate();
+        next.setDate(1);
+        next.setMonth(next.getMonth() + interval * 3);
+        const maxInMonth = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
+        next.setDate(Math.min(targetDay, maxInMonth));
+        shiftWeekendIfNeeded(next);
+        break;
+      }
+      case 'year': {
+        const targetDay = current.getDate();
+        const targetMonth = current.getMonth();
+        next.setDate(1);
+        next.setFullYear(next.getFullYear() + interval);
+        next.setMonth(targetMonth);
+        const maxInMonth = new Date(next.getFullYear(), targetMonth + 1, 0).getDate();
+        next.setDate(Math.min(targetDay, maxInMonth));
+        shiftWeekendIfNeeded(next);
+        break;
+      }
+    }
+
+    const formatted = this.formatLocalDateTime(next);
+    if (rec.endType === 'until_date' && rec.endDate && formatted.slice(0, 10) > rec.endDate) {
+      return null;
+    }
+    return formatted;
+  }
+
+  public getUpcomingReminderOccurrences(
+    dueAt: string,
+    rec: ReminderRecurrence,
+    limit: number = 3
+  ): string[] {
+    if (!dueAt || !rec || rec.unit === 'none') return [];
+    const results: string[] = [];
+    let cursor = dueAt;
+    const remainingCap =
+      rec.endType === 'max_occurrences' && rec.maxOccurrences
+        ? Math.max(0, rec.maxOccurrences - (rec.occurrenceCount || 0) - 1)
+        : limit;
+    const count = Math.min(limit, remainingCap);
+    for (let i = 0; i < count; i++) {
+      const next = this.calculateNextReminderDueAt(cursor, rec);
+      if (!next) break;
+      results.push(next);
+      cursor = next;
+    }
+    return results;
+  }
+
+  public getReminderEntityOptions(
+    type: ReminderEntityType
+  ): Array<{ value: string; label: string; subtitle?: string }> {
+    switch (type) {
+      case 'company':
+        return this.companies.map((c) => ({
+          value: c.id,
+          label: c.name,
+          subtitle: c.legalName || c.inn,
+        }));
+      case 'counterparty':
+        return this.counterparties.map((cp) => ({
+          value: cp.id,
+          label: cp.name,
+          subtitle: cp.legalName || cp.inn,
+        }));
+      case 'contact':
+        return this.counterparties.flatMap((cp) =>
+          (cp.contacts || []).map((cnt) => ({
+            value: cnt.id,
+            label: `${cnt.fullName} (${cp.name})`,
+            subtitle: [cnt.position, cnt.email || cnt.phone].filter(Boolean).join(' · '),
+          }))
+        );
+      case 'contract':
+        return this.contracts.map((c) => ({
+          value: c.id,
+          label: `${c.number} — ${c.title}`,
+          subtitle: `${c.amount.toLocaleString()} ${c.currency}`,
+        }));
+      case 'employee':
+        return this.users.map((u) => ({
+          value: u.id,
+          label: u.name,
+          subtitle: `${u.role} · ${u.email}`,
+        }));
+      case 'invoice':
+        return this.invoices.map((i) => {
+          const cp = this.counterparties.find((c) => c.id === i.counterpartyId);
+          return {
+            value: i.id,
+            label: `${i.number} · ${i.totalAmount.toLocaleString()} ${i.currency}`,
+            subtitle: cp ? `${cp.name} (${i.dueDate})` : i.dueDate,
+          };
+        });
+      case 'calculation':
+        return this.calculations.map((calc) => {
+          const cp = this.counterparties.find((c) => c.id === calc.counterpartyId);
+          return {
+            value: calc.id,
+            label: `${calc.number} · ${calc.billableAmount.toLocaleString()} ${calc.currency}`,
+            subtitle: cp ? `${cp.name} (${calc.periodStart}..${calc.periodEnd})` : `${calc.periodStart}..${calc.periodEnd}`,
+          };
+        });
+      case 'payment':
+        return this.payments.map((p) => {
+          const cp = this.counterparties.find((c) => c.id === p.counterpartyId);
+          return {
+            value: p.id,
+            label: `${p.documentNumber || p.id} · ${p.amount.toLocaleString()} ${p.currency}`,
+            subtitle: cp ? `${cp.name} (${p.paymentDate})` : p.paymentDate,
+          };
+        });
+      case 'project':
+        return this.projects.map((p) => ({
+          value: p.id,
+          label: `${p.key} · ${p.name}`,
+          subtitle: p.status,
+        }));
+      case 'task':
+        return this.tasks.map((tk) => ({
+          value: tk.id,
+          label: `${tk.id} · ${tk.title}`,
+          subtitle: tk.dueDate,
+        }));
+      case 'document':
+        return this.documents.map((doc) => ({
+          value: doc.id,
+          label: doc.title,
+          subtitle: doc.fileName,
+        }));
+      case 'requirement':
+        return this.requirements.map((req) => ({
+          value: req.id,
+          label: `${req.code} · ${req.title}`,
+          subtitle: req.category,
+        }));
+      case 'expense':
+        return this.expenses.map((ex) => ({
+          value: ex.id,
+          label: `${ex.title} (${ex.amount.toLocaleString()} ${ex.currency})`,
+          subtitle: `${ex.vendor || ''} ${ex.date}`.trim(),
+        }));
+      case 'none':
+      default:
+        return [];
+    }
+  }
+
+  public getReminderEntityInfo(
+    type: ReminderEntityType,
+    id?: string
+  ): { typeLabel: string; label: string; subtitle?: string; navigable: boolean } {
+    const t = getTranslation(this.customization.language);
+    const typeLabel = t.entityTypes[type] || type;
+    if (type === 'none' || !id) {
+      return { typeLabel, label: t.entityTypes.none, navigable: false };
+    }
+
+    switch (type) {
+      case 'company': {
+        const c = this.companies.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: c?.name || id,
+          subtitle: c?.legalName,
+          navigable: Boolean(c),
+        };
+      }
+      case 'counterparty': {
+        const cp = this.counterparties.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: cp?.name || id,
+          subtitle: cp?.legalName,
+          navigable: Boolean(cp),
+        };
+      }
+      case 'contact': {
+        for (const cp of this.counterparties) {
+          const cnt = (cp.contacts || []).find((x) => x.id === id);
+          if (cnt) {
+            return {
+              typeLabel,
+              label: cnt.fullName,
+              subtitle: `${cp.name}${cnt.position ? ` · ${cnt.position}` : ''}`,
+              navigable: true,
+            };
+          }
+        }
+        return { typeLabel, label: id, navigable: false };
+      }
+      case 'contract': {
+        const c = this.contracts.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: c ? `${c.number} · ${c.title}` : id,
+          subtitle: c ? `${c.amount.toLocaleString(t.common.locale)} ${c.currency}` : undefined,
+          navigable: Boolean(c),
+        };
+      }
+      case 'employee': {
+        const u = this.users.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: u?.name || id,
+          subtitle: u?.role,
+          navigable: Boolean(u),
+        };
+      }
+      case 'invoice': {
+        const inv = this.invoices.find((x) => x.id === id);
+        const cp = inv ? this.counterparties.find((c) => c.id === inv.counterpartyId) : undefined;
+        return {
+          typeLabel,
+          label: inv ? `${inv.number} · ${inv.totalAmount.toLocaleString(t.common.locale)} ${inv.currency}` : id,
+          subtitle: inv ? `${cp ? `${cp.name} · ` : ''}${inv.dueDate}` : undefined,
+          navigable: Boolean(inv),
+        };
+      }
+      case 'calculation': {
+        const calc = this.calculations.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: calc ? `${calc.number} · ${calc.billableAmount.toLocaleString(t.common.locale)} ${calc.currency}` : id,
+          subtitle: calc ? `${calc.periodStart} — ${calc.periodEnd}` : undefined,
+          navigable: Boolean(calc),
+        };
+      }
+      case 'payment': {
+        const p = this.payments.find((x) => x.id === id);
+        const cp = p ? this.counterparties.find((c) => c.id === p.counterpartyId) : undefined;
+        return {
+          typeLabel,
+          label: p ? `${p.documentNumber || p.id} · ${p.amount.toLocaleString(t.common.locale)} ${p.currency}` : id,
+          subtitle: cp?.name || p?.paymentDate,
+          navigable: Boolean(p),
+        };
+      }
+      case 'project': {
+        const p = this.projects.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: p ? `${p.key} · ${p.name}` : id,
+          navigable: Boolean(p),
+        };
+      }
+      case 'task': {
+        const tk = this.tasks.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: tk ? `${tk.id} · ${tk.title}` : id,
+          navigable: Boolean(tk),
+        };
+      }
+      case 'document': {
+        const d = this.documents.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: d?.title || id,
+          subtitle: d?.fileName,
+          navigable: Boolean(d),
+        };
+      }
+      case 'requirement': {
+        const r = this.requirements.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: r ? `${r.code} · ${r.title}` : id,
+          subtitle: r?.category,
+          navigable: Boolean(r),
+        };
+      }
+      case 'expense': {
+        const e = this.expenses.find((x) => x.id === id);
+        return {
+          typeLabel,
+          label: e ? `${e.title} (${e.amount.toLocaleString(t.common.locale)} ${e.currency})` : id,
+          subtitle: e?.vendor,
+          navigable: Boolean(e),
+        };
+      }
+    }
+  }
+
+  public navigateToReminderEntity(type: ReminderEntityType, id?: string): void {
+    if (!id || type === 'none') return;
+    switch (type) {
+      case 'company':
+        this.openCompanyDetail(id);
+        break;
+      case 'counterparty':
+        this.openCounterpartyDetail(id);
+        break;
+      case 'contact': {
+        const cp = this.counterparties.find((c) => (c.contacts || []).some((ct) => ct.id === id));
+        if (cp) this.openCounterpartyDetail(cp.id);
+        break;
+      }
+      case 'contract':
+        this.openContractDetail(id);
+        break;
+      case 'employee':
+        this.openEmployeeDetail(id);
+        break;
+      case 'invoice': {
+        const inv = this.invoices.find((i) => i.id === id);
+        if (inv) this.openContractDetail(inv.contractId);
+        else this.setActiveView('payments');
+        break;
+      }
+      case 'calculation':
+        this.openCalculationDetail(id);
+        break;
+      case 'payment':
+        this.setActiveView('payments');
+        break;
+      case 'project':
+        this.openProjectDetail(id);
+        break;
+      case 'task':
+        this.openTaskDetail(id);
+        break;
+      case 'document':
+        this.setActiveView('documents');
+        break;
+      case 'requirement':
+        this.openRequirementDetail(id);
+        break;
+      case 'expense':
+        this.setActiveView('expenses');
+        break;
+    }
+  }
+
+  public getRemindersForEntity(type: ReminderEntityType, entityId: string): Reminder[] {
+    return this.reminders
+      .filter((r) => r.entityType === type && r.entityId === entityId)
+      .sort((a, b) => this.getEffectiveReminderDueAt(a).localeCompare(this.getEffectiveReminderDueAt(b)));
+  }
+
+  public addReminder(
+    data: Omit<Reminder, 'id' | 'createdAt' | 'updatedAt'>
+  ): Reminder {
+    const now = new Date().toISOString();
+    const created: Reminder = {
+      ...data,
+      id: `rem-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.reminders = [created, ...this.reminders];
+    this.saveReminders();
+    const t = getTranslation(this.customization.language);
+    const info = this.getReminderEntityInfo(created.entityType, created.entityId);
+    this.logActivity('create', 'reminder', created.title, `${info.typeLabel}: ${info.label}`, created.id);
+    this.addNotification('success', t.reminders.toastCreated, created.title);
+    this.notify();
+    return created;
+  }
+
+  public updateReminder(updated: Reminder): void {
+    const next: Reminder = {
+      ...updated,
+      updatedAt: new Date().toISOString(),
+    };
+    this.reminders = this.reminders.map((r) => (r.id === next.id ? next : r));
+    this.saveReminders();
+    const t = getTranslation(this.customization.language);
+    this.logActivity('update', 'reminder', next.title, next.dueAt, next.id);
+    this.addNotification('info', t.reminders.toastUpdated, next.title);
+    this.notify();
+  }
+
+  public deleteReminder(id: string): void {
+    const target = this.reminders.find((r) => r.id === id);
+    if (!target) return;
+    this.reminders = this.reminders.filter((r) => r.id !== id);
+    this.saveReminders();
+    const t = getTranslation(this.customization.language);
+    this.logActivity('delete', 'reminder', target.title, target.dueAt, target.id);
+    this.addNotification('warning', t.reminders.toastDeleted, target.title);
+    this.notify();
+  }
+
+  public completeReminder(id: string): { advanced: boolean; nextDueAt?: string } {
+    const rem = this.reminders.find((r) => r.id === id);
+    if (!rem) return { advanced: false };
+    const t = getTranslation(this.customization.language);
+    const now = new Date().toISOString();
+
+    const nextCount = (rem.recurrence.occurrenceCount || 0) + 1;
+    const hitMaxOccurrences =
+      rem.recurrence.endType === 'max_occurrences' &&
+      Boolean(rem.recurrence.maxOccurrences) &&
+      nextCount >= (rem.recurrence.maxOccurrences || 1);
+
+    const nextDue =
+      rem.recurrence.unit !== 'none' && !hitMaxOccurrences
+        ? this.calculateNextReminderDueAt(rem.dueAt, rem.recurrence)
+        : null;
+
+    if (nextDue) {
+      const updated: Reminder = {
+        ...rem,
+        dueAt: nextDue,
+        snoozedUntil: undefined,
+        status: 'active',
+        recurrence: {
+          ...rem.recurrence,
+          occurrenceCount: nextCount,
+        },
+        updatedAt: now,
+      };
+      this.reminders = this.reminders.map((r) => (r.id === rem.id ? updated : r));
+      this.saveReminders();
+      const formattedNext = this.parseLocalDateTime(nextDue).toLocaleString(t.common.locale, {
+        day: '2-digit',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+      this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastAdvanced(formattedNext), rem.id);
+      this.addNotification('success', t.reminders.toastAdvanced(formattedNext), rem.title);
+      this.notify();
+      return { advanced: true, nextDueAt: nextDue };
+    }
+
+    const completed: Reminder = {
+      ...rem,
+      status: 'completed',
+      snoozedUntil: undefined,
+      completedAt: now,
+      recurrence: {
+        ...rem.recurrence,
+        occurrenceCount: nextCount,
+      },
+      updatedAt: now,
+    };
+    this.reminders = this.reminders.map((r) => (r.id === rem.id ? completed : r));
+    this.saveReminders();
+    this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastCompleted, rem.id);
+    this.addNotification('success', t.reminders.toastCompleted, rem.title);
+    this.notify();
+    return { advanced: false };
+  }
+
+  public snoozeReminder(id: string, snoozedUntil: string): void {
+    const rem = this.reminders.find((r) => r.id === id);
+    if (!rem) return;
+    const t = getTranslation(this.customization.language);
+    const updated: Reminder = {
+      ...rem,
+      status: 'snoozed',
+      snoozedUntil,
+      updatedAt: new Date().toISOString(),
+    };
+    this.reminders = this.reminders.map((r) => (r.id === rem.id ? updated : r));
+    this.saveReminders();
+    const formatted = this.parseLocalDateTime(snoozedUntil).toLocaleString(t.common.locale, {
+      day: '2-digit',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastSnoozed(formatted), rem.id);
+    this.addNotification('info', t.reminders.toastSnoozed(formatted), rem.title);
+    this.notify();
+  }
+
+  public toggleReminderPause(id: string): void {
+    const rem = this.reminders.find((r) => r.id === id);
+    if (!rem) return;
+    const t = getTranslation(this.customization.language);
+    const nextStatus = rem.status === 'paused' ? 'active' : 'paused';
+    const updated: Reminder = {
+      ...rem,
+      status: nextStatus,
+      updatedAt: new Date().toISOString(),
+    };
+    this.reminders = this.reminders.map((r) => (r.id === rem.id ? updated : r));
+    this.saveReminders();
+    const msg = nextStatus === 'paused' ? t.reminders.toastPaused : t.reminders.toastResumed;
+    this.logActivity('status_change', 'reminder', rem.title, msg, rem.id);
+    this.addNotification('info', msg, rem.title);
+    this.notify();
+  }
+
+  public triggerReminderNotification(id: string): void {
+    const rem = this.reminders.find((r) => r.id === id);
+    if (!rem) return;
+    const t = getTranslation(this.customization.language);
+    const enabledRules = rem.notifications.rules.filter((r) => r.enabled);
+    const channelNames = enabledRules.length > 0
+      ? enabledRules.map((r) => t.reminders.channels[r.channel]).join(', ')
+      : t.reminders.channels.in_app;
+    const now = new Date().toISOString();
+    const updated: Reminder = {
+      ...rem,
+      lastTriggeredAt: now,
+      updatedAt: now,
+    };
+    this.reminders = this.reminders.map((r) => (r.id === rem.id ? updated : r));
+    this.saveReminders();
+    const entityInfo = this.getReminderEntityInfo(rem.entityType, rem.entityId);
+    this.logActivity('update', 'reminder', rem.title, t.reminders.toastTestSent(channelNames), rem.id);
+    this.addNotification(
+      rem.priority === 'urgent' ? 'warning' : 'info',
+      t.reminders.toastTestSent(channelNames),
+      `${rem.title} (${entityInfo.label})`
+    );
+    this.notify();
+  }
 }
 
 export const store = AppStore.getInstance();
+
 

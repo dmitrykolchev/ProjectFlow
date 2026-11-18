@@ -121,6 +121,8 @@ export class AppHeader extends LitElement {
       'task-detail': detailTask ? `${detailTask.id} · ${detailTask.title}` : t.navigation.kanban,
       'knowledge-base': t.navigation.knowledgeBase,
       documents: t.navigation.documents,
+      reminders: t.navigation.reminders,
+      directories: t.navigation.directories,
       'project-chat': t.navigation.projectChat,
       gantt: t.navigation.gantt,
       grid: t.navigation.grid,
