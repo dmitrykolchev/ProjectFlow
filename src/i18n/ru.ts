@@ -75,7 +75,7 @@ export const ru = {
     projectChat: 'Чат по проектам',
     knowledgeBase: 'База знаний',
     documents: 'Документы и файлы',
-    settings: 'Кастомизация',
+    settings: 'Настройки',
     activity: 'Журнал активности',
     storybook: 'Storybook компонентов',
     designTokens: 'Design Tokens',
@@ -84,9 +84,6 @@ export const ru = {
     groupPlanning: 'Данные и аналитика',
     groupDirectory: 'Справочники и CRM',
     groupSystem: 'Система',
-    groupsLabel: 'Группы',
-    groupModeSingle: 'Одна',
-    groupModeMultiple: 'Несколько',
   },
   entityTypes: {
     project: 'Проект',
@@ -267,7 +264,7 @@ export const ru = {
     thLogged: 'Залогировано',
   },
   settings: {
-    title: 'Кастомизация интерфейса',
+    title: 'Настройки интерфейса',
     subtitle: 'Персонализируйте внешний вид, фон, плотность и поведение приложения',
     theme: 'Тема оформления',
     themeDark: 'Тёмная тема (рекомендуется)',

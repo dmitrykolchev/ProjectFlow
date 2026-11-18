@@ -75,7 +75,7 @@ export const en = {
     projectChat: 'Project Chat',
     knowledgeBase: 'Knowledge Base',
     documents: 'Document Library',
-    settings: 'Customization',
+    settings: 'Settings',
     activity: 'Activity Log',
     storybook: 'Component Storybook',
     designTokens: 'Design Tokens',
@@ -84,9 +84,6 @@ export const en = {
     groupPlanning: 'Data & Analytics',
     groupDirectory: 'Directory & CRM',
     groupSystem: 'System',
-    groupsLabel: 'Groups',
-    groupModeSingle: 'Single',
-    groupModeMultiple: 'Multi',
   },
   entityTypes: {
     project: 'Project',
@@ -267,7 +264,7 @@ export const en = {
     thLogged: 'Logged',
   },
   settings: {
-    title: 'Interface Customization',
+    title: 'Interface Settings',
     subtitle: 'Personalize appearance, surface background, density, and behavior',
     theme: 'Theme Mode',
     themeDark: 'Dark Theme (Recommended)',

@@ -50,7 +50,7 @@ export const meta: ComponentStoryMeta = {
           </sidebar-group>
 
           <sidebar-group group-id="system" label="Система" expanded>
-            <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+            <sidebar-item value="settings" label="Настройки" .icon="${iconSettings()}"></sidebar-item>
           </sidebar-group>
         </div>
       `,

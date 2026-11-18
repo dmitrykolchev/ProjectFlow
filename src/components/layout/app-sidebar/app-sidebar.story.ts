@@ -53,7 +53,7 @@ export const meta: ComponentStoryMeta = {
 
             <sidebar-group group-id="system" label="Система" .expanded="${false}">
               <sidebar-item value="activity" label="Активность" .icon="${iconActivity()}"></sidebar-item>
-              <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+              <sidebar-item value="settings" label="Настройки" .icon="${iconSettings()}"></sidebar-item>
             </sidebar-group>
           </app-sidebar>
         </div>
@@ -76,7 +76,7 @@ export const meta: ComponentStoryMeta = {
             </sidebar-group>
 
             <sidebar-group group-id="system" label="Система" .expanded="${false}">
-              <sidebar-item value="settings" label="Кастомизация" .icon="${iconSettings()}"></sidebar-item>
+              <sidebar-item value="settings" label="Настройки" .icon="${iconSettings()}"></sidebar-item>
             </sidebar-group>
           </app-sidebar>
         </div>

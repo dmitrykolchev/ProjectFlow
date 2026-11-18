@@ -36,7 +36,7 @@ export const meta: ComponentStoryMeta = {
           <sidebar-item value="dashboard" label="Дашборд" active .icon="${iconDashboard()}"></sidebar-item>
           <sidebar-item value="kanban" label="Канбан-доска" badge="14" .icon="${iconKanban()}"></sidebar-item>
           <sidebar-item value="grid" label="Таблица задач" .icon="${iconTable()}"></sidebar-item>
-          <sidebar-item value="settings" label="Кастомизация" disabled .icon="${iconSettings()}"></sidebar-item>
+          <sidebar-item value="settings" label="Настройки" disabled .icon="${iconSettings()}"></sidebar-item>
         </div>
       `,
     },
