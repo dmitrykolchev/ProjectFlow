@@ -4545,7 +4545,7 @@ export class AppStore {
 
     const nextDue =
       rem.recurrence.unit !== 'none' && !hitMaxOccurrences
-        ? this.calculateNextReminderDueAt(rem.dueAt, rem.recurrence)
+        ? this.calculateNextReminderDueAt(this.getEffectiveReminderDueAt(rem), rem.recurrence)
         : null;
 
     if (nextDue) {
