@@ -464,6 +464,7 @@ export type ActiveView =
   | 'calculations'
   | 'calculation-detail'
   | 'payments'
+  | 'directories'
   | 'projects'
   | 'project-detail'
   | 'requirements'
@@ -496,6 +497,7 @@ export interface ActivityLogItem {
     | 'calculation'
     | 'invoice'
     | 'payment'
+    | 'directory'
     | 'time_entry'
     | 'expense'
     | 'chat'
@@ -659,3 +661,66 @@ export interface UserCustomization {
     tags: boolean;
   };
 }
+
+// --- Master Reference Data & Classifiers ---
+export type DirectoryGroupKey =
+  | 'organization'
+  | 'operations'
+  | 'finance'
+  | 'measurements'
+  | 'contracts_geo'
+  | 'custom';
+
+export type DirectoryFieldType = 'text' | 'number' | 'boolean' | 'select';
+
+export interface DirectoryFieldOption {
+  value: string;
+  labelKey?: string;
+  customLabel?: string;
+}
+
+export interface DirectoryFieldDef {
+  key: string;
+  labelKey?: string;
+  customLabel?: string;
+  type: DirectoryFieldType;
+  required?: boolean;
+  mono?: boolean;
+  align?: 'left' | 'right' | 'center';
+  showInTable?: boolean;
+  step?: number;
+  min?: number;
+  max?: number;
+  options?: DirectoryFieldOption[];
+  defaultValue?: string | number | boolean;
+}
+
+export interface DirectoryRecord {
+  id: string;
+  code: string;
+  name: string;
+  nameEn?: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+  isSystem?: boolean;
+  extra?: Record<string, string | number | boolean>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DirectoryDefinition {
+  id: string;
+  code: string;
+  group: DirectoryGroupKey;
+  schemaType: 'simple' | 'extended';
+  catalogKey?: string;
+  customName?: string;
+  customDescription?: string;
+  usedInKeys?: string[];
+  fields: DirectoryFieldDef[];
+  isSystem?: boolean;
+  records: DirectoryRecord[];
+  updatedAt: string;
+}
+

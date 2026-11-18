@@ -83,6 +83,7 @@ import contextChipMeta from '../../common/app-context-chip/app-context-chip.stor
 import contextChipsListMeta from '../../common/app-context-chips-list/app-context-chips-list.story';
 import draggableListItemMeta from '../../common/app-draggable-list-item/app-draggable-list-item.story';
 import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
+import directoryRecordModalMeta from '../../common/app-directory-record-modal/app-directory-record-modal.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -124,6 +125,7 @@ import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
 import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
 import profileSettingsMeta from '../app-profile-settings/app-profile-settings.story';
+import directoriesMeta from '../app-directories/app-directories.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
   buttonMeta,
@@ -198,6 +200,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   contextChipsListMeta,
   draggableListItemMeta,
   draggableListMeta,
+  directoryRecordModalMeta,
   toastMeta,
   activityMeta,
   headerMeta,
@@ -234,6 +237,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   calculationsMeta,
   calculationDetailMeta,
   paymentsMeta,
+  directoriesMeta,
   timeTrackingMeta,
   expensesMeta,
   settingsMeta,

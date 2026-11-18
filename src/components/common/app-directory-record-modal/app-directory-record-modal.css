@@ -1,0 +1,57 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: contents;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+@media (max-width: 640px) {
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}
+
+.modal-section-heading {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted, #64748b);
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  margin-top: 0.25rem;
+}
+
+.switch-field {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-height-md, 38px);
+  padding: 0.45rem 0.75rem;
+  background: var(--bg-subtle, rgba(148, 163, 184, 0.06));
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-md, 8px);
+}
+
+.error-banner {
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--color-danger, #ef4444);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}

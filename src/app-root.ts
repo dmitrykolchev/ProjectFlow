@@ -27,6 +27,7 @@ import {
   iconFolderOpen,
   iconGrid,
   iconCalculator,
+  iconDatabase,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -70,6 +71,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'calculation-detail': () =>
     import('./components/views/app-calculation-detail/app-calculation-detail'),
   payments: () => import('./components/views/app-payments/app-payments'),
+  directories: () => import('./components/views/app-directories/app-directories'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
   settings: () => import('./components/views/app-settings/app-settings'),
@@ -349,6 +351,12 @@ export class AppRoot extends LitElement {
             label="${t.navigation.payments}"
             .icon="${iconCreditCard()}"
           ></sidebar-item>
+
+          <sidebar-item
+            value="directories"
+            label="${t.navigation.directories}"
+            .icon="${iconDatabase()}"
+          ></sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="system" label="${t.navigation.groupSystem}">
@@ -469,6 +477,8 @@ export class AppRoot extends LitElement {
         return html`<app-calculation-detail></app-calculation-detail>`;
       case 'payments':
         return html`<app-payments></app-payments>`;
+      case 'directories':
+        return html`<app-directories></app-directories>`;
       case 'time-tracking':
         return html`<app-time-tracking></app-time-tracking>`;
       case 'expenses':

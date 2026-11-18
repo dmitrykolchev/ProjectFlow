@@ -25,6 +25,7 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
   calculations: 'calculations',
   'calculation-detail': 'calculation-detail',
   payments: 'payments',
+  directories: 'directories',
   projects: 'projects',
   'project-detail': 'project-detail',
   requirements: 'requirements',

@@ -11,6 +11,10 @@ import {
   Contract,
   Counterparty,
   CounterpartyContact,
+  DirectoryDefinition,
+  DirectoryFieldDef,
+  DirectoryGroupKey,
+  DirectoryRecord,
   DocumentItem,
   DocumentScope,
   Expense,
@@ -53,6 +57,7 @@ import {
   initialTimeEntries,
   initialUsers,
 } from './mock-data';
+import { createInitialDirectories } from './directories-data';
 import { locationToPath, pathToLocation, NavLocation } from '../domain/navigation';
 import { getTranslation } from '../i18n';
 
@@ -74,6 +79,7 @@ const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
 const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
+const STORAGE_KEY_DIRECTORIES = 'projectflow_directories_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -262,6 +268,8 @@ export class AppStore {
   public knowledgeArticles: KnowledgeArticle[] = [];
   public documents: DocumentItem[] = [];
   public requirements: ProjectRequirement[] = [];
+  public directories: DirectoryDefinition[] = [];
+  public activeDirectoryId: string = 'activity_types';
   public selectedProjectId: string = 'all';
   public detailProjectId: string = '';
   public detailCompanyId: string = '';
@@ -627,6 +635,36 @@ export class AppStore {
         ? JSON.parse(storedRequirements)
         : [...initialRequirements];
 
+      const storedDirectories = localStorage.getItem(STORAGE_KEY_DIRECTORIES);
+      const seedDirs = createInitialDirectories();
+      if (storedDirectories) {
+        const parsedDirs: DirectoryDefinition[] = JSON.parse(storedDirectories);
+        const existingMap = new Map(parsedDirs.map((d) => [d.id, d]));
+        const merged: DirectoryDefinition[] = parsedDirs.map((d) => {
+          const seed = seedDirs.find((s) => s.id === d.id);
+          return seed
+            ? {
+                ...seed,
+                ...d,
+                fields: seed.fields,
+                catalogKey: seed.catalogKey,
+                usedInKeys: seed.usedInKeys,
+              }
+            : d;
+        });
+        for (const seed of seedDirs) {
+          if (!existingMap.has(seed.id)) {
+            merged.push(seed);
+          }
+        }
+        this.directories = merged;
+      } else {
+        this.directories = seedDirs;
+      }
+      if (!this.directories.some((d) => d.id === this.activeDirectoryId)) {
+        this.activeDirectoryId = this.directories[0]?.id || 'activity_types';
+      }
+
       const storedUsage = localStorage.getItem(STORAGE_KEY_USAGE);
       if (storedUsage) {
         const parsed: AiUsageDay[] = JSON.parse(storedUsage);
@@ -688,6 +726,7 @@ export class AppStore {
       this.chatMessages = [...initialChatMessages];
       this.knowledgeArticles = [...initialKnowledgeArticles];
       this.documents = [...initialDocuments];
+      this.directories = createInitialDirectories();
     }
   }
 
@@ -816,6 +855,14 @@ export class AppStore {
   private saveRequirements(): void {
     try {
       localStorage.setItem(STORAGE_KEY_REQUIREMENTS, JSON.stringify(this.requirements));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveDirectories(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_DIRECTORIES, JSON.stringify(this.directories));
     } catch (e) {
       console.error(e);
     }
@@ -1259,7 +1306,8 @@ export class AppStore {
       view === 'contract-detail' ||
       view === 'calculations' ||
       view === 'calculation-detail' ||
-      view === 'payments'
+      view === 'payments' ||
+      view === 'directories'
     ) {
       return 'directory';
     }
@@ -1359,6 +1407,8 @@ export class AppStore {
         return this.detailCalculationId || undefined;
       case 'project-chat':
         return this.chatProjectId || undefined;
+      case 'directories':
+        return this.activeDirectoryId || undefined;
       default:
         return undefined;
     }
@@ -1412,6 +1462,9 @@ export class AppStore {
     } else if (view === 'project-chat') {
       if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
+    } else if (view === 'directories') {
+      if (id && this.directories.some((d) => d.id === id)) this.activeDirectoryId = id;
+      else if (!this.activeDirectoryId) this.activeDirectoryId = this.directories[0]?.id || '';
     }
     this.activeView = view;
     this.activePage = loc.page ?? 1;
@@ -3357,6 +3410,168 @@ export class AppStore {
     this.saveRequirements();
     this.saveTasks();
     this.logActivity('delete', 'requirement', `${target.code} — ${target.title}`, 'Удалено требование', target.id);
+    this.notify();
+  }
+
+  // --- Reference Directories & Classifiers ---
+  public setActiveDirectory(directoryId: string): void {
+    if (!this.directories.some((d) => d.id === directoryId)) return;
+    this.activeDirectoryId = directoryId;
+    this.notify();
+    if (this.activeView === 'directories') {
+      this.syncHistory(true);
+    }
+  }
+
+  public openDirectory(directoryId?: string): void {
+    if (directoryId && this.directories.some((d) => d.id === directoryId)) {
+      this.activeDirectoryId = directoryId;
+    }
+    this.setActiveView('directories');
+  }
+
+  public addDirectoryDefinition(payload: {
+    code: string;
+    name: string;
+    description?: string;
+    group?: DirectoryGroupKey;
+    fields?: DirectoryFieldDef[];
+  }): DirectoryDefinition {
+    const now = new Date().toISOString();
+    const cleanCode = payload.code.trim().toUpperCase().replace(/\s+/g, '_');
+    const id = `dir_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 5)}`;
+    const fields = payload.fields || [];
+    const created: DirectoryDefinition = {
+      id,
+      code: cleanCode || `DICT_${Date.now().toString().slice(-4)}`,
+      group: payload.group || 'custom',
+      schemaType: fields.length > 0 ? 'extended' : 'simple',
+      customName: payload.name.trim(),
+      customDescription: payload.description?.trim() || '',
+      fields,
+      isSystem: false,
+      records: [],
+      updatedAt: now,
+    };
+    this.directories = [...this.directories, created];
+    this.activeDirectoryId = created.id;
+    this.saveDirectories();
+    this.logActivity('create', 'directory', created.customName || created.code, created.code, created.id);
+    this.notify();
+    if (this.activeView === 'directories') {
+      this.syncHistory(true);
+    }
+    return created;
+  }
+
+  public deleteDirectoryDefinition(directoryId: string): void {
+    const target = this.directories.find((d) => d.id === directoryId);
+    if (!target || target.isSystem) return;
+    this.directories = this.directories.filter((d) => d.id !== directoryId);
+    if (this.activeDirectoryId === directoryId) {
+      this.activeDirectoryId = this.directories[0]?.id || '';
+    }
+    this.saveDirectories();
+    this.logActivity('delete', 'directory', target.customName || target.code, target.code, target.id);
+    this.notify();
+  }
+
+  public addDirectoryRecord(
+    directoryId: string,
+    data: Omit<DirectoryRecord, 'id' | 'createdAt' | 'updatedAt'>
+  ): DirectoryRecord | null {
+    const dir = this.directories.find((d) => d.id === directoryId);
+    if (!dir) return null;
+    const now = new Date().toISOString();
+    const record: DirectoryRecord = {
+      ...data,
+      id: `rec-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 5)}`,
+      isSystem: false,
+      createdAt: now,
+      updatedAt: now,
+    };
+    const nextDir: DirectoryDefinition = {
+      ...dir,
+      updatedAt: now,
+      records: [...dir.records, record],
+    };
+    this.directories = this.directories.map((d) => (d.id === directoryId ? nextDir : d));
+    this.saveDirectories();
+    this.logActivity('create', 'directory', `${record.code} — ${record.name}`, dir.code, record.id);
+    this.notify();
+    return record;
+  }
+
+  public updateDirectoryRecord(directoryId: string, updated: DirectoryRecord): void {
+    const dir = this.directories.find((d) => d.id === directoryId);
+    if (!dir) return;
+    const now = new Date().toISOString();
+    const nextRecord: DirectoryRecord = { ...updated, updatedAt: now };
+    const nextDir: DirectoryDefinition = {
+      ...dir,
+      updatedAt: now,
+      records: dir.records.map((r) => (r.id === nextRecord.id ? nextRecord : r)),
+    };
+    this.directories = this.directories.map((d) => (d.id === directoryId ? nextDir : d));
+    this.saveDirectories();
+    this.logActivity('update', 'directory', `${nextRecord.code} — ${nextRecord.name}`, dir.code, nextRecord.id);
+    this.notify();
+  }
+
+  public toggleDirectoryRecordActive(directoryId: string, recordId: string): void {
+    const dir = this.directories.find((d) => d.id === directoryId);
+    const rec = dir?.records.find((r) => r.id === recordId);
+    if (!dir || !rec) return;
+    this.updateDirectoryRecord(directoryId, { ...rec, isActive: !rec.isActive });
+  }
+
+  public duplicateDirectoryRecord(directoryId: string, recordId: string): DirectoryRecord | null {
+    const dir = this.directories.find((d) => d.id === directoryId);
+    const source = dir?.records.find((r) => r.id === recordId);
+    if (!dir || !source) return null;
+    let suffix = 1;
+    const existingCodes = new Set(dir.records.map((r) => r.code.toLowerCase()));
+    let candidateCode = `${source.code}_COPY`;
+    while (existingCodes.has(candidateCode.toLowerCase())) {
+      suffix += 1;
+      candidateCode = `${source.code}_COPY_${suffix}`;
+    }
+    const maxSort = dir.records.reduce((m, r) => Math.max(m, r.sortOrder), 0);
+    return this.addDirectoryRecord(directoryId, {
+      code: candidateCode,
+      name: `${source.name} (копия)`,
+      nameEn: source.nameEn ? `${source.nameEn} (copy)` : '',
+      description: source.description || '',
+      sortOrder: maxSort + 10,
+      isActive: source.isActive,
+      extra: source.extra ? { ...source.extra } : undefined,
+    });
+  }
+
+  public deleteDirectoryRecord(directoryId: string, recordId: string): void {
+    const dir = this.directories.find((d) => d.id === directoryId);
+    const target = dir?.records.find((r) => r.id === recordId);
+    if (!dir || !target) return;
+    const now = new Date().toISOString();
+    const nextDir: DirectoryDefinition = {
+      ...dir,
+      updatedAt: now,
+      records: dir.records.filter((r) => r.id !== recordId),
+    };
+    this.directories = this.directories.map((d) => (d.id === directoryId ? nextDir : d));
+    this.saveDirectories();
+    this.logActivity('delete', 'directory', `${target.code} — ${target.name}`, dir.code, target.id);
+    this.notify();
+  }
+
+  public resetDirectoryToDefaults(directoryId: string): void {
+    const seed = createInitialDirectories().find((d) => d.id === directoryId);
+    if (!seed) return;
+    this.directories = this.directories.map((d) =>
+      d.id === directoryId ? { ...seed, updatedAt: new Date().toISOString() } : d
+    );
+    this.saveDirectories();
+    this.logActivity('update', 'directory', seed.code, 'Сброс справочника к эталонным значениям', seed.id);
     this.notify();
   }
 

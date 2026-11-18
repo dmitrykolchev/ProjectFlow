@@ -92,6 +92,7 @@ export {
   type PendingAttachmentFile,
   type AttachmentsChangeDetail,
 } from './app-project-attachments/app-project-attachments';
+export { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -149,6 +150,7 @@ import { AppDataGridColumn } from './app-data-grid-column/app-data-grid-column';
 import { AppBankRequisites } from './app-bank-requisites/app-bank-requisites';
 import { AppCounterpartyContacts } from './app-counterparty-contacts/app-counterparty-contacts';
 import { AppProjectAttachments } from './app-project-attachments/app-project-attachments';
+import { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -198,6 +200,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-bank-requisites': AppBankRequisites,
   'app-counterparty-contacts': AppCounterpartyContacts,
   'app-project-attachments': AppProjectAttachments,
+  'app-directory-record-modal': AppDirectoryRecordModal,
 } as const;
 
 export function getRegisteredUiElements(): string[] {
