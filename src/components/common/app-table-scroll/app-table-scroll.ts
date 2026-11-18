@@ -82,7 +82,7 @@ export class AppTableScroll extends LitElement {
     }
     if (col.type === 'number') {
       const num = typeof value === 'number' ? value : Number(value);
-      return num.toLocaleString(this.locale, { maximumFractionDigits: 6 });
+      return num.toLocaleString(this.locale, { maximumFractionDigits: 5 });
     }
     return String(value);
   }

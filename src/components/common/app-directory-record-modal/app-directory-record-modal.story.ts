@@ -18,7 +18,7 @@ export const meta: ComponentStoryMeta = {
   stories: [
     {
       name: 'Extended Classifier (Units of Measure)',
-      description: 'Opens schema-driven editor with OKEI code, physical dimension, base unit, conversion factor, and precision',
+      description: 'Opens schema-driven editor with OKEI code, physical dimension, base unit, multiplier and divisor',
       render: () => {
         const uomDir =
           store.directories.find((d) => d.id === 'units_of_measure') || store.directories[0];

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation, TranslationType } from '../../../i18n';
@@ -50,7 +50,7 @@ import styles from './app-directories.css';
 type SchemaFilter = 'all' | 'simple' | 'extended';
 type WorkspaceTab = 'records' | 'schema';
 type StatusFilter = 'all' | 'active' | 'inactive';
-type SortColumn = 'code' | 'name' | 'nameEn' | 'sortOrder';
+type SortColumn = 'code' | 'name' | 'nameEn' | 'sortOrder' | 'conversionFactor';
 
 interface CustomFieldDraft {
   key: string;
@@ -242,6 +242,12 @@ export class AppDirectories extends LitElement {
     });
   }
 
+  private unitFactor(rec: DirectoryRecord): number {
+    const mult = Number(rec.extra?.multiplier ?? 1);
+    const div = Number(rec.extra?.divisor ?? 1);
+    return div > 0 ? mult / div : 0;
+  }
+
   private getFilteredRecords(dir: DirectoryDefinition): DirectoryRecord[] {
     const q = this.recordSearch.trim().toLowerCase();
     const list = dir.records.filter((rec) => {
@@ -271,6 +277,10 @@ export class AppDirectories extends LitElement {
     return [...list].sort((a, b) => {
       if (this.sortBy === 'sortOrder') {
         const diff = (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+        return diff !== 0 ? diff * dirSign : a.code.localeCompare(b.code) * dirSign;
+      }
+      if (this.sortBy === 'conversionFactor') {
+        const diff = this.unitFactor(a) - this.unitFactor(b);
         return diff !== 0 ? diff * dirSign : a.code.localeCompare(b.code) * dirSign;
       }
       const valA = String(a[this.sortBy] ?? '');
@@ -460,8 +470,8 @@ export class AppDirectories extends LitElement {
     const toDim = String(toUnit.extra?.dimension || '');
     const compatible = fromDim === toDim;
 
-    const fromFactor = Number(fromUnit.extra?.conversionFactor ?? 1);
-    const toFactor = Number(toUnit.extra?.conversionFactor ?? 1);
+    const fromFactor = this.unitFactor(fromUnit);
+    const toFactor = this.unitFactor(toUnit);
 
     const useEnFields = t.common.locale.startsWith('en');
     let convertedText = '';
@@ -563,8 +573,25 @@ export class AppDirectories extends LitElement {
     `;
   }
 
+  private renderFactorColumn(t: TranslationType) {
+    return html`
+      <app-table-scroll-column
+        field="conversionFactor"
+        label="${t.viewTexts.directories.fields.conversionFactor}"
+        type="number"
+        align="right"
+        mono
+        sortable
+        .valueFn="${(row: Record<string, unknown>) =>
+          this.unitFactor(row as unknown as DirectoryRecord)}"
+      ></app-table-scroll-column>
+    `;
+  }
+
   private renderRecordsWorkspace(dir: DirectoryDefinition, t: TranslationType) {
-    const tableFields = dir.fields.filter((f) => f.showInTable !== false);
+    const tableFields = dir.fields.filter(
+      (f) => f.showInTable !== false && f.key !== 'multiplier' && f.key !== 'divisor'
+    );
     const dimensionField = dir.fields.find((f) => f.key === 'dimension');
     const filtered = this.getFilteredRecords(dir);
     const paged = paginateItems(filtered, this.currentPage, this.pageSize);
@@ -586,6 +613,30 @@ export class AppDirectories extends LitElement {
           })),
         ]
       : [];
+
+    const tableCols: TemplateResult[] = tableFields.map((field) =>
+      html`
+        <app-table-scroll-column
+          field="${field.key}"
+          label="${this.getFieldLabel(field, t)}"
+          type="${field.type}"
+          align="${field.align || 'left'}"
+          yes-label="${t.viewTexts.directories.boolYes}"
+          no-label="${t.viewTexts.directories.boolNo}"
+          ?mono="${Boolean(field.mono)}"
+          .options="${(field.options || []).map((o) => ({
+            value: o.value,
+            label: this.getOptionLabel(o, t),
+          }))}"
+          .valueFn="${(row: Record<string, unknown>) =>
+            (row as unknown as DirectoryRecord).extra?.[field.key]}"
+        ></app-table-scroll-column>
+      `,
+    );
+    const factorAnchor = tableFields.findIndex((f) => f.key === 'baseUnitCode');
+    if (dir.id === 'units_of_measure' && factorAnchor !== -1) {
+      tableCols.splice(factorAnchor + 1, 0, this.renderFactorColumn(t));
+    }
 
     return html`
       ${this.renderUnitConverter(dir, t)}
@@ -677,25 +728,7 @@ export class AppDirectories extends LitElement {
           label="${t.viewTexts.directories.thNameEn}"
           sortable
         ></app-table-scroll-column>
-        ${tableFields.map(
-          (field) => html`
-            <app-table-scroll-column
-              field="${field.key}"
-              label="${this.getFieldLabel(field, t)}"
-              type="${field.type}"
-              align="${field.align || 'left'}"
-              yes-label="${t.viewTexts.directories.boolYes}"
-              no-label="${t.viewTexts.directories.boolNo}"
-              ?mono="${Boolean(field.mono)}"
-              .options="${(field.options || []).map((o) => ({
-                value: o.value,
-                label: this.getOptionLabel(o, t),
-              }))}"
-              .valueFn="${(row: Record<string, unknown>) =>
-                (row as unknown as DirectoryRecord).extra?.[field.key]}"
-            ></app-table-scroll-column>
-          `
-        )}
+        ${tableCols}
         <app-table-scroll-column
           field="sortOrder"
           label="${t.viewTexts.directories.thSortOrder}"
