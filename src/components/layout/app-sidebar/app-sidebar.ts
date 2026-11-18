@@ -253,7 +253,11 @@ export class AppSidebar extends LitElement {
             if (!currentUser) return '';
             return !this.collapsed
               ? html`
-                  <div class="user-profile">
+                  <div
+                    class="user-profile is-clickable"
+                    title="${t.viewTexts.sidebar.profileOpenTitle}"
+                    @click="${() => store.setActiveView('profile-settings')}"
+                  >
                     <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
                     <div class="user-info">
                       <span class="user-name">${currentUser.name}</span>
@@ -262,7 +266,12 @@ export class AppSidebar extends LitElement {
                   </div>
                 `
               : html`
-                  <div class="user-profile" style="justify-content: center;">
+                  <div
+                    class="user-profile is-clickable"
+                    style="justify-content: center;"
+                    title="${t.viewTexts.sidebar.profileOpenTitle}"
+                    @click="${() => store.setActiveView('profile-settings')}"
+                  >
                     <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
                   </div>
                 `;

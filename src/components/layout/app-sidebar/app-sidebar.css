@@ -186,6 +186,18 @@
   padding: 0.4rem 0.25rem;
 }
 
+.user-profile.is-clickable {
+  cursor: pointer;
+  border-radius: var(--radius-md, 8px);
+  transition: background-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+.user-profile.is-clickable:hover {
+  background: var(--bg-hover, #223049);
+  box-shadow: var(--surface-glow, none);
+}
+
 .user-info {
   display: flex;
   flex-direction: column;
