@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconAlertTriangle, iconCheck, iconCpu, iconDashboard, iconRefreshCw, iconTable } from '../../common/icons';
+import { iconAlertTriangle, iconCheck, iconCpu, iconDashboard, iconRefreshCw, iconTable, iconWallet } from '../../common/icons';
 import { DEFAULT_AI_ENDPOINT, fetchAvailableModels, formatAiError } from '../../../services/openai-client';
 import { eventValue } from '../../common/event-value';
 import { CARD_GRID_PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE_OPTIONS } from '../../common/paginate';
@@ -714,6 +714,54 @@ export class AppSettings extends LitElement {
                 </div>
               `
             : ''}
+        </app-section-card>
+
+        <!-- Daily AI Request Budget -->
+        <app-section-card variant="panel" title="${t.viewTexts.ai.budgetTitle}">
+          <span slot="icon">${iconWallet(17)}</span>
+          <p class="section-desc">${t.viewTexts.ai.budgetDesc}</p>
+
+          <div class="ai-settings-grid">
+            <div class="ai-field-group">
+              <app-input
+                type="number"
+                label="${t.viewTexts.ai.reqLimitLabel}"
+                hint="${t.viewTexts.ai.reqLimitHint}"
+                .value="${String(this.custom.aiBudget.dailyRequests)}"
+                @input="${(e: CustomEvent<{ value: string }>) => {
+                  const n = Math.max(0, Math.floor(Number(eventValue(e)) || 0));
+                  store.updateCustomization({
+                    aiBudget: { ...this.custom.aiBudget, dailyRequests: n },
+                  });
+                }}"
+              ></app-input>
+            </div>
+
+            <div class="ai-field-group">
+              <app-input
+                type="number"
+                label="${t.viewTexts.ai.tokLimitLabel}"
+                hint="${t.viewTexts.ai.tokLimitHint}"
+                .value="${String(this.custom.aiBudget.dailyTokens)}"
+                @input="${(e: CustomEvent<{ value: string }>) => {
+                  const n = Math.max(0, Math.floor(Number(eventValue(e)) || 0));
+                  store.updateCustomization({
+                    aiBudget: { ...this.custom.aiBudget, dailyTokens: n },
+                  });
+                }}"
+              ></app-input>
+            </div>
+          </div>
+
+          <div class="budget-usage-row">
+            <span class="budget-usage-text">${t.viewTexts.ai.usageToday(
+              store.todayUsage().requests,
+              store.todayUsage().tokens
+            )}</span>
+            ${store.aiBudgetExhausted()
+              ? html`<span class="budget-exhausted-tag">${t.viewTexts.ai.budgetExhaustedTag}</span>`
+              : ''}
+          </div>
         </app-section-card>
 
         <!-- Reset Actions -->
