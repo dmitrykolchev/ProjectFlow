@@ -149,20 +149,22 @@ export class AppProfileSettings extends LitElement {
         <!-- Timezone -->
         <app-section-card variant="panel" title="${t.profileSettings.timezoneLabel}">
           <span slot="icon">${iconGlobe(17)}</span>
-          <div class="profile-field-group">
-            <app-select
-              label="${t.profileSettings.timezoneLabel}"
-              .value="${this.custom.timezone}"
-              .options="${TIMEZONES.map((tz) => ({ value: tz, label: tz }))}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                store.updateCustomization({ timezone: eventValue(e) })}"
-            ></app-select>
-            <span class="field-hint">${t.profileSettings.timezoneHint}</span>
-          </div>
+          <div class="section-blocks">
+            <div class="profile-field-group">
+              <app-select
+                label="${t.profileSettings.timezoneLabel}"
+                .value="${this.custom.timezone}"
+                .options="${TIMEZONES.map((tz) => ({ value: tz, label: tz }))}"
+                @change="${(e: CustomEvent<{ value: string }>) =>
+                  store.updateCustomization({ timezone: eventValue(e) })}"
+              ></app-select>
+              <span class="field-hint">${t.profileSettings.timezoneHint}</span>
+            </div>
 
-          <div class="profile-clock-row">
-            <span class="profile-clock-icon">${iconClock(14)}</span>
-            <span class="profile-clock-text">${new Date().toLocaleString(t.common.locale, { timeZone: this.custom.timezone })}</span>
+            <div class="profile-clock-row">
+              <span class="profile-clock-icon">${iconClock(14)}</span>
+              <span class="profile-clock-text">${new Date().toLocaleString(t.common.locale, { timeZone: this.custom.timezone })}</span>
+            </div>
           </div>
         </app-section-card>
 
@@ -187,8 +189,6 @@ export class AppProfileSettings extends LitElement {
         <!-- Security & Session -->
         <app-section-card variant="panel" title="${t.profileSettings.securityTitle}">
           <span slot="icon">${iconShieldCheck(17)}</span>
-          <p class="section-desc">${t.profileSettings.securityDesc}</p>
-
           ${(() => {
             const session = store.authSession;
             const providerKey = session?.provider || 'local';
@@ -196,77 +196,81 @@ export class AppProfileSettings extends LitElement {
             const twoFactorActive = currentUser ? store.isTwoFactorEnabledForUser(currentUser.id) : false;
 
             return html`
-              <div class="security-meta-grid">
-                <div class="security-meta-box">
-                  <span class="security-meta-label">${t.profileSettings.securityProviderLabel}</span>
-                  <span class="security-meta-value">
-                    ${session?.tenantId ? `${providerLabel} (${session.tenantId})` : providerLabel}
-                  </span>
-                </div>
-                <div class="security-meta-box">
-                  <span class="security-meta-label">${t.profileSettings.securitySessionAt}</span>
-                  <span class="security-meta-value">
-                    ${session?.authenticatedAt
-                      ? new Date(session.authenticatedAt).toLocaleString(t.common.locale)
-                      : '—'}
-                  </span>
-                </div>
-              </div>
+              <div class="section-blocks">
+                <p class="section-desc">${t.profileSettings.securityDesc}</p>
 
-              <div class="security-toggle-row">
-                <div class="security-toggle-copy">
-                  <span class="security-toggle-title">${t.profileSettings.security2faLabel}</span>
-                  <span class="field-hint">${t.profileSettings.security2faDesc}</span>
+                <div class="security-meta-grid">
+                  <div class="security-meta-box">
+                    <span class="security-meta-label">${t.profileSettings.securityProviderLabel}</span>
+                    <span class="security-meta-value">
+                      ${session?.tenantId ? `${providerLabel} (${session.tenantId})` : providerLabel}
+                    </span>
+                  </div>
+                  <div class="security-meta-box">
+                    <span class="security-meta-label">${t.profileSettings.securitySessionAt}</span>
+                    <span class="security-meta-value">
+                      ${session?.authenticatedAt
+                        ? new Date(session.authenticatedAt).toLocaleString(t.common.locale)
+                        : '—'}
+                    </span>
+                  </div>
                 </div>
-                <app-switch
-                  .checked="${twoFactorActive}"
-                  label="${twoFactorActive
-                    ? t.profileSettings.security2faEnabled
-                    : t.profileSettings.security2faDisabled}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) => {
-                    store.toggleCurrentUserTwoFactor(e.detail.checked);
-                    store.addNotification(
-                      'success',
-                      t.profileSettings.securityTitle,
-                      e.detail.checked
-                        ? t.profileSettings.security2faToastOn
-                        : t.profileSettings.security2faToastOff
-                    );
-                  }}"
-                ></app-switch>
-              </div>
 
-              <div class="security-actions-row">
-                <app-button
-                  variant="secondary"
-                  size="sm"
-                  @click="${() => {
-                    store.resetTrustedDevicesForCurrentUser();
-                    store.addNotification(
-                      'info',
-                      t.profileSettings.securityTitle,
-                      t.profileSettings.securityTrustedCleared
-                    );
-                  }}"
-                >
-                  <span>${t.profileSettings.securityResetTrusted}</span>
-                </app-button>
+                <div class="security-toggle-row">
+                  <div class="security-toggle-copy">
+                    <span class="security-toggle-title">${t.profileSettings.security2faLabel}</span>
+                    <span class="field-hint">${t.profileSettings.security2faDesc}</span>
+                  </div>
+                  <app-switch
+                    .checked="${twoFactorActive}"
+                    label="${twoFactorActive
+                      ? t.profileSettings.security2faEnabled
+                      : t.profileSettings.security2faDisabled}"
+                    @change="${(e: CustomEvent<{ checked: boolean }>) => {
+                      store.toggleCurrentUserTwoFactor(e.detail.checked);
+                      store.addNotification(
+                        'success',
+                        t.profileSettings.securityTitle,
+                        e.detail.checked
+                          ? t.profileSettings.security2faToastOn
+                          : t.profileSettings.security2faToastOff
+                      );
+                    }}"
+                  ></app-switch>
+                </div>
 
-                <app-button
-                  variant="danger"
-                  size="sm"
-                  @click="${() => {
-                    store.logout();
-                    store.addNotification(
-                      'info',
-                      t.profileSettings.logoutToastTitle,
-                      t.profileSettings.logoutToastDesc
-                    );
-                  }}"
-                >
-                  <span slot="icon-start">${iconLogOut(15)}</span>
-                  <span>${t.profileSettings.logoutButton}</span>
-                </app-button>
+                <div class="security-actions-row">
+                  <app-button
+                    variant="secondary"
+                    size="sm"
+                    @click="${() => {
+                      store.resetTrustedDevicesForCurrentUser();
+                      store.addNotification(
+                        'info',
+                        t.profileSettings.securityTitle,
+                        t.profileSettings.securityTrustedCleared
+                      );
+                    }}"
+                  >
+                    <span>${t.profileSettings.securityResetTrusted}</span>
+                  </app-button>
+
+                  <app-button
+                    variant="danger"
+                    size="sm"
+                    @click="${() => {
+                      store.logout();
+                      store.addNotification(
+                        'info',
+                        t.profileSettings.logoutToastTitle,
+                        t.profileSettings.logoutToastDesc
+                      );
+                    }}"
+                  >
+                    <span slot="icon-start">${iconLogOut(15)}</span>
+                    <span>${t.profileSettings.logoutButton}</span>
+                  </app-button>
+                </div>
               </div>
             `;
           })()}

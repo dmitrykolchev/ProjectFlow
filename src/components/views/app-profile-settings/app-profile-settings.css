@@ -31,6 +31,22 @@
   margin-top: -0.5rem;
 }
 
+/* vertical rhythm between blocks inside a section card body */
+.section-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* inherited <p> margins must not stack on top of the flex gap */
+.section-blocks > * {
+  margin: 0;
+}
+
+.section-blocks .section-desc {
+  margin-top: -0.5rem;
+}
+
 .profile-card-row {
   display: flex;
   align-items: center;
