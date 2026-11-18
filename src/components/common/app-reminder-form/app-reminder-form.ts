@@ -983,30 +983,24 @@ export class AppReminderForm extends LitElement {
             </div>
 
             <div class="policies-grid">
-              <div class="policy-switch-card">
-                <app-switch
-                  label="${t.reminders.policySound}"
-                  ?checked="${this.fSoundEnabled}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                    (this.fSoundEnabled = Boolean(e.detail?.checked))}"
-                ></app-switch>
-              </div>
-              <div class="policy-switch-card">
-                <app-switch
-                  label="${t.reminders.policyAck}"
-                  ?checked="${this.fRequireAck}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                    (this.fRequireAck = Boolean(e.detail?.checked))}"
-                ></app-switch>
-              </div>
-              <div class="policy-switch-card">
-                <app-switch
-                  label="${t.reminders.policyQuietHours}"
-                  ?checked="${this.fQuietHoursRespect}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                    (this.fQuietHoursRespect = Boolean(e.detail?.checked))}"
-                ></app-switch>
-              </div>
+              <app-switch
+                label="${t.reminders.policySound}"
+                ?checked="${this.fSoundEnabled}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                  (this.fSoundEnabled = Boolean(e.detail?.checked))}"
+              ></app-switch>
+              <app-switch
+                label="${t.reminders.policyAck}"
+                ?checked="${this.fRequireAck}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                  (this.fRequireAck = Boolean(e.detail?.checked))}"
+              ></app-switch>
+              <app-switch
+                label="${t.reminders.policyQuietHours}"
+                ?checked="${this.fQuietHoursRespect}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                  (this.fQuietHoursRespect = Boolean(e.detail?.checked))}"
+              ></app-switch>
             </div>
 
             <app-form-grid columns="2">
