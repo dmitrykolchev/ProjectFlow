@@ -2,6 +2,7 @@ import {
   AccentColor,
   ActiveView,
   ActivityLogItem,
+  AiUsageDay,
   BackgroundPreset,
   BankRequisite,
   Calculation,
@@ -56,6 +57,7 @@ import { locationToPath, pathToLocation, NavLocation } from '../domain/navigatio
 import { getTranslation } from '../i18n';
 
 const STORAGE_KEY_CUSTOMIZATION = 'projectflow_customization_v1';
+const STORAGE_KEY_USAGE = 'projectflow_ai_usage_v1';
 const STORAGE_KEY_TASKS = 'projectflow_tasks_v2';
 const STORAGE_KEY_PROJECTS = 'projectflow_projects_v2';
 const STORAGE_KEY_LOGS = 'projectflow_activity_v1';
@@ -90,6 +92,7 @@ const defaultCustomization: UserCustomization = {
   cardGridPageSize: 6,
   aiEndpoint: 'http://127.0.0.1:3000/v1',
   aiModel: '',
+  aiBudget: { dailyRequests: 0, dailyTokens: 0 },
   gridColumns: {
     id: true,
     title: true,
@@ -291,6 +294,8 @@ export class AppStore {
   public customization: UserCustomization = { ...defaultCustomization };
   public activityLog: ActivityLogItem[] = [];
   public notifications: NotificationItem[] = [];
+  public aiUsage: AiUsageDay[] = [];
+  public aiBusyCount: number = 0;
 
   public isTaskModalOpen: boolean = false;
   public editingTask: Task | null = null;
@@ -344,6 +349,16 @@ export class AppStore {
         }
         if (typeof this.customization.aiModel !== 'string') {
           this.customization.aiModel = defaultCustomization.aiModel;
+        }
+        const budget = this.customization.aiBudget;
+        if (
+          !budget ||
+          typeof budget.dailyRequests !== 'number' ||
+          budget.dailyRequests < 0 ||
+          typeof budget.dailyTokens !== 'number' ||
+          budget.dailyTokens < 0
+        ) {
+          this.customization.aiBudget = { ...defaultCustomization.aiBudget };
         }
         this.activeView = this.customization.defaultView || 'dashboard';
       }
@@ -555,6 +570,19 @@ export class AppStore {
       this.requirements = storedRequirements
         ? JSON.parse(storedRequirements)
         : [...initialRequirements];
+
+      const storedUsage = localStorage.getItem(STORAGE_KEY_USAGE);
+      if (storedUsage) {
+        const parsed: AiUsageDay[] = JSON.parse(storedUsage);
+        this.aiUsage = parsed.filter(
+          (d) =>
+            d &&
+            typeof d.date === 'string' &&
+            /^\d{4}-\d{2}-\d{2}$/.test(d.date) &&
+            typeof d.requests === 'number' &&
+            typeof d.tokens === 'number'
+        );
+      }
 
       const storedLogs = localStorage.getItem(STORAGE_KEY_LOGS);
       if (storedLogs) {
@@ -1518,6 +1546,62 @@ export class AppStore {
     this.customization = { ...this.customization, ...partial };
     this.applyThemeAndCustomization();
     this.saveCustomization();
+    this.notify();
+  }
+
+  // --- AI usage & budget ---
+
+  private todayKey(): string {
+    const d = new Date();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${d.getFullYear()}-${m}-${day}`;
+  }
+
+  private saveUsage(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_USAGE, JSON.stringify(this.aiUsage));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  public todayUsage(): AiUsageDay {
+    const key = this.todayKey();
+    const day = this.aiUsage.find((d) => d.date === key);
+    return day || { date: key, requests: 0, tokens: 0 };
+  }
+
+  /** true when the daily budget is exhausted and a new AI request must be refused */
+  public aiBudgetExhausted(): boolean {
+    const budget = this.customization.aiBudget;
+    const usage = this.todayUsage();
+    if (budget.dailyRequests > 0 && usage.requests >= budget.dailyRequests) return true;
+    if (budget.dailyTokens > 0 && usage.tokens >= budget.dailyTokens) return true;
+    return false;
+  }
+
+  public recordAiUsage(tokens: number): void {
+    const key = this.todayKey();
+    let day = this.aiUsage.find((d) => d.date === key);
+    if (!day) {
+      day = { date: key, requests: 0, tokens: 0 };
+      this.aiUsage = [...this.aiUsage, day];
+    }
+    const updated: AiUsageDay = {
+      date: key,
+      requests: day.requests + 1,
+      tokens: day.tokens + Math.max(0, Math.round(tokens || 0)),
+    };
+    this.aiUsage = this.aiUsage.map((d) => (d.date === key ? updated : d));
+    this.saveUsage();
+    this.notify();
+  }
+
+  public setAiBusy(active: boolean): void {
+    const next = Math.max(0, this.aiBusyCount + (active ? 1 : -1));
+    if (next === this.aiBusyCount) return;
+    this.aiBusyCount = next;
     this.notify();
   }
 

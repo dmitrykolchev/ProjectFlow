@@ -612,6 +612,17 @@ export interface NotificationItem {
   timestamp: number;
 }
 
+export interface AiUsageDay {
+  date: string; // YYYY-MM-DD
+  requests: number;
+  tokens: number;
+}
+
+export interface AiBudgetConfig {
+  dailyRequests: number; // 0 = unlimited
+  dailyTokens: number; // 0 = unlimited
+}
+
 export interface UserCustomization {
   theme: ThemeMode;
   density: DensityMode;
@@ -629,6 +640,7 @@ export interface UserCustomization {
   cardGridPageSize: number;
   aiEndpoint: string;
   aiModel: string;
+  aiBudget: AiBudgetConfig;
   gridColumns: {
     id: boolean;
     title: boolean;
