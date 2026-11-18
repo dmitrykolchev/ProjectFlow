@@ -3486,7 +3486,7 @@ export const initialRequirements: ProjectRequirement[] = [
   },
 ];
 
-export const initialReminders: Reminder[] = [
+const reminderSeeds: Reminder[] = [
   {
     id: 'rem-1',
     title: 'Контроль оплаты счёта № СЧ-2026-041 (Северный Капитал Банк)',
@@ -4045,6 +4045,45 @@ export const initialReminders: Reminder[] = [
     updatedAt: '2026-11-16T11:45:00Z',
   },
 ];
+
+// Seed dates are authored around 2026-11-19. Shifting every seed date by the day
+// delta from that anchor keeps the demo pattern (overdue / due today / upcoming)
+// valid as real time passes, instead of letting every seed become overdue.
+const REMINDER_SEED_ANCHOR = new Date(2026, 10, 19);
+
+function seedDayDelta(): number {
+  const now = new Date();
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((todayMidnight.getTime() - REMINDER_SEED_ANCHOR.getTime()) / 86400000);
+}
+
+function shiftSeedDate(value: string | undefined, days: number): string | undefined {
+  if (!value) return value;
+  const m = /^(\d{4})-(\d{2})-(\d{2})(.*)$/.exec(value);
+  if (!m) return value;
+  const shifted = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]) + days);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${shifted.getFullYear()}-${pad(shifted.getMonth() + 1)}-${pad(shifted.getDate())}${m[4]}`;
+}
+
+function shiftReminderSeedsToToday(seeds: Reminder[]): Reminder[] {
+  const days = seedDayDelta();
+  if (days === 0) return seeds.map((rem) => ({ ...rem }));
+  return seeds.map((rem) => ({
+    ...rem,
+    dueAt: shiftSeedDate(rem.dueAt, days) as string,
+    snoozedUntil: shiftSeedDate(rem.snoozedUntil, days),
+    completedAt: shiftSeedDate(rem.completedAt, days),
+    createdAt: shiftSeedDate(rem.createdAt, days) as string,
+    updatedAt: shiftSeedDate(rem.updatedAt, days) as string,
+    recurrence: {
+      ...rem.recurrence,
+      endDate: shiftSeedDate(rem.recurrence.endDate, days),
+    },
+  }));
+}
+
+export const initialReminders: Reminder[] = shiftReminderSeedsToToday(reminderSeeds);
 
 
 
