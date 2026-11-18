@@ -122,6 +122,7 @@ import paymentsMeta from '../app-payments/app-payments.story';
 import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
 import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
+import profileSettingsMeta from '../app-profile-settings/app-profile-settings.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
   buttonMeta,
@@ -234,6 +235,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   timeTrackingMeta,
   expensesMeta,
   settingsMeta,
+  profileSettingsMeta,
 ];
 
 @customElement('app-storybook')
