@@ -1,0 +1,285 @@
+import { html, TemplateResult } from 'lit';
+import { ComponentStoryMeta } from '../../../types/storybook';
+import { iconEdit, iconCopy, iconTrash } from '../icons';
+import '../app-switch/app-switch';
+import './app-table-scroll';
+import '../app-table-scroll-column/app-table-scroll-column';
+
+type DemoRecord = {
+  code: string;
+  name: string;
+  description: string;
+  category: string;
+  billable: boolean;
+  rate: number;
+  isActive: boolean;
+};
+
+const demoRecords: DemoRecord[] = [
+  {
+    code: 'DEV',
+    name: 'Development',
+    description: 'Feature and component implementation work',
+    category: 'engineering',
+    billable: true,
+    rate: 1200,
+    isActive: true,
+  },
+  {
+    code: 'PM',
+    name: 'Project Management',
+    description: 'Planning, tracking and reporting',
+    category: 'management',
+    billable: true,
+    rate: 950,
+    isActive: true,
+  },
+  {
+    code: 'QA',
+    name: 'Quality Assurance',
+    description: 'Testing and acceptance of deliverables',
+    category: 'engineering',
+    billable: true,
+    rate: 850,
+    isActive: true,
+  },
+  {
+    code: 'OPS',
+    name: 'Operations Support',
+    description: 'Production monitoring and maintenance',
+    category: 'operations',
+    billable: false,
+    rate: 700,
+    isActive: true,
+  },
+  {
+    code: 'ARCH',
+    name: 'Legacy Architecture Review',
+    description: 'Retired audit activity, kept for history',
+    category: 'management',
+    billable: false,
+    rate: 600,
+    isActive: false,
+  },
+];
+
+const categoryOptions = [
+  { value: 'engineering', label: 'Engineering' },
+  { value: 'management', label: 'Management' },
+  { value: 'operations', label: 'Operations' },
+];
+
+function renderNameCell(row: Record<string, unknown>): TemplateResult {
+  const rec = row as unknown as DemoRecord;
+  return html`
+    <div class="cell-name-main">${rec.name}</div>
+    ${rec.description ? html`<div class="cell-name-desc">${rec.description}</div>` : ''}
+  `;
+}
+
+function renderActiveCell(row: Record<string, unknown>): TemplateResult {
+  const rec = row as unknown as DemoRecord;
+  return html`
+    <app-switch
+      .checked="${rec.isActive}"
+      @change="${(e: Event) => {
+        rec.isActive = !rec.isActive;
+        const host = (e.composedPath() as EventTarget[]).find(
+          (n) => (n as HTMLElement).tagName === 'APP-TABLE-SCROLL',
+        ) as HTMLElement & { requestUpdate: () => void };
+        if (host) host.requestUpdate();
+      }}"
+    ></app-switch>
+  `;
+}
+
+function renderActionsCell(row: Record<string, unknown>): TemplateResult {
+  const rec = row as unknown as DemoRecord;
+  return html`
+    <div class="row-actions">
+      <button
+        type="button"
+        class="icon-action-btn"
+        title="Edit"
+        @click="${() => console.log('edit', rec.code)}"
+      >
+        ${iconEdit(15)}
+      </button>
+      <button
+        type="button"
+        class="icon-action-btn"
+        title="Duplicate"
+        @click="${() => console.log('duplicate', rec.code)}"
+      >
+        ${iconCopy(14)}
+      </button>
+      <button
+        type="button"
+        class="icon-action-btn is-danger"
+        title="Delete"
+        @click="${() => console.log('delete', rec.code)}"
+      >
+        ${iconTrash(15)}
+      </button>
+    </div>
+  `;
+}
+
+export const meta: ComponentStoryMeta = {
+  title: 'Common/TableScroll',
+  component: 'app-table-scroll',
+  description:
+    'Lightweight scrollable table with sticky sortable headers, field-driven cell formatting (text/number/boolean/select), mono and code cells, inactive row dimming, custom render columns and empty state. Columns are declared as child app-table-scroll-column elements.',
+  category: 'Common',
+  propsDoc: {
+    rows: 'Array of row objects rendered by the table',
+    'sort-by': 'Field name currently used for sorting (arrow shown on its header)',
+    'sort-dir': 'Current sort direction: asc / desc',
+    'active-key': 'Row property holding the active flag; falsy rows render as is-inactive',
+    'empty-title': 'Title passed to the compact empty state when rows is empty',
+    locale: 'Locale used for number formatting (t.common.locale)',
+    striped: 'Enables alternating row background coloring (zebra striping)',
+    'sort-change event': 'Emitted with detail { field, dir } when a header sort button is clicked',
+  },
+  stories: [
+    {
+      name: 'Directory Records Table',
+      description:
+        'Full replica of the directories record table: code, name with description, select, number, boolean columns plus active switch and row action buttons',
+      render: () => html`
+        <div style="max-width: 900px;">
+          <app-table-scroll .rows="${demoRecords}" sort-by="code" sort-dir="asc">
+            <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
+            <app-table-scroll-column
+              field="name"
+              label="Name"
+              sortable
+              .cellRender="${renderNameCell}"
+            ></app-table-scroll-column>
+            <app-table-scroll-column
+              field="category"
+              label="Category"
+              type="select"
+              .options="${categoryOptions}"
+            ></app-table-scroll-column>
+            <app-table-scroll-column
+              field="billable"
+              label="Billable"
+              type="boolean"
+              align="center"
+              yes-label="Yes"
+              no-label="No"
+            ></app-table-scroll-column>
+            <app-table-scroll-column
+              field="rate"
+              label="Rate, ₽/h"
+              type="number"
+              align="right"
+              mono
+            ></app-table-scroll-column>
+            <app-table-scroll-column
+              field="isActive"
+              label="Active"
+              align="center"
+              .cellRender="${renderActiveCell}"
+            ></app-table-scroll-column>
+            <app-table-scroll-column
+              field=""
+              label="Actions"
+              align="right"
+              .cellRender="${renderActionsCell}"
+            ></app-table-scroll-column>
+          </app-table-scroll>
+        </div>
+      `,
+    },
+    {
+      name: 'Sorting & Inactive Rows',
+      description:
+        'Clicking header sort buttons emits sort-change; the caller re-sorts rows. Rows with a falsy active flag render dimmed',
+      render: () => {
+        let rows = [...demoRecords];
+        let sortBy = 'rate';
+        let sortDir: 'asc' | 'desc' = 'asc';
+        return html`
+          <div style="max-width: 700px;">
+            <app-table-scroll
+              .rows="${rows}"
+              sort-by="${sortBy}"
+              sort-dir="${sortDir}"
+              @sort-change="${(e: CustomEvent<{ field: string; dir: 'asc' | 'desc' }>) => {
+                sortBy = e.detail.field;
+                sortDir = e.detail.dir;
+                rows.sort((a, b) => {
+                  const av = a[sortBy as keyof DemoRecord];
+                  const bv = b[sortBy as keyof DemoRecord];
+                  const cmp =
+                    typeof av === 'number' && typeof bv === 'number'
+                      ? av - bv
+                      : String(av).localeCompare(String(bv));
+                  return sortDir === 'asc' ? cmp : -cmp;
+                });
+                const target = e.currentTarget as HTMLElement & {
+                  rows: Record<string, unknown>[];
+                  sortBy: string;
+                  sortDir: 'asc' | 'desc';
+                };
+                if (target) {
+                  target.rows = [...rows];
+                  target.sortBy = sortBy;
+                  target.sortDir = sortDir;
+                }
+              }}"
+            >
+              <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
+              <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
+              <app-table-scroll-column
+                field="rate"
+                label="Rate, ₽/h"
+                type="number"
+                align="right"
+                mono
+                sortable
+              ></app-table-scroll-column>
+            </app-table-scroll>
+          </div>
+        `;
+      },
+    },
+    {
+      name: 'Striped Rows',
+      description:
+        'The striped attribute enables alternating row background coloring; inactive rows stay dimmed over the zebra pattern',
+      render: () => html`
+        <div style="max-width: 700px;">
+          <app-table-scroll .rows="${demoRecords}" striped sort-by="code" sort-dir="asc">
+            <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
+            <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
+            <app-table-scroll-column
+              field="rate"
+              label="Rate, ₽/h"
+              type="number"
+              align="right"
+              mono
+              sortable
+            ></app-table-scroll-column>
+          </app-table-scroll>
+        </div>
+      `,
+    },
+    {
+      name: 'Empty State',
+      description: 'Compact app-empty-state rendered when the rows array is empty',
+      render: () => html`
+        <div style="max-width: 700px;">
+          <table-scroll .rows="${[]}" empty-title="No records found">
+            <app-table-scroll-column field="code" label="Code" sortable></app-table-scroll-column>
+            <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
+          </app-table-scroll>
+        </div>
+      `,
+    },
+  ],
+};
+
+export default meta;

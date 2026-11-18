@@ -94,6 +94,14 @@ export {
   type AttachmentsChangeDetail,
 } from './app-project-attachments/app-project-attachments';
 export { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
+export { AppTableScroll, type SortDirection, type SortChangeDetail } from './app-table-scroll/app-table-scroll';
+export {
+  AppTableScrollColumn,
+  type TableCellType,
+  type CellAlign,
+  type CellRenderFn,
+  type ColumnOption,
+} from './app-table-scroll-column/app-table-scroll-column';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -153,6 +161,8 @@ import { AppBankRequisites } from './app-bank-requisites/app-bank-requisites';
 import { AppCounterpartyContacts } from './app-counterparty-contacts/app-counterparty-contacts';
 import { AppProjectAttachments } from './app-project-attachments/app-project-attachments';
 import { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
+import { AppTableScroll } from './app-table-scroll/app-table-scroll';
+import { AppTableScrollColumn } from './app-table-scroll-column/app-table-scroll-column';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -204,6 +214,8 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-counterparty-contacts': AppCounterpartyContacts,
   'app-project-attachments': AppProjectAttachments,
   'app-directory-record-modal': AppDirectoryRecordModal,
+  'app-table-scroll': AppTableScroll,
+  'app-table-scroll-column': AppTableScrollColumn,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

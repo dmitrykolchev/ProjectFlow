@@ -85,6 +85,7 @@ import contextChipsListMeta from '../../common/app-context-chips-list/app-contex
 import draggableListItemMeta from '../../common/app-draggable-list-item/app-draggable-list-item.story';
 import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
 import directoryRecordModalMeta from '../../common/app-directory-record-modal/app-directory-record-modal.story';
+import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -204,6 +205,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   draggableListItemMeta,
   draggableListMeta,
   directoryRecordModalMeta,
+  tableScrollMeta,
   toastMeta,
   activityMeta,
   headerMeta,
