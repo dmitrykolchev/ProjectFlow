@@ -134,7 +134,7 @@
   height: 17px;
   padding: 0 4px;
   border-radius: 4px;
-  background: var(--color-warning, #f59e0b);
+  background: var(--color-warning-solid, #d97706);
   color: var(--text-inverse, #090d16);
   font-family: var(--font-mono, monospace);
   font-size: 0.6875rem;
@@ -354,7 +354,7 @@ th.drop-after {
 }
 
 .sort-indicator.is-group-sort .sort-dir-arrow {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning-solid, #d97706);
 }
 
 .sort-order-num {
@@ -382,7 +382,7 @@ th:hover .th-group-icon {
 }
 
 .th-group-icon.is-grouped {
-  color: var(--color-warning, #f59e0b);
+  color: var(--color-warning-solid, #d97706);
   opacity: 1;
 }
 
