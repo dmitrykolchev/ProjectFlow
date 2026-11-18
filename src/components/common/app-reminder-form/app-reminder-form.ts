@@ -323,9 +323,8 @@ export class AppReminderForm extends LitElement {
   }
 
   private openTemplatesDirectory() {
-    store.activeDirectoryId = 'recurrence_templates';
     this.closeModal();
-    store.setActiveView('directories');
+    store.openDirectory('recurrence_templates');
   }
 
   private handleSave() {

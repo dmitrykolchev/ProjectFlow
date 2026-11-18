@@ -153,8 +153,7 @@ export class AppReminders extends LitElement {
   }
 
   private openRecurrenceDirectory() {
-    store.activeDirectoryId = 'recurrence_templates';
-    store.setActiveView('directories');
+    store.openDirectory('recurrence_templates');
   }
 
   render() {
