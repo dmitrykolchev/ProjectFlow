@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
-import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconContrast, iconHeart, iconTerminal, iconZap } from '../../common/icons';
+import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconContrast, iconHeart, iconTerminal, iconZap, iconRefreshCw } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
@@ -35,6 +35,7 @@ export class AppHeader extends LitElement {
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
   @state() private activityCount = store.activityLog.length;
+  @state() private aiBusyCount = store.aiBusyCount;
 
   private unsubscribe?: () => void;
 
@@ -68,6 +69,7 @@ export class AppHeader extends LitElement {
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
     this.activityCount = store.activityLog.length;
+    this.aiBusyCount = store.aiBusyCount;
   }
 
   render() {
@@ -188,6 +190,15 @@ export class AppHeader extends LitElement {
               @input="${(e: Event) => store.setSearchQuery((e.target as HTMLInputElement).value)}"
             />
           </div>
+
+          ${this.aiBusyCount > 0
+            ? html`
+                <div class="ai-busy-chip" title="${t.viewTexts.ai.busyLabel(this.aiBusyCount)}">
+                  <span class="ai-busy-spin">${iconRefreshCw(14)}</span>
+                  <span>${t.viewTexts.ai.busyLabel(this.aiBusyCount)}</span>
+                </div>
+              `
+            : ''}
 
           <button
             class="icon-action-btn"

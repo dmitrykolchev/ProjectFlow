@@ -150,6 +150,35 @@
   box-shadow: var(--accent-glow, none);
 }
 
+.ai-busy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.7rem;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.ai-busy-spin {
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent-primary, #6366f1);
+  animation: ai-busy-rotate 1.2s linear infinite;
+}
+
+@keyframes ai-busy-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: flex;
