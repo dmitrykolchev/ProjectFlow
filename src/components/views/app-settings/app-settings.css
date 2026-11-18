@@ -465,12 +465,14 @@
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .ai-status-banner {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
+  margin-top: 1rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md, 8px);
   font-size: 0.8rem;
@@ -500,7 +502,7 @@
   align-items: center;
   gap: 0.6rem;
   flex-wrap: wrap;
-  margin-top: 0.9rem;
+  margin-top: 1rem;
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md, 8px);
   background: var(--bg-elevated, rgba(148, 163, 184, 0.08));
@@ -531,6 +533,7 @@
   align-items: center;
   gap: 0.45rem;
   flex-wrap: wrap;
+  margin-top: 1rem;
 }
 
 .ai-models-label {
