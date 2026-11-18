@@ -4100,7 +4100,6 @@ export class AppStore {
         break;
       case 'hour':
         next.setHours(next.getHours() + interval);
-        shiftWeekendIfNeeded(next);
         break;
       case 'day':
         next.setDate(next.getDate() + interval);
