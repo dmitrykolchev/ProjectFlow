@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { AccentColor, ActiveView, BackgroundPreset, ThemeBaseColors, ThemeMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconAlertTriangle, iconCheck, iconCpu, iconDashboard, iconRefreshCw, iconTable, iconWallet } from '../../common/icons';
+import { iconAlertTriangle, iconCheck, iconCpu, iconDashboard, iconRefreshCw, iconSettings, iconTable, iconWallet } from '../../common/icons';
 import { DEFAULT_AI_ENDPOINT, fetchAvailableModels, formatAiError } from '../../../services/openai-client';
 import { eventValue } from '../../common/event-value';
 import { CARD_GRID_PAGE_SIZE_OPTIONS, TABLE_PAGE_SIZE_OPTIONS } from '../../common/paginate';
@@ -217,7 +217,9 @@ export class AppSettings extends LitElement {
 
     return html`
       <div class="settings-container">
-        <app-page-header title="${t.settings.title}" subtitle="${t.settings.subtitle}"></app-page-header>
+        <app-page-header title="${t.settings.title}" subtitle="${t.settings.subtitle}">
+          <span slot="icon">${iconSettings(28)}</span>
+        </app-page-header>
 
         <!-- Theme Mode -->
         <app-section-card variant="panel" title="${t.settings.theme}">
