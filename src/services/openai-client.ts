@@ -17,10 +17,11 @@ import type {
   TaskPriority,
 } from '../types';
 import type { getTranslation } from '../i18n';
+import { store } from '../state/store';
 
 export const DEFAULT_AI_ENDPOINT = 'http://127.0.0.1:47831/v1';
 
-export type AiErrorCode = 'NETWORK_ERROR' | 'HTTP_ERROR' | 'EMPTY_RESPONSE' | 'PARSE_ERROR' | 'ABORTED';
+export type AiErrorCode = 'NETWORK_ERROR' | 'HTTP_ERROR' | 'EMPTY_RESPONSE' | 'PARSE_ERROR' | 'ABORTED' | 'BUDGET_EXCEEDED';
 
 export class AiClientError extends Error {
   public readonly code: AiErrorCode;
@@ -102,6 +103,12 @@ export function formatAiError(
     }
     if (err.code === 'EMPTY_RESPONSE') return t.viewTexts.ai.errors.empty;
     if (err.code === 'PARSE_ERROR') return t.viewTexts.ai.errors.parse;
+    if (err.code === 'ABORTED') return t.viewTexts.ai.errors.aborted;
+    if (err.code === 'BUDGET_EXCEEDED') {
+      const budget = store.customization.aiBudget;
+      const usage = store.todayUsage();
+      return t.viewTexts.ai.errors.budgetExceeded(usage.requests, budget.dailyRequests, usage.tokens, budget.dailyTokens);
+    }
     return err.message;
   }
   if (err instanceof Error) return err.message;
@@ -195,73 +202,91 @@ export async function chatCompletion(params: {
   signal?: AbortSignal;
 }): Promise<{ content: string; model: string }> {
   const endpoint = normalizeOpenAIBaseUrl(params.baseUrl);
+
+  if (store.aiBudgetExhausted()) {
+    throw new AiClientError('BUDGET_EXCEEDED', 'Daily AI budget exhausted');
+  }
+
   const model = await resolveModelName(endpoint, params.model);
 
+  store.setAiBusy(true);
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 90_000);
+  const timeoutId = setTimeout(() => controller.abort(), 300_000);
   if (params.signal) {
     params.signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
 
-  let res: Response;
   try {
-    res = await fetch(`${endpoint}/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        model,
-        messages: params.messages,
-        temperature: params.temperature ?? 0.3,
-        ...(params.maxTokens ? { max_tokens: params.maxTokens } : {}),
-        stream: false,
-      }),
-      signal: controller.signal,
-    });
-  } catch (err) {
-    clearTimeout(timeoutId);
-    if ((err as Error)?.name === 'AbortError') {
-      throw new AiClientError('ABORTED', 'Request aborted');
+    let res: Response;
+    try {
+      res = await fetch(`${endpoint}/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages: params.messages,
+          temperature: params.temperature ?? 0.3,
+          ...(params.maxTokens ? { max_tokens: params.maxTokens } : {}),
+          stream: false,
+        }),
+        signal: controller.signal,
+      });
+    } catch (err) {
+      clearTimeout(timeoutId);
+      if ((err as Error)?.name === 'AbortError') {
+        throw new AiClientError('ABORTED', 'Request aborted');
+      }
+      throw new AiClientError('NETWORK_ERROR', (err as Error)?.message || 'Network error');
     }
-    throw new AiClientError('NETWORK_ERROR', (err as Error)?.message || 'Network error');
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      const errText = await safeReadErrorText(res);
+      throw new AiClientError('HTTP_ERROR', `HTTP ${res.status}`, res.status, errText);
+    }
+
+    const data = (await res.json()) as {
+      model?: string;
+      usage?: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number };
+      choices?: Array<{
+        message?: { content?: string | Array<{ type?: string; text?: string }> };
+        text?: string;
+      }>;
+    };
+
+    const first = data.choices?.[0];
+    let content = '';
+    if (typeof first?.message?.content === 'string') {
+      content = first.message.content;
+    } else if (Array.isArray(first?.message?.content)) {
+      content = first.message.content.map((p) => p.text || '').join('\n');
+    } else if (typeof first?.text === 'string') {
+      content = first.text;
+    }
+
+    const trimmed = content.trim();
+    if (!trimmed) {
+      throw new AiClientError('EMPTY_RESPONSE', 'Empty completion response');
+    }
+
+    const usage = data.usage;
+    const tokens =
+      typeof usage?.total_tokens === 'number'
+        ? usage.total_tokens
+        : Math.round(((usage?.prompt_tokens || 0) + (usage?.completion_tokens || 0)) || 0);
+    store.recordAiUsage(tokens);
+
+    return {
+      content: trimmed,
+      model: data.model || model,
+    };
+  } finally {
+    store.setAiBusy(false);
   }
-
-  clearTimeout(timeoutId);
-
-  if (!res.ok) {
-    const errText = await safeReadErrorText(res);
-    throw new AiClientError('HTTP_ERROR', `HTTP ${res.status}`, res.status, errText);
-  }
-
-  const data = (await res.json()) as {
-    model?: string;
-    choices?: Array<{
-      message?: { content?: string | Array<{ type?: string; text?: string }> };
-      text?: string;
-    }>;
-  };
-
-  const first = data.choices?.[0];
-  let content = '';
-  if (typeof first?.message?.content === 'string') {
-    content = first.message.content;
-  } else if (Array.isArray(first?.message?.content)) {
-    content = first.message.content.map((p) => p.text || '').join('\n');
-  } else if (typeof first?.text === 'string') {
-    content = first.text;
-  }
-
-  const trimmed = content.trim();
-  if (!trimmed) {
-    throw new AiClientError('EMPTY_RESPONSE', 'Empty completion response');
-  }
-
-  return {
-    content: trimmed,
-    model: data.model || model,
-  };
 }
 
 function decodeDataUrlText(dataUrl?: string, mimeType?: string): string {
