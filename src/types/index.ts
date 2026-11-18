@@ -832,6 +832,8 @@ export interface Reminder {
   notifications: ReminderNotificationConfig;
   tags: string[];
   lastTriggeredAt?: string;
+  // per-occurrence delivery bookkeeping: "<ruleId>|<dueAt>" keys fired by the scheduler
+  triggeredKeys?: string[];
   completedAt?: string;
   createdAt: string;
   updatedAt: string;

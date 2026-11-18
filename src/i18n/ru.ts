@@ -228,6 +228,11 @@ export const ru = {
     toastPaused: 'Серия напоминаний поставлена на паузу',
     toastResumed: 'Напоминание возобновлено',
     toastTestSent: (channels: string) => `Тестовое уведомление отправлено (${channels})`,
+    deliveryTitle: 'Напоминание · срок',
+    deliveryNagTitle: 'Напоминание · повтор',
+    escalationTitle: (name: string) => `Эскалация: ${name}`,
+    activityDelivered: (channels: string) => `Отправлено через ${channels}`,
+    activityEscalated: (name: string) => `Эскалировано: ${name}`,
   },
   dashboard: {
     title: 'Операционная панель',

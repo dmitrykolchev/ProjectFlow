@@ -228,6 +228,11 @@ export const en = {
     toastPaused: 'Recurring reminder paused',
     toastResumed: 'Reminder resumed',
     toastTestSent: (channels: string) => `Test notification dispatched (${channels})`,
+    deliveryTitle: 'Reminder · due',
+    deliveryNagTitle: 'Reminder · repeat',
+    escalationTitle: (name: string) => `Escalation: ${name}`,
+    activityDelivered: (channels: string) => `Delivered via ${channels}`,
+    activityEscalated: (name: string) => `Escalated to ${name}`,
   },
   dashboard: {
     title: 'Executive Dashboard',

@@ -37,6 +37,7 @@ import {
   Reminder,
   ReminderEntityType,
   ReminderRecurrence,
+  ReminderNotificationRule,
   SidebarGroupMode,
   Task,
   TaskAiAnalysis,
@@ -334,6 +335,7 @@ export class AppStore {
   private constructor() {
     this.loadState();
     this.applyThemeAndCustomization();
+    this.startReminderScheduler();
   }
 
   public static getInstance(): AppStore {
@@ -4631,6 +4633,136 @@ export class AppStore {
     this.logActivity('status_change', 'reminder', rem.title, msg, rem.id);
     this.addNotification('info', msg, rem.title);
     this.notify();
+  }
+
+  // --- Notification scheduler: lead offsets, quiet hours, repeat nag, escalation ---
+
+  private reminderSchedulerId?: number;
+
+  public startReminderScheduler(): void {
+    if (this.reminderSchedulerId !== undefined) return;
+    this.reminderSchedulerId = window.setInterval(
+      () => this.runReminderSchedulerTick(),
+      30000
+    );
+    this.runReminderSchedulerTick();
+  }
+
+  private leadOffsetMs(rule: ReminderNotificationRule): number {
+    if (rule.offsetUnit === 'at_time' || rule.offsetValue === 0) return 0;
+    const unitMs =
+      rule.offsetUnit === 'minutes'
+        ? 60000
+        : rule.offsetUnit === 'hours'
+        ? 3600000
+        : rule.offsetUnit === 'days'
+        ? 86400000
+        : 604800000;
+    return rule.offsetValue * unitMs;
+  }
+
+  private isQuietHour(): boolean {
+    const hour = new Date().getHours();
+    return hour >= 22 || hour < 8;
+  }
+
+  public runReminderSchedulerTick(): void {
+    const t = getTranslation(this.customization.language);
+    const nowMs = Date.now();
+    const quiet = this.isQuietHour();
+    let changed = false;
+
+    for (const original of [...this.reminders]) {
+      if (original.status !== 'active' && original.status !== 'snoozed') continue;
+
+      let rem = original;
+      // snooze window elapsed → reactivate before checking deliveries
+      if (
+        rem.status === 'snoozed' &&
+        rem.snoozedUntil &&
+        nowMs >= this.parseLocalDateTime(rem.snoozedUntil).getTime()
+      ) {
+        rem = { ...rem, status: 'active', snoozedUntil: undefined };
+        changed = true;
+      }
+
+      const effectiveDue = this.getEffectiveReminderDueAt(rem);
+      const dueMs = this.parseLocalDateTime(effectiveDue).getTime();
+      const enabledRules = rem.notifications.rules.filter((r) => r.enabled);
+      const keys = rem.triggeredKeys ? [...rem.triggeredKeys] : [];
+      const firedChannels: string[] = [];
+      let nagFired = false;
+
+      for (const rule of enabledRules) {
+        if (nowMs < dueMs - this.leadOffsetMs(rule)) continue;
+        const key = `${rule.id}|${effectiveDue}`;
+        if (keys.includes(key)) continue;
+        if (rem.notifications.quietHoursRespect && quiet) continue;
+        keys.push(key);
+        firedChannels.push(t.reminders.channels[rule.channel]);
+      }
+
+      // repeat nag: overdue, unacknowledged, at least nagMinutes since the last delivery
+      const nagMinutes = rem.notifications.repeatNagMinutes || 0;
+      const overdueNow = nowMs >= dueMs;
+      if (nagMinutes > 0 && overdueNow && !quiet && firedChannels.length === 0) {
+        const nagDone = keys.filter((k) => k.startsWith(`nag|${effectiveDue}|`)).length;
+        const lastMs = rem.lastTriggeredAt ? new Date(rem.lastTriggeredAt).getTime() : dueMs;
+        if (nagDone < 3 && nowMs - lastMs >= nagMinutes * 60000) {
+          keys.push(`nag|${effectiveDue}|${nagDone}`);
+          firedChannels.push(...enabledRules.map((r) => t.reminders.channels[r.channel]));
+          nagFired = true;
+        }
+      }
+
+      // escalation of an unacknowledged overdue reminder to the designated user
+      const escId = rem.notifications.escalationUserId;
+      const escalate = Boolean(escId) && rem.notifications.requireAck && overdueNow && !quiet
+        && !keys.includes(`esc|${effectiveDue}`);
+      if (escalate) keys.push(`esc|${effectiveDue}`);
+
+      if (firedChannels.length === 0 && !escalate) {
+        if (rem !== original) {
+          this.reminders = this.reminders.map((r) => (r.id === rem.id ? rem : r));
+        }
+        continue;
+      }
+
+      const nowIso = new Date().toISOString();
+      const updated: Reminder = {
+        ...rem,
+        triggeredKeys: keys,
+        lastTriggeredAt: firedChannels.length > 0 ? nowIso : rem.lastTriggeredAt,
+        updatedAt: nowIso,
+      };
+      this.reminders = this.reminders.map((r) => (r.id === rem.id ? updated : r));
+      changed = true;
+
+      const entityLabel = this.getReminderEntityInfo(rem.entityType, rem.entityId).label;
+
+      if (firedChannels.length > 0) {
+        const channels = Array.from(new Set(firedChannels)).join(', ');
+        const title = nagFired ? t.reminders.deliveryNagTitle : t.reminders.deliveryTitle;
+        const custom = enabledRules.find((r) => r.customMessage)?.customMessage;
+        const body = custom || `${rem.title} (${entityLabel})`;
+        this.addNotification(
+          rem.priority === 'urgent' || rem.priority === 'high' ? 'warning' : 'info',
+          title,
+          body
+        );
+        this.logActivity('update', 'reminder', rem.title, t.reminders.activityDelivered(channels), rem.id);
+      }
+
+      if (escalate) {
+        const escUser = this.users.find((u) => u.id === escId);
+        if (escUser) {
+          this.addNotification('warning', t.reminders.escalationTitle(escUser.name), `${rem.title} (${entityLabel})`);
+          this.logActivity('update', 'reminder', rem.title, t.reminders.activityEscalated(escUser.name), rem.id);
+        }
+      }
+    }
+
+    if (changed) this.notify();
   }
 
   public triggerReminderNotification(id: string): void {
