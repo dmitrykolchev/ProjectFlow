@@ -16,6 +16,12 @@ import '../app-date-input/app-date-input';
 import '../app-checkbox/app-checkbox';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
+import '../app-project-attachments/app-project-attachments';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../app-project-attachments/app-project-attachments';
 
 /**
  * Canonical expense create/edit form. The component owns the whole field set (title,
@@ -51,6 +57,8 @@ export class AppExpenseForm extends LitElement {
   @state() private fStatus: ExpenseStatus = 'pending';
   @state() private fVendor = '';
   @state() private fNotes = '';
+  @state() private fDocumentIds: string[] = [];
+  @state() private fPendingFiles: PendingAttachmentFile[] = [];
   @state() private formError = '';
 
   private unsubscribe?: () => void;
@@ -102,6 +110,8 @@ export class AppExpenseForm extends LitElement {
       this.fStatus = exp.status;
       this.fVendor = exp.vendor || '';
       this.fNotes = exp.notes;
+      this.fDocumentIds = [...(exp.documentIds || [])];
+      this.fPendingFiles = [];
     } else {
       this.fTitle = '';
       this.fProjectId = this.presetProjectId ?? (store.projects[0]?.id || '');
@@ -115,6 +125,8 @@ export class AppExpenseForm extends LitElement {
       this.fStatus = 'pending';
       this.fVendor = '';
       this.fNotes = '';
+      this.fDocumentIds = [];
+      this.fPendingFiles = [];
     }
     this.formError = '';
   }
@@ -126,9 +138,27 @@ export class AppExpenseForm extends LitElement {
       return;
     }
 
+    const targetProjectId = this.fProjectId || store.projects[0]?.id || '';
+    const documentIds = commitPendingAttachments({
+      projectId: targetProjectId,
+      taskId: this.fTaskId || undefined,
+      uploadedById: this.fUserId || store.users[0]?.id || '',
+      category: 'act_invoice',
+      tags: [
+        t.viewTexts.attachments.tagExpense,
+        ...(this.fTaskId ? [this.fTaskId] : []),
+      ],
+      existingDocumentIds: this.fDocumentIds,
+      pendingFiles: this.fPendingFiles,
+      description:
+        this.fNotes.trim() ||
+        t.viewTexts.attachments.defaultExpenseDescription(this.fTitle.trim()),
+      versionNote: t.viewTexts.attachments.defaultExpenseDescription(this.fTitle.trim()),
+    });
+
     const payload = {
       title: this.fTitle.trim(),
-      projectId: this.fProjectId || store.projects[0]?.id || '',
+      projectId: targetProjectId,
       taskId: this.fTaskId || undefined,
       userId: this.fUserId || store.users[0]?.id || '',
       date: this.fDate || new Date().toISOString().slice(0, 10),
@@ -139,6 +169,7 @@ export class AppExpenseForm extends LitElement {
       status: this.fStatus,
       vendor: this.fVendor.trim() || undefined,
       notes: this.fNotes.trim(),
+      documentIds,
     };
 
     let saved: Expense;
@@ -154,6 +185,7 @@ export class AppExpenseForm extends LitElement {
       saved = store.addExpense(payload);
     }
 
+    this.fPendingFiles = [];
     this.open = false;
     this.dispatchEvent(
       new CustomEvent('saved', {
@@ -232,6 +264,9 @@ export class AppExpenseForm extends LitElement {
               @change="${(e: CustomEvent<{ value: string }>) => {
                 this.fProjectId = eventValue(e);
                 this.fTaskId = '';
+                this.fDocumentIds = this.fDocumentIds.filter((id) =>
+                  store.documents.some((d) => d.id === id && d.projectId === this.fProjectId)
+                );
               }}"
             ></app-entity-selector>
           </div>
@@ -329,6 +364,18 @@ export class AppExpenseForm extends LitElement {
               rows="2"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fNotes = eventValue(e))}"
             ></app-textarea>
+          </div>
+
+          <div class="col-span-2">
+            <app-project-attachments
+              project-id="${this.fProjectId}"
+              .documentIds="${this.fDocumentIds}"
+              .pendingFiles="${this.fPendingFiles}"
+              @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                this.fDocumentIds = e.detail.documentIds;
+                this.fPendingFiles = e.detail.pendingFiles;
+              }}"
+            ></app-project-attachments>
           </div>
         </app-form-grid>
 

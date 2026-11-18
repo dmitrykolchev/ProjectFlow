@@ -249,3 +249,51 @@
   color: var(--color-danger, #f87171);
 }
 
+.record-attach-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+  margin-top: 0.22rem;
+}
+
+.record-attach-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.12rem 0.42rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+  color: var(--accent-primary, #818cf8);
+  font-family: inherit;
+  font-size: 0.71rem;
+  font-weight: 500;
+  max-width: 190px;
+  cursor: pointer;
+}
+
+.record-attach-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.record-attach-chip:hover {
+  border-color: var(--accent-primary, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+}
+
+.quick-attach-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.quick-attach-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+

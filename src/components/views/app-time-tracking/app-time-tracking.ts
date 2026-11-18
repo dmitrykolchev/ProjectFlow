@@ -2,11 +2,12 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { TimeEntry, TimeEntryCategory, TimeEntryStatus } from '../../../types';
+import { DocumentItem, TimeEntry, TimeEntryCategory, TimeEntryStatus } from '../../../types';
 import {
   iconCheck,
   iconClock,
   iconEdit,
+  iconPaperclip,
   iconPlus,
   iconTrash,
 } from '../../common/icons';
@@ -29,6 +30,13 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-modal/app-modal';
 import '../../common/app-time-entry-form/app-time-entry-form';
+import '../../common/app-project-attachments/app-project-attachments';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../../common/app-project-attachments/app-project-attachments';
+import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
@@ -64,6 +72,9 @@ export class AppTimeTracking extends LitElement {
   @state() private quickCategory: TimeEntryCategory = 'development';
   @state() private quickDescription = '';
   @state() private quickBillable = true;
+  @state() private quickAttachOpen = false;
+  @state() private quickDocumentIds: string[] = [];
+  @state() private quickPendingFiles: PendingAttachmentFile[] = [];
 
   // Create / Edit modal
   @state() private modalOpen = false;
@@ -71,6 +82,7 @@ export class AppTimeTracking extends LitElement {
   @state() private presetTimeProjectId: string | null = null;
   @state() private presetTimeTaskId: string | null = null;
 
+  @state() private previewDoc: DocumentItem | null = null;
   @state() private deletingEntry: TimeEntry | null = null;
 
   private unsubscribe?: () => void;
@@ -97,6 +109,9 @@ export class AppTimeTracking extends LitElement {
     this.tablePageSize = store.customization.tablePageSize;
     if (!store.projects.some((p) => p.id === this.quickProjectId)) {
       this.quickProjectId = store.projects[0]?.id || '';
+    }
+    if (this.previewDoc) {
+      this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
     }
     this.ensureQuickTaskValid();
   }
@@ -281,6 +296,19 @@ export class AppTimeTracking extends LitElement {
             @change="${(e: CustomEvent<{ checked: boolean }>) => (this.quickBillable = e.detail.checked)}"
           ></app-checkbox>
           <app-button
+            variant="${this.quickAttachOpen || this.quickDocumentIds.length + this.quickPendingFiles.length > 0 ? 'secondary' : 'outline'}"
+            size="sm"
+            title="${t.viewTexts.timeTracking.attachFilesTitle}"
+            @click="${() => (this.quickAttachOpen = !this.quickAttachOpen)}"
+          >
+            <span slot="icon-start">${iconPaperclip(14)}</span>
+            <span>
+              ${t.viewTexts.attachments.attachQuickButton}${this.quickDocumentIds.length + this.quickPendingFiles.length > 0
+                ? ` (${this.quickDocumentIds.length + this.quickPendingFiles.length})`
+                : ''}
+            </span>
+          </app-button>
+          <app-button
             variant="primary"
             size="sm"
             ?disabled="${!this.quickTaskId || this.quickHours <= 0}"
@@ -290,6 +318,23 @@ export class AppTimeTracking extends LitElement {
             <span>${t.viewTexts.timeTracking.logTimeButton}</span>
           </app-button>
         </div>
+
+        ${this.quickAttachOpen
+          ? html`
+              <div class="quick-log-attachments">
+                <app-project-attachments
+                  compact
+                  project-id="${this.quickProjectId}"
+                  .documentIds="${this.quickDocumentIds}"
+                  .pendingFiles="${this.quickPendingFiles}"
+                  @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                    this.quickDocumentIds = e.detail.documentIds;
+                    this.quickPendingFiles = e.detail.pendingFiles;
+                  }}"
+                ></app-project-attachments>
+              </div>
+            `
+          : ''}
       </section>
 
       <!-- Filters Toolbar -->
@@ -338,6 +383,7 @@ export class AppTimeTracking extends LitElement {
         : this.renderByTaskView(filtered, t)}
 
       ${this.renderFormModal(t)}
+      ${this.renderPreviewModal(t)}
       ${this.renderDeleteModal(t)}
     `;
   }
@@ -529,6 +575,42 @@ export class AppTimeTracking extends LitElement {
           ></app-data-grid-column>
 
           <app-data-grid-column
+            field="documentIds"
+            caption="${t.viewTexts.timeTracking.thAttachments}"
+            width="175"
+            sortable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              return entry.documentIds?.length || 0;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
+              const docs = this.getAttachedDocs(entry);
+              if (docs.length === 0) return html`<span class="dg-sub">—</span>`;
+              return html`
+                <div class="dg-stack">
+                  ${docs.slice(0, 2).map(
+                    (doc) => html`
+                      <app-link
+                        class="dg-link"
+                        size="sm"
+                        variant="primary"
+                        @click="${() => (this.previewDoc = doc)}"
+                      >
+                        <span slot="start">${iconPaperclip(12)}</span>
+                        <span>${doc.fileName}</span>
+                      </app-link>
+                    `
+                  )}
+                  ${docs.length > 2
+                    ? html`<span class="dg-sub">+${docs.length - 2}</span>`
+                    : ''}
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
             field="status"
             caption="${t.viewTexts.timeTracking.statusLabel}"
             width="140"
@@ -619,6 +701,7 @@ export class AppTimeTracking extends LitElement {
               <th>${t.viewTexts.timeTracking.labelEmployee}</th>
               <th>${t.viewTexts.timeTracking.thCategory}</th>
               <th>${t.viewTexts.timeTracking.thDescription}</th>
+              <th>${t.viewTexts.timeTracking.thAttachments}</th>
               <th>${t.viewTexts.timeTracking.labelHours}</th>
               <th>${t.viewTexts.timeTracking.thBilling}</th>
               <th>${t.viewTexts.timeTracking.statusLabel}</th>
@@ -630,6 +713,7 @@ export class AppTimeTracking extends LitElement {
               const task = store.tasks.find((tk) => tk.id === entry.taskId);
               const proj = store.projects.find((p) => p.id === entry.projectId);
               const user = store.users.find((u) => u.id === entry.userId);
+              const docs = this.getAttachedDocs(entry);
 
               return html`
                 <tr>
@@ -664,6 +748,9 @@ export class AppTimeTracking extends LitElement {
                     </app-badge>
                   </td>
                   <td class="desc-cell">${entry.description || '—'}</td>
+                  <td>
+                    ${this.renderEntryAttachmentsCell(docs, t)}
+                  </td>
                   <td class="hours-cell">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</td>
                   <td>
                     <app-badge
@@ -816,6 +903,7 @@ export class AppTimeTracking extends LitElement {
               <div class="task-entries-list">
                 ${list.map((entry) => {
                   const user = store.users.find((u) => u.id === entry.userId);
+                  const docs = this.getAttachedDocs(entry);
                   return html`
                     <div class="task-entry-row">
                       <span class="mono">${entry.date}</span>
@@ -828,7 +916,12 @@ export class AppTimeTracking extends LitElement {
                           ${t.timeTracking.categories[entry.category]}
                         </app-badge>
                       </span>
-                      <span class="desc-cell" style="max-width: none;">${entry.description || '—'}</span>
+                      <div class="desc-cell" style="max-width: none;">
+                        <div>${entry.description || '—'}</div>
+                        ${docs.length > 0
+                          ? html`<div style="margin-top: 0.28rem;">${this.renderEntryAttachmentsCell(docs, t)}</div>`
+                          : ''}
+                      </div>
                       <span class="hours-cell">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
                       <span>
                         <app-status-chip
@@ -921,8 +1014,80 @@ export class AppTimeTracking extends LitElement {
     `;
   }
 
+  private getAttachedDocs(entry: TimeEntry): DocumentItem[] {
+    if (!entry.documentIds?.length) return [];
+    return entry.documentIds
+      .map((id) => store.documents.find((d) => d.id === id))
+      .filter((d): d is DocumentItem => Boolean(d));
+  }
+
+  private renderEntryAttachmentsCell(
+    docs: DocumentItem[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    if (docs.length === 0) {
+      return html`<span style="color: var(--text-muted);">—</span>`;
+    }
+    return html`
+      <div class="attach-chips-list">
+        ${docs.slice(0, 2).map(
+          (doc) => html`
+            <button
+              type="button"
+              class="attach-chip-btn"
+              title="${doc.title} (${t.viewTexts.attachments.previewButton})"
+              @click="${() => (this.previewDoc = doc)}"
+            >
+              ${iconPaperclip(12)}
+              <span class="attach-chip-name">${doc.fileName}</span>
+            </button>
+          `
+        )}
+        ${docs.length > 2
+          ? html`<app-badge variant="default" appearance="soft" size="sm">+${docs.length - 2}</app-badge>`
+          : ''}
+      </div>
+    `;
+  }
+
+  private renderPreviewModal(t: ReturnType<typeof getTranslation>) {
+    return html`
+      <app-modal
+        ?open="${Boolean(this.previewDoc)}"
+        size="xl"
+        title="${this.previewDoc?.title || ''}"
+        @close="${() => (this.previewDoc = null)}"
+      >
+        ${this.previewDoc
+          ? html`
+              <app-document-previewer
+                .document="${this.previewDoc}"
+                .showHeader="${false}"
+                height="480px"
+              ></app-document-previewer>
+            `
+          : ''}
+      </app-modal>
+    `;
+  }
+
   private handleQuickSubmit() {
     if (!this.quickTaskId || this.quickHours <= 0) return;
+    const t = getTranslation(this.currentLang);
+    const documentIds = commitPendingAttachments({
+      projectId: this.quickProjectId,
+      taskId: this.quickTaskId,
+      uploadedById: this.quickUserId || store.users[0]?.id || 'user-1',
+      category: 'report',
+      tags: [t.viewTexts.attachments.tagTimeEntry, this.quickTaskId],
+      existingDocumentIds: this.quickDocumentIds,
+      pendingFiles: this.quickPendingFiles,
+      description:
+        this.quickDescription.trim() ||
+        t.viewTexts.attachments.defaultTimeDescription(this.quickTaskId),
+      versionNote: t.viewTexts.attachments.defaultTimeDescription(this.quickTaskId),
+    });
+
     store.addTimeEntry({
       projectId: this.quickProjectId,
       taskId: this.quickTaskId,
@@ -933,8 +1098,12 @@ export class AppTimeTracking extends LitElement {
       category: this.quickCategory,
       status: 'logged',
       description: this.quickDescription.trim(),
+      documentIds,
     });
     this.quickDescription = '';
+    this.quickDocumentIds = [];
+    this.quickPendingFiles = [];
+    this.quickAttachOpen = false;
   }
 
   private openCreateModal(presetProjectId?: string, presetTaskId?: string) {

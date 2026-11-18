@@ -445,6 +445,19 @@ export class AppDocuments extends LitElement {
 
               <app-meta-grid columns="2" layout="grid" .items="${metaItems}"></app-meta-grid>
 
+              ${doc.timeEntryId || doc.expenseId
+                ? html`
+                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                      ${doc.timeEntryId
+                        ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
+                        : ''}
+                      ${doc.expenseId
+                        ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
+                        : ''}
+                    </div>
+                  `
+                : ''}
+
               <app-tags-row
                 mode="add-button"
                 .tags="${doc.tags}"
@@ -566,7 +579,7 @@ export class AppDocuments extends LitElement {
                       </div>
                     </td>
                     <td>
-                      <div style="display: flex; flex-direction: column; gap: 0.12rem; max-width: 240px;">
+                      <div style="display: flex; flex-direction: column; gap: 0.18rem; max-width: 240px;">
                         <span style="font-size: 0.7rem; color: var(--text-muted);">
                           ${t.documents.scopes[doc.scope]}
                         </span>
@@ -577,6 +590,18 @@ export class AppDocuments extends LitElement {
                               </app-link>
                             `
                           : html`<span>${linked.label}</span>`}
+                        ${doc.timeEntryId || doc.expenseId
+                          ? html`
+                              <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                                ${doc.timeEntryId
+                                  ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
+                                  : ''}
+                                ${doc.expenseId
+                                  ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
+                                  : ''}
+                              </div>
+                            `
+                          : ''}
                       </div>
                     </td>
                     <td>${t.documents.categories[doc.category]}</td>

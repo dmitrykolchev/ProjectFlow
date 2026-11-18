@@ -3,10 +3,11 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { formatMoney } from '../../common/app-money/app-money';
 import { getTranslation } from '../../../i18n';
-import { Expense, ExpenseCategory, ExpenseStatus } from '../../../types';
+import { DocumentItem, Expense, ExpenseCategory, ExpenseStatus } from '../../../types';
 import {
   iconCheck,
   iconEdit,
+  iconPaperclip,
   iconPlus,
   iconTrash,
   iconWallet,
@@ -28,6 +29,9 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
 import '../app-data-grid/app-data-grid';
 import '../../common/app-data-grid-column/app-data-grid-column';
+import '../../common/app-modal/app-modal';
+import '../../common/app-document-previewer/app-document-previewer';
+import '../../common/app-link/app-link';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-expenses.css';
 import { eventValue } from '../../common/event-value';
@@ -55,6 +59,7 @@ export class AppExpenses extends LitElement {
   @state() private presetExpenseProjectId: string | null = null;
   @state() private presetExpenseTaskId: string | null = null;
 
+  @state() private previewDoc: DocumentItem | null = null;
   @state() private deletingExpense: Expense | null = null;
 
   private unsubscribe?: () => void;
@@ -79,6 +84,9 @@ export class AppExpenses extends LitElement {
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
     this.cardPageSize = store.customization.cardGridPageSize;
+    if (this.previewDoc) {
+      this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
+    }
   }
 
   private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
@@ -235,6 +243,7 @@ export class AppExpenses extends LitElement {
         : this.renderRegistryTable(filtered, t)}
 
       ${this.renderFormModal(t)}
+      ${this.renderPreviewModal(t)}
       ${this.renderDeleteModal(t)}
     `;
   }
@@ -416,6 +425,42 @@ export class AppExpenses extends LitElement {
           ></app-data-grid-column>
 
           <app-data-grid-column
+            field="documentIds"
+            caption="${t.viewTexts.expenses.thAttachments}"
+            width="175"
+            sortable
+            .sortValue="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return exp.documentIds?.length || 0;
+            }}"
+            .template="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              const docs = this.getAttachedDocs(exp);
+              if (docs.length === 0) return html`<span class="dg-sub">—</span>`;
+              return html`
+                <div class="dg-stack">
+                  ${docs.slice(0, 2).map(
+                    (doc) => html`
+                      <app-link
+                        class="dg-link"
+                        size="sm"
+                        variant="primary"
+                        @click="${() => (this.previewDoc = doc)}"
+                      >
+                        <span slot="start">${iconPaperclip(12)}</span>
+                        <span>${doc.fileName}</span>
+                      </app-link>
+                    `
+                  )}
+                  ${docs.length > 2
+                    ? html`<span class="dg-sub">+${docs.length - 2}</span>`
+                    : ''}
+                </div>
+              `;
+            }}"
+          ></app-data-grid-column>
+
+          <app-data-grid-column
             field="status"
             caption="${t.viewTexts.expenses.thStatus}"
             width="145"
@@ -515,6 +560,7 @@ export class AppExpenses extends LitElement {
               <th>${t.viewTexts.expenses.thProjectTask}</th>
               <th>${t.viewTexts.expenses.thCategory}</th>
               <th>${t.viewTexts.expenses.thOwner}</th>
+              <th>${t.viewTexts.expenses.thAttachments}</th>
               <th>${t.viewTexts.expenses.thAmount}</th>
               <th>${t.viewTexts.expenses.thStatus}</th>
               <th></th>
@@ -525,6 +571,7 @@ export class AppExpenses extends LitElement {
               const proj = store.projects.find((p) => p.id === exp.projectId);
               const task = exp.taskId ? store.tasks.find((tk) => tk.id === exp.taskId) : undefined;
               const user = store.users.find((u) => u.id === exp.userId);
+              const docs = this.getAttachedDocs(exp);
 
               return html`
                 <tr>
@@ -567,6 +614,9 @@ export class AppExpenses extends LitElement {
                     </app-badge>
                   </td>
                   <td style="white-space: nowrap;">${user?.name || exp.userId}</td>
+                  <td>
+                    ${this.renderExpenseAttachmentsCell(docs, t)}
+                  </td>
                   <td class="amount-cell">
                     <div>${formatMoney(exp.amount, exp.currency)}</div>
                     ${exp.billable
@@ -747,6 +797,63 @@ export class AppExpenses extends LitElement {
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
       ></app-pagination>
+    `;
+  }
+
+  private getAttachedDocs(exp: Expense): DocumentItem[] {
+    if (!exp.documentIds?.length) return [];
+    return exp.documentIds
+      .map((id) => store.documents.find((d) => d.id === id))
+      .filter((d): d is DocumentItem => Boolean(d));
+  }
+
+  private renderExpenseAttachmentsCell(
+    docs: DocumentItem[],
+    t: ReturnType<typeof getTranslation>
+  ) {
+    if (docs.length === 0) {
+      return html`<span style="color: var(--text-muted);">—</span>`;
+    }
+    return html`
+      <div class="attach-chips-list">
+        ${docs.slice(0, 2).map(
+          (doc) => html`
+            <button
+              type="button"
+              class="attach-chip-btn"
+              title="${doc.title} (${t.viewTexts.attachments.previewButton})"
+              @click="${() => (this.previewDoc = doc)}"
+            >
+              ${iconPaperclip(12)}
+              <span class="attach-chip-name">${doc.fileName}</span>
+            </button>
+          `
+        )}
+        ${docs.length > 2
+          ? html`<app-badge variant="default" appearance="soft" size="sm">+${docs.length - 2}</app-badge>`
+          : ''}
+      </div>
+    `;
+  }
+
+  private renderPreviewModal(t: ReturnType<typeof getTranslation>) {
+    return html`
+      <app-modal
+        ?open="${Boolean(this.previewDoc)}"
+        size="xl"
+        title="${this.previewDoc?.title || ''}"
+        @close="${() => (this.previewDoc = null)}"
+      >
+        ${this.previewDoc
+          ? html`
+              <app-document-previewer
+                .document="${this.previewDoc}"
+                .showHeader="${false}"
+                height="480px"
+              ></app-document-previewer>
+            `
+          : ''}
+      </app-modal>
     `;
   }
 

@@ -5,6 +5,7 @@ import { getTranslation } from '../../../i18n';
 import {
   ActivityLogItem,
   AnalysisSummary,
+  DocumentItem,
   Expense,
   ExpenseCategory,
   ProjectChatMessage,
@@ -21,11 +22,13 @@ import {
   iconChevronLeft,
   iconClock,
   iconCornerUpLeft,
+  iconDownload,
   iconEdit,
   iconFileText,
   iconFolder,
   iconLayers,
   iconMessageSquare,
+  iconPaperclip,
   iconPin,
   iconPlus,
   iconSend,
@@ -39,9 +42,11 @@ import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/app-draggable-list/app-draggable-list';
 import '../../common/app-date-input/app-date-input';
+import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-number-input/app-number-input';
+import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-switch/app-switch';
@@ -56,6 +61,12 @@ import '../../common/app-markdown/app-markdown';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-task-detail.css';
 import { eventValue } from '../../common/event-value';
+import { downloadDocumentFile } from '../../common/document-utils';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../../common/app-project-attachments/app-project-attachments';
 
 type DetailTab = 'timeline' | 'time' | 'expenses' | 'discussions';
 type TimelineFilter = 'all' | 'time' | 'expense' | 'discussion' | 'audit';
@@ -96,6 +107,8 @@ export class AppTaskDetail extends LitElement {
   @state() private timeCategory: TimeEntryCategory = 'development';
   @state() private timeBillable: boolean = true;
   @state() private timeDesc: string = '';
+  @state() private timeDocumentIds: string[] = [];
+  @state() private timePendingFiles: PendingAttachmentFile[] = [];
 
   // Quick Expense Form
   @state() private expTitle: string = '';
@@ -107,6 +120,11 @@ export class AppTaskDetail extends LitElement {
   @state() private expVendor: string = '';
   @state() private expBillable: boolean = true;
   @state() private expNotes: string = '';
+  @state() private expDocumentIds: string[] = [];
+  @state() private expPendingFiles: PendingAttachmentFile[] = [];
+
+  // Document preview modal
+  @state() private previewDoc: DocumentItem | null = null;
 
   // Discussion Form
   @state() private commentText: string = '';
@@ -792,6 +810,35 @@ export class AppTaskDetail extends LitElement {
           </app-button>
         </div>
       </app-modal>
+
+      <app-modal
+        ?open="${this.previewDoc !== null}"
+        size="xl"
+        title="${this.previewDoc?.title || ''}"
+        @close="${() => (this.previewDoc = null)}"
+      >
+        ${this.previewDoc
+          ? html`
+              <app-document-previewer
+                .document="${this.previewDoc}"
+                @download="${() => this.previewDoc && downloadDocumentFile(this.previewDoc)}"
+              ></app-document-previewer>
+            `
+          : ''}
+        <div slot="footer">
+          ${this.previewDoc
+            ? html`
+                <app-button variant="secondary" @click="${() => this.previewDoc && downloadDocumentFile(this.previewDoc)}">
+                  <span slot="icon-start">${iconDownload(14)}</span>
+                  <span>${t.documents.downloadFile}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button variant="ghost" @click="${() => (this.previewDoc = null)}">
+            ${t.common.cancel}
+          </app-button>
+        </div>
+      </app-modal>
     `;
   }
 
@@ -943,6 +990,17 @@ export class AppTaskDetail extends LitElement {
           ></app-input>
         </div>
 
+        <app-project-attachments
+          compact
+          project-id="${task.projectId}"
+          .documentIds="${this.timeDocumentIds}"
+          .pendingFiles="${this.timePendingFiles}"
+          @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+            this.timeDocumentIds = e.detail.documentIds;
+            this.timePendingFiles = e.detail.pendingFiles;
+          }}"
+        ></app-project-attachments>
+
         <div class="form-actions-row">
           <app-switch
             label="${t.taskDetail.fieldBillable}"
@@ -982,6 +1040,9 @@ export class AppTaskDetail extends LitElement {
                     const user = store.users.find((u) => u.id === te.userId);
                     const rate = user?.hourlyRate ?? 3600;
                     const cost = Math.round(te.hours * rate);
+                    const attachedDocs = (te.documentIds || [])
+                      .map((id) => store.documents.find((d) => d.id === id))
+                      .filter((d): d is DocumentItem => Boolean(d));
                     return html`
                       <tr>
                         <td class="num-col" style="text-align: left;">${te.date}</td>
@@ -1004,6 +1065,25 @@ export class AppTaskDetail extends LitElement {
                           <div class="sub-line">
                             ${t.timeTracking.categories[te.category]} · ${te.billable ? 'Billable' : 'Internal'} · ${t.timeTracking.statuses[te.status]}
                           </div>
+                          ${attachedDocs.length > 0
+                            ? html`
+                                <div class="record-attachments-row">
+                                  ${attachedDocs.map(
+                                    (doc) => html`
+                                      <button
+                                        type="button"
+                                        class="record-doc-chip"
+                                        title="${doc.fileName}"
+                                        @click="${() => (this.previewDoc = doc)}"
+                                      >
+                                        ${iconPaperclip(11)}
+                                        <span>${doc.title}</span>
+                                      </button>
+                                    `
+                                  )}
+                                </div>
+                              `
+                            : ''}
                         </td>
                         <td class="num-col"><strong>${te.hours.toFixed(1)} ${t.common.hours}</strong></td>
                         <td class="num-col">${cost.toLocaleString(t.common.locale)} ₽</td>
@@ -1090,6 +1170,17 @@ export class AppTaskDetail extends LitElement {
           ></app-input>
         </div>
 
+        <app-project-attachments
+          compact
+          project-id="${task.projectId}"
+          .documentIds="${this.expDocumentIds}"
+          .pendingFiles="${this.expPendingFiles}"
+          @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+            this.expDocumentIds = e.detail.documentIds;
+            this.expPendingFiles = e.detail.pendingFiles;
+          }}"
+        ></app-project-attachments>
+
         <div class="form-actions-row">
           <app-switch
             label="${t.taskDetail.fieldBillable}"
@@ -1127,6 +1218,9 @@ export class AppTaskDetail extends LitElement {
                   ${expenses.map((exp) => {
                     const sym = exp.currency === 'USD' ? '$' : exp.currency === 'EUR' ? '€' : '₽';
                     const author = store.users.find((u) => u.id === exp.userId);
+                    const attachedDocs = (exp.documentIds || [])
+                      .map((id) => store.documents.find((d) => d.id === id))
+                      .filter((d): d is DocumentItem => Boolean(d));
                     return html`
                       <tr>
                         <td class="num-col" style="text-align: left;">${exp.date}</td>
@@ -1135,6 +1229,25 @@ export class AppTaskDetail extends LitElement {
                           <div class="sub-line">
                             ${t.expenses.categories[exp.category]}${exp.vendor ? ` · ${exp.vendor}` : ''}${author ? ` · ${author.name}` : ''}
                           </div>
+                          ${attachedDocs.length > 0
+                            ? html`
+                                <div class="record-attachments-row">
+                                  ${attachedDocs.map(
+                                    (doc) => html`
+                                      <button
+                                        type="button"
+                                        class="record-doc-chip"
+                                        title="${doc.fileName}"
+                                        @click="${() => (this.previewDoc = doc)}"
+                                      >
+                                        ${iconPaperclip(11)}
+                                        <span>${doc.title}</span>
+                                      </button>
+                                    `
+                                  )}
+                                </div>
+                              `
+                            : ''}
                         </td>
                         <td>
                           <span style="color: ${exp.status === 'approved' || exp.status === 'reimbursed' ? 'var(--color-success)' : exp.status === 'rejected' ? 'var(--color-danger)' : 'var(--color-warning)'}; font-weight: 600;">
@@ -1366,26 +1479,58 @@ export class AppTaskDetail extends LitElement {
 
   private handleAddTimeEntry(task: Task) {
     if (this.timeHours <= 0) return;
+    const t = getTranslation(this.currentLang);
+    const userId = this.timeUserId || task.assigneeId || store.users[0]?.id || 'user-1';
+    const documentIds = commitPendingAttachments({
+      projectId: task.projectId,
+      taskId: task.id,
+      uploadedById: userId,
+      category: 'report',
+      tags: [t.viewTexts.attachments.tagTimeEntry, task.id],
+      existingDocumentIds: this.timeDocumentIds,
+      pendingFiles: this.timePendingFiles,
+      description:
+        this.timeDesc.trim() || t.viewTexts.attachments.defaultTimeDescription(task.id),
+      versionNote: t.viewTexts.attachments.defaultTimeDescription(task.id),
+    });
     store.addTimeEntry({
       taskId: task.id,
       projectId: task.projectId,
-      userId: this.timeUserId || task.assigneeId || store.users[0]?.id || 'user-1',
+      userId,
       date: this.timeDate || new Date().toISOString().slice(0, 10),
       hours: this.timeHours,
       billable: this.timeBillable,
       category: this.timeCategory,
       status: 'logged',
       description: this.timeDesc.trim(),
+      documentIds,
     });
     this.timeDesc = '';
+    this.timeDocumentIds = [];
+    this.timePendingFiles = [];
   }
 
   private handleAddExpense(task: Task) {
     if (!this.expTitle.trim()) return;
+    const t = getTranslation(this.currentLang);
+    const userId = this.expUserId || task.assigneeId || store.users[0]?.id || 'user-1';
+    const documentIds = commitPendingAttachments({
+      projectId: task.projectId,
+      taskId: task.id,
+      uploadedById: userId,
+      category: 'act_invoice',
+      tags: [t.viewTexts.attachments.tagExpense, task.id],
+      existingDocumentIds: this.expDocumentIds,
+      pendingFiles: this.expPendingFiles,
+      description:
+        this.expNotes.trim() ||
+        t.viewTexts.attachments.defaultExpenseDescription(this.expTitle.trim()),
+      versionNote: t.viewTexts.attachments.defaultExpenseDescription(this.expTitle.trim()),
+    });
     store.addExpense({
       projectId: task.projectId,
       taskId: task.id,
-      userId: this.expUserId || task.assigneeId || store.users[0]?.id || 'user-1',
+      userId,
       date: this.expDate || new Date().toISOString().slice(0, 10),
       title: this.expTitle.trim(),
       category: this.expCategory,
@@ -1394,11 +1539,14 @@ export class AppTaskDetail extends LitElement {
       billable: this.expBillable,
       status: 'pending',
       vendor: this.expVendor.trim() || undefined,
-      notes: this.expNotes.trim() || getTranslation(this.currentLang).viewTexts.taskDetail.taskExpenseNote(task.id),
+      notes: this.expNotes.trim() || t.viewTexts.taskDetail.taskExpenseNote(task.id),
+      documentIds,
     });
     this.expTitle = '';
     this.expVendor = '';
     this.expNotes = '';
+    this.expDocumentIds = [];
+    this.expPendingFiles = [];
   }
 
   private handleSendComment(task: Task) {

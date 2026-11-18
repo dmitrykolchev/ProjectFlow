@@ -14,6 +14,7 @@ export class AppFileDropzone extends LitElement {
   @property({ type: String, attribute: 'selected-file-name' }) selectedFileName: string = '';
   @property({ type: Number, attribute: 'selected-file-size' }) selectedFileSize: number = 0;
   @property({ type: Boolean }) compact: boolean = false;
+  @property({ type: Boolean }) multiple: boolean = false;
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) title: string = '';
   @property({ type: String }) hint: string = '';
@@ -48,11 +49,18 @@ export class AppFileDropzone extends LitElement {
     this.fileInput?.click();
   }
 
-  private emitFile(file: File | undefined) {
-    if (!file || this.disabled) return;
+  private emitFiles(files: File[]) {
+    if (!files.length || this.disabled) return;
+    this.dispatchEvent(
+      new CustomEvent('files-selected', {
+        detail: { files },
+        bubbles: true,
+        composed: true,
+      })
+    );
     this.dispatchEvent(
       new CustomEvent('file-selected', {
-        detail: { file },
+        detail: { file: files[0] },
         bubbles: true,
         composed: true,
       })
@@ -61,9 +69,9 @@ export class AppFileDropzone extends LitElement {
 
   private handleInputChange(e: Event) {
     const input = e.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (file) {
-      this.emitFile(file);
+    const files = input.files ? Array.from(input.files) : [];
+    if (files.length > 0) {
+      this.emitFiles(files);
     }
     input.value = '';
   }
@@ -99,9 +107,9 @@ export class AppFileDropzone extends LitElement {
     e.stopPropagation();
     this.isDragging = false;
     if (this.disabled) return;
-    const file = e.dataTransfer?.files?.[0];
-    if (file) {
-      this.emitFile(file);
+    const files = e.dataTransfer?.files ? Array.from(e.dataTransfer.files) : [];
+    if (files.length > 0) {
+      this.emitFiles(this.multiple ? files : [files[0]]);
     }
   }
 
@@ -149,6 +157,7 @@ export class AppFileDropzone extends LitElement {
           class="file-input"
           type="file"
           accept="${this.accept}"
+          ?multiple="${this.multiple}"
           ?disabled="${this.disabled}"
           @change="${this.handleInputChange}"
         />

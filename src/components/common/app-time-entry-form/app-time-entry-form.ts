@@ -15,6 +15,12 @@ import '../app-select/app-select';
 import '../app-checkbox/app-checkbox';
 import '../app-textarea/app-textarea';
 import '../app-button/app-button';
+import '../app-project-attachments/app-project-attachments';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../app-project-attachments/app-project-attachments';
 
 /**
  * Canonical time entry create/edit form. The component owns the whole field set
@@ -47,6 +53,8 @@ export class AppTimeEntryForm extends LitElement {
   @state() private fStatus: TimeEntryStatus = 'logged';
   @state() private fBillable = true;
   @state() private fDescription = '';
+  @state() private fDocumentIds: string[] = [];
+  @state() private fPendingFiles: PendingAttachmentFile[] = [];
   @state() private formError = '';
 
   private unsubscribe?: () => void;
@@ -95,6 +103,8 @@ export class AppTimeEntryForm extends LitElement {
       this.fStatus = e.status;
       this.fBillable = e.billable;
       this.fDescription = e.description;
+      this.fDocumentIds = [...(e.documentIds || [])];
+      this.fPendingFiles = [];
     } else {
       const projectId = this.presetProjectId ?? (store.projects[0]?.id || '');
       const taskId =
@@ -109,6 +119,8 @@ export class AppTimeEntryForm extends LitElement {
       this.fStatus = 'logged';
       this.fBillable = true;
       this.fDescription = '';
+      this.fDocumentIds = [];
+      this.fPendingFiles = [];
     }
     this.formError = '';
   }
@@ -120,8 +132,22 @@ export class AppTimeEntryForm extends LitElement {
       return;
     }
 
+    const targetProjectId = this.fProjectId || store.projects[0]?.id || '';
+    const documentIds = commitPendingAttachments({
+      projectId: targetProjectId,
+      taskId: this.fTaskId,
+      uploadedById: this.fUserId || store.users[0]?.id || '',
+      category: 'report',
+      tags: [t.viewTexts.attachments.tagTimeEntry, this.fTaskId],
+      existingDocumentIds: this.fDocumentIds,
+      pendingFiles: this.fPendingFiles,
+      description:
+        this.fDescription.trim() || t.viewTexts.attachments.defaultTimeDescription(this.fTaskId),
+      versionNote: t.viewTexts.attachments.defaultTimeDescription(this.fTaskId),
+    });
+
     const payload = {
-      projectId: this.fProjectId || store.projects[0]?.id || '',
+      projectId: targetProjectId,
       taskId: this.fTaskId,
       userId: this.fUserId || store.users[0]?.id || '',
       date: this.fDate || new Date().toISOString().slice(0, 10),
@@ -130,6 +156,7 @@ export class AppTimeEntryForm extends LitElement {
       status: this.fStatus,
       billable: this.fBillable,
       description: this.fDescription.trim(),
+      documentIds,
     };
 
     let saved: TimeEntry;
@@ -145,6 +172,7 @@ export class AppTimeEntryForm extends LitElement {
       saved = store.addTimeEntry(payload);
     }
 
+    this.fPendingFiles = [];
     this.open = false;
     this.dispatchEvent(
       new CustomEvent('saved', {
@@ -202,6 +230,9 @@ export class AppTimeEntryForm extends LitElement {
                 this.fProjectId = eventValue(e);
                 const firstTask = store.tasks.find((tk) => tk.projectId === this.fProjectId);
                 this.fTaskId = firstTask?.id || '';
+                this.fDocumentIds = this.fDocumentIds.filter((id) =>
+                  store.documents.some((d) => d.id === id && d.projectId === this.fProjectId)
+                );
                 this.formError = '';
               }}"
             ></app-entity-selector>
@@ -285,6 +316,18 @@ export class AppTimeEntryForm extends LitElement {
               rows="3"
               @input="${(e: CustomEvent<{ value: string }>) => (this.fDescription = eventValue(e))}"
             ></app-textarea>
+          </div>
+
+          <div class="col-span-2">
+            <app-project-attachments
+              project-id="${this.fProjectId}"
+              .documentIds="${this.fDocumentIds}"
+              .pendingFiles="${this.fPendingFiles}"
+              @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                this.fDocumentIds = e.detail.documentIds;
+                this.fPendingFiles = e.detail.pendingFiles;
+              }}"
+            ></app-project-attachments>
           </div>
         </app-form-grid>
 

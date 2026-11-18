@@ -2,20 +2,30 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
+import { DocumentItem, Project, ProjectRole, ProjectStatus, TaskStatus } from '../../../types';
 import {
   iconBookOpen,
   iconChevronLeft,
   iconClock,
   iconEdit,
   iconFileText,
+  iconFolderOpen,
   iconKanban,
   iconMessageSquare,
+  iconPaperclip,
   iconPlus,
+  iconSearch,
   iconTrash,
+  iconUpload,
   iconUsers,
   iconWallet,
 } from '../../common/icons';
+import {
+  formatFileSize,
+  isImageMimeOrExt,
+  isPdfMimeOrExt,
+  isTextMimeOrExt,
+} from '../../common/document-utils';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-button/app-button';
@@ -36,6 +46,9 @@ import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-project-requirements/app-project-requirements';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-document-previewer/app-document-previewer';
+import '../../common/app-document-form/app-document-form';
+import '../../common/app-modal/app-modal';
 import styles from './app-project-detail.css';
 import { eventValue } from '../../common/event-value';
 
@@ -97,6 +110,14 @@ export class AppProjectDetail extends LitElement {
 
   @state() private timeEntriesVersion = store.timeEntries.length;
   @state() private expensesVersion = store.expenses.length;
+  @state() private documentsVersion = store.documents.length;
+
+  // Project Document Library state
+  @state() private docSearchQuery = '';
+  @state() private docTypeFilter: 'all' | 'pdf' | 'image' | 'text' = 'all';
+  @state() private selectedDocId = '';
+  @state() private docFormOpen = false;
+  @state() private expandedPreviewDoc: DocumentItem | null = null;
 
   private unsubscribe?: () => void;
 
@@ -127,6 +148,11 @@ export class AppProjectDetail extends LitElement {
     }
     this.timeEntriesVersion = store.timeEntries.length;
     this.expensesVersion = store.expenses.length;
+    this.documentsVersion = store.documents.length;
+    if (this.expandedPreviewDoc) {
+      this.expandedPreviewDoc =
+        store.documents.find((d) => d.id === this.expandedPreviewDoc!.id) || null;
+    }
   }
 
   render() {
@@ -163,6 +189,7 @@ export class AppProjectDetail extends LitElement {
     const statusKey = (proj.status || 'active') as ProjectStatus;
     void this.timeEntriesVersion;
     void this.expensesVersion;
+    void this.documentsVersion;
 
     const projectSwitchOptions = this.projects.map((p) => ({
       value: p.id,
@@ -696,6 +723,24 @@ export class AppProjectDetail extends LitElement {
                             <div class="contract-sub">${te.date} · ${user?.name || te.userId}</div>
                           </div>
                           <div class="contract-right">
+                            ${(te.documentIds?.length || 0) > 0
+                              ? (() => {
+                                  const firstDoc = store.documents.find((d) => d.id === te.documentIds![0]);
+                                  return firstDoc
+                                    ? html`
+                                        <button
+                                          type="button"
+                                          class="doc-attach-pill"
+                                          title="${firstDoc.title}"
+                                          @click="${() => (this.expandedPreviewDoc = firstDoc)}"
+                                        >
+                                          ${iconPaperclip(12)}
+                                          <span>${te.documentIds!.length}</span>
+                                        </button>
+                                      `
+                                    : '';
+                                })()
+                              : ''}
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">${te.hours.toFixed(1)}${t.viewTexts.projectDetail.timeUnit}</span>
                             <app-status-chip
                               domain="timeEntry"
@@ -746,6 +791,24 @@ export class AppProjectDetail extends LitElement {
                             </div>
                           </div>
                           <div class="contract-right">
+                            ${(exp.documentIds?.length || 0) > 0
+                              ? (() => {
+                                  const firstDoc = store.documents.find((d) => d.id === exp.documentIds![0]);
+                                  return firstDoc
+                                    ? html`
+                                        <button
+                                          type="button"
+                                          class="doc-attach-pill"
+                                          title="${firstDoc.title}"
+                                          @click="${() => (this.expandedPreviewDoc = firstDoc)}"
+                                        >
+                                          ${iconPaperclip(12)}
+                                          <span>${exp.documentIds!.length}</span>
+                                        </button>
+                                      `
+                                    : '';
+                                })()
+                              : ''}
                             <span class="mono" style="font-weight: 700; font-size: 0.85rem;">
                               ${exp.amount.toLocaleString(t.common.locale)} ${sym}
                             </span>
@@ -763,6 +826,9 @@ export class AppProjectDetail extends LitElement {
                 `}
           </app-section-card>
         </div>
+
+        <!-- Project Document Library (including Time Entry & Expense attachments) -->
+        ${this.renderProjectDocumentsSection(proj, t)}
       </div>
 
       ${this.renderEditModal(t)}
@@ -770,6 +836,8 @@ export class AppProjectDetail extends LitElement {
       ${this.renderMemberRemoveDialog(proj, t)}
       ${this.renderQuickTimeModal(proj, projectTasks, t)}
       ${this.renderQuickExpenseModal(proj, projectTasks, t)}
+      ${this.renderProjectDocFormModal(proj)}
+      ${this.renderExpandedDocPreviewModal()}
     `;
   }
 
@@ -889,6 +957,211 @@ export class AppProjectDetail extends LitElement {
         @close="${() => (this.expenseModalOpen = false)}"
         @saved="${() => (this.expenseModalOpen = false)}"
       ></app-expense-form>
+    `;
+  }
+
+  private getExtBadgeVariant(doc: DocumentItem): string {
+    if (isPdfMimeOrExt(doc.mimeType, doc.extension)) return 'is-pdf';
+    if (isImageMimeOrExt(doc.mimeType, doc.extension)) return 'is-image';
+    if (isTextMimeOrExt(doc.mimeType, doc.extension)) return 'is-code';
+    return '';
+  }
+
+  private renderProjectDocumentsSection(proj: Project, t: ReturnType<typeof getTranslation>) {
+    const projectDocs = store.documents.filter((d) => d.projectId === proj.id);
+    const pdfCount = projectDocs.filter((d) => isPdfMimeOrExt(d.mimeType, d.extension)).length;
+    const imageCount = projectDocs.filter((d) => isImageMimeOrExt(d.mimeType, d.extension)).length;
+    const textCount = projectDocs.filter((d) => isTextMimeOrExt(d.mimeType, d.extension)).length;
+
+    const query = this.docSearchQuery.trim().toLowerCase();
+    const filteredDocs = projectDocs.filter((d) => {
+      if (this.docTypeFilter === 'pdf' && !isPdfMimeOrExt(d.mimeType, d.extension)) return false;
+      if (this.docTypeFilter === 'image' && !isImageMimeOrExt(d.mimeType, d.extension)) return false;
+      if (this.docTypeFilter === 'text' && !isTextMimeOrExt(d.mimeType, d.extension)) return false;
+      if (!query) return true;
+      return (
+        d.title.toLowerCase().includes(query) ||
+        d.fileName.toLowerCase().includes(query) ||
+        d.tags.some((tg) => tg.toLowerCase().includes(query))
+      );
+    });
+
+    const activeDoc =
+      filteredDocs.find((d) => d.id === this.selectedDocId) ||
+      filteredDocs[0] ||
+      projectDocs[0] ||
+      null;
+
+    return html`
+      <app-section-card
+        title="${t.viewTexts.projectDetail.documentsSectionTitle}"
+        subtitle="(${projectDocs.length})"
+      >
+        <span slot="icon">${iconFolderOpen(18)}</span>
+        <div slot="actions" class="section-actions-inline">
+          <app-button
+            size="sm"
+            variant="primary"
+            @click="${() => (this.docFormOpen = true)}"
+          >
+            <span slot="icon-start">${iconUpload(14)}</span>
+            <span>${t.viewTexts.projectDetail.uploadDocumentButton}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="outline"
+            @click="${() => store.openDocuments({ scope: 'project', projectId: proj.id })}"
+          >
+            <span>${t.viewTexts.projectDetail.openDocsLibraryButton}</span>
+          </app-button>
+        </div>
+
+        ${projectDocs.length === 0
+          ? html`<app-empty-state compact title="${t.viewTexts.projectDetail.emptyNoProjectDocs}"></app-empty-state>`
+          : html`
+              <div class="project-docs-workspace">
+                <div class="docs-list-pane">
+                  <app-input
+                    size="sm"
+                    placeholder="${t.documents.searchInLibrary}"
+                    .value="${this.docSearchQuery}"
+                    @input="${(e: CustomEvent<{ value: string }>) =>
+                      (this.docSearchQuery = eventValue(e))}"
+                  >
+                    <span slot="prefix">${iconSearch(14)}</span>
+                  </app-input>
+
+                  <div class="docs-filter-pills">
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'all' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'all')}"
+                    >
+                      ${t.documents.filterAllTypes} (${projectDocs.length})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'pdf' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'pdf')}"
+                    >
+                      ${t.documents.filterPdf} (${pdfCount})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'image' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'image')}"
+                    >
+                      ${t.documents.filterImages} (${imageCount})
+                    </button>
+                    <button
+                      type="button"
+                      class="doc-filter-pill ${this.docTypeFilter === 'text' ? 'is-active' : ''}"
+                      @click="${() => (this.docTypeFilter = 'text')}"
+                    >
+                      ${t.documents.filterText} (${textCount})
+                    </button>
+                  </div>
+
+                  ${filteredDocs.length === 0
+                    ? html`<app-empty-state compact title="${t.documents.noCompanyDocsMatch}"></app-empty-state>`
+                    : html`
+                        <div class="docs-pane-items">
+                          ${filteredDocs.map((doc) => {
+                            const isActive = activeDoc?.id === doc.id;
+                            const extLabel = (doc.extension || 'file').toUpperCase();
+                            return html`
+                              <button
+                                type="button"
+                                class="doc-select-card ${isActive ? 'is-active' : ''}"
+                                @click="${() => (this.selectedDocId = doc.id)}"
+                              >
+                                <span class="ext-badge ${this.getExtBadgeVariant(doc)}">${extLabel}</span>
+                                <div class="doc-select-main">
+                                  <span class="doc-select-title">${doc.title}</span>
+                                  <div class="doc-select-sub">
+                                    <span class="mono">${doc.fileName}</span>
+                                    <span>·</span>
+                                    <span class="mono">${formatFileSize(doc.sizeBytes, t)}</span>
+                                  </div>
+                                  ${doc.timeEntryId || doc.expenseId
+                                    ? html`
+                                        <div class="doc-source-tags">
+                                          ${doc.timeEntryId
+                                            ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.projectDetail.fromTimeEntryTag}</app-badge>`
+                                            : ''}
+                                          ${doc.expenseId
+                                            ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.projectDetail.fromExpenseTag}</app-badge>`
+                                            : ''}
+                                        </div>
+                                      `
+                                    : ''}
+                                </div>
+                                <app-status-chip
+                                  domain="document"
+                                  status="${doc.status}"
+                                  appearance="soft"
+                                  size="sm"
+                                ></app-status-chip>
+                              </button>
+                            `;
+                          })}
+                        </div>
+                      `}
+                </div>
+
+                <div class="docs-preview-pane">
+                  <app-document-previewer
+                    .document="${activeDoc}"
+                    .documents="${filteredDocs}"
+                    show-expand
+                    height="520px"
+                    @select-document="${(e: CustomEvent<{ document: DocumentItem }>) =>
+                      (this.selectedDocId = e.detail.document.id)}"
+                    @expand="${(e: CustomEvent<{ document: DocumentItem }>) =>
+                      (this.expandedPreviewDoc = e.detail.document)}"
+                  ></app-document-previewer>
+                </div>
+              </div>
+            `}
+      </app-section-card>
+    `;
+  }
+
+  private renderProjectDocFormModal(proj: Project) {
+    return html`
+      <app-document-form
+        .open="${this.docFormOpen}"
+        .presetProjectId="${proj.id}"
+        .presetCompanyId="${proj.companyId || null}"
+        @close="${() => (this.docFormOpen = false)}"
+        @saved="${(e: CustomEvent<{ document: DocumentItem }>) => {
+          this.docFormOpen = false;
+          if (e.detail?.document?.id) {
+            this.selectedDocId = e.detail.document.id;
+          }
+        }}"
+      ></app-document-form>
+    `;
+  }
+
+  private renderExpandedDocPreviewModal() {
+    return html`
+      <app-modal
+        ?open="${Boolean(this.expandedPreviewDoc)}"
+        size="xl"
+        title="${this.expandedPreviewDoc?.title || ''}"
+        @close="${() => (this.expandedPreviewDoc = null)}"
+      >
+        ${this.expandedPreviewDoc
+          ? html`
+              <app-document-previewer
+                .document="${this.expandedPreviewDoc}"
+                .showHeader="${false}"
+                height="520px"
+              ></app-document-previewer>
+            `
+          : ''}
+      </app-modal>
     `;
   }
 }

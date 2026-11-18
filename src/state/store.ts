@@ -549,10 +549,18 @@ export class AppStore {
       this.syncOverdueInvoices(false);
 
       const storedTimeEntries = localStorage.getItem(STORAGE_KEY_TIME_ENTRIES);
-      this.timeEntries = storedTimeEntries ? JSON.parse(storedTimeEntries) : [...initialTimeEntries];
+      const parsedTimeEntries: TimeEntry[] | null = storedTimeEntries
+        ? JSON.parse(storedTimeEntries)
+        : null;
+      const hadAnyTimeEntryAttachments = Boolean(
+        parsedTimeEntries?.some((te) => Array.isArray(te.documentIds))
+      );
 
       const storedExpenses = localStorage.getItem(STORAGE_KEY_EXPENSES);
-      this.expenses = storedExpenses ? JSON.parse(storedExpenses) : [...initialExpenses];
+      const parsedExpenses: Expense[] | null = storedExpenses ? JSON.parse(storedExpenses) : null;
+      const hadAnyExpenseAttachments = Boolean(
+        parsedExpenses?.some((ex) => Array.isArray(ex.documentIds))
+      );
 
       const storedChat = localStorage.getItem(STORAGE_KEY_CHAT);
       this.chatMessages = storedChat ? JSON.parse(storedChat) : [...initialChatMessages];
@@ -565,14 +573,54 @@ export class AppStore {
       const storedDocuments = localStorage.getItem(STORAGE_KEY_DOCUMENTS);
       if (storedDocuments) {
         const parsedDocs: DocumentItem[] = JSON.parse(storedDocuments);
-        this.documents = parsedDocs.map((doc) => {
-          if (doc.dataUrl) return doc;
+        const docsList: DocumentItem[] = parsedDocs.map((doc) => {
           const seed = initialDocuments.find((d) => d.id === doc.id);
-          return seed?.dataUrl ? { ...doc, dataUrl: seed.dataUrl } : doc;
+          return {
+            ...doc,
+            dataUrl: doc.dataUrl || seed?.dataUrl,
+            timeEntryId: doc.timeEntryId ?? seed?.timeEntryId,
+            expenseId: doc.expenseId ?? seed?.expenseId,
+          };
         });
+        if (!hadAnyTimeEntryAttachments && !hadAnyExpenseAttachments) {
+          const existingDocIds = new Set(docsList.map((d) => d.id));
+          for (const seedDoc of initialDocuments) {
+            if ((seedDoc.timeEntryId || seedDoc.expenseId) && !existingDocIds.has(seedDoc.id)) {
+              docsList.push({ ...seedDoc });
+            }
+          }
+        }
+        this.documents = docsList;
       } else {
         this.documents = [...initialDocuments];
       }
+
+      const existingDocIdSet = new Set(this.documents.map((d) => d.id));
+      this.timeEntries = parsedTimeEntries
+        ? parsedTimeEntries.map((te) => {
+            const fallback = initialTimeEntries.find((ite) => ite.id === te.id);
+            const rawIds = Array.isArray(te.documentIds)
+              ? te.documentIds
+              : fallback?.documentIds || [];
+            return {
+              ...te,
+              documentIds: rawIds.filter((id) => existingDocIdSet.has(id)),
+            };
+          })
+        : [...initialTimeEntries];
+
+      this.expenses = parsedExpenses
+        ? parsedExpenses.map((ex) => {
+            const fallback = initialExpenses.find((iex) => iex.id === ex.id);
+            const rawIds = Array.isArray(ex.documentIds)
+              ? ex.documentIds
+              : fallback?.documentIds || [];
+            return {
+              ...ex,
+              documentIds: rawIds.filter((id) => existingDocIdSet.has(id)),
+            };
+          })
+        : [...initialExpenses];
 
       const storedRequirements = localStorage.getItem(STORAGE_KEY_REQUIREMENTS);
       this.requirements = storedRequirements
@@ -2591,12 +2639,80 @@ export class AppStore {
     }
   }
 
+  private syncEntryDocuments(opts: {
+    projectId: string;
+    taskId?: string;
+    timeEntryId?: string;
+    expenseId?: string;
+    documentIds?: string[];
+  }): string[] {
+    const cleanIds = Array.from(new Set((opts.documentIds || []).filter(Boolean)));
+    const idSet = new Set(cleanIds);
+    const proj = this.projects.find((p) => p.id === opts.projectId);
+    let docsChanged = false;
+
+    this.documents = this.documents.map((doc) => {
+      const isAttached = idSet.has(doc.id);
+      if (isAttached) {
+        const nextProjectId = doc.projectId || opts.projectId;
+        const nextCompanyId = doc.companyId || proj?.companyId;
+        const nextTaskId = doc.taskId || opts.taskId || undefined;
+        const nextTimeEntryId = opts.timeEntryId ? doc.timeEntryId || opts.timeEntryId : doc.timeEntryId;
+        const nextExpenseId = opts.expenseId ? doc.expenseId || opts.expenseId : doc.expenseId;
+        if (
+          nextProjectId !== doc.projectId ||
+          nextCompanyId !== doc.companyId ||
+          nextTaskId !== doc.taskId ||
+          nextTimeEntryId !== doc.timeEntryId ||
+          nextExpenseId !== doc.expenseId
+        ) {
+          docsChanged = true;
+          return {
+            ...doc,
+            projectId: nextProjectId,
+            companyId: nextCompanyId,
+            taskId: nextTaskId,
+            timeEntryId: nextTimeEntryId,
+            expenseId: nextExpenseId,
+          };
+        }
+        return doc;
+      }
+
+      if (
+        (opts.timeEntryId && doc.timeEntryId === opts.timeEntryId) ||
+        (opts.expenseId && doc.expenseId === opts.expenseId)
+      ) {
+        docsChanged = true;
+        return {
+          ...doc,
+          timeEntryId: opts.timeEntryId && doc.timeEntryId === opts.timeEntryId ? undefined : doc.timeEntryId,
+          expenseId: opts.expenseId && doc.expenseId === opts.expenseId ? undefined : doc.expenseId,
+        };
+      }
+      return doc;
+    });
+
+    if (docsChanged) {
+      this.saveDocuments();
+    }
+    return cleanIds;
+  }
+
   public addTimeEntry(data: Omit<TimeEntry, 'id' | 'createdAt'>): TimeEntry {
     const hours = Math.max(0.25, Math.round((Number(data.hours) || 0) * 100) / 100);
+    const id = `te-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
+    const documentIds = this.syncEntryDocuments({
+      projectId: data.projectId,
+      taskId: data.taskId,
+      timeEntryId: id,
+      documentIds: data.documentIds,
+    });
     const entry: TimeEntry = {
       ...data,
+      documentIds,
       hours,
-      id: `te-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id,
       createdAt: new Date().toISOString(),
     };
     this.timeEntries = [entry, ...this.timeEntries];
@@ -2621,7 +2737,13 @@ export class AppStore {
   public updateTimeEntry(updated: TimeEntry): void {
     const old = this.timeEntries.find((e) => e.id === updated.id);
     const nextHours = Math.max(0.25, Math.round((Number(updated.hours) || 0) * 100) / 100);
-    const normalized: TimeEntry = { ...updated, hours: nextHours };
+    const documentIds = this.syncEntryDocuments({
+      projectId: updated.projectId,
+      taskId: updated.taskId,
+      timeEntryId: updated.id,
+      documentIds: updated.documentIds,
+    });
+    const normalized: TimeEntry = { ...updated, hours: nextHours, documentIds };
 
     this.timeEntries = this.timeEntries.map((e) => (e.id === normalized.id ? normalized : e));
     this.saveTimeEntries();
@@ -2653,6 +2775,11 @@ export class AppStore {
   public deleteTimeEntry(id: string): void {
     const target = this.timeEntries.find((e) => e.id === id);
     if (!target) return;
+    this.syncEntryDocuments({
+      projectId: target.projectId,
+      timeEntryId: id,
+      documentIds: [],
+    });
     this.timeEntries = this.timeEntries.filter((e) => e.id !== id);
     this.saveTimeEntries();
     this.adjustTaskLoggedHours(target.taskId, -target.hours);
@@ -2672,10 +2799,18 @@ export class AppStore {
   // --- Expenses CRUD ---
   public addExpense(data: Omit<Expense, 'id' | 'createdAt'>): Expense {
     const amount = Math.max(0, Math.round((Number(data.amount) || 0) * 100) / 100);
+    const id = `exp-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`;
+    const documentIds = this.syncEntryDocuments({
+      projectId: data.projectId,
+      taskId: data.taskId,
+      expenseId: id,
+      documentIds: data.documentIds,
+    });
     const expense: Expense = {
       ...data,
+      documentIds,
       amount,
-      id: `exp-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      id,
       createdAt: new Date().toISOString(),
     };
     this.expenses = [expense, ...this.expenses];
@@ -2699,7 +2834,13 @@ export class AppStore {
 
   public updateExpense(updated: Expense): void {
     const amount = Math.max(0, Math.round((Number(updated.amount) || 0) * 100) / 100);
-    const normalized: Expense = { ...updated, amount };
+    const documentIds = this.syncEntryDocuments({
+      projectId: updated.projectId,
+      taskId: updated.taskId,
+      expenseId: updated.id,
+      documentIds: updated.documentIds,
+    });
+    const normalized: Expense = { ...updated, amount, documentIds };
     this.expenses = this.expenses.map((e) => (e.id === normalized.id ? normalized : e));
     this.saveExpenses();
 
@@ -2718,6 +2859,11 @@ export class AppStore {
   public deleteExpense(id: string): void {
     const target = this.expenses.find((e) => e.id === id);
     if (!target) return;
+    this.syncEntryDocuments({
+      projectId: target.projectId,
+      expenseId: id,
+      documentIds: [],
+    });
     this.expenses = this.expenses.filter((e) => e.id !== id);
     this.saveExpenses();
     this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена', target.taskId);
@@ -3070,6 +3216,23 @@ export class AppStore {
     if (!target) return;
     this.documents = this.documents.filter((d) => d.id !== id);
     this.saveDocuments();
+
+    let timeChanged = false;
+    this.timeEntries = this.timeEntries.map((te) => {
+      if (!te.documentIds?.includes(id)) return te;
+      timeChanged = true;
+      return { ...te, documentIds: te.documentIds.filter((docId) => docId !== id) };
+    });
+    if (timeChanged) this.saveTimeEntries();
+
+    let expenseChanged = false;
+    this.expenses = this.expenses.map((ex) => {
+      if (!ex.documentIds?.includes(id)) return ex;
+      expenseChanged = true;
+      return { ...ex, documentIds: ex.documentIds.filter((docId) => docId !== id) };
+    });
+    if (expenseChanged) this.saveExpenses();
+
     this.logActivity('delete', 'document', target.title, `Удалён файл ${target.fileName}`, target.id);
     this.addNotification('warning', 'Документ удалён', target.title);
     this.notify();

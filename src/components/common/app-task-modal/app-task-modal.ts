@@ -1,20 +1,28 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
+import { DocumentItem, Expense, ExpenseCategory, Task, TaskPriority, TaskStatus, TimeEntry, TimeEntryCategory } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconArrowUpRight, iconBookOpen, iconClock, iconLayers, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
+import { iconArrowUpRight, iconBookOpen, iconClock, iconDownload, iconLayers, iconPaperclip, iconPlus, iconTrash, iconWallet, iconX } from '../icons';
 import styles from './app-task-modal.css';
 import '../app-modal/app-modal';
 import '../app-confirm-dialog/app-confirm-dialog';
 import '../app-badge/app-badge';
 import '../app-button/app-button';
+import '../app-document-previewer/app-document-previewer';
 import '../app-input/app-input';
 import '../app-textarea/app-textarea';
 import '../app-select/app-select';
 import '../app-entity-selector/app-entity-selector';
+import '../app-project-attachments/app-project-attachments';
 import { mapKnowledgeOptions, mapProjectOptions, mapRequirementOptions, mapUserOptions } from '../entity-selector-options';
 import { eventValue } from '../event-value';
+import { downloadDocumentFile } from '../document-utils';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../app-project-attachments/app-project-attachments';
 import '../app-date-input/app-date-input';
 import '../app-number-input/app-number-input';
 import '../app-combobox/app-combobox';
@@ -53,9 +61,16 @@ export class AppTaskModal extends LitElement {
   @state() private quickTimeHours: number = 1.5;
   @state() private quickTimeCategory: TimeEntryCategory = 'development';
   @state() private quickTimeDesc: string = '';
+  @state() private quickTimeAttachOpen: boolean = false;
+  @state() private quickTimeDocumentIds: string[] = [];
+  @state() private quickTimePendingFiles: PendingAttachmentFile[] = [];
   @state() private quickExpenseTitle: string = '';
   @state() private quickExpenseAmount: number = 5000;
   @state() private quickExpenseCategory: ExpenseCategory = 'software';
+  @state() private quickExpAttachOpen: boolean = false;
+  @state() private quickExpDocumentIds: string[] = [];
+  @state() private quickExpPendingFiles: PendingAttachmentFile[] = [];
+  @state() private previewDoc: DocumentItem | null = null;
 
   private unsubscribe?: () => void;
 
@@ -130,9 +145,15 @@ export class AppTaskModal extends LitElement {
       this.quickTimeHours = 1.5;
       this.quickTimeCategory = 'development';
       this.quickTimeDesc = '';
+      this.quickTimeAttachOpen = false;
+      this.quickTimeDocumentIds = [];
+      this.quickTimePendingFiles = [];
       this.quickExpenseTitle = '';
       this.quickExpenseAmount = 5000;
       this.quickExpenseCategory = 'software';
+      this.quickExpAttachOpen = false;
+      this.quickExpDocumentIds = [];
+      this.quickExpPendingFiles = [];
     }
 
     if (this.isOpen && this.editingTask) {
@@ -475,6 +496,35 @@ export class AppTaskModal extends LitElement {
         @cancel="${() => (this.confirmRemoveSubtaskId = null)}"
         @confirm="${() => this.doRemoveSubtask()}"
       ></app-confirm-dialog>
+
+      <app-modal
+        ?open="${this.previewDoc !== null}"
+        size="xl"
+        title="${this.previewDoc?.title || ''}"
+        @close="${() => (this.previewDoc = null)}"
+      >
+        ${this.previewDoc
+          ? html`
+              <app-document-previewer
+                .document="${this.previewDoc}"
+                @download="${() => this.previewDoc && downloadDocumentFile(this.previewDoc)}"
+              ></app-document-previewer>
+            `
+          : ''}
+        <div slot="footer">
+          ${this.previewDoc
+            ? html`
+                <app-button variant="secondary" @click="${() => this.previewDoc && downloadDocumentFile(this.previewDoc)}">
+                  <span slot="icon-start">${iconDownload(14)}</span>
+                  <span>${t.documents.downloadFile}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button variant="ghost" @click="${() => (this.previewDoc = null)}">
+            ${t.common.cancel}
+          </app-button>
+        </div>
+      </app-modal>
     `;
   }
 
@@ -639,6 +689,9 @@ export class AppTaskModal extends LitElement {
               <div class="record-list">
                 ${this.taskTimeEntries.map((entry) => {
                   const user = store.users.find((u) => u.id === entry.userId);
+                  const attachedDocs = (entry.documentIds || [])
+                    .map((id) => store.documents.find((d) => d.id === id))
+                    .filter((d): d is DocumentItem => Boolean(d));
                   return html`
                     <div class="record-row">
                       <div class="record-main">
@@ -646,6 +699,25 @@ export class AppTaskModal extends LitElement {
                         <div class="record-meta">
                           ${entry.date} · ${user?.name || entry.userId} · ${t.timeTracking.categories[entry.category]}
                         </div>
+                        ${attachedDocs.length > 0
+                          ? html`
+                              <div class="record-attach-row">
+                                ${attachedDocs.map(
+                                  (doc) => html`
+                                    <button
+                                      type="button"
+                                      class="record-attach-chip"
+                                      title="${doc.fileName}"
+                                      @click="${() => (this.previewDoc = doc)}"
+                                    >
+                                      ${iconPaperclip(11)}
+                                      <span>${doc.title}</span>
+                                    </button>
+                                  `
+                                )}
+                              </div>
+                            `
+                          : ''}
                       </div>
                       <div class="record-right">
                         <span class="record-val">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>
@@ -705,6 +777,37 @@ export class AppTaskModal extends LitElement {
             <span>${t.viewTexts.taskModal.logButton}</span>
           </app-button>
         </div>
+
+        <div class="quick-attach-wrap">
+          <div class="quick-attach-bar">
+            <app-button
+              size="sm"
+              variant="ghost"
+              @click="${() => (this.quickTimeAttachOpen = !this.quickTimeAttachOpen)}"
+            >
+              <span slot="icon-start">${iconPaperclip(13)}</span>
+              <span>
+                ${t.viewTexts.attachments.attachQuickButton}${this.quickTimeDocumentIds.length + this.quickTimePendingFiles.length > 0
+                  ? ` (${this.quickTimeDocumentIds.length + this.quickTimePendingFiles.length})`
+                  : ''}
+              </span>
+            </app-button>
+          </div>
+          ${this.quickTimeAttachOpen
+            ? html`
+                <app-project-attachments
+                  compact
+                  project-id="${this.projectId || this.editingTask?.projectId || ''}"
+                  .documentIds="${this.quickTimeDocumentIds}"
+                  .pendingFiles="${this.quickTimePendingFiles}"
+                  @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                    this.quickTimeDocumentIds = e.detail.documentIds;
+                    this.quickTimePendingFiles = e.detail.pendingFiles;
+                  }}"
+                ></app-project-attachments>
+              `
+            : ''}
+        </div>
       </div>
 
       <!-- Task Expenses Section -->
@@ -723,6 +826,9 @@ export class AppTaskModal extends LitElement {
               <div class="record-list">
                 ${this.taskExpenses.map((exp) => {
                   const sym = exp.currency === 'USD' ? '$' : exp.currency === 'EUR' ? '€' : '₽';
+                  const attachedDocs = (exp.documentIds || [])
+                    .map((id) => store.documents.find((d) => d.id === id))
+                    .filter((d): d is DocumentItem => Boolean(d));
                   return html`
                     <div class="record-row">
                       <div class="record-main">
@@ -730,6 +836,25 @@ export class AppTaskModal extends LitElement {
                         <div class="record-meta">
                           ${exp.date} · ${t.expenses.categories[exp.category]} · ${t.expenses.statuses[exp.status]}
                         </div>
+                        ${attachedDocs.length > 0
+                          ? html`
+                              <div class="record-attach-row">
+                                ${attachedDocs.map(
+                                  (doc) => html`
+                                    <button
+                                      type="button"
+                                      class="record-attach-chip"
+                                      title="${doc.fileName}"
+                                      @click="${() => (this.previewDoc = doc)}"
+                                    >
+                                      ${iconPaperclip(11)}
+                                      <span>${doc.title}</span>
+                                    </button>
+                                  `
+                                )}
+                              </div>
+                            `
+                          : ''}
                       </div>
                       <div class="record-right">
                         <span class="record-val">${exp.amount.toLocaleString(t.common.locale)} ${sym}</span>
@@ -788,25 +913,76 @@ export class AppTaskModal extends LitElement {
             <span>${t.viewTexts.taskModal.expenseButton}</span>
           </app-button>
         </div>
+
+        <div class="quick-attach-wrap">
+          <div class="quick-attach-bar">
+            <app-button
+              size="sm"
+              variant="ghost"
+              @click="${() => (this.quickExpAttachOpen = !this.quickExpAttachOpen)}"
+            >
+              <span slot="icon-start">${iconPaperclip(13)}</span>
+              <span>
+                ${t.viewTexts.attachments.attachQuickButton}${this.quickExpDocumentIds.length + this.quickExpPendingFiles.length > 0
+                  ? ` (${this.quickExpDocumentIds.length + this.quickExpPendingFiles.length})`
+                  : ''}
+              </span>
+            </app-button>
+          </div>
+          ${this.quickExpAttachOpen
+            ? html`
+                <app-project-attachments
+                  compact
+                  project-id="${this.projectId || this.editingTask?.projectId || ''}"
+                  .documentIds="${this.quickExpDocumentIds}"
+                  .pendingFiles="${this.quickExpPendingFiles}"
+                  @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                    this.quickExpDocumentIds = e.detail.documentIds;
+                    this.quickExpPendingFiles = e.detail.pendingFiles;
+                  }}"
+                ></app-project-attachments>
+              `
+            : ''}
+        </div>
       </div>
     `;
   }
 
   private handleAddQuickTime() {
     if (!this.editingTask || this.quickTimeHours <= 0) return;
+    const t = getTranslation(this.currentLang);
+    const targetProjectId = this.projectId || this.editingTask.projectId;
+    const userId = this.assigneeId || store.users[0]?.id || 'user-1';
+    const documentIds = commitPendingAttachments({
+      projectId: targetProjectId,
+      taskId: this.editingTask.id,
+      uploadedById: userId,
+      category: 'report',
+      tags: [t.viewTexts.attachments.tagTimeEntry, this.editingTask.id],
+      existingDocumentIds: this.quickTimeDocumentIds,
+      pendingFiles: this.quickTimePendingFiles,
+      description:
+        this.quickTimeDesc.trim() ||
+        t.viewTexts.attachments.defaultTimeDescription(this.editingTask.id),
+      versionNote: t.viewTexts.attachments.defaultTimeDescription(this.editingTask.id),
+    });
     const entry = store.addTimeEntry({
       taskId: this.editingTask.id,
-      projectId: this.projectId || this.editingTask.projectId,
-      userId: this.assigneeId || store.users[0]?.id || 'user-1',
+      projectId: targetProjectId,
+      userId,
       date: new Date().toISOString().slice(0, 10),
       hours: this.quickTimeHours,
       billable: true,
       category: this.quickTimeCategory,
       status: 'logged',
       description: this.quickTimeDesc.trim(),
+      documentIds,
     });
     this.loggedHours = Math.max(0, Math.round((this.loggedHours + entry.hours) * 100) / 100);
     this.quickTimeDesc = '';
+    this.quickTimeDocumentIds = [];
+    this.quickTimePendingFiles = [];
+    this.quickTimeAttachOpen = false;
   }
 
   private handleDeleteQuickTime(entry: TimeEntry) {
@@ -816,10 +992,24 @@ export class AppTaskModal extends LitElement {
 
   private handleAddQuickExpense() {
     if (!this.editingTask || !this.quickExpenseTitle.trim()) return;
-    store.addExpense({
-      projectId: this.projectId || this.editingTask.projectId,
+    const t = getTranslation(this.currentLang);
+    const targetProjectId = this.projectId || this.editingTask.projectId;
+    const userId = this.assigneeId || store.users[0]?.id || 'user-1';
+    const documentIds = commitPendingAttachments({
+      projectId: targetProjectId,
       taskId: this.editingTask.id,
-      userId: this.assigneeId || store.users[0]?.id || 'user-1',
+      uploadedById: userId,
+      category: 'act_invoice',
+      tags: [t.viewTexts.attachments.tagExpense, this.editingTask.id],
+      existingDocumentIds: this.quickExpDocumentIds,
+      pendingFiles: this.quickExpPendingFiles,
+      description: t.viewTexts.attachments.defaultExpenseDescription(this.quickExpenseTitle.trim()),
+      versionNote: t.viewTexts.attachments.defaultExpenseDescription(this.quickExpenseTitle.trim()),
+    });
+    store.addExpense({
+      projectId: targetProjectId,
+      taskId: this.editingTask.id,
+      userId,
       date: new Date().toISOString().slice(0, 10),
       title: this.quickExpenseTitle.trim(),
       category: this.quickExpenseCategory,
@@ -827,8 +1017,12 @@ export class AppTaskModal extends LitElement {
       currency: 'RUB',
       billable: true,
       status: 'pending',
-      notes: getTranslation(this.currentLang).viewTexts.taskModal.taskLinkedNote(this.editingTask.id),
+      notes: t.viewTexts.taskModal.taskLinkedNote(this.editingTask.id),
+      documentIds,
     });
     this.quickExpenseTitle = '';
+    this.quickExpDocumentIds = [];
+    this.quickExpPendingFiles = [];
+    this.quickExpAttachOpen = false;
   }
 }

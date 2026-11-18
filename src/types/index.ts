@@ -380,6 +380,7 @@ export interface TimeEntry {
   category: TimeEntryCategory;
   status: TimeEntryStatus;
   description: string;
+  documentIds?: string[];
   createdAt: string;
 }
 
@@ -408,6 +409,7 @@ export interface Expense {
   status: ExpenseStatus;
   vendor?: string;
   notes: string;
+  documentIds?: string[];
   createdAt: string;
 }
 
@@ -594,6 +596,8 @@ export interface DocumentItem {
   contractId?: string;
   counterpartyId?: string;
   taskId?: string;
+  timeEntryId?: string;
+  expenseId?: string;
   description: string;
   tags: string[];
   version: number;
