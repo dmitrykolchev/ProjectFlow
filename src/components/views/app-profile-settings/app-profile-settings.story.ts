@@ -5,7 +5,7 @@ import './app-profile-settings';
 export const meta: ComponentStoryMeta = {
   title: 'Views/ProfileSettings',
   component: 'app-profile-settings',
-  description: 'User profile settings page: user card, regional settings (language, timezone) and business defaults (default project, default view).',
+  description: 'User profile settings page in the interface-settings layout: user card, language option cards, timezone select with live clock, default project and default activity view.',
   category: 'Views',
   stories: [
     {

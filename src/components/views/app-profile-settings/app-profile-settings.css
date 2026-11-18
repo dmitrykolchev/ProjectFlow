@@ -13,8 +13,16 @@
   overflow-y: auto;
   overflow-x: hidden;
   background: var(--bg-canvas, #090d16);
-  padding: 1.5rem;
-  gap: 1.25rem;
+  padding: 2rem 1.5rem;
+}
+
+.settings-container {
+  max-width: 860px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
 }
 
 .section-desc {
@@ -51,11 +59,49 @@
   color: var(--text-secondary, #94a3b8);
 }
 
-.profile-grid {
+.options-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  align-items: start;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.option-card {
+  padding: 1rem;
+  background: var(--bg-subtle, #1a2438);
+  border: 1.5px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  transition: border-color var(--transition-fast, 150ms ease),
+              background-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+.option-card:hover {
+  background: var(--bg-hover, #223049);
+  border-color: var(--border-strong, #475569);
+}
+
+.option-card.is-active {
+  border-color: var(--accent-primary, #6366f1);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
+  box-shadow: var(--accent-glow, none);
+}
+
+.option-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.option-card-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
 }
 
 .profile-field-group {
@@ -91,10 +137,4 @@
   font-size: 0.8rem;
   font-variant-numeric: tabular-nums;
   color: var(--text-secondary, #94a3b8);
-}
-
-@media (max-width: 720px) {
-  .profile-grid {
-    grid-template-columns: 1fr;
-  }
 }

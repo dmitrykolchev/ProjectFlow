@@ -37,19 +37,6 @@ const TIMEZONES = [
   'UTC',
 ];
 
-const DEFAULT_VIEW_OPTIONS: ActiveView[] = [
-  'dashboard',
-  'kanban',
-  'gantt',
-  'grid',
-  'calendar',
-  'analytics',
-  'projects',
-  'requirements',
-  'knowledge-base',
-  'documents',
-];
-
 @customElement('app-profile-settings')
 export class AppProfileSettings extends LitElement {
   @state() private custom = { ...store.customization };
@@ -81,55 +68,85 @@ export class AppProfileSettings extends LitElement {
     const t = getTranslation(this.currentLang);
     const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
 
+    const viewsList: { id: ActiveView; label: string }[] = [
+      { id: 'dashboard', label: t.navigation.dashboard },
+      { id: 'projects', label: t.navigation.projects },
+      { id: 'kanban', label: t.navigation.kanban },
+      { id: 'gantt', label: t.navigation.gantt },
+      { id: 'grid', label: t.navigation.grid },
+      { id: 'calendar', label: t.navigation.calendar },
+      { id: 'analytics', label: t.navigation.analytics },
+      { id: 'companies', label: t.navigation.companies },
+      { id: 'employees', label: t.navigation.employees },
+      { id: 'counterparties', label: t.navigation.counterparties },
+      { id: 'contracts', label: t.navigation.contracts },
+      { id: 'calculations', label: t.navigation.calculations },
+      { id: 'payments', label: t.navigation.payments },
+      { id: 'time-tracking', label: t.navigation.timeTracking },
+      { id: 'expenses', label: t.navigation.expenses },
+    ];
+
     return html`
-      <app-page-header
-        title="${t.navigation.profileSettings}"
-        subtitle="${t.profileSettings.subtitle}"
-      >
-        <span slot="icon">${iconUser(28)}</span>
-      </app-page-header>
+      <div class="settings-container">
+        <app-page-header
+          title="${t.navigation.profileSettings}"
+          subtitle="${t.profileSettings.subtitle}"
+        >
+          <span slot="icon">${iconUser(28)}</span>
+        </app-page-header>
 
-      <!-- User card (read-only, from the employee directory) -->
-      <app-section-card variant="panel" title="${t.profileSettings.profileCardTitle}">
-        <span slot="icon">${iconUser(17)}</span>
-        <p class="section-desc">${t.profileSettings.profileCardDesc}</p>
-        ${currentUser
-          ? html`
-              <div class="profile-card-row">
-                <app-avatar
-                  size="xl"
-                  initials="${currentUser.avatar}"
-                  title="${currentUser.name}"
-                  color="var(--bg-hover, #223049)"
-                ></app-avatar>
-                <div class="profile-card-info">
-                  <span class="profile-card-name">${currentUser.name}</span>
-                  <span class="profile-card-role">${currentUser.role}</span>
+        <!-- User card (read-only, from the employee directory) -->
+        <app-section-card variant="panel" title="${t.profileSettings.profileCardTitle}">
+          <span slot="icon">${iconUser(17)}</span>
+          <p class="section-desc">${t.profileSettings.profileCardDesc}</p>
+          ${currentUser
+            ? html`
+                <div class="profile-card-row">
+                  <app-avatar
+                    size="xl"
+                    initials="${currentUser.avatar}"
+                    title="${currentUser.name}"
+                    color="var(--bg-hover, #223049)"
+                  ></app-avatar>
+                  <div class="profile-card-info">
+                    <span class="profile-card-name">${currentUser.name}</span>
+                    <span class="profile-card-role">${currentUser.role}</span>
+                  </div>
                 </div>
+              `
+            : ''}
+        </app-section-card>
+
+        <!-- Language (moved from interface settings) -->
+        <app-section-card variant="panel" title="${t.settings.language}">
+          <div class="options-grid">
+            <div
+              class="option-card ${this.custom.language === 'ru' ? 'is-active' : ''}"
+              @click="${() => store.setLanguage('ru')}"
+            >
+              <div class="option-card-header">
+                <span>${t.settings.langRu}</span>
+                ${this.custom.language === 'ru' ? '✓' : ''}
               </div>
-            `
-          : ''}
-      </app-section-card>
+              <p class="option-card-desc">${t.viewTexts.settings.langRuDesc}</p>
+            </div>
 
-      <!-- Regional settings -->
-      <app-section-card variant="panel" title="${t.profileSettings.regionTitle}">
-        <span slot="icon">${iconGlobe(17)}</span>
-        <p class="section-desc">${t.profileSettings.regionDesc}</p>
-
-        <div class="profile-grid">
-          <div class="profile-field-group">
-            <app-select
-              label="${t.profileSettings.languageLabel}"
-              .value="${this.custom.language}"
-              .options="${[
-                { value: 'ru', label: t.profileSettings.langRu },
-                { value: 'en', label: t.profileSettings.langEn },
-              ]}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                store.setLanguage(eventValue(e) as 'ru' | 'en')}"
-            ></app-select>
+            <div
+              class="option-card ${this.custom.language === 'en' ? 'is-active' : ''}"
+              @click="${() => store.setLanguage('en')}"
+            >
+              <div class="option-card-header">
+                <span>${t.settings.langEn}</span>
+                ${this.custom.language === 'en' ? '✓' : ''}
+              </div>
+              <p class="option-card-desc">${t.viewTexts.settings.langEnDesc}</p>
+            </div>
           </div>
+        </app-section-card>
 
+        <!-- Timezone -->
+        <app-section-card variant="panel" title="${t.profileSettings.timezoneLabel}">
+          <span slot="icon">${iconGlobe(17)}</span>
           <div class="profile-field-group">
             <app-select
               label="${t.profileSettings.timezoneLabel}"
@@ -140,15 +157,16 @@ export class AppProfileSettings extends LitElement {
             ></app-select>
             <span class="field-hint">${t.profileSettings.timezoneHint}</span>
           </div>
-        </div>
-      </app-section-card>
 
-      <!-- Business settings -->
-      <app-section-card variant="panel" title="${t.profileSettings.businessTitle}">
-        <span slot="icon">${iconZap(17)}</span>
-        <p class="section-desc">${t.profileSettings.businessDesc}</p>
+          <div class="profile-clock-row">
+            <span class="profile-clock-icon">${iconClock(14)}</span>
+            <span class="profile-clock-text">${new Date().toLocaleString(t.common.locale, { timeZone: this.custom.timezone })}</span>
+          </div>
+        </app-section-card>
 
-        <div class="profile-grid">
+        <!-- Default project -->
+        <app-section-card variant="panel" title="${t.profileSettings.projectLabel}">
+          <span slot="icon">${iconZap(17)}</span>
           <div class="profile-field-group">
             <app-select
               label="${t.profileSettings.projectLabel}"
@@ -162,27 +180,27 @@ export class AppProfileSettings extends LitElement {
             ></app-select>
             <span class="field-hint">${t.profileSettings.projectHint}</span>
           </div>
+        </app-section-card>
 
-          <div class="profile-field-group">
-            <app-select
-              label="${t.profileSettings.viewLabel}"
-              .value="${this.custom.defaultView}"
-              .options="${DEFAULT_VIEW_OPTIONS.map((v) => ({
-                value: v,
-                label: (t.navigation as Record<string, string>)[v] ?? v,
-              }))}"
-              @change="${(e: CustomEvent<{ value: string }>) =>
-                store.updateCustomization({ defaultView: eventValue(e) as ActiveView })}"
-            ></app-select>
-            <span class="field-hint">${t.profileSettings.viewHint}</span>
+        <!-- Default activity view -->
+        <app-section-card variant="panel" title="${t.profileSettings.viewLabel}">
+          <div class="options-grid">
+            ${viewsList.map(
+              (v) => html`
+                <div
+                  class="option-card ${this.custom.defaultView === v.id ? 'is-active' : ''}"
+                  @click="${() => store.updateCustomization({ defaultView: v.id })}"
+                >
+                  <div class="option-card-header">
+                    <span>${v.label}</span>
+                    ${this.custom.defaultView === v.id ? '✓' : ''}
+                  </div>
+                </div>
+              `
+            )}
           </div>
-        </div>
-
-        <div class="profile-clock-row">
-          <span class="profile-clock-icon">${iconClock(14)}</span>
-          <span class="profile-clock-text">${new Date().toLocaleString(t.common.locale, { timeZone: this.custom.timezone })}</span>
-        </div>
-      </app-section-card>
+        </app-section-card>
+      </div>
     `;
   }
 }
