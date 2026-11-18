@@ -27,7 +27,6 @@ import {
   iconFolderOpen,
   iconGrid,
   iconCalculator,
-  iconUser,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -381,12 +380,6 @@ export class AppRoot extends LitElement {
             value="settings"
             label="${t.navigation.settings}"
             .icon="${iconSettings()}"
-          ></sidebar-item>
-
-          <sidebar-item
-            value="profile-settings"
-            label="${t.navigation.profileSettings}"
-            .icon="${iconUser()}"
           ></sidebar-item>
         </sidebar-group>
       </app-sidebar>
