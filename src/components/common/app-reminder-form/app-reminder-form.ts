@@ -71,7 +71,7 @@ export class AppReminderForm extends LitElement {
   @state() private fDescription = '';
   @state() private fEntityType: ReminderEntityType = 'project';
   @state() private fEntityId = '';
-  @state() private fDueDate = '2026-11-19';
+  @state() private fDueDate = '';
   @state() private fDueTime = '10:00';
   @state() private fPriority: ReminderPriority = 'medium';
   @state() private fStatus: ReminderStatus = 'active';
@@ -137,7 +137,7 @@ export class AppReminderForm extends LitElement {
       this.fDescription = rem.description || '';
       this.fEntityType = rem.entityType || 'none';
       this.fEntityId = rem.entityId || '';
-      this.fDueDate = datePart || new Date().toISOString().slice(0, 10);
+      this.fDueDate = datePart || store.formatLocalDateTime(new Date()).slice(0, 10);
       this.fDueTime = (timePart || '10:00').slice(0, 5);
       this.fPriority = rem.priority;
       this.fStatus = rem.status;
@@ -490,7 +490,7 @@ export class AppReminderForm extends LitElement {
     const previewDates =
       this.fUnit !== 'none'
         ? store.getUpcomingReminderOccurrences(
-            `${this.fDueDate || '2026-11-19'}T${this.fDueTime || '10:00'}`,
+            `${this.fDueDate || store.formatLocalDateTime(new Date()).slice(0, 10)}T${this.fDueTime || '10:00'}`,
             draftRecurrence,
             3
           )
