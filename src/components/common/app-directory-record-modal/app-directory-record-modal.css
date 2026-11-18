@@ -29,14 +29,33 @@
   margin-top: 0.25rem;
 }
 
+/* boolean fields mirror app-input: label row + control box of identical
+   --control-height-md, so switch rows align with text/number neighbours */
 .switch-field {
   display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.switch-field label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
   align-items: center;
-  min-height: var(--control-height-md, 38px);
-  padding: 0.45rem 0.75rem;
-  background: var(--bg-subtle, rgba(148, 163, 184, 0.06));
-  border: 1px solid var(--border-subtle, #1e293b);
+  gap: 0.25rem;
+}
+
+.switch-box {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--control-height-md, 38px);
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #334155);
   border-radius: var(--radius-md, 8px);
+  padding: 0 0.75rem;
 }
 
 .error-banner {
