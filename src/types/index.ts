@@ -724,3 +724,27 @@ export interface DirectoryDefinition {
   updatedAt: string;
 }
 
+// --- Hybrid Authentication & 2FA (TOTP) ---
+export type AuthProviderId = 'local' | 'google' | 'microsoft' | 'facebook' | 'oidc_sso';
+
+export interface AuthSession {
+  userId: string;
+  email: string;
+  provider: AuthProviderId;
+  tenantId?: string;
+  twoFactorVerified: boolean;
+  trustedDevice: boolean;
+  rememberMe: boolean;
+  authenticatedAt: string;
+}
+
+export interface AuthAccountCredential {
+  userId: string;
+  email: string;
+  password: string;
+  twoFactorEnabled: boolean;
+  totpSecret: string;
+  recoveryCodes: string[];
+}
+
+

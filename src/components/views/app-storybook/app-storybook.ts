@@ -29,6 +29,7 @@ import metaItemMeta from '../../common/app-meta-item/app-meta-item.story';
 import cardFooterMeta from '../../common/card-footer/card-footer.story';
 import linkMeta from '../../common/app-link/app-link.story';
 import inputMeta from '../../common/app-input/app-input.story';
+import otpInputMeta from '../../common/app-otp-input/app-otp-input.story';
 import textareaMeta from '../../common/app-textarea/app-textarea.story';
 import numberMeta from '../../common/app-number-input/app-number-input.story';
 import dateMeta from '../../common/app-date-input/app-date-input.story';
@@ -126,6 +127,7 @@ import expensesMeta from '../app-expenses/app-expenses.story';
 import settingsMeta from '../app-settings/app-settings.story';
 import profileSettingsMeta from '../app-profile-settings/app-profile-settings.story';
 import directoriesMeta from '../app-directories/app-directories.story';
+import authMeta from '../app-auth/app-auth.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
   buttonMeta,
@@ -150,6 +152,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   checkboxMeta,
   switchMeta,
   inputMeta,
+  otpInputMeta,
   textareaMeta,
   numberMeta,
   dateMeta,
@@ -242,6 +245,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   expensesMeta,
   settingsMeta,
   profileSettingsMeta,
+  authMeta,
 ];
 
 @customElement('app-storybook')

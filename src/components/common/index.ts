@@ -33,6 +33,7 @@ export type { SegmentedOption } from './app-segmented-switch/app-segmented-switc
 
 export { AppSwitch } from './app-switch/app-switch';
 export { AppInput } from './app-input/app-input';
+export { AppOtpInput } from './app-otp-input/app-otp-input';
 export { AppTextarea } from './app-textarea/app-textarea';
 export { AppNumberInput } from './app-number-input/app-number-input';
 export { AppDateInput } from './app-date-input/app-date-input';
@@ -118,6 +119,7 @@ import { AppMenuDivider } from './app-menu-divider/app-menu-divider';
 import { AppSegmentedSwitch } from './app-segmented-switch/app-segmented-switch';
 import { AppSwitch } from './app-switch/app-switch';
 import { AppInput } from './app-input/app-input';
+import { AppOtpInput } from './app-otp-input/app-otp-input';
 import { AppTextarea } from './app-textarea/app-textarea';
 import { AppNumberInput } from './app-number-input/app-number-input';
 import { AppDateInput } from './app-date-input/app-date-input';
@@ -168,6 +170,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-segmented-switch': AppSegmentedSwitch,
   'app-switch': AppSwitch,
   'app-input': AppInput,
+  'app-otp-input': AppOtpInput,
   'app-textarea': AppTextarea,
   'app-number-input': AppNumberInput,
   'app-date-input': AppDateInput,

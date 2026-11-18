@@ -16,6 +16,7 @@ import {
   iconHeart,
   iconTerminal,
   iconZap,
+  iconLogOut,
 } from '../../common/icons';
 import { SidebarItem } from '../sidebar-item/sidebar-item';
 import { SidebarGroup } from '../sidebar-group/sidebar-group';
@@ -253,26 +254,54 @@ export class AppSidebar extends LitElement {
             if (!currentUser) return '';
             return !this.collapsed
               ? html`
-                  <div
-                    class="user-profile is-clickable"
-                    title="${t.viewTexts.sidebar.profileOpenTitle}"
-                    @click="${() => store.setActiveView('profile-settings')}"
-                  >
-                    <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
-                    <div class="user-info">
-                      <span class="user-name">${currentUser.name}</span>
-                      <span class="user-role">${currentUser.role}</span>
+                  <div class="user-footer-row">
+                    <div
+                      class="user-profile is-clickable"
+                      title="${t.viewTexts.sidebar.profileOpenTitle}"
+                      @click="${() => store.setActiveView('profile-settings')}"
+                    >
+                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                      <div class="user-info">
+                        <span class="user-name">${currentUser.name}</span>
+                        <span class="user-role">${currentUser.role}</span>
+                      </div>
                     </div>
+                    <button
+                      type="button"
+                      class="logout-btn"
+                      title="${t.viewTexts.sidebar.logoutTitle}"
+                      aria-label="${t.viewTexts.sidebar.logoutTitle}"
+                      @click="${(e: Event) => {
+                        e.stopPropagation();
+                        store.logout();
+                      }}"
+                    >
+                      ${iconLogOut(15)}
+                    </button>
                   </div>
                 `
               : html`
-                  <div
-                    class="user-profile is-clickable"
-                    style="justify-content: center;"
-                    title="${t.viewTexts.sidebar.profileOpenTitle}"
-                    @click="${() => store.setActiveView('profile-settings')}"
-                  >
-                    <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                  <div class="user-footer-collapsed">
+                    <div
+                      class="user-profile is-clickable"
+                      style="justify-content: center;"
+                      title="${t.viewTexts.sidebar.profileOpenTitle}"
+                      @click="${() => store.setActiveView('profile-settings')}"
+                    >
+                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                    </div>
+                    <button
+                      type="button"
+                      class="logout-btn"
+                      title="${t.viewTexts.sidebar.logoutTitle}"
+                      aria-label="${t.viewTexts.sidebar.logoutTitle}"
+                      @click="${(e: Event) => {
+                        e.stopPropagation();
+                        store.logout();
+                      }}"
+                    >
+                      ${iconLogOut(15)}
+                    </button>
                   </div>
                 `;
           })()}

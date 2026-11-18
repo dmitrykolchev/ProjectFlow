@@ -1,0 +1,121 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.otp-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.otp-cell {
+  width: 46px;
+  height: 54px;
+  padding: 0;
+  text-align: center;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text-primary, #f8fafc);
+  background: var(--bg-subtle, #1a2438);
+  border: 1.5px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-md, 8px);
+  outline: none;
+  caret-color: var(--accent-primary, #6366f1);
+  transition:
+    border-color var(--transition-fast, 150ms ease),
+    box-shadow var(--transition-fast, 150ms ease),
+    background-color var(--transition-fast, 150ms ease),
+    transform var(--transition-fast, 150ms ease);
+}
+
+.otp-cell:hover:not(:disabled) {
+  border-color: var(--border-strong, #334155);
+  background: var(--bg-hover, #223049);
+}
+
+.otp-cell:focus:not(:disabled) {
+  border-color: var(--border-focus, var(--accent-primary, #6366f1));
+  background: var(--bg-surface, #111827);
+  box-shadow: 0 0 0 3px var(--accent-soft, rgba(99, 102, 241, 0.2)), var(--accent-glow, none);
+  transform: translateY(-1px);
+}
+
+.otp-cell.is-filled:not(:focus) {
+  border-color: var(--border-strong, #334155);
+  background: var(--bg-surface, #111827);
+}
+
+.otp-cell:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.otp-separator {
+  width: 8px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border-strong, #334155);
+  flex-shrink: 0;
+  margin: 0 0.1rem;
+}
+
+:host([error]) .otp-cell {
+  border-color: var(--color-danger, #ef4444);
+  background: var(--color-danger-bg, rgba(239, 68, 68, 0.1));
+}
+
+:host([error]) .otp-cell:focus:not(:disabled) {
+  box-shadow: 0 0 0 3px var(--color-danger-bg, rgba(239, 68, 68, 0.22));
+}
+
+:host([error]) .otp-group {
+  animation: otp-shake 0.34s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes otp-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-5px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@media (max-width: 440px) {
+  .otp-group {
+    gap: 0.3rem;
+  }
+
+  .otp-cell {
+    width: 40px;
+    height: 48px;
+    font-size: 1.15rem;
+  }
+
+  .otp-separator {
+    width: 6px;
+    margin: 0;
+  }
+}

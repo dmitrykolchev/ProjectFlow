@@ -36,6 +36,7 @@ import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
 import './components/common/app-activity-panel/app-activity-panel';
 import './components/common/app-task-modal/app-task-modal';
+import './components/views/app-auth/app-auth';
 import { eventValue } from './components/common/event-value';
 
 const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
@@ -91,6 +92,7 @@ export class AppRoot extends LitElement {
   @state() private chatCount = store.chatMessages.length;
   @state() private knowledgeCount = store.knowledgeArticles.length;
   @state() private documentCount = store.documents.length;
+  @state() private isAuthenticated = store.isAuthenticated;
   @state() private loadedViews: Set<ActiveView> = new Set();
 
   private loadingViews: Set<ActiveView> = new Set();
@@ -119,7 +121,10 @@ export class AppRoot extends LitElement {
     this.chatCount = store.chatMessages.length;
     this.knowledgeCount = store.knowledgeArticles.length;
     this.documentCount = store.documents.length;
-    this.ensureViewLoaded(this.activeView);
+    this.isAuthenticated = store.isAuthenticated;
+    if (this.isAuthenticated) {
+      this.ensureViewLoaded(this.activeView);
+    }
   }
 
   private async ensureViewLoaded(view: ActiveView) {
@@ -203,6 +208,13 @@ export class AppRoot extends LitElement {
   `;
 
   render() {
+    if (!this.isAuthenticated) {
+      return html`
+        <app-auth></app-auth>
+        <app-toast></app-toast>
+      `;
+    }
+
     const t = getTranslation(this.currentLang);
     const isViewReady = this.loadedViews.has(this.activeView);
 

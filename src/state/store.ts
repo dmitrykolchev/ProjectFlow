@@ -3,6 +3,9 @@ import {
   ActiveView,
   ActivityLogItem,
   AiUsageDay,
+  AuthAccountCredential,
+  AuthProviderId,
+  AuthSession,
   BackgroundPreset,
   BankRequisite,
   Calculation,
@@ -80,6 +83,9 @@ const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
 const STORAGE_KEY_DIRECTORIES = 'projectflow_directories_v1';
+const STORAGE_KEY_AUTH_SESSION = 'projectflow_auth_session_v1';
+const STORAGE_KEY_TRUSTED_DEVICES = 'projectflow_trusted_2fa_v1';
+const STORAGE_KEY_AUTH_ACCOUNTS = 'projectflow_auth_accounts_v1';
 
 const defaultCustomization: UserCustomization = {
   theme: 'dark',
@@ -289,6 +295,10 @@ export class AppStore {
   public documentFilterProjectId: string = 'all';
   public chatProjectId: string = '';
   public currentUserId: string = 'user-1';
+  public authSession: AuthSession | null = null;
+  public isAuthenticated: boolean = false;
+  public authAccounts: AuthAccountCredential[] = [];
+  public trusted2faEmails: string[] = [];
   public pendingInvoiceForContractId: string | null = null;
   public pendingCalculationForContractId: string | null = null;
   public activeView: ActiveView = 'dashboard';
@@ -707,6 +717,8 @@ export class AppStore {
           },
         ];
       }
+
+      this.initAuthState();
     } catch (e) {
       console.warn('Error loading state from localStorage:', e);
       this.tasks = [...initialTasks];
@@ -727,6 +739,7 @@ export class AppStore {
       this.knowledgeArticles = [...initialKnowledgeArticles];
       this.documents = [...initialDocuments];
       this.directories = createInitialDirectories();
+      this.initAuthState();
     }
   }
 
@@ -3634,6 +3647,353 @@ export class AppStore {
       return true;
     });
   }
+
+  // --- Hybrid Authentication, OIDC & TOTP 2FA ---
+  private buildDefaultAuthAccounts(): AuthAccountCredential[] {
+    return this.users.map((u, idx) => ({
+      userId: u.id,
+      email: u.email.toLowerCase(),
+      password: idx === 0 ? 'ProjectFlow!2026' : 'demo1234',
+      twoFactorEnabled: idx === 0 || idx === 2 || idx === 4,
+      totpSecret: `PF_SECRET_${u.id.toUpperCase()}`,
+      recoveryCodes: ['PF-9421-88K2', 'PF-3107-M4Q9'],
+    }));
+  }
+
+  private initAuthState(): void {
+    try {
+      const storedAccounts = localStorage.getItem(STORAGE_KEY_AUTH_ACCOUNTS);
+      const base = this.buildDefaultAuthAccounts();
+      if (storedAccounts) {
+        const parsed: AuthAccountCredential[] = JSON.parse(storedAccounts);
+        const existingEmails = new Set(parsed.map((a) => a.email.toLowerCase()));
+        this.authAccounts = [...parsed, ...base.filter((b) => !existingEmails.has(b.email))];
+      } else {
+        this.authAccounts = base;
+      }
+
+      const storedTrusted = localStorage.getItem(STORAGE_KEY_TRUSTED_DEVICES);
+      this.trusted2faEmails = storedTrusted ? JSON.parse(storedTrusted) : [];
+
+      const rawSession =
+        localStorage.getItem(STORAGE_KEY_AUTH_SESSION) ||
+        sessionStorage.getItem(STORAGE_KEY_AUTH_SESSION);
+      if (rawSession) {
+        const parsedSession: AuthSession = JSON.parse(rawSession);
+        if (
+          parsedSession &&
+          parsedSession.userId &&
+          this.users.some((u) => u.id === parsedSession.userId)
+        ) {
+          this.authSession = parsedSession;
+          this.currentUserId = parsedSession.userId;
+          this.isAuthenticated = true;
+          return;
+        }
+      }
+    } catch {
+      this.authAccounts = this.buildDefaultAuthAccounts();
+    }
+    this.authSession = null;
+    this.isAuthenticated = false;
+  }
+
+  private saveAuthAccounts(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_AUTH_ACCOUNTS, JSON.stringify(this.authAccounts));
+    } catch (e) {
+      console.warn('Could not save auth accounts:', e);
+    }
+  }
+
+  private saveAuthSession(session: AuthSession | null): void {
+    try {
+      localStorage.removeItem(STORAGE_KEY_AUTH_SESSION);
+      sessionStorage.removeItem(STORAGE_KEY_AUTH_SESSION);
+      if (!session) return;
+      const serialized = JSON.stringify(session);
+      if (session.rememberMe) {
+        localStorage.setItem(STORAGE_KEY_AUTH_SESSION, serialized);
+      } else {
+        sessionStorage.setItem(STORAGE_KEY_AUTH_SESSION, serialized);
+      }
+    } catch (e) {
+      console.warn('Could not save auth session:', e);
+    }
+  }
+
+  public maskEmailAddress(email: string): string {
+    const clean = email.trim();
+    const at = clean.indexOf('@');
+    if (at <= 1) return clean;
+    const local = clean.slice(0, at);
+    const domain = clean.slice(at);
+    const visible = local.slice(0, Math.min(2, local.length));
+    return `${visible}***${domain}`;
+  }
+
+  public isTwoFactorEnabledForUser(userId: string): boolean {
+    const acc = this.authAccounts.find((a) => a.userId === userId);
+    return acc ? acc.twoFactorEnabled : false;
+  }
+
+  public toggleCurrentUserTwoFactor(enabled: boolean): void {
+    const acc = this.authAccounts.find((a) => a.userId === this.currentUserId);
+    if (!acc) return;
+    acc.twoFactorEnabled = enabled;
+    this.authAccounts = [...this.authAccounts];
+    this.saveAuthAccounts();
+    this.notify();
+  }
+
+  public resetTrustedDevicesForCurrentUser(): void {
+    const user = this.users.find((u) => u.id === this.currentUserId);
+    if (!user) return;
+    const email = user.email.toLowerCase();
+    this.trusted2faEmails = this.trusted2faEmails.filter((e) => e !== email);
+    try {
+      localStorage.setItem(STORAGE_KEY_TRUSTED_DEVICES, JSON.stringify(this.trusted2faEmails));
+    } catch {
+      // ignore
+    }
+    this.notify();
+  }
+
+  public async getTotpCodeForEmail(email: string): Promise<string> {
+    const clean = email.trim().toLowerCase();
+    const acc = this.authAccounts.find((a) => a.email === clean);
+    const seed = acc?.totpSecret || `PF_SECRET_${clean}`;
+    const step = Math.floor(Date.now() / 30000);
+    const input = `${seed}:${step}`;
+
+    try {
+      if (typeof crypto !== 'undefined' && crypto.subtle) {
+        const encoded = new TextEncoder().encode(input);
+        const digest = await crypto.subtle.digest('SHA-256', encoded);
+        const view = new DataView(digest);
+        const num = view.getUint32(0, false) % 1000000;
+        return String(num).padStart(6, '0');
+      }
+    } catch {
+      // fallback deterministic 6-digit hash
+    }
+
+    let hash = 2166136261;
+    for (let i = 0; i < input.length; i++) {
+      hash ^= input.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return String(Math.abs(hash) % 1000000).padStart(6, '0');
+  }
+
+  public async verifyPrimaryCredentials(
+    identifier: string,
+    password: string
+  ): Promise<
+    | { ok: true; user: User; requires2FA: boolean; maskedEmail: string }
+    | { ok: false; errorCode: 'empty_fields' | 'invalid_credentials' }
+  > {
+    const cleanId = identifier.trim().toLowerCase();
+    const cleanPass = password;
+    if (!cleanId || !cleanPass) {
+      return { ok: false, errorCode: 'empty_fields' };
+    }
+
+    const account = this.authAccounts.find(
+      (a) => a.email === cleanId || a.email.split('@')[0] === cleanId
+    );
+    if (!account || account.password !== cleanPass) {
+      return { ok: false, errorCode: 'invalid_credentials' };
+    }
+
+    const user = this.users.find((u) => u.id === account.userId);
+    if (!user) {
+      return { ok: false, errorCode: 'invalid_credentials' };
+    }
+
+    const isTrustedDevice = this.trusted2faEmails.includes(account.email);
+    const requires2FA = account.twoFactorEnabled && !isTrustedDevice;
+
+    return {
+      ok: true,
+      user,
+      requires2FA,
+      maskedEmail: this.maskEmailAddress(user.email),
+    };
+  }
+
+  public resolveOidcLogin(
+    provider: Exclude<AuthProviderId, 'local'>,
+    tenantOrEmail?: string
+  ):
+    | {
+        ok: true;
+        user: User;
+        requires2FA: boolean;
+        maskedEmail: string;
+        tenantId?: string;
+      }
+    | { ok: false; errorCode: 'missing_tenant' | 'unknown_tenant' } {
+    if (provider === 'oidc_sso') {
+      const cleanTenant = (tenantOrEmail || '').trim().toLowerCase();
+      if (!cleanTenant || cleanTenant.length < 3) {
+        return { ok: false, errorCode: 'missing_tenant' };
+      }
+      if (cleanTenant.includes('invalid') || cleanTenant.includes('error')) {
+        return { ok: false, errorCode: 'unknown_tenant' };
+      }
+      const matchedUser =
+        this.users.find((u) => u.email.toLowerCase() === cleanTenant) ||
+        this.users.find(
+          (u) => cleanTenant.includes('flowcloud') && u.email.includes('flowcloud')
+        ) ||
+        this.users[0];
+      const account = this.authAccounts.find((a) => a.userId === matchedUser.id);
+      const isTrusted = this.trusted2faEmails.includes(matchedUser.email.toLowerCase());
+      const requires2FA = (account?.twoFactorEnabled ?? true) && !isTrusted;
+      return {
+        ok: true,
+        user: matchedUser,
+        requires2FA,
+        maskedEmail: this.maskEmailAddress(matchedUser.email),
+        tenantId: cleanTenant,
+      };
+    }
+
+    const providerUserIdx = provider === 'google' ? 0 : provider === 'microsoft' ? 2 : 1;
+    const user = this.users[providerUserIdx] || this.users[0];
+    const account = this.authAccounts.find((a) => a.userId === user.id);
+    const isTrusted = this.trusted2faEmails.includes(user.email.toLowerCase());
+    const requires2FA = (account?.twoFactorEnabled ?? false) && !isTrusted;
+
+    return {
+      ok: true,
+      user,
+      requires2FA,
+      maskedEmail: this.maskEmailAddress(user.email),
+    };
+  }
+
+  public async verifyTwoFactorCode(
+    email: string,
+    code: string,
+    isRecovery: boolean,
+    trustDevice: boolean
+  ): Promise<{ ok: true } | { ok: false; errorCode: 'invalid_otp' | 'invalid_recovery' }> {
+    const cleanEmail = email.trim().toLowerCase();
+    const account = this.authAccounts.find((a) => a.email === cleanEmail);
+    const cleanCode = code.trim().toUpperCase();
+
+    if (isRecovery) {
+      const validCodes = account?.recoveryCodes || ['PF-9421-88K2', 'PF-3107-M4Q9'];
+      if (!validCodes.includes(cleanCode)) {
+        return { ok: false, errorCode: 'invalid_recovery' };
+      }
+    } else {
+      const expectedTotp = await this.getTotpCodeForEmail(cleanEmail);
+      const digitsOnly = cleanCode.replace(/\D/g, '');
+      const isDemoValid = digitsOnly === expectedTotp || digitsOnly === '123456';
+      if (digitsOnly.length !== 6 || !isDemoValid) {
+        return { ok: false, errorCode: 'invalid_otp' };
+      }
+    }
+
+    if (trustDevice) {
+      if (!this.trusted2faEmails.includes(cleanEmail)) {
+        this.trusted2faEmails = [...this.trusted2faEmails, cleanEmail];
+        try {
+          localStorage.setItem(STORAGE_KEY_TRUSTED_DEVICES, JSON.stringify(this.trusted2faEmails));
+        } catch {
+          // ignore
+        }
+      }
+    }
+
+    return { ok: true };
+  }
+
+  public registerLocalAccount(payload: {
+    name: string;
+    email: string;
+    password: string;
+    enable2FA: boolean;
+  }):
+    | { ok: true; user: User; requires2FA: boolean; maskedEmail: string }
+    | { ok: false; errorCode: 'duplicate_email' | 'invalid_input' } {
+    const cleanName = payload.name.trim();
+    const cleanEmail = payload.email.trim().toLowerCase();
+    if (!cleanName || !cleanEmail.includes('@') || payload.password.length < 6) {
+      return { ok: false, errorCode: 'invalid_input' };
+    }
+    if (this.users.some((u) => u.email.toLowerCase() === cleanEmail)) {
+      return { ok: false, errorCode: 'duplicate_email' };
+    }
+
+    const parts = cleanName.split(/\s+/);
+    const initials =
+      parts.length >= 2
+        ? `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase()
+        : cleanName.slice(0, 2).toUpperCase();
+
+    const newUser: User = {
+      id: `user-${Date.now().toString(36)}`,
+      name: cleanName,
+      email: cleanEmail,
+      avatar: initials || 'PF',
+      role: 'Member',
+      status: 'active',
+      hireDate: new Date().toISOString().slice(0, 10),
+    };
+
+    const newAccount: AuthAccountCredential = {
+      userId: newUser.id,
+      email: cleanEmail,
+      password: payload.password,
+      twoFactorEnabled: payload.enable2FA,
+      totpSecret: `PF_SECRET_${newUser.id.toUpperCase()}`,
+      recoveryCodes: ['PF-9421-88K2', 'PF-3107-M4Q9'],
+    };
+
+    this.users = [...this.users, newUser];
+    this.authAccounts = [...this.authAccounts, newAccount];
+    this.saveEmployees();
+    this.saveAuthAccounts();
+
+    return {
+      ok: true,
+      user: newUser,
+      requires2FA: payload.enable2FA,
+      maskedEmail: this.maskEmailAddress(cleanEmail),
+    };
+  }
+
+  public completeAuthentication(payload: {
+    userId: string;
+    email: string;
+    provider: AuthProviderId;
+    tenantId?: string;
+    twoFactorVerified: boolean;
+    trustedDevice: boolean;
+    rememberMe: boolean;
+  }): void {
+    const session: AuthSession = {
+      ...payload,
+      authenticatedAt: new Date().toISOString(),
+    };
+    this.authSession = session;
+    this.currentUserId = payload.userId;
+    this.isAuthenticated = true;
+    this.saveAuthSession(session);
+    this.notify();
+  }
+
+  public logout(): void {
+    this.authSession = null;
+    this.isAuthenticated = false;
+    this.saveAuthSession(null);
+    this.notify();
+  }
 }
 
 export const store = AppStore.getInstance();
+
