@@ -45,6 +45,7 @@
   display: flex;
   align-items: center;
   gap: 0.25rem;
+  min-height: 1rem;
 }
 
 .switch-box {
