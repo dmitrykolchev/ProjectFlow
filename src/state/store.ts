@@ -93,6 +93,8 @@ const defaultCustomization: UserCustomization = {
   aiEndpoint: 'http://127.0.0.1:3000/v1',
   aiModel: '',
   aiBudget: { dailyRequests: 0, dailyTokens: 0 },
+  timezone: 'Europe/Moscow',
+  defaultProjectId: '',
   gridColumns: {
     id: true,
     title: true,
@@ -359,6 +361,12 @@ export class AppStore {
           budget.dailyTokens < 0
         ) {
           this.customization.aiBudget = { ...defaultCustomization.aiBudget };
+        }
+        if (typeof this.customization.timezone !== 'string' || !this.customization.timezone.trim()) {
+          this.customization.timezone = defaultCustomization.timezone;
+        }
+        if (typeof this.customization.defaultProjectId !== 'string') {
+          this.customization.defaultProjectId = defaultCustomization.defaultProjectId;
         }
         this.activeView = this.customization.defaultView || 'dashboard';
       }

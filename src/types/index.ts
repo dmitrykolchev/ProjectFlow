@@ -473,6 +473,7 @@ export type ActiveView =
   | 'time-tracking'
   | 'expenses'
   | 'settings'
+  | 'profile-settings'
   | 'storybook'
   | 'design-tokens'
   | 'material-icons';
@@ -641,6 +642,8 @@ export interface UserCustomization {
   aiEndpoint: string;
   aiModel: string;
   aiBudget: AiBudgetConfig;
+  timezone: string;
+  defaultProjectId: string;
   gridColumns: {
     id: boolean;
     title: boolean;

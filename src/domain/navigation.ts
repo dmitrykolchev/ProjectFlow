@@ -36,6 +36,7 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
   'time-tracking': 'time-tracking',
   expenses: 'expenses',
   settings: 'settings',
+  'profile-settings': 'profile-settings',
   'design-tokens': 'design-tokens',
   storybook: 'storybook',
   'material-icons': 'material-icons',
