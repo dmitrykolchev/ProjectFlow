@@ -11,15 +11,19 @@ import katexStyles from './katex.css';
 
 /**
  * Canonical markdown renderer web component: headings, paragraphs, quotes,
- * bullet / numbered lists, checklists (display-only checkboxes), GFM pipe
- * tables, LaTeX math (KaTeX, inline `$...$` and display `$$...$$`) and fenced
- * code blocks with a copy action. The markdown source is passed as the
- * `content` property or declared directly as light-DOM children; the
- * component owns its prose styling.
+ * bullet / numbered lists, checklists (display-only checkboxes, interactive
+ * when `editable` is set — then a `checklist-toggle` event carries
+ * `{ line, checked }`), GFM pipe tables, LaTeX math (KaTeX, inline `$...$`
+ * and display `$$...$$`) and fenced code blocks with a copy action. The
+ * markdown source is passed as the `content` property or declared directly as
+ * light-DOM children; the component owns its prose styling.
  */
 @customElement('app-markdown')
 export class AppMarkdown extends LitElement {
   @property({ attribute: false }) content = '';
+
+  /** Checklist checkboxes are interactive and emit `checklist-toggle` when true. */
+  @property({ type: Boolean }) editable = false;
 
   @state() private currentLang = store.customization.language;
   @state() private copiedBlockKey: string | null = null;
@@ -61,6 +65,17 @@ export class AppMarkdown extends LitElement {
     }
   }
 
+  private emitChecklistToggle(line: number, checked: boolean) {
+    if (!this.editable) return;
+    this.dispatchEvent(
+      new CustomEvent('checklist-toggle', {
+        detail: { line, checked },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   render() {
     const t = getTranslation(this.currentLang);
     const source = this.content || this.slottedText;
@@ -99,7 +114,13 @@ export class AppMarkdown extends LitElement {
                   ${(block.items || []).map(
                     (it) => html`
                       <li class="checklist-row ${it.checked ? 'is-checked' : ''}">
-                        <app-checkbox ?checked="${Boolean(it.checked)}" ?disabled>
+                        <app-checkbox
+                          ?checked="${Boolean(it.checked)}"
+                          ?disabled="${!this.editable}"
+                          @change="${(e: CustomEvent<{ checked: boolean }>) => {
+                            if (it.line !== undefined) this.emitChecklistToggle(it.line, e.detail.checked);
+                          }}"
+                        >
                           <span>${renderInlineMarkdown(it.text)}</span>
                         </app-checkbox>
                       </li>

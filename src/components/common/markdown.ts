@@ -11,7 +11,7 @@ export interface MarkdownBlock {
   type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table' | 'math';
   text?: string;
   lang?: string;
-  items?: { text: string; checked?: boolean }[];
+  items?: { text: string; checked?: boolean; line?: number }[];
   header?: MarkdownCell[];
   rows?: MarkdownCell[][];
 }
@@ -151,10 +151,10 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
     }
 
     if (/^- \[[xX ]\] /.test(trimmed)) {
-      const items: { text: string; checked: boolean }[] = [];
+      const items: { text: string; checked: boolean; line: number }[] = [];
       while (i < lines.length && /^- \[[xX ]\] /.test(lines[i].trim())) {
         const cur = lines[i].trim();
-        items.push({ checked: cur[3].toLowerCase() === 'x', text: cur.slice(6) });
+        items.push({ checked: cur[3].toLowerCase() === 'x', text: cur.slice(6), line: i });
         i += 1;
       }
       blocks.push({ type: 'checklist', items });

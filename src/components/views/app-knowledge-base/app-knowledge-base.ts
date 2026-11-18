@@ -12,7 +12,6 @@ import {
   iconArrowUpRight,
   iconBookOpen,
   iconBuilding,
-  iconCopy,
   iconEdit,
   iconFolder,
   iconPin,
@@ -24,7 +23,7 @@ import {
 } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/app-checkbox/app-checkbox';
+import '../../common/app-markdown/app-markdown';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -34,13 +33,6 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-page-header/app-page-header';
 import styles from './app-knowledge-base.css';
 import { eventValue } from '../../common/event-value';
-
-interface ParsedBlock {
-  type: 'h1' | 'h2' | 'h3' | 'p' | 'ul' | 'ol' | 'checklist' | 'quote' | 'code';
-  text?: string;
-  lang?: string;
-  items?: { text: string; checked?: boolean; lineIdx?: number }[];
-}
 
 @customElement('app-knowledge-base')
 export class AppKnowledgeBase extends LitElement {
@@ -54,7 +46,6 @@ export class AppKnowledgeBase extends LitElement {
   @state() private statusFilter: 'all' | KnowledgeArticleStatus = 'all';
   @state() private localSearch = '';
   @state() private globalSearch = store.searchQuery;
-  @state() private copiedBlockKey: string | null = null;
 
   // Editor Modal state
   @state() private modalOpen = false;
@@ -149,217 +140,6 @@ export class AppKnowledgeBase extends LitElement {
       month: 'short',
       year: 'numeric',
     });
-  }
-
-  private parseMarkdownBlocks(raw: string): ParsedBlock[] {
-    const lines = (raw || '').split('\n');
-    const blocks: ParsedBlock[] = [];
-    let i = 0;
-
-    while (i < lines.length) {
-      const line = lines[i];
-      const trimmed = line.trim();
-
-      if (!trimmed) {
-        i += 1;
-        continue;
-      }
-
-      if (trimmed.startsWith('```')) {
-        const lang = trimmed.slice(3).trim();
-        const codeLines: string[] = [];
-        i += 1;
-        while (i < lines.length && !lines[i].trim().startsWith('```')) {
-          codeLines.push(lines[i]);
-          i += 1;
-        }
-        i += 1;
-        blocks.push({ type: 'code', lang, text: codeLines.join('\n') });
-        continue;
-      }
-
-      if (trimmed.startsWith('### ')) {
-        blocks.push({ type: 'h3', text: trimmed.slice(4) });
-        i += 1;
-        continue;
-      }
-      if (trimmed.startsWith('## ')) {
-        blocks.push({ type: 'h2', text: trimmed.slice(3) });
-        i += 1;
-        continue;
-      }
-      if (trimmed.startsWith('# ')) {
-        blocks.push({ type: 'h1', text: trimmed.slice(2) });
-        i += 1;
-        continue;
-      }
-
-      if (trimmed.startsWith('> ')) {
-        const quoteLines: string[] = [];
-        while (i < lines.length && lines[i].trim().startsWith('> ')) {
-          quoteLines.push(lines[i].trim().slice(2));
-          i += 1;
-        }
-        blocks.push({ type: 'quote', text: quoteLines.join(' ') });
-        continue;
-      }
-
-      if (/^- \[[xX ]\] /.test(trimmed)) {
-        const items: { text: string; checked: boolean; lineIdx: number }[] = [];
-        while (i < lines.length && /^- \[[xX ]\] /.test(lines[i].trim())) {
-          const cur = lines[i].trim();
-          items.push({
-            checked: cur[3].toLowerCase() === 'x',
-            text: cur.slice(6),
-            lineIdx: i,
-          });
-          i += 1;
-        }
-        blocks.push({ type: 'checklist', items });
-        continue;
-      }
-
-      if (/^[-*] /.test(trimmed)) {
-        const items: { text: string }[] = [];
-        while (i < lines.length && /^[-*] /.test(lines[i].trim()) && !/^- \[[xX ]\] /.test(lines[i].trim())) {
-          items.push({ text: lines[i].trim().slice(2) });
-          i += 1;
-        }
-        blocks.push({ type: 'ul', items });
-        continue;
-      }
-
-      if (/^\d+\. /.test(trimmed)) {
-        const items: { text: string }[] = [];
-        while (i < lines.length && /^\d+\. /.test(lines[i].trim())) {
-          items.push({ text: lines[i].trim().replace(/^\d+\. /, '') });
-          i += 1;
-        }
-        blocks.push({ type: 'ol', items });
-        continue;
-      }
-
-      const paraLines: string[] = [trimmed];
-      i += 1;
-      while (
-        i < lines.length &&
-        lines[i].trim() &&
-        !lines[i].trim().startsWith('#') &&
-        !lines[i].trim().startsWith('>') &&
-        !lines[i].trim().startsWith('```') &&
-        !/^[-*] /.test(lines[i].trim()) &&
-        !/^\d+\. /.test(lines[i].trim())
-      ) {
-        paraLines.push(lines[i].trim());
-        i += 1;
-      }
-      blocks.push({ type: 'p', text: paraLines.join(' ') });
-    }
-
-    return blocks;
-  }
-
-  private renderInline(text: string): (string | TemplateResult)[] {
-    const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
-    return tokens.map((part) => {
-      if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
-        return html`<code>${part.slice(1, -1)}</code>`;
-      }
-      if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
-        return html`<strong>${part.slice(2, -2)}</strong>`;
-      }
-      return part;
-    });
-  }
-
-  private renderMarkdown(content: string, article?: KnowledgeArticle) {
-    const t = getTranslation(this.currentLang);
-    const blocks = this.parseMarkdownBlocks(content);
-
-    return html`
-      <div class="prose">
-        ${blocks.map((block, bIdx) => {
-          switch (block.type) {
-            case 'h1':
-              return html`<h1>${this.renderInline(block.text || '')}</h1>`;
-            case 'h2':
-              return html`<h2>${this.renderInline(block.text || '')}</h2>`;
-            case 'h3':
-              return html`<h3>${this.renderInline(block.text || '')}</h3>`;
-            case 'quote':
-              return html`<div class="prose-quote">${this.renderInline(block.text || '')}</div>`;
-            case 'ul':
-              return html`
-                <ul>
-                  ${(block.items || []).map((it) => html`<li>${this.renderInline(it.text)}</li>`)}
-                </ul>
-              `;
-            case 'ol':
-              return html`
-                <ol>
-                  ${(block.items || []).map((it) => html`<li>${this.renderInline(it.text)}</li>`)}
-                </ol>
-              `;
-            case 'checklist':
-              return html`
-                <ul class="prose-checklist">
-                  ${(block.items || []).map(
-                    (it) => html`
-                      <li class="checklist-row ${it.checked ? 'is-checked' : ''}">
-                        <app-checkbox
-                          ?checked="${Boolean(it.checked)}"
-                          ?disabled="${!article}"
-                          @change="${() => {
-                            if (article && it.lineIdx !== undefined) {
-                              this.toggleChecklistLine(article, it.lineIdx);
-                            }
-                          }}"
-                        >
-                          <span>${this.renderInline(it.text)}</span>
-                        </app-checkbox>
-                      </li>
-                    `
-                  )}
-                </ul>
-              `;
-            case 'code': {
-              const key = `${article?.id || 'preview'}-${bIdx}`;
-              const isCopied = this.copiedBlockKey === key;
-              return html`
-                <div class="code-block-wrap">
-                  <div class="code-block-head">
-                    <span>${block.lang || 'snippet'}</span>
-                    <button
-                      type="button"
-                      class="code-copy-btn"
-                      @click="${() => this.copySnippet(key, block.text || '')}"
-                    >
-                      ${iconCopy(13)}
-                      <span>${isCopied ? t.knowledgeBase.copiedCode : t.knowledgeBase.copyCode}</span>
-                    </button>
-                  </div>
-                  <pre class="code-block-pre">${block.text}</pre>
-                </div>
-              `;
-            }
-            default:
-              return html`<p>${this.renderInline(block.text || '')}</p>`;
-          }
-        })}
-      </div>
-    `;
-  }
-
-  private async copySnippet(key: string, text: string) {
-    try {
-      await navigator.clipboard?.writeText(text);
-      this.copiedBlockKey = key;
-      setTimeout(() => {
-        if (this.copiedBlockKey === key) this.copiedBlockKey = null;
-      }, 1800);
-    } catch {
-      // Clipboard may be unavailable in restricted contexts
-    }
   }
 
   private toggleChecklistLine(article: KnowledgeArticle, lineIdx: number) {
@@ -793,7 +573,12 @@ export class AppKnowledgeBase extends LitElement {
 
         ${article.summary ? html`<div class="summary-box">${article.summary}</div>` : ''}
 
-        ${this.renderMarkdown(article.content, article)}
+        <app-markdown
+          .content="${article.content}"
+          editable
+          @checklist-toggle="${(e: CustomEvent<{ line: number; checked: boolean }>) =>
+            this.toggleChecklistLine(article, e.detail.line)}"
+        ></app-markdown>
 
         ${linkedTasks.length > 0
           ? html`
@@ -1020,7 +805,7 @@ export class AppKnowledgeBase extends LitElement {
                   @input="${(e: CustomEvent<{ value: string }>) => (this.formContent = eventValue(e))}"
                 ></app-textarea>
               `
-            : html`<div class="preview-surface">${this.renderMarkdown(this.formContent)}</div>`}
+            : html`<div class="preview-surface"><app-markdown .content="${this.formContent}"></app-markdown></div>`}
 
           <app-input
             label="${kb.fieldRevisionSummary}"

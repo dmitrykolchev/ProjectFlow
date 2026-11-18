@@ -30,6 +30,25 @@ const CHECKLIST_DOC = `## Acceptance checklist
 - [ ] **Audit** logging for admin overrides
 `;
 
+const EDITABLE_CHECKLIST_DOC = `## Release checklist
+
+- [ ] Publish the changelog
+- [x] Freeze the release branch
+- [ ] **Tag** the build
+`;
+
+/** Story helper: flip the checklist source line reported by checklist-toggle. */
+function flipChecklistLine(e: CustomEvent<{ line: number; checked: boolean }>) {
+  const el = e.currentTarget as HTMLElement & { content: string };
+  const lines = el.content.split('\n');
+  const target = lines[e.detail.line];
+  if (!target) return;
+  lines[e.detail.line] = e.detail.checked
+    ? target.replace('- [ ] ', '- [x] ')
+    : target.replace(/- \[[xX]\] /, '- [ ] ');
+  el.content = lines.join('\n');
+}
+
 const TABLE_DOC = `## Rate card
 
 | Role | Rate | Hours |
@@ -62,6 +81,7 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     content: 'Markdown source text; empty content renders nothing',
     children: 'Markdown declared directly as light-DOM children (slot capture); the content property wins when both are set',
+    editable: 'Checklist checkboxes are interactive and emit checklist-toggle {line, checked} when true',
   },
   stories: [
     {
@@ -78,6 +98,11 @@ export const meta: ComponentStoryMeta = {
       name: 'Checklist',
       description: 'Display-only checklist rows with checked / unchecked states',
       render: () => html`<app-markdown .content="${CHECKLIST_DOC}"></app-markdown>`,
+    },
+    {
+      name: 'Editable Checklist',
+      description: 'editable property makes the checkboxes interactive; each click emits checklist-toggle {line, checked} and this story flips the matching source line',
+      render: () => html`<app-markdown .content="${EDITABLE_CHECKLIST_DOC}" editable @checklist-toggle="${flipChecklistLine}"></app-markdown>`,
     },
     {
       name: 'Table',
