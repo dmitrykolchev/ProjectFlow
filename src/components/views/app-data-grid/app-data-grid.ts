@@ -909,7 +909,6 @@ export class AppDataGrid extends LitElement {
                             @dragend="${() => (this.draggingGroupChip = null)}"
                           >
                             <span class="group-chip">
-                              <span class="group-chip-index">${index + 1}</span>
                               <span class="group-chip-label">${caption}</span>
                               ${this.renderSortIndicator(field, effectiveSortRules, t)}
                               ${this.renderGroupIcon(true, t)}
