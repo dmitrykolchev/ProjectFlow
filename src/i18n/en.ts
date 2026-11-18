@@ -273,7 +273,6 @@ export const en = {
     projectLabel: 'Default project',
     projectAuto: 'Auto — first available project',
     projectHint: 'The selected project opens at startup and is used for new tasks',
-    viewLabel: 'Default activity view',
   },
   settings: {
     title: 'Interface Settings',

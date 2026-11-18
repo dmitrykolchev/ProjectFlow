@@ -182,8 +182,8 @@ export class AppProfileSettings extends LitElement {
           </div>
         </app-section-card>
 
-        <!-- Default activity view -->
-        <app-section-card variant="panel" title="${t.profileSettings.viewLabel}">
+        <!-- Default launch view (title reuses the interface settings label) -->
+        <app-section-card variant="panel" title="${t.settings.defaultView}">
           <div class="options-grid">
             ${viewsList.map(
               (v) => html`
