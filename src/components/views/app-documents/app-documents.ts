@@ -494,10 +494,10 @@ export class AppDocuments extends LitElement {
                         size="24"
                         .initials="${uploader.avatar}"
                         .presence="${effectivePresence(uploader)}"
+                        .primaryText="${uploader.name}"
                         @click="${() => store.openEmployeeDetail(uploader.id)}"
                       ></app-persona>`
-                    : ''}
-                  <span class="uploader-name">${uploader?.name || doc.uploadedById}</span>
+                    : html`<span class="uploader-name">${doc.uploadedById}</span>`}
                 </div>
 
                 <app-button
