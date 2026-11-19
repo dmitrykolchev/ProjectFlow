@@ -102,9 +102,20 @@
 }
 
 /* The journal is rendered by the canonical app-data-table: fixed header, fixed footer
-   with pagination, body stretches to all rows. Inside the card the host stays
-   transparent so the card shell paints the background and rounds the corners. */
+   with pagination inside the card, body scrolls in its own area. The card fills the
+   remaining view height (flex:1, min-height:0) and the host fills the card, so when
+   the rows do not fit, the body gets its own scrollbar while header and footer stay
+   in place. Inside the card the host stays transparent so the card shell paints the
+   background and rounds the corners. */
+.table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+
 .table-card app-data-table {
+  flex: 1;
+  min-height: 0;
   background: transparent;
 }
 

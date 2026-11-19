@@ -101,7 +101,6 @@ export const meta: ComponentStoryMeta = {
     'max-height': 'Host height cap in px; 0 (default) stretches the table to show all rendered rows, a positive value gives the body its own scrollbar',
     'empty-title': 'Title passed to the compact empty state when rows is empty',
     locale: 'Locale used for number formatting and the pagination summary',
-    'hide-footer': 'Rows are still sliced internally, but no footer is rendered; the consumer owns the pagination bar outside the table',
     'sort-change event': 'Emitted with detail { field, dir } when a header sort button is clicked',
     'page-change event': 'Emitted with detail { page, pageSize, totalItems } when pagination changes',
   },

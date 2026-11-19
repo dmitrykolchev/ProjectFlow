@@ -757,8 +757,6 @@ export class AppTimeTracking extends LitElement {
       `;
     };
 
-    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
-
     return html`
       <div class="table-card">
         <app-data-table
@@ -766,7 +764,14 @@ export class AppTimeTracking extends LitElement {
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
           locale="${t.common.locale}"
-          hide-footer
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
         >
           <app-table-scroll-column field="date" label="${t.viewTexts.timeTracking.labelDate}" .cellRender="${dateCell}"></app-table-scroll-column>
           <app-table-scroll-column field="taskId" label="${t.viewTexts.timeTracking.thTaskProject}" .cellRender="${taskCell}"></app-table-scroll-column>
@@ -875,20 +880,6 @@ export class AppTimeTracking extends LitElement {
           ></app-table-scroll-column>
         </app-data-table>
       </div>
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
