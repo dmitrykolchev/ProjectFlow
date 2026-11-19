@@ -52,9 +52,9 @@
   border-bottom: 1px solid var(--border-subtle, #1e293b);
   padding: var(--dt-th-padding, 0.8rem 1rem);
   text-align: left;
+  text-transform: var(--dt-th-transform, uppercase);
   font-size: var(--dt-th-font-size, 0.75rem);
   font-weight: var(--dt-th-weight, 600);
-  text-transform: uppercase;
   letter-spacing: var(--dt-th-letter-spacing, 0.03em);
   color: var(--text-muted, #64748b);
   white-space: nowrap;
@@ -216,6 +216,33 @@
 }
 
 /* Requirements registry reference rich cells: title main/sub lines */
+/* Projects table reference rich cells: title row with color dot and key chip */
+.proj-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.proj-key {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-strong, #334155);
+}
+
 /* Requirements registry reference rich cells: code badge, FR/NFR type tag, project
    pill with 7px dot, title main/sub lines */
 .req-code-badge {
