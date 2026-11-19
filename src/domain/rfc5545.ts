@@ -113,19 +113,45 @@ export function daysInYear(year: number): number {
   return isLeapYear(year) ? 366 : 365;
 }
 
+function toUtcRfc(d: Date): string {
+  return `${d.getUTCFullYear()}${pad2(d.getUTCMonth() + 1)}${pad2(d.getUTCDate())}T${pad2(d.getUTCHours())}${pad2(d.getUTCMinutes())}${pad2(d.getUTCSeconds())}Z`;
+}
+
 function formatUntilRfc(endDate: string): string {
   const cleaned = endDate.trim();
-  const dtMatch = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?/.exec(cleaned);
+  const dtMatch = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})(?::(\d{2}))?$/.exec(cleaned);
   if (dtMatch) {
-    return `${dtMatch[1]}${dtMatch[2]}${dtMatch[3]}T${dtMatch[4]}${dtMatch[5]}${dtMatch[6] || '00'}`;
+    const d = new Date(
+      Number(dtMatch[1]),
+      Number(dtMatch[2]) - 1,
+      Number(dtMatch[3]),
+      Number(dtMatch[4]),
+      Number(dtMatch[5]),
+      Number(dtMatch[6] || '00')
+    );
+    return toUtcRfc(d);
   }
   const dMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(cleaned);
   if (dMatch) {
-    return `${dMatch[1]}${dMatch[2]}${dMatch[3]}T235959`;
+    // Date-only UNTIL means the end of that day in the local timezone.
+    const d = new Date(Number(dMatch[1]), Number(dMatch[2]) - 1, Number(dMatch[3]), 23, 59, 59);
+    return toUtcRfc(d);
   }
-  const rawMatch = /^(\d{8})(?:T(\d{6})Z?)?$/i.exec(cleaned);
+  const rawMatch = /^(\d{8})(?:T(\d{6}))?(Z?)$/i.exec(cleaned);
   if (rawMatch) {
-    return rawMatch[2] ? `${rawMatch[1]}T${rawMatch[2]}` : `${rawMatch[1]}T235959`;
+    const t = rawMatch[2] || '235959';
+    if (rawMatch[3].toUpperCase() === 'Z') {
+      return `${rawMatch[1]}T${t}Z`;
+    }
+    const d = new Date(
+      Number(rawMatch[1].slice(0, 4)),
+      Number(rawMatch[1].slice(4, 6)) - 1,
+      Number(rawMatch[1].slice(6, 8)),
+      Number(t.slice(0, 2)),
+      Number(t.slice(2, 4)),
+      Number(t.slice(4, 6))
+    );
+    return toUtcRfc(d);
   }
   return cleaned.replace(/[-:]/g, '');
 }
@@ -144,11 +170,11 @@ function parseUntilRfc(val: string): string | null {
         Number(utcDt[6])
       )
     );
-    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+    return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}T${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
   }
   const localDt = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})$/.exec(v);
   if (localDt) {
-    return `${localDt[1]}-${localDt[2]}-${localDt[3]}T${localDt[4]}:${localDt[5]}`;
+    return `${localDt[1]}-${localDt[2]}-${localDt[3]}T${localDt[4]}:${localDt[5]}:${localDt[6]}`;
   }
   const dateOnly = /^(\d{4})(\d{2})(\d{2})$/.exec(v);
   if (dateOnly) {
