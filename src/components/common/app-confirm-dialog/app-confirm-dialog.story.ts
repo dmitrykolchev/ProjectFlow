@@ -33,6 +33,8 @@ export const meta: ComponentStoryMeta = {
           variant="danger"
           action="Шлюз «Directum СЭД — routes of contracts» будет отключен; очередь (2) замрёт до повторного включения."
           result="Событие фиксируется в журнале шлюза и Журнале аудита холдинга."
+          .actionLabel="${'Выполняемое действие:'}"
+          .resultLabel="${'Ожидаемый результат:'}"
           .cancelLabel="${'Отмена'}"
           .confirmLabel="${'Отключить шлюз'}"
         ></app-confirm-dialog>
@@ -48,6 +50,8 @@ export const meta: ComponentStoryMeta = {
           variant="warning"
           action="Шлюз будет перезапущен; обработка очереди прервётся на несколько секунд."
           result="Незавершённые сообщения будут обработаны после восстановления."
+          .actionLabel="${'Выполняемое действие:'}"
+          .resultLabel="${'Ожидаемый результат:'}"
           .cancelLabel="${'Отмена'}"
           .confirmLabel="${'Перезапустить'}"
         ></app-confirm-dialog>
@@ -63,6 +67,8 @@ export const meta: ComponentStoryMeta = {
           variant="info"
           action="Калькуляция №7 будет отправлена на согласование заказчику."
           result="Статус изменится на «Отправлено», редактирование станет недоступным."
+          .actionLabel="${'Выполняемое действие:'}"
+          .resultLabel="${'Ожидаемый результат:'}"
           .cancelLabel="${'Cancel'}"
           .confirmLabel="${'Send'}"
         ></app-confirm-dialog>

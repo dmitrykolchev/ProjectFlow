@@ -20,8 +20,8 @@ export class AppConfirmDialog extends LitElement {
   @property({ type: String }) result: string = '';
   /** Legacy single-paragraph message (rendered when action/result are empty) */
   @property({ type: String }) message: string = '';
-  @property({ type: String }) actionLabel: string = 'Выполняемое действие:';
-  @property({ type: String }) resultLabel: string = 'Ожидаемый результат:';
+  @property({ type: String }) actionLabel: string = '';
+  @property({ type: String }) resultLabel: string = '';
   @property({ type: String }) confirmLabel: string = '';
   @property({ type: String }) cancelLabel: string = '';
   @property({ type: String }) size: 'sm' | 'md' | 'lg' | 'xl' = 'sm';
@@ -51,7 +51,7 @@ export class AppConfirmDialog extends LitElement {
               ${this.action
                 ? html`
                     <div>
-                      <p class="section-label">${this.actionLabel}</p>
+                      ${this.actionLabel ? html`<p class="section-label">${this.actionLabel}</p>` : ''}
                       <p class="action-text">${this.action}</p>
                     </div>
                   `
@@ -59,7 +59,7 @@ export class AppConfirmDialog extends LitElement {
               ${this.result
                 ? html`
                     <div style="--confirm-color: ${confirmColor};">
-                      <p class="section-label">${this.resultLabel}</p>
+                      ${this.resultLabel ? html`<p class="section-label">${this.resultLabel}</p>` : ''}
                       <div class="result-box">${this.result}</div>
                     </div>
                   `
