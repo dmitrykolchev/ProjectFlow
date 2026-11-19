@@ -34,6 +34,7 @@ import {
   iconBellRing,
   iconCalendar,
   iconCopy,
+  iconPaperclip,
   iconPlus,
   iconRepeat,
   iconTrash,
@@ -50,6 +51,12 @@ import '../app-entity-selector/app-entity-selector';
 import type { AppEntitySelector } from '../app-entity-selector/app-entity-selector';
 import '../app-switch/app-switch';
 import '../app-button/app-button';
+import {
+  AttachmentsChangeDetail,
+  commitPendingAttachments,
+  PendingAttachmentFile,
+} from '../app-project-attachments/app-project-attachments';
+import '../app-project-attachments/app-project-attachments';
 
 const REMINDER_ENTITY_TYPES: ReminderEntityType[] = [
   'company',
@@ -90,6 +97,8 @@ export class AppReminderForm extends LitElement {
   @state() private fOwnerId = '';
   @state() private fAssigneeIds: string[] = [];
   @state() private fTags = '';
+  @state() private fAttachmentIds: string[] = [];
+  @state() private fPendingFiles: PendingAttachmentFile[] = [];
 
   // RFC 5545 Recurrence fields
   @state() private fTemplateCode = 'ONCE';
@@ -290,6 +299,8 @@ export class AppReminderForm extends LitElement {
       this.fOwnerId = rem.ownerId || store.currentUserId;
       this.fAssigneeIds = [...(rem.assigneeIds || [])];
       this.fTags = (rem.tags || []).join(', ');
+      this.fAttachmentIds = rem.attachmentIds ? [...rem.attachmentIds] : [];
+      this.fPendingFiles = [];
 
       this.fTemplateCode = rem.recurrence.templateCode || 'ONCE';
       this.fSkipWeekends = Boolean(rem.recurrence.skipWeekends);
@@ -336,6 +347,8 @@ export class AppReminderForm extends LitElement {
     this.fOwnerId = owner;
     this.fAssigneeIds = [owner];
     this.fTags = '';
+    this.fAttachmentIds = [];
+    this.fPendingFiles = [];
 
     this.fTemplateCode = 'ONCE';
     this.fSkipWeekends = false;
@@ -569,6 +582,76 @@ export class AppReminderForm extends LitElement {
     this.fRules = this.fRules.filter((r) => r.id !== id);
   }
 
+  private resolveAttachmentContext(): {
+    projectId?: string;
+    companyId?: string;
+    contractId?: string;
+    counterpartyId?: string;
+    taskId?: string;
+  } {
+    const id = this.fEntityId;
+    if (!id || this.fEntityType === 'none') return {};
+    switch (this.fEntityType) {
+      case 'project': {
+        const p = store.projects.find((x) => x.id === id);
+        return { projectId: id, companyId: p?.companyId, counterpartyId: p?.counterpartyId };
+      }
+      case 'company':
+        return { companyId: id };
+      case 'counterparty':
+        return { counterpartyId: id };
+      case 'contract': {
+        const c = store.contracts.find((x) => x.id === id);
+        return {
+          contractId: id,
+          projectId: c?.projectId,
+          companyId: c?.companyId,
+          counterpartyId: c?.counterpartyId,
+        };
+      }
+      case 'task': {
+        const tk = store.tasks.find((x) => x.id === id);
+        const p = tk ? store.projects.find((x) => x.id === tk.projectId) : undefined;
+        return { taskId: id, projectId: tk?.projectId, companyId: p?.companyId };
+      }
+      case 'invoice': {
+        const inv = store.invoices.find((x) => x.id === id);
+        return {
+          contractId: inv?.contractId,
+          companyId: inv?.companyId,
+          counterpartyId: inv?.counterpartyId,
+        };
+      }
+      case 'calculation': {
+        const calc = store.calculations.find((x) => x.id === id);
+        return {
+          contractId: calc?.contractId,
+          projectId: calc?.projectId,
+          companyId: calc?.companyId,
+          counterpartyId: calc?.counterpartyId,
+        };
+      }
+      case 'payment': {
+        const pay = store.payments.find((x) => x.id === id);
+        return {
+          contractId: pay?.contractId,
+          companyId: pay?.companyId,
+          counterpartyId: pay?.counterpartyId,
+        };
+      }
+      case 'requirement': {
+        const req = store.requirements.find((x) => x.id === id);
+        return { projectId: req?.projectId };
+      }
+      case 'expense': {
+        const exp = store.expenses.find((x) => x.id === id);
+        return { projectId: exp?.projectId, taskId: exp?.taskId };
+      }
+      default:
+        return {};
+    }
+  }
+
   private handleSave() {
     const t = getTranslation(this.currentLang);
     const title = this.fTitle.trim();
@@ -599,6 +682,17 @@ export class AppReminderForm extends LitElement {
       .map((s) => s.trim())
       .filter(Boolean);
 
+    const ctx = this.resolveAttachmentContext();
+    const attachmentIds = commitPendingAttachments({
+      ...ctx,
+      category: 'other',
+      tags: [...tags],
+      existingDocumentIds: this.fAttachmentIds,
+      pendingFiles: this.fPendingFiles,
+      description: this.fDescription.trim(),
+      versionNote: title,
+    });
+
     const payload = {
       title,
       description: this.fDescription.trim(),
@@ -622,6 +716,7 @@ export class AppReminderForm extends LitElement {
         escalationUserId: this.fEscalationUserId || undefined,
       },
       tags,
+      attachmentIds,
     };
 
     let saved: Reminder;
@@ -636,6 +731,7 @@ export class AppReminderForm extends LitElement {
       saved = store.addReminder(payload);
     }
 
+    this.fPendingFiles = [];
     this.dispatchEvent(
       new CustomEvent('saved', { detail: { reminder: saved }, bubbles: true, composed: true })
     );
@@ -1446,6 +1542,28 @@ export class AppReminderForm extends LitElement {
                 @change="${(e: Event) => (this.fEscalationUserId = eventValue(e))}"
               ></app-select>
             </app-form-grid>
+          </section>
+
+          <!-- Section 4: Attached Documents -->
+          <section class="form-section">
+            <div class="section-head">
+              <span class="section-title">
+                <span class="section-title-icon">${iconPaperclip(16)}</span>
+                <span>${t.reminders.detailAttachments}</span>
+              </span>
+            </div>
+
+            <app-project-attachments
+              compact
+              project-id="${this.resolveAttachmentContext().projectId || ''}"
+              label="${t.reminders.detailAttachments}"
+              .documentIds="${this.fAttachmentIds}"
+              .pendingFiles="${this.fPendingFiles}"
+              @attachments-change="${(e: CustomEvent<AttachmentsChangeDetail>) => {
+                this.fAttachmentIds = [...e.detail.documentIds];
+                this.fPendingFiles = [...e.detail.pendingFiles];
+              }}"
+            ></app-project-attachments>
           </section>
         </div>
 

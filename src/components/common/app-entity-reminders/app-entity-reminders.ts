@@ -16,6 +16,8 @@ import {
   iconClock,
   iconCopy,
   iconEdit,
+  iconEye,
+  iconPaperclip,
   iconPause,
   iconPlay,
   iconPlus,
@@ -188,7 +190,14 @@ export class AppEntityReminders extends LitElement {
                               : ''}
                           </div>
                           <div class="row-title ${rem.status === 'completed' ? 'is-done' : ''}">
-                            ${rem.title}
+                            <button
+                              type="button"
+                              class="row-title-btn"
+                              title="${t.reminders.actionDetails}"
+                              @click="${() => store.openReminderDetail(rem.id, false)}"
+                            >
+                              ${rem.title}
+                            </button>
                           </div>
                           ${rem.description ? html`<div class="row-desc">${rem.description}</div>` : ''}
                         </div>
@@ -219,6 +228,20 @@ export class AppEntityReminders extends LitElement {
                           ? html`
                               <span class="meta-dot">·</span>
                               <span class="meta-token">${owner.name}</span>
+                            `
+                          : ''}
+                        ${(rem.attachmentIds || []).length > 0
+                          ? html`
+                              <span class="meta-dot">·</span>
+                              <button
+                                type="button"
+                                class="attachments-meta-btn"
+                                title="${t.reminders.actionDetails}"
+                                @click="${() => store.openReminderDetail(rem.id, false)}"
+                              >
+                                ${iconPaperclip(11)}
+                                <span>${t.reminders.detailAttachmentsCount((rem.attachmentIds || []).length)}</span>
+                              </button>
                             `
                           : ''}
                       </div>
@@ -301,6 +324,14 @@ export class AppEntityReminders extends LitElement {
                         </div>
 
                         <div class="actions-right">
+                          <app-button
+                            size="sm"
+                            variant="ghost"
+                            title="${t.reminders.actionDetails}"
+                            @click="${() => store.openReminderDetail(rem.id, false)}"
+                          >
+                            <span slot="icon-start">${iconEye(13)}</span>
+                          </app-button>
                           <app-button
                             size="sm"
                             variant="ghost"

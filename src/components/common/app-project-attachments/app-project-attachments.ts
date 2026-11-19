@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { DocumentCategory, DocumentItem, SupportedLang } from '../../../types';
+import { DocumentCategory, DocumentItem, DocumentScope, SupportedLang } from '../../../types';
 import {
   downloadDocumentFile,
   formatFileSize,
@@ -33,8 +33,12 @@ export interface AttachmentsChangeDetail {
 }
 
 export function commitPendingAttachments(options: {
-  projectId: string;
+  projectId?: string;
+  companyId?: string;
+  contractId?: string;
+  counterpartyId?: string;
   taskId?: string;
+  scope?: DocumentScope;
   uploadedById?: string;
   category: DocumentCategory;
   tags: string[];
@@ -43,8 +47,21 @@ export function commitPendingAttachments(options: {
   description?: string;
   versionNote?: string;
 }): string[] {
-  const proj = store.projects.find((p) => p.id === options.projectId);
+  const proj = options.projectId
+    ? store.projects.find((p) => p.id === options.projectId)
+    : undefined;
   const createdIds: string[] = [];
+  const scope: DocumentScope =
+    options.scope ||
+    (options.projectId
+      ? 'project'
+      : options.contractId
+      ? 'contract'
+      : options.companyId
+      ? 'company'
+      : options.counterpartyId
+      ? 'counterparty'
+      : 'general');
 
   for (const item of options.pendingFiles) {
     const doc = store.addDocument({
@@ -55,9 +72,11 @@ export function commitPendingAttachments(options: {
       sizeBytes: item.payload.sizeBytes,
       category: options.category,
       status: 'approved',
-      scope: 'project',
-      projectId: options.projectId,
-      companyId: proj?.companyId,
+      scope,
+      projectId: options.projectId || undefined,
+      companyId: options.companyId || proj?.companyId,
+      contractId: options.contractId || undefined,
+      counterpartyId: options.counterpartyId || undefined,
       taskId: options.taskId || undefined,
       tags: Array.from(new Set(options.tags.filter(Boolean))),
       description: options.description || '',

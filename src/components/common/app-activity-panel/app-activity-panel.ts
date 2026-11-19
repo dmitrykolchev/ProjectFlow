@@ -4,6 +4,7 @@ import { store } from '../../../state/store';
 import { ActivityLogItem } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
+import { iconArrowUpRight } from '../icons';
 import '../app-button/app-button';
 import styles from './app-activity-panel.css';
 
@@ -114,15 +115,34 @@ export class AppActivityPanel extends LitElement {
               : this.logs.map((log) => {
                   const date = new Date(log.timestamp);
                   const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  const canOpen = store.canOpenActivityTarget(log.targetType, log.targetId);
 
                   return html`
-                    <div class="log-item">
+                    <div class="log-item ${canOpen ? 'is-navigable' : ''}">
                       <div class="log-meta">
                         <span>${log.userName}</span>
                         <span class="log-time">${timeStr}</span>
                       </div>
                       <div class="log-content">
-                        <span class="log-target">${log.targetTitle}</span>
+                        ${canOpen
+                          ? html`
+                              <button
+                                type="button"
+                                class="log-target-btn"
+                                title="${log.targetType === 'reminder'
+                                  ? t.reminders.openReminderAction
+                                  : t.activity.openTarget}"
+                                @click="${() =>
+                                  store.openActivityTarget(log.targetType, log.targetId)}"
+                              >
+                                <span class="log-target">${log.targetTitle}</span>
+                                <span class="log-target-action">
+                                  <span>${t.activity.openTarget}</span>
+                                  ${iconArrowUpRight(11)}
+                                </span>
+                              </button>
+                            `
+                          : html`<span class="log-target">${log.targetTitle}</span>`}
                       </div>
                       <div class="log-details">${log.details}</div>
                     </div>

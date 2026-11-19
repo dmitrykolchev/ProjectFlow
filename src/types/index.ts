@@ -619,6 +619,9 @@ export interface NotificationItem {
   title: string;
   message: string;
   timestamp: number;
+  actionLabel?: string;
+  targetType?: ActivityLogItem['targetType'];
+  targetId?: string;
 }
 
 export interface AiUsageDay {
@@ -847,6 +850,7 @@ export interface Reminder {
   recurrence: ReminderRecurrence;
   notifications: ReminderNotificationConfig;
   tags: string[];
+  attachmentIds?: string[];
   lastTriggeredAt?: string;
   // per-occurrence delivery bookkeeping: "<ruleId>|<dueAt>" keys fired by the scheduler
   triggeredKeys?: string[];

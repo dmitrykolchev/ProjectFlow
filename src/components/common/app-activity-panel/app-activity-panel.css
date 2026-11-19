@@ -99,17 +99,41 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb, #334155) var(--scrollbar-track, #090d16);
+}
+
+.drawer-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.drawer-body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, #090d16);
+}
+
+.drawer-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #334155);
+  border-radius: 3px;
+}
+
+.drawer-body::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, #6366f1);
 }
 
 .log-item {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.28rem;
   padding: 0.75rem;
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #334155);
   border-radius: var(--radius-md, 8px);
   font-size: 0.8125rem;
+  transition: border-color 0.15s ease;
+}
+
+.log-item.is-navigable:hover {
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
 }
 
 .log-meta {
@@ -129,8 +153,48 @@
   font-weight: 500;
 }
 
+.log-target-btn {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
 .log-target {
   color: var(--accent-primary, #818cf8);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.log-target-btn:hover .log-target {
+  text-decoration: underline;
+}
+
+.log-target-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  flex-shrink: 0;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm, 5px);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
+  color: var(--accent-primary, #818cf8);
+  font-size: 0.7rem;
+  font-weight: 600;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.log-target-btn:hover .log-target-action {
+  background: var(--accent-primary, #6366f1);
+  color: var(--text-on-accent, #ffffff);
 }
 
 .log-details {

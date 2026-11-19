@@ -269,6 +269,23 @@ const DYNAMIC_THEME_VARS = [
   '--scrollbar-thumb-hover',
 ];
 
+export interface NotificationOptions {
+  targetType?: ActivityLogItem['targetType'];
+  targetId?: string;
+  actionLabel?: string;
+  durationMs?: number;
+}
+
+export interface ReminderRelatedObject {
+  type: ReminderEntityType;
+  id: string;
+  typeLabel: string;
+  label: string;
+  subtitle?: string;
+  isPrimary: boolean;
+  navigable: boolean;
+}
+
 export class AppStore {
   private static instance: AppStore;
 
@@ -300,6 +317,7 @@ export class AppStore {
   public detailKnowledgeId: string = '';
   public detailRequirementId: string = '';
   public detailCalculationId: string = '';
+  public detailReminderId: string | null = null;
   public requirementFilterProjectId: string = 'all';
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
@@ -719,10 +737,19 @@ export class AppStore {
       const storedReminders = localStorage.getItem(STORAGE_KEY_REMINDERS);
       if (storedReminders) {
         const parsedRems: Reminder[] = JSON.parse(storedReminders);
-        this.reminders = parsedRems.map((r) => ({
-          ...r,
-          recurrence: normalizeReminderRecurrence(r.recurrence),
-        }));
+        this.reminders = parsedRems.map((r) => {
+          const fallback = initialReminders.find((ir) => ir.id === r.id);
+          return {
+            ...r,
+            entityId: r.id === 'rem-2' && r.entityId === 'cont-1' ? 'ctr-1' : r.entityId,
+            attachmentIds: Array.isArray(r.attachmentIds)
+              ? [...r.attachmentIds]
+              : fallback?.attachmentIds
+              ? [...fallback.attachmentIds]
+              : [],
+            recurrence: normalizeReminderRecurrence(r.recurrence),
+          };
+        });
       } else {
         this.reminders = initialReminders.map((r) => ({
           ...r,
@@ -733,6 +760,7 @@ export class AppStore {
           },
           assigneeIds: [...r.assigneeIds],
           tags: [...r.tags],
+          attachmentIds: r.attachmentIds ? [...r.attachmentIds] : [],
         }));
       }
 
@@ -754,6 +782,17 @@ export class AppStore {
         this.activityLog = JSON.parse(storedLogs);
       } else {
         this.activityLog = [
+          {
+            id: 'log-3',
+            timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+            userId: 'user-3',
+            userName: 'Дмитрий Волков',
+            action: 'create',
+            targetType: 'reminder',
+            targetId: 'rem-13',
+            targetTitle: 'Внеочередной аудит резервных копий и DR-учений (Пятница 13-е)',
+            details: 'RRULE:FREQ=MONTHLY;BYMONTHDAY=13;BYDAY=FR',
+          },
           {
             id: 'log-1',
             timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
@@ -1914,15 +1953,31 @@ export class AppStore {
   }
 
   // --- Notifications ---
-  public addNotification(type: 'info' | 'success' | 'warning' | 'error', title: string, message: string): void {
+  public addNotification(
+    type: 'info' | 'success' | 'warning' | 'error',
+    title: string,
+    message: string,
+    options?: NotificationOptions
+  ): void {
     const id = `notif-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
-    const item: NotificationItem = { id, type, title, message, timestamp: Date.now() };
+    const item: NotificationItem = {
+      id,
+      type,
+      title,
+      message,
+      timestamp: Date.now(),
+      actionLabel: options?.actionLabel,
+      targetType: options?.targetType,
+      targetId: options?.targetId,
+    };
     this.notifications = [item, ...this.notifications.slice(0, 4)];
     this.notify();
 
+    const durationMs =
+      options?.durationMs ?? (options?.targetType === 'reminder' ? 8000 : 4500);
     setTimeout(() => {
       this.dismissNotification(id);
-    }, 4500);
+    }, durationMs);
   }
 
   public dismissNotification(id: string): void {
@@ -4357,6 +4412,260 @@ export class AppStore {
     }
   }
 
+  public openReminderDetail(reminderId: string, navigateToView: boolean = true): void {
+    const exists = this.reminders.some((r) => r.id === reminderId);
+    if (!exists) return;
+    if (this.customization.showActivityPanel) {
+      this.customization = { ...this.customization, showActivityPanel: false };
+      this.saveCustomization();
+    }
+    if (navigateToView && this.activeView !== 'reminders') {
+      this.setActiveView('reminders');
+    }
+    this.detailReminderId = reminderId;
+    this.notify();
+  }
+
+  public closeReminderDetail(): void {
+    if (this.detailReminderId !== null) {
+      this.detailReminderId = null;
+      this.notify();
+    }
+  }
+
+  public canOpenActivityTarget(
+    targetType?: ActivityLogItem['targetType'],
+    targetId?: string
+  ): boolean {
+    if (!targetType || !targetId) return false;
+    switch (targetType) {
+      case 'reminder':
+        return this.reminders.some((r) => r.id === targetId);
+      case 'task':
+        return this.tasks.some((tk) => tk.id === targetId);
+      case 'project':
+        return this.projects.some((p) => p.id === targetId);
+      case 'company':
+        return this.companies.some((c) => c.id === targetId);
+      case 'counterparty':
+        return this.counterparties.some((cp) => cp.id === targetId);
+      case 'contract':
+        return this.contracts.some((c) => c.id === targetId);
+      case 'calculation':
+        return this.calculations.some((c) => c.id === targetId);
+      case 'employee':
+        return this.users.some((u) => u.id === targetId);
+      case 'requirement':
+        return this.requirements.some((r) => r.id === targetId);
+      case 'knowledge':
+        return this.knowledgeArticles.some((k) => k.id === targetId);
+      case 'document':
+        return this.documents.some((d) => d.id === targetId);
+      case 'invoice':
+        return this.invoices.some((i) => i.id === targetId);
+      case 'payment':
+        return this.payments.some((p) => p.id === targetId);
+      case 'expense':
+        return this.expenses.some((e) => e.id === targetId);
+      case 'directory':
+        return this.directories.some((d) => d.id === targetId);
+      default:
+        return false;
+    }
+  }
+
+  public openActivityTarget(
+    targetType?: ActivityLogItem['targetType'],
+    targetId?: string
+  ): void {
+    if (!targetType || !targetId || !this.canOpenActivityTarget(targetType, targetId)) {
+      return;
+    }
+    if (this.customization.showActivityPanel) {
+      this.customization = { ...this.customization, showActivityPanel: false };
+      this.saveCustomization();
+    }
+    switch (targetType) {
+      case 'reminder':
+        this.openReminderDetail(targetId, true);
+        break;
+      case 'task':
+        this.openTaskDetail(targetId);
+        break;
+      case 'project':
+        this.openProjectDetail(targetId);
+        break;
+      case 'company':
+        this.openCompanyDetail(targetId);
+        break;
+      case 'counterparty':
+        this.openCounterpartyDetail(targetId);
+        break;
+      case 'contract':
+        this.openContractDetail(targetId);
+        break;
+      case 'calculation':
+        this.openCalculationDetail(targetId);
+        break;
+      case 'employee':
+        this.openEmployeeDetail(targetId);
+        break;
+      case 'requirement':
+        this.openRequirementDetail(targetId);
+        break;
+      case 'knowledge':
+        this.openKnowledgeBase({ articleId: targetId });
+        break;
+      case 'document':
+        this.openDocuments();
+        break;
+      case 'invoice': {
+        const inv = this.invoices.find((i) => i.id === targetId);
+        if (inv) this.openContractDetail(inv.contractId);
+        else this.setActiveView('payments');
+        break;
+      }
+      case 'payment':
+        this.setActiveView('payments');
+        break;
+      case 'expense':
+        this.setActiveView('expenses');
+        break;
+      case 'directory':
+        this.openDirectory(targetId);
+        break;
+      default:
+        break;
+    }
+    this.notify();
+  }
+
+  public getReminderRelatedObjects(rem: Reminder): ReminderRelatedObject[] {
+    const result: ReminderRelatedObject[] = [];
+    const seen = new Set<string>();
+
+    const pushEntity = (type: ReminderEntityType, id: string | undefined, isPrimary: boolean) => {
+      if (!id || type === 'none') return;
+      const key = `${type}:${id}`;
+      if (seen.has(key)) return;
+      const info = this.getReminderEntityInfo(type, id);
+      if (!isPrimary && !info.navigable) return;
+      seen.add(key);
+      result.push({
+        type,
+        id,
+        typeLabel: info.typeLabel,
+        label: info.label,
+        subtitle: info.subtitle,
+        isPrimary,
+        navigable: info.navigable,
+      });
+    };
+
+    const type = rem.entityType;
+    const id = rem.entityId;
+    if (type !== 'none' && id) {
+      pushEntity(type, id, true);
+
+      switch (type) {
+        case 'contract': {
+          const c = this.contracts.find((x) => x.id === id);
+          if (c) {
+            pushEntity('project', c.projectId, false);
+            pushEntity('company', c.companyId, false);
+            pushEntity('counterparty', c.counterpartyId, false);
+          }
+          break;
+        }
+        case 'invoice': {
+          const inv = this.invoices.find((x) => x.id === id);
+          if (inv) {
+            pushEntity('contract', inv.contractId, false);
+            pushEntity('calculation', inv.calculationId, false);
+            pushEntity('company', inv.companyId, false);
+            pushEntity('counterparty', inv.counterpartyId, false);
+          }
+          break;
+        }
+        case 'calculation': {
+          const calc = this.calculations.find((x) => x.id === id);
+          if (calc) {
+            pushEntity('contract', calc.contractId, false);
+            pushEntity('project', calc.projectId, false);
+            pushEntity('company', calc.companyId, false);
+            pushEntity('counterparty', calc.counterpartyId, false);
+            pushEntity('invoice', calc.invoiceId, false);
+          }
+          break;
+        }
+        case 'payment': {
+          const pay = this.payments.find((x) => x.id === id);
+          if (pay) {
+            pushEntity('invoice', pay.invoiceId, false);
+            pushEntity('contract', pay.contractId, false);
+            pushEntity('company', pay.companyId, false);
+            pushEntity('counterparty', pay.counterpartyId, false);
+          }
+          break;
+        }
+        case 'project': {
+          const proj = this.projects.find((x) => x.id === id);
+          if (proj) {
+            pushEntity('company', proj.companyId, false);
+            pushEntity('counterparty', proj.counterpartyId, false);
+          }
+          break;
+        }
+        case 'task': {
+          const tk = this.tasks.find((x) => x.id === id);
+          if (tk) {
+            pushEntity('project', tk.projectId, false);
+            const proj = this.projects.find((p) => p.id === tk.projectId);
+            if (proj) pushEntity('company', proj.companyId, false);
+          }
+          break;
+        }
+        case 'requirement': {
+          const req = this.requirements.find((x) => x.id === id);
+          if (req) {
+            pushEntity('project', req.projectId, false);
+          }
+          break;
+        }
+        case 'contact': {
+          const cp = this.counterparties.find((c) =>
+            (c.contacts || []).some((ct) => ct.id === id)
+          );
+          if (cp) pushEntity('counterparty', cp.id, false);
+          break;
+        }
+        case 'expense': {
+          const exp = this.expenses.find((x) => x.id === id);
+          if (exp) {
+            pushEntity('project', exp.projectId, false);
+            pushEntity('task', exp.taskId, false);
+          }
+          break;
+        }
+        case 'document': {
+          const doc = this.documents.find((x) => x.id === id);
+          if (doc) {
+            pushEntity('project', doc.projectId, false);
+            pushEntity('contract', doc.contractId, false);
+            pushEntity('company', doc.companyId, false);
+            pushEntity('counterparty', doc.counterpartyId, false);
+            pushEntity('task', doc.taskId, false);
+          }
+          break;
+        }
+        default:
+          break;
+      }
+    }
+
+    return result;
+  }
+
   public navigateToReminderEntity(type: ReminderEntityType, id?: string): void {
     if (!id || type === 'none') return;
     switch (type) {
@@ -4428,7 +4737,11 @@ export class AppStore {
     const t = getTranslation(this.customization.language);
     const info = this.getReminderEntityInfo(created.entityType, created.entityId);
     this.logActivity('create', 'reminder', created.title, `${info.typeLabel}: ${info.label}`, created.id);
-    this.addNotification('success', t.reminders.toastCreated, created.title);
+    this.addNotification('success', t.reminders.toastCreated, created.title, {
+      targetType: 'reminder',
+      targetId: created.id,
+      actionLabel: t.reminders.openReminderAction,
+    });
     this.notify();
     return created;
   }
@@ -4442,7 +4755,11 @@ export class AppStore {
     this.saveReminders();
     const t = getTranslation(this.customization.language);
     this.logActivity('update', 'reminder', next.title, next.dueAt, next.id);
-    this.addNotification('info', t.reminders.toastUpdated, next.title);
+    this.addNotification('info', t.reminders.toastUpdated, next.title, {
+      targetType: 'reminder',
+      targetId: next.id,
+      actionLabel: t.reminders.openReminderAction,
+    });
     this.notify();
   }
 
@@ -4450,6 +4767,9 @@ export class AppStore {
     const target = this.reminders.find((r) => r.id === id);
     if (!target) return;
     this.reminders = this.reminders.filter((r) => r.id !== id);
+    if (this.detailReminderId === id) {
+      this.detailReminderId = null;
+    }
     this.saveReminders();
     const t = getTranslation(this.customization.language);
     this.logActivity('delete', 'reminder', target.title, target.dueAt, target.id);
@@ -4495,7 +4815,11 @@ export class AppStore {
         minute: '2-digit',
       });
       this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastAdvanced(formattedNext), rem.id);
-      this.addNotification('success', t.reminders.toastAdvanced(formattedNext), rem.title);
+      this.addNotification('success', t.reminders.toastAdvanced(formattedNext), rem.title, {
+        targetType: 'reminder',
+        targetId: rem.id,
+        actionLabel: t.reminders.openReminderAction,
+      });
       this.notify();
       return { advanced: true, nextDueAt: nextDue };
     }
@@ -4514,7 +4838,11 @@ export class AppStore {
     this.reminders = this.reminders.map((r) => (r.id === rem.id ? completed : r));
     this.saveReminders();
     this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastCompleted, rem.id);
-    this.addNotification('success', t.reminders.toastCompleted, rem.title);
+    this.addNotification('success', t.reminders.toastCompleted, rem.title, {
+      targetType: 'reminder',
+      targetId: rem.id,
+      actionLabel: t.reminders.openReminderAction,
+    });
     this.notify();
     return { advanced: false };
   }
@@ -4538,7 +4866,11 @@ export class AppStore {
       minute: '2-digit',
     });
     this.logActivity('status_change', 'reminder', rem.title, t.reminders.toastSnoozed(formatted), rem.id);
-    this.addNotification('info', t.reminders.toastSnoozed(formatted), rem.title);
+    this.addNotification('info', t.reminders.toastSnoozed(formatted), rem.title, {
+      targetType: 'reminder',
+      targetId: rem.id,
+      actionLabel: t.reminders.openReminderAction,
+    });
     this.notify();
   }
 
@@ -4556,7 +4888,11 @@ export class AppStore {
     this.saveReminders();
     const msg = nextStatus === 'paused' ? t.reminders.toastPaused : t.reminders.toastResumed;
     this.logActivity('status_change', 'reminder', rem.title, msg, rem.id);
-    this.addNotification('info', msg, rem.title);
+    this.addNotification('info', msg, rem.title, {
+      targetType: 'reminder',
+      targetId: rem.id,
+      actionLabel: t.reminders.openReminderAction,
+    });
     this.notify();
   }
 
@@ -4673,7 +5009,12 @@ export class AppStore {
         this.addNotification(
           rem.priority === 'urgent' || rem.priority === 'high' ? 'warning' : 'info',
           title,
-          body
+          body,
+          {
+            targetType: 'reminder',
+            targetId: rem.id,
+            actionLabel: t.reminders.openReminderAction,
+          }
         );
         this.logActivity('update', 'reminder', rem.title, t.reminders.activityDelivered(channels), rem.id);
       }
@@ -4681,7 +5022,16 @@ export class AppStore {
       if (escalate) {
         const escUser = this.users.find((u) => u.id === escId);
         if (escUser) {
-          this.addNotification('warning', t.reminders.escalationTitle(escUser.name), `${rem.title} (${entityLabel})`);
+          this.addNotification(
+            'warning',
+            t.reminders.escalationTitle(escUser.name),
+            `${rem.title} (${entityLabel})`,
+            {
+              targetType: 'reminder',
+              targetId: rem.id,
+              actionLabel: t.reminders.openReminderAction,
+            }
+          );
           this.logActivity('update', 'reminder', rem.title, t.reminders.activityEscalated(escUser.name), rem.id);
         }
       }
@@ -4711,7 +5061,12 @@ export class AppStore {
     this.addNotification(
       rem.priority === 'urgent' ? 'warning' : 'info',
       t.reminders.toastTestSent(channelNames),
-      `${rem.title} (${entityInfo.label})`
+      `${rem.title} (${entityInfo.label})`,
+      {
+        targetType: 'reminder',
+        targetId: rem.id,
+        actionLabel: t.reminders.openReminderAction,
+      }
     );
     this.notify();
   }

@@ -68,6 +68,22 @@
   line-height: 1.35;
 }
 
+.row-title-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.row-title-btn:hover {
+  color: var(--accent-primary, #818cf8);
+  text-decoration: underline;
+}
+
 .row-title.is-done {
   text-decoration: line-through;
   color: var(--text-muted, #64748b);
@@ -107,6 +123,27 @@
 
 .meta-dot {
   color: var(--border-strong, #334155);
+}
+
+.attachments-meta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  padding: 0.08rem 0.38rem;
+  border-radius: var(--radius-sm, 5px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+  color: var(--accent-primary, #818cf8);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.attachments-meta-btn:hover {
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
 }
 
 .rrule-strip {

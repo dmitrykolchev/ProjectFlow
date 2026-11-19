@@ -32,6 +32,8 @@ import {
   iconCopy,
   iconDatabase,
   iconEdit,
+  iconEye,
+  iconPaperclip,
   iconPause,
   iconPlay,
   iconPlus,
@@ -425,7 +427,16 @@ export class AppReminders extends LitElement {
                       </div>
                     </div>
 
-                    <h3 class="card-title ${isDone ? 'is-done' : ''}">${rem.title}</h3>
+                    <h3 class="card-title ${isDone ? 'is-done' : ''}">
+                      <button
+                        type="button"
+                        class="card-title-btn"
+                        title="${t.reminders.actionDetails}"
+                        @click="${() => store.openReminderDetail(rem.id, false)}"
+                      >
+                        ${rem.title}
+                      </button>
+                    </h3>
                     ${rem.description ? html`<p class="card-desc">${rem.description}</p>` : ''}
 
                     <div class="entity-link-bar">
@@ -473,6 +484,20 @@ export class AppReminders extends LitElement {
                         ? html`
                             <span class="meta-dot">·</span>
                             <span class="meta-item">${owner.name}</span>
+                          `
+                        : ''}
+                      ${(rem.attachmentIds || []).length > 0
+                        ? html`
+                            <span class="meta-dot">·</span>
+                            <button
+                              type="button"
+                              class="attachments-meta-btn"
+                              title="${t.reminders.actionDetails}"
+                              @click="${() => store.openReminderDetail(rem.id, false)}"
+                            >
+                              ${iconPaperclip(12)}
+                              <span>${t.reminders.detailAttachmentsCount((rem.attachmentIds || []).length)}</span>
+                            </button>
                           `
                         : ''}
                     </div>
@@ -560,6 +585,14 @@ export class AppReminders extends LitElement {
                       </div>
 
                       <div class="footer-right">
+                        <app-button
+                          size="sm"
+                          variant="ghost"
+                          title="${t.reminders.actionDetails}"
+                          @click="${() => store.openReminderDetail(rem.id, false)}"
+                        >
+                          <span slot="icon-start">${iconEye(14)}</span>
+                        </app-button>
                         <app-button
                           size="sm"
                           variant="ghost"

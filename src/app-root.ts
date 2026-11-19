@@ -37,6 +37,7 @@ import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
 import './components/common/app-activity-panel/app-activity-panel';
 import './components/common/app-task-modal/app-task-modal';
+import './components/common/app-reminder-detail-modal/app-reminder-detail-modal';
 import './components/views/app-auth/app-auth';
 import { eventValue } from './components/common/event-value';
 
@@ -432,6 +433,7 @@ export class AppRoot extends LitElement {
 
       <!-- Modals and Overlays -->
       <app-task-modal></app-task-modal>
+      <app-reminder-detail-modal></app-reminder-detail-modal>
       <app-activity-panel></app-activity-panel>
       <app-toast></app-toast>
     `;

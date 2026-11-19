@@ -6,6 +6,7 @@ import { getTranslation } from '../../../i18n';
 import styles from './app-dashboard.css';
 import {
   iconAnalytics,
+  iconArrowUpRight,
   iconCheck,
   iconClock,
   iconDashboard,
@@ -291,14 +292,26 @@ export class AppDashboard extends LitElement {
               </div>
 
               <div class="activity-list">
-                ${recentLogs.map(
-                  (log) => html`
-                    <div class="activity-item">
-                      <span class="activity-title">${log.targetTitle}</span>
+                ${recentLogs.map((log) => {
+                  const canOpen = store.canOpenActivityTarget(log.targetType, log.targetId);
+                  return html`
+                    <div
+                      class="activity-item ${canOpen ? 'is-clickable' : ''}"
+                      title="${canOpen ? t.activity.openTarget : ''}"
+                      @click="${() => {
+                        if (canOpen) store.openActivityTarget(log.targetType, log.targetId);
+                      }}"
+                    >
+                      <div class="activity-title-row">
+                        <span class="activity-title">${log.targetTitle}</span>
+                        ${canOpen
+                          ? html`<span class="activity-open-icon">${iconArrowUpRight(13)}</span>`
+                          : ''}
+                      </div>
                       <span class="activity-details">${log.userName} · ${log.details}</span>
                     </div>
-                  `
-                )}
+                  `;
+                })}
               </div>
             </div>
           </div>
