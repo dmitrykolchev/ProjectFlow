@@ -27,6 +27,8 @@ import {
 } from '../../../services/openai-client';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
@@ -347,104 +349,130 @@ export class AppProjects extends LitElement {
   }
 
   private renderTable(list: Project[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+    const titleCell = (row: Record<string, unknown>) => {
+      const proj = row as unknown as Project;
+      return html`
+        <div class="proj-title-row">
+          <span class="color-dot" style="background: ${proj.color};"></span>
+          <span class="proj-key">${proj.key}</span>
+          <span style="font-weight: 600;">${proj.name}</span>
+        </div>
+      `;
+    };
+    const companyCell = (row: Record<string, unknown>) => {
+      const proj = row as unknown as Project;
+      const company = store.companies.find((c) => c.id === proj.companyId);
+      const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
+      return html`
+        <div>${company?.name || '—'}</div>
+        <div style="font-size: 0.74rem; color: var(--text-muted);">${counterparty?.name || '—'}</div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.projects.thProject}</th>
-              <th>${t.viewTexts.projects.thCompanyClient}</th>
-              <th>${t.viewTexts.projects.thTeam}</th>
-              <th>${t.viewTexts.projects.thTasks}</th>
-              <th>${t.viewTexts.projects.thProgress}</th>
-              <th>${t.viewTexts.projects.thBudget}</th>
-              <th>${t.viewTexts.projects.thDueDate}</th>
-              <th>${t.viewTexts.projects.thStatus}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((proj) => {
-              const company = store.companies.find((c) => c.id === proj.companyId);
-              const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
-              const tasksCount = store.tasks.filter((tk) => tk.projectId === proj.id).length;
+        <app-data-table
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @row-click="${(e: CustomEvent<{ row: Record<string, unknown> }>) => {
+            store.openProjectDetail((e.detail.row as unknown as Project).id);
+          }}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="key" label="${t.viewTexts.projects.thProject}" .cellRender="${titleCell}"></app-table-column>
+          <app-table-column field="companyId" label="${t.viewTexts.projects.thCompanyClient}" .cellRender="${companyCell}"></app-table-column>
+          <app-table-column
+            field="members"
+            label="${t.viewTexts.projects.thTeam}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const proj = row as unknown as Project;
               const members = proj.members || [];
-              const uniqueMembers = new Set(members.map((m) => m.userId)).size;
-              const statusKey = (proj.status || 'active') as ProjectStatus;
-
+              return html`${new Set(members.map((m) => m.userId)).size} (${members.length})`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="id"
+            label="${t.viewTexts.projects.thTasks}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) =>
+              html`${store.tasks.filter((tk) => tk.projectId === (row as unknown as Project).id).length}`}"
+          ></app-table-column>
+          <app-table-column
+            field="progress"
+            label="${t.viewTexts.projects.thProgress}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => html`${(row as unknown as Project).progress}%`}"
+          ></app-table-column>
+          <app-table-column
+            field="budget"
+            label="${t.viewTexts.projects.thBudget}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const b = (row as unknown as Project).budget;
+              return html`${b ? `${(b / 1_000_000).toFixed(1)}M ₽` : '—'}`;
+            }}"
+          ></app-table-column>
+          <app-table-column field="dueDate" label="${t.viewTexts.projects.thDueDate}" mono></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.projects.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="project"
+                status="${(row as unknown as Project).status || 'active'}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            .cellRender="${(row: Record<string, unknown>) => {
+              const proj = row as unknown as Project;
               return html`
-                <tr @click="${() => store.openProjectDetail(proj.id)}">
-                  <td>
-                    <div class="proj-title-row">
-                      <span class="color-dot" style="background: ${proj.color};"></span>
-                      <span class="proj-key">${proj.key}</span>
-                      <span style="font-weight: 600;">${proj.name}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div>${company?.name || '—'}</div>
-                    <div style="font-size: 0.74rem; color: var(--text-muted);">${counterparty?.name || '—'}</div>
-                  </td>
-                  <td class="mono">${uniqueMembers} (${members.length})</td>
-                  <td class="mono">${tasksCount}</td>
-                  <td class="mono">${proj.progress}%</td>
-                  <td class="mono">${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}</td>
-                  <td class="mono">${proj.dueDate}</td>
-                  <td>
-                    <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
-                  </td>
-                  <td @click="${(e: Event) => e.stopPropagation()}">
-                    <div class="actions-row">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.projectDetail.openProject}"
-                        @click="${() => store.openProjectDetail(proj.id)}"
-                      >
-                        <span slot="start">${iconChevronRight(14)}</span>
-                      </app-button>
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditModal(proj)}"
-                      >
-                        <span slot="start">${iconEdit(14)}</span>
-                      </app-button>
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingProject = proj)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <div class="actions-row">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.projectDetail.openProject}"
+                    @click="${() => store.openProjectDetail(proj.id)}"
+                  >
+                    <span slot="start">${iconChevronRight(14)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(proj)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingProject = proj)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
