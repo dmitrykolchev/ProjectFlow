@@ -29,6 +29,7 @@ import {
   NotificationItem,
   PaymentDirection,
   Project,
+  ProjectChatChannel,
   ProjectChatMessage,
   ProjectMember,
   ProjectRequirement,
@@ -56,6 +57,7 @@ import {
 } from '../domain/rfc5545';
 import {
   initialCalculations,
+  initialChatChannels,
   initialChatMessages,
   initialCompanies,
   initialContracts,
@@ -91,6 +93,7 @@ const STORAGE_KEY_PAYMENTS = 'projectflow_payments_v1';
 const STORAGE_KEY_TIME_ENTRIES = 'projectflow_time_entries_v1';
 const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
+const STORAGE_KEY_CHAT_CHANNELS = 'projectflow_chat_channels_v1';
 const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
@@ -301,6 +304,7 @@ export class AppStore {
   public timeEntries: TimeEntry[] = [];
   public expenses: Expense[] = [];
   public chatMessages: ProjectChatMessage[] = [];
+  public chatChannels: ProjectChatChannel[] = [];
   public knowledgeArticles: KnowledgeArticle[] = [];
   public documents: DocumentItem[] = [];
   public requirements: ProjectRequirement[] = [];
@@ -330,6 +334,7 @@ export class AppStore {
   public documentFilterCompanyId: string = 'all';
   public documentFilterProjectId: string = 'all';
   public chatProjectId: string = '';
+  public chatChannelId: string = '';
   public currentUserId: string = 'user-1';
   public authSession: AuthSession | null = null;
   public isAuthenticated: boolean = false;
@@ -617,8 +622,50 @@ export class AppStore {
         parsedExpenses?.some((ex) => Array.isArray(ex.documentIds))
       );
 
+      const storedChatChannels = localStorage.getItem(STORAGE_KEY_CHAT_CHANNELS);
+      if (storedChatChannels) {
+        this.chatChannels = JSON.parse(storedChatChannels);
+      } else {
+        const seeded = initialChatChannels.map((c) => ({ ...c }));
+        for (const proj of this.projects) {
+          if (!seeded.some((c) => c.projectId === proj.id)) {
+            seeded.push({
+              id: `ch-${proj.id}-general`,
+              projectId: proj.id,
+              slug: 'general',
+              name: this.customization.language === 'en' ? 'General' : 'Общий',
+              description: proj.description || undefined,
+              isDefault: true,
+              createdById: proj.members?.[0]?.userId || this.users[0]?.id || 'user-1',
+              createdAt: new Date().toISOString(),
+            });
+          }
+        }
+        this.chatChannels = seeded;
+      }
+
       const storedChat = localStorage.getItem(STORAGE_KEY_CHAT);
-      this.chatMessages = storedChat ? JSON.parse(storedChat) : [...initialChatMessages];
+      const rawChatMessages: ProjectChatMessage[] = storedChat
+        ? JSON.parse(storedChat)
+        : initialChatMessages.map((m) => ({ ...m }));
+      this.chatMessages = rawChatMessages.map((m) => {
+        if (m.channelId && this.chatChannels.some((c) => c.id === m.channelId)) {
+          return m;
+        }
+        const seedMatch = initialChatMessages.find((im) => im.id === m.id);
+        const fallbackChannel =
+          (seedMatch?.channelId &&
+          this.chatChannels.some((c) => c.id === seedMatch.channelId)
+            ? seedMatch.channelId
+            : undefined) ||
+          this.chatChannels.find((c) => c.projectId === m.projectId && c.isDefault)?.id ||
+          this.chatChannels.find((c) => c.projectId === m.projectId)?.id ||
+          '';
+        return {
+          ...m,
+          channelId: fallbackChannel,
+        };
+      });
 
       const storedKnowledge = localStorage.getItem(STORAGE_KEY_KNOWLEDGE);
       this.knowledgeArticles = storedKnowledge
@@ -839,7 +886,8 @@ export class AppStore {
       this.payments = [...initialPayments];
       this.timeEntries = [...initialTimeEntries];
       this.expenses = [...initialExpenses];
-      this.chatMessages = [...initialChatMessages];
+      this.chatChannels = initialChatChannels.map((c) => ({ ...c }));
+      this.chatMessages = initialChatMessages.map((m) => ({ ...m }));
       this.knowledgeArticles = [...initialKnowledgeArticles];
       this.documents = [...initialDocuments];
       this.directories = createInitialDirectories();
@@ -939,6 +987,14 @@ export class AppStore {
   private saveChatMessages(): void {
     try {
       localStorage.setItem(STORAGE_KEY_CHAT, JSON.stringify(this.chatMessages));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveChatChannels(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_CHAT_CHANNELS, JSON.stringify(this.chatChannels));
     } catch (e) {
       console.error(e);
     }
@@ -1613,6 +1669,9 @@ export class AppStore {
     } else if (view === 'project-chat') {
       if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
+      if (this.chatProjectId) {
+        this.resolveActiveChannelForProject(this.chatProjectId);
+      }
     } else if (view === 'directories') {
       if (id && this.directories.some((d) => d.id === id)) this.activeDirectoryId = id;
       else if (!this.activeDirectoryId) this.activeDirectoryId = this.directories[0]?.id || '';
@@ -1685,7 +1744,24 @@ export class AppStore {
     this.setActiveView('requirement-detail');
   }
 
-  public openProjectChat(projectId?: string): void {
+  private resolveActiveChannelForProject(projectId: string, preferredChannelId?: string): string {
+    const projectChannels = this.chatChannels.filter((c) => c.projectId === projectId);
+    if (preferredChannelId && projectChannels.some((c) => c.id === preferredChannelId)) {
+      this.chatChannelId = preferredChannelId;
+      return preferredChannelId;
+    }
+    if (this.chatChannelId && projectChannels.some((c) => c.id === this.chatChannelId)) {
+      return this.chatChannelId;
+    }
+    const nextChannel =
+      projectChannels.find((c) => !c.archived && c.isDefault) ||
+      projectChannels.find((c) => !c.archived) ||
+      projectChannels[0];
+    this.chatChannelId = nextChannel?.id || '';
+    return this.chatChannelId;
+  }
+
+  public openProjectChat(projectId?: string, channelId?: string): void {
     if (projectId) {
       this.chatProjectId = projectId;
     } else if (!this.chatProjectId) {
@@ -1694,7 +1770,18 @@ export class AppStore {
           ? this.selectedProjectId
           : this.projects[0]?.id || '';
     }
+    if (this.chatProjectId) {
+      this.resolveActiveChannelForProject(this.chatProjectId, channelId);
+    }
     this.setActiveView('project-chat');
+  }
+
+  public selectChatChannel(channelId: string): void {
+    const ch = this.chatChannels.find((c) => c.id === channelId);
+    if (!ch) return;
+    this.chatProjectId = ch.projectId;
+    this.chatChannelId = ch.id;
+    this.notify();
   }
 
   public openDocuments(options?: {
@@ -2849,6 +2936,20 @@ export class AppStore {
     };
     this.projects = [project, ...this.projects];
     this.saveProjects();
+
+    const defaultChannel: ProjectChatChannel = {
+      id: `ch-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+      projectId: project.id,
+      slug: 'general',
+      name: this.customization.language === 'en' ? 'General' : 'Общий',
+      description: project.description || undefined,
+      isDefault: true,
+      createdById: this.currentUserId || project.members?.[0]?.userId || this.users[0]?.id || 'user-1',
+      createdAt: new Date().toISOString(),
+    };
+    this.chatChannels = [...this.chatChannels, defaultChannel];
+    this.saveChatChannels();
+
     this.logActivity('create', 'project', project.name, `Ключ: ${project.key}`);
     this.addNotification('success', 'Проект создан', project.name);
     this.notify();
@@ -2876,6 +2977,20 @@ export class AppStore {
         this.activeView = 'projects';
         this.syncHistory(true);
       }
+    }
+    if (this.chatProjectId === id) {
+      this.chatProjectId = this.projects[0]?.id || '';
+      this.resolveActiveChannelForProject(this.chatProjectId);
+    }
+    const prevChannelLen = this.chatChannels.length;
+    this.chatChannels = this.chatChannels.filter((c) => c.projectId !== id);
+    if (this.chatChannels.length !== prevChannelLen) {
+      this.saveChatChannels();
+    }
+    const prevMsgLen = this.chatMessages.length;
+    this.chatMessages = this.chatMessages.filter((m) => m.projectId !== id);
+    if (this.chatMessages.length !== prevMsgLen) {
+      this.saveChatMessages();
     }
     const prevReqLen = this.requirements.length;
     this.requirements = this.requirements.filter((r) => r.projectId !== id);
@@ -3223,22 +3338,276 @@ export class AppStore {
     this.notify();
   }
 
-  // --- Project Chat CRUD ---
+  // --- Project Chat Channels & Messages CRUD ---
+  public isUserProjectMember(projectId: string, userId = this.currentUserId): boolean {
+    const proj = this.projects.find((p) => p.id === projectId);
+    if (!proj) return false;
+    const members = proj.members || [];
+    if (members.length === 0) return true;
+    return members.some((m) => m.userId === userId);
+  }
+
+  public getProjectChatChannels(projectId: string, includeArchived = true): ProjectChatChannel[] {
+    return this.chatChannels
+      .filter((c) => c.projectId === projectId && (includeArchived || !c.archived))
+      .sort((a, b) => {
+        if (Boolean(a.archived) !== Boolean(b.archived)) return a.archived ? 1 : -1;
+        if (Boolean(a.isDefault) !== Boolean(b.isDefault)) return a.isDefault ? -1 : 1;
+        return (Date.parse(a.createdAt) || 0) - (Date.parse(b.createdAt) || 0);
+      });
+  }
+
+  public getDefaultChatChannel(projectId: string): ProjectChatChannel | undefined {
+    const list = this.getProjectChatChannels(projectId, true);
+    return (
+      list.find((c) => !c.archived && c.isDefault) ||
+      list.find((c) => !c.archived) ||
+      list[0]
+    );
+  }
+
+  public slugifyChannelName(raw: string): string {
+    const map: Record<string, string> = {
+      а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z',
+      и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r',
+      с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch',
+      ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+    };
+    const lowered = raw.trim().toLowerCase();
+    let out = '';
+    for (const ch of lowered) {
+      out += map[ch] !== undefined ? map[ch] : ch;
+    }
+    const slug = out
+      .replace(/[^a-z0-9-]+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 36);
+    return slug || 'channel';
+  }
+
+  private ensureUniqueChannelSlug(projectId: string, desiredSlug: string, excludeId?: string): string {
+    const base = this.slugifyChannelName(desiredSlug);
+    const existing = new Set(
+      this.chatChannels
+        .filter((c) => c.projectId === projectId && c.id !== excludeId)
+        .map((c) => c.slug.toLowerCase())
+    );
+    if (!existing.has(base)) return base;
+    let idx = 2;
+    while (existing.has(`${base}-${idx}`)) idx++;
+    return `${base}-${idx}`;
+  }
+
+  public addChatChannel(data: {
+    projectId: string;
+    name: string;
+    slug?: string;
+    description?: string;
+    createdById?: string;
+    isDefault?: boolean;
+  }): ProjectChatChannel | null {
+    const actorId = data.createdById || this.currentUserId || this.users[0]?.id || '';
+    if (!this.isUserProjectMember(data.projectId, actorId)) {
+      return null;
+    }
+    const name = data.name.trim();
+    if (!name) return null;
+    const slug = this.ensureUniqueChannelSlug(
+      data.projectId,
+      data.slug?.trim() ? data.slug : name
+    );
+    const channel: ProjectChatChannel = {
+      id: `ch-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      projectId: data.projectId,
+      slug,
+      name,
+      description: data.description?.trim() || undefined,
+      isDefault: data.isDefault || false,
+      archived: false,
+      createdById: actorId,
+      createdAt: new Date().toISOString(),
+    };
+    this.chatChannels = [...this.chatChannels, channel];
+    this.saveChatChannels();
+    this.chatProjectId = data.projectId;
+    this.chatChannelId = channel.id;
+
+    const proj = this.projects.find((p) => p.id === data.projectId);
+    const prefix = proj ? `[${proj.key}] ` : '';
+    this.logActivity(
+      'create',
+      'chat',
+      `${prefix}#${channel.name}`,
+      channel.description || channel.slug,
+      channel.id
+    );
+    this.addNotification('success', `#${channel.name}`, proj?.name || '', {
+      targetType: 'chat',
+      targetId: channel.id,
+    });
+    this.notify();
+    return channel;
+  }
+
+  public updateChatChannel(
+    id: string,
+    patch: { name?: string; slug?: string; description?: string },
+    actorId = this.currentUserId
+  ): boolean {
+    const target = this.chatChannels.find((c) => c.id === id);
+    if (!target || !this.isUserProjectMember(target.projectId, actorId)) return false;
+
+    const nextName = patch.name !== undefined ? patch.name.trim() : target.name;
+    if (!nextName) return false;
+    const nextSlug =
+      patch.slug !== undefined && patch.slug.trim()
+        ? this.ensureUniqueChannelSlug(target.projectId, patch.slug, target.id)
+        : target.slug;
+
+    this.chatChannels = this.chatChannels.map((c) =>
+      c.id === id
+        ? {
+            ...c,
+            name: nextName,
+            slug: nextSlug,
+            description:
+              patch.description !== undefined
+                ? patch.description.trim() || undefined
+                : c.description,
+          }
+        : c
+    );
+    this.saveChatChannels();
+
+    const proj = this.projects.find((p) => p.id === target.projectId);
+    this.logActivity(
+      'update',
+      'chat',
+      `${proj ? `[${proj.key}] ` : ''}#${nextName}`,
+      nextSlug,
+      id
+    );
+    this.addNotification('info', `#${nextName}`, proj?.name || '', {
+      targetType: 'chat',
+      targetId: id,
+    });
+    this.notify();
+    return true;
+  }
+
+  public archiveChatChannel(
+    id: string,
+    archived = true,
+    actorId = this.currentUserId
+  ): boolean {
+    const target = this.chatChannels.find((c) => c.id === id);
+    if (!target || !this.isUserProjectMember(target.projectId, actorId)) return false;
+
+    const nowIso = new Date().toISOString();
+    this.chatChannels = this.chatChannels.map((c) =>
+      c.id === id
+        ? {
+            ...c,
+            archived,
+            archivedAt: archived ? nowIso : undefined,
+            archivedById: archived ? actorId : undefined,
+          }
+        : c
+    );
+    this.saveChatChannels();
+
+    const proj = this.projects.find((p) => p.id === target.projectId);
+    this.logActivity(
+      'status_change',
+      'chat',
+      `${proj ? `[${proj.key}] ` : ''}#${target.name}`,
+      archived ? 'Канал архивирован' : 'Канал восстановлен из архива',
+      id
+    );
+    this.addNotification(
+      archived ? 'warning' : 'success',
+      `#${target.name}`,
+      proj?.name || '',
+      { targetType: 'chat', targetId: id }
+    );
+    this.notify();
+    return true;
+  }
+
+  public deleteChatChannel(id: string, actorId = this.currentUserId): boolean {
+    const target = this.chatChannels.find((c) => c.id === id);
+    if (!target || !this.isUserProjectMember(target.projectId, actorId)) return false;
+
+    this.chatChannels = this.chatChannels.filter((c) => c.id !== id);
+    this.saveChatChannels();
+
+    const prevMsgLen = this.chatMessages.length;
+    this.chatMessages = this.chatMessages.filter((m) => m.channelId !== id);
+    if (this.chatMessages.length !== prevMsgLen) {
+      this.saveChatMessages();
+    }
+
+    if (this.chatChannelId === id) {
+      this.resolveActiveChannelForProject(target.projectId);
+    }
+
+    const proj = this.projects.find((p) => p.id === target.projectId);
+    this.logActivity(
+      'delete',
+      'chat',
+      `${proj ? `[${proj.key}] ` : ''}#${target.name}`,
+      'Канал проекта удалён'
+    );
+    this.addNotification('warning', `#${target.name}`, proj?.name || '');
+    this.notify();
+    return true;
+  }
+
   public addChatMessage(data: {
     projectId: string;
+    channelId?: string;
     senderId?: string;
     text: string;
     replyToId?: string;
     taskRefId?: string;
-  }): ProjectChatMessage {
+  }): ProjectChatMessage | null {
     const senderId = data.senderId || this.currentUserId || this.users[0]?.id || '';
+    let resolvedChannel = data.channelId
+      ? this.chatChannels.find((c) => c.id === data.channelId && c.projectId === data.projectId)
+      : undefined;
+    if (resolvedChannel?.archived) {
+      return null;
+    }
+    if (!resolvedChannel) {
+      const candidate = this.getDefaultChatChannel(data.projectId);
+      resolvedChannel = candidate && !candidate.archived ? candidate : undefined;
+    }
+    if (!resolvedChannel) {
+      const proj = this.projects.find((p) => p.id === data.projectId);
+      const fallbackChannel: ProjectChatChannel = {
+        id: `ch-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
+        projectId: data.projectId,
+        slug: 'general',
+        name: this.customization.language === 'en' ? 'General' : 'Общий',
+        description: proj?.description || undefined,
+        isDefault: true,
+        createdById: senderId || 'user-1',
+        createdAt: new Date().toISOString(),
+      };
+      this.chatChannels = [...this.chatChannels, fallbackChannel];
+      this.saveChatChannels();
+      resolvedChannel = fallbackChannel;
+    }
+
     const latestChannelMs = this.chatMessages
-      .filter((m) => m.projectId === data.projectId)
+      .filter((m) => m.channelId === resolvedChannel!.id)
       .reduce((max, m) => Math.max(max, Date.parse(m.createdAt) || 0), 0);
     const createdMs = Math.max(Date.now(), latestChannelMs + 1000);
     const msg: ProjectChatMessage = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       projectId: data.projectId,
+      channelId: resolvedChannel.id,
       senderId,
       text: data.text.trim(),
       replyToId: data.replyToId || undefined,
@@ -3255,9 +3624,9 @@ export class AppStore {
     this.logActivity(
       'create',
       'chat',
-      proj ? `[${proj.key}] ${proj.name}` : msg.projectId,
+      `${proj ? `[${proj.key}] ` : ''}#${resolvedChannel.name}`,
       `${sender?.name || senderId}: ${msg.text.slice(0, 60)}`,
-      msg.taskRefId
+      msg.taskRefId || resolvedChannel.id
     );
     this.notify();
     return msg;
@@ -3266,6 +3635,10 @@ export class AppStore {
   public updateChatMessage(id: string, text: string): void {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const msg = this.chatMessages.find((m) => m.id === id);
+    if (!msg) return;
+    const ch = this.chatChannels.find((c) => c.id === msg.channelId);
+    if (ch?.archived) return;
     this.chatMessages = this.chatMessages.map((m) =>
       m.id === id ? { ...m, text: trimmed, editedAt: new Date().toISOString() } : m
     );
@@ -3274,6 +3647,10 @@ export class AppStore {
   }
 
   public togglePinChatMessage(id: string): void {
+    const msg = this.chatMessages.find((m) => m.id === id);
+    if (!msg) return;
+    const ch = this.chatChannels.find((c) => c.id === msg.channelId);
+    if (ch?.archived) return;
     this.chatMessages = this.chatMessages.map((m) =>
       m.id === id ? { ...m, pinned: !m.pinned } : m
     );
@@ -4650,6 +5027,12 @@ export class AppStore {
         );
       case 'directory':
         return this.directories.some((d) => d.id === targetId);
+      case 'chat':
+        return (
+          this.chatChannels.some((c) => c.id === targetId) ||
+          this.projects.some((p) => p.id === targetId) ||
+          this.tasks.some((tk) => tk.id === targetId)
+        );
       default:
         return false;
     }
@@ -4726,6 +5109,20 @@ export class AppStore {
       case 'directory':
         this.openDirectory(targetId);
         break;
+      case 'chat': {
+        const ch = this.chatChannels.find((c) => c.id === targetId);
+        if (ch) {
+          this.openProjectChat(ch.projectId, ch.id);
+        } else {
+          const tk = this.tasks.find((t) => t.id === targetId);
+          if (tk) {
+            this.openProjectChat(tk.projectId);
+          } else {
+            this.openProjectChat(targetId);
+          }
+        }
+        break;
+      }
       default:
         break;
     }

@@ -969,3 +969,25 @@ export function iconLink(size: number | IconSize = 15): TemplateResult {
   `;
 }
 
+export function iconHash(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="4" y1="9" x2="20" y2="9"/>
+      <line x1="4" y1="15" x2="20" y2="15"/>
+      <line x1="10" y1="3" x2="8" y2="21"/>
+      <line x1="16" y1="3" x2="14" y2="21"/>
+    </svg>
+  `;
+}
+
+export function iconArchive(size: number | IconSize = 15): TemplateResult {
+  const px = iconPx(size);
+  return html`
+    <svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="2" y="3" width="20" height="5" rx="1"/>
+      <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/>
+      <path d="M10 12h4"/>
+    </svg>
+  `;
+}

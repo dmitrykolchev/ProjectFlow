@@ -27,6 +27,7 @@ import {
   iconEye,
   iconFileText,
   iconFolder,
+  iconHash,
   iconLayers,
   iconMessageSquare,
   iconPaperclip,
@@ -459,7 +460,7 @@ export class AppTaskDetail extends LitElement {
             <app-button
               size="sm"
               variant="outline"
-              @click="${() => store.openProjectChat(task.projectId)}"
+              @click="${() => store.openProjectChat(task.projectId, discussions[0]?.channelId)}"
             >
               <span slot="icon-start">${iconMessageSquare(15)}</span>
               <span>${t.taskDetail.openInChat}</span>
@@ -1343,6 +1344,7 @@ export class AppTaskDetail extends LitElement {
             <div class="discussion-feed">
               ${discussions.map((msg) => {
                 const sender = store.users.find((u) => u.id === msg.senderId);
+                const msgChannel = store.chatChannels.find((c) => c.id === msg.channelId);
                 const parent = msg.replyToId ? discussions.find((x) => x.id === msg.replyToId) : null;
                 const parentAuthor = parent ? store.users.find((u) => u.id === parent.senderId) : null;
                 const isEditing = this.editingMsgId === msg.id;
@@ -1355,6 +1357,18 @@ export class AppTaskDetail extends LitElement {
                         <span class="msg-author">${sender?.name || msg.senderId}</span>
                         <span aria-hidden="true" style="color: var(--text-muted);">·</span>
                         <span class="msg-time">${this.formatDateTime(msg.createdAt)}</span>
+                        ${msgChannel
+                          ? html`
+                              <app-link
+                                size="sm"
+                                title="${t.taskDetail.openInChat}"
+                                @click="${() => store.openProjectChat(task.projectId, msgChannel.id)}"
+                              >
+                                <span slot="icon-start">${iconHash(12)}</span>
+                                <span>${msgChannel.name}</span>
+                              </app-link>
+                            `
+                          : ''}
                         ${msg.editedAt ? html`<span class="msg-time">(${t.projectChat.edited})</span>` : ''}
                       </div>
 

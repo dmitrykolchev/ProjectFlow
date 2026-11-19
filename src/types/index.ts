@@ -433,9 +433,24 @@ export interface ProjectChatReaction {
   userIds: string[];
 }
 
+export interface ProjectChatChannel {
+  id: string;
+  projectId: string;
+  slug: string;
+  name: string;
+  description?: string;
+  isDefault?: boolean;
+  archived?: boolean;
+  archivedAt?: string;
+  archivedById?: string;
+  createdById: string;
+  createdAt: string;
+}
+
 export interface ProjectChatMessage {
   id: string;
   projectId: string;
+  channelId: string;
   senderId: string;
   text: string;
   replyToId?: string;
