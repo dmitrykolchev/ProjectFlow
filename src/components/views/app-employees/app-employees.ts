@@ -19,6 +19,8 @@ import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-persona/app-persona';
 import '../../common/app-pagination/app-pagination';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-employees.css';
 import { eventValue } from '../../common/event-value';
@@ -315,105 +317,130 @@ export class AppEmployees extends LitElement {
   }
 
   private renderTable(list: User[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+    const personaCell = (row: Record<string, unknown>) => {
+      const emp = row as unknown as User;
+      return html`
+        <app-persona
+          size="32"
+          .initials="${emp.avatar}"
+          .presence="${effectivePresence(emp)}"
+          .primaryText="${emp.name}"
+          .secondaryText="${emp.role}"
+          @click="${() => store.openEmployeeDetail(emp.id)}"
+        ></app-persona>
+      `;
+    };
+    const contactsCell = (row: Record<string, unknown>) => {
+      const emp = row as unknown as User;
+      return html`
+        <div>${emp.email}</div>
+        <div style="font-size: 0.74rem; color: var(--text-muted);">${emp.phone || '—'}</div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.employees.thEmployee}</th>
-              <th>${t.viewTexts.employees.thDepartment}</th>
-              <th>${t.viewTexts.employees.thCompany}</th>
-              <th>${t.viewTexts.employees.thContacts}</th>
-              <th>${t.viewTexts.employees.thProjectsTasks}</th>
-              <th>${t.viewTexts.employees.thRate}</th>
-              <th>${t.viewTexts.employees.thStatus}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((emp) => {
-              const company = store.companies.find((c) => c.id === emp.companyId);
-              const taskCount = store.tasks.filter((t) => t.assigneeId === emp.id).length;
+        <app-data-table
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="name" label="${t.viewTexts.employees.thEmployee}" .cellRender="${personaCell}"></app-table-column>
+          <app-table-column
+            field="department"
+            label="${t.viewTexts.employees.thDepartment}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              html`${(row as unknown as User).department || '—'}`}"
+          ></app-table-column>
+          <app-table-column
+            field="companyId"
+            label="${t.viewTexts.employees.thCompany}"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const emp = row as unknown as User;
+              return html`${store.companies.find((c) => c.id === emp.companyId)?.name || '—'}`;
+            }}"
+          ></app-table-column>
+          <app-table-column field="email" label="${t.viewTexts.employees.thContacts}" .cellRender="${contactsCell}"></app-table-column>
+          <app-table-column
+            field="id"
+            label="${t.viewTexts.employees.thProjectsTasks}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const emp = row as unknown as User;
               const projCount = store.projects.filter((p) =>
                 (p.members || []).some((m) => m.userId === emp.id)
               ).length;
+              const taskCount = store.tasks.filter((tk) => tk.assigneeId === emp.id).length;
+              return html`${projCount} / ${taskCount}`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="hourlyRate"
+            label="${t.viewTexts.employees.thRate}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const emp = row as unknown as User;
+              return html`${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.employees.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const emp = row as unknown as User;
               const badge = this.getStatusLabel(emp.status, t);
-
               return html`
-                <tr>
-                  <td>
-                    <app-persona
-                      size="32"
-                      .initials="${emp.avatar}"
-                      .presence="${effectivePresence(emp)}"
-                      .primaryText="${emp.name}"
-                      .secondaryText="${emp.role}"
-                      @click="${() => store.openEmployeeDetail(emp.id)}"
-                    ></app-persona>
-                  </td>
-                  <td>${emp.department || '—'}</td>
-                  <td>${company?.name || '—'}</td>
-                  <td>
-                    <div>${emp.email}</div>
-                    <div style="font-size: 0.74rem; color: var(--text-muted);">${emp.phone || '—'}</div>
-                  </td>
-                  <td class="mono">${projCount} / ${taskCount}</td>
-                  <td class="mono">${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</td>
-                  <td>
-                    <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
-                  </td>
-                  <td>
-                    <div class="actions-row">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.viewTexts.employees.openProfileButton}"
-                        @click="${() => store.openEmployeeDetail(emp.id)}"
-                      >
-                        <span slot="start">${iconChevronRight(15)}</span>
-                      </app-button>
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditModal(emp)}"
-                      >
-                        <span slot="start">${iconEdit(14)}</span>
-                      </app-button>
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingEmployee = emp)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            .cellRender="${(row: Record<string, unknown>) => {
+              const emp = row as unknown as User;
+              return html`
+                <div class="emp-actions-row">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.employees.openProfileButton}"
+                    @click="${() => store.openEmployeeDetail(emp.id)}"
+                  >
+                    <span slot="start">${iconChevronRight(15)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(emp)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingEmployee = emp)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
