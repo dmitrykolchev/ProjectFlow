@@ -28,6 +28,7 @@ import {
   KnowledgeScope,
   NotificationItem,
   PaymentDirection,
+  PresenceStatus,
   Project,
   ProjectChatChannel,
   ProjectChatMessage,
@@ -55,7 +56,6 @@ import {
   normalizeReminderRecurrence,
   parseLocalDateTime as parseRfcLocalDateTime,
 } from '../domain/rfc5545';
-import { statusFromPresence, type PersonaPresence } from '../domain/presence-tokens';
 import {
   initialCalculations,
   initialChatChannels,
@@ -2175,13 +2175,13 @@ export class AppStore {
     return employee;
   }
 
-  /** Manual presence choice (the sidebar footer menu): writes the matching employee status. */
-  public setUserPresence(userId: string, presence: PersonaPresence): void {
-    const status = statusFromPresence(presence);
-    if (!status) return;
+  /** Manual presence choice (the sidebar footer menu): writes the PresenceStatus
+     directly on the user; EmployeeStatus is untouched. Every persona in the app shows
+     the chosen presence — for the surroundings the user is exactly in that status. */
+  public setUserPresence(userId: string, presence: PresenceStatus): void {
     const target = this.users.find((u) => u.id === userId);
-    if (!target || target.status === status) return;
-    this.users = this.users.map((u) => (u.id === userId ? { ...u, status } : u));
+    if (!target || target.presence === presence) return;
+    this.users = this.users.map((u) => (u.id === userId ? { ...u, presence } : u));
     this.saveEmployees();
     this.logActivity('update', 'employee', target.name, this.texts().employees.presenceUpdated);
     this.notify();

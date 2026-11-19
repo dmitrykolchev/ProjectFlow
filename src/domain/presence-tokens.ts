@@ -52,25 +52,6 @@ export function presenceFromStatus(status?: EmployeeStatus): PersonaPresence {
   }
 }
 
-/** Manual presence -> employee status (the inverse of `presenceFromStatus`);
-   '' for presences that have no employee-status counterpart. */
-export function statusFromPresence(presence: PersonaPresence): EmployeeStatus | '' {
-  switch (presence) {
-    case 'available':
-      return 'active';
-    case 'online':
-      return 'remote';
-    case 'away':
-      return 'vacation';
-    case 'busy':
-      return 'onboarding';
-    case 'ooo':
-      return 'vacation';
-    default:
-      return '';
-  }
-}
-
 /** Manual presence (User.presence, written by the sidebar footer menu) wins over the
    badge derived from the employee status. Presence is its own status: choosing it does
    not touch EmployeeStatus. */

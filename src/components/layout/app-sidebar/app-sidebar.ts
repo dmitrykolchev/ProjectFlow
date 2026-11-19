@@ -1,13 +1,9 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { SidebarGroupMode } from '../../../types';
+import { SidebarGroupMode, PresenceStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import {
-  presenceFromStatus,
-  presenceLabel,
-  type PersonaPresence,
-} from '../../../domain/presence-tokens';
+import { effectivePresence, presenceLabel } from '../../../domain/presence-tokens';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
 import { MenuItem } from '../../common/app-menu/app-menu';
 import '../../common/app-presence-icon/app-presence-icon';
@@ -77,8 +73,8 @@ export class AppSidebar extends LitElement {
     const anchor = this.shadowRoot?.querySelector('.user-persona') as HTMLElement | null;
     if (!anchor) return;
 
-    const current = presenceFromStatus(currentUser.status);
-    const options: PersonaPresence[] = ['available', 'online', 'away', 'busy'];
+    const current = effectivePresence(currentUser);
+    const options: PresenceStatus[] = ['available', 'online', 'away', 'busy', 'ooo', 'offline'];
     const items: MenuItem[] = [
       { id: 'presence-header', header: t.viewTexts.sidebar.presenceHeader },
       ...options.map((p) => ({
@@ -138,7 +134,7 @@ export class AppSidebar extends LitElement {
       return;
     }
     if (id.startsWith('presence-')) {
-      store.setUserPresence(store.currentUserId, id.slice('presence-'.length) as PersonaPresence);
+      store.setUserPresence(store.currentUserId, id.slice('presence-'.length) as PresenceStatus);
     }
   }
 
@@ -306,7 +302,7 @@ export class AppSidebar extends LitElement {
                       class="user-persona"
                       size="32"
                       .initials="${currentUser.avatar}"
-                      .presence="${presenceFromStatus(currentUser.status)}"
+                      .presence="${effectivePresence(currentUser)}"
                       .primaryText="${currentUser.name}"
                       .secondaryText="${currentUser.role}"
                       .color="${'var(--bg-hover, #223049)'}"
@@ -332,7 +328,7 @@ export class AppSidebar extends LitElement {
                       class="user-persona"
                       size="32"
                       .initials="${currentUser.avatar}"
-                      .presence="${presenceFromStatus(currentUser.status)}"
+                      .presence="${effectivePresence(currentUser)}"
                       .color="${'var(--bg-hover, #223049)'}"
                       @click="${() => this.openPresenceMenu()}"
                     ></app-persona>
