@@ -15,11 +15,12 @@
 
 /* Grid and card geometry are tokens with the projects cards reference as defaults; a view
    can retune them locally (counterparties and documents use 340px/1.1rem, employees
-   310px/1.1rem, requirements 360px/1rem with the compact card padding and gap). */
+   310px/1.1rem, requirements 360px/1rem with the compact card padding and gap). The grid
+   gap canonical default is 1rem. */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(var(--cards-min-width, 360px), 1fr));
-  gap: var(--cards-gap, 1.15rem);
+  gap: var(--cards-gap, 1rem);
 }
 
 .card-shell {
