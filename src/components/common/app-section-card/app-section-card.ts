@@ -7,6 +7,7 @@ import styles from './app-section-card.css';
 export class AppSectionCard extends LitElement {
   @property({ type: String }) title: string = '';
   @property({ type: String }) subtitle: string = '';
+  @property({ type: String, attribute: 'aria-label' }) ariaLabel: string = '';
   @property({ type: String }) variant: 'default' | 'plain' | 'panel' | 'tabbed' = 'default';
   @property({ type: Boolean, attribute: 'collapsible' }) collapsible: boolean = false;
   @property({ type: Boolean, reflect: true }) collapsed: boolean = false;
@@ -22,6 +23,7 @@ export class AppSectionCard extends LitElement {
           class="section-header ${this.collapsible ? 'is-collapsible' : ''}"
           role="${this.collapsible ? 'button' : 'presentation'}"
           tabindex="${this.collapsible ? 0 : -1}"
+          aria-label="${this.ariaLabel || this.title}"
           aria-expanded="${this.collapsible && !this.collapsed ? 'true' : 'false'}"
           @click="${(e: MouseEvent) => this.handleToggle(e)}"
           @keydown="${(e: KeyboardEvent) => {
