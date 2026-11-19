@@ -423,6 +423,8 @@ export const ru = {
     densitySwitchTitle: 'Плотность строк таблицы',
     sortGroupHint: 'Приоритетная сортировка группы',
     groupableColumnHint: 'Можно перетащить в область группировки',
+    groupIconAddHint: 'Клик — группировать по этой колонке',
+    groupIconRemoveHint: 'Клик — снять группировку по этой колонке',
     columns: {
       id: 'Код',
       title: 'Задача',
