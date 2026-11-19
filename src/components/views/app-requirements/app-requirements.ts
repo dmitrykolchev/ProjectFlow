@@ -20,6 +20,7 @@ import {
   iconCpu,
   iconEdit,
   iconFileText,
+  iconFilter,
   iconLayers,
   iconPlus,
   iconTrash,
@@ -46,6 +47,7 @@ import '../../common/app-requirement-form/app-requirement-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
@@ -66,6 +68,7 @@ export class AppRequirements extends LitElement {
   @state() private priorityFilter: 'all' | RequirementPriority = 'all';
   @state() private statusFilter: 'all' | RequirementStatus = 'all';
   @state() private displayMode: 'cards' | 'table' | 'grid' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -238,38 +241,7 @@ export class AppRequirements extends LitElement {
         ></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${t.viewTexts.requirements.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'project', type: 'entity', options: projectOptions },
-          { key: 'type', options: typeOptions },
-          { key: 'priority', options: priorityOptions },
-          { key: 'status', options: statusOptions },
-        ]}"
-        .values="${{
-          project: this.projectFilter,
-          type: this.typeFilter,
-          priority: this.priorityFilter,
-          status: this.statusFilter,
-        }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          const val = eventValue(e);
-          if (e.detail.key === 'project') {
-            this.projectFilter = val;
-            store.requirementFilterProjectId = val;
-          }
-          if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
-          if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
-          if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -283,7 +255,51 @@ export class AppRequirements extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${t.viewTexts.requirements.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'project', type: 'entity', options: projectOptions },
+              { key: 'type', options: typeOptions },
+              { key: 'priority', options: priorityOptions },
+              { key: 'status', options: statusOptions },
+            ]}"
+            .values="${{
+              project: this.projectFilter,
+              type: this.typeFilter,
+              priority: this.priorityFilter,
+              status: this.statusFilter,
+            }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              const val = eventValue(e);
+              if (e.detail.key === 'project') {
+                this.projectFilter = val;
+                store.requirementFilterProjectId = val;
+              }
+              if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
+              if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
+              if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       <div class="bulk-toolbar">
         <div class="bulk-left">
