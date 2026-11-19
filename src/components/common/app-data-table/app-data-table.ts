@@ -28,7 +28,9 @@ export interface DataTablePageChangeDetail {
  * too: rows are sliced by page-size, and the footer shows app-pagination whenever
  * there is more than one page. By default the table stretches to display every
  * rendered row; setting max-height caps the host, so the body gets its own
- * scrollbar while the header and footer stay in place.
+ * scrollbar while the header and footer stay in place. With hide-footer the rows
+ * are still sliced internally, but no footer is rendered — the consumer owns the
+ * pagination bar outside the table (the journal view reference layout).
  */
 @customElement('app-data-table')
 export class AppDataTable extends LitElement {
@@ -40,6 +42,7 @@ export class AppDataTable extends LitElement {
   @property({ type: Number, attribute: 'max-height' }) maxHeight: number = 0;
   @property({ type: String, attribute: 'empty-title' }) emptyTitle: string = '';
   @property({ type: String }) locale: string = 'ru-RU';
+  @property({ type: Boolean, attribute: 'hide-footer' }) hideFooter: boolean = false;
 
   @state() private currentPage: number = 1;
 
@@ -236,7 +239,7 @@ export class AppDataTable extends LitElement {
               </table>
             `}
       </div>
-      ${slice.totalItems > slice.pageSize
+      ${!this.hideFooter && slice.totalItems > slice.pageSize
         ? html`
             <div class="table-footer">
               <app-pagination
