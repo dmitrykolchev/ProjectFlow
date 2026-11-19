@@ -21,6 +21,42 @@
   text-align: left;
 }
 
+/* Ghost-button behaviour (the default): transparent fill, hover fill, focus ring,
+   active press, disabled dim — the canonical app-button ghost recipe. */
+button.persona {
+  padding: var(--persona-padding, 4px 8px);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md, 8px);
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  cursor: pointer;
+  user-select: none;
+  outline: none;
+  transition: background-color var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              transform var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+button.persona:hover:not(:disabled) {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+}
+
+button.persona:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-surface, #111827), 0 0 0 4px var(--accent-primary, #6366f1);
+}
+
+button.persona:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+button.persona:disabled {
+  opacity: var(--btn-disabled-opacity, 0.5);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .avatar-wrap {
   position: relative;
   flex-shrink: 0;
@@ -92,12 +128,6 @@
 .tertiary {
   font-size: var(--persona-secondary-size, 12px);
   line-height: var(--persona-secondary-line, 17px);
-  color: var(--text-secondary, #cbd5e1);
-}
-
-/* Text alternative for the colour-only presence dot on small personas. */
-.presence-text {
-  font-weight: 400;
   color: var(--text-secondary, #cbd5e1);
 }
 

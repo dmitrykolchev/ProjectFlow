@@ -51,10 +51,8 @@ export class AppPersona extends LitElement {
   @property({ type: String }) primaryText: string = '';
   @property({ type: String }) secondaryText: string = '';
   @property({ type: String }) tertiaryText: string = '';
-  /** Presence badge status ('none' renders no badge). */
+  /** Presence badge status ('none' renders no badge). Its words go to the tooltip and the accessible name. */
   @property({ type: String }) presence: PersonaPresence = 'none';
-  /** Text alternative next to the name (recommended for sizes <= 32, colour-only dots). */
-  @property({ type: Boolean, attribute: 'presence-text' }) presenceText: boolean = false;
   /** Native tooltip with the full text on truncated lines. */
   @property({ type: Boolean, attribute: 'show-overflow-tooltip' })
   showOverflowTooltip: boolean = true;
@@ -62,6 +60,10 @@ export class AppPersona extends LitElement {
   @property({ type: String }) color: string = '';
   /** Accessible name override; defaults to "name — presence". */
   @property({ type: String }) ariaLabel: string = '';
+  /** Ghost-button behaviour on by default: focusable, cursor pointer, hover fill. */
+  @property({ type: Boolean, attribute: 'interactive' }) interactive: boolean = true;
+  /** Disabled ghost button (no hover, no click, dimmed). */
+  @property({ type: Boolean, attribute: 'persona-disabled' }) personaDisabled: boolean = false;
 
   private unsubscribe: (() => void) | null = null;
 
@@ -94,43 +96,57 @@ export class AppPersona extends LitElement {
     const badgePx = BADGE_PX[this.size] ?? 20;
     // Sizes <= 32 are colour-only dots (per the presence spec); glyphs need >= 16px.
     const glyphPx = badgePx >= 16 ? Math.round(badgePx * 0.6) : 0;
-    const showPresenceText = Boolean(label) && this.presenceText;
-    // The textual status is a secondary line under the name, not a suffix of it.
-    const secondaryLine = showPresenceText ? label : this.secondaryText;
     const accessible = this.ariaLabel || [this.primaryText, label].filter(Boolean).join(' — ');
     const tip = (text: string) => (this.showOverflowTooltip ? text : '');
+    // The status is graphic only: its words go to the tooltip and the accessible name,
+    // the secondary line carries the position / project role.
+    const primaryTip = [this.primaryText, label].filter(Boolean).join(' — ');
 
-    return html`
-      <div class="persona size-${this.size}" aria-label="${accessible}">
-        <div class="avatar-wrap">
-          <div class="avatar" style="background: ${bg};">
-            ${this.image
-              ? html`<img src="${this.image}" alt="${this.primaryText}" />`
-              : html`<span>${initials}</span>`}
-          </div>
-          ${token
-            ? html`
-                <span class="presence" style="background: ${token.color};">
-                  ${glyphPx ? presenceGlyph(token.glyph, glyphPx) : ''}
-                </span>
-              `
-            : ''}
+    const body = html`
+      <div class="avatar-wrap">
+        <div class="avatar" style="background: ${bg};">
+          ${this.image
+            ? html`<img src="${this.image}" alt="${this.primaryText}" />`
+            : html`<span>${initials}</span>`}
         </div>
-        ${this.primaryText
+        ${token
           ? html`
-              <div class="text">
-                <span class="line primary" title="${tip(this.primaryText)}">${this.primaryText}</span>
-                ${secondaryLine
-                  ? html`<span class="line secondary" title="${tip(secondaryLine)}">${secondaryLine}</span>`
-                  : ''}
-                ${this.tertiaryText
-                  ? html`<span class="line tertiary" title="${tip(this.tertiaryText)}">${this.tertiaryText}</span>`
-                  : ''}
-              </div>
+              <span class="presence" style="background: ${token.color};" title="${tip(label)}">
+                ${glyphPx ? presenceGlyph(token.glyph, glyphPx) : ''}
+              </span>
             `
           : ''}
       </div>
+      ${this.primaryText
+        ? html`
+            <div class="text">
+              <span class="line primary" title="${tip(primaryTip)}">${this.primaryText}</span>
+              ${this.secondaryText
+                ? html`<span class="line secondary" title="${tip(this.secondaryText)}">${this.secondaryText}</span>`
+                : ''}
+              ${this.tertiaryText
+                ? html`<span class="line tertiary" title="${tip(this.tertiaryText)}">${this.tertiaryText}</span>`
+                : ''}
+            </div>
+          `
+        : ''}
     `;
+
+    // Ghost-button by default: the persona is a focusable control, so consumers bind
+    // @click on the host (a button inside a button would be invalid markup).
+    return this.interactive
+      ? html`
+          <button
+            type="button"
+            class="persona size-${this.size}"
+            aria-label="${accessible}"
+            ?disabled="${this.personaDisabled}"
+            @click="${() => this.dispatchEvent(new Event('persona-click', { bubbles: true, composed: true }))}"
+          >
+            ${body}
+          </button>
+        `
+      : html`<div class="persona size-${this.size}" aria-label="${accessible}">${body}</div>`;
   }
 }
 
