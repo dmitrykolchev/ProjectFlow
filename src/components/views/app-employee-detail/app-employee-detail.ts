@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import { User } from '../../../types';
 import {
   iconChevronLeft,
@@ -25,7 +26,7 @@ import '../../common/app-time-entry-form/app-time-entry-form';
 import '../../common/app-employee-form/app-employee-form';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-meta-grid/app-meta-grid';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-entity-reminders/app-entity-reminders';
@@ -196,7 +197,12 @@ export class AppEmployeeDetail extends LitElement {
           <div class="hero-top">
             <div class="hero-identity">
               <div class="avatar-emblem-wrap">
-                <app-avatar size="lg" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
+                <app-persona
+                  size="72"
+                  .initials="${emp.avatar}"
+                  .presence="${presenceFromStatus(emp.status)}"
+                  .interactive="${false}"
+                ></app-persona>
                 <app-entity-emblem class="avatar-entity-badge" entity="employee" size="sm"></app-entity-emblem>
               </div>
               <div class="title-block">
