@@ -13,6 +13,7 @@ export const ru = {
     close: 'Закрыть',
     search: 'Поиск...',
     filter: 'Фильтры',
+    filterToggle: 'Фильтр',
     all: 'Все',
     apply: 'Применить',
     reset: 'Сбросить',

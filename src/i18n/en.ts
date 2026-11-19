@@ -13,6 +13,7 @@ export const en = {
     close: 'Close',
     search: 'Search...',
     filter: 'Filters',
+    filterToggle: 'Filter',
     all: 'All',
     apply: 'Apply',
     reset: 'Reset',
