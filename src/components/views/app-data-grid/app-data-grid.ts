@@ -695,11 +695,42 @@ export class AppDataGrid extends LitElement {
     `;
   }
 
-  private renderGroupIcon(isGroupedCol: boolean, t: ReturnType<typeof getTranslation>) {
+  private renderGroupIcon(
+    isGroupedCol: boolean,
+    field: string,
+    t: ReturnType<typeof getTranslation>,
+    interactive: boolean
+  ) {
+    // In the column header the indicator is a real control: clicking it toggles
+    // grouping for this column (the same add/remove the dropbar chips do).
+    // stopPropagation keeps the click from reaching the th's sort handler. In the
+    // group chips the icon stays decorative — the chip has its own remove button.
+    const hint = interactive
+      ? isGroupedCol
+        ? t.grid.groupIconRemoveHint
+        : t.grid.groupIconAddHint
+      : t.grid.sortGroupHint;
     return html`
       <span
         class="th-group-icon ${isGroupedCol ? 'is-grouped' : ''}"
-        title="${isGroupedCol ? t.grid.sortGroupHint : t.grid.groupableColumnHint}"
+        role="${interactive ? 'button' : 'presentation'}"
+        tabindex="${interactive ? '0' : '-1'}"
+        aria-label="${hint}"
+        title="${hint}"
+        @click="${interactive
+          ? (e: MouseEvent) => {
+              e.stopPropagation();
+              this.toggleColumnGroup(field);
+            }
+          : (e: Event) => e.stopPropagation()}"
+        @keydown="${interactive
+          ? (e: KeyboardEvent) => {
+              if (e.key !== 'Enter' && e.key !== ' ') return;
+              e.preventDefault();
+              e.stopPropagation();
+              this.toggleColumnGroup(field);
+            }
+          : null}"
       >
         <svg
           width="12"
@@ -920,7 +951,7 @@ export class AppDataGrid extends LitElement {
                             <span class="group-chip">
                               <span class="group-chip-label">${caption}</span>
                               ${this.renderSortIndicator(field, effectiveSortRules, t)}
-                              ${this.renderGroupIcon(true, t)}
+                              ${this.renderGroupIcon(true, field, t, false)}
                               <button
                                 type="button"
                                 class="group-chip-remove"
@@ -1045,7 +1076,7 @@ export class AppDataGrid extends LitElement {
                         ${this.renderSortIndicator(col.field, effectiveSortRules, t)}
                       </div>
                       ${(col.groupable || isGroupedCol) && col.caption.trim() !== ''
-                        ? this.renderGroupIcon(isGroupedCol, t)
+                        ? this.renderGroupIcon(isGroupedCol, col.field, t, true)
                         : ''}
                     </div>
                     ${col.resizable
@@ -1521,6 +1552,17 @@ export class AppDataGrid extends LitElement {
     };
     collect(rows, 0, '');
     this.collapsedGroups = allPaths;
+  }
+
+  private toggleColumnGroup(field: string) {
+    if (this.groupByFields.includes(field)) {
+      this.removeGroupField(field);
+      return;
+    }
+    const col = this.columns.find((c) => c.field === field);
+    if (col?.groupable) {
+      this.groupByFields = [...this.groupByFields, field];
+    }
   }
 
   private removeGroupField(field: string) {

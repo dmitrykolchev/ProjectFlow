@@ -361,6 +361,18 @@ th.drop-after {
               opacity var(--transition-fast, 150ms ease);
 }
 
+/* The indicator is a button (role=button, tabindex): pointer cursor and a focus ring,
+   so clicking it toggles grouping for the column. */
+.th-group-icon[role="button"] {
+  cursor: pointer;
+}
+
+.th-group-icon[role="button"]:focus-visible {
+  outline: 1px solid var(--accent-primary, #6366f1);
+  outline-offset: 2px;
+  opacity: 1;
+}
+
 th:hover .th-group-icon {
   opacity: 0.85;
 }
