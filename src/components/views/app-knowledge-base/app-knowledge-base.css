@@ -86,6 +86,18 @@
   color: var(--text-primary);
 }
 
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode row holds the scope app-segmented-switch (size="sm") and the filter
+   toggle (app-toggle-button size="sm", funnel icon + label; pressed = the filter toolbar is
+   visible, unpressed = hidden, the view mirrors the pressed state in filterVisible); it sits
+   directly before the filter toolbar. The switch host is inline-flex and the toggle host is
+   inline-block, so the row keeps the intrinsic widths left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 /* Toolbar & Filters */
 .kb-toolbar {
   display: flex;

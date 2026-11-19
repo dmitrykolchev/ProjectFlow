@@ -13,6 +13,7 @@ import {
   iconBookOpen,
   iconBuilding,
   iconEdit,
+  iconFilter,
   iconFolder,
   iconPin,
   iconPlus,
@@ -27,6 +28,7 @@ import '../../common/app-markdown/app-markdown';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
@@ -46,6 +48,7 @@ export class AppKnowledgeBase extends LitElement {
   @state() private statusFilter: 'all' | KnowledgeArticleStatus = 'all';
   @state() private localSearch = '';
   @state() private globalSearch = store.searchQuery;
+  @state() private filterVisible: boolean = true;
 
   // Editor Modal state
   @state() private modalOpen = false;
@@ -239,40 +242,53 @@ export class AppKnowledgeBase extends LitElement {
           </div>
         </div>
 
-        <!-- Filters -->
-        <div class="kb-toolbar">
-          <div class="toolbar-left">
-            <div class="toolbar-search">
-              <app-input
-                size="sm"
-                placeholder="${kb.searchPlaceholder}"
-                .value="${this.localSearch}"
-                clearable
-                @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
-              >
-                <span slot="icon">${iconSearch(14)}</span>
-              </app-input>
-            </div>
+        <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
+             toggle, filter toolbar, data representation -->
+        <div class="mode-row">
+          <app-segmented-switch
+            size="sm"
+            .value="${this.scopeFilter}"
+            .options="${[
+              { value: 'all', label: kb.scopeAll },
+              { value: 'project', label: kb.scopeProject },
+              { value: 'company', label: kb.scopeCompany },
+              { value: 'general', label: kb.scopeGeneral },
+            ]}"
+            @change="${(e: CustomEvent<{ value: string }>) => {
+              const nextScope = eventValue(e) as 'all' | KnowledgeScope;
+              store.setKnowledgeFilters({
+                scope: nextScope,
+                projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
+                companyId: nextScope === 'general' ? 'all' : this.companyFilter,
+              });
+            }}"
+          ></app-segmented-switch>
 
-            <app-segmented-switch
-              size="sm"
-              .value="${this.scopeFilter}"
-              .options="${[
-                { value: 'all', label: kb.scopeAll },
-                { value: 'project', label: kb.scopeProject },
-                { value: 'company', label: kb.scopeCompany },
-                { value: 'general', label: kb.scopeGeneral },
-              ]}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                const nextScope = eventValue(e) as 'all' | KnowledgeScope;
-                store.setKnowledgeFilters({
-                  scope: nextScope,
-                  projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
-                  companyId: nextScope === 'general' ? 'all' : this.companyFilter,
-                });
-              }}"
-            ></app-segmented-switch>
-          </div>
+          <app-toggle-button
+            size="sm"
+            .pressed="${this.filterVisible}"
+            @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+          >
+            <span slot="icon-start">${iconFilter(14)}</span>
+            <span>${t.common.filterToggle}</span>
+          </app-toggle-button>
+        </div>
+
+        ${this.filterVisible
+          ? html`<div class="kb-toolbar">
+              <div class="toolbar-left">
+                <div class="toolbar-search">
+                  <app-input
+                    size="sm"
+                    placeholder="${kb.searchPlaceholder}"
+                    .value="${this.localSearch}"
+                    clearable
+                    @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+                  >
+                    <span slot="icon">${iconSearch(14)}</span>
+                  </app-input>
+                </div>
+              </div>
 
           <div class="toolbar-filters">
             <div class="filter-select">
@@ -319,7 +335,8 @@ export class AppKnowledgeBase extends LitElement {
                 `
               : ''}
           </div>
-        </div>
+        </div>`
+        : ''}
 
         <!-- Two-Pane Workspace -->
         <div class="kb-workspace">
