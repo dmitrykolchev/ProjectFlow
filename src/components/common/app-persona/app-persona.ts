@@ -22,8 +22,9 @@ const BADGE_PX: Record<PersonaSize, number> = {
 
 /** White glyph inside the presence badge. Attributes are written literally: lit-html
     has no attribute spread, so a single `${string}` placeholder leaves the svg without
-    width/height/viewBox (defaulting to 300x150) and the glyph escapes the badge. */
-function presenceGlyph(glyph: string, px: number): TemplateResult {
+    width/height/viewBox (defaulting to 300x150) and the glyph escapes the badge.
+    Exported for consumers that draw the badge outside the persona (menu icons). */
+export function presenceGlyph(glyph: string, px: number): TemplateResult {
   switch (glyph) {
     case 'check':
       return html`<svg width="${px}" height="${px}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>`;
