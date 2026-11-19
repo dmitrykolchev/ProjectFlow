@@ -55,6 +55,16 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  /* every sidebar icon occupies the same box, so labels start on one vertical line
+     regardless of the default size of the icon function used at the call site.
+     SVG icons scale uniformly (viewBox), so stroke weight matches the 18px neighbours. */
+  width: var(--sidebar-icon-size, 18px);
+  height: var(--sidebar-icon-size, 18px);
+}
+
+.nav-icon svg {
+  width: var(--sidebar-icon-size, 18px);
+  height: var(--sidebar-icon-size, 18px);
 }
 
 /* canonical slot API: start / default / end.
