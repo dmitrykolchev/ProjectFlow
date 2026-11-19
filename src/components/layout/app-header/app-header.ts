@@ -113,6 +113,12 @@ export class AppHeader extends LitElement {
     if (id) store.setTheme(id as ThemeMode);
   }
 
+  private handleLangSelect(e: CustomEvent) {
+    e.stopPropagation();
+    const id = String((e.detail as { id?: string })?.id || '');
+    if (id === 'ru' || id === 'en') store.setLanguage(id);
+  }
+
   render() {
     const t = getTranslation(this.currentLang);
     const activeProject = store.projects.find((p) => p.id === this.selectedProjectId);
@@ -219,6 +225,12 @@ export class AppHeader extends LitElement {
 
     const detailEntity = DETAIL_ENTITY_MAP[this.activeView];
 
+    const langItems: MenuItem[] = (['ru', 'en'] as const).map((lg) => ({
+      id: lg,
+      label: t.viewTexts.header.langNames[lg],
+      checked: lg === this.currentLang,
+    }));
+
     const themeItems: MenuItem[] = THEME_ORDER.map((th) => ({
       id: th,
       label: t.viewTexts.header.themeNames[th],
@@ -300,15 +312,18 @@ export class AppHeader extends LitElement {
             <span slot="start">${themeIcon}</span>
           </app-split-button>
 
-          <button
-            class="icon-action-btn lang-toggle-btn"
-            @click="${() =>
+          <!-- Language split button: the main button cycles languages sequentially as
+             before (the current code), the chevron menu picks a language directly. -->
+          <app-split-button
+            variant="secondary"
+            size="md"
+            .label="${this.currentLang.toUpperCase()}"
+            .items="${langItems}"
+            @primary-click="${() =>
               store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
-            title="${t.viewTexts.header.langToggleTitle}"
-            aria-label="${t.viewTexts.header.langToggleTitle}"
+            @select="${this.handleLangSelect}"
           >
-            <span class="lang-label">${this.currentLang.toUpperCase()}</span>
-          </button>
+          </app-split-button>
 
           <button
             class="icon-action-btn"

@@ -1516,7 +1516,6 @@ export const en = {
       materialIcons: 'Palette of every Material Symbols ligature with search by name, category and tags; <app-material-icon> snippet with copy to clipboard',
     },
     header: {
-      langToggleTitle: 'Change language (RU / EN)',
       langNames: {
         ru: 'Русский',
         en: 'English',

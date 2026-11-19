@@ -1516,7 +1516,6 @@ export const ru = {
       materialIcons: 'Палитра всех лигатур Material Symbols с поиском по имени, категории и тегам; сниппет <app-material-icon> с копированием в буфер',
     },
     header: {
-      langToggleTitle: 'Сменить язык (RU / EN)',
       langNames: {
         ru: 'Русский',
         en: 'English',
