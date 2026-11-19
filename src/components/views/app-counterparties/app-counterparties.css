@@ -44,8 +44,8 @@ app-cards-table {
   --card-hover-border: var(--accent-border, rgba(99, 102, 241, 0.35));
   --card-hover-transform: translateY(-1px);
   --card-hover-shadow: var(--shadow-sm), var(--surface-glow, none);
-  --card-footer-gap: 0.75rem;
-  --card-footer-padding-top: 0.65rem;
+  --cards-footer-gap: 0.75rem;
+  --cards-footer-padding-top: 0.65rem;
 }
 
 /* card name-links are app-link web components at size md restoring the inherited text-primary
