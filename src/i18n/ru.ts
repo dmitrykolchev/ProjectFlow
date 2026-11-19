@@ -678,6 +678,7 @@ export const ru = {
       roleLine: (role: string) => `Должность: ${role}`,
       addedTitle: 'Сотрудник добавлен',
       profileUpdated: 'Обновлён профиль сотрудника',
+      presenceUpdated: 'Изменён статус присутствия',
       updatedTitle: 'Сотрудник обновлён',
       deletedActivity: 'Сотрудник удалён',
       deletedMessage: (name: string) => `Сотрудник "${name}" удалён`,
@@ -1517,6 +1518,8 @@ export const ru = {
       themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Сменить язык (RU / EN)',
       profileOpenTitle: 'Открыть настройки профиля',
+      presenceHeader: 'Статус присутствия',
+      profileMenuItem: 'Профиль',
       logoutTitle: 'Выйти из системы',
     },
     storybook: {

@@ -678,6 +678,7 @@ export const en = {
       roleLine: (role: string) => `Role: ${role}`,
       addedTitle: 'Employee added',
       profileUpdated: 'Employee profile updated',
+      presenceUpdated: 'Presence status changed',
       updatedTitle: 'Employee updated',
       deletedActivity: 'Employee deleted',
       deletedMessage: (name: string) => `Employee "${name}" deleted`,
@@ -1517,6 +1518,8 @@ export const en = {
       themeToggleTitle: 'Switch theme (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Change language (RU / EN)',
       profileOpenTitle: 'Open profile settings',
+      presenceHeader: 'Presence status',
+      profileMenuItem: 'Profile',
       logoutTitle: 'Sign out',
     },
     storybook: {
