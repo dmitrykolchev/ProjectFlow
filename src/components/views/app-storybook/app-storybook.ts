@@ -90,6 +90,7 @@ import directoryRecordModalMeta from '../../common/app-directory-record-modal/ap
 import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.story';
 import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
+import dataTableMeta from '../../common/app-data-table/app-data-table.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -220,6 +221,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   directoryRecordModalMeta,
   entityRemindersMeta,
   tableScrollMeta,
+  dataTableMeta,
   toastMeta,
   activityMeta,
   headerMeta,

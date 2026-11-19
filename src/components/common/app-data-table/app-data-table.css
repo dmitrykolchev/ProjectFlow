@@ -1,0 +1,178 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The body is the only scrollable shell: with max-height set on the host it flexes
+   to the remaining space and gets its own scrollbar, while the header (sticky thead)
+   and the footer stay fixed. Without max-height the host is auto-sized and the body
+   stretches to display every rendered row. */
+.table-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.table-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, #0f172a);
+}
+
+.table-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #334155);
+  border-radius: 4px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--bg-surface, #111827);
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  padding: 0.62rem 0.75rem;
+  text-align: left;
+  font-size: 0.71rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.data-table thead th.align-right,
+.data-table tbody td.align-right {
+  text-align: right;
+}
+
+.data-table thead th.align-center,
+.data-table tbody td.align-center {
+  text-align: center;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sort-btn:hover {
+  color: var(--text-primary, #f8fafc);
+}
+
+.sort-btn.is-sorted {
+  color: var(--accent-primary, #6366f1);
+}
+
+.data-table tbody tr {
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  transition: background 0.12s ease;
+}
+
+.data-table tbody tr:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.03));
+}
+
+.data-table tbody td {
+  padding: 0.55rem 0.75rem;
+  vertical-align: middle;
+  color: var(--text-primary, #f8fafc);
+}
+
+.cell-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-code {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-weight: 600;
+  color: var(--accent-primary, #6366f1);
+  white-space: nowrap;
+}
+
+.bool-yes {
+  color: var(--color-success, #22c55e);
+  font-weight: 600;
+  font-size: 0.76rem;
+}
+
+.bool-no {
+  color: var(--text-muted, #64748b);
+  font-size: 0.76rem;
+}
+
+/* Row action buttons rendered through column cellRender live in this shadow tree. */
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.icon-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.icon-action-btn:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--border-subtle, #1e293b);
+  color: var(--text-primary, #f8fafc);
+}
+
+.icon-action-btn.is-danger:hover {
+  color: var(--color-danger, #ef4444);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.empty-wrap {
+  padding: 2rem;
+}
+
+/* The footer shell is outside the scroll area, so it never scrolls away. It hosts
+   app-pagination only when there is more than one page. */
+.table-footer {
+  padding: 0.7rem 1rem;
+  background: var(--bg-surface, #111827);
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
+.table-footer app-pagination {
+  width: 100%;
+}
