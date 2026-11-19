@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-analytics.css';
@@ -164,7 +164,7 @@ export class AppAnalytics extends LitElement {
                     <app-persona
                       size="32"
                       .initials="${user.avatar}"
-                      .presence="${presenceFromStatus(user.status)}"
+                      .presence="${effectivePresence(user)}"
                       .primaryText="${user.name}"
                       @click="${() => store.openEmployeeDetail(user.id)}"
                     ></app-persona>

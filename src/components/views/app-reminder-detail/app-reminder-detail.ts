@@ -7,7 +7,7 @@ import {
   recurrenceToRRule,
   serializeRRule,
 } from '../../../domain/rfc5545';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   Reminder,
   ReminderEntityType,
@@ -496,7 +496,7 @@ export class AppReminderDetail extends LitElement {
                 <app-persona
                   size="24"
                   .initials="${owner.avatar}"
-                  .presence="${presenceFromStatus(owner.status)}"
+                  .presence="${effectivePresence(owner)}"
                   .primaryText="${owner.name}"
                   .secondaryText="${owner.role}"
                   @click="${() => store.openEmployeeDetail(owner.id)}"
@@ -515,7 +515,7 @@ export class AppReminderDetail extends LitElement {
                     <app-persona
                       size="24"
                       .initials="${u.avatar}"
-                      .presence="${presenceFromStatus(u.status)}"
+                      .presence="${effectivePresence(u)}"
                       .primaryText="${u.name}"
                       .secondaryText="${u.role}"
                       @click="${() => store.openEmployeeDetail(u.id)}"

@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   Calculation,
   TimeEntry,
@@ -315,7 +315,7 @@ export class AppTimeEntryDetail extends LitElement {
                 <app-persona
                   size="24"
                   .initials="${user.avatar}"
-                  .presence="${presenceFromStatus(user.status)}"
+                  .presence="${effectivePresence(user)}"
                   .primaryText="${user.name}"
                   .secondaryText="${user.role}"
                   @click="${() => store.openEmployeeDetail(user.id)}"

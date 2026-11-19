@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   downloadDocumentFile,
   formatFileSize,
@@ -475,7 +475,7 @@ export class AppDocuments extends LitElement {
                     ? html`<app-persona
                         size="24"
                         .initials="${uploader.avatar}"
-                        .presence="${presenceFromStatus(uploader.status)}"
+                        .presence="${effectivePresence(uploader)}"
                         @click="${() => store.openEmployeeDetail(uploader.id)}"
                       ></app-persona>`
                     : ''}

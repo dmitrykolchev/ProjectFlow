@@ -3,7 +3,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import '../../common/app-persona/app-persona';
 import styles from './app-data-grid.css';
 import {
@@ -1334,7 +1334,7 @@ export class AppDataGrid extends LitElement {
             <app-persona
               size="24"
               .initials="${assignee ? assignee.avatar : '?'}"
-              .presence="${assignee ? presenceFromStatus(assignee.status) : 'none'}"
+              .presence="${assignee ? effectivePresence(assignee) : 'none'}"
               .ariaLabel="${assignee ? assignee.name : ''}"
               .interactive="${false}"
             ></app-persona>

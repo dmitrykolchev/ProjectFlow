@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import { User } from '../../../types';
 import {
   iconChevronLeft,
@@ -200,7 +200,7 @@ export class AppEmployeeDetail extends LitElement {
                 <app-persona
                   size="72"
                   .initials="${emp.avatar}"
-                  .presence="${presenceFromStatus(emp.status)}"
+                  .presence="${effectivePresence(emp)}"
                   .interactive="${false}"
                 ></app-persona>
                 <app-entity-emblem class="avatar-entity-badge" entity="employee" size="sm"></app-entity-emblem>

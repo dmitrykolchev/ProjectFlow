@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   Project,
   ProjectChatChannel,
@@ -1078,7 +1078,7 @@ export class AppProjectChat extends LitElement {
                               class="member-persona"
                               size="32"
                               .initials="${entry.user.avatar}"
-                              .presence="${presenceFromStatus(entry.user.status)}"
+                              .presence="${effectivePresence(entry.user)}"
                               .primaryText="${entry.user.name}"
                               .secondaryText="${rolesText}"
                               @click="${() => store.openEmployeeDetail(entry.user.id)}"
@@ -1273,7 +1273,7 @@ export class AppProjectChat extends LitElement {
           class="msg-author"
           size="40"
           .initials="${sender?.avatar || '?'}"
-          .presence="${presenceFromStatus(sender?.status)}"
+          .presence="${sender ? effectivePresence(sender) : 'none'}"
           .primaryText="${sender?.name || msg.senderId}"
           .secondaryText="${roleLabel || ''}"
           @click="${() => sender && store.openEmployeeDetail(sender.id)}"

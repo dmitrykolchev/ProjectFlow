@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import { formatMoney } from '../../common/app-money/app-money';
 import {
   downloadDocumentFile,
@@ -348,7 +348,7 @@ export class AppCompanyDetail extends LitElement {
                       <app-persona
                         size="32"
                         .initials="${director.avatar}"
-                        .presence="${presenceFromStatus(director.status)}"
+                        .presence="${effectivePresence(director)}"
                         .primaryText="${director.name}"
                         .secondaryText="${director.role}"
                         @click="${() => store.openEmployeeDetail(director.id)}"
@@ -592,7 +592,7 @@ export class AppCompanyDetail extends LitElement {
                         class="row-persona"
                         size="32"
                         .initials="${emp.avatar}"
-                        .presence="${presenceFromStatus(emp.status)}"
+                        .presence="${effectivePresence(emp)}"
                         .primaryText="${emp.name}"
                         .secondaryText="${[emp.role, emp.department].filter(Boolean).join(' · ')}"
                       ></app-persona>
@@ -807,7 +807,7 @@ export class AppCompanyDetail extends LitElement {
                           <app-persona
                             size="32"
                             .initials="${emp.avatar}"
-                            .presence="${presenceFromStatus(emp.status)}"
+                            .presence="${effectivePresence(emp)}"
                             .primaryText="${emp.name}"
                             .secondaryText="${emp.role}"
                             @click="${() => store.openEmployeeDetail(emp.id)}"

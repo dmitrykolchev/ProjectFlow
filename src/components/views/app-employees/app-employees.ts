@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import { iconChevronRight, iconEdit, iconPlus, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-filter-bar/app-filter-bar';
@@ -227,7 +227,7 @@ export class AppEmployees extends LitElement {
                 <app-persona
                   size="48"
                   .initials="${emp.avatar}"
-                  .presence="${presenceFromStatus(emp.status)}"
+                  .presence="${effectivePresence(emp)}"
                   .primaryText="${emp.name}"
                   .secondaryText="${emp.role}"
                   @click="${() => store.openEmployeeDetail(emp.id)}"
@@ -347,7 +347,7 @@ export class AppEmployees extends LitElement {
                     <app-persona
                       size="32"
                       .initials="${emp.avatar}"
-                      .presence="${presenceFromStatus(emp.status)}"
+                      .presence="${effectivePresence(emp)}"
                       .primaryText="${emp.name}"
                       .secondaryText="${emp.role}"
                       @click="${() => store.openEmployeeDetail(emp.id)}"
