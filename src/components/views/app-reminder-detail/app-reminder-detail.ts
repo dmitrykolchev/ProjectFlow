@@ -7,6 +7,7 @@ import {
   recurrenceToRRule,
   serializeRRule,
 } from '../../../domain/rfc5545';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import {
   Reminder,
   ReminderEntityType,
@@ -35,8 +36,8 @@ import {
   iconRepeat,
   iconTrash,
 } from '../../common/icons';
-import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
+import '../../common/app-persona/app-persona';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-dropdown-button/app-dropdown-button';
@@ -499,8 +500,13 @@ export class AppReminderDetail extends LitElement {
                   variant="primary"
                   @click="${() => store.openEmployeeDetail(owner.id)}"
                 >
-                  <span slot="start"><app-avatar name="${owner.name}" size="xs"></app-avatar></span>
-                  <span>${owner.name}</span>
+                  <app-persona
+                    size="24"
+                    presence-text
+                    .initials="${owner.avatar}"
+                    .presence="${presenceFromStatus(owner.status)}"
+                    .primaryText="${owner.name}"
+                  ></app-persona>
                 </app-link>
               `
             : html`<span class="meta-val">—</span>`}
@@ -518,8 +524,13 @@ export class AppReminderDetail extends LitElement {
                       class="user-pill-btn"
                       @click="${() => store.openEmployeeDetail(u.id)}"
                     >
-                      <app-avatar name="${u.name}" size="xs"></app-avatar>
-                      <span>${u.name}</span>
+                      <app-persona
+                        size="24"
+                        presence-text
+                        .initials="${u.avatar}"
+                        .presence="${presenceFromStatus(u.status)}"
+                        .primaryText="${u.name}"
+                      ></app-persona>
                     </button>
                   `
                 )}

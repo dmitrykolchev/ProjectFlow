@@ -1,3 +1,5 @@
+import type { EmployeeStatus } from '../types';
+
 /** Visual + textual representation of a person's presence (Fluent-style persona badge). */
 export type PersonaPresence =
   | 'none'
@@ -31,6 +33,22 @@ export const PRESENCE_TOKENS: Record<PersonaPresence, PresenceToken | null> = {
   blocked: { color: 'var(--color-danger, #ef4444)', glyph: 'slash', i18nKey: 'blocked' },
   offline: { color: 'var(--text-muted, #94a3b8)', glyph: 'ring', i18nKey: 'offline' },
 };
+
+/** Employee status -> presence badge (Fluent mapping: OOO is away, onboarding is busy). */
+export function presenceFromStatus(status?: EmployeeStatus): PersonaPresence {
+  switch (status) {
+    case 'active':
+      return 'available';
+    case 'remote':
+      return 'online';
+    case 'vacation':
+      return 'away';
+    case 'onboarding':
+      return 'busy';
+    default:
+      return 'none';
+  }
+}
 
 /** Resolve the presence label in the given language ('' when no badge). */
 export function presenceLabel(
