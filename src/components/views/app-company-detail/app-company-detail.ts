@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import { formatMoney } from '../../common/app-money/app-money';
 import {
   downloadDocumentFile,
@@ -52,7 +53,7 @@ import {
   formatAiError,
   generateDocumentSummaryAndTags,
 } from '../../../services/openai-client';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
@@ -341,20 +342,22 @@ export class AppCompanyDetail extends LitElement {
 
             ${director
               ? html`
-                  <button
-                    type="button"
-                    class="director-pill"
-                    @click="${() => store.openEmployeeDetail(director.id)}"
-                  >
-                    <app-avatar size="sm" initials="${director.avatar}" title="${director.name}"></app-avatar>
+                  <div class="director-pill">
                     <div class="director-meta">
                       <span class="director-label">${t.viewTexts.companies.metaDirector}</span>
-                      <span class="director-name">${director.name}</span>
+                      <app-persona
+                        size="32"
+                        .initials="${director.avatar}"
+                        .presence="${presenceFromStatus(director.status)}"
+                        .primaryText="${director.name}"
+                        .secondaryText="${director.role}"
+                        @click="${() => store.openEmployeeDetail(director.id)}"
+                      ></app-persona>
                     </div>
-                  </button>
+                  </div>
                 `
               : html`
-                  <div class="director-pill is-static">
+                  <div class="director-pill">
                     <div class="director-meta">
                       <span class="director-label">${t.viewTexts.companies.metaDirector}</span>
                       <span class="director-name">${t.companyDetail.unassignedDirector}</span>
@@ -585,18 +588,14 @@ export class AppCompanyDetail extends LitElement {
                 <div class="rows-list">
                   ${companyEmployees.map((emp) => html`
                     <div class="list-row clickable" @click="${() => store.openEmployeeDetail(emp.id)}">
-                      <div class="row-main">
-                        <div class="emp-cell">
-                          <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
-                          <div class="emp-info">
-                            <div class="row-title">${emp.name}</div>
-                            <div class="row-sub">
-                              <span>${emp.role}</span>
-                              ${emp.department ? html`<span>· ${emp.department}</span>` : ''}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+                      <app-persona
+                        class="row-persona"
+                        size="32"
+                        .initials="${emp.avatar}"
+                        .presence="${presenceFromStatus(emp.status)}"
+                        .primaryText="${emp.name}"
+                        .secondaryText="${[emp.role, emp.department].filter(Boolean).join(' · ')}"
+                      ></app-persona>
                       <div class="row-right">
                         <app-status-chip domain="employee" status="${emp.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
                         ${iconChevronRight(15)}
@@ -805,20 +804,14 @@ export class AppCompanyDetail extends LitElement {
                     ${companyEmployees.map((emp) => html`
                       <tr>
                         <td>
-                          <div class="emp-cell">
-                            <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}"></app-avatar>
-                            <div class="emp-info">
-                              <app-link
-                                class="link-btn"
-                                size="md"
-                                variant="primary"
-                                @click="${() => store.openEmployeeDetail(emp.id)}"
-                              >
-                                <span class="link-wrap"><span class="link-inner">${emp.name}</span></span>
-                              </app-link>
-                              <span class="emp-role">${emp.role}</span>
-                            </div>
-                          </div>
+                          <app-persona
+                            size="32"
+                            .initials="${emp.avatar}"
+                            .presence="${presenceFromStatus(emp.status)}"
+                            .primaryText="${emp.name}"
+                            .secondaryText="${emp.role}"
+                            @click="${() => store.openEmployeeDetail(emp.id)}"
+                          ></app-persona>
                         </td>
                         <td>${emp.department || '—'}</td>
                         <td class="mono">${emp.email || '—'}</td>

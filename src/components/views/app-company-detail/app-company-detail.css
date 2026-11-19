@@ -156,6 +156,9 @@
   text-decoration: underline;
 }
 
+/* The director pill is a static frame; the app-persona inside it is a ghost button
+   and carries the click to the employee detail, so its hover/focus feedback comes
+   from the persona itself. */
 .director-pill {
   display: inline-flex;
   align-items: center;
@@ -164,25 +167,6 @@
   border-radius: var(--radius-md, 8px);
   background: var(--bg-subtle, #1a2438);
   border: 1px solid var(--border-subtle, #1e293b);
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  transition: border-color 150ms ease, background-color 150ms ease;
-}
-
-.director-pill:hover {
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.4));
-  background: var(--bg-hover, rgba(255, 255, 255, 0.04));
-}
-
-.director-pill.is-static {
-  cursor: default;
-}
-
-.director-pill.is-static:hover {
-  border-color: var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
 }
 
 .director-meta {
@@ -433,17 +417,12 @@
   background: var(--bg-hover, rgba(255, 255, 255, 0.03));
 }
 
-.emp-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-}
-
-.emp-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+/* The employee persona fills the left of the row; the row keeps its click handler
+   and the persona is a ghost button inside it. */
+.row-persona {
+  flex: 1;
   min-width: 0;
+  --persona-button-width: 100%;
 }
 
 .emp-role {
