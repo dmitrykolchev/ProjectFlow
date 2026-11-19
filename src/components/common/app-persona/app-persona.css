@@ -15,6 +15,10 @@
   gap: var(--persona-gap, 12px);
   min-width: 0;
   max-width: var(--persona-text-max, 220px);
+  /* Lines are left-aligned inside the text column. Consumers that center their
+     content (app-link, pill buttons) pass `text-align: center` down the shadow
+     boundary, which would center the name and status lines. */
+  text-align: left;
 }
 
 .avatar-wrap {
@@ -107,6 +111,8 @@
   --persona-gap: 6px;
   --persona-primary-size: 12px;
   --persona-primary-line: 16px;
+  --persona-secondary-size: 10px;
+  --persona-secondary-line: 14px;
   --persona-text-max: 200px;
 }
 
@@ -120,6 +126,8 @@
   --persona-gap: 8px;
   --persona-primary-size: 12px;
   --persona-primary-line: 16px;
+  --persona-secondary-size: 10px;
+  --persona-secondary-line: 14px;
   --persona-text-max: 200px;
 }
 
