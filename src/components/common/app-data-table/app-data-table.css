@@ -789,6 +789,61 @@
   color: var(--text-secondary, #94a3b8);
 }
 
+/* Payments page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the payments contract-desc variant (220px ellipsis line, margin-top
+   0.12rem — narrower than the contracts 320px and the calculations 240px), the block
+   pay-cell-sub muted line (no flex, margin-top 0.18rem), the req-sub requisites line
+   (mono 0.72rem muted with the landmark glyph gap 0.28rem, 240px ellipsis), the signed
+   amount colors incoming / outgoing on the shared amount-cell, and the payments
+   inv-pay-cell variant (min-width 155px — the bar/fill/meta stay shared). The link-btn,
+   text-link-btn, mono, due-tag variants, inv-pay bar classes and ctr-actions-row are
+   reused from the existing sets. */
+.pay-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.12rem;
+}
+
+.pay-cell-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.18rem;
+}
+
+.req-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount-cell.incoming {
+  color: #10b981;
+}
+
+.amount-cell.outgoing {
+  color: #f59e0b;
+}
+
+.pay-inv-pay-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-width: 155px;
+}
+
 /* Contracts page reference rich cells (shared by the four tab tables): the mono number
    links (app-link through the additive hooks, plus the div-as-button chip consumer), the
    title/description lines, the amount and dates cells, the billing sub-line with the
