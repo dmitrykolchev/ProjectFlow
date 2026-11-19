@@ -13,10 +13,10 @@ export const meta: ComponentStoryMeta = {
     image: 'Photo URL; falls back to initials when empty',
     initials: 'Initials; derived from primaryText when not set',
     primaryText: 'Name or identification',
-    secondaryText: 'Job title / status line (sizes 40+)',
+    secondaryText: 'Job title / status line under the name (when presence-text is off)',
     tertiaryText: 'Extra line, e.g. "In a meeting" (sizes 56+)',
     presence: 'Presence badge status (none/online/available/away/busy/dnd/blocked/offline)',
-    presenceText: 'Text alternative next to the name — recommended for sizes ≤ 32',
+    presenceText: 'Show the presence label as the secondary line under the name — recommended for sizes ≤ 32',
     showOverflowTooltip: 'Native tooltip with the full text on truncated lines (default true)',
     color: 'Background of the initials tile',
     ariaLabel: 'Accessible name override',
@@ -57,7 +57,7 @@ export const meta: ComponentStoryMeta = {
     {
       name: 'Small Personas With Text Alternative',
       description:
-        'At sizes 24 and 32 the badge is colour-only, so presence-text adds the accessible text next to the name',
+        'At sizes 24 and 32 the badge is a colour-only dot, so presence-text puts the status under the name',
       render: () => html`
         <div style="display: flex; flex-direction: column; gap: 1rem;">
           <app-persona size="24" initials="AL" presence="available" presence-text .primaryText="${'Annie Lindqvist'}"></app-persona>

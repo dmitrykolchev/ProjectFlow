@@ -46,13 +46,17 @@
   object-fit: cover;
 }
 
-/* Presence badge: a filled circle with a white glyph, ringed by the surface colour. */
+/* Presence badge: a filled circle with a white glyph, ringed by the surface colour.
+   The badge sits in the bottom-right corner of the square circumscribed around the
+   avatar circle, so its offset is (avatar - badge) at every size and it is always
+   tangent to the avatar edge — no size looks crooked. Sizes <= 32 render a
+   colour-only dot with no glyph (the text alternative carries the meaning). */
 .presence {
   position: absolute;
-  left: var(--persona-badge-x, 24px);
-  top: var(--persona-badge-y, 24px);
-  width: var(--persona-badge, 24px);
-  height: var(--persona-badge, 24px);
+  left: var(--persona-badge-x, 28px);
+  top: var(--persona-badge-y, 28px);
+  width: var(--persona-badge, 20px);
+  height: var(--persona-badge, 20px);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -96,9 +100,10 @@
 .size-24 {
   --persona-avatar: 24px;
   --persona-initials-size: 10px;
-  --persona-badge: 12px;
-  --persona-badge-x: 11px;
-  --persona-badge-y: 19px;
+  --persona-badge: 8px;
+  --persona-badge-x: 16px;
+  --persona-badge-y: 16px;
+  --persona-badge-ring: 1px;
   --persona-gap: 6px;
   --persona-primary-size: 12px;
   --persona-primary-line: 16px;
@@ -108,9 +113,10 @@
 .size-32 {
   --persona-avatar: 32px;
   --persona-initials-size: 13px;
-  --persona-badge: 16px;
-  --persona-badge-x: 19px;
-  --persona-badge-y: 22px;
+  --persona-badge: 12px;
+  --persona-badge-x: 20px;
+  --persona-badge-y: 20px;
+  --persona-badge-ring: 1px;
   --persona-gap: 8px;
   --persona-primary-size: 12px;
   --persona-primary-line: 16px;
@@ -120,9 +126,10 @@
 .size-40 {
   --persona-avatar: 40px;
   --persona-initials-size: 16px;
-  --persona-badge: 20px;
-  --persona-badge-x: 21px;
-  --persona-badge-y: 21px;
+  --persona-badge: 16px;
+  --persona-badge-x: 24px;
+  --persona-badge-y: 24px;
+  --persona-badge-ring: 2px;
   --persona-gap: 10px;
   --persona-primary-size: 12px;
   --persona-primary-line: 16px;
@@ -134,9 +141,10 @@
 .size-48 {
   --persona-avatar: 48px;
   --persona-initials-size: 19px;
-  --persona-badge: 24px;
-  --persona-badge-x: 24px;
-  --persona-badge-y: 24px;
+  --persona-badge: 20px;
+  --persona-badge-x: 28px;
+  --persona-badge-y: 28px;
+  --persona-badge-ring: 2px;
   --persona-gap: 12px;
   --persona-primary-size: 14px;
   --persona-primary-line: 20px;
@@ -148,9 +156,10 @@
 .size-56 {
   --persona-avatar: 56px;
   --persona-initials-size: 22px;
-  --persona-badge: 28px;
-  --persona-badge-x: 36px;
-  --persona-badge-y: 36px;
+  --persona-badge: 24px;
+  --persona-badge-x: 32px;
+  --persona-badge-y: 32px;
+  --persona-badge-ring: 2px;
   --persona-gap: 12px;
   --persona-primary-size: 24px;
   --persona-primary-line: 30px;
@@ -163,8 +172,9 @@
   --persona-avatar: 72px;
   --persona-initials-size: 28px;
   --persona-badge: 32px;
-  --persona-badge-x: 50px;
-  --persona-badge-y: 50px;
+  --persona-badge-x: 40px;
+  --persona-badge-y: 40px;
+  --persona-badge-ring: 2px;
   --persona-gap: 16px;
   --persona-primary-size: 28px;
   --persona-primary-line: 34px;
@@ -177,8 +187,9 @@
   --persona-avatar: 100px;
   --persona-initials-size: 38px;
   --persona-badge: 40px;
-  --persona-badge-x: 74px;
-  --persona-badge-y: 74px;
+  --persona-badge-x: 60px;
+  --persona-badge-y: 60px;
+  --persona-badge-ring: 2px;
   --persona-gap: 20px;
   --persona-primary-size: 30px;
   --persona-primary-line: 36px;
