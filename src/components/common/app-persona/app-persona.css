@@ -22,8 +22,12 @@
 }
 
 /* Ghost-button behaviour (the default): transparent fill, hover fill, focus ring,
-   active press, disabled dim — the canonical app-button ghost recipe. */
+   active press, disabled dim — the canonical app-button ghost recipe.
+   --persona-button-width lets a consumer stretch the control to its column
+   (the size presets define --persona-text-max on the inner element, so a host-level
+   text-width hook is overridden by them; this hook is read on the button itself). */
 button.persona {
+  width: var(--persona-button-width, auto);
   padding: var(--persona-padding, 4px 8px);
   border: 1px solid transparent;
   border-radius: var(--radius-md, 8px);
