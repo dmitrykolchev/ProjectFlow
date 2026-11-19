@@ -633,7 +633,7 @@ export class AppStore {
               id: `ch-${proj.id}-general`,
               projectId: proj.id,
               slug: 'general',
-              name: this.customization.language === 'en' ? 'General' : 'Общий',
+              name: this.texts().generalChannel,
               description: proj.description || undefined,
               isDefault: true,
               createdById: proj.members?.[0]?.userId || this.users[0]?.id || 'user-1',
@@ -853,7 +853,7 @@ export class AppStore {
             targetType: 'task',
             targetId: 'CORE-102',
             targetTitle: 'Оптимизация бандла Web-компонентов Lit',
-            details: 'Переведено в статус Review',
+            details: this.texts().tasks.seedMovedTo('Review'),
           },
           {
             id: 'log-2',
@@ -864,7 +864,7 @@ export class AppStore {
             targetType: 'task',
             targetId: 'CORE-101',
             targetTitle: 'Архитектура распределенного кэширования L2',
-            details: 'Создана задача с приоритетом Urgent',
+            details: this.texts().tasks.seedCreatedWithPriority('Urgent'),
           },
         ];
       }
@@ -1295,17 +1295,17 @@ export class AppStore {
     this.saveCustomization();
     const themeLabel =
       theme === 'high-contrast'
-        ? 'тему высокой контрастности'
+        ? this.texts().settings.themeLabels.highContrast
         : theme === 'barbie'
-        ? 'тему Барби'
+        ? this.texts().settings.themeLabels.barbie
         : theme === 'matrix'
-        ? 'тему Матрица'
+        ? this.texts().settings.themeLabels.matrix
         : theme === 'cyberpunk'
-        ? 'тему Киберпанк'
+        ? this.texts().settings.themeLabels.cyberpunk
         : theme === 'dark'
-        ? 'тёмную тему'
-        : 'светлую тему';
-    this.logActivity('update', 'settings', 'Тема интерфейса', `Переключено на ${themeLabel}`);
+        ? this.texts().settings.themeLabels.dark
+        : this.texts().settings.themeLabels.light;
+    this.logActivity('update', 'settings', this.texts().settings.targetTheme, this.texts().settings.themeSwitched(themeLabel));
     this.notify();
   }
 
@@ -1344,7 +1344,7 @@ export class AppStore {
     };
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.logActivity('update', 'settings', 'Цвета темы', `Применена базовая палитра для темы ${theme}`);
+    this.logActivity('update', 'settings', this.texts().settings.themeColors, this.texts().settings.paletteApplied(theme));
     this.notify();
   }
 
@@ -1357,7 +1357,7 @@ export class AppStore {
     }
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.logActivity('update', 'settings', 'Цвета темы', `Сброшены базовые цвета для темы ${theme}`);
+    this.logActivity('update', 'settings', this.texts().settings.themeColors, this.texts().settings.paletteReset(theme));
     this.notify();
   }
 
@@ -1379,7 +1379,7 @@ export class AppStore {
     }
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.logActivity('update', 'settings', 'Фон интерфейса', `Установлен фон: ${preset}`);
+    this.logActivity('update', 'settings', this.texts().settings.targetBackground, this.texts().settings.backgroundSet(preset));
     this.notify();
   }
 
@@ -1409,7 +1409,7 @@ export class AppStore {
     this.customization.language = lang;
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.logActivity('update', 'settings', 'Язык интерфейса', `Установлен язык: ${lang.toUpperCase()}`);
+    this.logActivity('update', 'settings', this.texts().settings.targetLanguage, this.texts().settings.languageSet(lang.toUpperCase()));
     this.notify();
   }
 
@@ -1971,7 +1971,7 @@ export class AppStore {
     this.customization = { ...defaultCustomization };
     this.applyThemeAndCustomization();
     this.saveCustomization();
-    this.addNotification('info', 'Настройки', 'Сброшены параметры интерфейса');
+    this.addNotification('info', this.texts().settings.title, this.texts().settings.resetMessage);
     this.notify();
   }
 
@@ -1995,8 +1995,8 @@ export class AppStore {
     if (newTask.knowledgeArticleIds?.length) {
       this.syncKnowledgeLinkedTasks(newTask.id, newTask.knowledgeArticleIds);
     }
-    this.logActivity('create', 'task', newTask.title, `Создана в проекте ${project?.name || ''}`, newTask.id);
-    this.addNotification('success', 'Успешно', `Задача "${newTask.title}" создана`);
+    this.logActivity('create', 'task', newTask.title, this.texts().tasks.createdInProject(project?.name || ''), newTask.id);
+    this.addNotification('success', this.texts().titleSuccess, this.texts().tasks.taskCreatedMessage(newTask.title));
     this.notify();
     return newTask;
   }
@@ -2010,14 +2010,14 @@ export class AppStore {
     }
 
     if (old && old.status !== updated.status) {
-      this.logActivity('status_change', 'task', updated.title, `Статус изменен с ${old.status} на ${updated.status}`, updated.id);
+      this.logActivity('status_change', 'task', updated.title, this.texts().tasks.statusFromTo(old.status, updated.status), updated.id);
     } else if (old && old.priority !== updated.priority) {
-      this.logActivity('priority_change', 'task', updated.title, `Приоритет изменен с ${old.priority} на ${updated.priority}`, updated.id);
+      this.logActivity('priority_change', 'task', updated.title, this.texts().tasks.priorityFromTo(old.priority, updated.priority), updated.id);
     } else {
-      this.logActivity('update', 'task', updated.title, 'Обновлены данные задачи', updated.id);
+      this.logActivity('update', 'task', updated.title, this.texts().tasks.dataUpdated, updated.id);
     }
 
-    this.addNotification('info', 'Обновлено', `Задача "${updated.title}" сохранена`);
+    this.addNotification('info', this.texts().titleUpdated, this.texts().tasks.taskSavedMessage(updated.title));
     this.notify();
   }
 
@@ -2027,8 +2027,8 @@ export class AppStore {
 
     this.tasks = this.tasks.filter((t) => t.id !== taskId);
     this.saveTasks();
-    this.logActivity('delete', 'task', task.title, 'Удалена пользователем', task.id);
-    this.addNotification('warning', 'Удалено', `Задача "${task.title}" удалена`);
+    this.logActivity('delete', 'task', task.title, this.texts().tasks.deletedByUser, task.id);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().tasks.taskDeletedMessage(task.title));
     this.notify();
   }
 
@@ -2041,23 +2041,23 @@ export class AppStore {
     task.updatedAt = new Date().toISOString();
     this.saveTasks();
 
-    this.logActivity('status_change', 'task', task.title, `Перемещено: ${oldStatus} → ${newStatus}`, task.id);
+    this.logActivity('status_change', 'task', task.title, this.texts().tasks.movedTo(oldStatus, newStatus), task.id);
     this.notify();
   }
 
   public bulkUpdateStatus(taskIds: string[], newStatus: TaskStatus): void {
     this.tasks = this.tasks.map((t) => (taskIds.includes(t.id) ? { ...t, status: newStatus, updatedAt: new Date().toISOString() } : t));
     this.saveTasks();
-    this.logActivity('status_change', 'task', `${taskIds.length} задач`, `Массовый перенос в статус ${newStatus}`);
-    this.addNotification('success', 'Успешно', `Обновлен статус для ${taskIds.length} задач`);
+    this.logActivity('status_change', 'task', this.texts().tasks.tasksCount(taskIds.length), this.texts().tasks.bulkMovedTo(newStatus));
+    this.addNotification('success', this.texts().titleSuccess, this.texts().tasks.bulkStatusMessage(taskIds.length));
     this.notify();
   }
 
   public bulkDeleteTasks(taskIds: string[]): void {
     this.tasks = this.tasks.filter((t) => !taskIds.includes(t.id));
     this.saveTasks();
-    this.logActivity('delete', 'task', `${taskIds.length} задач`, 'Массовое удаление задач');
-    this.addNotification('warning', 'Удалено', `Удалено ${taskIds.length} задач`);
+    this.logActivity('delete', 'task', this.texts().tasks.tasksCount(taskIds.length), this.texts().tasks.bulkDeleteActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().tasks.bulkDeletedMessage(taskIds.length));
     this.notify();
   }
 
@@ -2123,8 +2123,8 @@ export class AppStore {
     };
     this.companies = [company, ...this.companies];
     this.saveCompanies();
-    this.logActivity('create', 'company', company.name, 'Добавлена компания');
-    this.addNotification('success', 'Компания добавлена', company.name);
+    this.logActivity('create', 'company', company.name, this.texts().companies.addedActivity);
+    this.addNotification('success', this.texts().companies.addedTitle, company.name);
     this.notify();
     return company;
   }
@@ -2132,8 +2132,8 @@ export class AppStore {
   public updateCompany(updated: Company): void {
     this.companies = this.companies.map((c) => (c.id === updated.id ? { ...updated } : c));
     this.saveCompanies();
-    this.logActivity('update', 'company', updated.name, 'Обновлены реквизиты компании');
-    this.addNotification('info', 'Компания обновлена', updated.name);
+    this.logActivity('update', 'company', updated.name, this.texts().companies.requisitesUpdated);
+    this.addNotification('info', this.texts().companies.updatedTitle, updated.name);
     this.notify();
   }
 
@@ -2149,8 +2149,8 @@ export class AppStore {
       }
     }
     this.saveCompanies();
-    this.logActivity('delete', 'company', target.name, 'Компания удалена');
-    this.addNotification('warning', 'Удалено', `Компания "${target.name}" удалена`);
+    this.logActivity('delete', 'company', target.name, this.texts().companies.deletedActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().companies.deletedMessage(target.name));
     this.notify();
   }
 
@@ -2169,8 +2169,8 @@ export class AppStore {
     };
     this.users = [employee, ...this.users];
     this.saveEmployees();
-    this.logActivity('create', 'employee', employee.name, `Должность: ${employee.role}`);
-    this.addNotification('success', 'Сотрудник добавлен', employee.name);
+    this.logActivity('create', 'employee', employee.name, this.texts().employees.roleLine(employee.role));
+    this.addNotification('success', this.texts().employees.addedTitle, employee.name);
     this.notify();
     return employee;
   }
@@ -2186,8 +2186,8 @@ export class AppStore {
       u.id === updated.id ? { ...updated, avatar: updated.avatar || initials } : u
     );
     this.saveEmployees();
-    this.logActivity('update', 'employee', updated.name, 'Обновлён профиль сотрудника');
-    this.addNotification('info', 'Сотрудник обновлён', updated.name);
+    this.logActivity('update', 'employee', updated.name, this.texts().employees.profileUpdated);
+    this.addNotification('info', this.texts().employees.updatedTitle, updated.name);
     this.notify();
   }
 
@@ -2211,8 +2211,8 @@ export class AppStore {
     }
     this.saveEmployees();
     this.saveProjects();
-    this.logActivity('delete', 'employee', target.name, 'Сотрудник удалён');
-    this.addNotification('warning', 'Удалено', `Сотрудник "${target.name}" удалён`);
+    this.logActivity('delete', 'employee', target.name, this.texts().employees.deletedActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().employees.deletedMessage(target.name));
     this.notify();
   }
 
@@ -2249,8 +2249,8 @@ export class AppStore {
     };
     this.counterparties = [cp, ...this.counterparties];
     this.saveCounterparties();
-    this.logActivity('create', 'counterparty', cp.name, 'Добавлен контрагент');
-    this.addNotification('success', 'Контрагент добавлен', cp.name);
+    this.logActivity('create', 'counterparty', cp.name, this.texts().counterparties.addedActivity);
+    this.addNotification('success', this.texts().counterparties.addedTitle, cp.name);
     this.notify();
     return cp;
   }
@@ -2261,8 +2261,8 @@ export class AppStore {
       c.id === updated.id ? { ...normalized, id: updated.id } : c
     );
     this.saveCounterparties();
-    this.logActivity('update', 'counterparty', updated.name, 'Обновлена карточка контрагента');
-    this.addNotification('info', 'Контрагент обновлён', updated.name);
+    this.logActivity('update', 'counterparty', updated.name, this.texts().counterparties.cardUpdated);
+    this.addNotification('info', this.texts().counterparties.updatedTitle, updated.name);
     this.notify();
   }
 
@@ -2278,8 +2278,8 @@ export class AppStore {
       }
     }
     this.saveCounterparties();
-    this.logActivity('delete', 'counterparty', target.name, 'Контрагент удалён');
-    this.addNotification('warning', 'Удалено', `Контрагент "${target.name}" удалён`);
+    this.logActivity('delete', 'counterparty', target.name, this.texts().counterparties.deletedActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().counterparties.deletedMessage(target.name));
     this.notify();
   }
 
@@ -2291,8 +2291,8 @@ export class AppStore {
     };
     this.contracts = [contract, ...this.contracts];
     this.saveContracts();
-    this.logActivity('create', 'contract', `${contract.number} — ${contract.title}`, 'Создан договор');
-    this.addNotification('success', 'Договор создан', contract.number);
+    this.logActivity('create', 'contract', `${contract.number} — ${contract.title}`, this.texts().contracts.createdActivity);
+    this.addNotification('success', this.texts().contracts.createdTitle, contract.number);
     this.notify();
     return contract;
   }
@@ -2300,8 +2300,8 @@ export class AppStore {
   public updateContract(updated: Contract): void {
     this.contracts = this.contracts.map((c) => (c.id === updated.id ? { ...updated } : c));
     this.saveContracts();
-    this.logActivity('update', 'contract', `${updated.number} — ${updated.title}`, 'Обновлён договор');
-    this.addNotification('info', 'Договор обновлён', updated.number);
+    this.logActivity('update', 'contract', `${updated.number} — ${updated.title}`, this.texts().contracts.updatedActivity);
+    this.addNotification('info', this.texts().contracts.updatedTitle, updated.number);
     this.notify();
   }
 
@@ -2317,8 +2317,8 @@ export class AppStore {
       }
     }
     this.saveContracts();
-    this.logActivity('delete', 'contract', `${target.number} — ${target.title}`, 'Договор удалён');
-    this.addNotification('warning', 'Удалено', `Договор ${target.number} удалён`);
+    this.logActivity('delete', 'contract', `${target.number} — ${target.title}`, this.texts().contracts.deletedActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().contracts.deletedMessage(target.number));
     this.notify();
   }
 
@@ -2336,9 +2336,9 @@ export class AppStore {
       'create',
       'calculation',
       calc.number,
-      `Сформирована калькуляция (${calc.periodStart} → ${calc.periodEnd}, ${calc.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
+      this.texts().calculations.createdActivity(calc.periodStart, calc.periodEnd, `${calc.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`)
     );
-    this.addNotification('success', 'Калькуляция сформирована', calc.number);
+    this.addNotification('success', this.texts().calculations.createdTitle, calc.number);
     this.notify();
     return calc;
   }
@@ -2351,9 +2351,9 @@ export class AppStore {
       'update',
       'calculation',
       updated.number,
-      `Обновлена калькуляция (${updated.status}, ${updated.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
+      this.texts().calculations.updatedActivity(updated.status, `${updated.billableAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`)
     );
-    this.addNotification('info', 'Калькуляция обновлена', updated.number);
+    this.addNotification('info', this.texts().calculations.updatedTitle, updated.number);
     this.notify();
   }
 
@@ -2373,11 +2373,11 @@ export class AppStore {
       'status_change',
       'calculation',
       updated.number,
-      `Статус калькуляции изменён на ${status}`
+      this.texts().calculations.statusTo(status)
     );
     this.addNotification(
       status === 'approved' ? 'success' : status === 'rejected' ? 'warning' : 'info',
-      'Статус калькуляции обновлён',
+      this.texts().calculations.statusUpdatedTitle,
       `${updated.number} → ${status}`
     );
     this.notify();
@@ -2388,8 +2388,8 @@ export class AppStore {
     if (!target) return;
     this.calculations = this.calculations.filter((c) => c.id !== id);
     this.saveCalculations();
-    this.logActivity('delete', 'calculation', target.number, 'Калькуляция удалена');
-    this.addNotification('warning', 'Калькуляция удалена', target.number);
+    this.logActivity('delete', 'calculation', target.number, this.texts().calculations.deletedText);
+    this.addNotification('warning', this.texts().calculations.deletedText, target.number);
     this.notify();
   }
 
@@ -2425,12 +2425,12 @@ export class AppStore {
       'create',
       'invoice',
       `${invoice.number}`,
-      `Выставлен счёт на сумму ${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      this.texts().invoices.issuedActivity(`${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`)
     );
     this.addNotification(
       'success',
-      'Счёт создан',
-      `${invoice.number} на ${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      this.texts().invoices.createdTitle,
+      this.texts().invoices.onAmount(invoice.number, `${invoice.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`)
     );
     this.notify();
     return invoice;
@@ -2455,9 +2455,9 @@ export class AppStore {
       'update',
       'invoice',
       updated.number,
-      `Обновлён счёт (${updated.status}, ${updated.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym})`
+      this.texts().invoices.updatedActivity(updated.status, `${updated.totalAmount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`)
     );
-    this.addNotification('info', 'Счёт обновлён', updated.number);
+    this.addNotification('info', this.texts().invoices.updatedTitle, updated.number);
     this.notify();
   }
 
@@ -2492,8 +2492,8 @@ export class AppStore {
           currency: existing.currency,
           paymentDate: today,
           method: 'bank_transfer',
-          documentNumber: `${direction === 'outgoing' ? 'ИСХ' : 'ПП'}-${today.slice(0, 4)}/AUTO-${existing.number.slice(-3)}`,
-          notes: `Полная оплата счёта ${existing.number}`,
+          documentNumber: `${this.texts().payments.docCodeOutgoing}-${today.slice(0, 4)}/AUTO-${existing.number.slice(-3)}`,
+          notes: this.texts().payments.fullInvoicePaymentNote(existing.number),
         });
         return;
       }
@@ -2508,10 +2508,10 @@ export class AppStore {
     const updated: Invoice = { ...existing, status, paidDate };
     this.invoices = this.invoices.map((inv) => (inv.id === id ? updated : inv));
     this.saveInvoices();
-    this.logActivity('status_change', 'invoice', updated.number, `Статус счёта изменён на ${status}`);
+    this.logActivity('status_change', 'invoice', updated.number, this.texts().invoices.statusTo(status));
     this.addNotification(
       status === 'paid' ? 'success' : 'info',
-      'Статус счёта обновлён',
+      this.texts().invoices.statusUpdatedTitle,
       `${updated.number} → ${status}`
     );
     this.notify();
@@ -2545,8 +2545,8 @@ export class AppStore {
       }
     }
 
-    this.logActivity('delete', 'invoice', target.number, 'Счёт удалён');
-    this.addNotification('warning', 'Счёт удалён', target.number);
+    this.logActivity('delete', 'invoice', target.number, this.texts().invoices.deletedText);
+    this.addNotification('warning', this.texts().invoices.deletedText, target.number);
     this.notify();
   }
 
@@ -2781,7 +2781,7 @@ export class AppStore {
         ? 'AED'
         : '₽';
     const isFull = inv ? inv.status === 'paid' : false;
-    const dirPrefix = direction === 'outgoing' ? 'Исходящий платёж' : 'Входящий платёж';
+    const dirPrefix = direction === 'outgoing' ? this.texts().payments.outgoingPrefix : this.texts().payments.incomingPrefix;
     const targetName = inv
       ? `${inv.number}${payment.documentNumber ? ` · ${payment.documentNumber}` : ''}`
       : payment.documentNumber || company?.name || payment.id;
@@ -2789,13 +2789,13 @@ export class AppStore {
       'create',
       'payment',
       targetName,
-      `${dirPrefix}${compAcc ? ` (${compAcc.bankName})` : ''}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      this.texts().payments.paidLine(dirPrefix, compAcc ? ` (${compAcc.bankName})` : '', `${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`),
       payment.id
     );
     this.addNotification(
       'success',
-      isFull ? 'Счёт полностью оплачен' : `${dirPrefix} зафиксирован`,
-      `${inv?.number || company?.name || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      isFull ? this.texts().payments.invoicePaidFull : this.texts().payments.recorded(dirPrefix),
+      this.texts().payments.paymentLine(inv?.number || company?.name || '', `${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`),
       { targetType: 'payment', targetId: payment.id }
     );
     this.notify();
@@ -2920,10 +2920,10 @@ export class AppStore {
       inv
         ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}`
         : target.documentNumber || target.id,
-      `Удалён платёж на ${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      this.texts().payments.deletedMessage(`${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`),
       target.id
     );
-    this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`);
+    this.addNotification('warning', this.texts().payments.deletedTitle, `${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`);
     this.notify();
   }
 
@@ -2941,7 +2941,7 @@ export class AppStore {
       id: `ch-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
       projectId: project.id,
       slug: 'general',
-      name: this.customization.language === 'en' ? 'General' : 'Общий',
+      name: this.texts().generalChannel,
       description: project.description || undefined,
       isDefault: true,
       createdById: this.currentUserId || project.members?.[0]?.userId || this.users[0]?.id || 'user-1',
@@ -2950,8 +2950,8 @@ export class AppStore {
     this.chatChannels = [...this.chatChannels, defaultChannel];
     this.saveChatChannels();
 
-    this.logActivity('create', 'project', project.name, `Ключ: ${project.key}`);
-    this.addNotification('success', 'Проект создан', project.name);
+    this.logActivity('create', 'project', project.name, this.texts().projects.keyLine(project.key));
+    this.addNotification('success', this.texts().projects.createdTitle, project.name);
     this.notify();
     return project;
   }
@@ -2959,8 +2959,8 @@ export class AppStore {
   public updateProject(updated: Project): void {
     this.projects = this.projects.map((p) => (p.id === updated.id ? { ...updated } : p));
     this.saveProjects();
-    this.logActivity('update', 'project', updated.name, 'Обновлены параметры проекта');
-    this.addNotification('info', 'Проект обновлён', updated.name);
+    this.logActivity('update', 'project', updated.name, this.texts().projects.paramsUpdated);
+    this.addNotification('info', this.texts().projects.updatedTitle, updated.name);
     this.notify();
   }
 
@@ -2998,8 +2998,8 @@ export class AppStore {
       this.saveRequirements();
     }
     this.saveProjects();
-    this.logActivity('delete', 'project', target.name, 'Проект удалён');
-    this.addNotification('warning', 'Удалено', `Проект "${target.name}" удалён`);
+    this.logActivity('delete', 'project', target.name, this.texts().projects.deletedActivity);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().projects.deletedMessage(target.name));
     this.notify();
   }
 
@@ -3018,9 +3018,9 @@ export class AppStore {
       'update',
       'project',
       project.name,
-      `Назначен участник ${user?.name || member.userId} (${member.role})`
+      this.texts().projects.memberAssigned(user?.name || member.userId, member.role)
     );
-    this.addNotification('success', 'Участник добавлен', `${user?.name || ''} добавлен в проект`);
+    this.addNotification('success', this.texts().projects.memberAddedTitle, this.texts().projects.memberAddedMessage(user?.name || ''));
     this.notify();
   }
 
@@ -3042,7 +3042,7 @@ export class AppStore {
       p.id === projectId ? { ...p, members: nextMembers } : p
     );
     this.saveProjects();
-    this.logActivity('update', 'project', project.name, `Изменена роль участника на ${newRole}`);
+    this.logActivity('update', 'project', project.name, this.texts().projects.memberRoleTo(newRole));
     this.notify();
   }
 
@@ -3057,7 +3057,7 @@ export class AppStore {
     );
     this.saveProjects();
     const user = this.users.find((u) => u.id === userId);
-    this.logActivity('update', 'project', project.name, `Удалён участник ${user?.name || userId}`);
+    this.logActivity('update', 'project', project.name, this.texts().projects.memberRemoved(user?.name || userId));
     this.notify();
   }
 
@@ -3167,10 +3167,10 @@ export class AppStore {
       'create',
       'time_entry',
       targetTitle,
-      `Списано ${entry.hours} ч (${user?.name || entry.userId})`,
+      this.texts().timeEntries.writtenActivity(entry.hours, user?.name || entry.userId),
       entry.id
     );
-    this.addNotification('success', 'Время списано', `${entry.hours} ч по задаче ${entry.taskId}`, {
+    this.addNotification('success', this.texts().timeEntries.writtenTitle, this.texts().timeEntries.writtenMessage(entry.hours, entry.taskId), {
       targetType: 'time_entry',
       targetId: entry.id,
     });
@@ -3209,10 +3209,10 @@ export class AppStore {
       'update',
       'time_entry',
       task ? `${task.id} · ${task.title}` : normalized.taskId,
-      `Обновлена запись: ${normalized.hours} ч (${normalized.status})`,
+      this.texts().timeEntries.updatedActivity(normalized.hours, normalized.status),
       normalized.id
     );
-    this.addNotification('info', 'Запись обновлена', `${normalized.hours} ч по ${normalized.taskId}`, {
+    this.addNotification('info', this.texts().timeEntries.updatedTitle, this.texts().timeEntries.updatedMessage(normalized.hours, normalized.taskId), {
       targetType: 'time_entry',
       targetId: normalized.id,
     });
@@ -3243,10 +3243,10 @@ export class AppStore {
       'delete',
       'time_entry',
       task ? `${task.id} · ${task.title}` : target.taskId,
-      `Удалена запись о времени (${target.hours} ч)`,
+      this.texts().timeEntries.deletedActivity(target.hours),
       target.id
     );
-    this.addNotification('warning', 'Запись удалена', `Удалено ${target.hours} ч по ${target.taskId}`);
+    this.addNotification('warning', this.texts().timeEntries.deletedTitle, this.texts().timeEntries.deletedMessage(target.hours, target.taskId));
     this.notify();
   }
 
@@ -3281,7 +3281,7 @@ export class AppStore {
       }`,
       expense.id
     );
-    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`, {
+    this.addNotification('success', this.texts().expenses.addedTitle, this.texts().expenses.lineWithAmount(expense.title, `${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`), {
       targetType: 'expense',
       targetId: expense.id,
     });
@@ -3306,10 +3306,10 @@ export class AppStore {
       'update',
       'expense',
       normalized.title,
-      `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`,
+      this.texts().expenses.statusAmount(normalized.status, `${normalized.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`),
       normalized.id
     );
-    this.addNotification('info', 'Расход обновлён', normalized.title, {
+    this.addNotification('info', this.texts().expenses.updatedTitle, normalized.title, {
       targetType: 'expense',
       targetId: normalized.id,
     });
@@ -3333,8 +3333,8 @@ export class AppStore {
       }
     }
     this.saveExpenses();
-    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена', target.id);
-    this.addNotification('warning', 'Расход удалён', target.title);
+    this.logActivity('delete', 'expense', target.title, this.texts().expenses.deletedActivity, target.id);
+    this.addNotification('warning', this.texts().expenses.deletedTitle, target.title);
     this.notify();
   }
 
@@ -3522,7 +3522,7 @@ export class AppStore {
       'status_change',
       'chat',
       `${proj ? `[${proj.key}] ` : ''}#${target.name}`,
-      archived ? 'Канал архивирован' : 'Канал восстановлен из архива',
+      archived ? this.texts().chat.channelArchived : this.texts().chat.channelUnarchived,
       id
     );
     this.addNotification(
@@ -3557,7 +3557,7 @@ export class AppStore {
       'delete',
       'chat',
       `${proj ? `[${proj.key}] ` : ''}#${target.name}`,
-      'Канал проекта удалён'
+      this.texts().chat.projectChannelDeleted
     );
     this.addNotification('warning', `#${target.name}`, proj?.name || '');
     this.notify();
@@ -3589,7 +3589,7 @@ export class AppStore {
         id: `ch-${Date.now()}-${Math.random().toString(36).substring(2, 5)}`,
         projectId: data.projectId,
         slug: 'general',
-        name: this.customization.language === 'en' ? 'General' : 'Общий',
+        name: this.texts().generalChannel,
         description: proj?.description || undefined,
         isDefault: true,
         createdById: senderId || 'user-1',
@@ -3730,7 +3730,7 @@ export class AppStore {
           id: `rev-${Date.now()}`,
           editedById: data.authorId || this.currentUserId || 'user-1',
           editedAt: now,
-          summary: revisionSummary?.trim() || 'Создание документа в базе знаний',
+          summary: revisionSummary?.trim() || this.texts().knowledge.createSummary,
         },
       ],
       createdAt: now,
@@ -3740,8 +3740,8 @@ export class AppStore {
     this.knowledgeArticles = [article, ...this.knowledgeArticles];
     this.detailKnowledgeId = article.id;
     this.saveKnowledgeArticles();
-    this.logActivity('create', 'knowledge', article.title, `Добавлен материал (${article.category})`, article.id);
-    this.addNotification('success', 'База знаний', `Статья "${article.title}" опубликована`);
+    this.logActivity('create', 'knowledge', article.title, this.texts().knowledge.addedActivity(article.category), article.id);
+    this.addNotification('success', this.texts().knowledge.title, this.texts().knowledge.publishedMessage(article.title));
     this.notify();
     return article;
   }
@@ -3753,7 +3753,7 @@ export class AppStore {
       id: `rev-${Date.now()}`,
       editedById: editorId,
       editedAt: now,
-      summary: revisionSummary?.trim() || 'Обновление документации и выводов',
+      summary: revisionSummary?.trim() || this.texts().knowledge.updateSummary,
     };
     const next: KnowledgeArticle = {
       ...updated,
@@ -3765,7 +3765,7 @@ export class AppStore {
     this.knowledgeArticles = this.knowledgeArticles.map((a) => (a.id === next.id ? next : a));
     this.saveKnowledgeArticles();
     this.logActivity('update', 'knowledge', next.title, nextRevision.summary, next.id);
-    this.addNotification('info', 'База знаний', `Статья "${next.title}" обновлена`);
+    this.addNotification('info', this.texts().knowledge.title, this.texts().knowledge.updatedMessage(next.title));
     this.notify();
   }
 
@@ -3799,7 +3799,7 @@ export class AppStore {
       'status_change',
       'knowledge',
       target.title,
-      isVerified ? 'Снята отметка верификации' : 'Подтверждена актуальность документа',
+      isVerified ? this.texts().knowledge.verificationRemoved : this.texts().knowledge.verificationConfirmed,
       target.id
     );
     this.notify();
@@ -3829,8 +3829,8 @@ export class AppStore {
       this.detailKnowledgeId = this.knowledgeArticles[0]?.id || '';
     }
     this.saveKnowledgeArticles();
-    this.logActivity('delete', 'knowledge', target.title, 'Материал удалён из базы знаний', target.id);
-    this.addNotification('warning', 'Удалено', `Статья "${target.title}" удалена`);
+    this.logActivity('delete', 'knowledge', target.title, this.texts().knowledge.deletedActivity, target.id);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().knowledge.deletedMessage(target.title));
     this.notify();
   }
 
@@ -3867,7 +3867,7 @@ export class AppStore {
           mimeType: data.mimeType,
           uploadedById: uploaderId,
           uploadedAt: now,
-          notes: versionNote?.trim() || 'Первичная загрузка файла',
+          notes: versionNote?.trim() || this.texts().documents.initialUploadNote,
         },
       ],
       createdAt: now,
@@ -3876,7 +3876,7 @@ export class AppStore {
     this.documents = [doc, ...this.documents];
     this.saveDocuments();
     this.logActivity('create', 'document', doc.title, `${doc.fileName} (${doc.category})`, doc.id);
-    this.addNotification('success', 'Документ загружен', doc.title);
+    this.addNotification('success', this.texts().documents.uploadedTitle, doc.title);
     this.notify();
     return doc;
   }
@@ -3886,8 +3886,8 @@ export class AppStore {
     const next: DocumentItem = { ...updated, updatedAt: now };
     this.documents = this.documents.map((d) => (d.id === next.id ? next : d));
     this.saveDocuments();
-    this.logActivity('update', 'document', next.title, `Обновлены метаданные (${next.status})`, next.id);
-    this.addNotification('info', 'Документ обновлён', next.title);
+    this.logActivity('update', 'document', next.title, this.texts().documents.metaUpdated(next.status), next.id);
+    this.addNotification('info', this.texts().documents.updatedTitle, next.title);
     this.notify();
   }
 
@@ -3928,15 +3928,15 @@ export class AppStore {
           mimeType: payload.mimeType,
           uploadedById: uploaderId,
           uploadedAt: now,
-          notes: payload.notes.trim() || `Версия ${nextVersion}`,
+          notes: payload.notes.trim() || this.texts().documents.versionNote(nextVersion),
         },
         ...(existing.versions || []),
       ].slice(0, 20),
     };
     this.documents = this.documents.map((d) => (d.id === id ? nextDoc : d));
     this.saveDocuments();
-    this.logActivity('update', 'document', nextDoc.title, `Загружена v${nextVersion}: ${nextDoc.fileName}`, nextDoc.id);
-    this.addNotification('success', `Версия v${nextVersion}`, nextDoc.title);
+    this.logActivity('update', 'document', nextDoc.title, this.texts().documents.versionActivity(nextVersion, nextDoc.fileName), nextDoc.id);
+    this.addNotification('success', this.texts().documents.versionTitle(nextVersion), nextDoc.title);
     this.notify();
   }
 
@@ -3962,8 +3962,8 @@ export class AppStore {
     });
     if (expenseChanged) this.saveExpenses();
 
-    this.logActivity('delete', 'document', target.title, `Удалён файл ${target.fileName}`, target.id);
-    this.addNotification('warning', 'Документ удалён', target.title);
+    this.logActivity('delete', 'document', target.title, this.texts().documents.fileDeleted(target.fileName), target.id);
+    this.addNotification('warning', this.texts().documents.deletedTitle, target.title);
     this.notify();
   }
 
@@ -4005,7 +4005,7 @@ export class AppStore {
           id: `rev-${Date.now()}-${idx}`,
           editedById: data.authorId || authorFallback,
           editedAt: now,
-          summary: 'Автогенерация из спецификации проекта',
+          summary: this.texts().knowledge.autoSummary,
         },
       ],
       createdAt: now,
@@ -4018,8 +4018,8 @@ export class AppStore {
     this.logActivity(
       'create',
       'knowledge',
-      `${created.length} статей`,
-      'Сформирована база знаний из спецификации проекта'
+      this.texts().knowledge.articlesCount(created.length),
+      this.texts().knowledge.generatedTitle
     );
     this.notify();
     return created;
@@ -4059,8 +4059,8 @@ export class AppStore {
     this.logActivity(
       'create',
       'requirement',
-      `${created.length} требований`,
-      'Импортировано из спецификации проекта'
+      this.texts().requirements.count(created.length),
+      this.texts().requirements.importedFromSpec
     );
     this.notify();
     return created;
@@ -4085,7 +4085,7 @@ export class AppStore {
     );
     this.saveRequirements();
     this.saveTasks();
-    this.logActivity('delete', 'requirement', `${target.code} — ${target.title}`, 'Удалено требование', target.id);
+    this.logActivity('delete', 'requirement', `${target.code} — ${target.title}`, this.texts().requirements.deletedActivity, target.id);
     this.notify();
   }
 
@@ -4215,7 +4215,7 @@ export class AppStore {
     const maxSort = dir.records.reduce((m, r) => Math.max(m, r.sortOrder), 0);
     return this.addDirectoryRecord(directoryId, {
       code: candidateCode,
-      name: `${source.name} (копия)`,
+      name: this.texts().copyOf(source.name),
       nameEn: source.nameEn ? `${source.nameEn} (copy)` : '',
       description: source.description || '',
       sortOrder: maxSort + 10,
@@ -4247,11 +4247,15 @@ export class AppStore {
       d.id === directoryId ? { ...seed, updatedAt: new Date().toISOString() } : d
     );
     this.saveDirectories();
-    this.logActivity('update', 'directory', seed.code, 'Сброс справочника к эталонным значениям', seed.id);
+    this.logActivity('update', 'directory', seed.code, this.texts().directories.resetActivity, seed.id);
     this.notify();
   }
 
   // --- Activity Log ---
+  private texts(): ReturnType<typeof getTranslation>['storeTexts'] {
+    return getTranslation(this.customization.language).storeTexts;
+  }
+
   public logActivity(
     action: 'create' | 'update' | 'delete' | 'status_change' | 'priority_change',
     targetType: ActivityLogItem['targetType'],
@@ -4260,7 +4264,7 @@ export class AppStore {
     targetId?: string
   ): void {
     const currentUser = this.users.find((u) => u.id === this.currentUserId);
-    const currentUserName = currentUser?.name || 'Текущий пользователь';
+    const currentUserName = currentUser?.name || this.texts().currentUserFallback;
     const logItem: ActivityLogItem = {
       id: `act-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
       timestamp: new Date().toISOString(),
