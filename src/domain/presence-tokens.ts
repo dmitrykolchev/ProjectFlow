@@ -1,4 +1,4 @@
-import type { EmployeeStatus } from '../types';
+import type { EmployeeStatus, PresenceStatus } from '../types';
 
 /** Visual + textual representation of a person's presence (Fluent-style persona badge). */
 export type PersonaPresence =
@@ -8,6 +8,7 @@ export type PersonaPresence =
   | 'away'
   | 'busy'
   | 'dnd'
+  | 'ooo'
   | 'blocked'
   | 'offline';
 
@@ -30,6 +31,7 @@ export const PRESENCE_TOKENS: Record<PersonaPresence, PresenceToken | null> = {
   away: { color: 'var(--color-warning, #f59e0b)', glyph: 'clock', i18nKey: 'away' },
   busy: { color: 'var(--color-danger, #ef4444)', glyph: 'minus', i18nKey: 'busy' },
   dnd: { color: 'var(--color-danger, #ef4444)', glyph: 'moon', i18nKey: 'dnd' },
+  ooo: { color: 'var(--color-warning, #f59e0b)', glyph: 'clock', i18nKey: 'ooo' },
   blocked: { color: 'var(--color-danger, #ef4444)', glyph: 'slash', i18nKey: 'blocked' },
   offline: { color: 'var(--text-muted, #94a3b8)', glyph: 'ring', i18nKey: 'offline' },
 };
@@ -62,9 +64,21 @@ export function statusFromPresence(presence: PersonaPresence): EmployeeStatus | 
       return 'vacation';
     case 'busy':
       return 'onboarding';
+    case 'ooo':
+      return 'vacation';
     default:
       return '';
   }
+}
+
+/** Manual presence (User.presence, written by the sidebar footer menu) wins over the
+   badge derived from the employee status. Presence is its own status: choosing it does
+   not touch EmployeeStatus. */
+export function effectivePresence(user: {
+  status?: EmployeeStatus;
+  presence?: PresenceStatus;
+}): PersonaPresence {
+  return user.presence ?? presenceFromStatus(user.status);
 }
 
 /** Resolve the presence label in the given language ('' when no badge). */
