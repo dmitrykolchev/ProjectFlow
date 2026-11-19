@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html, type TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
@@ -12,6 +12,24 @@ import '../../common/app-entity-emblem/app-entity-emblem';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
 
 const THEME_ORDER: ThemeMode[] = ['dark', 'light', 'cyberpunk', 'matrix', 'barbie', 'high-contrast'];
+
+/** The graphic identity of a theme (the same icons the header button uses). */
+function themeGlyph(theme: ThemeMode, px: number): TemplateResult {
+  switch (theme) {
+    case 'dark':
+      return iconMoon(px);
+    case 'light':
+      return iconSun(px);
+    case 'cyberpunk':
+      return iconZap(px);
+    case 'matrix':
+      return iconTerminal(px);
+    case 'barbie':
+      return iconHeart(px);
+    default:
+      return iconContrast(px);
+  }
+}
 
 const DETAIL_ENTITY_MAP: Record<string, EntityEmblemKind> = {
   'project-detail': 'project',
@@ -201,10 +219,10 @@ export class AppHeader extends LitElement {
 
     const detailEntity = DETAIL_ENTITY_MAP[this.activeView];
 
-    const themeName = t.viewTexts.header.themeNames[this.theme];
     const themeItems: MenuItem[] = THEME_ORDER.map((th) => ({
       id: th,
       label: t.viewTexts.header.themeNames[th],
+      icon: themeGlyph(th, 16),
       checked: th === this.theme,
     }));
     const themeIcon = this.theme === 'high-contrast'
@@ -269,11 +287,12 @@ export class AppHeader extends LitElement {
             : ''}
 
           <!-- Theme split button: the main button cycles the themes sequentially as
-             before, the chevron menu picks a specific theme directly. -->
+             before (icon only), the chevron menu picks a theme directly — icon plus
+             its name, the current one checked. -->
           <app-split-button
             variant="secondary"
             size="md"
-            .label="${themeName}"
+            .label="${''}"
             .items="${themeItems}"
             @primary-click="${() => store.toggleTheme()}"
             @select="${this.handleThemeSelect}"
