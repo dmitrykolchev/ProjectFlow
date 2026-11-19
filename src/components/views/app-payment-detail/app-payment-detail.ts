@@ -22,13 +22,14 @@ import {
   iconReceipt,
   iconTrash,
 } from '../../common/icons';
+import { DetailSwitchDetail } from '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
+import '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-entity-reminders/app-entity-reminders';
-import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-link/app-link';
 import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-progress-bar/app-progress-bar';
@@ -277,225 +278,210 @@ export class AppPaymentDetail extends LitElement {
     });
 
     return html`
-      <div class="page-shell">
-        <div class="top-nav-bar">
-          <div class="nav-left">
-            <app-button
-              variant="outline"
-              size="sm"
-              @click="${() => store.setActiveView('payments')}"
-            >
-              <span slot="icon-start">${iconChevronLeft(15)}</span>
-              <span>${t.viewTexts.paymentDetail.backToList}</span>
-            </app-button>
-
-            <div class="pay-switcher">
-              <app-entity-selector
+      <app-detail-shell
+        entity="payment"
+        backLabel="${t.viewTexts.paymentDetail.backToList}"
+        switcherPlaceholder="${t.viewTexts.paymentDetail.switcherPlaceholder}"
+        .switcherOptions="${switcherOptions}"
+        switcherValue="${pay.id}"
+        @detail-back="${() => store.setActiveView('payments')}"
+        @entity-switch="${(e: CustomEvent<DetailSwitchDetail>) => {
+          const nextId = e.detail.value;
+          if (nextId && nextId !== pay.id) {
+            store.openPaymentDetail(nextId);
+          }
+        }}"
+      >
+        ${contract
+          ? html`
+              <app-button
+                slot="nav-actions"
                 size="sm"
-                placeholder="${t.viewTexts.paymentDetail.switcherPlaceholder}"
-                .options="${switcherOptions}"
-                .value="${pay.id}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextId = eventValue(e);
-                  if (nextId && nextId !== pay.id) {
-                    store.openPaymentDetail(nextId);
-                  }
-                }}"
-              ></app-entity-selector>
-            </div>
-          </div>
+                variant="outline"
+                @click="${() => store.openContractDetail(contract.id)}"
+              >
+                <span slot="icon-start">${iconFileText(14)}</span>
+                <span>${t.viewTexts.paymentDetail.openInvoiceContractBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-          <div class="nav-actions">
-            ${contract
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openContractDetail(contract.id)}"
-                  >
-                    <span slot="icon-start">${iconFileText(14)}</span>
-                    <span>${t.viewTexts.paymentDetail.openInvoiceContractBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${company
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="outline"
+                @click="${() => store.openCompanyDetail(company.id)}"
+              >
+                <span slot="icon-start">${iconBuilding(14)}</span>
+                <span>${t.viewTexts.paymentDetail.openCompanyBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${company
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openCompanyDetail(company.id)}"
-                  >
-                    <span slot="icon-start">${iconBuilding(14)}</span>
-                    <span>${t.viewTexts.paymentDetail.openCompanyBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${cp
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="outline"
+                @click="${() => store.openCounterpartyDetail(cp.id)}"
+              >
+                <span slot="icon-start">${iconHandshake(14)}</span>
+                <span>${t.viewTexts.paymentDetail.openCounterpartyBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${cp
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openCounterpartyDetail(cp.id)}"
-                  >
-                    <span slot="icon-start">${iconHandshake(14)}</span>
-                    <span>${t.viewTexts.paymentDetail.openCounterpartyBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        <app-button
+          slot="nav-actions"
+          size="sm"
+          variant="secondary"
+          @click="${() => (this.editModalOpen = true)}"
+        >
+          <span slot="icon-start">${iconEdit(14)}</span>
+          <span>${t.common.edit}</span>
+        </app-button>
 
-            <app-button
-              size="sm"
-              variant="secondary"
-              @click="${() => (this.editModalOpen = true)}"
-            >
-              <span slot="icon-start">${iconEdit(14)}</span>
-              <span>${t.common.edit}</span>
-            </app-button>
+        <app-button
+          slot="nav-actions"
+          action="delete"
+          size="xs"
+          variant="icon"
+          title="${t.common.delete}"
+          @click="${() => (this.confirmDeleteOpen = true)}"
+        >
+          <span slot="start">${iconTrash(15)}</span>
+        </app-button>
 
-            <app-button
-              action="delete"
-              size="xs"
-              variant="icon"
-              title="${t.common.delete}"
-              @click="${() => (this.confirmDeleteOpen = true)}"
-            >
-              <span slot="start">${iconTrash(15)}</span>
-            </app-button>
-          </div>
+        <app-entity-emblem
+          slot="hero-meta"
+          entity="payment"
+          variant="pill"
+          size="sm"
+        ></app-entity-emblem>
+        <span slot="hero-meta" class="mono">${pay.paymentDate}</span>
+        <span slot="hero-meta" aria-hidden="true">·</span>
+        <span slot="hero-meta">${t.payments.methods[pay.method]}</span>
+        ${inv
+          ? html`
+              <span slot="hero-meta" aria-hidden="true">·</span>
+              <span slot="hero-meta" class="mono">${inv.number}</span>
+            `
+          : html`
+              <span slot="hero-meta" aria-hidden="true">·</span>
+              <span slot="hero-meta">${t.viewTexts.payments.standalonePayment}</span>
+            `}
+
+        <h1 slot="title" class="pay-title">${pay.documentNumber || pay.id}</h1>
+        <app-status-chip
+          slot="title"
+          domain="paymentDirection"
+          status="${direction}"
+          appearance="soft"
+          size="md"
+        ></app-status-chip>
+        <app-badge
+          slot="title"
+          variant="default"
+          appearance="soft"
+          size="sm"
+        >
+          ${t.payments.methods[pay.method]}
+        </app-badge>
+
+        <div slot="hero-sub" class="pay-sub">
+          <span>${company?.name || '—'}</span>
+          <span aria-hidden="true">·</span>
+          <span>${cp?.name || t.viewTexts.paymentDetail.noCounterparty}</span>
         </div>
 
-        <section class="overview-card">
-          <div class="hero-top">
-            <div class="hero-identity">
-              <app-entity-emblem entity="payment" size="lg"></app-entity-emblem>
-              <div class="title-block">
-                <div class="hero-meta-row">
-                  <app-entity-emblem entity="payment" variant="pill" size="sm"></app-entity-emblem>
-                  <span class="mono">${pay.paymentDate}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>${t.payments.methods[pay.method]}</span>
-                  ${inv
-                    ? html`
-                        <span aria-hidden="true">·</span>
-                        <span class="mono">${inv.number}</span>
-                      `
-                    : html`
-                        <span aria-hidden="true">·</span>
-                        <span>${t.viewTexts.payments.standalonePayment}</span>
-                      `}
-                </div>
+        <div
+          slot="hero-side"
+          class="hero-amount-box ${isOutgoing ? 'is-outgoing' : 'is-incoming'}"
+        >
+          <span class="hero-amount-sign">
+            ${isOutgoing ? iconArrowUpRight(18) : iconArrowDownLeft(18)}
+          </span>
+          <span class="hero-amount-val">
+            ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
+          </span>
+        </div>
 
-                <div class="title-row">
-                  <h1 class="pay-title">${pay.documentNumber || pay.id}</h1>
-                  <app-status-chip
-                    domain="paymentDirection"
-                    status="${direction}"
-                    appearance="soft"
-                    size="md"
-                  ></app-status-chip>
-                  <app-badge variant="default" appearance="soft" size="sm">
-                    ${t.payments.methods[pay.method]}
-                  </app-badge>
-                </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.paymentDetail.kpiAmount}</span>
+          <span class="kpi-val ${isOutgoing ? 'warning' : 'success'}">
+            ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
+          </span>
+          <span class="kpi-hint">${pay.currency}</span>
+        </div>
 
-                <div class="pay-sub">
-                  <span>${company?.name || '—'}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>${cp?.name || t.viewTexts.paymentDetail.noCounterparty}</span>
-                </div>
-              </div>
-            </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.paymentDetail.kpiRubEquivalent}</span>
+          <span class="kpi-val accent">${formatMoney(rubEquivalent, 'RUB')}</span>
+          <span class="kpi-hint">${t.payments.directions[direction]}</span>
+        </div>
 
-            <div class="hero-amount-box ${isOutgoing ? 'is-outgoing' : 'is-incoming'}">
-              <span class="hero-amount-sign">
-                ${isOutgoing ? iconArrowUpRight(18) : iconArrowDownLeft(18)}
-              </span>
-              <span class="hero-amount-val">
-                ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
-              </span>
-            </div>
-          </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.paymentDetail.kpiMethodDate}</span>
+          <span class="kpi-val">${pay.paymentDate}</span>
+          <span class="kpi-hint">${t.payments.methods[pay.method]}</span>
+        </div>
 
-          <div class="kpi-strip">
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.paymentDetail.kpiAmount}</span>
-              <span class="kpi-val ${isOutgoing ? 'warning' : 'success'}">
-                ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
-              </span>
-              <span class="kpi-hint">${pay.currency}</span>
-            </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.paymentDetail.kpiBasis}</span>
+          <span class="kpi-val">
+            ${inv ? inv.number : t.viewTexts.payments.standalonePayment}
+          </span>
+          <span class="kpi-hint">
+            ${inv
+              ? t.viewTexts.paymentDetail.kpiInvoiceLinked
+              : t.viewTexts.paymentDetail.kpiStandalone}
+          </span>
+        </div>
 
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.paymentDetail.kpiRubEquivalent}</span>
-              <span class="kpi-val accent">${formatMoney(rubEquivalent, 'RUB')}</span>
-              <span class="kpi-hint">${t.payments.directions[direction]}</span>
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.paymentDetail.labelPaymentDoc}</span>
+          <span class="meta-val mono">${pay.documentNumber || '—'}</span>
+        </div>
 
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.paymentDetail.kpiMethodDate}</span>
-              <span class="kpi-val">${pay.paymentDate}</span>
-              <span class="kpi-hint">${t.payments.methods[pay.method]}</span>
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.payments.labelCompany}</span>
+          ${company
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openCompanyDetail(company.id)}"
+                >
+                  <span>${company.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.paymentDetail.kpiBasis}</span>
-              <span class="kpi-val">
-                ${inv ? inv.number : t.viewTexts.payments.standalonePayment}
-              </span>
-              <span class="kpi-hint">
-                ${inv
-                  ? t.viewTexts.paymentDetail.kpiInvoiceLinked
-                  : t.viewTexts.paymentDetail.kpiStandalone}
-              </span>
-            </div>
-          </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.payments.labelCounterparty}</span>
+          ${cp
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openCounterpartyDetail(cp.id)}"
+                >
+                  <span>${cp.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">${t.viewTexts.paymentDetail.noCounterparty}</span>`}
+        </div>
 
-          <div class="context-grid">
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.paymentDetail.labelPaymentDoc}</span>
-              <span class="meta-val mono">${pay.documentNumber || '—'}</span>
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.payments.labelCompany}</span>
-              ${company
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openCompanyDetail(company.id)}"
-                    >
-                      <span>${company.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.payments.labelCounterparty}</span>
-              ${cp
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openCounterpartyDetail(cp.id)}"
-                    >
-                      <span>${cp.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">${t.viewTexts.paymentDetail.noCounterparty}</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.paymentDetail.labelCreatedAt}</span>
-              <span class="meta-val mono">${createdFormatted}</span>
-            </div>
-          </div>
-        </section>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.paymentDetail.labelCreatedAt}</span>
+          <span class="meta-val mono">${createdFormatted}</span>
+        </div>
 
         <!-- Fund Flow & Bank Requisites -->
         <app-section-card title="${t.viewTexts.paymentDetail.flowTitle}">
@@ -672,7 +658,7 @@ export class AppPaymentDetail extends LitElement {
         </app-section-card>
 
         <app-entity-reminders entity-type="payment" .entityId="${pay.id}"></app-entity-reminders>
-      </div>
+      </app-detail-shell>
 
       <app-payment-form
         .open="${this.editModalOpen}"

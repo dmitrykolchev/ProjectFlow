@@ -1,11 +1,6 @@
 /* View-specific blocks and shell overrides; the shared detail shell lives in
    ../../common/app-detail-shell/app-detail-shell.css (first entry of static styles). */
 
-.pay-switcher {
-  width: 320px;
-  max-width: 100%;
-}
-
 .pay-title {
   margin: 0;
   font-size: 1.42rem;
