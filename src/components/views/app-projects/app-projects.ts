@@ -169,6 +169,21 @@ export class AppProjects extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.projects.kpiAvgProgress}" value="${avgProgress}%"></app-metric-card>
       </app-kpi-strip>
 
+      <div class="mode-row">
+        <app-segmented-switch
+          size="sm"
+          .value="${this.displayMode}"
+          .options="${[
+            { value: 'cards', label: t.viewTexts.projects.viewCards },
+            { value: 'table', label: t.viewTexts.projects.viewTable },
+          ]}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.displayMode = eventValue(e) as 'cards' | 'table';
+            this.currentPage = 1; store.setActivePage(1, false);
+          }}"
+        ></app-segmented-switch>
+      </div>
+
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px;"
         placeholder="${t.viewTexts.projects.searchPlaceholder}"
@@ -187,20 +202,7 @@ export class AppProjects extends LitElement {
           if (e.detail.key === 'company') this.companyFilter = eventValue(e);
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
-      >
-        <app-segmented-switch
-          size="sm"
-          .value="${this.displayMode}"
-          .options="${[
-            { value: 'cards', label: t.viewTexts.projects.viewCards },
-            { value: 'table', label: t.viewTexts.projects.viewTable },
-          ]}"
-          @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1; store.setActivePage(1, false);
-          }}"
-        ></app-segmented-switch>
-      </app-filter-bar>
+      ></app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.projects.emptyNoProjects}"></app-empty-state>`

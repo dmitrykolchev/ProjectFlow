@@ -16,6 +16,15 @@
   padding: 1.5rem;
   gap: 1.25rem;
 }
+
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode switcher (app-segmented-switch size="sm") sits in its own row
+   between the KPI strip and the filter bar; the switch host is inline-flex, so the row keeps
+   its intrinsic width left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+}
 /* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
    (surface, border, radius, padding, hover lift) and all card content classes (proj-card-head,
    proj-name, proj-desc, proj-meta-grid, meta-item/label/val, team-summary-line, sep,
