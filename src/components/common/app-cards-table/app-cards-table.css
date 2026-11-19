@@ -56,14 +56,17 @@
 }
 
 /* card-footer web component keeps its own chrome; the shell pins it to the bottom with the
-   projects reference gap and padding-top through tokens, and passes the start/end gaps at the
-   card-footer defaults so a view can retune them locally */
+   projects reference gap and padding-top, and passes the start/end gaps at the card-footer
+   defaults. The view-facing tokens carry the cards- prefix (cards-footer-gap and friends): a
+   self-referential var of the card-footer property name is a custom property cycle that makes
+   the declaration invalid, so the view retunes are read from distinct names inherited from the
+   view host through the shadow tree. */
 card-footer {
   margin-top: auto;
-  --card-footer-gap: var(--card-footer-gap, 0.65rem);
-  --card-footer-padding-top: var(--card-footer-padding-top, 0.75rem);
-  --card-footer-start-gap: var(--card-footer-start-gap, 0.75rem);
-  --card-footer-end-gap: var(--card-footer-end-gap, 0.35rem);
+  --card-footer-gap: var(--cards-footer-gap, 0.65rem);
+  --card-footer-padding-top: var(--cards-footer-padding-top, 0.75rem);
+  --card-footer-start-gap: var(--cards-footer-start-gap, 0.75rem);
+  --card-footer-end-gap: var(--cards-footer-end-gap, 0.35rem);
 }
 
 .empty-wrap {
