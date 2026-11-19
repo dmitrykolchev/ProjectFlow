@@ -1514,6 +1514,9 @@ export const ru = {
       designTokens: 'CSS-переменные, определяющие темы Light, Dark, Cyberpunk, Matrix, Barbie и High Contrast. Живые значения обновляются при смене темы.',
       materialIcons: 'Палитра всех лигатур Material Symbols с поиском по имени, категории и тегам; сниппет <app-material-icon> с копированием в буфер',
     },
+    header: {
+      langToggleTitle: 'Сменить язык (RU / EN)',
+    },
     sidebar: {
       themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Сменить язык (RU / EN)',

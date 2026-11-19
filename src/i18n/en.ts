@@ -1514,6 +1514,9 @@ export const en = {
       designTokens: 'CSS custom properties powering the Light, Dark, Cyberpunk, Matrix, Barbie and High Contrast themes. Live values update when the theme changes.',
       materialIcons: 'Palette of every Material Symbols ligature with search by name, category and tags; <app-material-icon> snippet with copy to clipboard',
     },
+    header: {
+      langToggleTitle: 'Change language (RU / EN)',
+    },
     sidebar: {
       themeToggleTitle: 'Switch theme (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Change language (RU / EN)',
