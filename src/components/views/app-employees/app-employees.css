@@ -16,6 +16,18 @@
   padding: 1.5rem;
   gap: 1.25rem;
 }
+
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode row holds the cards/table app-segmented-switch (size="sm") and the
+   filter toggle (app-toggle-button size="sm", funnel icon + label; pressed = the filter bar is
+   visible, unpressed = hidden, the view mirrors the pressed state in filterVisible); it sits
+   between the KPI strip and the filter bar. The switch host is inline-flex and the toggle host
+   is inline-block, so the row keeps the intrinsic widths left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
