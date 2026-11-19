@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import {
   downloadDocumentFile,
   formatFileSize,
@@ -36,7 +37,7 @@ import {
   formatAiError,
   generateDocumentSummaryAndTags,
 } from '../../../services/openai-client';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
@@ -471,7 +472,12 @@ export class AppDocuments extends LitElement {
               <card-footer>
                 <div slot="start" class="uploader-info">
                   ${uploader
-                    ? html`<app-avatar size="xs" initials="${uploader.avatar}" title="${uploader.name}"></app-avatar>`
+                    ? html`<app-persona
+                        size="24"
+                        .initials="${uploader.avatar}"
+                        .presence="${presenceFromStatus(uploader.status)}"
+                        @click="${() => store.openEmployeeDetail(uploader.id)}"
+                      ></app-persona>`
                     : ''}
                   <span class="uploader-name">${uploader?.name || doc.uploadedById}</span>
                 </div>
