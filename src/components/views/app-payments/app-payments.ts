@@ -34,8 +34,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-segmented-switch/app-segmented-switch';
-import '../../common/app-pagination/app-pagination';
-import { paginateItems } from '../../common/paginate';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import styles from './app-payments.css';
 import { eventValue } from '../../common/event-value';
 
@@ -453,185 +453,194 @@ export class AppPayments extends LitElement {
       `;
     }
 
-    const paged = paginateItems(invoices, this.currentPage, this.tablePageSize);
+    // Due control reference rich cells (rendered inside the app-data-table shadow tree)
+    const dueInvNumberCell = (row: Record<string, unknown>) => {
+      const inv = row as unknown as Invoice;
+      const comp = store.companies.find((c) => c.id === inv.companyId);
+      return html`
+        <app-link
+          class="link-btn"
+          size="md"
+          variant="primary"
+          @click="${() => {
+            const ctr = this.contracts.find((c) => c.id === inv.contractId);
+            if (ctr) store.openContractDetail(ctr.id);
+          }}"
+        >
+          <span slot="start">${iconReceipt(15)}</span>
+          <span>${inv.number}</span>
+        </app-link>
+        <div class="pay-cell-sub">
+          ${comp ? `${comp.name} · ` : ''}${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
+        </div>
+      `;
+    };
+    const dueContractCell = (row: Record<string, unknown>) => {
+      const inv = row as unknown as Invoice;
+      const ctr = this.contracts.find((c) => c.id === inv.contractId);
+      return html`
+        ${ctr
+          ? html`
+              <app-link
+                class="link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openContractDetail(ctr.id)}"
+              >
+                <span>${ctr.number}</span>
+              </app-link>
+              <div class="pay-contract-desc" title="${ctr.title}">${ctr.title}</div>
+            `
+          : '—'}
+      `;
+    };
+    const dueCpCell = (row: Record<string, unknown>) => {
+      const inv = row as unknown as Invoice;
+      const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
+      return html`
+        ${cp
+          ? html`
+              <app-link
+                class="text-link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openCounterpartyDetail(cp.id)}"
+              >
+                ${cp.name}
+              </app-link>
+            `
+          : '—'}
+      `;
+    };
+    const dueDatesCell = (row: Record<string, unknown>) => {
+      const inv = row as unknown as Invoice;
+      return html`
+        <div class="mono" style="white-space: nowrap;">
+          ${inv.issueDate} → ${inv.dueDate}
+        </div>
+        <div>${this.renderDueControlTag(inv, t)}</div>
+      `;
+    };
+    const duePayCell = (row: Record<string, unknown>) => {
+      const inv = row as unknown as Invoice;
+      const invPaid = store.getInvoicePaidAmount(inv.id);
+      const invRemaining = store.getInvoiceRemainingAmount(inv);
+      const payPct =
+        inv.totalAmount > 0 ? Math.min(100, Math.round((invPaid / inv.totalAmount) * 100)) : 0;
+      const dueCtrl = store.getInvoiceDueControl(inv);
+      return html`
+        <div class="pay-inv-pay-cell">
+          <div class="inv-pay-meta mono">
+            <span style="color: ${invPaid > 0 ? '#10b981' : 'var(--text-muted)'}; font-weight: 600;">
+              ${formatMoney(invPaid, inv.currency)}
+            </span>
+            <span>${payPct}%</span>
+          </div>
+          <div class="inv-pay-bar">
+            <div
+              class="inv-pay-fill ${dueCtrl.state === 'overdue'
+                ? 'overdue'
+                : payPct > 0 && payPct < 100
+                ? 'partial'
+                : ''}"
+              style="width: ${payPct}%;"
+            ></div>
+          </div>
+          ${invRemaining > 0
+            ? html`
+                <div class="inv-pay-meta mono">
+                  <span>${t.viewTexts.payments.dueLabel}:</span>
+                  <span style="color: ${dueCtrl.state === 'overdue' ? '#ef4444' : 'var(--text-primary)'}; font-weight: 600;">
+                    ${formatMoney(invRemaining, inv.currency)}
+                  </span>
+                </div>
+              `
+            : ''}
+        </div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.payments.thInvoice}</th>
-              <th>${t.viewTexts.payments.thContract}</th>
-              <th>${t.viewTexts.payments.thCounterparty}</th>
-              <th>${t.viewTexts.payments.thDatesControl}</th>
-              <th>${t.viewTexts.payments.thPaidBalance}</th>
-              <th>${t.viewTexts.payments.thInvoiceTotal}</th>
-              <th>${t.viewTexts.payments.thStatus}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((inv) => {
-              const ctr = this.contracts.find((c) => c.id === inv.contractId);
-              const cp = store.counterparties.find((c) => c.id === inv.counterpartyId);
-              const comp = store.companies.find((c) => c.id === inv.companyId);
-              const invPaid = store.getInvoicePaidAmount(inv.id);
-              const invRemaining = store.getInvoiceRemainingAmount(inv);
-              const payPct =
-                inv.totalAmount > 0
-                  ? Math.min(100, Math.round((invPaid / inv.totalAmount) * 100))
-                  : 0;
-              const dueCtrl = store.getInvoiceDueControl(inv);
-              const canPay = invRemaining > 0;
-
-              return html`
-                <tr>
-                  <td>
-                    <app-link
-                      class="link-btn"
-                      size="md"
-                      variant="primary"
-                      @click="${() => ctr && store.openContractDetail(ctr.id)}"
-                    >
-                      <span slot="start">${iconReceipt(15)}</span>
-                      <span>${inv.number}</span>
-                    </app-link>
-                    <div class="cell-sub">
-                      ${comp ? `${comp.name} · ` : ''}${store.getInvoicePayments(inv.id).length} ${t.viewTexts.payments.paymentsCountSuffix}
-                    </div>
-                  </td>
-                  <td>
-                    ${ctr
-                      ? html`
-                          <app-link
-                            class="link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openContractDetail(ctr.id)}"
-                          >
-                            <span>${ctr.number}</span>
-                          </app-link>
-                          <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
-                        `
-                      : '—'}
-                  </td>
-                  <td>
-                    ${cp
-                      ? html`
-                          <app-link
-                            class="text-link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openCounterpartyDetail(cp.id)}"
-                          >
-                            ${cp.name}
-                          </app-link>
-                        `
-                      : '—'}
-                  </td>
-                  <td>
-                    <div class="mono" style="white-space: nowrap;">
-                      ${inv.issueDate} → ${inv.dueDate}
-                    </div>
-                    <div>${this.renderDueControlTag(inv, t)}</div>
-                  </td>
-                  <td>
-                    <div class="inv-pay-cell">
-                      <div class="inv-pay-meta mono">
-                        <span style="color: ${invPaid > 0 ? '#10b981' : 'var(--text-muted)'}; font-weight: 600;">
-                          ${formatMoney(invPaid, inv.currency)}
-                        </span>
-                        <span>${payPct}%</span>
-                      </div>
-                      <div class="inv-pay-bar">
-                        <div
-                          class="inv-pay-fill ${dueCtrl.state === 'overdue'
-                            ? 'overdue'
-                            : payPct > 0 && payPct < 100
-                            ? 'partial'
-                            : ''}"
-                          style="width: ${payPct}%;"
-                        ></div>
-                      </div>
-                      ${invRemaining > 0
-                        ? html`
-                            <div class="inv-pay-meta mono">
-                              <span>${t.viewTexts.payments.dueLabel}:</span>
-                              <span style="color: ${dueCtrl.state === 'overdue' ? '#ef4444' : 'var(--text-primary)'}; font-weight: 600;">
-                                ${formatMoney(invRemaining, inv.currency)}
-                              </span>
-                            </div>
-                          `
-                        : ''}
-                    </div>
-                  </td>
-                  <td class="amount-cell">${formatMoney(inv.totalAmount, inv.currency)}</td>
-                  <td>
-                    <app-status-chip
-                      domain="invoice"
-                      status="${inv.status}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td>
-                    <div class="actions-row">
-                      ${canPay
-                        ? html`
-                            <app-button
-                              action="accept"
-                              size="sm"
-                              variant="icon"
-                              title="${t.payments.recordPayment}"
-                              @click="${() => this.openPaymentModal(inv)}"
-                            >
-                              <span slot="start">${iconCreditCard(14)}</span>
-                            </app-button>
-                            <app-button
-                              action="accept"
-                              size="sm"
-                              variant="icon"
-                              title="${t.invoices.markPaid}"
-                              @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
-                            >
-                              <span slot="start">${iconCheck(14)}</span>
-                            </app-button>
-                          `
-                        : ''}
-                      ${ctr
-                        ? html`
-                            <app-button
-                              size="sm"
-                              variant="icon"
-                              title="${t.contractDetail.openContract}"
-                              @click="${() => store.openContractDetail(ctr.id)}"
-                            >
-                              <span slot="start">${iconChevronRight(15)}</span>
-                            </app-button>
-                          `
-                        : ''}
-                    </div>
-                  </td>
-                </tr>
-              `;
-            })}
-          </tbody>
-        </table>
+        <app-data-table
+          .rows="${invoices}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="number" label="${t.viewTexts.payments.thInvoice}" .cellRender="${dueInvNumberCell}"></app-table-column>
+          <app-table-column field="contractId" label="${t.viewTexts.payments.thContract}" .cellRender="${dueContractCell}"></app-table-column>
+          <app-table-column field="counterpartyId" label="${t.viewTexts.payments.thCounterparty}" .cellRender="${dueCpCell}"></app-table-column>
+          <app-table-column field="issueDate" label="${t.viewTexts.payments.thDatesControl}" .cellRender="${dueDatesCell}"></app-table-column>
+          <app-table-column field="totalAmount" label="${t.viewTexts.payments.thPaidBalance}" .cellRender="${duePayCell}"></app-table-column>
+          <app-table-column field="totalAmount" label="${t.viewTexts.payments.thInvoiceTotal}" .cellRender="${(row: Record<string, unknown>) => html`
+            <div class="amount-cell">${formatMoney((row as unknown as Invoice).totalAmount, (row as unknown as Invoice).currency)}</div>
+          `}"></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.payments.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="invoice"
+                status="${(row as unknown as Invoice).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column field="" label="" .cellRender="${(row: Record<string, unknown>) => {
+            const inv = row as unknown as Invoice;
+            const ctr = this.contracts.find((c) => c.id === inv.contractId);
+            const canPay = store.getInvoiceRemainingAmount(inv) > 0;
+            return html`
+              <div class="ctr-actions-row">
+                ${canPay
+                  ? html`
+                      <app-button
+                        action="accept"
+                        size="sm"
+                        variant="icon"
+                        title="${t.payments.recordPayment}"
+                        @click="${() => this.openPaymentModal(inv)}"
+                      >
+                        <span slot="start">${iconCreditCard(14)}</span>
+                      </app-button>
+                      <app-button
+                        action="accept"
+                        size="sm"
+                        variant="icon"
+                        title="${t.invoices.markPaid}"
+                        @click="${() => store.updateInvoiceStatus(inv.id, 'paid')}"
+                      >
+                        <span slot="start">${iconCheck(14)}</span>
+                      </app-button>
+                    `
+                  : ''}
+                ${ctr
+                  ? html`
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.contractDetail.openContract}"
+                        @click="${() => store.openContractDetail(ctr.id)}"
+                      >
+                        <span slot="start">${iconChevronRight(15)}</span>
+                      </app-button>
+                    `
+                  : ''}
+              </div>
+            `;
+          }}"></app-table-column>
+        </app-data-table>
       </div>
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
@@ -643,201 +652,205 @@ export class AppPayments extends LitElement {
       return html`<app-empty-state compact title="${t.payments.noPayments}"></app-empty-state>`;
     }
 
-    const paged = paginateItems(payments, this.currentPage, this.tablePageSize);
+    // Payment ledger reference rich cells (rendered inside the app-data-table shadow tree)
+    const payDocCell = (row: Record<string, unknown>) => {
+      const pay = row as unknown as InvoicePayment;
+      const isOutgoing = pay.direction === 'outgoing';
+      return html`
+        <div style="font-weight: 700; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.35rem;">
+          <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
+            ${isOutgoing ? iconArrowUpRight(14) : iconArrowDownLeft(14)}
+          </span>
+          <app-link
+            class="link-btn"
+            size="md"
+            variant="primary"
+            title="${t.viewTexts.payments.openDetailsTitle}"
+            @click="${() => store.openPaymentDetail(pay.id)}"
+          >
+            <span class="mono">${pay.documentNumber || pay.id}</span>
+          </app-link>
+        </div>
+      `;
+    };
+    const payCompanyCell = (row: Record<string, unknown>) => {
+      const pay = row as unknown as InvoicePayment;
+      const comp = store.companies.find((c) => c.id === pay.companyId);
+      const compReqLabel = store.getPaymentCompanyRequisitesLabel(pay);
+      return html`
+        ${comp
+          ? html`
+              <app-link
+                class="text-link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openCompanyDetail(comp.id)}"
+              >
+                ${comp.name}
+              </app-link>
+            `
+          : '—'}
+        ${compReqLabel
+          ? html`
+              <div class="req-sub" title="${compReqLabel}">
+                ${iconLandmark(11)}
+                <span>${compReqLabel}</span>
+              </div>
+            `
+          : html`<div class="pay-cell-sub">${t.viewTexts.payments.noBankAccountOption}</div>`}
+      `;
+    };
+    const payCpCell = (row: Record<string, unknown>) => {
+      const pay = row as unknown as InvoicePayment;
+      const cp = pay.counterpartyId
+        ? store.counterparties.find((c) => c.id === pay.counterpartyId)
+        : undefined;
+      const cpReqLabel = store.getPaymentCounterpartyRequisitesLabel(pay);
+      return html`
+        ${cp
+          ? html`
+              <app-link
+                class="text-link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openCounterpartyDetail(cp.id)}"
+              >
+                ${cp.name}
+              </app-link>
+            `
+          : '—'}
+        ${cpReqLabel
+          ? html`
+              <div class="req-sub" title="${cpReqLabel}">
+                ${iconLandmark(11)}
+                <span>${cpReqLabel}</span>
+              </div>
+            `
+          : ''}
+      `;
+    };
+    const payInvoiceCell = (row: Record<string, unknown>) => {
+      const pay = row as unknown as InvoicePayment;
+      const inv = pay.invoiceId ? this.invoices.find((i) => i.id === pay.invoiceId) : undefined;
+      const ctr = pay.contractId ? this.contracts.find((c) => c.id === pay.contractId) : undefined;
+      return html`
+        ${inv
+          ? html`
+              <app-link
+                class="link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => ctr && store.openContractDetail(ctr.id)}"
+              >
+                <span>${inv.number}</span>
+              </app-link>
+              ${ctr
+                ? html`<div class="pay-contract-desc" title="${ctr.title}">${ctr.number}</div>`
+                : ''}
+            `
+          : ctr
+          ? html`
+              <app-link
+                class="link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openContractDetail(ctr.id)}"
+              >
+                <span>${ctr.number}</span>
+              </app-link>
+              <div class="pay-cell-sub">${t.viewTexts.payments.standalonePayment}</div>
+            `
+          : html`<span class="pay-cell-sub">${t.viewTexts.payments.standalonePayment}</span>`}
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.payments.paymentDate}</th>
-              <th>${t.viewTexts.payments.thDirection}</th>
-              <th>${t.payments.documentNumber}</th>
-              <th>${t.viewTexts.payments.thCompanyRequisites}</th>
-              <th>${t.viewTexts.payments.thCounterparty}</th>
-              <th>${t.viewTexts.payments.thInvoice}</th>
-              <th>${t.payments.paymentMethod}</th>
-              <th>${t.payments.notes}</th>
-              <th>${t.viewTexts.payments.thAmount}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((pay) => {
-              const inv = pay.invoiceId ? this.invoices.find((i) => i.id === pay.invoiceId) : undefined;
-              const ctr = pay.contractId ? this.contracts.find((c) => c.id === pay.contractId) : undefined;
-              const cp = pay.counterpartyId
-                ? store.counterparties.find((c) => c.id === pay.counterpartyId)
-                : undefined;
-              const comp = store.companies.find((c) => c.id === pay.companyId);
-              const compReqLabel = store.getPaymentCompanyRequisitesLabel(pay);
-              const cpReqLabel = store.getPaymentCounterpartyRequisitesLabel(pay);
-              const isOutgoing = pay.direction === 'outgoing';
-
-              return html`
-                <tr>
-                  <td class="mono" style="white-space: nowrap;">${pay.paymentDate}</td>
-                  <td>
-                    <app-status-chip
-                      domain="paymentDirection"
-                      status="${pay.direction}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td class="mono" style="font-weight: 700; white-space: nowrap;">
-                    <div style="display: inline-flex; align-items: center; gap: 0.35rem;">
-                      <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
-                        ${isOutgoing ? iconArrowUpRight(14) : iconArrowDownLeft(14)}
-                      </span>
-                      <app-link
-                        class="link-btn"
-                        size="md"
-                        variant="primary"
-                        title="${t.viewTexts.payments.openDetailsTitle}"
-                        @click="${() => store.openPaymentDetail(pay.id)}"
-                      >
-                        <span class="mono">${pay.documentNumber || pay.id}</span>
-                      </app-link>
-                    </div>
-                  </td>
-                  <td>
-                    ${comp
-                      ? html`
-                          <app-link
-                            class="text-link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openCompanyDetail(comp.id)}"
-                          >
-                            ${comp.name}
-                          </app-link>
-                        `
-                      : '—'}
-                    ${compReqLabel
-                      ? html`
-                          <div class="req-sub" title="${compReqLabel}">
-                            ${iconLandmark(11)}
-                            <span>${compReqLabel}</span>
-                          </div>
-                        `
-                      : html`<div class="cell-sub">${t.viewTexts.payments.noBankAccountOption}</div>`}
-                  </td>
-                  <td>
-                    ${cp
-                      ? html`
-                          <app-link
-                            class="text-link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openCounterpartyDetail(cp.id)}"
-                          >
-                            ${cp.name}
-                          </app-link>
-                        `
-                      : '—'}
-                    ${cpReqLabel
-                      ? html`
-                          <div class="req-sub" title="${cpReqLabel}">
-                            ${iconLandmark(11)}
-                            <span>${cpReqLabel}</span>
-                          </div>
-                        `
-                      : ''}
-                  </td>
-                  <td>
-                    ${inv
-                      ? html`
-                          <app-link
-                            class="link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => ctr && store.openContractDetail(ctr.id)}"
-                          >
-                            <span>${inv.number}</span>
-                          </app-link>
-                          ${ctr
-                            ? html`<div class="contract-desc" title="${ctr.title}">${ctr.number}</div>`
-                            : ''}
-                        `
-                      : ctr
-                      ? html`
-                          <app-link
-                            class="link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openContractDetail(ctr.id)}"
-                          >
-                            <span>${ctr.number}</span>
-                          </app-link>
-                          <div class="cell-sub">${t.viewTexts.payments.standalonePayment}</div>
-                        `
-                      : html`<span class="cell-sub">${t.viewTexts.payments.standalonePayment}</span>`}
-                  </td>
-                  <td>
-                    <app-badge variant="default" appearance="soft" size="sm">
-                      ${t.payments.methods[pay.method]}
-                    </app-badge>
-                  </td>
-                  <td style="color: var(--text-secondary); max-width: 240px;">
-                    ${pay.notes || '—'}
-                  </td>
-                  <td class="amount-cell ${isOutgoing ? 'outgoing' : 'incoming'}">
-                    ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
-                  </td>
-                  <td>
-                    <div class="actions-row">
+        <app-data-table
+          .rows="${payments}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="paymentDate" label="${t.payments.paymentDate}" mono .cellRender="${(row: Record<string, unknown>) => html`
+            <div style="white-space: nowrap;">${(row as unknown as InvoicePayment).paymentDate}</div>
+          `}"></app-table-column>
+          <app-table-column field="direction" label="${t.viewTexts.payments.thDirection}" .cellRender="${(row: Record<string, unknown>) => html`
+            <app-status-chip
+              domain="paymentDirection"
+              status="${(row as unknown as InvoicePayment).direction}"
+              appearance="soft"
+              size="sm"
+            ></app-status-chip>
+          `}"></app-table-column>
+          <app-table-column field="documentNumber" label="${t.payments.documentNumber}" mono .cellRender="${payDocCell}"></app-table-column>
+          <app-table-column field="companyId" label="${t.viewTexts.payments.thCompanyRequisites}" .cellRender="${payCompanyCell}"></app-table-column>
+          <app-table-column field="counterpartyId" label="${t.viewTexts.payments.thCounterparty}" .cellRender="${payCpCell}"></app-table-column>
+          <app-table-column field="invoiceId" label="${t.viewTexts.payments.thInvoice}" .cellRender="${payInvoiceCell}"></app-table-column>
+          <app-table-column field="method" label="${t.payments.paymentMethod}" .cellRender="${(row: Record<string, unknown>) => html`
+            <app-badge variant="default" appearance="soft" size="sm">
+              ${t.payments.methods[(row as unknown as InvoicePayment).method]}
+            </app-badge>
+          `}"></app-table-column>
+          <app-table-column field="notes" label="${t.payments.notes}" .cellRender="${(row: Record<string, unknown>) => html`
+            <div style="color: var(--text-secondary); max-width: 240px;">${(row as unknown as InvoicePayment).notes || '—'}</div>
+          `}"></app-table-column>
+          <app-table-column field="amount" label="${t.viewTexts.payments.thAmount}" .cellRender="${(row: Record<string, unknown>) => {
+            const pay = row as unknown as InvoicePayment;
+            const isOutgoing = pay.direction === 'outgoing';
+            return html`
+              <div class="amount-cell ${isOutgoing ? 'outgoing' : 'incoming'}">
+                ${isOutgoing ? '−' : '+'}${formatMoney(pay.amount, pay.currency)}
+              </div>
+            `;
+          }}"></app-table-column>
+          <app-table-column field="" label="" .cellRender="${(row: Record<string, unknown>) => {
+            const pay = row as unknown as InvoicePayment;
+            const ctr = pay.contractId ? this.contracts.find((c) => c.id === pay.contractId) : undefined;
+            return html`
+              <div class="ctr-actions-row">
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  title="${t.viewTexts.payments.openDetailsTitle}"
+                  @click="${() => store.openPaymentDetail(pay.id)}"
+                >
+                  <span slot="start">${iconEye(14)}</span>
+                </app-button>
+                ${ctr
+                  ? html`
                       <app-button
                         size="sm"
                         variant="icon"
-                        title="${t.viewTexts.payments.openDetailsTitle}"
-                        @click="${() => store.openPaymentDetail(pay.id)}"
+                        title="${t.contractDetail.openContract}"
+                        @click="${() => store.openContractDetail(ctr.id)}"
                       >
-                        <span slot="start">${iconEye(14)}</span>
+                        <span slot="start">${iconChevronRight(15)}</span>
                       </app-button>
-                      ${ctr
-                        ? html`
-                            <app-button
-                              size="sm"
-                              variant="icon"
-                              title="${t.contractDetail.openContract}"
-                              @click="${() => store.openContractDetail(ctr.id)}"
-                            >
-                              <span slot="start">${iconChevronRight(15)}</span>
-                            </app-button>
-                          `
-                        : ''}
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingPayment = pay)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
-              `;
-            })}
-          </tbody>
-        </table>
+                    `
+                  : ''}
+                <app-button
+                  action="delete"
+                  size="sm"
+                  variant="icon"
+                  title="${t.common.delete}"
+                  @click="${() => (this.deletingPayment = pay)}"
+                >
+                  <span slot="start">${iconTrash(14)}</span>
+                </app-button>
+              </div>
+            `;
+          }}"></app-table-column>
+        </app-data-table>
       </div>
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
