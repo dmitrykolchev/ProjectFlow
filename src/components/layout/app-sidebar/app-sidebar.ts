@@ -3,9 +3,16 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { presenceFromStatus } from '../../../domain/presence-tokens';
+import {
+  presenceFromStatus,
+  presenceLabel,
+  type PersonaPresence,
+} from '../../../domain/presence-tokens';
+import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
+import { MenuItem } from '../../common/app-menu/app-menu';
 import { mapProjectOptions } from '../../common/entity-selector-options';
 import '../../common/app-persona/app-persona';
+import '../../common/app-menu/app-menu';
 import '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-sidebar.css';
 import {
@@ -52,6 +59,84 @@ export class AppSidebar extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this.unsubscribe) this.unsubscribe();
+    this.closePresenceMenu();
+  }
+
+  private portalHandle: PortalHandle | null = null;
+
+  private closePresenceMenu() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
+  /** The footer persona opens its menu: manual presence selection + the profile entry. */
+  private openPresenceMenu() {
+    if (this.portalHandle) {
+      this.closePresenceMenu();
+      return;
+    }
+    const t = getTranslation(this.currentLang);
+    const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
+    if (!currentUser) return;
+    const anchor = this.shadowRoot?.querySelector('.user-persona') as HTMLElement | null;
+    if (!anchor) return;
+
+    const current = presenceFromStatus(currentUser.status);
+    const options: PersonaPresence[] = ['available', 'online', 'away', 'busy'];
+    const items: MenuItem[] = [
+      { id: 'presence-header', header: t.viewTexts.sidebar.presenceHeader },
+      ...options.map((p) => ({
+        id: `presence-${p}`,
+        label: presenceLabel(p, this.currentLang, t),
+        checked: p === current,
+      })),
+      { id: 'profile-divider', divider: true },
+      { id: 'profile', label: t.viewTexts.sidebar.profileMenuItem },
+    ];
+
+    const rect = anchor.getBoundingClientRect();
+    const minW = Math.max(200, Math.round(rect.width));
+    const left = Math.max(8, Math.min(Math.round(rect.left), window.innerWidth - minW - 8));
+    const spaceAbove = rect.top - 12;
+    const spaceBelow = window.innerHeight - rect.bottom - 12;
+    const above = spaceAbove >= spaceBelow;
+    const vert = above
+      ? `bottom: ${Math.round(window.innerHeight - rect.top + 6)}px; top: auto;`
+      : `top: ${Math.round(rect.bottom + 6)}px; bottom: auto;`;
+    const maxH = Math.max(100, Math.min(320, above ? spaceAbove : spaceBelow));
+
+    this.portalHandle = portalManager.mountTemplate({
+      kind: 'popup',
+      styles,
+      template: html`
+        <div
+          class="popover-menu"
+          style="left: ${left}px; right: auto; ${vert} min-width: ${minW}px; max-height: ${maxH}px;"
+        >
+          <app-menu .items="${items}" @select="${this.handlePresenceMenuSelect}"></app-menu>
+        </div>
+      `,
+      host: this,
+      closeOnBackdrop: true,
+      onClose: () => {
+        this.portalHandle = null;
+      },
+    });
+  }
+
+  private handlePresenceMenuSelect(e: CustomEvent) {
+    e.stopPropagation();
+    const id = String((e.detail as { id?: string })?.id || '');
+    this.closePresenceMenu();
+    if (id === 'profile') {
+      store.setActiveView('profile-settings');
+      return;
+    }
+    if (id.startsWith('presence-')) {
+      store.setUserPresence(store.currentUserId, id.slice('presence-'.length) as PersonaPresence);
+    }
   }
 
   private syncState() {
@@ -256,21 +341,16 @@ export class AppSidebar extends LitElement {
             return !this.collapsed
               ? html`
                   <div class="user-footer-row">
-                    <div
-                      class="user-profile is-clickable"
-                      title="${t.viewTexts.sidebar.profileOpenTitle}"
-                      @click="${() => store.setActiveView('profile-settings')}"
-                    >
-                      <app-persona
-                        size="32"
-                        .initials="${currentUser.avatar}"
-                        .presence="${presenceFromStatus(currentUser.status)}"
-                        .primaryText="${currentUser.name}"
-                        .secondaryText="${currentUser.role}"
-                        .color="${'var(--bg-hover, #223049)'}"
-                        .interactive="${false}"
-                      ></app-persona>
-                    </div>
+                    <app-persona
+                      class="user-persona"
+                      size="32"
+                      .initials="${currentUser.avatar}"
+                      .presence="${presenceFromStatus(currentUser.status)}"
+                      .primaryText="${currentUser.name}"
+                      .secondaryText="${currentUser.role}"
+                      .color="${'var(--bg-hover, #223049)'}"
+                      @click="${() => this.openPresenceMenu()}"
+                    ></app-persona>
                     <button
                       type="button"
                       class="logout-btn"
@@ -287,20 +367,14 @@ export class AppSidebar extends LitElement {
                 `
               : html`
                   <div class="user-footer-collapsed">
-                    <div
-                      class="user-profile is-clickable"
-                      style="justify-content: center;"
-                      title="${t.viewTexts.sidebar.profileOpenTitle}"
-                      @click="${() => store.setActiveView('profile-settings')}"
-                    >
-                      <app-persona
-                        size="32"
-                        .initials="${currentUser.avatar}"
-                        .presence="${presenceFromStatus(currentUser.status)}"
-                        .color="${'var(--bg-hover, #223049)'}"
-                        .interactive="${false}"
-                      ></app-persona>
-                    </div>
+                    <app-persona
+                      class="user-persona"
+                      size="32"
+                      .initials="${currentUser.avatar}"
+                      .presence="${presenceFromStatus(currentUser.status)}"
+                      .color="${'var(--bg-hover, #223049)'}"
+                      @click="${() => this.openPresenceMenu()}"
+                    ></app-persona>
                     <button
                       type="button"
                       class="logout-btn"
