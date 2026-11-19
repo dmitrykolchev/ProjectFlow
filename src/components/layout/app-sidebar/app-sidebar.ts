@@ -262,7 +262,7 @@ export class AppSidebar extends LitElement {
                       @click="${() => store.setActiveView('profile-settings')}"
                     >
                       <app-persona
-                        size="48"
+                        size="32"
                         .initials="${currentUser.avatar}"
                         .presence="${presenceFromStatus(currentUser.status)}"
                         .primaryText="${currentUser.name}"
@@ -294,7 +294,7 @@ export class AppSidebar extends LitElement {
                       @click="${() => store.setActiveView('profile-settings')}"
                     >
                       <app-persona
-                        size="48"
+                        size="32"
                         .initials="${currentUser.avatar}"
                         .presence="${presenceFromStatus(currentUser.status)}"
                         .color="${'var(--bg-hover, #223049)'}"
