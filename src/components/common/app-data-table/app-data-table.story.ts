@@ -90,7 +90,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/DataTable',
   component: 'app-data-table',
   description:
-    'Data table with a fixed header and footer. Columns are declared as child app-table-column elements (field-driven formatting, mono/code cells, custom cellRender for rich cells and row actions). Sorting and pagination are internal: sortable headers sort the rows and emit sort-change, rows are sliced by page-size and the footer shows app-pagination whenever there is more than one page. The table stretches to display all rendered rows; max-height caps the host so the body gets its own scrollbar.',
+    'Data table with a fixed header and footer. Columns are declared as child app-table-column elements (field-driven formatting, mono/code cells, custom cellRender for rich cells and row actions). Sorting and pagination are internal: sortable headers sort the rows and emit sort-change, rows are sliced by page-size and the footer shows app-pagination whenever the table is not empty — even with a single page it hosts the page-size selector, so rows-per-page can always be changed from the footer. The table stretches to display all rendered rows; max-height caps the host so the body gets its own scrollbar.',
   category: 'Common',
   propsDoc: {
     rows: 'Array of row objects rendered by the table',
@@ -103,6 +103,7 @@ export const meta: ComponentStoryMeta = {
     locale: 'Locale used for number formatting and the pagination summary',
     'sort-change event': 'Emitted with detail { field, dir } when a header sort button is clicked',
     'page-change event': 'Emitted with detail { page, pageSize, totalItems } when pagination changes',
+    'page-size-change event': 'Emitted with detail { page: 1, pageSize, totalItems } when the footer page-size selector changes; rows are re-sliced at the new size and the page resets to 1',
   },
   stories: [
     {
@@ -179,9 +180,9 @@ export const meta: ComponentStoryMeta = {
       `,
     },
     {
-      name: 'Single Page (No Footer)',
+      name: 'Single Page With Footer',
       description:
-        'When the rows fit in one page the footer is omitted; the table stretches to show every row',
+        'When the rows fit in one page the footer is still shown: it hosts the page-size selector so the rows-per-page can be changed even with a single page; the table stretches to show every row',
       render: () => html`
         <div style="max-width: 700px;">
           <app-data-table .rows="${demoEntries.slice(0, 6)}" page-size="10">

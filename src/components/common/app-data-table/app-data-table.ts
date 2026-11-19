@@ -28,7 +28,9 @@ export interface DataTablePageChangeDetail {
  * too: rows are sliced by page-size, and the footer shows app-pagination whenever
  * there is more than one page. By default the table stretches to display every
  * rendered row; setting max-height caps the host, so the body gets its own
- * scrollbar while the header and footer stay in place.
+ * scrollbar while the header and footer stay in place. The footer is shown
+ * whenever the table is not empty: even with a single page it hosts the page-size
+ * selector, so the rows-per-page can always be changed from the footer.
  */
 @customElement('app-data-table')
 export class AppDataTable extends LitElement {
@@ -236,7 +238,7 @@ export class AppDataTable extends LitElement {
               </table>
             `}
       </div>
-      ${slice.totalItems > slice.pageSize
+      ${sorted.length > 0
         ? html`
             <div class="table-footer">
               <app-pagination

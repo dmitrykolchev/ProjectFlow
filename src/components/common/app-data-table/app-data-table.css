@@ -139,6 +139,73 @@
   gap: 0.25rem;
 }
 
+/* Registry reference rich cells (expenses journal): title link, vendor line, project
+   pill, task chip, amount with billable sub-line */
+.exp-title {
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.exp-vendor {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+}
+
+.project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* the project pill dot is 8px (registry reference), scoped so it does not change the
+   journal project-sub dot which stays 7px */
+.project-pill .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.task-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.1rem 0.42rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.task-chip-btn:hover {
+  filter: brightness(1.15);
+}
+
+.amount-cell {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.billable-sub {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 500;
+  margin-top: 0.15rem;
+  font-family: inherit;
+}
+
 .icon-action-btn {
   display: inline-flex;
   align-items: center;
@@ -299,7 +366,7 @@
   --btn-radius-br: var(--radius-sm, 6px);
 }
 
-.actions-row app-button:not([action='accept']):not([action='delete']) {
+.actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
