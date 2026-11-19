@@ -34,9 +34,9 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
-import '../../common/app-pagination/app-pagination';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import '../../common/app-entity-emblem/app-entity-emblem';
-import { paginateItems } from '../../common/paginate';
 import styles from './app-calculations.css';
 import { eventValue } from '../../common/event-value';
 
@@ -124,7 +124,6 @@ export class AppCalculations extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const filtered = this.getFiltered();
-    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
 
     const sentCalcs = this.calculations.filter((c) => c.status === 'sent');
     const approvedCalcs = this.calculations.filter((c) => c.status === 'approved');
@@ -163,6 +162,194 @@ export class AppCalculations extends LitElement {
     ];
 
     const hUnit = t.viewTexts.calculations.hoursUnitShort;
+    // Calculations registry reference rich cells (rendered inside the app-data-table shadow tree)
+    const calcNumberCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
+      const nonBillableItems = calc.items.filter((i) => !i.billable).length;
+      return html`
+        <app-link
+          class="link-btn"
+          size="md"
+          variant="primary"
+          @click="${() => store.openCalculationDetail(calc.id)}"
+        >
+          <span slot="start">${iconCalculator(15)}</span>
+          <span>${calc.number}</span>
+        </app-link>
+        <div class="cell-sub">
+          <span>${calc.items.length} ${t.viewTexts.calculations.itemsSuffix}</span>
+          ${nonBillableItems > 0
+            ? html`<span class="micro-tag zero">0 ₽: ${nonBillableItems}</span>`
+            : ''}
+          ${priorCount > 0
+            ? html`<span class="micro-tag prior">+${priorCount} ${t.calculations.priorBadge}</span>`
+            : ''}
+        </div>
+      `;
+    };
+    const calcContractCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const ctr = this.contracts.find((c) => c.id === calc.contractId);
+      return html`
+        ${ctr
+          ? html`
+              <app-link
+                class="link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openContractDetail(ctr.id)}"
+              >
+                <span>${ctr.number}</span>
+              </app-link>
+              <div class="calc-contract-desc" title="${ctr.title}">${ctr.title}</div>
+            `
+          : '—'}
+      `;
+    };
+    const calcCpCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const cp = store.counterparties.find((c) => c.id === calc.counterpartyId);
+      return html`
+        ${cp
+          ? html`
+              <app-link
+                class="text-link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openCounterpartyDetail(cp.id)}"
+              >
+                ${cp.name}
+              </app-link>
+            `
+          : '—'}
+      `;
+    };
+    const calcPeriodCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      return html`
+        <div class="mono" style="white-space: nowrap;">
+          ${calc.periodStart} → ${calc.periodEnd}
+        </div>
+        <div class="cell-sub">${t.calculations.frequencies[calc.frequency]}</div>
+      `;
+    };
+    const calcHoursCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      return html`
+        <div>${calc.billableHours} ${hUnit}</div>
+        ${calc.nonBillableHours > 0
+          ? html`<div class="cell-sub">+${calc.nonBillableHours} ${hUnit} (0 ₽)</div>`
+          : ''}
+      `;
+    };
+    const calcAmountCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const linkedInv = calc.invoiceId
+        ? this.invoices.find((i) => i.id === calc.invoiceId)
+        : undefined;
+      return html`
+        <div class="amount-cell">
+          <div>${formatMoney(calc.billableAmount, calc.currency)}</div>
+          ${linkedInv
+            ? html`<div class="cell-sub" style="color: #10b981;">${linkedInv.number}</div>`
+            : ''}
+        </div>
+      `;
+    };
+    const calcActionsCell = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const ctr = this.contracts.find((c) => c.id === calc.contractId);
+      return html`
+        <div class="ctr-actions-row">
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${t.calculations.previewCalculation}"
+            @click="${() => (this.previewCalculation = calc)}"
+          >
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+          ${calc.status === 'draft' || calc.status === 'rejected'
+            ? html`
+                <app-button
+                  action="submit"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.sendForApproval}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
+                >
+                  <span slot="start">${iconSend(14)}</span>
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'sent'
+            ? html`
+                <app-button
+                  action="accept"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.approveCalc}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
+                >
+                  <span slot="start">${iconCheck(14)}</span>
+                </app-button>
+                <app-button
+                  action="reject"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.rejectCalc}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
+                >
+                  <span slot="start">${iconX(14)}</span>
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'approved' && ctr
+            ? html`
+                <app-button
+                  action="accept"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.createInvoiceFromCalc}"
+                  @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
+                >
+                  <span slot="start">${iconReceipt(15)}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(calc)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          ${ctr
+            ? html`
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  title="${t.contractDetail.openContract}"
+                  @click="${() => store.openContractDetail(ctr.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button
+            action="delete"
+            size="sm"
+            variant="icon"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingCalculation = calc)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </div>
+      `;
+    };
 
     return html`
       <app-page-header
@@ -227,219 +414,41 @@ export class AppCalculations extends LitElement {
           `
         : html`
             <div class="table-card">
-              <table class="data-table">
-                <thead>
-                  <tr>
-                    <th>${t.viewTexts.calculations.thCalculation}</th>
-                    <th>${t.viewTexts.calculations.thContract}</th>
-                    <th>${t.viewTexts.calculations.thCounterparty}</th>
-                    <th>${t.viewTexts.calculations.thPeriodCycle}</th>
-                    <th>${t.viewTexts.calculations.thLabor}</th>
-                    <th>${t.viewTexts.calculations.thBillableCol}</th>
-                    <th>${t.viewTexts.calculations.thStatus}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  ${paged.items.map((calc) => {
-                    const ctr = this.contracts.find((c) => c.id === calc.contractId);
-                    const cp = store.counterparties.find((c) => c.id === calc.counterpartyId);
-                    const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
-                    const nonBillableItems = calc.items.filter((i) => !i.billable).length;
-                    const linkedInv = calc.invoiceId
-                      ? this.invoices.find((i) => i.id === calc.invoiceId)
-                      : undefined;
-
-                    return html`
-                      <tr>
-                        <td>
-                          <app-link
-                            class="link-btn"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openCalculationDetail(calc.id)}"
-                          >
-                            <span slot="start">${iconCalculator(15)}</span>
-                            <span>${calc.number}</span>
-                          </app-link>
-                          <div class="cell-sub">
-                            <span>${calc.items.length} ${t.viewTexts.calculations.itemsSuffix}</span>
-                            ${nonBillableItems > 0
-                              ? html`<span class="micro-tag zero">0 ₽: ${nonBillableItems}</span>`
-                              : ''}
-                            ${priorCount > 0
-                              ? html`<span class="micro-tag prior">+${priorCount} ${t.calculations.priorBadge}</span>`
-                              : ''}
-                          </div>
-                        </td>
-                        <td>
-                          ${ctr
-                            ? html`
-                                <app-link
-                                  class="link-btn"
-                                  size="md"
-                                  variant="primary"
-                                  @click="${() => store.openContractDetail(ctr.id)}"
-                                >
-                                  <span>${ctr.number}</span>
-                                </app-link>
-                                <div class="contract-desc" title="${ctr.title}">${ctr.title}</div>
-                              `
-                            : '—'}
-                        </td>
-                        <td>
-                          ${cp
-                            ? html`
-                                <app-link
-                                  class="text-link-btn"
-                                  size="md"
-                                  variant="primary"
-                                  @click="${() => store.openCounterpartyDetail(cp.id)}"
-                                >
-                                  ${cp.name}
-                                </app-link>
-                              `
-                            : '—'}
-                        </td>
-                        <td>
-                          <div class="mono" style="white-space: nowrap;">
-                            ${calc.periodStart} → ${calc.periodEnd}
-                          </div>
-                          <div class="cell-sub">${t.calculations.frequencies[calc.frequency]}</div>
-                        </td>
-                        <td class="mono" style="white-space: nowrap;">
-                          <div>${calc.billableHours} ${hUnit}</div>
-                          ${calc.nonBillableHours > 0
-                            ? html`<div class="cell-sub">+${calc.nonBillableHours} ${hUnit} (0 ₽)</div>`
-                            : ''}
-                        </td>
-                        <td class="amount-cell">
-                          <div>${formatMoney(calc.billableAmount, calc.currency)}</div>
-                          ${linkedInv
-                            ? html`
-                                <div class="cell-sub" style="color: #10b981;">
-                                  ${linkedInv.number}
-                                </div>
-                              `
-                            : ''}
-                        </td>
-                        <td>
-                          <app-status-chip
-                            domain="calculation"
-                            status="${calc.status}"
-                            appearance="soft"
-                            size="sm"
-                          ></app-status-chip>
-                        </td>
-                        <td>
-                          <div class="actions-row">
-                            <app-button
-                              size="sm"
-                              variant="icon"
-                              title="${t.calculations.previewCalculation}"
-                              @click="${() => (this.previewCalculation = calc)}"
-                            >
-                              <span slot="start">${iconEye(14)}</span>
-                            </app-button>
-                            ${calc.status === 'draft' || calc.status === 'rejected'
-                              ? html`
-                                  <app-button
-                                    action="submit"
-                                    size="sm"
-                                    variant="icon"
-                                    title="${t.calculations.sendForApproval}"
-                                    @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
-                                  >
-                                    <span slot="start">${iconSend(14)}</span>
-                                  </app-button>
-                                `
-                              : ''}
-                            ${calc.status === 'sent'
-                              ? html`
-                                  <app-button
-                                    action="accept"
-                                    size="sm"
-                                    variant="icon"
-                                    title="${t.calculations.approveCalc}"
-                                    @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
-                                  >
-                                    <span slot="start">${iconCheck(14)}</span>
-                                  </app-button>
-                                  <app-button
-                                    action="reject"
-                                    size="sm"
-                                    variant="icon"
-                                    title="${t.calculations.rejectCalc}"
-                                    @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
-                                  >
-                                    <span slot="start">${iconX(14)}</span>
-                                  </app-button>
-                                `
-                              : ''}
-                            ${calc.status === 'approved' && ctr
-                              ? html`
-                                  <app-button
-                                    action="accept"
-                                    size="sm"
-                                    variant="icon"
-                                    title="${t.calculations.createInvoiceFromCalc}"
-                                    @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
-                                  >
-                                    <span slot="start">${iconReceipt(15)}</span>
-                                  </app-button>
-                                `
-                              : ''}
-                            <app-button
-                              size="sm"
-                              variant="icon"
-                              title="${t.common.edit}"
-                              @click="${() => this.openEditModal(calc)}"
-                            >
-                              <span slot="start">${iconEdit(14)}</span>
-                            </app-button>
-                            ${ctr
-                              ? html`
-                                  <app-button
-                                    size="sm"
-                                    variant="icon"
-                                    title="${t.contractDetail.openContract}"
-                                    @click="${() => store.openContractDetail(ctr.id)}"
-                                  >
-                                    <span slot="start">${iconChevronRight(15)}</span>
-                                  </app-button>
-                                `
-                              : ''}
-                            <app-button
-                              action="delete"
-                              size="sm"
-                              variant="icon"
-                              title="${t.common.delete}"
-                              @click="${() => (this.deletingCalculation = calc)}"
-                            >
-                              <span slot="start">${iconTrash(14)}</span>
-                            </app-button>
-                          </div>
-                        </td>
-                      </tr>
-                    `;
-                  })}
-                </tbody>
-              </table>
+              <app-data-table
+                .rows="${filtered}"
+                page-size="${this.tablePageSize}"
+                page="${this.currentPage}"
+                locale="${t.common.locale}"
+                @page-change="${(e: CustomEvent<{ page: number }>) => {
+                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+                  this.scrollTop = 0;
+                }}"
+                @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+                  this.currentPage = 1; store.setActivePage(1, false);
+                  store.setTablePageSize(e.detail.pageSize);
+                }}"
+              >
+                <app-table-column field="number" label="${t.viewTexts.calculations.thCalculation}" .cellRender="${calcNumberCell}"></app-table-column>
+                <app-table-column field="contractId" label="${t.viewTexts.calculations.thContract}" .cellRender="${calcContractCell}"></app-table-column>
+                <app-table-column field="counterpartyId" label="${t.viewTexts.calculations.thCounterparty}" .cellRender="${calcCpCell}"></app-table-column>
+                <app-table-column field="periodStart" label="${t.viewTexts.calculations.thPeriodCycle}" .cellRender="${calcPeriodCell}"></app-table-column>
+                <app-table-column field="billableHours" label="${t.viewTexts.calculations.thLabor}" mono .cellRender="${calcHoursCell}"></app-table-column>
+                <app-table-column field="billableAmount" label="${t.viewTexts.calculations.thBillableCol}" .cellRender="${calcAmountCell}"></app-table-column>
+                <app-table-column
+                  field="status"
+                  label="${t.viewTexts.calculations.thStatus}"
+                  .cellRender="${(row: Record<string, unknown>) => html`
+                    <app-status-chip
+                      domain="calculation"
+                      status="${(row as unknown as Calculation).status}"
+                      appearance="soft"
+                      size="sm"
+                    ></app-status-chip>
+                  `}"
+                ></app-table-column>
+                <app-table-column field="" label="" .cellRender="${calcActionsCell}"></app-table-column>
+              </app-data-table>
             </div>
-            <app-pagination
-              layout-mode="table"
-              .totalItems="${paged.totalItems}"
-              .page="${paged.page}"
-              .pageSize="${paged.pageSize}"
-              @page-change="${(e: CustomEvent<{ page: number }>) => {
-                this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-                this.scrollTop = 0;
-              }}"
-              @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                this.currentPage = 1; store.setActivePage(1, false);
-                store.setTablePageSize(e.detail.pageSize);
-              }}"
-            ></app-pagination>
           `}
 
       ${this.renderFormModal(t)}
