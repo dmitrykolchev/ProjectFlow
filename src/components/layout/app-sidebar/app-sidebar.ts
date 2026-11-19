@@ -17,14 +17,8 @@ import '../../common/app-menu/app-menu';
 import '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-sidebar.css';
 import {
-  iconMoon,
-  iconSun,
   iconChevronLeft,
   iconChevronRight,
-  iconContrast,
-  iconHeart,
-  iconTerminal,
-  iconZap,
   iconLogOut,
 } from '../../common/icons';
 import { SidebarItem } from '../sidebar-item/sidebar-item';
@@ -39,7 +33,6 @@ export class AppSidebar extends LitElement {
   @property({ type: String, attribute: 'group-mode' }) groupMode: SidebarGroupMode = store.customization.sidebarGroupMode;
   @property({ type: Boolean }) standalone: boolean = false;
 
-  @state() private theme = store.customization.theme;
   @state() private currentLang = store.customization.language;
   @state() private selectedProjectId = store.selectedProjectId;
   @state() private expandedGroups: string[] = [...store.customization.sidebarExpandedGroups];
@@ -150,7 +143,6 @@ export class AppSidebar extends LitElement {
   }
 
   private syncState() {
-    this.theme = store.customization.theme;
     this.currentLang = store.customization.language;
     this.selectedProjectId = store.selectedProjectId;
     if (!this.standalone) {
@@ -304,47 +296,6 @@ export class AppSidebar extends LitElement {
         </nav>
 
         <div class="sidebar-footer">
-          <div class="quick-controls">
-            <button
-              class="quick-btn"
-              @click="${() => store.toggleTheme()}"
-              title="${t.viewTexts.sidebar.themeToggleTitle}"
-            >
-              ${this.theme === 'high-contrast'
-                ? iconContrast(14)
-                : this.theme === 'barbie'
-                ? iconHeart(14)
-                : this.theme === 'matrix'
-                ? iconTerminal(14)
-                : this.theme === 'cyberpunk'
-                ? iconZap(14)
-                : this.theme === 'dark'
-                ? iconSun(14)
-                : iconMoon(14)}
-              ${!this.collapsed
-                ? html`<span>${this.theme === 'high-contrast'
-                    ? 'AAA'
-                    : this.theme === 'barbie'
-                    ? 'Barbie'
-                    : this.theme === 'matrix'
-                    ? 'Matrix'
-                    : this.theme === 'cyberpunk'
-                    ? 'Cyber'
-                    : this.theme === 'dark'
-                    ? 'Dark'
-                    : 'Light'}</span>`
-                : ''}
-            </button>
-            <button
-              class="quick-btn"
-              @click="${() =>
-                store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
-              title="${t.viewTexts.sidebar.langToggleTitle}"
-            >
-              ${!this.collapsed ? html`<span>${this.currentLang.toUpperCase()}</span>` : html`<span>${this.currentLang.toUpperCase()}</span>`}
-            </button>
-          </div>
-
           ${(() => {
             const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
             if (!currentUser) return '';

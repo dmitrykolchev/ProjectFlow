@@ -145,40 +145,6 @@
   gap: 0.5rem;
 }
 
-.quick-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-}
-
-:host([collapsed]) .quick-controls {
-  flex-direction: column;
-}
-
-.quick-btn {
-  flex: 1;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
-  padding: 0.4rem;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-sm, 6px);
-  color: var(--text-secondary, #94a3b8);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
-}
-
-.quick-btn:hover {
-  background: var(--bg-hover, #223049);
-  color: var(--text-primary, #f8fafc);
-}
-
 .user-footer-row {
   display: flex;
   align-items: center;
