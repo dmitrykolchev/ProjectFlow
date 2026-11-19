@@ -1,0 +1,188 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.persona {
+  display: flex;
+  align-items: center;
+  gap: var(--persona-gap, 12px);
+  min-width: 0;
+  max-width: var(--persona-text-max, 220px);
+}
+
+.avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--persona-avatar, 48px);
+  height: var(--persona-avatar, 48px);
+}
+
+.avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary, #6366f1);
+  font-weight: 700;
+  font-size: var(--persona-initials-size, 19px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Presence badge: a filled circle with a white glyph, ringed by the surface colour. */
+.presence {
+  position: absolute;
+  left: var(--persona-badge-x, 24px);
+  top: var(--persona-badge-y, 24px);
+  width: var(--persona-badge, 24px);
+  height: var(--persona-badge, 24px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 0 0 var(--persona-badge-ring, 2px) var(--persona-ring-color, var(--bg-surface, #111827));
+}
+
+.text {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.line {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.primary {
+  font-size: var(--persona-primary-size, 14px);
+  line-height: var(--persona-primary-line, 20px);
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.secondary,
+.tertiary {
+  font-size: var(--persona-secondary-size, 12px);
+  line-height: var(--persona-secondary-line, 17px);
+  color: var(--text-secondary, #cbd5e1);
+}
+
+/* Text alternative for the colour-only presence dot on small personas. */
+.presence-text {
+  font-weight: 400;
+  color: var(--text-secondary, #cbd5e1);
+}
+
+.size-24 {
+  --persona-avatar: 24px;
+  --persona-initials-size: 10px;
+  --persona-badge: 12px;
+  --persona-badge-x: 11px;
+  --persona-badge-y: 19px;
+  --persona-gap: 6px;
+  --persona-primary-size: 12px;
+  --persona-primary-line: 16px;
+  --persona-text-max: 200px;
+}
+
+.size-32 {
+  --persona-avatar: 32px;
+  --persona-initials-size: 13px;
+  --persona-badge: 16px;
+  --persona-badge-x: 19px;
+  --persona-badge-y: 22px;
+  --persona-gap: 8px;
+  --persona-primary-size: 12px;
+  --persona-primary-line: 16px;
+  --persona-text-max: 200px;
+}
+
+.size-40 {
+  --persona-avatar: 40px;
+  --persona-initials-size: 16px;
+  --persona-badge: 20px;
+  --persona-badge-x: 21px;
+  --persona-badge-y: 21px;
+  --persona-gap: 10px;
+  --persona-primary-size: 12px;
+  --persona-primary-line: 16px;
+  --persona-secondary-size: 11px;
+  --persona-secondary-line: 15px;
+  --persona-text-max: 220px;
+}
+
+.size-48 {
+  --persona-avatar: 48px;
+  --persona-initials-size: 19px;
+  --persona-badge: 24px;
+  --persona-badge-x: 24px;
+  --persona-badge-y: 24px;
+  --persona-gap: 12px;
+  --persona-primary-size: 14px;
+  --persona-primary-line: 20px;
+  --persona-secondary-size: 12px;
+  --persona-secondary-line: 17px;
+  --persona-text-max: 220px;
+}
+
+.size-56 {
+  --persona-avatar: 56px;
+  --persona-initials-size: 22px;
+  --persona-badge: 28px;
+  --persona-badge-x: 36px;
+  --persona-badge-y: 36px;
+  --persona-gap: 12px;
+  --persona-primary-size: 24px;
+  --persona-primary-line: 30px;
+  --persona-secondary-size: 12px;
+  --persona-secondary-line: 17px;
+  --persona-text-max: 300px;
+}
+
+.size-72 {
+  --persona-avatar: 72px;
+  --persona-initials-size: 28px;
+  --persona-badge: 32px;
+  --persona-badge-x: 50px;
+  --persona-badge-y: 50px;
+  --persona-gap: 16px;
+  --persona-primary-size: 28px;
+  --persona-primary-line: 34px;
+  --persona-secondary-size: 14px;
+  --persona-secondary-line: 20px;
+  --persona-text-max: 340px;
+}
+
+.size-100 {
+  --persona-avatar: 100px;
+  --persona-initials-size: 38px;
+  --persona-badge: 40px;
+  --persona-badge-x: 74px;
+  --persona-badge-y: 74px;
+  --persona-gap: 20px;
+  --persona-primary-size: 30px;
+  --persona-primary-line: 36px;
+  --persona-secondary-size: 14px;
+  --persona-secondary-line: 20px;
+  --persona-text-max: 380px;
+}

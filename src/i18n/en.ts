@@ -365,6 +365,15 @@ export const en = {
     high: 'High',
     urgent: 'Urgent',
   },
+  presence: {
+    online: 'Online',
+    available: 'Available',
+    away: 'Away',
+    busy: 'Busy',
+    dnd: 'Do not disturb',
+    blocked: 'Blocked',
+    offline: 'Offline',
+  },
   kanban: {
     addTask: 'Add Card',
     emptyColumn: 'No tasks in this column',

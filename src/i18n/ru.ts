@@ -365,6 +365,15 @@ export const ru = {
     high: 'Высокий',
     urgent: 'Срочный',
   },
+  presence: {
+    online: 'В сети',
+    available: 'Доступен',
+    away: 'Отошёл',
+    busy: 'Занят',
+    dnd: 'Не беспокоить',
+    blocked: 'Заблокирован',
+    offline: 'Не в сети',
+  },
   kanban: {
     addTask: 'Добавить карточку',
     emptyColumn: 'В этой колонке нет задач',
