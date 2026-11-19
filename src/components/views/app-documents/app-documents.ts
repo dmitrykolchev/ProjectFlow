@@ -55,7 +55,7 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-document-form/app-document-form';
 import '../../common/app-tags-row/app-tags-row';
 import '../../common/app-page-header/app-page-header';
-import '../../common/app-pagination/app-pagination';
+import '../../common/app-cards-table/app-cards-table';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-status-chip/app-status-chip';
@@ -63,7 +63,6 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
-import { paginateItems } from '../../common/paginate';
 import { eventValue } from '../../common/event-value';
 import styles from './app-documents.css';
 
@@ -419,137 +418,133 @@ export class AppDocuments extends LitElement {
   }
 
   private renderCardsGrid(filtered: DocumentItem[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(filtered, this.currentPage, this.cardPageSize);
+    const docCard = (row: Record<string, unknown>) => {
+      const doc = row as unknown as DocumentItem;
+      const uploader = store.users.find((u) => u.id === doc.uploadedById);
+      const linked = this.getLinkedEntityLabel(doc, t);
+      const metaItems = [
+        { label: t.documents.fieldCategory, value: t.documents.categories[doc.category] },
+        {
+          label: `${t.documents.versionLabel} / ${t.documents.sizeLabel}`,
+          value: `v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}`,
+          mono: true,
+        },
+        {
+          label: `${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})`,
+          value: linked.label,
+          link: linked.onClick ? { label: linked.label, onClick: linked.onClick } : undefined,
+        },
+        { label: t.documents.updatedLabel, value: doc.updatedAt.slice(0, 10), mono: true },
+      ];
+
+      return html`
+        <div class="card-top">
+          <div class="doc-identity">
+            ${this.renderFileTypeTile(doc)}
+            <div class="doc-titles">
+              <button
+                type="button"
+                class="doc-title-btn"
+                @click="${() => this.openPreviewModal(doc)}"
+              >
+                ${doc.title}
+              </button>
+              <div class="doc-filename" title="${doc.fileName}">${doc.fileName}</div>
+            </div>
+          </div>
+          <app-status-chip domain="document" status="${doc.status}" appearance="soft" size="sm"></app-status-chip>
+        </div>
+
+        <p class="doc-desc">${doc.description || '—'}</p>
+
+        <app-meta-grid columns="2" layout="grid" .items="${metaItems}"></app-meta-grid>
+
+        ${doc.timeEntryId || doc.expenseId
+          ? html`
+              <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
+                ${doc.timeEntryId
+                  ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
+                  : ''}
+                ${doc.expenseId
+                  ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
+                  : ''}
+              </div>
+            `
+          : ''}
+
+        <app-tags-row
+          mode="add-button"
+          .tags="${doc.tags}"
+          @click="${(e: Event) => e.stopPropagation()}"
+          @tag-remove="${(e: CustomEvent<{ tag: string }>) =>
+            this.removeTagFromDoc(doc, e.detail.tag)}"
+          @tag-add="${(e: CustomEvent<{ tag: string }>) =>
+            this.commitTagToDoc(doc, e.detail.tag)}"
+        ></app-tags-row>
+
+        <card-footer>
+          <div slot="start" class="uploader-info">
+            ${uploader
+              ? html`<app-persona
+                  size="24"
+                  .initials="${uploader.avatar}"
+                  .presence="${effectivePresence(uploader)}"
+                  .primaryText="${uploader.name}"
+                  @click="${() => store.openEmployeeDetail(uploader.id)}"
+                ></app-persona>`
+              : html`<span class="uploader-name">${doc.uploadedById}</span>`}
+          </div>
+
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingDoc = doc)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="edit"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(doc)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.documents.downloadFile}"
+            @click="${() => downloadDocumentFile(doc)}"
+          >
+            <span slot="start">${iconDownload(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.documents.previewTitle}"
+            @click="${() => this.openPreviewModal(doc)}"
+          >
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
 
     return html`
-      <div class="cards-grid">
-        ${paged.items.map((doc) => {
-          const uploader = store.users.find((u) => u.id === doc.uploadedById);
-          const linked = this.getLinkedEntityLabel(doc, t);
-          const metaItems = [
-            { label: t.documents.fieldCategory, value: t.documents.categories[doc.category] },
-            {
-              label: `${t.documents.versionLabel} / ${t.documents.sizeLabel}`,
-              value: `v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}`,
-              mono: true,
-            },
-            {
-              label: `${t.documents.linkedToLabel} (${t.documents.scopes[doc.scope]})`,
-              value: linked.label,
-              link: linked.onClick ? { label: linked.label, onClick: linked.onClick } : undefined,
-            },
-            { label: t.documents.updatedLabel, value: doc.updatedAt.slice(0, 10), mono: true },
-          ];
-
-          return html`
-            <article class="doc-card">
-              <div class="card-top">
-                <div class="doc-identity">
-                  ${this.renderFileTypeTile(doc)}
-                  <div class="doc-titles">
-                    <button
-                      type="button"
-                      class="doc-title-btn"
-                      @click="${() => this.openPreviewModal(doc)}"
-                    >
-                      ${doc.title}
-                    </button>
-                    <div class="doc-filename" title="${doc.fileName}">${doc.fileName}</div>
-                  </div>
-                </div>
-                <app-status-chip domain="document" status="${doc.status}" appearance="soft" size="sm"></app-status-chip>
-              </div>
-
-              <p class="doc-desc">${doc.description || '—'}</p>
-
-              <app-meta-grid columns="2" layout="grid" .items="${metaItems}"></app-meta-grid>
-
-              ${doc.timeEntryId || doc.expenseId
-                ? html`
-                    <div style="display: flex; gap: 0.35rem; flex-wrap: wrap;">
-                      ${doc.timeEntryId
-                        ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
-                        : ''}
-                      ${doc.expenseId
-                        ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
-                        : ''}
-                    </div>
-                  `
-                : ''}
-
-              <app-tags-row
-                mode="add-button"
-                .tags="${doc.tags}"
-                @click="${(e: Event) => e.stopPropagation()}"
-                @tag-remove="${(e: CustomEvent<{ tag: string }>) =>
-                  this.removeTagFromDoc(doc, e.detail.tag)}"
-                @tag-add="${(e: CustomEvent<{ tag: string }>) =>
-                  this.commitTagToDoc(doc, e.detail.tag)}"
-              ></app-tags-row>
-
-              <card-footer>
-                <div slot="start" class="uploader-info">
-                  ${uploader
-                    ? html`<app-persona
-                        size="24"
-                        .initials="${uploader.avatar}"
-                        .presence="${effectivePresence(uploader)}"
-                        .primaryText="${uploader.name}"
-                        @click="${() => store.openEmployeeDetail(uploader.id)}"
-                      ></app-persona>`
-                    : html`<span class="uploader-name">${doc.uploadedById}</span>`}
-                </div>
-
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingDoc = doc)}"
-                >
-                  <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="edit"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditModal(doc)}"
-                >
-                  <span slot="start">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.documents.downloadFile}"
-                  @click="${() => downloadDocumentFile(doc)}"
-                >
-                  <span slot="start">${iconDownload(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="view"
-                  title="${t.documents.previewTitle}"
-                  @click="${() => this.openPreviewModal(doc)}"
-                >
-                  <span slot="start">${iconEye(14)}</span>
-                </app-button>
-              </card-footer>
-            </article>
-          `;
-        })}
-      </div>
-
-      <app-pagination
-        layout-mode="cards"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
+      <app-cards-table
+        .rows="${filtered}"
+        .cardRender="${docCard}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
@@ -558,7 +553,7 @@ export class AppDocuments extends LitElement {
           this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
-      ></app-pagination>
+      ></app-cards-table>
     `;
   }
 

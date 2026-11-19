@@ -47,47 +47,30 @@
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
 
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-  gap: 1.1rem;
+/* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
+   (surface, border, radius, padding, hover lift), the card content classes (card-top, doc-identity,
+   the file type tile, doc-titles, doc-title-btn, doc-filename, doc-desc, uploader-info,
+   uploader-name, the card-footer pin) live in the component CSS — the cardRender template renders
+   in its shadow tree. The documents reference geometry is retuned locally through the component
+   tokens: grid minmax 340px with a 1.1rem gap, card padding 1.2rem and card gap 0.85rem, the calm
+   hover (accent border 0.35, -1px, shadow unchanged), and the card-footer chrome pinned to the
+   bottom with the historical gaps (gap 0.65rem, end-gap 0.3rem, padding-top at the component
+   default 0.65rem). */
+app-cards-table {
+  --cards-min-width: 340px;
+  --cards-gap: 1.1rem;
+  --card-padding: 1.2rem;
+  --card-gap: 0.85rem;
+  --card-hover-border: var(--accent-border, rgba(99, 102, 241, 0.35));
+  --card-hover-transform: translateY(-1px);
+  --card-hover-shadow: var(--shadow-sm), var(--surface-glow, none);
+  --card-footer-gap: 0.65rem;
+  --card-footer-padding-top: 0.65rem;
+  --card-footer-end-gap: 0.3rem;
 }
 
-.doc-card {
-  background: var(--bg-surface, #111827);
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: var(--radius-lg, 12px);
-  padding: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.85rem;
-  box-shadow: var(--shadow-sm), var(--surface-glow, none);
-  transition:
-    border-color var(--transition-fast, 150ms ease),
-    transform var(--transition-fast, 150ms ease);
-  min-width: 0;
-}
-
-.doc-card:hover {
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.35));
-  transform: translateY(-1px);
-}
-
-.card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.doc-identity {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  min-width: 0;
-  flex: 1;
-}
-
+/* preview modal identity: the file type tile and the title column are shared with the cards
+   (the same rules exist in the component CSS for the card shadow tree) */
 .file-type-tile {
   width: 42px;
   height: 42px;
@@ -213,29 +196,6 @@
   font-weight: 600;
   color: var(--text-secondary, #94a3b8);
   flex-shrink: 0;
-}
-
-/* card-footer web component keeps its own chrome; the view pins it to the
-   bottom of the card, tunes historical gaps, and overrides the delete action hover tokens */
-card-footer {
-  margin-top: auto;
-  --card-footer-gap: 0.65rem;
-  --card-footer-end-gap: 0.3rem;
-}
-
-.uploader-info {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-width: 0;
-  font-size: 0.75rem;
-  color: var(--text-secondary, #94a3b8);
-}
-
-.uploader-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 /* table name-links are app-link web components at size md restoring the historical block
@@ -478,9 +438,6 @@ card-footer {
 }
 
 @media (max-width: 760px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
   .col-span-2 {
     grid-column: span 1;
   }
