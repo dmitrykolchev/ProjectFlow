@@ -2333,6 +2333,10 @@ export const en = {
         examples: 'Usage examples',
         sharedBase: 'Shared base (all themes)',
       },
+      chips: {
+        fontSans: '--font-sans: Manrope',
+        fontMono: '--font-mono: JetBrains Mono',
+      },
       examples: {
         tokenFallback: '1. Token access with fallback (component convention)',
         cardSurfaces: '2. Card surfaces and borders',

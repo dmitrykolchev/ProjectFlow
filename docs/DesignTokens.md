@@ -31,7 +31,7 @@
 
 | Токен | Значение |
 |---|---|
-| `--font-sans` | `'Plus Jakarta Sans', -apple-system, …, sans-serif` |
+| `--font-sans` | `'Manrope', -apple-system, …, sans-serif` |
 | `--font-mono` | `'JetBrains Mono', monospace` |
 | `--radius-sm / md / lg / xl` | `6px / 8px / 12px / 16px` |
 | `--transition-fast` | `150ms cubic-bezier(0.16, 1, 0.3, 1)` |

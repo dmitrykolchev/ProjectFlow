@@ -2333,6 +2333,10 @@ export const ru = {
         examples: 'Примеры использования',
         sharedBase: 'Общая база (все темы)',
       },
+      chips: {
+        fontSans: '--font-sans: Manrope',
+        fontMono: '--font-mono: JetBrains Mono',
+      },
       examples: {
         tokenFallback: '1. Обращение к токену с fallback (соглашение компонентов)',
         cardSurfaces: '2. Поверхности и границы карточки',

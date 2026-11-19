@@ -297,8 +297,8 @@ ${tx.viewTexts.designTokens.demos.glowCodeComment}</code></pre>
 
       <app-section-card title="${tx.viewTexts.designTokens.sections.sharedBase}">
         <div class="shared-chips">
-          <code>--font-sans: Plus Jakarta Sans</code>
-          <code>--font-mono: JetBrains Mono</code>
+          <code>${tx.viewTexts.designTokens.chips.fontSans}</code>
+          <code>${tx.viewTexts.designTokens.chips.fontMono}</code>
           <code>--radius-sm: 6px</code>
           <code>--radius-md: 8px</code>
           <code>--radius-lg: 12px</code>
