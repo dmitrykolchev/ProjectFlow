@@ -244,6 +244,7 @@ export class AppDataTable extends LitElement {
                 page="${slice.page}"
                 page-size="${slice.pageSize}"
                 layout-mode="table"
+                variant="bare"
                 locale="${this.locale}"
                 @page-change="${this.handlePageChange}"
                 @page-size-change="${this.handlePageSizeChange}"
