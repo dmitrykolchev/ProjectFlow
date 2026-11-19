@@ -3,8 +3,9 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import { mapProjectOptions } from '../../common/entity-selector-options';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
 import '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-sidebar.css';
 import {
@@ -260,11 +261,15 @@ export class AppSidebar extends LitElement {
                       title="${t.viewTexts.sidebar.profileOpenTitle}"
                       @click="${() => store.setActiveView('profile-settings')}"
                     >
-                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
-                      <div class="user-info">
-                        <span class="user-name">${currentUser.name}</span>
-                        <span class="user-role">${currentUser.role}</span>
-                      </div>
+                      <app-persona
+                        size="48"
+                        .initials="${currentUser.avatar}"
+                        .presence="${presenceFromStatus(currentUser.status)}"
+                        .primaryText="${currentUser.name}"
+                        .secondaryText="${currentUser.role}"
+                        .color="${'var(--bg-hover, #223049)'}"
+                        .interactive="${false}"
+                      ></app-persona>
                     </div>
                     <button
                       type="button"
@@ -288,7 +293,13 @@ export class AppSidebar extends LitElement {
                       title="${t.viewTexts.sidebar.profileOpenTitle}"
                       @click="${() => store.setActiveView('profile-settings')}"
                     >
-                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
+                      <app-persona
+                        size="48"
+                        .initials="${currentUser.avatar}"
+                        .presence="${presenceFromStatus(currentUser.status)}"
+                        .color="${'var(--bg-hover, #223049)'}"
+                        .interactive="${false}"
+                      ></app-persona>
                     </div>
                     <button
                       type="button"

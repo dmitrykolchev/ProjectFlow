@@ -239,23 +239,10 @@
   box-shadow: var(--surface-glow, none);
 }
 
-.user-info {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.user-name {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-
-.user-role {
-  font-size: 0.6875rem;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
+/* The persona fills the clickable profile row; its text lines truncate inside it.
+   The row keeps the historical hover fill and glow, so the persona renders as a
+   plain (non-interactive) block and the div carries the click to the profile. */
+.user-profile app-persona {
+  flex: 1;
+  min-width: 0;
 }
