@@ -404,6 +404,21 @@ export function parseRRule(input: string): RRuleParseResult {
     return { ok: false, errorCode: 'count_until_conflict' };
   }
 
+  // RFC 5545 restricts the BYDAY prefix by frequency: a numeric prefix is only
+  // meaningful for MONTHLY (-5..-1, 1..5) and YEARLY (-53..-1, 1..53); DAILY,
+  // WEEKLY, HOURLY and MINUTELY rules must not carry one.
+  if (byDay) {
+    for (const item of byDay) {
+      if (item.nth === undefined) continue;
+      const abs = Math.abs(item.nth);
+      if (freq === 'MONTHLY') {
+        if (abs > 5) return { ok: false, errorCode: 'invalid_byday', detail: formatByDayItem(item) };
+      } else if (freq !== 'YEARLY') {
+        return { ok: false, errorCode: 'invalid_byday', detail: formatByDayItem(item) };
+      }
+    }
+  }
+
   return {
     ok: true,
     rule: {
