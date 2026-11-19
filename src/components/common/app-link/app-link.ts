@@ -13,6 +13,7 @@ export class AppLink extends LitElement {
   @property({ type: String }) variant: LinkVariant = 'primary';
   @property({ type: String }) size: LinkSize = 'md';
   @property({ type: Boolean }) disabled: boolean = false;
+  @property({ type: String, attribute: 'aria-label' }) ariaLabel: string = '';
   // additive active state for segmented pill consumers; default false keeps every
   // existing consumer pixel-identical, the fill comes from the --link-active-bg hook
   @property({ type: Boolean, reflect: true }) active: boolean = false;
@@ -36,6 +37,8 @@ export class AppLink extends LitElement {
           href="${this.href}"
           target="${this.target}"
           rel="${rel}"
+          aria-label="${this.ariaLabel || this.title}"
+          title="${this.title}"
           aria-disabled="${this.disabled ? 'true' : 'false'}"
           tabindex="${this.disabled ? '-1' : '0'}"
           @click="${this.handleClick}"
@@ -49,6 +52,8 @@ export class AppLink extends LitElement {
       <button
         type="button"
         class="${classes}"
+        aria-label="${this.ariaLabel || this.title}"
+        title="${this.title}"
         ?disabled="${this.disabled}"
         @click="${this.handleClick}"
       >
