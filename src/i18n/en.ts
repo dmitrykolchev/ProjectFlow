@@ -371,6 +371,7 @@ export const en = {
     away: 'Away',
     busy: 'Busy',
     dnd: 'Do not disturb',
+    ooo: 'Out of office',
     blocked: 'Blocked',
     offline: 'Offline',
   },
