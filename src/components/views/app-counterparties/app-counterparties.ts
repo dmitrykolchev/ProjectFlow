@@ -151,6 +151,21 @@ export class AppCounterparties extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.counterparties.kpiPortfolio}" value="${(activePortfolioRub / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix}"></app-metric-card>
       </app-kpi-strip>
 
+      <div class="mode-row">
+        <app-segmented-switch
+          size="sm"
+          .value="${this.displayMode}"
+          .options="${[
+            { value: 'cards', label: t.viewTexts.counterparties.viewCards },
+            { value: 'table', label: t.viewTexts.counterparties.viewTable },
+          ]}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.displayMode = eventValue(e) as 'cards' | 'table';
+            this.currentPage = 1; store.setActivePage(1, false);
+          }}"
+        ></app-segmented-switch>
+      </div>
+
       <app-filter-bar
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
         placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
@@ -169,20 +184,7 @@ export class AppCounterparties extends LitElement {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
-      >
-        <app-segmented-switch
-          size="sm"
-          .value="${this.displayMode}"
-          .options="${[
-            { value: 'cards', label: t.viewTexts.counterparties.viewCards },
-            { value: 'table', label: t.viewTexts.counterparties.viewTable },
-          ]}"
-          @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
-            this.currentPage = 1; store.setActivePage(1, false);
-          }}"
-        ></app-segmented-switch>
-      </app-filter-bar>
+      ></app-filter-bar>
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.counterparties.emptyNoCounterparties}"></app-empty-state>`
