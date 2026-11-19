@@ -1,0 +1,4 @@
+# ProjectFlow — private enterprise dashboard behind authentication.
+# Nothing here is meant to be crawled or indexed.
+User-agent: *
+Disallow: /
