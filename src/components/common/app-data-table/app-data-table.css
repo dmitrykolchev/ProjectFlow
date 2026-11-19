@@ -716,6 +716,79 @@
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
+/* Calculations page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the mono number/contract links (link-btn restores zero padding, weight 700,
+   line-height 1.5, mono family with tabular numerals and the 0.84rem cell font size pinned
+   through control-font-md; text-link-btn is the counterparty name link with weight 600,
+   text-primary glyph and the accent hover), the cell-sub muted sub-line (flex, 0.35rem gap,
+   wrap), the calculations contract-desc variant (240px ellipsis line, margin-top 0.12rem —
+   narrower than the contracts contract-desc), the mono helper for inline date lines, and
+   the borderless micro-tag with the prior / zero variants (the bill variant stays in the
+   view: it is only used by the preview modal in light DOM). */
+.link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
+}
+
+.text-link-btn {
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --control-font-md: 0.84rem;
+}
+
+.cell-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.calc-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.12rem;
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.micro-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.08rem 0.38rem;
+  border-radius: 4px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}
+
 /* Contracts page reference rich cells (shared by the four tab tables): the mono number
    links (app-link through the additive hooks, plus the div-as-button chip consumer), the
    title/description lines, the amount and dates cells, the billing sub-line with the
