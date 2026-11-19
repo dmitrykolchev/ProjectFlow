@@ -68,6 +68,7 @@ export class AppProfileSettings extends LitElement {
 
   render() {
     const t = getTranslation(this.currentLang);
+    const isEn = t.common.locale.startsWith('en');
     const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
 
     const viewsList: { id: ActiveView; label: string }[] = [
@@ -123,23 +124,23 @@ export class AppProfileSettings extends LitElement {
         <app-section-card variant="panel" title="${t.settings.language}">
           <div class="options-grid">
             <div
-              class="option-card ${this.custom.language === 'ru' ? 'is-active' : ''}"
+              class="option-card ${isEn ? '' : 'is-active'}"
               @click="${() => store.setLanguage('ru')}"
             >
               <div class="option-card-header">
                 <span>${t.settings.langRu}</span>
-                ${this.custom.language === 'ru' ? '✓' : ''}
+                ${isEn ? '' : '✓'}
               </div>
               <p class="option-card-desc">${t.viewTexts.settings.langRuDesc}</p>
             </div>
 
             <div
-              class="option-card ${this.custom.language === 'en' ? 'is-active' : ''}"
+              class="option-card ${isEn ? 'is-active' : ''}"
               @click="${() => store.setLanguage('en')}"
             >
               <div class="option-card-header">
                 <span>${t.settings.langEn}</span>
-                ${this.custom.language === 'en' ? '✓' : ''}
+                ${isEn ? '✓' : ''}
               </div>
               <p class="option-card-desc">${t.viewTexts.settings.langEnDesc}</p>
             </div>

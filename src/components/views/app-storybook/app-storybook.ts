@@ -86,7 +86,6 @@ import draggableListItemMeta from '../../common/app-draggable-list-item/app-drag
 import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
 import directoryRecordModalMeta from '../../common/app-directory-record-modal/app-directory-record-modal.story';
 import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.story';
-import reminderDetailModalMeta from '../../common/app-reminder-detail-modal/app-reminder-detail-modal.story';
 import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
 
@@ -95,6 +94,7 @@ import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
 import sidebarGroupMeta from '../../layout/sidebar-group/sidebar-group.story';
 import sidebarItemMeta from '../../layout/sidebar-item/sidebar-item.story';
 import pageHeaderMeta from '../../common/app-page-header/app-page-header.story';
+import detailShellMeta from '../../common/app-detail-shell/app-detail-shell.story';
 
 import metricCardMeta from '../../dashboard/app-metric-card/app-metric-card.story';
 import chartCardMeta from '../../dashboard/app-chart-card/app-chart-card.story';
@@ -184,7 +184,6 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   documentFormMeta,
   decomposeFormMeta,
   reminderFormMeta,
-  reminderDetailModalMeta,
   tagsRowMeta,
   colorSwatchesMeta,
   emptyStateMeta,
@@ -224,6 +223,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   sidebarGroupMeta,
   sidebarItemMeta,
   pageHeaderMeta,
+  detailShellMeta,
   metricCardMeta,
   chartCardMeta,
   projectProgressMeta,

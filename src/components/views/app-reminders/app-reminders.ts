@@ -303,7 +303,7 @@ export class AppReminders extends LitElement {
           size="compact"
           label="${t.viewTexts.reminders.kpiDueOverdue}"
           value="${String(dueCount)}"
-          value-color="${dueCount > 0 ? '#ef4444' : ''}"
+          valueColor="${dueCount > 0 ? '#ef4444' : ''}"
         ></app-metric-card>
         <app-metric-card
           size="compact"

@@ -12,9 +12,9 @@ import {
   ReminderEntityType,
   ReminderNotificationRule,
 } from '../../../types';
-import { eventValue } from '../../common/event-value';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
 import type { MenuItem } from '../../common/app-menu/app-menu';
+import { DetailSwitchDetail } from '../../common/app-detail-shell/app-detail-shell';
 import {
   AttachmentsChangeDetail,
   commitPendingAttachments,
@@ -40,15 +40,16 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-dropdown-button/app-dropdown-button';
+import '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
-import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-link/app-link';
 import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-reminder-form/app-reminder-form';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-tags-row/app-tags-row';
+import detailShellStyles from '../../common/app-detail-shell/app-detail-shell.css';
 import styles from './app-reminder-detail.css';
 
 const ENTITY_EMBLEM_MAP: Record<ReminderEntityType, EntityEmblemKind> = {
@@ -79,7 +80,7 @@ export class AppReminderDetail extends LitElement {
 
   private unsubscribe?: () => void;
 
-  static styles = styles;
+  static styles = [detailShellStyles, styles];
 
   connectedCallback() {
     super.connectedCallback();
@@ -289,263 +290,257 @@ export class AppReminderDetail extends LitElement {
         : '—';
 
     return html`
-      <div class="page-shell">
-        <div class="top-nav-bar">
-          <div class="nav-left">
-            <app-button
-              variant="outline"
-              size="sm"
-              @click="${() => store.setActiveView('reminders')}"
-            >
-              <span slot="icon-start">${iconChevronLeft(15)}</span>
-              <span>${t.viewTexts.reminderDetail.backToList}</span>
-            </app-button>
-
-            <div class="rem-switcher">
-              <app-entity-selector
+      <app-detail-shell
+        entity="reminder"
+        backLabel="${t.viewTexts.reminderDetail.backToList}"
+        switcherPlaceholder="${t.viewTexts.reminderDetail.switcherPlaceholder}"
+        .switcherOptions="${switcherOptions}"
+        switcherValue="${rem.id}"
+        @detail-back="${() => store.setActiveView('reminders')}"
+        @entity-switch="${(e: CustomEvent<DetailSwitchDetail>) => {
+          const nextId = e.detail.value;
+          if (nextId && nextId !== rem.id) {
+            store.openReminderDetail(nextId);
+          }
+        }}"
+      >
+        ${primaryObj && primaryObj.navigable
+          ? html`
+              <app-button
+                slot="nav-actions"
                 size="sm"
-                placeholder="${t.viewTexts.reminderDetail.switcherPlaceholder}"
-                .options="${switcherOptions}"
-                .value="${rem.id}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextId = eventValue(e);
-                  if (nextId && nextId !== rem.id) {
-                    store.openReminderDetail(nextId);
-                  }
-                }}"
-              ></app-entity-selector>
-            </div>
-          </div>
+                variant="outline"
+                @click="${() => store.navigateToReminderEntity(primaryObj.type, primaryObj.id)}"
+              >
+                <span slot="icon-start">${iconArrowUpRight(14)}</span>
+                <span>${t.reminders.actionOpenEntity}</span>
+              </app-button>
+            `
+          : ''}
 
-          <div class="nav-actions">
-            ${primaryObj && primaryObj.navigable
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.navigateToReminderEntity(primaryObj.type, primaryObj.id)}"
-                  >
-                    <span slot="icon-start">${iconArrowUpRight(14)}</span>
-                    <span>${t.reminders.actionOpenEntity}</span>
-                  </app-button>
-                `
-              : ''}
+        ${!isDone
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="primary"
+                @click="${() => store.completeReminder(rem.id)}"
+              >
+                <span slot="icon-start">${iconCheck(14)}</span>
+                <span>${isRecurring ? t.reminders.actionAdvanceCycle : t.reminders.actionComplete}</span>
+              </app-button>
 
-            ${!isDone
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.completeReminder(rem.id)}"
-                  >
-                    <span slot="icon-start">${iconCheck(14)}</span>
-                    <span>${isRecurring ? t.reminders.actionAdvanceCycle : t.reminders.actionComplete}</span>
-                  </app-button>
+              <app-dropdown-button
+                slot="nav-actions"
+                size="sm"
+                variant="outline"
+                label="${t.reminders.actionSnooze}"
+                .items="${snoozeMenuItems}"
+                @select="${(e: CustomEvent<{ id: string }>) =>
+                  this.handleSnoozePreset(rem, e.detail.id)}"
+              ></app-dropdown-button>
 
-                  <app-dropdown-button
-                    size="sm"
-                    variant="outline"
-                    label="${t.reminders.actionSnooze}"
-                    .items="${snoozeMenuItems}"
-                    @select="${(e: CustomEvent<{ id: string }>) =>
-                      this.handleSnoozePreset(rem, e.detail.id)}"
-                  ></app-dropdown-button>
+              ${isRecurring
+                ? html`
+                    <app-button
+                      slot="nav-actions"
+                      size="sm"
+                      variant="ghost"
+                      @click="${() => store.toggleReminderPause(rem.id)}"
+                    >
+                      <span slot="icon-start">
+                        ${rem.status === 'paused' ? iconPlay(14) : iconPause(14)}
+                      </span>
+                      <span>${rem.status === 'paused' ? t.reminders.actionResume : t.reminders.actionPause}</span>
+                    </app-button>
+                  `
+                : ''}
+            `
+          : ''}
 
-                  ${isRecurring
-                    ? html`
-                        <app-button
-                          size="sm"
-                          variant="ghost"
-                          @click="${() => store.toggleReminderPause(rem.id)}"
-                        >
-                          <span slot="icon-start">
-                            ${rem.status === 'paused' ? iconPlay(14) : iconPause(14)}
-                          </span>
-                          <span>${rem.status === 'paused' ? t.reminders.actionResume : t.reminders.actionPause}</span>
-                        </app-button>
-                      `
-                    : ''}
-                `
-              : ''}
+        <app-button
+          slot="nav-actions"
+          size="sm"
+          variant="ghost"
+          title="${t.reminders.actionTestNotify}"
+          @click="${() => store.triggerReminderNotification(rem.id)}"
+        >
+          <span slot="icon-start">${iconBellRing(14)}</span>
+          <span>${t.reminders.actionTestNotify}</span>
+        </app-button>
 
-            <app-button
-              size="sm"
-              variant="ghost"
-              title="${t.reminders.actionTestNotify}"
-              @click="${() => store.triggerReminderNotification(rem.id)}"
-            >
-              <span slot="icon-start">${iconBellRing(14)}</span>
-              <span>${t.reminders.actionTestNotify}</span>
-            </app-button>
+        <app-button
+          slot="nav-actions"
+          size="sm"
+          variant="secondary"
+          @click="${() => (this.editModalOpen = true)}"
+        >
+          <span slot="icon-start">${iconEdit(14)}</span>
+          <span>${t.common.edit}</span>
+        </app-button>
 
-            <app-button
-              size="sm"
-              variant="secondary"
-              @click="${() => (this.editModalOpen = true)}"
-            >
-              <span slot="icon-start">${iconEdit(14)}</span>
-              <span>${t.common.edit}</span>
-            </app-button>
+        <app-button
+          slot="nav-actions"
+          action="delete"
+          size="xs"
+          variant="icon"
+          title="${t.common.delete}"
+          @click="${() => (this.confirmDeleteOpen = true)}"
+        >
+          <span slot="start">${iconTrash(15)}</span>
+        </app-button>
 
-            <app-button
-              action="delete"
-              size="xs"
-              variant="icon"
-              title="${t.common.delete}"
-              @click="${() => (this.confirmDeleteOpen = true)}"
-            >
-              <span slot="start">${iconTrash(15)}</span>
-            </app-button>
+        <app-entity-emblem
+          slot="hero-meta"
+          entity="reminder"
+          variant="pill"
+          size="sm"
+        ></app-entity-emblem>
+        <span slot="hero-meta" class="mono">${formattedDue}</span>
+        ${rem.snoozedUntil && rem.status === 'snoozed'
+          ? html`
+              <span slot="hero-meta" aria-hidden="true">·</span>
+              <app-badge
+                slot="hero-meta"
+                variant="info"
+                size="sm"
+              >
+                ${t.reminders.snoozedUntilLabel(
+                  store.parseLocalDateTime(rem.snoozedUntil).toLocaleString(t.common.locale, {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+                )}
+              </app-badge>
+            `
+          : ''}
+
+        <h1 slot="title" class="rem-title ${isDone ? 'is-done' : ''}">${rem.title}</h1>
+        <app-status-chip
+          slot="title"
+          domain="reminder"
+          status="${rem.status}"
+          appearance="soft"
+          size="md"
+        ></app-status-chip>
+        <app-status-chip
+          slot="title"
+          domain="reminderPriority"
+          status="${rem.priority}"
+          appearance="soft"
+          size="md"
+        ></app-status-chip>
+        ${overdue
+          ? html`<app-badge slot="title" variant="danger" size="sm">${t.reminders.overdueLabel}</app-badge>`
+          : dueToday
+          ? html`<app-badge slot="title" variant="warning" size="sm">${t.reminders.dueTodayLabel}</app-badge>`
+          : ''}
+
+        <p slot="hero-sub" class="rem-desc ${rem.description ? '' : 'is-empty'}">
+          ${rem.description || t.reminders.detailNoDescription}
+        </p>
+
+        ${rem.tags.length > 0
+          ? html`<app-tags-row slot="hero-sub" .tags="${rem.tags}" max-visible="10"></app-tags-row>`
+          : ''}
+
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.reminderDetail.kpiDueAt}</span>
+          <span class="kpi-val ${overdue ? 'danger' : dueToday ? 'warning' : 'accent'}">
+            ${effectiveDue.replace('T', ' ').slice(0, 16)}
+          </span>
+          <span class="kpi-hint">
+            ${overdue
+              ? t.viewTexts.reminderDetail.kpiOverdueHint
+              : dueToday
+              ? t.viewTexts.reminderDetail.kpiTodayHint
+              : store.customization.timezone || 'UTC+3'}
+          </span>
+        </div>
+
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.reminderDetail.kpiRecurrence}</span>
+          <span class="kpi-val">${tplLabel}</span>
+          <span class="kpi-hint">
+            ${isRecurring
+              ? t.reminders.occurrenceBadge(
+                  rem.recurrence.occurrenceCount,
+                  rem.recurrence.endType === 'max_occurrences' ? rem.recurrence.maxOccurrences : undefined
+                )
+              : t.viewTexts.reminderDetail.kpiOneTimeHint}
+          </span>
+        </div>
+
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.reminderDetail.kpiNotifyRules}</span>
+          <span class="kpi-val success">${enabledRules.length}</span>
+          <span class="kpi-hint">
+            ${t.viewTexts.reminderDetail.kpiEnabledRulesHint(rem.notifications.rules.length)}
+          </span>
+        </div>
+
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.reminderDetail.kpiLinksAndFiles}</span>
+          <span class="kpi-val">${relatedObjects.length + attachmentCount}</span>
+          <span class="kpi-hint">
+            ${t.viewTexts.reminderDetail.kpiLinksHint(relatedObjects.length, attachmentCount)}
+          </span>
+        </div>
+
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.reminders.fieldOwner}</span>
+          ${owner
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openEmployeeDetail(owner.id)}"
+                >
+                  <span slot="start"><app-avatar name="${owner.name}" size="xs"></app-avatar></span>
+                  <span>${owner.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
+
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.reminders.fieldAssignees}</span>
+          <div class="people-row">
+            ${assignees.length === 0
+              ? html`<span class="meta-val">—</span>`
+              : assignees.map(
+                  (u) => html`
+                    <button
+                      type="button"
+                      class="user-pill-btn"
+                      @click="${() => store.openEmployeeDetail(u.id)}"
+                    >
+                      <app-avatar name="${u.name}" size="xs"></app-avatar>
+                      <span>${u.name}</span>
+                    </button>
+                  `
+                )}
           </div>
         </div>
 
-        <section class="overview-card">
-          <div class="hero-top">
-            <div class="hero-identity">
-              <app-entity-emblem entity="reminder" size="lg"></app-entity-emblem>
-              <div class="title-block">
-                <div class="hero-meta-row">
-                  <app-entity-emblem entity="reminder" variant="pill" size="sm"></app-entity-emblem>
-                  <span class="mono">${formattedDue}</span>
-                  ${rem.snoozedUntil && rem.status === 'snoozed'
-                    ? html`
-                        <span aria-hidden="true">·</span>
-                        <app-badge variant="info" size="sm">
-                          ${t.reminders.snoozedUntilLabel(
-                            store.parseLocalDateTime(rem.snoozedUntil).toLocaleString(t.common.locale, {
-                              day: '2-digit',
-                              month: 'short',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })
-                          )}
-                        </app-badge>
-                      `
-                    : ''}
-                </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.reminderDetail.metaCreatedAt}</span>
+          <span class="meta-val mono">${formatTimestamp(rem.createdAt)}</span>
+        </div>
 
-                <div class="title-row">
-                  <h1 class="rem-title ${isDone ? 'is-done' : ''}">${rem.title}</h1>
-                  <app-status-chip domain="reminder" status="${rem.status}" appearance="soft" size="md"></app-status-chip>
-                  <app-status-chip domain="reminderPriority" status="${rem.priority}" appearance="soft" size="md"></app-status-chip>
-                  ${overdue
-                    ? html`<app-badge variant="danger" size="sm">${t.reminders.overdueLabel}</app-badge>`
-                    : dueToday
-                    ? html`<app-badge variant="warning" size="sm">${t.reminders.dueTodayLabel}</app-badge>`
-                    : ''}
-                </div>
-
-                <p class="rem-desc ${rem.description ? '' : 'is-empty'}">
-                  ${rem.description || t.reminders.detailNoDescription}
-                </p>
-
-                ${rem.tags.length > 0
-                  ? html`<app-tags-row .tags="${rem.tags}" max-visible="10"></app-tags-row>`
-                  : ''}
-              </div>
-            </div>
-          </div>
-
-          <div class="kpi-strip">
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.reminderDetail.kpiDueAt}</span>
-              <span class="kpi-val ${overdue ? 'danger' : dueToday ? 'warning' : 'accent'}">
-                ${effectiveDue.replace('T', ' ').slice(0, 16)}
-              </span>
-              <span class="kpi-hint">
-                ${overdue
-                  ? t.viewTexts.reminderDetail.kpiOverdueHint
-                  : dueToday
-                  ? t.viewTexts.reminderDetail.kpiTodayHint
-                  : store.customization.timezone || 'UTC+3'}
-              </span>
-            </div>
-
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.reminderDetail.kpiRecurrence}</span>
-              <span class="kpi-val">${tplLabel}</span>
-              <span class="kpi-hint">
-                ${isRecurring
-                  ? t.reminders.occurrenceBadge(
-                      rem.recurrence.occurrenceCount,
-                      rem.recurrence.endType === 'max_occurrences' ? rem.recurrence.maxOccurrences : undefined
-                    )
-                  : t.viewTexts.reminderDetail.kpiOneTimeHint}
-              </span>
-            </div>
-
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.reminderDetail.kpiNotifyRules}</span>
-              <span class="kpi-val success">${enabledRules.length}</span>
-              <span class="kpi-hint">
-                ${t.viewTexts.reminderDetail.kpiEnabledRulesHint(rem.notifications.rules.length)}
-              </span>
-            </div>
-
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.reminderDetail.kpiLinksAndFiles}</span>
-              <span class="kpi-val">${relatedObjects.length + attachmentCount}</span>
-              <span class="kpi-hint">
-                ${t.viewTexts.reminderDetail.kpiLinksHint(relatedObjects.length, attachmentCount)}
-              </span>
-            </div>
-          </div>
-
-          <div class="context-grid">
-            <div class="meta-box">
-              <span class="meta-label">${t.reminders.fieldOwner}</span>
-              ${owner
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openEmployeeDetail(owner.id)}"
-                    >
-                      <span slot="start"><app-avatar name="${owner.name}" size="xs"></app-avatar></span>
-                      <span>${owner.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.reminders.fieldAssignees}</span>
-              <div class="people-row">
-                ${assignees.length === 0
-                  ? html`<span class="meta-val">—</span>`
-                  : assignees.map(
-                      (u) => html`
-                        <button
-                          type="button"
-                          class="user-pill-btn"
-                          @click="${() => store.openEmployeeDetail(u.id)}"
-                        >
-                          <app-avatar name="${u.name}" size="xs"></app-avatar>
-                          <span>${u.name}</span>
-                        </button>
-                      `
-                    )}
-              </div>
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.reminderDetail.metaCreatedAt}</span>
-              <span class="meta-val mono">${formatTimestamp(rem.createdAt)}</span>
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">
-                ${rem.completedAt
-                  ? t.viewTexts.reminderDetail.metaCompletedAt
-                  : t.viewTexts.reminderDetail.metaUpdatedAt}
-              </span>
-              <span class="meta-val mono">
-                ${formatTimestamp(rem.completedAt || rem.updatedAt)}
-              </span>
-            </div>
-          </div>
-        </section>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">
+            ${rem.completedAt
+              ? t.viewTexts.reminderDetail.metaCompletedAt
+              : t.viewTexts.reminderDetail.metaUpdatedAt}
+          </span>
+          <span class="meta-val mono">
+            ${formatTimestamp(rem.completedAt || rem.updatedAt)}
+          </span>
+        </div>
 
         <!-- Linked System Objects -->
         <app-section-card
@@ -721,7 +716,7 @@ export class AppReminderDetail extends LitElement {
               : ''}
           </div>
         </app-section-card>
-      </div>
+      </app-detail-shell>
 
       <app-reminder-form
         ?open="${this.editModalOpen}"
