@@ -26,6 +26,7 @@ export class AppButton extends LitElement {
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: Boolean }) loading: boolean = false;
   @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
+  @property({ type: String, attribute: 'aria-label' }) ariaLabel: string = '';
   @property({ type: String }) type: 'button' | 'submit' | 'reset' = 'button';
 
   // a button whose light DOM holds only an icon (no text) is square on its own,
@@ -40,6 +41,8 @@ export class AppButton extends LitElement {
       <button
         type="${this.type}"
         ?disabled="${this.disabled || this.loading}"
+        aria-label="${this.ariaLabel || this.title}"
+        title="${this.title}"
         class="variant-${this.variant} size-${this.size} action-${this.action} ${iconOnly ? 'icon-only' : ''}"
         @click="${this.handleClick}"
       >
