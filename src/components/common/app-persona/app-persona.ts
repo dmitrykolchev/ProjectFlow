@@ -8,7 +8,7 @@ import {
   type PersonaPresence,
   type PersonaSize,
 } from '../../../domain/presence-tokens';
-import { presenceGlyph } from '../app-presence-icon/app-presence-icon';
+import '../app-presence-icon/app-presence-icon';
 import styles from './app-persona.css';
 
 const BADGE_PX: Record<PersonaSize, number> = {
@@ -75,8 +75,6 @@ export class AppPersona extends LitElement {
     const initials = this.deriveInitials();
     const bg = this.color || 'var(--accent-soft, rgba(99, 102, 241, 0.15))';
     const badgePx = BADGE_PX[this.size] ?? 20;
-    // Sizes <= 32 are colour-only dots (per the presence spec); glyphs need >= 16px.
-    const glyphPx = badgePx >= 16 ? Math.round(badgePx * 0.6) : 0;
     const accessible = this.ariaLabel || [this.primaryText, label].filter(Boolean).join(' — ');
     const tip = (text: string) => (this.showOverflowTooltip ? text : '');
     // The status is graphic only: its words go to the tooltip and the accessible name,
@@ -92,9 +90,12 @@ export class AppPersona extends LitElement {
         </div>
         ${token
           ? html`
-              <span class="presence" style="background: ${token.color};" title="${tip(label)}">
-                ${glyphPx ? presenceGlyph(token.glyph, glyphPx) : ''}
-              </span>
+              <app-presence-icon
+                class="presence"
+                presence="${this.presence}"
+                size="${String(badgePx)}"
+                .showOverflowTooltip="${this.showOverflowTooltip}"
+              ></app-presence-icon>
             `
           : ''}
       </div>

@@ -90,22 +90,15 @@ button.persona:disabled {
   object-fit: cover;
 }
 
-/* Presence badge: a filled circle with a white glyph, ringed by the surface colour.
-   The badge sits in the bottom-right corner of the square circumscribed around the
-   avatar circle, so its offset is (avatar - badge) at every size and it is always
-   tangent to the avatar edge — no size looks crooked. Sizes <= 32 render a
-   colour-only dot with no glyph (the text alternative carries the meaning). */
+/* Presence badge: rendered by app-presence-icon (its own sheet carries the dot and the
+   glyph). The persona only positions it: the badge sits in the bottom-right corner of
+   the square circumscribed around the avatar circle, so its offset is (avatar - badge)
+   at every size and it is always tangent to the avatar edge — no size looks crooked.
+   Sizes <= 32 render a colour-only dot with no glyph (the auto rule of the icon). */
 .presence {
   position: absolute;
   left: var(--persona-badge-x, 28px);
   top: var(--persona-badge-y, 28px);
-  width: var(--persona-badge, 20px);
-  height: var(--persona-badge, 20px);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
   box-shadow: 0 0 0 var(--persona-badge-ring, 2px) var(--persona-ring-color, var(--bg-surface, #111827));
 }
 
@@ -138,7 +131,6 @@ button.persona:disabled {
 .size-24 {
   --persona-avatar: 24px;
   --persona-initials-size: 10px;
-  --persona-badge: 8px;
   --persona-badge-x: 16px;
   --persona-badge-y: 16px;
   --persona-badge-ring: 1px;
@@ -153,7 +145,6 @@ button.persona:disabled {
 .size-32 {
   --persona-avatar: 32px;
   --persona-initials-size: 13px;
-  --persona-badge: 12px;
   --persona-badge-x: 20px;
   --persona-badge-y: 20px;
   --persona-badge-ring: 1px;
@@ -168,7 +159,6 @@ button.persona:disabled {
 .size-40 {
   --persona-avatar: 40px;
   --persona-initials-size: 16px;
-  --persona-badge: 16px;
   --persona-badge-x: 24px;
   --persona-badge-y: 24px;
   --persona-badge-ring: 2px;
@@ -183,7 +173,6 @@ button.persona:disabled {
 .size-48 {
   --persona-avatar: 48px;
   --persona-initials-size: 19px;
-  --persona-badge: 20px;
   --persona-badge-x: 28px;
   --persona-badge-y: 28px;
   --persona-badge-ring: 2px;
@@ -198,7 +187,6 @@ button.persona:disabled {
 .size-56 {
   --persona-avatar: 56px;
   --persona-initials-size: 22px;
-  --persona-badge: 24px;
   --persona-badge-x: 32px;
   --persona-badge-y: 32px;
   --persona-badge-ring: 2px;
@@ -213,7 +201,6 @@ button.persona:disabled {
 .size-72 {
   --persona-avatar: 72px;
   --persona-initials-size: 28px;
-  --persona-badge: 32px;
   --persona-badge-x: 40px;
   --persona-badge-y: 40px;
   --persona-badge-ring: 2px;
@@ -228,7 +215,6 @@ button.persona:disabled {
 .size-100 {
   --persona-avatar: 100px;
   --persona-initials-size: 38px;
-  --persona-badge: 40px;
   --persona-badge-x: 60px;
   --persona-badge-y: 60px;
   --persona-badge-ring: 2px;
