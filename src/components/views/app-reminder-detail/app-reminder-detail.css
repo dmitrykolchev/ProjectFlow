@@ -48,6 +48,8 @@ app-detail-shell {
 
 .meta-link {
   --control-font-md: 0.9rem;
+  /* The owner is a persona, not a text link: no underline on hover. */
+  --link-hover-decoration: none;
 }
 
 .people-row {
