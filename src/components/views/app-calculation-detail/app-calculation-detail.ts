@@ -448,18 +448,44 @@ export class AppCalculationDetail extends LitElement {
                               </span>
                             </td>
                             <td>
-                              ${item.taskId
+                              ${item.itemType === 'time_entry' &&
+                              item.sourceId &&
+                              store.timeEntries.some((te) => te.id === item.sourceId)
                                 ? html`
                                     <app-link
                                       class="link-btn task-link"
                                       size="md"
                                       variant="primary"
-                                      @click="${() => store.openTaskDetail(item.taskId!)}"
+                                      @click="${() => store.openTimeEntryDetail(item.sourceId!)}"
                                     >
                                       ${item.title}
                                     </app-link>
                                   `
-                                : item.title}
+                                : item.itemType === 'expense' &&
+                                    item.sourceId &&
+                                    store.expenses.some((ex) => ex.id === item.sourceId)
+                                  ? html`
+                                      <app-link
+                                        class="link-btn task-link"
+                                        size="md"
+                                        variant="primary"
+                                        @click="${() => store.openExpenseDetail(item.sourceId!)}"
+                                      >
+                                        ${item.title}
+                                      </app-link>
+                                    `
+                                  : item.taskId
+                                    ? html`
+                                        <app-link
+                                          class="link-btn task-link"
+                                          size="md"
+                                          variant="primary"
+                                          @click="${() => store.openTaskDetail(item.taskId!)}"
+                                        >
+                                          ${item.title}
+                                        </app-link>
+                                      `
+                                    : item.title}
                             </td>
                             <td class="mono" style="white-space: nowrap;">
                               ${item.quantity} ${this.unitLabel(item.unit, t)}

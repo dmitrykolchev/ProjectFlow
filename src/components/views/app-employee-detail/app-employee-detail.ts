@@ -410,14 +410,36 @@ export class AppEmployeeDetail extends LitElement {
                           const proj = store.projects.find((p) => p.id === te.projectId);
                           return html`
                             <tr>
-                              <td class="mono">${te.date}</td>
+                              <td class="mono">
+                                <app-link
+                                  size="sm"
+                                  variant="primary"
+                                  title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                                  @click="${() => store.openTimeEntryDetail(te.id)}"
+                                >
+                                  <span class="mono">${te.date}</span>
+                                </app-link>
+                              </td>
                               <td>
-                                <span class="mono" style="color: var(--accent-primary); font-weight: 700;">
-                                  ${te.taskId}
-                                </span>
+                                <app-link
+                                  size="sm"
+                                  variant="primary"
+                                  @click="${() => store.openTaskDetail(te.taskId)}"
+                                >
+                                  <span class="mono" style="font-weight: 700;">${te.taskId}</span>
+                                </app-link>
                                 ${proj ? html`<span style="color: var(--text-muted);"> · ${proj.key}</span>` : ''}
                               </td>
-                              <td>${te.description || t.timeTracking.categories[te.category]}</td>
+                              <td>
+                                <app-link
+                                  size="md"
+                                  variant="primary"
+                                  title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                                  @click="${() => store.openTimeEntryDetail(te.id)}"
+                                >
+                                  ${te.description || t.timeTracking.categories[te.category]}
+                                </app-link>
+                              </td>
                               <td class="mono" style="font-weight: 700;">${te.hours.toFixed(1)} ${t.viewTexts.calculations.hoursUnitShort}</td>
                               <td>
                                 <app-badge variant="${te.billable ? 'success' : 'default'}" appearance="outline" size="sm">
@@ -465,7 +487,16 @@ export class AppEmployeeDetail extends LitElement {
                         return html`
                           <tr>
                             <td class="mono">${exp.date}</td>
-                            <td>${exp.title}</td>
+                            <td>
+                              <app-link
+                                size="md"
+                                variant="primary"
+                                title="${t.viewTexts.expenses.openDetailsTitle}"
+                                @click="${() => store.openExpenseDetail(exp.id)}"
+                              >
+                                ${exp.title}
+                              </app-link>
+                            </td>
                             <td>${proj ? `[${proj.key}] ${proj.name}` : '—'}</td>
                             <td class="mono" style="font-weight: 700;">
                               ${exp.amount.toLocaleString(t.common.locale)} ${sym}

@@ -68,7 +68,7 @@ export class AppReminderDetailModal extends LitElement {
   @property({ attribute: false }) reminder: Reminder | null = null;
 
   @state() private currentLang = store.customization.language;
-  @state() private detailReminderId: string | null = store.detailReminderId;
+  @state() private modalReminderId: string | null = store.modalReminderId;
   @state() private reminders: Reminder[] = store.reminders;
   @state() private editingReminder: Reminder | null = null;
   @state() private deleteConfirmOpen = false;
@@ -90,7 +90,7 @@ export class AppReminderDetailModal extends LitElement {
 
   private syncState() {
     this.currentLang = store.customization.language;
-    this.detailReminderId = store.detailReminderId;
+    this.modalReminderId = store.modalReminderId;
     this.reminders = store.reminders;
   }
 
@@ -98,8 +98,8 @@ export class AppReminderDetailModal extends LitElement {
     if (this.reminder) {
       return this.reminders.find((r) => r.id === this.reminder?.id) || this.reminder;
     }
-    if (!this.detailReminderId) return null;
-    return this.reminders.find((r) => r.id === this.detailReminderId) || null;
+    if (!this.modalReminderId) return null;
+    return this.reminders.find((r) => r.id === this.modalReminderId) || null;
   }
 
   private closeDetailModal() {
@@ -109,7 +109,7 @@ export class AppReminderDetailModal extends LitElement {
       this.open = false;
       this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
     } else {
-      store.closeReminderDetail();
+      store.closeReminderDetailModal();
     }
   }
 
@@ -194,7 +194,7 @@ export class AppReminderDetailModal extends LitElement {
     const rem = this.getActiveReminder();
     const isModalOpen = this.reminder
       ? this.open && Boolean(rem) && !this.editingReminder && !this.deleteConfirmOpen
-      : Boolean(this.detailReminderId && rem) && !this.editingReminder && !this.deleteConfirmOpen;
+      : Boolean(this.modalReminderId && rem) && !this.editingReminder && !this.deleteConfirmOpen;
 
     if (!rem) {
       return html``;

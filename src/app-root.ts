@@ -62,6 +62,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
   documents: () => import('./components/views/app-documents/app-documents'),
   reminders: () => import('./components/views/app-reminders/app-reminders'),
+  'reminder-detail': () => import('./components/views/app-reminder-detail/app-reminder-detail'),
   companies: () => import('./components/views/app-companies/app-companies'),
   'company-detail': () => import('./components/views/app-company-detail/app-company-detail'),
   employees: () => import('./components/views/app-employees/app-employees'),
@@ -75,9 +76,13 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   'calculation-detail': () =>
     import('./components/views/app-calculation-detail/app-calculation-detail'),
   payments: () => import('./components/views/app-payments/app-payments'),
+  'payment-detail': () => import('./components/views/app-payment-detail/app-payment-detail'),
   directories: () => import('./components/views/app-directories/app-directories'),
   'time-tracking': () => import('./components/views/app-time-tracking/app-time-tracking'),
+  'timeentry-detail': () =>
+    import('./components/views/app-timeentry-detail/app-timeentry-detail'),
   expenses: () => import('./components/views/app-expenses/app-expenses'),
+  'expense-detail': () => import('./components/views/app-expense-detail/app-expense-detail'),
   settings: () => import('./components/views/app-settings/app-settings'),
   'profile-settings': () => import('./components/views/app-profile-settings/app-profile-settings'),
   storybook: () => import('./components/views/app-storybook/app-storybook'),
@@ -242,6 +247,14 @@ export class AppRoot extends LitElement {
           ? 'companies'
           : this.activeView === 'calculation-detail'
           ? 'calculations'
+          : this.activeView === 'payment-detail'
+          ? 'payments'
+          : this.activeView === 'timeentry-detail'
+          ? 'time-tracking'
+          : this.activeView === 'expense-detail'
+          ? 'expenses'
+          : this.activeView === 'reminder-detail'
+          ? 'reminders'
           : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
@@ -482,6 +495,8 @@ export class AppRoot extends LitElement {
         return html`<app-documents></app-documents>`;
       case 'reminders':
         return html`<app-reminders></app-reminders>`;
+      case 'reminder-detail':
+        return html`<app-reminder-detail></app-reminder-detail>`;
       case 'companies':
         return html`<app-companies></app-companies>`;
       case 'company-detail':
@@ -504,12 +519,18 @@ export class AppRoot extends LitElement {
         return html`<app-calculation-detail></app-calculation-detail>`;
       case 'payments':
         return html`<app-payments></app-payments>`;
+      case 'payment-detail':
+        return html`<app-payment-detail></app-payment-detail>`;
       case 'directories':
         return html`<app-directories></app-directories>`;
       case 'time-tracking':
         return html`<app-time-tracking></app-time-tracking>`;
+      case 'timeentry-detail':
+        return html`<app-timeentry-detail></app-timeentry-detail>`;
       case 'expenses':
         return html`<app-expenses></app-expenses>`;
+      case 'expense-detail':
+        return html`<app-expense-detail></app-expense-detail>`;
       case 'settings':
         return html`<app-settings></app-settings>`;
       case 'profile-settings':

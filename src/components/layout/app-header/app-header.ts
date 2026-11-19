@@ -17,6 +17,10 @@ const DETAIL_ENTITY_MAP: Record<string, EntityEmblemKind> = {
   'contract-detail': 'contract',
   'calculation-detail': 'calculation',
   'employee-detail': 'employee',
+  'timeentry-detail': 'timeEntry',
+  'expense-detail': 'expense',
+  'payment-detail': 'payment',
+  'reminder-detail': 'reminder',
 };
 
 @customElement('app-header')
@@ -31,6 +35,10 @@ export class AppHeader extends LitElement {
   @state() private detailCounterpartyId = store.detailCounterpartyId;
   @state() private detailCalculationId = store.detailCalculationId;
   @state() private detailEmployeeId = store.detailEmployeeId;
+  @state() private detailTimeEntryId = store.detailTimeEntryId;
+  @state() private detailExpenseId = store.detailExpenseId;
+  @state() private detailPaymentId = store.detailPaymentId;
+  @state() private detailReminderId = store.detailReminderId;
   @state() private searchQuery = store.searchQuery;
   @state() private currentLang = store.customization.language;
   @state() private theme = store.customization.theme;
@@ -65,6 +73,10 @@ export class AppHeader extends LitElement {
     this.detailCounterpartyId = store.detailCounterpartyId;
     this.detailCalculationId = store.detailCalculationId;
     this.detailEmployeeId = store.detailEmployeeId;
+    this.detailTimeEntryId = store.detailTimeEntryId;
+    this.detailExpenseId = store.detailExpenseId;
+    this.detailPaymentId = store.detailPaymentId;
+    this.detailReminderId = store.detailReminderId;
     this.searchQuery = store.searchQuery;
     this.currentLang = store.customization.language;
     this.theme = store.customization.theme;
@@ -108,6 +120,22 @@ export class AppHeader extends LitElement {
       this.activeView === 'employee-detail'
         ? store.users.find((u) => u.id === this.detailEmployeeId)
         : undefined;
+    const detailTimeEntry =
+      this.activeView === 'timeentry-detail'
+        ? store.timeEntries.find((te) => te.id === this.detailTimeEntryId)
+        : undefined;
+    const detailExpense =
+      this.activeView === 'expense-detail'
+        ? store.expenses.find((e) => e.id === this.detailExpenseId)
+        : undefined;
+    const detailPayment =
+      this.activeView === 'payment-detail'
+        ? store.payments.find((p) => p.id === this.detailPaymentId)
+        : undefined;
+    const detailReminder =
+      this.activeView === 'reminder-detail'
+        ? store.reminders.find((r) => r.id === this.detailReminderId)
+        : undefined;
 
     const viewNames: Record<string, string> = {
       dashboard: t.navigation.dashboard,
@@ -122,6 +150,7 @@ export class AppHeader extends LitElement {
       'knowledge-base': t.navigation.knowledgeBase,
       documents: t.navigation.documents,
       reminders: t.navigation.reminders,
+      'reminder-detail': detailReminder ? detailReminder.title : t.navigation.reminders,
       directories: t.navigation.directories,
       'project-chat': t.navigation.projectChat,
       gantt: t.navigation.gantt,
@@ -143,8 +172,15 @@ export class AppHeader extends LitElement {
         ? detailCalculation.number
         : t.navigation.calculations,
       payments: t.navigation.payments,
+      'payment-detail': detailPayment
+        ? detailPayment.documentNumber || detailPayment.id
+        : t.navigation.payments,
       'time-tracking': t.navigation.timeTracking,
+      'timeentry-detail': detailTimeEntry
+        ? `${detailTimeEntry.taskId} · ${detailTimeEntry.date}`
+        : t.navigation.timeTracking,
       expenses: t.navigation.expenses,
+      'expense-detail': detailExpense ? detailExpense.title : t.navigation.expenses,
       settings: t.navigation.settings,
       'profile-settings': t.profileSettings.crumbLabel,
       storybook: t.navigation.storybook,

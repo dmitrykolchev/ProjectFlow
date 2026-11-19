@@ -126,12 +126,16 @@ import contractDetailMeta from '../app-contract-detail/app-contract-detail.story
 import calculationsMeta from '../app-calculations/app-calculations.story';
 import calculationDetailMeta from '../app-calculation-detail/app-calculation-detail.story';
 import paymentsMeta from '../app-payments/app-payments.story';
+import paymentDetailMeta from '../app-payment-detail/app-payment-detail.story';
 import timeTrackingMeta from '../app-time-tracking/app-time-tracking.story';
+import timeentryDetailMeta from '../app-timeentry-detail/app-timeentry-detail.story';
 import expensesMeta from '../app-expenses/app-expenses.story';
+import expenseDetailMeta from '../app-expense-detail/app-expense-detail.story';
 import settingsMeta from '../app-settings/app-settings.story';
 import profileSettingsMeta from '../app-profile-settings/app-profile-settings.story';
 import directoriesMeta from '../app-directories/app-directories.story';
 import remindersMeta from '../app-reminders/app-reminders.story';
+import reminderDetailMeta from '../app-reminder-detail/app-reminder-detail.story';
 import authMeta from '../app-auth/app-auth.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
@@ -249,10 +253,14 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   calculationsMeta,
   calculationDetailMeta,
   paymentsMeta,
+  paymentDetailMeta,
   directoriesMeta,
   remindersMeta,
+  reminderDetailMeta,
   timeTrackingMeta,
+  timeentryDetailMeta,
   expensesMeta,
+  expenseDetailMeta,
   settingsMeta,
   profileSettingsMeta,
   authMeta,

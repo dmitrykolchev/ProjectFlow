@@ -5,6 +5,7 @@ import {
   BankCurrency,
   BankRequisite,
   Invoice,
+  InvoicePayment,
   PaymentDirection,
   PaymentMethod,
 } from '../../../types';
@@ -34,6 +35,7 @@ const CURRENCIES: BankCurrency[] = ['RUB', 'USD', 'EUR', 'CNY', 'GBP', 'KZT', 'A
 export class AppPaymentForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
   @property({ attribute: false }) invoice: Invoice | null = null;
+  @property({ attribute: false }) payment: InvoicePayment | null = null;
   /** invoices the target selector may switch between */
   @property({ attribute: false }) payableInvoices: Invoice[] = [];
   @property({ type: String }) defaultDirection: PaymentDirection = 'incoming';
@@ -75,7 +77,11 @@ export class AppPaymentForm extends LitElement {
 
   protected willUpdate(changed: Map<PropertyKey, unknown>) {
     if (changed.has('open') && this.open) {
-      this.initFields(this.invoice);
+      if (this.payment) {
+        this.initFromPayment(this.payment);
+      } else {
+        this.initFields(this.invoice);
+      }
     }
   }
 
@@ -166,6 +172,35 @@ export class AppPaymentForm extends LitElement {
     this.companyError = '';
   }
 
+  private initFromPayment(pay: InvoicePayment) {
+    const linkedInv = pay.invoiceId
+      ? store.invoices.find((i) => i.id === pay.invoiceId) || this.invoice
+      : null;
+    const company = store.companies.find((c) => c.id === pay.companyId);
+    const cp = store.counterparties.find((c) => c.id === pay.counterpartyId);
+
+    this.currentInvoice = linkedInv || null;
+    this.direction = pay.direction || 'incoming';
+    this.companyId = pay.companyId || '';
+    this.companyBankAccountId =
+      pay.companyBankAccountId ||
+      store.resolveBankAccountId(company?.bankAccounts, undefined, pay.currency) ||
+      '';
+    this.counterpartyId = pay.counterpartyId || '';
+    this.counterpartyBankAccountId =
+      pay.counterpartyBankAccountId ||
+      store.resolveBankAccountId(cp?.bankAccounts, undefined, pay.currency) ||
+      '';
+    this.currency = pay.currency || 'RUB';
+    this.payAmount = pay.amount;
+    this.payDate = pay.paymentDate || new Date().toISOString().slice(0, 10);
+    this.payMethod = pay.method || 'bank_transfer';
+    this.payDocNumber = pay.documentNumber || '';
+    this.payNotes = pay.notes || '';
+    this.payError = '';
+    this.companyError = '';
+  }
+
   private handleDirectionChange(nextDir: PaymentDirection) {
     const t = getTranslation(this.currentLang);
     const prevDir = this.direction;
@@ -236,6 +271,35 @@ export class AppPaymentForm extends LitElement {
     const amount = Number(this.payAmount) || 0;
     if (amount <= 0) {
       this.payError = t.viewTexts.payments.amountError;
+      return;
+    }
+
+    if (this.payment) {
+      const updatedPayment: InvoicePayment = {
+        ...this.payment,
+        direction: this.direction,
+        invoiceId: inv?.id || '',
+        contractId: inv?.contractId || '',
+        companyId: this.companyId,
+        counterpartyId: this.counterpartyId,
+        companyBankAccountId: this.companyBankAccountId || undefined,
+        counterpartyBankAccountId: this.counterpartyBankAccountId || undefined,
+        amount,
+        currency: inv ? inv.currency : this.currency,
+        paymentDate: this.payDate || new Date().toISOString().slice(0, 10),
+        method: this.payMethod,
+        documentNumber: this.payDocNumber,
+        notes: this.payNotes,
+      };
+      store.updateInvoicePayment(updatedPayment);
+      this.open = false;
+      this.dispatchEvent(
+        new CustomEvent('saved', {
+          detail: { payment: updatedPayment },
+          bubbles: true,
+          composed: true,
+        })
+      );
       return;
     }
 
@@ -344,7 +408,9 @@ export class AppPaymentForm extends LitElement {
       { value: 'offset', label: t.payments.methods.offset },
     ];
 
-    const modalTitle = inv
+    const modalTitle = this.payment
+      ? `${t.viewTexts.payments.editPaymentTitle}${this.payment.documentNumber ? ` · ${this.payment.documentNumber}` : ''}`
+      : inv
       ? `${t.payments.newPayment} · ${inv.number}`
       : t.viewTexts.payments.newStandalonePaymentTitle;
 
@@ -661,7 +727,7 @@ export class AppPaymentForm extends LitElement {
             ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${() => this.handleSave()}">
-            ${t.payments.recordPayment}
+            ${this.payment ? t.common.save : t.payments.recordPayment}
           </app-button>
         </div>
       </app-modal>

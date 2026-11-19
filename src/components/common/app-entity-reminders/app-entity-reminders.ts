@@ -194,7 +194,7 @@ export class AppEntityReminders extends LitElement {
                               type="button"
                               class="row-title-btn"
                               title="${t.reminders.actionDetails}"
-                              @click="${() => store.openReminderDetail(rem.id, false)}"
+                              @click="${() => store.openReminderDetail(rem.id)}"
                             >
                               ${rem.title}
                             </button>
@@ -237,7 +237,7 @@ export class AppEntityReminders extends LitElement {
                                 type="button"
                                 class="attachments-meta-btn"
                                 title="${t.reminders.actionDetails}"
-                                @click="${() => store.openReminderDetail(rem.id, false)}"
+                                @click="${() => store.openReminderDetail(rem.id)}"
                               >
                                 ${iconPaperclip(11)}
                                 <span>${t.reminders.detailAttachmentsCount((rem.attachmentIds || []).length)}</span>
@@ -328,7 +328,7 @@ export class AppEntityReminders extends LitElement {
                             size="sm"
                             variant="ghost"
                             title="${t.reminders.actionDetails}"
-                            @click="${() => store.openReminderDetail(rem.id, false)}"
+                            @click="${() => store.openReminderDetail(rem.id)}"
                           >
                             <span slot="icon-start">${iconEye(13)}</span>
                           </app-button>

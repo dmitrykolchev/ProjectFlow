@@ -7,6 +7,7 @@ import { DocumentItem, Expense, ExpenseCategory, ExpenseStatus } from '../../../
 import {
   iconCheck,
   iconEdit,
+  iconEye,
   iconPaperclip,
   iconPlus,
   iconTrash,
@@ -283,7 +284,15 @@ export class AppExpenses extends LitElement {
               const exp = row as unknown as Expense;
               return html`
                 <div class="dg-stack">
-                  <span class="dg-title">${exp.title}</span>
+                  <app-link
+                    class="dg-link"
+                    size="md"
+                    variant="primary"
+                    title="${t.viewTexts.expenses.openDetailsTitle}"
+                    @click="${() => store.openExpenseDetail(exp.id)}"
+                  >
+                    <span class="dg-title">${exp.title}</span>
+                  </app-link>
                   <span class="dg-sub">${exp.vendor || '—'}${exp.notes ? ` · ${exp.notes}` : ''}</span>
                 </div>
               `;
@@ -485,8 +494,8 @@ export class AppExpenses extends LitElement {
           <app-data-grid-column
             field="_actions"
             caption=""
-            width="135"
-            min-width="110"
+            width="162"
+            min-width="135"
             align="right"
             resizable="false"
             reorderable="false"
@@ -496,6 +505,14 @@ export class AppExpenses extends LitElement {
               const exp = row as unknown as Expense;
               return html`
                 <div class="dg-actions">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.expenses.openDetailsTitle}"
+                    @click="${() => store.openExpenseDetail(exp.id)}"
+                  >
+                    <span slot="start">${iconEye(14)}</span>
+                  </app-button>
                   ${exp.status === 'pending'
                     ? html`
                         <app-button
@@ -577,7 +594,14 @@ export class AppExpenses extends LitElement {
                 <tr>
                   <td class="mono" style="white-space: nowrap;">${exp.date}</td>
                   <td>
-                    <div class="exp-title">${exp.title}</div>
+                    <app-link
+                      size="md"
+                      variant="primary"
+                      title="${t.viewTexts.expenses.openDetailsTitle}"
+                      @click="${() => store.openExpenseDetail(exp.id)}"
+                    >
+                      <span class="exp-title">${exp.title}</span>
+                    </app-link>
                     <div class="exp-vendor">
                       ${exp.vendor || '—'}${exp.notes ? ` · ${exp.notes}` : ''}
                     </div>
@@ -633,6 +657,14 @@ export class AppExpenses extends LitElement {
                   </td>
                   <td>
                     <div class="actions-row">
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.viewTexts.expenses.openDetailsTitle}"
+                        @click="${() => store.openExpenseDetail(exp.id)}"
+                      >
+                        <span slot="start">${iconEye(14)}</span>
+                      </app-button>
                       ${exp.status === 'pending'
                         ? html`
                             <app-button

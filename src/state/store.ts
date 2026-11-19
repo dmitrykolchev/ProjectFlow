@@ -317,7 +317,11 @@ export class AppStore {
   public detailKnowledgeId: string = '';
   public detailRequirementId: string = '';
   public detailCalculationId: string = '';
-  public detailReminderId: string | null = null;
+  public detailTimeEntryId: string = '';
+  public detailExpenseId: string = '';
+  public detailPaymentId: string = '';
+  public detailReminderId: string = '';
+  public modalReminderId: string | null = null;
   public requirementFilterProjectId: string = 'all';
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
@@ -1409,11 +1413,14 @@ export class AppStore {
       view === 'knowledge-base' ||
       view === 'documents' ||
       view === 'reminders' ||
+      view === 'reminder-detail' ||
       view === 'task-detail' ||
       view === 'kanban' ||
       view === 'gantt' ||
       view === 'time-tracking' ||
-      view === 'expenses'
+      view === 'timeentry-detail' ||
+      view === 'expenses' ||
+      view === 'expense-detail'
     ) {
       return 'workspace';
     }
@@ -1430,6 +1437,7 @@ export class AppStore {
       view === 'calculations' ||
       view === 'calculation-detail' ||
       view === 'payments' ||
+      view === 'payment-detail' ||
       view === 'directories'
     ) {
       return 'directory';
@@ -1528,6 +1536,14 @@ export class AppStore {
         return this.detailRequirementId || undefined;
       case 'calculation-detail':
         return this.detailCalculationId || undefined;
+      case 'timeentry-detail':
+        return this.detailTimeEntryId || undefined;
+      case 'expense-detail':
+        return this.detailExpenseId || undefined;
+      case 'payment-detail':
+        return this.detailPaymentId || undefined;
+      case 'reminder-detail':
+        return this.detailReminderId || undefined;
       case 'project-chat':
         return this.chatProjectId || undefined;
       case 'directories':
@@ -1582,6 +1598,18 @@ export class AppStore {
     } else if (view === 'calculation-detail') {
       if (id && this.calculations.some((c) => c.id === id)) this.detailCalculationId = id;
       else view = 'calculations';
+    } else if (view === 'timeentry-detail') {
+      if (id && this.timeEntries.some((t) => t.id === id)) this.detailTimeEntryId = id;
+      else view = 'time-tracking';
+    } else if (view === 'expense-detail') {
+      if (id && this.expenses.some((e) => e.id === id)) this.detailExpenseId = id;
+      else view = 'expenses';
+    } else if (view === 'payment-detail') {
+      if (id && this.payments.some((p) => p.id === id)) this.detailPaymentId = id;
+      else view = 'payments';
+    } else if (view === 'reminder-detail') {
+      if (id && this.reminders.some((r) => r.id === id)) this.detailReminderId = id;
+      else view = 'reminders';
     } else if (view === 'project-chat') {
       if (id && this.projects.some((p) => p.id === id)) this.chatProjectId = id;
       else if (!this.chatProjectId) this.chatProjectId = this.projects[0]?.id || '';
@@ -1728,6 +1756,21 @@ export class AppStore {
   public openCalculationDetail(calculationId: string): void {
     this.detailCalculationId = calculationId;
     this.setActiveView('calculation-detail');
+  }
+
+  public openTimeEntryDetail(timeEntryId: string): void {
+    this.detailTimeEntryId = timeEntryId;
+    this.setActiveView('timeentry-detail');
+  }
+
+  public openExpenseDetail(expenseId: string): void {
+    this.detailExpenseId = expenseId;
+    this.setActiveView('expense-detail');
+  }
+
+  public openPaymentDetail(paymentId: string): void {
+    this.detailPaymentId = paymentId;
+    this.setActiveView('payment-detail');
   }
 
   public consumePendingInvoiceModal(contractId: string): boolean {
@@ -2659,21 +2702,111 @@ export class AppStore {
       'create',
       'payment',
       targetName,
-      `${dirPrefix}${compAcc ? ` (${compAcc.bankName})` : ''}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      `${dirPrefix}${compAcc ? ` (${compAcc.bankName})` : ''}: ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      payment.id
     );
     this.addNotification(
       'success',
       isFull ? 'Счёт полностью оплачен' : `${dirPrefix} зафиксирован`,
-      `${inv?.number || company?.name || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      `${inv?.number || company?.name || ''} — ${payment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      { targetType: 'payment', targetId: payment.id }
     );
     this.notify();
     return payment;
+  }
+
+  public updateInvoicePayment(updated: InvoicePayment): void {
+    const prev = this.payments.find((p) => p.id === updated.id);
+    if (!prev) return;
+    const amount = Math.max(0.01, Math.round((Number(updated.amount) || 0) * 100) / 100);
+    const company = this.companies.find((c) => c.id === updated.companyId);
+    const cp = this.counterparties.find((c) => c.id === updated.counterpartyId);
+    const companyBankAccountId = this.resolveBankAccountId(
+      company?.bankAccounts,
+      updated.companyBankAccountId,
+      updated.currency
+    );
+    const counterpartyBankAccountId = this.resolveBankAccountId(
+      cp?.bankAccounts,
+      updated.counterpartyBankAccountId,
+      updated.currency
+    );
+    const compAcc = company?.bankAccounts?.find((a) => a.id === companyBankAccountId);
+    const cpAcc = cp?.bankAccounts?.find((a) => a.id === counterpartyBankAccountId);
+
+    const nextPayment: InvoicePayment = {
+      ...prev,
+      ...updated,
+      amount,
+      companyBankAccountId,
+      counterpartyBankAccountId,
+      companyBankSnapshot: compAcc
+        ? this.formatBankRequisiteShort(compAcc)
+        : updated.companyBankSnapshot,
+      counterpartyBankSnapshot: cpAcc
+        ? this.formatBankRequisiteShort(cpAcc)
+        : updated.counterpartyBankSnapshot,
+      documentNumber: updated.documentNumber.trim(),
+      notes: updated.notes.trim(),
+    };
+
+    this.payments = this.payments.map((p) => (p.id === nextPayment.id ? nextPayment : p));
+    this.savePayments();
+
+    if (prev.invoiceId && prev.invoiceId !== nextPayment.invoiceId) {
+      this.reconcileInvoiceAfterPayments(prev.invoiceId, 'sent');
+    }
+    if (nextPayment.invoiceId) {
+      this.reconcileInvoiceAfterPayments(nextPayment.invoiceId, 'sent');
+    }
+
+    const inv = nextPayment.invoiceId
+      ? this.invoices.find((i) => i.id === nextPayment.invoiceId)
+      : undefined;
+    const targetName = inv
+      ? `${inv.number}${nextPayment.documentNumber ? ` · ${nextPayment.documentNumber}` : ''}`
+      : nextPayment.documentNumber || company?.name || nextPayment.id;
+    const sym =
+      nextPayment.currency === 'USD'
+        ? '$'
+        : nextPayment.currency === 'EUR'
+        ? '€'
+        : nextPayment.currency === 'CNY'
+        ? '¥'
+        : nextPayment.currency === 'GBP'
+        ? '£'
+        : nextPayment.currency === 'KZT'
+        ? '₸'
+        : nextPayment.currency === 'AED'
+        ? 'AED'
+        : '₽';
+    this.logActivity(
+      'update',
+      'payment',
+      targetName,
+      `${nextPayment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      nextPayment.id
+    );
+    this.addNotification(
+      'info',
+      targetName,
+      `${nextPayment.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      { targetType: 'payment', targetId: nextPayment.id }
+    );
+    this.notify();
   }
 
   public deleteInvoicePayment(paymentId: string): void {
     const target = this.payments.find((p) => p.id === paymentId);
     if (!target) return;
     this.payments = this.payments.filter((p) => p.id !== paymentId);
+    if (this.detailPaymentId === paymentId) {
+      this.detailPaymentId = this.payments[0]?.id || '';
+      if (this.activeView === 'payment-detail') {
+        this.activeView = 'payments';
+        this.syncHistory(true);
+      }
+    }
     this.savePayments();
     if (target.invoiceId) {
       this.reconcileInvoiceAfterPayments(target.invoiceId, 'sent');
@@ -2700,7 +2833,8 @@ export class AppStore {
       inv
         ? `${inv.number}${target.documentNumber ? ` · ${target.documentNumber}` : ''}`
         : target.documentNumber || target.id,
-      `Удалён платёж на ${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`
+      `Удалён платёж на ${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`,
+      target.id
     );
     this.addNotification('warning', 'Платёж удалён', `${target.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${sym}`);
     this.notify();
@@ -2919,9 +3053,12 @@ export class AppStore {
       'time_entry',
       targetTitle,
       `Списано ${entry.hours} ч (${user?.name || entry.userId})`,
-      entry.taskId
+      entry.id
     );
-    this.addNotification('success', 'Время списано', `${entry.hours} ч по задаче ${entry.taskId}`);
+    this.addNotification('success', 'Время списано', `${entry.hours} ч по задаче ${entry.taskId}`, {
+      targetType: 'time_entry',
+      targetId: entry.id,
+    });
     this.notify();
     return entry;
   }
@@ -2958,9 +3095,12 @@ export class AppStore {
       'time_entry',
       task ? `${task.id} · ${task.title}` : normalized.taskId,
       `Обновлена запись: ${normalized.hours} ч (${normalized.status})`,
-      normalized.taskId
+      normalized.id
     );
-    this.addNotification('info', 'Запись обновлена', `${normalized.hours} ч по ${normalized.taskId}`);
+    this.addNotification('info', 'Запись обновлена', `${normalized.hours} ч по ${normalized.taskId}`, {
+      targetType: 'time_entry',
+      targetId: normalized.id,
+    });
     this.notify();
   }
 
@@ -2973,6 +3113,13 @@ export class AppStore {
       documentIds: [],
     });
     this.timeEntries = this.timeEntries.filter((e) => e.id !== id);
+    if (this.detailTimeEntryId === id) {
+      this.detailTimeEntryId = this.timeEntries[0]?.id || '';
+      if (this.activeView === 'timeentry-detail') {
+        this.activeView = 'time-tracking';
+        this.syncHistory(true);
+      }
+    }
     this.saveTimeEntries();
     this.adjustTaskLoggedHours(target.taskId, -target.hours);
 
@@ -2982,7 +3129,7 @@ export class AppStore {
       'time_entry',
       task ? `${task.id} · ${task.title}` : target.taskId,
       `Удалена запись о времени (${target.hours} ч)`,
-      target.taskId
+      target.id
     );
     this.addNotification('warning', 'Запись удалена', `Удалено ${target.hours} ч по ${target.taskId}`);
     this.notify();
@@ -3017,9 +3164,12 @@ export class AppStore {
       `${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol} · ${proj?.key || expense.projectId}${
         expense.taskId ? ` (${expense.taskId})` : ''
       }`,
-      expense.taskId
+      expense.id
     );
-    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`);
+    this.addNotification('success', 'Расход добавлен', `${expense.title} — ${expense.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`, {
+      targetType: 'expense',
+      targetId: expense.id,
+    });
     this.notify();
     return expense;
   }
@@ -3042,9 +3192,12 @@ export class AppStore {
       'expense',
       normalized.title,
       `Статус: ${normalized.status}, сумма: ${normalized.amount.toLocaleString(getTranslation(this.customization.language).common.locale)} ${symbol}`,
-      normalized.taskId
+      normalized.id
     );
-    this.addNotification('info', 'Расход обновлён', normalized.title);
+    this.addNotification('info', 'Расход обновлён', normalized.title, {
+      targetType: 'expense',
+      targetId: normalized.id,
+    });
     this.notify();
   }
 
@@ -3057,8 +3210,15 @@ export class AppStore {
       documentIds: [],
     });
     this.expenses = this.expenses.filter((e) => e.id !== id);
+    if (this.detailExpenseId === id) {
+      this.detailExpenseId = this.expenses[0]?.id || '';
+      if (this.activeView === 'expense-detail') {
+        this.activeView = 'expenses';
+        this.syncHistory(true);
+      }
+    }
     this.saveExpenses();
-    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена', target.taskId);
+    this.logActivity('delete', 'expense', target.title, 'Запись о расходе удалена', target.id);
     this.addNotification('warning', 'Расход удалён', target.title);
     this.notify();
   }
@@ -4419,18 +4579,31 @@ export class AppStore {
       this.customization = { ...this.customization, showActivityPanel: false };
       this.saveCustomization();
     }
-    if (navigateToView && this.activeView !== 'reminders') {
-      this.setActiveView('reminders');
-    }
+    this.modalReminderId = null;
     this.detailReminderId = reminderId;
+    if (navigateToView) {
+      this.setActiveView('reminder-detail');
+    } else {
+      this.setActiveView('reminder-detail');
+    }
+  }
+
+  public openReminderDetailModal(reminderId: string): void {
+    const exists = this.reminders.some((r) => r.id === reminderId);
+    if (!exists) return;
+    this.modalReminderId = reminderId;
     this.notify();
   }
 
   public closeReminderDetail(): void {
-    if (this.detailReminderId !== null) {
-      this.detailReminderId = null;
+    if (this.modalReminderId !== null) {
+      this.modalReminderId = null;
       this.notify();
     }
+  }
+
+  public closeReminderDetailModal(): void {
+    this.closeReminderDetail();
   }
 
   public canOpenActivityTarget(
@@ -4465,8 +4638,16 @@ export class AppStore {
         return this.invoices.some((i) => i.id === targetId);
       case 'payment':
         return this.payments.some((p) => p.id === targetId);
+      case 'time_entry':
+        return (
+          this.timeEntries.some((te) => te.id === targetId) ||
+          this.tasks.some((tk) => tk.id === targetId)
+        );
       case 'expense':
-        return this.expenses.some((e) => e.id === targetId);
+        return (
+          this.expenses.some((e) => e.id === targetId) ||
+          this.tasks.some((tk) => tk.id === targetId)
+        );
       case 'directory':
         return this.directories.some((d) => d.id === targetId);
       default:
@@ -4487,7 +4668,7 @@ export class AppStore {
     }
     switch (targetType) {
       case 'reminder':
-        this.openReminderDetail(targetId, true);
+        this.openReminderDetail(targetId);
         break;
       case 'task':
         this.openTaskDetail(targetId);
@@ -4526,10 +4707,21 @@ export class AppStore {
         break;
       }
       case 'payment':
-        this.setActiveView('payments');
+        this.openPaymentDetail(targetId);
+        break;
+      case 'time_entry':
+        if (this.timeEntries.some((te) => te.id === targetId)) {
+          this.openTimeEntryDetail(targetId);
+        } else {
+          this.openTaskDetail(targetId);
+        }
         break;
       case 'expense':
-        this.setActiveView('expenses');
+        if (this.expenses.some((e) => e.id === targetId)) {
+          this.openExpenseDetail(targetId);
+        } else {
+          this.openTaskDetail(targetId);
+        }
         break;
       case 'directory':
         this.openDirectory(targetId);
@@ -4696,7 +4888,7 @@ export class AppStore {
         this.openCalculationDetail(id);
         break;
       case 'payment':
-        this.setActiveView('payments');
+        this.openPaymentDetail(id);
         break;
       case 'project':
         this.openProjectDetail(id);
@@ -4711,7 +4903,7 @@ export class AppStore {
         this.openRequirementDetail(id);
         break;
       case 'expense':
-        this.setActiveView('expenses');
+        this.openExpenseDetail(id);
         break;
     }
   }
@@ -4767,8 +4959,15 @@ export class AppStore {
     const target = this.reminders.find((r) => r.id === id);
     if (!target) return;
     this.reminders = this.reminders.filter((r) => r.id !== id);
+    if (this.modalReminderId === id) {
+      this.modalReminderId = null;
+    }
     if (this.detailReminderId === id) {
-      this.detailReminderId = null;
+      this.detailReminderId = this.reminders[0]?.id || '';
+      if (this.activeView === 'reminder-detail') {
+        this.activeView = 'reminders';
+        this.syncHistory(true);
+      }
     }
     this.saveReminders();
     const t = getTranslation(this.customization.language);

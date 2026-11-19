@@ -24,6 +24,7 @@ import {
   iconCornerUpLeft,
   iconDownload,
   iconEdit,
+  iconEye,
   iconFileText,
   iconFolder,
   iconLayers,
@@ -1053,7 +1054,16 @@ export class AppTaskDetail extends LitElement {
                       .filter((d): d is DocumentItem => Boolean(d));
                     return html`
                       <tr>
-                        <td class="num-col" style="text-align: left;">${te.date}</td>
+                        <td class="num-col" style="text-align: left;">
+                          <app-link
+                            size="sm"
+                            variant="primary"
+                            title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                            @click="${() => store.openTimeEntryDetail(te.id)}"
+                          >
+                            <span class="mono">${te.date}</span>
+                          </app-link>
+                        </td>
                         <td>
                           ${user
                             ? html`
@@ -1069,7 +1079,16 @@ export class AppTaskDetail extends LitElement {
                             : te.userId}
                         </td>
                         <td>
-                          <div>${te.description || t.timeTracking.categories[te.category]}</div>
+                          <div>
+                            <app-link
+                              size="md"
+                              variant="primary"
+                              title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                              @click="${() => store.openTimeEntryDetail(te.id)}"
+                            >
+                              ${te.description || t.timeTracking.categories[te.category]}
+                            </app-link>
+                          </div>
                           <div class="sub-line">
                             ${t.timeTracking.categories[te.category]} · ${te.billable ? 'Billable' : 'Internal'} · ${t.timeTracking.statuses[te.status]}
                           </div>
@@ -1095,7 +1114,15 @@ export class AppTaskDetail extends LitElement {
                         </td>
                         <td class="num-col"><strong>${te.hours.toFixed(1)} ${t.common.hours}</strong></td>
                         <td class="num-col">${cost.toLocaleString(t.common.locale)} ₽</td>
-                        <td style="text-align: right;">
+                        <td style="text-align: right; white-space: nowrap;">
+                          <button
+                            type="button"
+                            class="mini-action-btn"
+                            title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                            @click="${() => store.openTimeEntryDetail(te.id)}"
+                          >
+                            ${iconEye(14)}
+                          </button>
                           <button
                             type="button"
                             class="mini-action-btn"
@@ -1233,7 +1260,16 @@ export class AppTaskDetail extends LitElement {
                       <tr>
                         <td class="num-col" style="text-align: left;">${exp.date}</td>
                         <td>
-                          <div>${exp.title}</div>
+                          <div>
+                            <app-link
+                              size="md"
+                              variant="primary"
+                              title="${t.viewTexts.expenses.openDetailsTitle}"
+                              @click="${() => store.openExpenseDetail(exp.id)}"
+                            >
+                              ${exp.title}
+                            </app-link>
+                          </div>
                           <div class="sub-line">
                             ${t.expenses.categories[exp.category]}${exp.vendor ? ` · ${exp.vendor}` : ''}${author ? ` · ${author.name}` : ''}
                           </div>
@@ -1263,7 +1299,15 @@ export class AppTaskDetail extends LitElement {
                           </span>
                         </td>
                         <td class="num-col"><strong>${exp.amount.toLocaleString(t.common.locale)} ${sym}</strong></td>
-                        <td style="text-align: right;">
+                        <td style="text-align: right; white-space: nowrap;">
+                          <button
+                            type="button"
+                            class="mini-action-btn"
+                            title="${t.viewTexts.expenses.openDetailsTitle}"
+                            @click="${() => store.openExpenseDetail(exp.id)}"
+                          >
+                            ${iconEye(14)}
+                          </button>
                           <button
                             type="button"
                             class="mini-action-btn"

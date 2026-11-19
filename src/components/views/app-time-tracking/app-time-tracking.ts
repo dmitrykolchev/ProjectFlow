@@ -7,6 +7,7 @@ import {
   iconCheck,
   iconClock,
   iconEdit,
+  iconEye,
   iconPaperclip,
   iconPlus,
   iconTrash,
@@ -409,7 +410,17 @@ export class AppTimeTracking extends LitElement {
             groupable
             .template="${(row: Record<string, unknown>) => {
               const entry = row as unknown as TimeEntry;
-              return html`<span class="dg-mono">${entry.date}</span>`;
+              return html`
+                <app-link
+                  class="dg-link"
+                  size="sm"
+                  variant="primary"
+                  title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                  @click="${() => store.openTimeEntryDetail(entry.id)}"
+                >
+                  <span class="dg-mono">${entry.date}</span>
+                </app-link>
+              `;
             }}"
           ></app-data-grid-column>
 
@@ -635,8 +646,8 @@ export class AppTimeTracking extends LitElement {
           <app-data-grid-column
             field="_actions"
             caption=""
-            width="115"
-            min-width="100"
+            width="142"
+            min-width="120"
             align="right"
             resizable="false"
             reorderable="false"
@@ -646,6 +657,14 @@ export class AppTimeTracking extends LitElement {
               const entry = row as unknown as TimeEntry;
               return html`
                 <div class="dg-actions">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                    @click="${() => store.openTimeEntryDetail(entry.id)}"
+                  >
+                    <span slot="start">${iconEye(14)}</span>
+                  </app-button>
                   ${entry.status !== 'approved'
                     ? html`
                         <app-button
@@ -717,7 +736,16 @@ export class AppTimeTracking extends LitElement {
 
               return html`
                 <tr>
-                  <td class="mono" style="white-space: nowrap;">${entry.date}</td>
+                  <td class="mono" style="white-space: nowrap;">
+                    <app-link
+                      size="sm"
+                      variant="primary"
+                      title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                      @click="${() => store.openTimeEntryDetail(entry.id)}"
+                    >
+                      <span class="mono">${entry.date}</span>
+                    </app-link>
+                  </td>
                   <td>
                     <app-link
                       class="task-link-btn"
@@ -771,6 +799,14 @@ export class AppTimeTracking extends LitElement {
                   </td>
                   <td>
                     <div class="actions-row">
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                        @click="${() => store.openTimeEntryDetail(entry.id)}"
+                      >
+                        <span slot="start">${iconEye(14)}</span>
+                      </app-button>
                       ${entry.status !== 'approved'
                         ? html`
                             <app-button
@@ -906,7 +942,14 @@ export class AppTimeTracking extends LitElement {
                   const docs = this.getAttachedDocs(entry);
                   return html`
                     <div class="task-entry-row">
-                      <span class="mono">${entry.date}</span>
+                      <app-link
+                        size="sm"
+                        variant="primary"
+                        title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                        @click="${() => store.openTimeEntryDetail(entry.id)}"
+                      >
+                        <span class="mono">${entry.date}</span>
+                      </app-link>
                       <div class="user-cell">
                         <span class="avatar-sm">${user?.avatar || '??'}</span>
                         <span>${user?.name || entry.userId}</span>
@@ -932,6 +975,14 @@ export class AppTimeTracking extends LitElement {
                         ></app-status-chip>
                       </span>
                       <div class="actions-row">
+                          <app-button
+                            size="sm"
+                            variant="icon"
+                            title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                            @click="${() => store.openTimeEntryDetail(entry.id)}"
+                          >
+                            <span slot="start">${iconEye(14)}</span>
+                          </app-button>
                           <app-button
                             size="sm"
                             variant="icon"

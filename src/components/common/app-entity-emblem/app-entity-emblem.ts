@@ -6,6 +6,7 @@ import {
   iconBell,
   iconBuilding,
   iconCalculator,
+  iconClock,
   iconCreditCard,
   iconFileText,
   iconFolder,
@@ -31,6 +32,7 @@ export type EntityEmblemKind =
   | 'invoice'
   | 'payment'
   | 'document'
+  | 'timeEntry'
   | 'expense'
   | 'reminder'
   | 'employee';
@@ -111,6 +113,8 @@ export class AppEntityEmblem extends LitElement {
         return iconCreditCard(iconSize);
       case 'document':
         return iconFileText(iconSize);
+      case 'timeEntry':
+        return iconClock(iconSize);
       case 'expense':
         return iconWallet(iconSize);
       case 'reminder':

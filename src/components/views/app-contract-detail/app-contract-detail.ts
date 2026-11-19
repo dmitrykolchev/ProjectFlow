@@ -23,6 +23,7 @@ import {
   iconClock,
   iconCreditCard,
   iconEdit,
+  iconEye,
   iconFileText,
   iconFolder,
   iconLandmark,
@@ -1090,7 +1091,15 @@ export class AppContractDetail extends LitElement {
                                 <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
                                   ${isOutgoing ? iconArrowUpRight(13) : iconArrowDownLeft(13)}
                                 </span>
-                                <span>${pay.documentNumber || '—'}</span>
+                                <app-link
+                                  class="link-btn"
+                                  size="md"
+                                  variant="primary"
+                                  title="${t.viewTexts.payments.openDetailsTitle}"
+                                  @click="${() => store.openPaymentDetail(pay.id)}"
+                                >
+                                  <span class="mono">${pay.documentNumber || pay.id}</span>
+                                </app-link>
                               </div>
                             </td>
                             <td>
@@ -1128,6 +1137,14 @@ export class AppContractDetail extends LitElement {
                             </td>
                             <td>
                               <div class="actions-row">
+                                <app-button
+                                  size="sm"
+                                  variant="icon"
+                                  title="${t.viewTexts.payments.openDetailsTitle}"
+                                  @click="${() => store.openPaymentDetail(pay.id)}"
+                                >
+                                  <span slot="start">${iconEye(14)}</span>
+                                </app-button>
                                 <app-button
                                   action="delete"
                                   size="sm"

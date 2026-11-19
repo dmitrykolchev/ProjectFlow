@@ -19,12 +19,14 @@ import {
   iconChevronRight,
   iconClock,
   iconCreditCard,
+  iconEye,
   iconLandmark,
   iconReceipt,
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-link/app-link';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-page-header/app-page-header';
@@ -688,7 +690,15 @@ export class AppPayments extends LitElement {
                       <span style="color: ${isOutgoing ? '#f59e0b' : '#10b981'}; display: inline-flex;">
                         ${isOutgoing ? iconArrowUpRight(14) : iconArrowDownLeft(14)}
                       </span>
-                      <span>${pay.documentNumber || '—'}</span>
+                      <app-link
+                        class="link-btn"
+                        size="md"
+                        variant="primary"
+                        title="${t.viewTexts.payments.openDetailsTitle}"
+                        @click="${() => store.openPaymentDetail(pay.id)}"
+                      >
+                        <span class="mono">${pay.documentNumber || pay.id}</span>
+                      </app-link>
                     </div>
                   </td>
                   <td>
@@ -777,6 +787,14 @@ export class AppPayments extends LitElement {
                   </td>
                   <td>
                     <div class="actions-row">
+                      <app-button
+                        size="sm"
+                        variant="icon"
+                        title="${t.viewTexts.payments.openDetailsTitle}"
+                        @click="${() => store.openPaymentDetail(pay.id)}"
+                      >
+                        <span slot="start">${iconEye(14)}</span>
+                      </app-button>
                       ${ctr
                         ? html`
                             <app-button

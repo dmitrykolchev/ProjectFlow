@@ -102,6 +102,7 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     outgoing: { variant: 'warning', i18nPath: ['payments', 'directions'] },
   },
   expense: {
+    draft: { variant: 'default', i18nPath: ['expenses', 'statuses'] },
     pending: { variant: 'warning', i18nPath: ['expenses', 'statuses'] },
     approved: { variant: 'success', i18nPath: ['expenses', 'statuses'] },
     reimbursed: { variant: 'info', i18nPath: ['expenses', 'statuses'] },
