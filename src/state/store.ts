@@ -325,7 +325,6 @@ export class AppStore {
   public detailExpenseId: string = '';
   public detailPaymentId: string = '';
   public detailReminderId: string = '';
-  public modalReminderId: string | null = null;
   public requirementFilterProjectId: string = 'all';
   public knowledgeFilterScope: 'all' | KnowledgeScope = 'all';
   public knowledgeFilterProjectId: string = 'all';
@@ -4960,31 +4959,12 @@ export class AppStore {
       this.customization = { ...this.customization, showActivityPanel: false };
       this.saveCustomization();
     }
-    this.modalReminderId = null;
     this.detailReminderId = reminderId;
     if (navigateToView) {
       this.setActiveView('reminder-detail');
     } else {
       this.setActiveView('reminder-detail');
     }
-  }
-
-  public openReminderDetailModal(reminderId: string): void {
-    const exists = this.reminders.some((r) => r.id === reminderId);
-    if (!exists) return;
-    this.modalReminderId = reminderId;
-    this.notify();
-  }
-
-  public closeReminderDetail(): void {
-    if (this.modalReminderId !== null) {
-      this.modalReminderId = null;
-      this.notify();
-    }
-  }
-
-  public closeReminderDetailModal(): void {
-    this.closeReminderDetail();
   }
 
   public canOpenActivityTarget(
@@ -5360,9 +5340,6 @@ export class AppStore {
     const target = this.reminders.find((r) => r.id === id);
     if (!target) return;
     this.reminders = this.reminders.filter((r) => r.id !== id);
-    if (this.modalReminderId === id) {
-      this.modalReminderId = null;
-    }
     if (this.detailReminderId === id) {
       this.detailReminderId = this.reminders[0]?.id || '';
       if (this.activeView === 'reminder-detail') {
