@@ -362,19 +362,29 @@ export function createInitialDirectories(): DirectoryDefinition[] {
       isSystem: true,
       fields: [
         {
-          key: 'unit',
-          labelKey: 'recurrenceUnit',
+          key: 'rrule',
+          labelKey: 'rruleExpression',
+          type: 'text',
+          required: false,
+          mono: true,
+          showInTable: true,
+          defaultValue: 'FREQ=WEEKLY;INTERVAL=1',
+        },
+        {
+          key: 'freq',
+          labelKey: 'recurrenceFreq',
           type: 'select',
           required: true,
           showInTable: true,
-          defaultValue: 'week',
+          defaultValue: 'WEEKLY',
           options: [
-            { value: 'none', labelKey: 'recUnitNone' },
-            { value: 'day', labelKey: 'unitDay' },
-            { value: 'week', labelKey: 'unitWeek' },
-            { value: 'month', labelKey: 'unitMonth' },
-            { value: 'quarter', labelKey: 'unitQuarter' },
-            { value: 'year', labelKey: 'unitYear' },
+            { value: 'NONE', labelKey: 'recUnitNone' },
+            { value: 'MINUTELY', labelKey: 'freqMinutely' },
+            { value: 'HOURLY', labelKey: 'freqHourly' },
+            { value: 'DAILY', labelKey: 'unitDay' },
+            { value: 'WEEKLY', labelKey: 'unitWeek' },
+            { value: 'MONTHLY', labelKey: 'unitMonth' },
+            { value: 'YEARLY', labelKey: 'unitYear' },
           ],
         },
         {
@@ -423,39 +433,47 @@ export function createInitialDirectories(): DirectoryDefinition[] {
       records: [
         rec('rect-1', 'ONCE', 'Разовое (без повтора)', 'One-time (No repeat)', 10, {
           description: 'Срабатывает один раз в указанную дату и время',
-          extra: { unit: 'none', interval: 1, defaultLeadMinutes: 30, skipWeekends: false, isRecurring: false },
+          extra: { rrule: '', freq: 'NONE', interval: 1, defaultLeadMinutes: 30, skipWeekends: false, isRecurring: false },
         }),
         rec('rect-2', 'DAILY', 'Ежедневно', 'Daily', 20, {
-          description: 'Повторяется каждый календарный день',
-          extra: { unit: 'day', interval: 1, defaultLeadMinutes: 15, skipWeekends: false, isRecurring: true },
+          description: 'Повторяется каждый календарный день (RFC 5545: FREQ=DAILY)',
+          extra: { rrule: 'FREQ=DAILY', freq: 'DAILY', interval: 1, defaultLeadMinutes: 15, skipWeekends: false, isRecurring: true },
         }),
         rec('rect-3', 'WEEKDAYS', 'По рабочим дням (Пн–Пт)', 'Weekdays (Mon–Fri)', 30, {
-          description: 'Только в будние дни с переносом выходных',
-          extra: { unit: 'week', interval: 1, defaultLeadMinutes: 15, skipWeekends: true, isRecurring: true },
+          description: 'Только по будним дням (RFC 5545: FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR)',
+          extra: { rrule: 'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', freq: 'WEEKLY', interval: 1, defaultLeadMinutes: 15, skipWeekends: false, isRecurring: true },
         }),
         rec('rect-4', 'WEEKLY', 'Еженедельно', 'Weekly', 40, {
-          description: 'Регулярное еженедельное напоминание в выбранные дни',
-          extra: { unit: 'week', interval: 1, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
+          description: 'Регулярное еженедельное напоминание (RFC 5545: FREQ=WEEKLY)',
+          extra: { rrule: 'FREQ=WEEKLY', freq: 'WEEKLY', interval: 1, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
         }),
         rec('rect-5', 'BIWEEKLY', 'Раз в 2 недели (спринт)', 'Biweekly (Sprint)', 50, {
-          description: 'Синхронизация по 2-недельным спринтам и проверкам',
-          extra: { unit: 'week', interval: 2, defaultLeadMinutes: 120, skipWeekends: false, isRecurring: true },
+          description: 'Синхронизация по 2-недельным спринтам (RFC 5545: FREQ=WEEKLY;INTERVAL=2)',
+          extra: { rrule: 'FREQ=WEEKLY;INTERVAL=2', freq: 'WEEKLY', interval: 2, defaultLeadMinutes: 120, skipWeekends: false, isRecurring: true },
         }),
         rec('rect-6', 'MONTHLY', 'Ежемесячно', 'Monthly', 60, {
-          description: 'Закрытие периода, сверка актов, оплата и отчётность',
-          extra: { unit: 'month', interval: 1, defaultLeadMinutes: 1440, skipWeekends: true, isRecurring: true },
+          description: 'Закрытие периода и отчётность (RFC 5545: FREQ=MONTHLY)',
+          extra: { rrule: 'FREQ=MONTHLY', freq: 'MONTHLY', interval: 1, defaultLeadMinutes: 1440, skipWeekends: true, isRecurring: true },
         }),
-        rec('rect-7', 'QUARTERLY', 'Ежеквартально', 'Quarterly', 70, {
-          description: 'Квартальные бюджеты, налоги, SLA-отчёты и продления',
-          extra: { unit: 'quarter', interval: 1, defaultLeadMinutes: 4320, skipWeekends: true, isRecurring: true },
+        rec('rect-7', 'LAST_WORKDAY', 'Последний рабочий день месяца', 'Last Business Day of Month', 65, {
+          description: 'Последний будний день каждого месяца (RFC 5545: FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1)',
+          extra: { rrule: 'FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1', freq: 'MONTHLY', interval: 1, defaultLeadMinutes: 1440, skipWeekends: false, isRecurring: true },
         }),
-        rec('rect-8', 'YEARLY', 'Ежегодно', 'Yearly / Annual', 80, {
-          description: 'Продление лицензий, договоров, доменов и сертификатов',
-          extra: { unit: 'year', interval: 1, defaultLeadMinutes: 10080, skipWeekends: false, isRecurring: true },
+        rec('rect-8', 'FRIDAY_13', 'Пятница 13-е', 'Friday the 13th', 68, {
+          description: 'Каждая пятница 13-го числа (RFC 5545: FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13)',
+          extra: { rrule: 'FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13', freq: 'MONTHLY', interval: 1, defaultLeadMinutes: 1440, skipWeekends: false, isRecurring: true },
         }),
-        rec('rect-9', 'CUSTOM', 'Своё правило интервала', 'Custom Schedule', 90, {
-          description: 'Произвольный шаг, дни недели, число месяца и лимит повторов',
-          extra: { unit: 'day', interval: 3, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
+        rec('rect-9', 'QUARTERLY', 'Ежеквартально', 'Quarterly (Every 3 Months)', 70, {
+          description: 'Квартальные отчёты и бюджеты (RFC 5545: FREQ=MONTHLY;INTERVAL=3)',
+          extra: { rrule: 'FREQ=MONTHLY;INTERVAL=3', freq: 'MONTHLY', interval: 3, defaultLeadMinutes: 4320, skipWeekends: true, isRecurring: true },
+        }),
+        rec('rect-10', 'YEARLY', 'Ежегодно', 'Yearly / Annual', 80, {
+          description: 'Продление лицензий и договоров (RFC 5545: FREQ=YEARLY)',
+          extra: { rrule: 'FREQ=YEARLY', freq: 'YEARLY', interval: 1, defaultLeadMinutes: 10080, skipWeekends: false, isRecurring: true },
+        }),
+        rec('rect-11', 'CUSTOM', 'Своё правило RFC 5545', 'Custom RFC 5545 RRULE', 90, {
+          description: 'Произвольная комбинация FREQ, BYMONTH, BYMONTHDAY, BYDAY и BYSETPOS',
+          extra: { rrule: 'FREQ=DAILY;INTERVAL=3', freq: 'DAILY', interval: 3, defaultLeadMinutes: 60, skipWeekends: false, isRecurring: true },
         }),
       ],
     },

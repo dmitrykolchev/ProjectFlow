@@ -769,19 +769,35 @@ export type ReminderEntityType =
 export type ReminderStatus = 'active' | 'snoozed' | 'completed' | 'paused' | 'cancelled';
 export type ReminderPriority = 'low' | 'medium' | 'high' | 'urgent';
 
-export type RecurrenceUnit = 'none' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
+export type Rfc5545Freq = 'MINUTELY' | 'HOURLY' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+export type Rfc5545Weekday = 'MO' | 'TU' | 'WE' | 'TH' | 'FR' | 'SA' | 'SU';
+
+export interface Rfc5545ByDay {
+  day: Rfc5545Weekday;
+  nth?: number; // positive (1..53) or negative (-53..-1), e.g. 1MO, -1FR
+}
+
 export type RecurrenceEndType = 'never' | 'until_date' | 'max_occurrences';
 
 export interface ReminderRecurrence {
   templateCode: string; // references code in DICT_RECURRENCE_TEMPLATES directory
-  unit: RecurrenceUnit;
+  enabled: boolean; // false = one-time, true = recurring RFC 5545 RRULE
+  rrule: string; // Canonical RFC 5545 text line, e.g. "RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13"
+  freq?: Rfc5545Freq;
   interval: number;
-  daysOfWeek?: number[]; // 1=Mon .. 7=Sun
-  dayOfMonth?: number; // 1..31
+  byDay?: Rfc5545ByDay[];
+  byMonthDay?: number[]; // -31..-1, 1..31
+  byMonth?: number[]; // 1..12
+  bySetPos?: number[]; // -366..-1, 1..366
+  byYearDay?: number[];
+  byWeekNo?: number[];
+  byHour?: number[];
+  byMinute?: number[];
+  wkst?: Rfc5545Weekday;
   skipWeekends?: boolean;
   endType: RecurrenceEndType;
-  endDate?: string; // YYYY-MM-DD
-  maxOccurrences?: number;
+  endDate?: string; // YYYY-MM-DD (also serialized as UNTIL)
+  maxOccurrences?: number; // also serialized as COUNT
   occurrenceCount: number;
 }
 

@@ -93,6 +93,53 @@
   min-width: 0;
 }
 
+.quick-patterns-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+}
+
+.quick-patterns-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+}
+
+.quick-patterns-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.38rem;
+}
+
+.pattern-btn {
+  height: 28px;
+  padding: 0 0.62rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-canvas, #090d16);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.pattern-btn:hover {
+  border-color: var(--border-strong, #334155);
+  color: var(--text-primary, #f8fafc);
+}
+
+.pattern-btn.is-active {
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.42));
+  color: var(--text-primary, #f8fafc);
+}
+
 .switch-field {
   display: flex;
   flex-direction: column;
@@ -135,7 +182,7 @@
 }
 
 .weekday-btn {
-  min-width: 40px;
+  min-width: 42px;
   height: 32px;
   padding: 0 0.6rem;
   border-radius: var(--radius-sm, 6px);
@@ -157,6 +204,93 @@
   background: var(--accent-soft, rgba(99, 102, 241, 0.16));
   border-color: var(--accent-border, rgba(99, 102, 241, 0.42));
   color: var(--text-primary, #f8fafc);
+}
+
+.months-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.month-btn {
+  height: 30px;
+  padding: 0 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.month-btn:hover {
+  border-color: var(--border-strong, #334155);
+  color: var(--text-primary, #f8fafc);
+}
+
+.month-btn.is-active {
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.42));
+  color: var(--text-primary, #f8fafc);
+}
+
+.rrule-editor-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-surface, #111827);
+}
+
+.rrule-input-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.55rem;
+}
+
+.rrule-input-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.rrule-mono-input {
+  font-family: var(--font-mono, monospace);
+}
+
+.rrule-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.rrule-error-msg {
+  font-size: 0.76rem;
+  color: var(--color-danger, #ef4444);
+  font-weight: 500;
+}
+
+.rrule-summary-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.rrule-summary-label {
+  color: var(--text-muted, #64748b);
+  font-weight: 600;
+}
+
+.rrule-summary-text {
+  color: var(--text-primary, #f8fafc);
+  font-weight: 500;
 }
 
 .preview-box {
@@ -311,9 +445,13 @@
   .datetime-pair {
     grid-template-columns: 1fr;
   }
-  .template-row {
+  .template-row,
+  .rrule-input-row {
     flex-direction: column;
     align-items: stretch;
+  }
+  .months-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
   .rule-top-row {
     grid-template-columns: 1fr 1fr;

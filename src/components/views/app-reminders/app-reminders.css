@@ -210,6 +210,39 @@
   color: var(--border-strong, #334155);
 }
 
+.rrule-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.rrule-token-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  padding: 0.22rem 0.55rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-canvas, #090d16);
+  color: var(--accent-primary, #818cf8);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.71rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rrule-token-btn:hover {
+  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.12));
+}
+
+.rrule-token-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .rules-box {
   display: flex;
   flex-direction: column;

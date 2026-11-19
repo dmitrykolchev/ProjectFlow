@@ -19,11 +19,17 @@ import type { FilterDef } from '../../common/app-filter-bar/app-filter-bar';
 import type { MenuItem } from '../../common/app-menu/app-menu';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
 import {
+  formatRRuleHumanSummary,
+  recurrenceToRRule,
+  serializeRRule,
+} from '../../../domain/rfc5545';
+import {
   iconArrowUpRight,
   iconBell,
   iconBellRing,
   iconCheck,
   iconClock,
+  iconCopy,
   iconDatabase,
   iconEdit,
   iconPause,
@@ -152,6 +158,16 @@ export class AppReminders extends LitElement {
     return `${ch} · ${rule.offsetValue} ${t.reminders.leadUnits[rule.offsetUnit]}`;
   }
 
+  private async copyRRuleText(text: string, t: ReturnType<typeof getTranslation>) {
+    if (!text) return;
+    try {
+      await navigator.clipboard?.writeText(text);
+    } catch {
+      // Clipboard fallback notification still confirms copied text
+    }
+    store.addNotification('info', t.reminders.rruleCopiedToast, text);
+  }
+
   private openRecurrenceDirectory() {
     store.openDirectory('recurrence_templates');
   }
@@ -164,7 +180,7 @@ export class AppReminders extends LitElement {
     const overdueCount = this.reminders.filter((r) => store.isReminderOverdue(r)).length;
     const dueCount = store.getDueRemindersCount();
     const recurringCount = this.reminders.filter(
-      (r) => r.recurrence.unit !== 'none' && r.status !== 'completed' && r.status !== 'cancelled'
+      (r) => r.recurrence.enabled && r.status !== 'completed' && r.status !== 'cancelled'
     ).length;
     const activeRulesTotal = this.reminders
       .filter((r) => r.status === 'active' || r.status === 'snoozed')
@@ -174,7 +190,7 @@ export class AppReminders extends LitElement {
       .filter((rem) => {
         if (this.scopeTab === 'overdue' && !store.isReminderOverdue(rem)) return false;
         if (this.scopeTab === 'today' && !store.isReminderDueToday(rem)) return false;
-        if (this.scopeTab === 'recurring' && rem.recurrence.unit === 'none') return false;
+        if (this.scopeTab === 'recurring' && !rem.recurrence.enabled) return false;
         if (this.scopeTab === 'completed' && rem.status !== 'completed' && rem.status !== 'cancelled') return false;
 
         if (this.statusFilter !== 'all' && rem.status !== this.statusFilter) return false;
@@ -358,6 +374,7 @@ export class AppReminders extends LitElement {
                 const dueToday = store.isReminderDueToday(rem);
                 const effectiveDue = store.getEffectiveReminderDueAt(rem);
                 const formattedDue = store.parseLocalDateTime(effectiveDue).toLocaleString(t.common.locale, {
+                  weekday: 'short',
                   day: '2-digit',
                   month: 'short',
                   year: 'numeric',
@@ -365,13 +382,31 @@ export class AppReminders extends LitElement {
                   minute: '2-digit',
                 });
                 const entityInfo = store.getReminderEntityInfo(rem.entityType, rem.entityId);
+                const isRecurring = rem.recurrence.enabled;
                 const tpl = templates.find((item) => item.code === rem.recurrence.templateCode);
-                const tplLabel = tpl
+                const summary = isRecurring
+                  ? formatRRuleHumanSummary(rem.recurrence, {
+                      freqEvery: t.reminders.rfcFreqEvery,
+                      weekdaysShortMap: t.reminders.rfcWeekdaysShort,
+                      monthsShort: t.reminders.monthsShort,
+                      nthPrefix: t.reminders.nthPrefix,
+                      monthDayPrefix: t.reminders.monthDayPrefix,
+                      setPosLabel: t.reminders.setPosLabel,
+                    })
+                  : '';
+                const tplLabel = !isRecurring
+                  ? t.reminders.rfcFreqs.NONE
+                  : rem.recurrence.templateCode !== 'CUSTOM' && tpl
                   ? useEnNames && tpl.nameEn
                     ? tpl.nameEn
                     : tpl.name
-                  : t.reminders.recUnits[rem.recurrence.unit];
-                const isRecurring = rem.recurrence.unit !== 'none';
+                  : summary || (rem.recurrence.freq ? t.reminders.rfcFreqs[rem.recurrence.freq] : t.reminders.rfcFreqs.NONE);
+                const parsedRule = isRecurring ? recurrenceToRRule(rem.recurrence) : null;
+                const rruleToken = isRecurring
+                  ? parsedRule
+                    ? serializeRRule(parsedRule, true)
+                    : rem.recurrence.rrule
+                  : '';
                 const owner = store.users.find((u) => u.id === rem.ownerId);
                 const enabledRules = rem.notifications.rules.filter((r) => r.enabled);
                 const isDone = rem.status === 'completed' || rem.status === 'cancelled';
@@ -419,7 +454,7 @@ export class AppReminders extends LitElement {
                         <span>${formattedDue}</span>
                       </span>
                       <span class="meta-dot">·</span>
-                      <span class="meta-item">
+                      <span class="meta-item" title="${summary || tplLabel}">
                         ${iconRepeat(13)}
                         <span>${tplLabel}</span>
                       </span>
@@ -441,6 +476,22 @@ export class AppReminders extends LitElement {
                           `
                         : ''}
                     </div>
+
+                    ${rruleToken
+                      ? html`
+                          <div class="rrule-badge-row">
+                            <button
+                              type="button"
+                              class="rrule-token-btn"
+                              title="${t.reminders.rruleCopyBtn}"
+                              @click="${() => this.copyRRuleText(rruleToken, t)}"
+                            >
+                              <span class="rrule-token-text">${rruleToken}</span>
+                              ${iconCopy(12)}
+                            </button>
+                          </div>
+                        `
+                      : ''}
 
                     ${rem.tags.length > 0
                       ? html`<app-tags-row .tags="${rem.tags}" max-visible="4"></app-tags-row>`

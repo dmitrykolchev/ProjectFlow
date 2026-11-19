@@ -12,12 +12,18 @@ import {
   ProjectChatMessage,
   ProjectRequirement,
   Reminder,
+  ReminderRecurrence,
   Task,
   TaskPriority,
   TaskStatus,
   TimeEntry,
   User,
 } from '../types';
+import {
+  buildRecurrenceFromRRule,
+  findFirstOccurrenceOnOrAfter,
+  parseRRule,
+} from '../domain/rfc5545';
 
 export const initialCompanies: Company[] = [
   {
@@ -3486,6 +3492,25 @@ export const initialRequirements: ProjectRequirement[] = [
   },
 ];
 
+function seedRec(
+  templateCode: string,
+  rruleStr: string,
+  opts: { skipWeekends?: boolean; occurrenceCount?: number } = {}
+): ReminderRecurrence {
+  if (!rruleStr) {
+    return buildRecurrenceFromRRule(null, {
+      templateCode,
+      occurrenceCount: opts.occurrenceCount,
+    });
+  }
+  const parsed = parseRRule(rruleStr);
+  return buildRecurrenceFromRRule(parsed.ok ? parsed.rule : null, {
+    templateCode,
+    skipWeekends: opts.skipWeekends,
+    occurrenceCount: opts.occurrenceCount,
+  });
+}
+
 const reminderSeeds: Reminder[] = [
   {
     id: 'rem-1',
@@ -3498,16 +3523,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'urgent',
     ownerId: 'user-5',
     assigneeIds: ['user-5', 'user-1'],
-    recurrence: {
-      templateCode: 'WEEKLY',
-      unit: 'week',
-      interval: 1,
-      daysOfWeek: [2, 4],
+    recurrence: seedRec('WEEKLY', 'RRULE:FREQ=WEEKLY;COUNT=6;BYDAY=TU,TH', {
       skipWeekends: true,
-      endType: 'max_occurrences',
-      maxOccurrences: 6,
       occurrenceCount: 2,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3558,16 +3577,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'high',
     ownerId: 'user-1',
     assigneeIds: ['user-1', 'user-6'],
-    recurrence: {
-      templateCode: 'MONTHLY',
-      unit: 'month',
-      interval: 1,
-      dayOfMonth: 18,
+    recurrence: seedRec('MONTHLY', 'RRULE:FREQ=MONTHLY;UNTIL=20270630T235959;BYMONTHDAY=18', {
       skipWeekends: true,
-      endType: 'until_date',
-      endDate: '2027-06-30',
       occurrenceCount: 1,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3607,15 +3620,7 @@ const reminderSeeds: Reminder[] = [
     priority: 'high',
     ownerId: 'user-1',
     assigneeIds: ['user-1', 'user-2', 'user-3'],
-    recurrence: {
-      templateCode: 'ONCE',
-      unit: 'none',
-      interval: 1,
-      skipWeekends: false,
-      endType: 'max_occurrences',
-      maxOccurrences: 1,
-      occurrenceCount: 0,
-    },
+    recurrence: seedRec('ONCE', '', { occurrenceCount: 0 }),
     notifications: {
       rules: [
         {
@@ -3655,15 +3660,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'medium',
     ownerId: 'user-3',
     assigneeIds: ['user-3', 'user-1'],
-    recurrence: {
-      templateCode: 'WEEKDAYS',
-      unit: 'week',
-      interval: 1,
-      daysOfWeek: [1, 2, 3, 4, 5],
+    recurrence: seedRec('WEEKDAYS', 'RRULE:FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 14,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3704,14 +3704,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'medium',
     ownerId: 'user-6',
     assigneeIds: ['user-6'],
-    recurrence: {
-      templateCode: 'QUARTERLY',
-      unit: 'quarter',
-      interval: 1,
+    recurrence: seedRec('QUARTERLY', 'RRULE:FREQ=MONTHLY;INTERVAL=3', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 1,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3752,15 +3748,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'high',
     ownerId: 'user-5',
     assigneeIds: ['user-5', 'user-1'],
-    recurrence: {
-      templateCode: 'BIWEEKLY',
-      unit: 'week',
-      interval: 2,
-      daysOfWeek: [5],
+    recurrence: seedRec('BIWEEKLY', 'RRULE:FREQ=WEEKLY;INTERVAL=2;BYDAY=FR', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 3,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3801,14 +3792,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'medium',
     ownerId: 'user-5',
     assigneeIds: ['user-5', 'user-8'],
-    recurrence: {
-      templateCode: 'YEARLY',
-      unit: 'year',
-      interval: 1,
+    recurrence: seedRec('YEARLY', 'RRULE:FREQ=YEARLY', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 1,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3848,14 +3835,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'medium',
     ownerId: 'user-1',
     assigneeIds: ['user-1', 'user-2'],
-    recurrence: {
-      templateCode: 'QUARTERLY',
-      unit: 'quarter',
-      interval: 1,
+    recurrence: seedRec('QUARTERLY', 'RRULE:FREQ=MONTHLY;INTERVAL=3', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 2,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3887,14 +3870,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'low',
     ownerId: 'user-8',
     assigneeIds: ['user-8'],
-    recurrence: {
-      templateCode: 'MONTHLY',
-      unit: 'month',
-      interval: 2,
+    recurrence: seedRec('MONTHLY', 'RRULE:FREQ=MONTHLY;INTERVAL=2', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 1,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -3926,15 +3905,7 @@ const reminderSeeds: Reminder[] = [
     priority: 'high',
     ownerId: 'user-1',
     assigneeIds: ['user-1', 'user-3'],
-    recurrence: {
-      templateCode: 'ONCE',
-      unit: 'none',
-      interval: 1,
-      skipWeekends: false,
-      endType: 'max_occurrences',
-      maxOccurrences: 1,
-      occurrenceCount: 0,
-    },
+    recurrence: seedRec('ONCE', '', { occurrenceCount: 0 }),
     notifications: {
       rules: [
         {
@@ -3974,15 +3945,10 @@ const reminderSeeds: Reminder[] = [
     priority: 'medium',
     ownerId: 'user-2',
     assigneeIds: ['user-2', 'user-5'],
-    recurrence: {
-      templateCode: 'MONTHLY',
-      unit: 'month',
-      interval: 1,
-      dayOfMonth: 11,
+    recurrence: seedRec('MONTHLY', 'RRULE:FREQ=MONTHLY;BYMONTHDAY=11', {
       skipWeekends: true,
-      endType: 'never',
       occurrenceCount: 1,
-    },
+    }),
     notifications: {
       rules: [
         {
@@ -4015,15 +3981,7 @@ const reminderSeeds: Reminder[] = [
     priority: 'low',
     ownerId: 'user-4',
     assigneeIds: ['user-4'],
-    recurrence: {
-      templateCode: 'ONCE',
-      unit: 'none',
-      interval: 1,
-      skipWeekends: false,
-      endType: 'max_occurrences',
-      maxOccurrences: 1,
-      occurrenceCount: 1,
-    },
+    recurrence: seedRec('ONCE', '', { occurrenceCount: 1 }),
     notifications: {
       rules: [
         {
@@ -4043,6 +4001,60 @@ const reminderSeeds: Reminder[] = [
     tags: ['документ', 'спецификация'],
     createdAt: '2026-11-12T09:00:00Z',
     updatedAt: '2026-11-16T11:45:00Z',
+  },
+  {
+    id: 'rem-13',
+    title: 'Внеочередной аудит резервных копий и DR-учений (Пятница 13-е)',
+    description: 'Проверка восстановления PostgreSQL из PITR-бэкапов, тестовый failover и аудит ключей доступа (RFC 5545: Пятница 13-го числа).',
+    entityType: 'project',
+    entityId: 'proj-3',
+    dueAt: findFirstOccurrenceOnOrAfter(
+      {
+        freq: 'MONTHLY',
+        interval: 1,
+        byDay: [{ day: 'FR' }],
+        byMonthDay: [13],
+        wkst: 'MO',
+      },
+      new Date(),
+      13,
+      0
+    ),
+    status: 'active',
+    priority: 'high',
+    ownerId: 'user-3',
+    assigneeIds: ['user-3', 'user-1'],
+    recurrence: seedRec('FRIDAY_13', 'RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13', {
+      skipWeekends: false,
+      occurrenceCount: 0,
+    }),
+    notifications: {
+      rules: [
+        {
+          id: 'rnr-13-1',
+          channel: 'in_app',
+          offsetValue: 1,
+          offsetUnit: 'days',
+          recipientMode: 'assignees',
+          enabled: true,
+        },
+        {
+          id: 'rnr-13-2',
+          channel: 'telegram',
+          offsetValue: 1,
+          offsetUnit: 'hours',
+          recipientMode: 'assignees',
+          enabled: true,
+        },
+      ],
+      soundEnabled: true,
+      requireAck: true,
+      quietHoursRespect: true,
+      repeatNagMinutes: 0,
+    },
+    tags: ['DR', 'audit', 'RFC5545', 'friday-13'],
+    createdAt: '2026-11-15T10:00:00Z',
+    updatedAt: '2026-11-15T10:00:00Z',
   },
 ];
 
@@ -4071,7 +4083,8 @@ function shiftReminderSeedsToToday(seeds: Reminder[]): Reminder[] {
   if (days === 0) return seeds.map((rem) => ({ ...rem }));
   return seeds.map((rem) => ({
     ...rem,
-    dueAt: shiftSeedDate(rem.dueAt, days) as string,
+    // Keep calendar-locked seeds like Friday the 13th anchored on an exact Friday 13th
+    dueAt: rem.id === 'rem-13' ? rem.dueAt : (shiftSeedDate(rem.dueAt, days) as string),
     snoozedUntil: shiftSeedDate(rem.snoozedUntil, days),
     completedAt: shiftSeedDate(rem.completedAt, days),
     createdAt: shiftSeedDate(rem.createdAt, days) as string,

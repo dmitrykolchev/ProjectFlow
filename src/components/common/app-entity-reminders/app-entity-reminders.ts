@@ -5,10 +5,16 @@ import { Reminder, ReminderEntityType, ReminderNotificationRule } from '../../..
 import { getTranslation } from '../../../i18n';
 import styles from './app-entity-reminders.css';
 import {
+  formatRRuleHumanSummary,
+  recurrenceToRRule,
+  serializeRRule,
+} from '../../../domain/rfc5545';
+import {
   iconBell,
   iconBellRing,
   iconCheck,
   iconClock,
+  iconCopy,
   iconEdit,
   iconPause,
   iconPlay,
@@ -87,6 +93,16 @@ export class AppEntityReminders extends LitElement {
     return `${channelLabel} · ${rule.offsetValue} ${t.reminders.leadUnits[rule.offsetUnit]}`;
   }
 
+  private async copyRRuleText(text: string, t: ReturnType<typeof getTranslation>) {
+    if (!text) return;
+    try {
+      await navigator.clipboard?.writeText(text);
+    } catch {
+      // Fallback notification still shows copied expression
+    }
+    store.addNotification('info', t.reminders.rruleCopiedToast, text);
+  }
+
   render() {
     const t = getTranslation(this.currentLang);
     const templates = store.getRecurrenceTemplates();
@@ -123,21 +139,40 @@ export class AppEntityReminders extends LitElement {
                   const dueToday = store.isReminderDueToday(rem);
                   const effectiveDue = store.getEffectiveReminderDueAt(rem);
                   const formattedDue = store.parseLocalDateTime(effectiveDue).toLocaleString(t.common.locale, {
+                    weekday: 'short',
                     day: '2-digit',
                     month: 'short',
                     year: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit',
                   });
+                  const isRecurring = rem.recurrence.enabled;
                   const tpl = templates.find((item) => item.code === rem.recurrence.templateCode);
-                  const tplLabel = tpl
+                  const summary = isRecurring
+                    ? formatRRuleHumanSummary(rem.recurrence, {
+                        freqEvery: t.reminders.rfcFreqEvery,
+                        weekdaysShortMap: t.reminders.rfcWeekdaysShort,
+                        monthsShort: t.reminders.monthsShort,
+                        nthPrefix: t.reminders.nthPrefix,
+                        monthDayPrefix: t.reminders.monthDayPrefix,
+                        setPosLabel: t.reminders.setPosLabel,
+                      })
+                    : '';
+                  const tplLabel = !isRecurring
+                    ? t.reminders.rfcFreqs.NONE
+                    : rem.recurrence.templateCode !== 'CUSTOM' && tpl
                     ? useEnNames && tpl.nameEn
                       ? tpl.nameEn
                       : tpl.name
-                    : t.reminders.recUnits[rem.recurrence.unit];
+                    : summary || (rem.recurrence.freq ? t.reminders.rfcFreqs[rem.recurrence.freq] : t.reminders.rfcFreqs.NONE);
+                  const parsedRule = isRecurring ? recurrenceToRRule(rem.recurrence) : null;
+                  const rruleToken = isRecurring
+                    ? parsedRule
+                      ? serializeRRule(parsedRule, true)
+                      : rem.recurrence.rrule
+                    : '';
                   const owner = store.users.find((u) => u.id === rem.ownerId);
                   const enabledRules = rem.notifications.rules.filter((r) => r.enabled);
-                  const isRecurring = rem.recurrence.unit !== 'none';
 
                   return html`
                     <div class="reminder-row ${rem.status === 'completed' ? 'is-completed' : ''}">
@@ -165,7 +200,7 @@ export class AppEntityReminders extends LitElement {
                           <span>${formattedDue}</span>
                         </span>
                         <span class="meta-dot">·</span>
-                        <span class="meta-token">
+                        <span class="meta-token" title="${summary || tplLabel}">
                           ${iconRepeat(13)}
                           <span>${tplLabel}</span>
                         </span>
@@ -187,6 +222,22 @@ export class AppEntityReminders extends LitElement {
                             `
                           : ''}
                       </div>
+
+                      ${rruleToken
+                        ? html`
+                            <div class="rrule-strip">
+                              <button
+                                type="button"
+                                class="rrule-token-btn"
+                                title="${t.reminders.rruleCopyBtn}"
+                                @click="${() => this.copyRRuleText(rruleToken, t)}"
+                              >
+                                <span class="rrule-token-text">${rruleToken}</span>
+                                ${iconCopy(11)}
+                              </button>
+                            </div>
+                          `
+                        : ''}
 
                       ${enabledRules.length > 0
                         ? html`

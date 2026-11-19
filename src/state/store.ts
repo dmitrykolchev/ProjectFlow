@@ -33,7 +33,6 @@ import {
   ProjectMember,
   ProjectRequirement,
   ProjectRole,
-  RecurrenceUnit,
   Reminder,
   ReminderEntityType,
   ReminderRecurrence,
@@ -48,6 +47,13 @@ import {
   User,
   UserCustomization,
 } from '../types';
+import {
+  formatLocalDateTime as formatRfcLocalDateTime,
+  getNextRRuleOccurrence,
+  getUpcomingRRuleOccurrences,
+  normalizeReminderRecurrence,
+  parseLocalDateTime as parseRfcLocalDateTime,
+} from '../domain/rfc5545';
 import {
   initialCalculations,
   initialChatMessages,
@@ -661,15 +667,41 @@ export class AppStore {
         const existingMap = new Map(parsedDirs.map((d) => [d.id, d]));
         const merged: DirectoryDefinition[] = parsedDirs.map((d) => {
           const seed = seedDirs.find((s) => s.id === d.id);
-          return seed
-            ? {
-                ...seed,
-                ...d,
-                fields: seed.fields,
-                catalogKey: seed.catalogKey,
-                usedInKeys: seed.usedInKeys,
+          if (!seed) return d;
+
+          let records = d.records;
+          if (d.id === 'recurrence_templates') {
+            const seedByCode = new Map(seed.records.map((sr) => [sr.code, sr]));
+            const existingCodes = new Set(records.map((r) => r.code));
+            records = records.map((recItem) => {
+              const seedRec = seedByCode.get(recItem.code);
+              if (recItem.extra?.rrule === undefined && seedRec) {
+                return {
+                  ...recItem,
+                  description: recItem.description || seedRec.description,
+                  extra: { ...(seedRec.extra || {}) },
+                };
               }
-            : d;
+              return recItem;
+            });
+            for (const sr of seed.records) {
+              if (!existingCodes.has(sr.code)) {
+                records.push({
+                  ...sr,
+                  extra: sr.extra ? { ...sr.extra } : undefined,
+                });
+              }
+            }
+          }
+
+          return {
+            ...seed,
+            ...d,
+            records,
+            fields: seed.fields,
+            catalogKey: seed.catalogKey,
+            usedInKeys: seed.usedInKeys,
+          };
         });
         for (const seed of seedDirs) {
           if (!existingMap.has(seed.id)) {
@@ -685,18 +717,24 @@ export class AppStore {
       }
 
       const storedReminders = localStorage.getItem(STORAGE_KEY_REMINDERS);
-      this.reminders = storedReminders
-        ? JSON.parse(storedReminders)
-        : initialReminders.map((r) => ({
-            ...r,
-            recurrence: { ...r.recurrence, daysOfWeek: r.recurrence.daysOfWeek ? [...r.recurrence.daysOfWeek] : undefined },
-            notifications: {
-              ...r.notifications,
-              rules: r.notifications.rules.map((rule) => ({ ...rule })),
-            },
-            assigneeIds: [...r.assigneeIds],
-            tags: [...r.tags],
-          }));
+      if (storedReminders) {
+        const parsedRems: Reminder[] = JSON.parse(storedReminders);
+        this.reminders = parsedRems.map((r) => ({
+          ...r,
+          recurrence: normalizeReminderRecurrence(r.recurrence),
+        }));
+      } else {
+        this.reminders = initialReminders.map((r) => ({
+          ...r,
+          recurrence: normalizeReminderRecurrence(r.recurrence),
+          notifications: {
+            ...r.notifications,
+            rules: r.notifications.rules.map((rule) => ({ ...rule })),
+          },
+          assigneeIds: [...r.assigneeIds],
+          tags: [...r.tags],
+        }));
+      }
 
       const storedUsage = localStorage.getItem(STORAGE_KEY_USAGE);
       if (storedUsage) {
@@ -4030,22 +4068,11 @@ export class AppStore {
   // --- Universal Entity-Linked Reminders, Recurrence & Notification Rules ---
 
   public formatLocalDateTime(date: Date): string {
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+    return formatRfcLocalDateTime(date);
   }
 
   public parseLocalDateTime(value: string): Date {
-    if (!value) return new Date();
-    const m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(value.trim());
-    if (m) {
-      return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]), Number(m[4]), Number(m[5]), 0, 0);
-    }
-    const dOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
-    if (dOnly) {
-      return new Date(Number(dOnly[1]), Number(dOnly[2]) - 1, Number(dOnly[3]), 9, 0, 0, 0);
-    }
-    const parsed = new Date(value);
-    return Number.isNaN(parsed.getTime()) ? new Date() : parsed;
+    return parseRfcLocalDateTime(value);
   }
 
   public getEffectiveReminderDueAt(rem: Reminder): string {
@@ -4084,95 +4111,7 @@ export class AppStore {
     baseDueAt: string,
     rec: ReminderRecurrence
   ): string | null {
-    if (!rec || rec.unit === 'none') return null;
-    const interval = Math.max(1, Math.round(rec.interval || 1));
-    const current = this.parseLocalDateTime(baseDueAt);
-    const next = new Date(current.getTime());
-
-    const shiftWeekendIfNeeded = (d: Date) => {
-      if (!rec.skipWeekends) return;
-      const day = d.getDay(); // 0=Sun, 6=Sat
-      if (day === 6) d.setDate(d.getDate() + 2);
-      else if (day === 0) d.setDate(d.getDate() + 1);
-    };
-
-    switch (rec.unit as RecurrenceUnit) {
-      case 'minute':
-        next.setMinutes(next.getMinutes() + interval);
-        break;
-      case 'hour':
-        next.setHours(next.getHours() + interval);
-        break;
-      case 'day':
-        next.setDate(next.getDate() + interval);
-        shiftWeekendIfNeeded(next);
-        break;
-      case 'week': {
-        const rawDays = (rec.daysOfWeek && rec.daysOfWeek.length > 0
-          ? rec.daysOfWeek
-          : rec.skipWeekends
-          ? [1, 2, 3, 4, 5]
-          : []
-        )
-          .filter((d) => d >= 1 && d <= 7)
-          .sort((a, b) => a - b);
-
-        if (rawDays.length > 0) {
-          const curIsoDay = current.getDay() === 0 ? 7 : current.getDay();
-          const laterThisWeek = rawDays.find((d) => d > curIsoDay);
-          if (laterThisWeek !== undefined && interval === 1) {
-            next.setDate(next.getDate() + (laterThisWeek - curIsoDay));
-          } else if (laterThisWeek !== undefined && interval > 1) {
-            const firstSelected = rawDays[0];
-            next.setDate(next.getDate() + (7 - curIsoDay) + (interval - 1) * 7 + firstSelected);
-          } else {
-            const firstSelected = rawDays[0];
-            next.setDate(next.getDate() + (7 - curIsoDay) + (interval - 1) * 7 + firstSelected);
-          }
-        } else {
-          next.setDate(next.getDate() + interval * 7);
-          shiftWeekendIfNeeded(next);
-        }
-        break;
-      }
-      case 'month': {
-        const targetDay = rec.dayOfMonth && rec.dayOfMonth >= 1 && rec.dayOfMonth <= 31
-          ? rec.dayOfMonth
-          : current.getDate();
-        next.setDate(1);
-        next.setMonth(next.getMonth() + interval);
-        const maxInMonth = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
-        next.setDate(Math.min(targetDay, maxInMonth));
-        shiftWeekendIfNeeded(next);
-        break;
-      }
-      case 'quarter': {
-        const targetDay = current.getDate();
-        next.setDate(1);
-        next.setMonth(next.getMonth() + interval * 3);
-        const maxInMonth = new Date(next.getFullYear(), next.getMonth() + 1, 0).getDate();
-        next.setDate(Math.min(targetDay, maxInMonth));
-        shiftWeekendIfNeeded(next);
-        break;
-      }
-      case 'year': {
-        const targetDay = current.getDate();
-        const targetMonth = current.getMonth();
-        next.setDate(1);
-        next.setFullYear(next.getFullYear() + interval);
-        next.setMonth(targetMonth);
-        const maxInMonth = new Date(next.getFullYear(), targetMonth + 1, 0).getDate();
-        next.setDate(Math.min(targetDay, maxInMonth));
-        shiftWeekendIfNeeded(next);
-        break;
-      }
-    }
-
-    const formatted = this.formatLocalDateTime(next);
-    if (rec.endType === 'until_date' && rec.endDate && formatted.slice(0, 10) > rec.endDate) {
-      return null;
-    }
-    return formatted;
+    return getNextRRuleOccurrence(baseDueAt, rec);
   }
 
   public getUpcomingReminderOccurrences(
@@ -4180,21 +4119,7 @@ export class AppStore {
     rec: ReminderRecurrence,
     limit: number = 3
   ): string[] {
-    if (!dueAt || !rec || rec.unit === 'none') return [];
-    const results: string[] = [];
-    let cursor = dueAt;
-    const remainingCap =
-      rec.endType === 'max_occurrences' && rec.maxOccurrences
-        ? Math.max(0, rec.maxOccurrences - (rec.occurrenceCount || 0) - 1)
-        : limit;
-    const count = Math.min(limit, remainingCap);
-    for (let i = 0; i < count; i++) {
-      const next = this.calculateNextReminderDueAt(cursor, rec);
-      if (!next) break;
-      results.push(next);
-      cursor = next;
-    }
-    return results;
+    return getUpcomingRRuleOccurrences(dueAt, rec, limit);
   }
 
   public getReminderEntityOptions(
@@ -4545,7 +4470,7 @@ export class AppStore {
       nextCount >= (rem.recurrence.maxOccurrences || 1);
 
     const nextDue =
-      rem.recurrence.unit !== 'none' && !hitMaxOccurrences
+      rem.recurrence.enabled && !hitMaxOccurrences
         ? this.calculateNextReminderDueAt(this.getEffectiveReminderDueAt(rem), rem.recurrence)
         : null;
 
