@@ -480,6 +480,23 @@
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
 
+/* the employees row actions container keeps its own 0.35rem gap layout without the
+   flex-end alignment, and the historical hover restored the subtle border for every
+   action including delete, so the hover border token is pinned back on all buttons */
+.emp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.emp-actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
 .empty-wrap {
   padding: 2rem;
 }
