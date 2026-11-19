@@ -97,42 +97,26 @@
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-lg, 12px);
-  overflow-x: auto;
+  overflow: hidden;
   box-shadow: var(--shadow-sm), var(--surface-glow, none);
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.83rem;
+/* The journal is rendered by the canonical app-data-table: fixed header, fixed footer
+   with pagination inside the card, body scrolls in its own area. The card fills the
+   remaining view height (flex:1, min-height:0) and the host fills the card, so when
+   the rows do not fit, the body gets its own scrollbar while header and footer stay
+   in place. Inside the card the host stays transparent so the card shell paints the
+   background and rounds the corners. */
+.table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
 }
 
-.data-table th {
-  text-align: left;
-  padding: 0.8rem 1rem;
-  color: var(--text-muted, #64748b);
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
-  white-space: nowrap;
-}
-
-.data-table td {
-  padding: 0.8rem 1rem;
-  color: var(--text-primary, #f8fafc);
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  vertical-align: middle;
-}
-
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.03));
+.table-card app-data-table {
+  flex: 1;
+  min-height: 0;
+  background: transparent;
 }
 
 .mono {

@@ -99,12 +99,12 @@ export { AppReminderForm } from './app-reminder-form/app-reminder-form';
 export { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 export { AppTableScroll, type SortDirection, type SortChangeDetail } from './app-table-scroll/app-table-scroll';
 export {
-  AppTableScrollColumn,
+  AppTableColumn,
   type TableCellType,
   type CellAlign,
   type CellRenderFn,
   type ColumnOption,
-} from './app-table-scroll-column/app-table-scroll-column';
+} from './app-table-column/app-table-column';
 export {
   paginateItems,
   TABLE_PAGE_SIZE_OPTIONS,
@@ -168,7 +168,7 @@ import { AppDirectoryRecordModal } from './app-directory-record-modal/app-direct
 import { AppReminderForm } from './app-reminder-form/app-reminder-form';
 import { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 import { AppTableScroll } from './app-table-scroll/app-table-scroll';
-import { AppTableScrollColumn } from './app-table-scroll-column/app-table-scroll-column';
+import { AppTableColumn } from './app-table-column/app-table-column';
 
 export const UI_LIBRARY_ELEMENTS = {
   'app-badge': AppBadge,
@@ -224,7 +224,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-reminder-form': AppReminderForm,
   'app-entity-reminders': AppEntityReminders,
   'app-table-scroll': AppTableScroll,
-  'app-table-scroll-column': AppTableScrollColumn,
+  'app-table-column': AppTableColumn,
 } as const;
 
 export function getRegisteredUiElements(): string[] {

@@ -30,6 +30,8 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
 import '../app-data-grid/app-data-grid';
 import '../../common/app-data-grid-column/app-data-grid-column';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import '../../common/app-modal/app-modal';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-link/app-link';
@@ -565,167 +567,186 @@ export class AppExpenses extends LitElement {
     filtered: Expense[],
     t: ReturnType<typeof getTranslation>
   ) {
-    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
+    const dateCell = (row: Record<string, unknown>) => {
+      const exp = row as unknown as Expense;
+      return html`<span class="mono" style="white-space: nowrap;">${exp.date}</span>`;
+    };
+    const expenseCell = (row: Record<string, unknown>) => {
+      const exp = row as unknown as Expense;
+      return html`
+        <app-link
+          size="md"
+          variant="primary"
+          title="${t.viewTexts.expenses.openDetailsTitle}"
+          @click="${() => store.openExpenseDetail(exp.id)}"
+        >
+          <span class="exp-title">${exp.title}</span>
+        </app-link>
+        <div class="exp-vendor">
+          ${exp.vendor || '—'}${exp.notes ? ` · ${exp.notes}` : ''}
+        </div>
+      `;
+    };
+    const projectCell = (row: Record<string, unknown>) => {
+      const exp = row as unknown as Expense;
+      const proj = store.projects.find((p) => p.id === exp.projectId);
+      const task = exp.taskId ? store.tasks.find((tk) => tk.id === exp.taskId) : undefined;
+      return html`
+        <div>
+          ${proj
+            ? html`
+                <span class="project-pill">
+                  <span class="dot" style="background: ${proj.color};"></span>
+                  <span>${proj.key}</span>
+                </span>
+              `
+            : '—'}
+        </div>
+        ${exp.taskId
+          ? html`
+              <button
+                type="button"
+                class="task-chip-btn"
+                title="${task?.title || exp.taskId}"
+                @click="${() => {
+                  if (task) store.openTaskDetail(task.id);
+                }}"
+              >
+                ${exp.taskId}
+              </button>
+            `
+          : ''}
+      `;
+    };
+    const ownerCell = (row: Record<string, unknown>) => {
+      const exp = row as unknown as Expense;
+      const user = store.users.find((u) => u.id === exp.userId);
+      return html`<span style="white-space: nowrap;">${user?.name || exp.userId}</span>`;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.expenses.thDate}</th>
-              <th>${t.viewTexts.expenses.thExpenseVendor}</th>
-              <th>${t.viewTexts.expenses.thProjectTask}</th>
-              <th>${t.viewTexts.expenses.thCategory}</th>
-              <th>${t.viewTexts.expenses.thOwner}</th>
-              <th>${t.viewTexts.expenses.thAttachments}</th>
-              <th>${t.viewTexts.expenses.thAmount}</th>
-              <th>${t.viewTexts.expenses.thStatus}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((exp) => {
-              const proj = store.projects.find((p) => p.id === exp.projectId);
-              const task = exp.taskId ? store.tasks.find((tk) => tk.id === exp.taskId) : undefined;
-              const user = store.users.find((u) => u.id === exp.userId);
-              const docs = this.getAttachedDocs(exp);
-
+        <app-data-table
+          .rows="${filtered}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="date" label="${t.viewTexts.expenses.thDate}" .cellRender="${dateCell}"></app-table-column>
+          <app-table-column field="title" label="${t.viewTexts.expenses.thExpenseVendor}" .cellRender="${expenseCell}"></app-table-column>
+          <app-table-column field="projectId" label="${t.viewTexts.expenses.thProjectTask}" .cellRender="${projectCell}"></app-table-column>
+          <app-table-column
+            field="category"
+            label="${t.viewTexts.expenses.thCategory}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-badge variant="default" appearance="soft" size="sm">
+                ${t.expenses.categories[(row as unknown as Expense).category]}
+              </app-badge>
+            `}"
+          ></app-table-column>
+          <app-table-column field="userId" label="${t.viewTexts.expenses.thOwner}" .cellRender="${ownerCell}"></app-table-column>
+          <app-table-column
+            field="documentIds"
+            label="${t.viewTexts.expenses.thAttachments}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              this.renderExpenseAttachmentsCell(this.getAttachedDocs(row as unknown as Expense), t)}"
+          ></app-table-column>
+          <app-table-column
+            field="amount"
+            label="${t.viewTexts.expenses.thAmount}"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
               return html`
-                <tr>
-                  <td class="mono" style="white-space: nowrap;">${exp.date}</td>
-                  <td>
-                    <app-link
-                      size="md"
-                      variant="primary"
-                      title="${t.viewTexts.expenses.openDetailsTitle}"
-                      @click="${() => store.openExpenseDetail(exp.id)}"
-                    >
-                      <span class="exp-title">${exp.title}</span>
-                    </app-link>
-                    <div class="exp-vendor">
-                      ${exp.vendor || '—'}${exp.notes ? ` · ${exp.notes}` : ''}
-                    </div>
-                  </td>
-                  <td>
-                    <div>
-                      ${proj
-                        ? html`
-                            <span class="project-pill">
-                              <span class="dot" style="background: ${proj.color};"></span>
-                              <span>${proj.key}</span>
-                            </span>
-                          `
-                        : '—'}
-                    </div>
-                    ${exp.taskId
-                      ? html`
-                          <button
-                            type="button"
-                            class="task-chip-btn"
-                            title="${task?.title || exp.taskId}"
-                            @click="${() => {
-                              if (task) store.openTaskDetail(task.id);
-                            }}"
-                          >
-                            ${exp.taskId}
-                          </button>
-                        `
-                      : ''}
-                  </td>
-                  <td>
-                    <app-badge variant="default" appearance="soft" size="sm">
-                      ${t.expenses.categories[exp.category]}
-                    </app-badge>
-                  </td>
-                  <td style="white-space: nowrap;">${user?.name || exp.userId}</td>
-                  <td>
-                    ${this.renderExpenseAttachmentsCell(docs, t)}
-                  </td>
-                  <td class="amount-cell">
-                    <div>${formatMoney(exp.amount, exp.currency)}</div>
-                    ${exp.billable
-                      ? html`<div class="billable-sub">${t.viewTexts.expenses.billableSub}</div>`
-                      : ''}
-                  </td>
-                  <td>
-                    <app-status-chip
-                      domain="expense"
-                      status="${exp.status}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td>
-                    <div class="actions-row">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.viewTexts.expenses.openDetailsTitle}"
-                        @click="${() => store.openExpenseDetail(exp.id)}"
-                      >
-                        <span slot="start">${iconEye(14)}</span>
-                      </app-button>
-                      ${exp.status === 'pending'
-                        ? html`
-                            <app-button
-                              action="accept"
-                              size="sm"
-                              variant="icon"
-                              title="${t.viewTexts.expenses.approveTitle}"
-                              @click="${() => store.updateExpense({ ...exp, status: 'approved' })}"
-                            >
-                              <span slot="start">${iconCheck(14)}</span>
-                            </app-button>
-                            <app-button
-                              action="reject"
-                              size="sm"
-                              variant="icon"
-                              title="${t.viewTexts.expenses.rejectTitle}"
-                              @click="${() => store.updateExpense({ ...exp, status: 'rejected' })}"
-                            >
-                              <span slot="start">${iconX(14)}</span>
-                            </app-button>
-                          `
-                        : ''}
-                        <app-button
-                          size="sm"
-                          variant="icon"
-                          title="${t.common.edit}"
-                          @click="${() => this.openEditModal(exp)}"
-                        >
-                          <span slot="start">${iconEdit(14)}</span>
-                        </app-button>
-                        <app-button
-                          action="delete"
-                          size="sm"
-                          variant="icon"
-                          title="${t.common.delete}"
-                          @click="${() => (this.deletingExpense = exp)}"
-                        >
-                          <span slot="start">${iconTrash(14)}</span>
-                        </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <div class="amount-cell">
+                  <div>${formatMoney(exp.amount, exp.currency)}</div>
+                  ${exp.billable
+                    ? html`<div class="billable-sub">${t.viewTexts.expenses.billableSub}</div>`
+                    : ''}
+                </div>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.expenses.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="expense"
+                status="${(row as unknown as Expense).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            align="right"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const exp = row as unknown as Expense;
+              return html`
+                <div class="actions-row">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.expenses.openDetailsTitle}"
+                    @click="${() => store.openExpenseDetail(exp.id)}"
+                  >
+                    <span slot="start">${iconEye(14)}</span>
+                  </app-button>
+                  ${exp.status === 'pending'
+                    ? html`
+                        <app-button
+                          action="accept"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.expenses.approveTitle}"
+                          @click="${() => store.updateExpense({ ...exp, status: 'approved' })}"
+                        >
+                          <span slot="start">${iconCheck(14)}</span>
+                        </app-button>
+                        <app-button
+                          action="reject"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.expenses.rejectTitle}"
+                          @click="${() => store.updateExpense({ ...exp, status: 'rejected' })}"
+                        >
+                          <span slot="start">${iconX(14)}</span>
+                        </app-button>
+                      `
+                    : ''}
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(exp)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingExpense = exp)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 

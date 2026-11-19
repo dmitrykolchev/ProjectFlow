@@ -17,245 +17,56 @@
   background: var(--bg-canvas, #090d16);
 }
 
-:host::-webkit-scrollbar,
-.table-card::-webkit-scrollbar {
+:host::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-:host::-webkit-scrollbar-track,
-.table-card::-webkit-scrollbar-track {
+:host::-webkit-scrollbar-track {
   background: var(--scrollbar-track, var(--bg-canvas));
 }
 
-:host::-webkit-scrollbar-thumb,
-.table-card::-webkit-scrollbar-thumb {
+:host::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb, var(--border-strong));
   border-radius: 4px;
 }
 
-:host::-webkit-scrollbar-thumb:hover,
-.table-card::-webkit-scrollbar-thumb:hover {
+:host::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
+
+/* Table mode: both tab tables (Контроль сроков and История поступлений) are rendered by
+   the canonical app-data-table. The card fills the remaining view height (flex:1,
+   min-height:0) and the host fills the card, so the body scrolls in its own area when rows
+   overflow while header and footer stay fixed; the host is transparent so the card shell
+   paints the background and rounds the corners. The payments reference geometry matches the
+   calculations retune (0.84rem body, 0.85rem 1rem header padding with a 0.74rem uppercase
+   header at 0.03em letter-spacing, 0.88rem 1rem cell padding) and is set locally through the
+   component geometry tokens. All rich-cell classes of these tables (link-btn, text-link-btn,
+   pay-contract-desc, pay-cell-sub, req-sub, mono, amount-cell with incoming/outgoing,
+   due-tag variants, pay-inv-pay-cell, inv-pay bar classes, ctr-actions-row) live in the
+   component CSS: the cellRender templates render in its shadow tree. */
 .table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-lg, 12px);
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   box-shadow: var(--shadow-sm);
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.84rem;
+.table-card app-data-table {
+  flex: 1;
+  min-height: 0;
+  background: transparent;
+  --dt-font-size: 0.84rem;
+  --dt-th-padding: 0.85rem 1rem;
+  --dt-th-font-size: 0.74rem;
+  --dt-td-padding: 0.88rem 1rem;
 }
 
-.data-table th {
-  text-align: left;
-  padding: 0.85rem 1rem;
-  color: var(--text-muted, #64748b);
-  font-weight: 600;
-  font-size: 0.74rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
-  white-space: nowrap;
-}
-
-.data-table td {
-  padding: 0.88rem 1rem;
-  color: var(--text-primary, #f8fafc);
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  vertical-align: middle;
-}
-
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.03));
-}
-
-/* table name-links are app-link web components at size md with the historical typography
-   restored through the additive link hooks: zero padding, weight 700, the inherited unitless
-   line-height 1.5, the mono family with tabular numerals, and the cell font size pinned
-   through control-font-md; the accent color and the hover underline are the primary variant */
-.link-btn {
-  --link-padding: 0;
-  --link-font-weight: 700;
-  --link-line-height: 1.5;
-  --link-font: var(--font-mono, monospace);
-  --link-numeric: tabular-nums;
-  --control-font-md: 0.84rem;
-}
-
-/* counterparty name-links are app-link web components at size md restoring the historical
-   text-primary glyph through the additive link hooks of zero padding, weight 600, the inherited
-   unitless line-height 1.5, the cell font size pinned through control-font-md, and the accent
-   hover color restored through link-hover-color with the canonical underline */
-.text-link-btn {
-  --link-padding: 0;
-  --link-font-weight: 600;
-  --link-line-height: 1.5;
-  --link-color: var(--text-primary, #f8fafc);
-  --link-hover-color: var(--accent-primary, #6366f1);
-  --control-font-md: 0.84rem;
-}
-
-.contract-desc {
-  font-size: 0.74rem;
-  color: var(--text-muted, #64748b);
-  max-width: 220px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.12rem;
-}
-
-.cell-sub {
-  font-size: 0.74rem;
-  color: var(--text-secondary, #94a3b8);
-  margin-top: 0.18rem;
-}
-
-.req-sub {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  font-size: 0.72rem;
-  color: var(--text-muted, #64748b);
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-  margin-top: 0.2rem;
-  max-width: 240px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mono {
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-cell {
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.amount-cell.incoming {
-  color: #10b981;
-}
-
-.amount-cell.outgoing {
-  color: #f59e0b;
-}
-
-.due-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.25rem;
-  padding: 0.12rem 0.45rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.due-tag.overdue {
-  background: rgba(239, 68, 68, 0.14);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.due-tag.due-soon {
-  background: rgba(245, 158, 11, 0.14);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.due-tag.on-track {
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--text-secondary, #94a3b8);
-  border: 1px solid var(--border-subtle, #334155);
-}
-
-.due-tag.paid-ok {
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.28);
-}
-
-.inv-pay-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
-  min-width: 155px;
-}
-
-.inv-pay-bar {
-  width: 100%;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--bg-subtle, #1a2438);
-  overflow: hidden;
-}
-
-.inv-pay-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: #10b981;
-  transition: width 200ms ease;
-}
-
-.inv-pay-fill.partial {
-  background: #f59e0b;
-}
-
-.inv-pay-fill.overdue {
-  background: #ef4444;
-}
-
-.inv-pay-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.73rem;
-  color: var(--text-secondary, #94a3b8);
-  white-space: nowrap;
-}
-
-.actions-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
-}
-
-/* table row icon actions are app-button web components at size sm: the historical
-   hover kept the subtle border unchanged for plain actions, so the hover border token
-   is pinned back for every action except accept and delete (the component supplies the
-   success and danger palettes for those actions), and the historical 6px radius replaces
-   the canonical md radius */
-.actions-row app-button {
-  --btn-radius-tl: var(--radius-sm, 6px);
-  --btn-radius-tr: var(--radius-sm, 6px);
-  --btn-radius-bl: var(--radius-sm, 6px);
-  --btn-radius-br: var(--radius-sm, 6px);
-}
-
-.actions-row app-button:not([action='accept']):not([action='delete']) {
-  --icon-btn-hover-border: var(--border-subtle, #334155);
-}
 @media (max-width: 640px) {
   :host {
     padding: 1rem;

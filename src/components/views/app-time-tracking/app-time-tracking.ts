@@ -45,6 +45,8 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
 import '../app-data-grid/app-data-grid';
 import '../../common/app-data-grid-column/app-data-grid-column';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-time-tracking.css';
 import { eventValue } from '../../common/event-value';
@@ -708,157 +710,176 @@ export class AppTimeTracking extends LitElement {
     filtered: TimeEntry[],
     t: ReturnType<typeof getTranslation>
   ) {
-    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
+    const dateCell = (row: Record<string, unknown>) => {
+      const entry = row as unknown as TimeEntry;
+      return html`
+        <app-link
+          size="sm"
+          variant="primary"
+          title="${t.viewTexts.timeTracking.openDetailsTitle}"
+          @click="${() => store.openTimeEntryDetail(entry.id)}"
+        >
+          <span class="mono">${entry.date}</span>
+        </app-link>
+      `;
+    };
+    const taskCell = (row: Record<string, unknown>) => {
+      const entry = row as unknown as TimeEntry;
+      const task = store.tasks.find((tk) => tk.id === entry.taskId);
+      const proj = store.projects.find((p) => p.id === entry.projectId);
+      return html`
+        <app-link
+          class="task-link-btn"
+          size="md"
+          variant="primary"
+          @click="${() => {
+            if (task) store.openTaskDetail(task.id);
+          }}"
+        >
+          <span class="task-key-chip" slot="start">${entry.taskId}</span>
+          <span>${task?.title || (t.viewTexts.timeTracking.removedTask)}</span>
+        </app-link>
+        <div class="project-sub">
+          ${proj
+            ? html`<span class="dot" style="background: ${proj.color};"></span><span>${proj.name}</span>`
+            : ''}
+        </div>
+      `;
+    };
+    const userCell = (row: Record<string, unknown>) => {
+      const entry = row as unknown as TimeEntry;
+      const user = store.users.find((u) => u.id === entry.userId);
+      return html`
+        <div class="user-cell">
+          <span class="avatar-sm">${user?.avatar || '??'}</span>
+          <span>${user?.name || entry.userId}</span>
+        </div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.timeTracking.labelDate}</th>
-              <th>${t.viewTexts.timeTracking.thTaskProject}</th>
-              <th>${t.viewTexts.timeTracking.labelEmployee}</th>
-              <th>${t.viewTexts.timeTracking.thCategory}</th>
-              <th>${t.viewTexts.timeTracking.thDescription}</th>
-              <th>${t.viewTexts.timeTracking.thAttachments}</th>
-              <th>${t.viewTexts.timeTracking.labelHours}</th>
-              <th>${t.viewTexts.timeTracking.thBilling}</th>
-              <th>${t.viewTexts.timeTracking.statusLabel}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((entry) => {
-              const task = store.tasks.find((tk) => tk.id === entry.taskId);
-              const proj = store.projects.find((p) => p.id === entry.projectId);
-              const user = store.users.find((u) => u.id === entry.userId);
-              const docs = this.getAttachedDocs(entry);
-
+        <app-data-table
+          .rows="${filtered}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="date" label="${t.viewTexts.timeTracking.labelDate}" .cellRender="${dateCell}"></app-table-column>
+          <app-table-column field="taskId" label="${t.viewTexts.timeTracking.thTaskProject}" .cellRender="${taskCell}"></app-table-column>
+          <app-table-column field="userId" label="${t.viewTexts.timeTracking.labelEmployee}" .cellRender="${userCell}"></app-table-column>
+          <app-table-column
+            field="category"
+            label="${t.viewTexts.timeTracking.thCategory}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-badge variant="default" appearance="soft" size="sm">
+                ${t.timeTracking.categories[(row as unknown as TimeEntry).category]}
+              </app-badge>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="description"
+            label="${t.viewTexts.timeTracking.thDescription}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              html`<div class="desc-cell">${(row as unknown as TimeEntry).description || '—'}</div>`}"
+          ></app-table-column>
+          <app-table-column
+            field="documentIds"
+            label="${t.viewTexts.timeTracking.thAttachments}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              this.renderEntryAttachmentsCell(this.getAttachedDocs(row as unknown as TimeEntry), t)}"
+          ></app-table-column>
+          <app-table-column
+            field="hours"
+            label="${t.viewTexts.timeTracking.labelHours}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              html`<span class="hours-cell">${(row as unknown as TimeEntry).hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>`}"
+          ></app-table-column>
+          <app-table-column
+            field="billable"
+            label="${t.viewTexts.timeTracking.thBilling}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-badge
+                variant="${(row as unknown as TimeEntry).billable ? 'info' : 'default'}"
+                appearance="soft"
+                size="sm"
+              >
+                ${(row as unknown as TimeEntry).billable ? t.viewTexts.timeTracking.badgeBillableShort : t.viewTexts.timeTracking.badgeInternalShort}
+              </app-badge>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.timeTracking.statusLabel}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="timeEntry"
+                status="${(row as unknown as TimeEntry).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            align="right"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const entry = row as unknown as TimeEntry;
               return html`
-                <tr>
-                  <td class="mono" style="white-space: nowrap;">
-                    <app-link
-                      size="sm"
-                      variant="primary"
-                      title="${t.viewTexts.timeTracking.openDetailsTitle}"
-                      @click="${() => store.openTimeEntryDetail(entry.id)}"
-                    >
-                      <span class="mono">${entry.date}</span>
-                    </app-link>
-                  </td>
-                  <td>
-                    <app-link
-                      class="task-link-btn"
-                      size="md"
-                      variant="primary"
-                      @click="${() => {
-                        if (task) store.openTaskDetail(task.id);
-                      }}"
-                    >
-                      <span class="task-key-chip" slot="start">${entry.taskId}</span>
-                      <span>${task?.title || (t.viewTexts.timeTracking.removedTask)}</span>
-                    </app-link>
-                    <div class="project-sub">
-                      ${proj
-                        ? html`<span class="dot" style="background: ${proj.color};"></span><span>${proj.name}</span>`
-                        : ''}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="user-cell">
-                      <span class="avatar-sm">${user?.avatar || '??'}</span>
-                      <span>${user?.name || entry.userId}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <app-badge variant="default" appearance="soft" size="sm">
-                      ${t.timeTracking.categories[entry.category]}
-                    </app-badge>
-                  </td>
-                  <td class="desc-cell">${entry.description || '—'}</td>
-                  <td>
-                    ${this.renderEntryAttachmentsCell(docs, t)}
-                  </td>
-                  <td class="hours-cell">${entry.hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</td>
-                  <td>
-                    <app-badge
-                      variant="${entry.billable ? 'info' : 'default'}"
-                      appearance="soft"
-                      size="sm"
-                    >
-                      ${entry.billable ? (t.viewTexts.timeTracking.badgeBillableShort) : t.viewTexts.timeTracking.badgeInternalShort}
-                    </app-badge>
-                  </td>
-                  <td>
-                    <app-status-chip
-                      domain="timeEntry"
-                      status="${entry.status}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td>
-                    <div class="actions-row">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.viewTexts.timeTracking.openDetailsTitle}"
-                        @click="${() => store.openTimeEntryDetail(entry.id)}"
-                      >
-                        <span slot="start">${iconEye(14)}</span>
-                      </app-button>
-                      ${entry.status !== 'approved'
-                        ? html`
-                            <app-button
-                              action="accept"
-                              size="sm"
-                              variant="icon"
-                              title="${t.viewTexts.timeTracking.approveEntryTitle}"
-                              @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
-                            >
-                              <span slot="start">${iconCheck(14)}</span>
-                            </app-button>
-                          `
-                        : ''}
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditModal(entry)}"
-                      >
-                        <span slot="start">${iconEdit(14)}</span>
-                      </app-button>
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingEntry = entry)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <div class="actions-row">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.timeTracking.openDetailsTitle}"
+                    @click="${() => store.openTimeEntryDetail(entry.id)}"
+                  >
+                    <span slot="start">${iconEye(14)}</span>
+                  </app-button>
+                  ${entry.status !== 'approved'
+                    ? html`
+                        <app-button
+                          action="accept"
+                          size="sm"
+                          variant="icon"
+                          title="${t.viewTexts.timeTracking.approveEntryTitle}"
+                          @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
+                        >
+                          <span slot="start">${iconCheck(14)}</span>
+                        </app-button>
+                      `
+                    : ''}
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(entry)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingEntry = entry)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 

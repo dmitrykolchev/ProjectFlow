@@ -17,327 +17,53 @@
   gap: 1.25rem;
 }
 
-:host::-webkit-scrollbar,
-.table-card::-webkit-scrollbar {
+:host::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
-:host::-webkit-scrollbar-track,
-.table-card::-webkit-scrollbar-track {
+:host::-webkit-scrollbar-track {
   background: var(--scrollbar-track, var(--bg-canvas));
 }
 
-:host::-webkit-scrollbar-thumb,
-.table-card::-webkit-scrollbar-thumb {
+:host::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb, var(--border-strong));
   border-radius: 4px;
 }
 
-:host::-webkit-scrollbar-thumb:hover,
-.table-card::-webkit-scrollbar-thumb:hover {
+:host::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
+
+/* Table mode: all four tab tables (Реестр договоров, Калькуляции, Выставленные счета,
+   Платежи и сроки) are rendered by the canonical app-data-table. The card fills the
+   remaining view height (flex:1, min-height:0) and the host fills the card, so the body
+   scrolls in its own area when rows overflow while header and footer stay fixed; the
+   host is transparent so the card shell paints the background and rounds the corners.
+   The contracts reference geometry (0.83rem body, 0.8rem 1rem padding on header and
+   cells, the uppercase 0.75rem header with 0.03em letter-spacing) is exactly the
+   component default, so no geometry tokens are retuned here. All rich-cell classes of
+   these tables (contract-link-btn, contract-title, contract-desc, amount-cell,
+   billing-sub, micro-pill, dates-cell, expiry-warn, project-pill, project-dot,
+   ctr-actions-row, due-tag variants, inv-pay bar classes) live in the component CSS:
+   the cellRender templates render in its shadow tree. */
 .table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
   background: var(--bg-surface, #111827);
   border: 1px solid var(--border-subtle, #1e293b);
   border-radius: var(--radius-lg, 12px);
-  overflow-x: auto;
+  overflow: hidden;
   box-shadow: var(--shadow-sm), var(--surface-glow, none);
 }
 
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.83rem;
-}
-
-.data-table th {
-  text-align: left;
-  padding: 0.8rem 1rem;
-  color: var(--text-muted, #64748b);
-  font-weight: 600;
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-subtle, #1a2438);
-  white-space: nowrap;
-}
-
-.data-table td {
-  padding: 0.8rem 1rem;
-  color: var(--text-primary, #f8fafc);
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
-  vertical-align: middle;
-}
-
-.data-table tr:last-child td {
-  border-bottom: none;
-}
-
-.data-table tr:hover td {
-  background: var(--bg-hover, rgba(255, 255, 255, 0.03));
-}
-
-.contract-num {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-family: var(--font-mono, monospace);
-  font-weight: 700;
-  color: var(--accent-primary, #6366f1);
-  white-space: nowrap;
-}
-
-/* number-links are app-link web components at size md restoring the historical mono chip through
-   the additive link hooks of the mono family, weight 700, tabular numerals, the UA normal
-   line-height, nowrap, the tighter 0.45rem icon gap, the control font size pinned to 1rem as the
-   native control reset computed it, and the accent glyph with the hover chip fill and text-primary
-   color restored through link-hover-bg and link-hover-color; the host carries the historical
-   negative margins that offset the inner padding in the cell layout */
-.contract-link-btn {
-  --link-font: var(--font-mono, monospace);
-  --link-font-weight: 700;
-  --link-numeric: tabular-nums;
-  --link-line-height: normal;
-  --link-white-space: nowrap;
-  --link-gap: 0.45rem;
-  --control-font-md: 1rem;
-  --link-hover-bg: var(--bg-hover, rgba(99, 102, 241, 0.12));
-  --link-hover-color: var(--text-primary, #f8fafc);
-  margin: -0.15rem -0.25rem;
-  vertical-align: baseline;
-  --control-font-md: 0.9524rem;
-}
-
-/* the invoice cell chip is a div-as-button consumer of the same class kept native: it restores
-   the full historical rule with the inherited cell font size and line-height, mono weight 700 tabular
-   numerals, accent glyph, padding offset by negative margins, nowrap and the fast transitions */
-div.contract-link-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  font-family: var(--font-mono, monospace);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--accent-primary, #6366f1);
+.table-card app-data-table {
+  flex: 1;
+  min-height: 0;
   background: transparent;
-  border: none;
-  padding: 0.15rem 0.25rem;
-  margin: -0.15rem -0.25rem;
-  border-radius: var(--radius-sm, 6px);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
 }
 
-.contract-title {
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-}
-
-.contract-desc {
-  font-size: 0.74rem;
-  color: var(--text-muted, #64748b);
-  margin-top: 0.15rem;
-  max-width: 320px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.mono {
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-}
-
-.amount-cell {
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.billing-sub {
-  margin-top: 0.22rem;
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--text-secondary, #94a3b8);
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-
-.billing-sub .paid-val {
-  color: var(--color-success, #10b981);
-}
-
-.billing-sub .calc-val {
-  color: var(--accent-primary, #6366f1);
-}
-
-.micro-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.08rem 0.35rem;
-  border-radius: 4px;
-  font-size: 0.68rem;
-  font-weight: 600;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  color: var(--text-secondary, #94a3b8);
-}
-
-.micro-pill.prior {
-  background: rgba(245, 158, 11, 0.14);
-  border-color: rgba(245, 158, 11, 0.35);
-  color: #f59e0b;
-}
-
-.micro-pill.zero {
-  background: rgba(148, 163, 184, 0.12);
-  border-color: rgba(148, 163, 184, 0.3);
-  color: var(--text-muted, #94a3b8);
-}
-
-.dates-cell {
-  font-family: var(--font-mono, monospace);
-  font-variant-numeric: tabular-nums;
-  font-size: 0.78rem;
-  white-space: nowrap;
-}
-
-.expiry-warn {
-  display: inline-block;
-  margin-top: 0.2rem;
-  font-size: 0.7rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 4px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-  font-family: inherit;
-}
-
-.project-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.18rem 0.5rem;
-  border-radius: var(--radius-sm, 6px);
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  font-size: 0.75rem;
-  white-space: nowrap;
-}
-
-.project-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.actions-row {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.35rem;
-}
-
-/* table row icon actions are app-button web components at size sm: the historical
-   hover kept the subtle border unchanged for plain actions, so the hover border token
-   is pinned back for every action except view, submit, accept, reject and delete (the
-   component supplies the accent, success and danger palettes for those actions), and
-   the historical 6px radius replaces the canonical md radius */
-.actions-row app-button {
-  --btn-radius-tl: var(--radius-sm, 6px);
-  --btn-radius-tr: var(--radius-sm, 6px);
-  --btn-radius-bl: var(--radius-sm, 6px);
-  --btn-radius-br: var(--radius-sm, 6px);
-}
-
-.actions-row app-button:not([action='view']):not([action='submit']):not([action='accept']):not([action='reject']):not([action='delete']) {
-  --icon-btn-hover-border: var(--border-subtle, #334155);
-}
 .col-span-2 {
   grid-column: span 2;
 }
-.due-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  margin-top: 0.25rem;
-  padding: 0.12rem 0.45rem;
-  border-radius: 4px;
-  font-family: inherit;
-  font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.due-tag.overdue {
-  background: rgba(239, 68, 68, 0.14);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.due-tag.due-soon {
-  background: rgba(245, 158, 11, 0.14);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.due-tag.on-track {
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--text-secondary, #94a3b8);
-  border: 1px solid var(--border-subtle, #334155);
-}
-
-.due-tag.paid-ok {
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.28);
-}
-
-.inv-pay-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.28rem;
-  min-width: 150px;
-}
-
-.inv-pay-bar {
-  width: 100%;
-  height: 5px;
-  border-radius: 999px;
-  background: var(--bg-subtle, #1a2438);
-  overflow: hidden;
-}
-
-.inv-pay-fill {
-  height: 100%;
-  border-radius: 999px;
-  background: #10b981;
-  transition: width 200ms ease;
-}
-
-.inv-pay-fill.partial {
-  background: #f59e0b;
-}
-
-.inv-pay-fill.overdue {
-  background: #ef4444;
-}
-
-.inv-pay-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  font-size: 0.73rem;
-  color: var(--text-secondary, #94a3b8);
-  white-space: nowrap;
-}
-

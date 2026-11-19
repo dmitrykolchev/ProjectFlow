@@ -2,7 +2,7 @@ import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import '../app-empty-state/app-empty-state';
 import styles from './app-table-scroll.css';
-import { AppTableScrollColumn } from '../app-table-scroll-column/app-table-scroll-column';
+import { AppTableColumn } from '../app-table-column/app-table-column';
 
 export type SortDirection = 'asc' | 'desc';
 
@@ -23,7 +23,7 @@ export class AppTableScroll extends LitElement {
 
   static styles = styles;
 
-  private columns: AppTableScrollColumn[] = [];
+  private columns: AppTableColumn[] = [];
 
   connectedCallback() {
     super.connectedCallback();
@@ -42,11 +42,11 @@ export class AppTableScroll extends LitElement {
 
   private syncColumns() {
     this.columns = Array.from(
-      this.querySelectorAll(':scope > app-table-scroll-column')
-    ) as AppTableScrollColumn[];
+      this.querySelectorAll(':scope > app-table-column')
+    ) as AppTableColumn[];
   }
 
-  private toggleSort(col: AppTableScrollColumn) {
+  private toggleSort(col: AppTableColumn) {
     if (this.sortBy === col.field) {
       this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     } else {
@@ -62,12 +62,12 @@ export class AppTableScroll extends LitElement {
     );
   }
 
-  private renderSortArrow(col: AppTableScrollColumn) {
+  private renderSortArrow(col: AppTableColumn) {
     if (this.sortBy !== col.field) return '';
     return html`<span>${this.sortDir === 'asc' ? '↑' : '↓'}</span>`;
   }
 
-  private formatCellValue(col: AppTableScrollColumn, value: unknown): TemplateResult | string {
+  private formatCellValue(col: AppTableColumn, value: unknown): TemplateResult | string {
     if (value === undefined || value === null || value === '') {
       return html`<span style="color: var(--text-muted);">—</span>`;
     }
@@ -87,13 +87,13 @@ export class AppTableScroll extends LitElement {
     return String(value);
   }
 
-  private headerClass(col: AppTableScrollColumn): string {
+  private headerClass(col: AppTableColumn): string {
     if (col.align === 'right') return 'align-right';
     if (col.align === 'center') return 'align-center';
     return '';
   }
 
-  private cellClass(col: AppTableScrollColumn): string {
+  private cellClass(col: AppTableColumn): string {
     const classes: string[] = [];
     if (col.code) classes.push('cell-code');
     if (col.mono) classes.push('cell-mono');

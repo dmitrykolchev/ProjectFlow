@@ -44,7 +44,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-directory-record-modal/app-directory-record-modal';
 import '../../common/app-table-scroll/app-table-scroll';
-import '../../common/app-table-scroll-column/app-table-scroll-column';
+import '../../common/app-table-column/app-table-column';
 import styles from './app-directories.css';
 
 type SchemaFilter = 'all' | 'simple' | 'extended';
@@ -576,7 +576,7 @@ export class AppDirectories extends LitElement {
 
   private renderFactorColumn(t: TranslationType) {
     return html`
-      <app-table-scroll-column
+      <app-table-column
         field="conversionFactor"
         label="${t.viewTexts.directories.fields.conversionFactor}"
         type="number"
@@ -585,7 +585,7 @@ export class AppDirectories extends LitElement {
         sortable
         .valueFn="${(row: Record<string, unknown>) =>
           this.unitFactor(row as unknown as DirectoryRecord)}"
-      ></app-table-scroll-column>
+      ></app-table-column>
     `;
   }
 
@@ -617,7 +617,7 @@ export class AppDirectories extends LitElement {
 
     const tableCols: TemplateResult[] = tableFields.map((field) =>
       html`
-        <app-table-scroll-column
+        <app-table-column
           field="${field.key}"
           label="${this.getFieldLabel(field, t)}"
           type="${field.type}"
@@ -631,7 +631,7 @@ export class AppDirectories extends LitElement {
           }))}"
           .valueFn="${(row: Record<string, unknown>) =>
             (row as unknown as DirectoryRecord).extra?.[field.key]}"
-        ></app-table-scroll-column>
+        ></app-table-column>
       `,
     );
     const factorAnchor = tableFields.findIndex((f) => f.key === 'baseUnitCode');
@@ -704,13 +704,13 @@ export class AppDirectories extends LitElement {
           this.currentPage = 1;
         }}"
       >
-        <app-table-scroll-column
+        <app-table-column
           field="code"
           label="${t.viewTexts.directories.thCode}"
           code
           sortable
-        ></app-table-scroll-column>
-        <app-table-scroll-column
+        ></app-table-column>
+        <app-table-column
           field="name"
           label="${t.viewTexts.directories.thName}"
           sortable
@@ -723,22 +723,22 @@ export class AppDirectories extends LitElement {
                 : ''}
             `;
           }}"
-        ></app-table-scroll-column>
-        <app-table-scroll-column
+        ></app-table-column>
+        <app-table-column
           field="nameEn"
           label="${t.viewTexts.directories.thNameEn}"
           sortable
-        ></app-table-scroll-column>
+        ></app-table-column>
         ${tableCols}
-        <app-table-scroll-column
+        <app-table-column
           field="sortOrder"
           label="${t.viewTexts.directories.thSortOrder}"
           type="number"
           align="right"
           mono
           sortable
-        ></app-table-scroll-column>
-        <app-table-scroll-column
+        ></app-table-column>
+        <app-table-column
           field="isActive"
           label="${t.viewTexts.directories.thActive}"
           align="center"
@@ -751,8 +751,8 @@ export class AppDirectories extends LitElement {
               ></app-switch>
             `;
           }}"
-        ></app-table-scroll-column>
-        <app-table-scroll-column
+        ></app-table-column>
+        <app-table-column
           field="actions"
           label="${t.viewTexts.directories.thActions}"
           align="right"
@@ -789,7 +789,7 @@ export class AppDirectories extends LitElement {
               </div>
             `;
           }}"
-        ></app-table-scroll-column>
+        ></app-table-column>
       </app-table-scroll>
 
       ${filtered.length > 0

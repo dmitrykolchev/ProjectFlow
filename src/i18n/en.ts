@@ -423,6 +423,8 @@ export const en = {
     densitySwitchTitle: 'Grid row density',
     sortGroupHint: 'Group-priority sort',
     groupableColumnHint: 'Drag column to group dropbar',
+    groupIconAddHint: 'Click to group by this column',
+    groupIconRemoveHint: 'Click to remove grouping by this column',
     columns: {
       id: 'Key',
       title: 'Task',

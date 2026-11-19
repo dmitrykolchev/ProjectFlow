@@ -57,6 +57,8 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-status-chip/app-status-chip';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
 import { paginateItems } from '../../common/paginate';
@@ -545,145 +547,158 @@ export class AppDocuments extends LitElement {
   }
 
   private renderTableView(filtered: DocumentItem[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(filtered, this.currentPage, this.tablePageSize);
+    const fileCell = (row: Record<string, unknown>) => {
+      const doc = row as unknown as DocumentItem;
+      return html`
+        <div class="table-doc-cell">
+          ${this.renderFileTypeTile(doc)}
+          <div class="doc-titles">
+            <button type="button" class="doc-title-btn" @click="${() => this.openPreviewModal(doc)}">
+              ${doc.title}
+            </button>
+            <span class="doc-filename">${doc.fileName}</span>
+          </div>
+        </div>
+      `;
+    };
+    const scopeCell = (row: Record<string, unknown>) => {
+      const doc = row as unknown as DocumentItem;
+      const linked = this.getLinkedEntityLabel(doc, t);
+      return html`
+        <div style="display: flex; flex-direction: column; gap: 0.18rem; max-width: 240px;">
+          <span style="font-size: 0.7rem; color: var(--text-muted);">
+            ${t.documents.scopes[doc.scope]}
+          </span>
+          ${linked.onClick
+            ? html`
+                <app-link class="link-btn" size="md" variant="primary" @click="${linked.onClick}">
+                  ${linked.label}
+                </app-link>
+              `
+            : html`<span>${linked.label}</span>`}
+          ${doc.timeEntryId || doc.expenseId
+            ? html`
+                <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
+                  ${doc.timeEntryId
+                    ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
+                    : ''}
+                  ${doc.expenseId
+                    ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
+                    : ''}
+                </div>
+              `
+            : ''}
+        </div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <div class="table-scroll">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>${t.viewTexts.documents.thFile}</th>
-                <th>${t.viewTexts.documents.thScopeLink}</th>
-                <th>${t.viewTexts.documents.thCategory}</th>
-                <th>${t.viewTexts.documents.thVersionSize}</th>
-                <th>${t.viewTexts.documents.thUpdated}</th>
-                <th>${t.viewTexts.documents.thStatus}</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              ${paged.items.map((doc) => {
-                const linked = this.getLinkedEntityLabel(doc, t);
-                const uploader = store.users.find((u) => u.id === doc.uploadedById);
-
-                return html`
-                  <tr>
-                    <td>
-                      <div class="table-doc-cell">
-                        ${this.renderFileTypeTile(doc)}
-                        <div class="doc-titles">
-                          <button
-                            type="button"
-                            class="doc-title-btn"
-                            @click="${() => this.openPreviewModal(doc)}"
-                          >
-                            ${doc.title}
-                          </button>
-                          <span class="doc-filename">${doc.fileName}</span>
-                        </div>
-                      </div>
-                    </td>
-                    <td>
-                      <div style="display: flex; flex-direction: column; gap: 0.18rem; max-width: 240px;">
-                        <span style="font-size: 0.7rem; color: var(--text-muted);">
-                          ${t.documents.scopes[doc.scope]}
-                        </span>
-                        ${linked.onClick
-                          ? html`
-                              <app-link class="link-btn" size="md" variant="primary" @click="${linked.onClick}">
-                                ${linked.label}
-                              </app-link>
-                            `
-                          : html`<span>${linked.label}</span>`}
-                        ${doc.timeEntryId || doc.expenseId
-                          ? html`
-                              <div style="display: flex; gap: 0.25rem; flex-wrap: wrap;">
-                                ${doc.timeEntryId
-                                  ? html`<app-badge variant="info" appearance="soft" size="sm">${t.viewTexts.documents.sourceTimeEntry}</app-badge>`
-                                  : ''}
-                                ${doc.expenseId
-                                  ? html`<app-badge variant="warning" appearance="soft" size="sm">${t.viewTexts.documents.sourceExpense}</app-badge>`
-                                  : ''}
-                              </div>
-                            `
-                          : ''}
-                      </div>
-                    </td>
-                    <td>${t.documents.categories[doc.category]}</td>
-                    <td class="mono">
-                      v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}
-                    </td>
-                    <td>
-                      <div class="mono">${doc.updatedAt.slice(0, 10)}</div>
-                      <div style="font-size: 0.72rem; color: var(--text-muted);">
-                        ${uploader?.name || doc.uploadedById}
-                      </div>
-                    </td>
-                    <td>
-                      <app-status-chip domain="document" status="${doc.status}" appearance="soft" size="sm"></app-status-chip>
-                    </td>
-                    <td>
-                      <div class="card-actions" style="justify-content: flex-end;">
-                        <app-button
-                          size="sm"
-                          variant="icon"
-                          action="view"
-                          title="${t.documents.previewTitle}"
-                          @click="${() => this.openPreviewModal(doc)}"
-                        >
-                          <span slot="start">${iconEye(14)}</span>
-                        </app-button>
-                        <app-button
-                          size="sm"
-                          variant="icon"
-                          title="${t.documents.downloadFile}"
-                          @click="${() => downloadDocumentFile(doc)}"
-                        >
-                          <span slot="start">${iconDownload(14)}</span>
-                        </app-button>
-                        <app-button
-                          size="sm"
-                          variant="icon"
-                          action="edit"
-                          title="${t.common.edit}"
-                          @click="${() => this.openEditModal(doc)}"
-                        >
-                          <span slot="start">${iconEdit(14)}</span>
-                        </app-button>
-                        <app-button
-                          action="delete"
-                          size="sm"
-                          variant="icon"
-                          title="${t.common.delete}"
-                          @click="${() => (this.deletingDoc = doc)}"
-                        >
-                          <span slot="start">${iconTrash(14)}</span>
-                        </app-button>
-                      </div>
-                    </td>
-                  </tr>
-                `;
-              })}
-            </tbody>
-          </table>
-        </div>
+        <app-data-table
+          .rows="${filtered}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="fileName" label="${t.viewTexts.documents.thFile}" .cellRender="${fileCell}"></app-table-column>
+          <app-table-column field="scope" label="${t.viewTexts.documents.thScopeLink}" .cellRender="${scopeCell}"></app-table-column>
+          <app-table-column
+            field="category"
+            label="${t.viewTexts.documents.thCategory}"
+            .cellRender="${(row: Record<string, unknown>) =>
+              html`${t.documents.categories[(row as unknown as DocumentItem).category]}`}"
+          ></app-table-column>
+          <app-table-column
+            field="version"
+            label="${t.viewTexts.documents.thVersionSize}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const doc = row as unknown as DocumentItem;
+              return html`v${doc.version} · ${formatFileSize(doc.sizeBytes, t)}`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="updatedAt"
+            label="${t.viewTexts.documents.thUpdated}"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const doc = row as unknown as DocumentItem;
+              const uploader = store.users.find((u) => u.id === doc.uploadedById);
+              return html`
+                <div class="mono">${doc.updatedAt.slice(0, 10)}</div>
+                <div style="font-size: 0.72rem; color: var(--text-muted);">
+                  ${uploader?.name || doc.uploadedById}
+                </div>
+              `;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.documents.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="document"
+                status="${(row as unknown as DocumentItem).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            .cellRender="${(row: Record<string, unknown>) => {
+              const doc = row as unknown as DocumentItem;
+              return html`
+                <div class="card-actions" style="justify-content: flex-end;">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    action="view"
+                    title="${t.documents.previewTitle}"
+                    @click="${() => this.openPreviewModal(doc)}"
+                  >
+                    <span slot="start">${iconEye(14)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.documents.downloadFile}"
+                    @click="${() => downloadDocumentFile(doc)}"
+                  >
+                    <span slot="start">${iconDownload(14)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    action="edit"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(doc)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingDoc = doc)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
+              `;
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 

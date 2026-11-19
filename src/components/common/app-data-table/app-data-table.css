@@ -1,0 +1,1086 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* The body is the only scrollable shell: with max-height set on the host it flexes
+   to the remaining space and gets its own scrollbar, while the header (sticky thead)
+   and the footer stay fixed. Without max-height the host is auto-sized and the body
+   stretches to display every rendered row. */
+.table-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.table-body::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-body::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, #0f172a);
+}
+
+.table-body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, #334155);
+  border-radius: 4px;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--dt-font-size, 0.83rem);
+}
+
+/* Header and cell geometry are tokens with the journal reference as defaults; a view
+   can retune them locally (the requirements table uses the compact 0.7/0.75rem
+   padding, 0.72rem header, 0.8125rem body and pointer rows). */
+.data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--dt-th-bg, var(--bg-subtle, #1a2438));
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  padding: var(--dt-th-padding, 0.8rem 1rem);
+  text-align: left;
+  text-transform: var(--dt-th-transform, uppercase);
+  font-size: var(--dt-th-font-size, 0.75rem);
+  font-weight: var(--dt-th-weight, 600);
+  letter-spacing: var(--dt-th-letter-spacing, 0.03em);
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+}
+
+.data-table thead th.select-col,
+.data-table tbody td.select-col {
+  width: 38px;
+}
+
+.data-table thead th.align-right,
+.data-table tbody td.align-right {
+  text-align: right;
+}
+
+.data-table thead th.align-center,
+.data-table tbody td.align-center {
+  text-align: center;
+}
+
+.sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font: inherit;
+  text-transform: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.sort-btn:hover {
+  color: var(--text-primary, #f8fafc);
+}
+
+.sort-btn.is-sorted {
+  color: var(--accent-primary, #6366f1);
+}
+
+.data-table tbody tr {
+  cursor: var(--dt-tr-cursor, default);
+  transition: background var(--transition-fast, 150ms ease);
+}
+
+.data-table tbody tr:hover {
+  background: var(--dt-row-hover, var(--bg-hover, rgba(255, 255, 255, 0.03)));
+}
+
+.data-table tbody td {
+  padding: var(--dt-td-padding, 0.8rem 1rem);
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+  vertical-align: middle;
+  color: var(--text-primary, #f8fafc);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cell-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.cell-code {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-weight: 600;
+  color: var(--accent-primary, #6366f1);
+  white-space: nowrap;
+}
+
+.bool-yes {
+  color: var(--color-success, #22c55e);
+  font-weight: 600;
+  font-size: 0.76rem;
+}
+
+.bool-no {
+  color: var(--text-muted, #64748b);
+  font-size: 0.76rem;
+}
+
+/* Row action buttons rendered through column cellRender live in this shadow tree. */
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+/* Registry reference rich cells (expenses journal): title link, vendor line, project
+   pill, task chip, amount with billable sub-line */
+.exp-title {
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.exp-vendor {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+}
+
+.project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* the project pill dot is 8px (registry reference), scoped so it does not change the
+   journal project-sub dot which stays 7px */
+.project-pill .dot {
+  width: 8px;
+  height: 8px;
+}
+
+.task-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.1rem 0.42rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.task-chip-btn:hover {
+  filter: brightness(1.15);
+}
+
+.amount-cell {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.billable-sub {
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 500;
+  margin-top: 0.15rem;
+  font-family: inherit;
+}
+
+/* Requirements registry reference rich cells: title main/sub lines */
+/* Projects table reference rich cells: title row with color dot and key chip */
+.proj-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.proj-key {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-strong, #334155);
+}
+
+/* Requirements registry reference rich cells: code badge, FR/NFR type tag, project
+   pill with 7px dot, title main/sub lines */
+.req-code-badge {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.16rem 0.48rem;
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--color-info, #38bdf8);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+}
+
+.req-code-badge.is-nfr {
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.req-type-tag,
+.req-project-pill {
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.14rem 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, rgba(148, 163, 184, 0.1));
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.req-project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.proj-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.td-title-main {
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.td-title-sub {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+}
+
+/* the requirements row actions container keeps its own 0.4rem gap layout */
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.footer-right app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.footer-right app-button:not([action='delete']) {
+  --icon-btn-hover-border: var(--border-subtle, #1e293b);
+}
+
+.icon-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.icon-action-btn:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.06));
+  border-color: var(--border-subtle, #1e293b);
+  color: var(--text-primary, #f8fafc);
+}
+
+.icon-action-btn.is-danger:hover {
+  color: var(--color-danger, #ef4444);
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.task-key-chip {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.14rem 0.45rem;
+  border-radius: 5px;
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+  white-space: nowrap;
+}
+
+.task-link-btn {
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-gap: 0.45rem;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --link-hover-decoration: none;
+  --control-font-md: 0.83rem;
+}
+
+.project-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.2rem;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.avatar-sm {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent-gradient, var(--accent-primary, #6366f1));
+  color: var(--text-on-accent, #ffffff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.desc-cell {
+  max-width: 280px;
+  color: var(--text-secondary, #94a3b8);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.hours-cell {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.attach-chips-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.attach-chip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 170px;
+  padding: 0.18rem 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #334155);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+
+.attach-chip-btn:hover {
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #6366f1);
+}
+
+.attach-chip-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+}
+
+.actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+/* Row icon actions are app-button web components at size sm: the historical hover kept
+   the subtle border unchanged for plain actions, so the hover border token is pinned back
+   for every action except accept and delete (the component supplies the success and danger
+   palettes for those actions), and the historical 6px radius replaces md */
+.actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+/* the employees row actions container keeps its own 0.35rem gap layout without the
+   flex-end alignment, and the historical hover restored the subtle border for every
+   action including delete, so the hover border token is pinned back on all buttons */
+.emp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.emp-actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+.empty-wrap {
+  padding: 2rem;
+}
+
+/* The footer shell is outside the scroll area, so it never scrolls away. It hosts
+   app-pagination only when there is more than one page. */
+.table-footer {
+  padding: 0.7rem 1rem;
+  background: var(--bg-surface, #111827);
+  border-top: 1px solid var(--border-subtle, #1e293b);
+}
+
+.table-footer app-pagination {
+  width: 100%;
+}
+
+/* Documents library reference rich cells: file-type tile (extension square with the
+   image/code palette variants), the title/filename column, the table doc cell row,
+   the name-links through app-link hooks, and the row actions container. */
+.file-type-tile {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  flex-shrink: 0;
+}
+
+.file-type-tile.is-image {
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--color-success, #10b981);
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+.file-type-tile.is-code {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.ext-text {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.56rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.doc-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.doc-title-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-primary, #f8fafc);
+  font: inherit;
+  font-size: 0.96rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 150ms ease;
+}
+
+.doc-title-btn:hover {
+  color: var(--accent-primary, #6366f1);
+}
+
+.doc-filename {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-doc-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 220px;
+}
+
+/* table name-links are app-link web components at size md restoring the historical block
+   filling label through the additive link hooks */
+.link-btn {
+  --link-host-display: block;
+  --link-width: 100%;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 0.76rem;
+}
+
+/* the documents row actions container keeps its own 0.3rem gap layout; icon buttons at
+   size sm get the historical 6px radius, and the hover border is pinned back for the
+   plain action (the component colors action view / edit / delete itself) */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.card-actions app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.card-actions app-button:not([action]) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+/* Counterparties registry reference rich cells: the name link (card weight/size plus
+   the table-cell retune), the rating stars, the bank accounts cell with currency chips
+   and the extra-count marker. */
+.cp-link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 1rem;
+}
+
+/* the table cell link inherits the smaller cell weight and font size */
+.table-link {
+  --link-font-weight: 600;
+  --control-font-md: 0.83rem;
+}
+
+.rating-stars {
+  color: #f59e0b;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+.bank-currencies {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.currency-chip {
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  color: var(--accent-primary, #6366f1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.table-bank-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-bank-name {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary, #f8fafc);
+}
+
+.bank-more-count {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+}
+
+/* the counterparties row actions container keeps its own 0.35rem gap layout; icon
+   buttons at size sm get the historical 6px radius, and the hover border is pinned back
+   for every action except delete (the component colors action="delete" itself) */
+.cp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.cp-actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.cp-actions-row app-button:not([action='delete']) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+/* Calculations page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the mono number/contract links (link-btn restores zero padding, weight 700,
+   line-height 1.5, mono family with tabular numerals and the 0.84rem cell font size pinned
+   through control-font-md; text-link-btn is the counterparty name link with weight 600,
+   text-primary glyph and the accent hover), the cell-sub muted sub-line (flex, 0.35rem gap,
+   wrap), the calculations contract-desc variant (240px ellipsis line, margin-top 0.12rem —
+   narrower than the contracts contract-desc), the mono helper for inline date lines, and
+   the borderless micro-tag with the prior / zero variants (the bill variant stays in the
+   view: it is only used by the preview modal in light DOM). */
+.link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
+}
+
+.text-link-btn {
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --control-font-md: 0.84rem;
+}
+
+.cell-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.2rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.calc-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.12rem;
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.micro-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.08rem 0.38rem;
+  border-radius: 4px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* Payments page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the payments contract-desc variant (220px ellipsis line, margin-top
+   0.12rem — narrower than the contracts 320px and the calculations 240px), the block
+   pay-cell-sub muted line (no flex, margin-top 0.18rem), the req-sub requisites line
+   (mono 0.72rem muted with the landmark glyph gap 0.28rem, 240px ellipsis), the signed
+   amount colors incoming / outgoing on the shared amount-cell, and the payments
+   inv-pay-cell variant (min-width 155px — the bar/fill/meta stay shared). The link-btn,
+   text-link-btn, mono, due-tag variants, inv-pay bar classes and ctr-actions-row are
+   reused from the existing sets. */
+.pay-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.12rem;
+}
+
+.pay-cell-sub {
+  font-size: 0.74rem;
+  color: var(--text-secondary, #94a3b8);
+  margin-top: 0.18rem;
+}
+
+.req-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  font-size: 0.72rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  margin-top: 0.2rem;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount-cell.incoming {
+  color: #10b981;
+}
+
+.amount-cell.outgoing {
+  color: #f59e0b;
+}
+
+.pay-inv-pay-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-width: 155px;
+}
+
+/* Contracts page reference rich cells (shared by the four tab tables): the mono number
+   links (app-link through the additive hooks, plus the div-as-button chip consumer), the
+   title/description lines, the amount and dates cells, the billing sub-line with the
+   calc/paid values, the micro pills, the expiry warning, the project pill with its 8px
+   dot, the due-control tags and the invoice payment progress bar. */
+.contract-link-btn {
+  --link-font: var(--font-mono, monospace);
+  --link-font-weight: 700;
+  --link-numeric: tabular-nums;
+  --link-line-height: normal;
+  --link-white-space: nowrap;
+  --link-gap: 0.45rem;
+  --control-font-md: 1rem;
+  --link-hover-bg: var(--bg-hover, rgba(99, 102, 241, 0.12));
+  --link-hover-color: var(--text-primary, #f8fafc);
+  margin: -0.15rem -0.25rem;
+  vertical-align: baseline;
+  --control-font-md: 0.9524rem;
+}
+
+/* the invoice cell chip is a div-as-button consumer of the same class kept native: it restores
+   the full historical rule with the inherited cell font size and line-height, mono weight 700 tabular
+   numerals, accent glyph, padding offset by negative margins, nowrap and the fast transitions */
+div.contract-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary, #6366f1);
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+
+.contract-title {
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.amount-cell {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.billing-sub {
+  margin-top: 0.22rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.billing-sub .paid-val {
+  color: var(--color-success, #10b981);
+}
+
+.billing-sub .calc-val {
+  color: var(--accent-primary, #6366f1);
+}
+
+.micro-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.micro-pill.prior {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.micro-pill.zero {
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: var(--text-muted, #94a3b8);
+}
+
+.dates-cell {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.expiry-warn {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  font-family: inherit;
+}
+
+.project-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.project-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* the contracts row actions container excludes the semantic view / submit / accept /
+   reject / delete actions from the hover-border pin (the component supplies the accent,
+   success and danger palettes for those) */
+.ctr-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.ctr-actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.ctr-actions-row app-button:not([action='view']):not([action='submit']):not([action='accept']):not([action='reject']):not([action='delete']) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+.due-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.due-tag.overdue {
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.due-tag.due-soon {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.due-tag.on-track {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #334155);
+}
+
+.due-tag.paid-ok {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.inv-pay-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-width: 150px;
+}
+
+.inv-pay-bar {
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-subtle, #1a2438);
+  overflow: hidden;
+}
+
+.inv-pay-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #10b981;
+  transition: width 200ms ease;
+}
+
+.inv-pay-fill.partial {
+  background: #f59e0b;
+}
+
+.inv-pay-fill.overdue {
+  background: #ef4444;
+}
+
+.inv-pay-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.73rem;
+  color: var(--text-secondary, #94a3b8);
+  white-space: nowrap;
+}

@@ -50,6 +50,8 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../app-data-grid/app-data-grid';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import '../../common/app-data-grid-column/app-data-grid-column';
 import styles from './app-requirements.css';
 
@@ -728,134 +730,149 @@ export class AppRequirements extends LitElement {
   }
 
   private renderTable(list: ProjectRequirement[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+    const codeCell = (row: Record<string, unknown>) => {
+      const req = row as unknown as ProjectRequirement;
+      return html`
+        <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
+          ${req.code}
+        </span>
+      `;
+    };
+    const titleCell = (row: Record<string, unknown>) => {
+      const req = row as unknown as ProjectRequirement;
+      return html`
+        <div class="td-title-main">${req.title}</div>
+        <div class="td-title-sub">
+          ${req.category} · ${t.viewTexts.requirements.criteriaCount(req.acceptanceCriteria.length)}
+        </div>
+      `;
+    };
+    const projectCell = (row: Record<string, unknown>) => {
+      const req = row as unknown as ProjectRequirement;
+      const proj = store.projects.find((p) => p.id === req.projectId);
+      return html`
+        ${proj
+          ? html`
+              <span class="req-project-pill">
+                <span class="proj-dot" style="background: ${proj.color};"></span>
+                <span class="mono">${proj.key}</span>
+              </span>
+            `
+          : '—'}
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th style="width: 38px;"></th>
-              <th>${t.viewTexts.requirements.thCode}</th>
-              <th>${t.viewTexts.requirements.thRequirement}</th>
-              <th>${t.viewTexts.requirements.thProject}</th>
-              <th>${t.viewTexts.requirements.thType}</th>
-              <th>${t.viewTexts.requirements.thPriority}</th>
-              <th>${t.viewTexts.requirements.thStatus}</th>
-              <th>${t.viewTexts.requirements.thTraceability}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((req) => {
-              const isSelected = this.selectedReqIds.includes(req.id);
-              const proj = store.projects.find((p) => p.id === req.projectId);
+        <app-data-table
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          selectable
+          key-field="id"
+          .selectedKeys="${this.selectedReqIds}"
+          @selection-change="${(e: CustomEvent<{ selectedIds: string[] }>) => {
+            this.selectedReqIds = e.detail.selectedIds;
+          }}"
+          @row-click="${(e: CustomEvent<{ row: Record<string, unknown> }>) => {
+            store.openRequirementDetail((e.detail.row as unknown as ProjectRequirement).id);
+          }}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="code" label="${t.viewTexts.requirements.thCode}" .cellRender="${codeCell}"></app-table-column>
+          <app-table-column field="title" label="${t.viewTexts.requirements.thRequirement}" .cellRender="${titleCell}"></app-table-column>
+          <app-table-column field="projectId" label="${t.viewTexts.requirements.thProject}" .cellRender="${projectCell}"></app-table-column>
+          <app-table-column
+            field="type"
+            label="${t.viewTexts.requirements.thType}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <span class="req-type-tag">
+                ${(row as unknown as ProjectRequirement).type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
+              </span>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="priority"
+            label="${t.viewTexts.requirements.thPriority}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="requirementPriority"
+                status="${(row as unknown as ProjectRequirement).priority}"
+                appearance="outline"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.requirements.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="requirement"
+                status="${(row as unknown as ProjectRequirement).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="linkedKnowledgeIds"
+            label="${t.viewTexts.requirements.thTraceability}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
               const linkedTasks = this.getLinkedTasksForReq(req);
-
+              return html`${(req.linkedKnowledgeIds || []).length} / ${linkedTasks.length}`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            align="right"
+            .cellRender="${(row: Record<string, unknown>) => {
+              const req = row as unknown as ProjectRequirement;
               return html`
-                <tr @click="${() => store.openRequirementDetail(req.id)}">
-                  <td @click="${(e: Event) => e.stopPropagation()}">
-                    <app-checkbox
-                      .checked="${isSelected}"
-                      @change="${() => this.toggleSelectOne(req.id)}"
-                    ></app-checkbox>
-                  </td>
-                  <td>
-                    <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
-                      ${req.code}
-                    </span>
-                  </td>
-                  <td>
-                    <div class="td-title-main">${req.title}</div>
-                    <div class="td-title-sub">
-                      ${req.category} · ${t.viewTexts.requirements.criteriaCount(req.acceptanceCriteria.length)}
-                    </div>
-                  </td>
-                  <td>
-                    ${proj
-                      ? html`
-                          <span class="req-project-pill">
-                            <span class="proj-dot" style="background: ${proj.color};"></span>
-                            <span class="mono">${proj.key}</span>
-                          </span>
-                        `
-                      : '—'}
-                  </td>
-                  <td>
-                    <span class="req-type-tag">
-                      ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
-                    </span>
-                  </td>
-                  <td>
-                    <app-status-chip
-                      domain="requirementPriority"
-                      status="${req.priority}"
-                      appearance="outline"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td>
-                    <app-status-chip
-                      domain="requirement"
-                      status="${req.status}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  </td>
-                  <td class="mono">
-                    ${(req.linkedKnowledgeIds || []).length} / ${linkedTasks.length}
-                  </td>
-                  <td @click="${(e: Event) => e.stopPropagation()}">
-                    <div class="footer-right">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.viewTexts.requirements.decomposeSingleBtn}"
-                        .disabled="${this.decomposing}"
-                        @click="${() => this.handleDecompose([req.id])}"
-                      >
-                        <span slot="start">${iconZap(13)}</span>
-                      </app-button>
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditReqModal(req)}"
-                      >
-                        <span slot="start">${iconEdit(14)}</span>
-                      </app-button>
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingReq = req)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <div class="footer-right">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.requirements.decomposeSingleBtn}"
+                    .disabled="${this.decomposing}"
+                    @click="${() => this.handleDecompose([req.id])}"
+                  >
+                    <span slot="start">${iconZap(13)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditReqModal(req)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingReq = req)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
