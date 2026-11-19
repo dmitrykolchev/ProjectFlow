@@ -608,7 +608,15 @@ export class AppDataGrid extends LitElement {
     const t = getTranslation(this.currentLang);
     const totalCount = this.buildVirtualItems(this.getSortedRows(), t).length;
     const rowH = this.rowHeightPx;
-    const maxScrollTop = Math.max(0, totalCount * rowH - this.viewportHeight);
+    // Every tbody tr carries a 1px border-bottom under border-collapse, so the real
+    // pitch of a rendered row is rowH + 1 while spacer rows have no border. Virtual
+    // geometry must use the pitch: with plain rowH the computed scroll height is
+    // smaller than the real one, and clamping scrollTop to it makes the last rows
+    // unreachable (the shortfall grows with the row count). The rowH added to
+    // maxScrollTop approximates the sticky thead, which is not taller than a row,
+    // so the clamp never fires below the true maximum scroll.
+    const pitch = rowH + 1;
+    const maxScrollTop = Math.max(0, rowH + totalCount * pitch - this.viewportHeight);
     if (this.currentScrollTop > maxScrollTop) {
       this.currentScrollTop = maxScrollTop;
       const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
@@ -617,8 +625,8 @@ export class AppDataGrid extends LitElement {
       }
     }
     const effectiveScrollTop = Math.max(0, this.currentScrollTop - rowH);
-    const rawStart = Math.floor(effectiveScrollTop / rowH);
-    const rawEnd = Math.ceil((this.currentScrollTop + this.viewportHeight) / rowH);
+    const rawStart = Math.floor(effectiveScrollTop / pitch);
+    const rawEnd = Math.ceil((this.currentScrollTop + this.viewportHeight) / pitch);
     const nextStart = Math.max(0, Math.min(Math.max(0, totalCount - 1), rawStart - ROW_OVERSCAN));
     const nextEnd = Math.min(totalCount, Math.max(nextStart + 10, rawEnd + ROW_OVERSCAN));
 
@@ -1143,9 +1151,12 @@ export class AppDataGrid extends LitElement {
     const start = Math.min(this.visStartRow, total);
     const end = Math.min(Math.max(start, this.visEndRow), total);
     const slice = virtualItems.slice(start, end);
-    const rowH = this.rowHeightPx;
-    const topPx = start * rowH;
-    const bottomPx = Math.max(0, (total - end) * rowH);
+    // Spacer heights must match the real row pitch (row box + its 1px border-bottom),
+    // exactly as recomputeVirtualWindow counts them; otherwise the scroll range and
+    // the window indices drift apart and the tail rows never enter the window.
+    const pitch = this.rowHeightPx + 1;
+    const topPx = start * pitch;
+    const bottomPx = Math.max(0, (total - end) * pitch);
     const colSpan = activeCols.length + (this.selectable ? 1 : 0);
 
     return html`
