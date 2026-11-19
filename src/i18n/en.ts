@@ -365,6 +365,16 @@ export const en = {
     high: 'High',
     urgent: 'Urgent',
   },
+  presence: {
+    online: 'Online',
+    available: 'Available',
+    away: 'Away',
+    busy: 'Busy',
+    dnd: 'Do not disturb',
+    ooo: 'Out of office',
+    blocked: 'Blocked',
+    offline: 'Offline',
+  },
   kanban: {
     addTask: 'Add Card',
     emptyColumn: 'No tasks in this column',
@@ -669,6 +679,7 @@ export const en = {
       roleLine: (role: string) => `Role: ${role}`,
       addedTitle: 'Employee added',
       profileUpdated: 'Employee profile updated',
+      presenceUpdated: 'Presence status changed',
       updatedTitle: 'Employee updated',
       deletedActivity: 'Employee deleted',
       deletedMessage: (name: string) => `Employee "${name}" deleted`,
@@ -1504,10 +1515,26 @@ export const en = {
       designTokens: 'CSS custom properties powering the Light, Dark, Cyberpunk, Matrix, Barbie and High Contrast themes. Live values update when the theme changes.',
       materialIcons: 'Palette of every Material Symbols ligature with search by name, category and tags; <app-material-icon> snippet with copy to clipboard',
     },
+    header: {
+      langNames: {
+        ru: 'Русский',
+        en: 'English',
+      },
+      themeNames: {
+        dark: 'Dark',
+        light: 'Light',
+        cyberpunk: 'Cyberpunk',
+        matrix: 'Matrix',
+        barbie: 'Barbie',
+        'high-contrast': 'High Contrast',
+      },
+    },
     sidebar: {
       themeToggleTitle: 'Switch theme (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Change language (RU / EN)',
       profileOpenTitle: 'Open profile settings',
+      presenceHeader: 'Presence status',
+      profileMenuItem: 'Profile',
       logoutTitle: 'Sign out',
     },
     storybook: {

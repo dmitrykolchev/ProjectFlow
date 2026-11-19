@@ -42,39 +42,11 @@ app-detail-shell {
   gap: 0.3rem;
 }
 
-.link-btn {
-  --link-gap: 0.4rem;
-}
-
-.meta-link {
-  --control-font-md: 0.9rem;
-}
-
 .people-row {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
   align-items: center;
-}
-
-.user-pill-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-surface, #111827);
-  color: var(--text-primary, #f8fafc);
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.15s ease;
-}
-
-.user-pill-btn:hover {
-  border-color: var(--accent-primary, #6366f1);
 }
 
 .related-grid {

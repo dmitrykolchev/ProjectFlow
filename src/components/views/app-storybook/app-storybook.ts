@@ -67,6 +67,8 @@ import confirmDialogMeta from '../../common/app-confirm-dialog/app-confirm-dialo
 import metaGridMeta from '../../common/app-meta-grid/app-meta-grid.story';
 import progressBarMeta from '../../common/app-progress-bar/app-progress-bar.story';
 import avatarMeta from '../../common/app-avatar/app-avatar.story';
+import personaMeta from '../../common/app-persona/app-persona.story';
+import presenceIconMeta from '../../common/app-presence-icon/app-presence-icon.story';
 import moneyMeta from '../../common/app-money/app-money.story';
 import paginationMeta from '../../common/app-pagination/app-pagination.story';
 import fileDropzoneMeta from '../../common/app-file-dropzone/app-file-dropzone.story';
@@ -196,6 +198,8 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   metaGridMeta,
   progressBarMeta,
   avatarMeta,
+  personaMeta,
+  presenceIconMeta,
   moneyMeta,
   paginationMeta,
   fileDropzoneMeta,

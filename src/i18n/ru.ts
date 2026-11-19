@@ -365,6 +365,16 @@ export const ru = {
     high: 'Высокий',
     urgent: 'Срочный',
   },
+  presence: {
+    online: 'В сети',
+    available: 'Доступен',
+    away: 'Отошёл',
+    busy: 'Занят',
+    dnd: 'Не беспокоить',
+    ooo: 'Не в офисе',
+    blocked: 'Заблокирован',
+    offline: 'Не в сети',
+  },
   kanban: {
     addTask: 'Добавить карточку',
     emptyColumn: 'В этой колонке нет задач',
@@ -669,6 +679,7 @@ export const ru = {
       roleLine: (role: string) => `Должность: ${role}`,
       addedTitle: 'Сотрудник добавлен',
       profileUpdated: 'Обновлён профиль сотрудника',
+      presenceUpdated: 'Изменён статус присутствия',
       updatedTitle: 'Сотрудник обновлён',
       deletedActivity: 'Сотрудник удалён',
       deletedMessage: (name: string) => `Сотрудник "${name}" удалён`,
@@ -1504,10 +1515,26 @@ export const ru = {
       designTokens: 'CSS-переменные, определяющие темы Light, Dark, Cyberpunk, Matrix, Barbie и High Contrast. Живые значения обновляются при смене темы.',
       materialIcons: 'Палитра всех лигатур Material Symbols с поиском по имени, категории и тегам; сниппет <app-material-icon> с копированием в буфер',
     },
+    header: {
+      langNames: {
+        ru: 'Русский',
+        en: 'English',
+      },
+      themeNames: {
+        dark: 'Тёмная',
+        light: 'Светлая',
+        cyberpunk: 'Киберпанк',
+        matrix: 'Матрица',
+        barbie: 'Барби',
+        'high-contrast': 'Контраст',
+      },
+    },
     sidebar: {
       themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
       langToggleTitle: 'Сменить язык (RU / EN)',
       profileOpenTitle: 'Открыть настройки профиля',
+      presenceHeader: 'Статус присутствия',
+      profileMenuItem: 'Профиль',
       logoutTitle: 'Выйти из системы',
     },
     storybook: {

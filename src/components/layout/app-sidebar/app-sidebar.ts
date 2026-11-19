@@ -1,21 +1,20 @@
 import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
-import { SidebarGroupMode } from '../../../types';
+import { SidebarGroupMode, PresenceStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { effectivePresence, presenceLabel } from '../../../domain/presence-tokens';
+import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
+import { MenuItem } from '../../common/app-menu/app-menu';
+import '../../common/app-presence-icon/app-presence-icon';
 import { mapProjectOptions } from '../../common/entity-selector-options';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
+import '../../common/app-menu/app-menu';
 import '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-sidebar.css';
 import {
-  iconMoon,
-  iconSun,
   iconChevronLeft,
   iconChevronRight,
-  iconContrast,
-  iconHeart,
-  iconTerminal,
-  iconZap,
   iconLogOut,
 } from '../../common/icons';
 import { SidebarItem } from '../sidebar-item/sidebar-item';
@@ -30,7 +29,6 @@ export class AppSidebar extends LitElement {
   @property({ type: String, attribute: 'group-mode' }) groupMode: SidebarGroupMode = store.customization.sidebarGroupMode;
   @property({ type: Boolean }) standalone: boolean = false;
 
-  @state() private theme = store.customization.theme;
   @state() private currentLang = store.customization.language;
   @state() private selectedProjectId = store.selectedProjectId;
   @state() private expandedGroups: string[] = [...store.customization.sidebarExpandedGroups];
@@ -51,10 +49,98 @@ export class AppSidebar extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     if (this.unsubscribe) this.unsubscribe();
+    this.closePresenceMenu();
+  }
+
+  private portalHandle: PortalHandle | null = null;
+
+  private closePresenceMenu() {
+    if (this.portalHandle) {
+      this.portalHandle.close();
+      this.portalHandle = null;
+    }
+  }
+
+  /** The footer persona opens its menu: manual presence selection + the profile entry. */
+  private openPresenceMenu() {
+    if (this.portalHandle) {
+      this.closePresenceMenu();
+      return;
+    }
+    const t = getTranslation(this.currentLang);
+    const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
+    if (!currentUser) return;
+    const anchor = this.shadowRoot?.querySelector('.user-persona') as HTMLElement | null;
+    if (!anchor) return;
+
+    const current = effectivePresence(currentUser);
+    const options: PresenceStatus[] = ['available', 'online', 'away', 'busy', 'ooo', 'offline'];
+    const items: MenuItem[] = [
+      { id: 'presence-header', header: t.viewTexts.sidebar.presenceHeader },
+      ...options.map((p) => ({
+        id: `presence-${p}`,
+        label: presenceLabel(p, this.currentLang, t),
+        checked: p === current,
+        // The icon renders inside app-menu's shadow root as a slotted element; it owns
+        // its styles, so no inline geometry is needed (12px dot, explicit 8px glyph).
+        // aria-hidden: the row text already carries the label, the icon is decoration.
+        icon: html`<app-presence-icon
+          size="12"
+          glyph="8"
+          presence="${p}"
+          aria-hidden="true"
+        ></app-presence-icon>`,
+      })),
+      { id: 'profile-divider', divider: true },
+      { id: 'profile', label: t.viewTexts.sidebar.profileMenuItem },
+    ];
+
+    const rect = anchor.getBoundingClientRect();
+    const minW = Math.max(200, Math.round(rect.width));
+    const left = Math.max(8, Math.min(Math.round(rect.left), window.innerWidth - minW - 8));
+    const spaceAbove = rect.top - 12;
+    const spaceBelow = window.innerHeight - rect.bottom - 12;
+    const above = spaceAbove >= spaceBelow;
+    const vert = above
+      ? `bottom: ${Math.round(window.innerHeight - rect.top + 6)}px; top: auto;`
+      : `top: ${Math.round(rect.bottom + 6)}px; bottom: auto;`;
+    const maxH = Math.max(100, Math.min(320, above ? spaceAbove : spaceBelow));
+
+    this.portalHandle = portalManager.mountTemplate({
+      kind: 'popup',
+      styles,
+      template: html`
+        <div
+          class="popover-menu"
+          style="left: ${left}px; right: auto; ${vert} min-width: ${minW}px; max-height: ${maxH}px;"
+        >
+          <app-menu .items="${items}" @select="${this.handlePresenceMenuSelect}"></app-menu>
+        </div>
+      `,
+      host: this,
+      closeOnBackdrop: true,
+      onClose: () => {
+        // The portal fires this on backdrop click and Escape; the layer stays mounted
+        // until close() is called, so close through the handle, not just the reference.
+        this.closePresenceMenu();
+      },
+    });
+  }
+
+  private handlePresenceMenuSelect(e: CustomEvent) {
+    e.stopPropagation();
+    const id = String((e.detail as { id?: string })?.id || '');
+    this.closePresenceMenu();
+    if (id === 'profile') {
+      store.setActiveView('profile-settings');
+      return;
+    }
+    if (id.startsWith('presence-')) {
+      store.setUserPresence(store.currentUserId, id.slice('presence-'.length) as PresenceStatus);
+    }
   }
 
   private syncState() {
-    this.theme = store.customization.theme;
     this.currentLang = store.customization.language;
     this.selectedProjectId = store.selectedProjectId;
     if (!this.standalone) {
@@ -208,64 +294,22 @@ export class AppSidebar extends LitElement {
         </nav>
 
         <div class="sidebar-footer">
-          <div class="quick-controls">
-            <button
-              class="quick-btn"
-              @click="${() => store.toggleTheme()}"
-              title="${t.viewTexts.sidebar.themeToggleTitle}"
-            >
-              ${this.theme === 'high-contrast'
-                ? iconContrast(14)
-                : this.theme === 'barbie'
-                ? iconHeart(14)
-                : this.theme === 'matrix'
-                ? iconTerminal(14)
-                : this.theme === 'cyberpunk'
-                ? iconZap(14)
-                : this.theme === 'dark'
-                ? iconSun(14)
-                : iconMoon(14)}
-              ${!this.collapsed
-                ? html`<span>${this.theme === 'high-contrast'
-                    ? 'AAA'
-                    : this.theme === 'barbie'
-                    ? 'Barbie'
-                    : this.theme === 'matrix'
-                    ? 'Matrix'
-                    : this.theme === 'cyberpunk'
-                    ? 'Cyber'
-                    : this.theme === 'dark'
-                    ? 'Dark'
-                    : 'Light'}</span>`
-                : ''}
-            </button>
-            <button
-              class="quick-btn"
-              @click="${() =>
-                store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
-              title="${t.viewTexts.sidebar.langToggleTitle}"
-            >
-              ${!this.collapsed ? html`<span>${this.currentLang.toUpperCase()}</span>` : html`<span>${this.currentLang.toUpperCase()}</span>`}
-            </button>
-          </div>
-
           ${(() => {
             const currentUser = store.users.find((u) => u.id === store.currentUserId) || store.users[0];
             if (!currentUser) return '';
             return !this.collapsed
               ? html`
                   <div class="user-footer-row">
-                    <div
-                      class="user-profile is-clickable"
-                      title="${t.viewTexts.sidebar.profileOpenTitle}"
-                      @click="${() => store.setActiveView('profile-settings')}"
-                    >
-                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
-                      <div class="user-info">
-                        <span class="user-name">${currentUser.name}</span>
-                        <span class="user-role">${currentUser.role}</span>
-                      </div>
-                    </div>
+                    <app-persona
+                      class="user-persona"
+                      size="32"
+                      .initials="${currentUser.avatar}"
+                      .presence="${effectivePresence(currentUser)}"
+                      .primaryText="${currentUser.name}"
+                      .secondaryText="${currentUser.role}"
+                      .color="${'var(--bg-hover, #223049)'}"
+                      @click="${() => this.openPresenceMenu()}"
+                    ></app-persona>
                     <button
                       type="button"
                       class="logout-btn"
@@ -282,14 +326,14 @@ export class AppSidebar extends LitElement {
                 `
               : html`
                   <div class="user-footer-collapsed">
-                    <div
-                      class="user-profile is-clickable"
-                      style="justify-content: center;"
-                      title="${t.viewTexts.sidebar.profileOpenTitle}"
-                      @click="${() => store.setActiveView('profile-settings')}"
-                    >
-                      <app-avatar size="md" initials="${currentUser.avatar}" title="${currentUser.name}" color="var(--bg-hover, #223049)"></app-avatar>
-                    </div>
+                    <app-persona
+                      class="user-persona"
+                      size="32"
+                      .initials="${currentUser.avatar}"
+                      .presence="${effectivePresence(currentUser)}"
+                      .color="${'var(--bg-hover, #223049)'}"
+                      @click="${() => this.openPresenceMenu()}"
+                    ></app-persona>
                     <button
                       type="button"
                       class="logout-btn"

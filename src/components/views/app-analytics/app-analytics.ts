@@ -3,7 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import '../../common/app-avatar/app-avatar';
+import { effectivePresence } from '../../../domain/presence-tokens';
+import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-analytics.css';
 
@@ -160,10 +161,13 @@ export class AppAnalytics extends LitElement {
               return html`
                 <tr>
                   <td>
-                    <div class="member-cell">
-                      <app-avatar size="sm" initials="${user.avatar}" title="${user.name}"></app-avatar>
-                      <span>${user.name}</span>
-                    </div>
+                    <app-persona
+                      size="32"
+                      .initials="${user.avatar}"
+                      .presence="${effectivePresence(user)}"
+                      .primaryText="${user.name}"
+                      @click="${() => store.openEmployeeDetail(user.id)}"
+                    ></app-persona>
                   </td>
                   <td><span style="color: var(--text-muted, #64748b);">${user.role}</span></td>
                   <td><strong class="tabular-nums">${userTasks.length}</strong></td>

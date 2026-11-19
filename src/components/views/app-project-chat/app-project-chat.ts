@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   Project,
   ProjectChatChannel,
@@ -37,21 +38,11 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-select/app-select';
 import '../../common/app-modal/app-modal';
 import '../../common/app-empty-state/app-empty-state';
+import '../../common/app-persona/app-persona';
 import styles from './app-project-chat.css';
 import { eventValue } from '../../common/event-value';
 
 const QUICK_REACTIONS = ['👍', '✅', '🔥', '👏', '👀'];
-
-const ROLE_COLORS: Record<ProjectRole, string> = {
-  pm: '#f59e0b',
-  tech_lead: '#8b5cf6',
-  architect: '#ec4899',
-  developer: '#6366f1',
-  designer: '#06b6d4',
-  qa: '#10b981',
-  analyst: '#3b82f6',
-  devops: '#f97316',
-};
 
 @customElement('app-project-chat')
 export class AppProjectChat extends LitElement {
@@ -325,11 +316,6 @@ export class AppProjectChat extends LitElement {
     const membership = (project.members || []).find((m) => m.userId === userId);
     if (!membership) return null;
     return t.projectRoles[membership.role];
-  }
-
-  private getMemberRoleColor(project: Project, userId: string): string {
-    const membership = (project.members || []).find((m) => m.userId === userId);
-    return membership ? ROLE_COLORS[membership.role] : '#64748b';
   }
 
   render() {
@@ -1085,25 +1071,20 @@ export class AppProjectChat extends LitElement {
                         <app-empty-state compact title="${t.viewTexts.projectChat.emptyNoMembers}"></app-empty-state>
                       `
                     : participantList.map((entry) => {
-                        const statusClass = entry.user.status || 'active';
                         const rolesText = entry.roles.map((r) => t.projectRoles[r]).join(', ');
                         return html`
-                          <button
-                            type="button"
-                            class="member-item"
-                            title="${t.employeeDetail.openEmployee}"
-                            @click="${() => store.openEmployeeDetail(entry.user.id)}"
-                          >
-                            <div class="member-avatar-wrap">
-                              <div class="member-avatar">${entry.user.avatar}</div>
-                              <span class="status-dot ${statusClass}"></span>
-                            </div>
-                            <div class="member-meta">
-                              <span class="member-name">${entry.user.name}</span>
-                              <span class="member-role">${rolesText}</span>
-                            </div>
+                          <div class="member-item">
+                            <app-persona
+                              class="member-persona"
+                              size="32"
+                              .initials="${entry.user.avatar}"
+                              .presence="${effectivePresence(entry.user)}"
+                              .primaryText="${entry.user.name}"
+                              .secondaryText="${rolesText}"
+                              @click="${() => store.openEmployeeDetail(entry.user.id)}"
+                            ></app-persona>
                             <span class="member-alloc">${entry.allocation}%</span>
-                          </button>
+                          </div>
                         `;
                       })}
                 </div>
@@ -1274,7 +1255,6 @@ export class AppProjectChat extends LitElement {
   ) {
     const sender = this.users.find((u) => u.id === msg.senderId);
     const roleLabel = this.getMemberRoleLabel(activeProject, msg.senderId);
-    const roleColor = this.getMemberRoleColor(activeProject, msg.senderId);
     const replyParent = msg.replyToId
       ? channelMessages.find((m) => m.id === msg.replyToId) || null
       : null;
@@ -1289,32 +1269,19 @@ export class AppProjectChat extends LitElement {
 
     return html`
       <article class="msg-row ${msg.pinned ? 'is-pinned' : ''}">
-        <button
-          type="button"
-          class="msg-avatar"
-          title="${sender?.name || ''}"
+        <app-persona
+          class="msg-author"
+          size="40"
+          .initials="${sender?.avatar || '?'}"
+          .presence="${sender ? effectivePresence(sender) : 'none'}"
+          .primaryText="${sender?.name || msg.senderId}"
+          .secondaryText="${roleLabel || ''}"
           @click="${() => sender && store.openEmployeeDetail(sender.id)}"
-        >
-          ${sender?.avatar || '?'}
-        </button>
+        ></app-persona>
 
         <div class="msg-content">
           <div class="msg-meta-bar">
             <div class="msg-author-group">
-              <button
-                type="button"
-                class="author-btn"
-                @click="${() => sender && store.openEmployeeDetail(sender.id)}"
-              >
-                ${sender?.name || msg.senderId}
-              </button>
-              ${roleLabel
-                ? html`
-                    <span class="role-tag" style="border-left: 2px solid ${roleColor};">
-                      ${roleLabel}
-                    </span>
-                  `
-                : ''}
               <span class="msg-time">${this.formatMessageTime(msg.createdAt)}</span>
               ${msg.editedAt ? html`<span class="edited-mark">(${t.projectChat.edited})</span>` : ''}
               ${msg.pinned

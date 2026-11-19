@@ -42,59 +42,9 @@
 
 .card-head {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
-}
-
-.person-box {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.person-info {
-  min-width: 0;
-}
-
-.person-name {
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* card name-links are app-link web components at size md restoring the inherited text-primary
-   glyph and the parent weight through the additive link hooks of zero padding, weight 700, the
-   inherited unitless line-height 1.5, nowrap with hidden ellipsis, and the card font size pinned
-   through control-font-md; the accent hover color is restored through link-hover-color with the
-   canonical underline */
-.person-link-btn {
-  --link-padding: 0;
-  --link-font-weight: 700;
-  --link-line-height: 1.5;
-  --link-color: var(--text-primary, #f8fafc);
-  --link-hover-color: var(--accent-primary, #6366f1);
-  --link-white-space: nowrap;
-  --link-overflow: hidden;
-  --link-text-overflow: ellipsis;
-  --control-font-md: 0.98rem;
-}
-
-/* the table cell link inherits the smaller inline font size of its block */
-.table-link {
-  --control-font-md: 0.85rem;
-}
-
-.person-role {
-  font-size: 0.78rem;
-  color: var(--text-secondary, #94a3b8);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .details-list {

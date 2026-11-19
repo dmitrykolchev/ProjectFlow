@@ -7,6 +7,7 @@ import {
   recurrenceToRRule,
   serializeRRule,
 } from '../../../domain/rfc5545';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import {
   Reminder,
   ReminderEntityType,
@@ -35,15 +36,14 @@ import {
   iconRepeat,
   iconTrash,
 } from '../../common/icons';
-import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
+import '../../common/app-persona/app-persona';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-dropdown-button/app-dropdown-button';
 import '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
-import '../../common/app-link/app-link';
 import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-reminder-form/app-reminder-form';
 import '../../common/app-section-card/app-section-card';
@@ -493,15 +493,14 @@ export class AppReminderDetail extends LitElement {
           <span class="meta-label">${t.reminders.fieldOwner}</span>
           ${owner
             ? html`
-                <app-link
-                  class="link-btn meta-link"
-                  size="md"
-                  variant="primary"
+                <app-persona
+                  size="24"
+                  .initials="${owner.avatar}"
+                  .presence="${effectivePresence(owner)}"
+                  .primaryText="${owner.name}"
+                  .secondaryText="${owner.role}"
                   @click="${() => store.openEmployeeDetail(owner.id)}"
-                >
-                  <span slot="start"><app-avatar name="${owner.name}" size="xs"></app-avatar></span>
-                  <span>${owner.name}</span>
-                </app-link>
+                ></app-persona>
               `
             : html`<span class="meta-val">—</span>`}
         </div>
@@ -513,14 +512,14 @@ export class AppReminderDetail extends LitElement {
               ? html`<span class="meta-val">—</span>`
               : assignees.map(
                   (u) => html`
-                    <button
-                      type="button"
-                      class="user-pill-btn"
+                    <app-persona
+                      size="24"
+                      .initials="${u.avatar}"
+                      .presence="${effectivePresence(u)}"
+                      .primaryText="${u.name}"
+                      .secondaryText="${u.role}"
                       @click="${() => store.openEmployeeDetail(u.id)}"
-                    >
-                      <app-avatar name="${u.name}" size="xs"></app-avatar>
-                      <span>${u.name}</span>
-                    </button>
+                    ></app-persona>
                   `
                 )}
           </div>

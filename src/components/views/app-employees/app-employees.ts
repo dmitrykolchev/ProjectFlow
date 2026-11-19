@@ -3,13 +3,13 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
 import { getTranslation } from '../../../i18n';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import { iconChevronRight, iconEdit, iconPlus, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-employee-form/app-employee-form';
@@ -17,7 +17,7 @@ import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
-import '../../common/app-avatar/app-avatar';
+import '../../common/app-persona/app-persona';
 import '../../common/app-pagination/app-pagination';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-employees.css';
@@ -224,22 +224,14 @@ export class AppEmployees extends LitElement {
           return html`
             <article class="employee-card">
               <div class="card-head">
-                <div class="person-box">
-                  <app-avatar size="md" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
-                  <div class="person-info">
-                    <div class="person-name">
-                      <app-link
-                        class="person-link-btn"
-                        size="md"
-                        variant="primary"
-                        @click="${() => store.openEmployeeDetail(emp.id)}"
-                      >
-                        ${emp.name}
-                      </app-link>
-                    </div>
-                    <div class="person-role">${emp.role}</div>
-                  </div>
-                </div>
+                <app-persona
+                  size="48"
+                  .initials="${emp.avatar}"
+                  .presence="${effectivePresence(emp)}"
+                  .primaryText="${emp.name}"
+                  .secondaryText="${emp.role}"
+                  @click="${() => store.openEmployeeDetail(emp.id)}"
+                ></app-persona>
                 <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
               </div>
 
@@ -352,22 +344,14 @@ export class AppEmployees extends LitElement {
               return html`
                 <tr>
                   <td>
-                    <div class="person-box">
-                      <app-avatar size="sm" initials="${emp.avatar}" title="${emp.name}" style="cursor: pointer;" @click="${() => store.openEmployeeDetail(emp.id)}"></app-avatar>
-                      <div class="person-info">
-                        <div class="person-name" style="font-size: 0.85rem;">
-                          <app-link
-                            class="person-link-btn table-link"
-                            size="md"
-                            variant="primary"
-                            @click="${() => store.openEmployeeDetail(emp.id)}"
-                          >
-                            ${emp.name}
-                          </app-link>
-                        </div>
-                        <div class="person-role">${emp.role}</div>
-                      </div>
-                    </div>
+                    <app-persona
+                      size="32"
+                      .initials="${emp.avatar}"
+                      .presence="${effectivePresence(emp)}"
+                      .primaryText="${emp.name}"
+                      .secondaryText="${emp.role}"
+                      @click="${() => store.openEmployeeDetail(emp.id)}"
+                    ></app-persona>
                   </td>
                   <td>${emp.department || '—'}</td>
                   <td>${company?.name || '—'}</td>

@@ -76,6 +76,7 @@ export { AppFormGrid } from './app-form-grid/app-form-grid';
 export { AppConfirmDialog } from './app-confirm-dialog/app-confirm-dialog';
 export { AppProgressBar, type ProgressSegment } from './app-progress-bar/app-progress-bar';
 export { AppAvatar } from './app-avatar/app-avatar';
+export { AppPersona } from './app-persona/app-persona';
 export { AppMoney, formatMoney, formatMoneyShort } from './app-money/app-money';
 export { AppPagination } from './app-pagination/app-pagination';
 export type { PaginationVariant } from './app-pagination/app-pagination';
@@ -152,6 +153,7 @@ import { AppFormGrid } from './app-form-grid/app-form-grid';
 import { AppConfirmDialog } from './app-confirm-dialog/app-confirm-dialog';
 import { AppProgressBar } from './app-progress-bar/app-progress-bar';
 import { AppAvatar } from './app-avatar/app-avatar';
+import { AppPersona } from './app-persona/app-persona';
 import { AppMoney } from './app-money/app-money';
 import { AppPagination } from './app-pagination/app-pagination';
 import { AppFileDropzone } from './app-file-dropzone/app-file-dropzone';
@@ -207,6 +209,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-confirm-dialog': AppConfirmDialog,
   'app-progress-bar': AppProgressBar,
   'app-avatar': AppAvatar,
+  'app-persona': AppPersona,
   'app-money': AppMoney,
   'app-pagination': AppPagination,
   'app-file-dropzone': AppFileDropzone,

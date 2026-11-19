@@ -1,0 +1,15 @@
+:host {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* The dot carries its size as an inline style (the size is a property, not a preset),
+   so the sheet only owns the shape and the glyph color. */
+.dot {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+}

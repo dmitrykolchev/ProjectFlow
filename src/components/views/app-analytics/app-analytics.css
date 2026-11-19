@@ -101,9 +101,3 @@
   border-bottom: 1px solid var(--border-subtle, #1e293b);
 }
 
-.member-cell {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-

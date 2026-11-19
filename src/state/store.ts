@@ -28,6 +28,7 @@ import {
   KnowledgeScope,
   NotificationItem,
   PaymentDirection,
+  PresenceStatus,
   Project,
   ProjectChatChannel,
   ProjectChatMessage,
@@ -2172,6 +2173,18 @@ export class AppStore {
     this.addNotification('success', this.texts().employees.addedTitle, employee.name);
     this.notify();
     return employee;
+  }
+
+  /** Manual presence choice (the sidebar footer menu): writes the PresenceStatus
+     directly on the user; EmployeeStatus is untouched. Every persona in the app shows
+     the chosen presence — for the surroundings the user is exactly in that status. */
+  public setUserPresence(userId: string, presence: PresenceStatus): void {
+    const target = this.users.find((u) => u.id === userId);
+    if (!target || target.presence === presence) return;
+    this.users = this.users.map((u) => (u.id === userId ? { ...u, presence } : u));
+    this.saveEmployees();
+    this.logActivity('update', 'employee', target.name, this.texts().employees.presenceUpdated);
+    this.notify();
   }
 
   public updateEmployee(updated: User): void {

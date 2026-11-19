@@ -3,6 +3,10 @@ export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export type EmployeeStatus = 'active' | 'remote' | 'vacation' | 'onboarding';
 
+/** Presence is a separate status (not an EmployeeStatus): the manual choice of the
+   user, carried by `User.presence` and shown as the persona badge. */
+export type PresenceStatus = 'available' | 'online' | 'away' | 'busy' | 'dnd' | 'ooo' | 'offline';
+
 export interface User {
   id: string;
   name: string;
@@ -14,6 +18,9 @@ export interface User {
   phone?: string;
   location?: string;
   status?: EmployeeStatus;
+  /** Manual presence (the sidebar footer menu writes it); shown as the persona badge,
+     independent from the employee status. */
+  presence?: PresenceStatus;
   hireDate?: string;
   hourlyRate?: number;
 }

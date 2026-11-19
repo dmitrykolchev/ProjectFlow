@@ -106,10 +106,12 @@
   flex-shrink: 0;
 }
 
+/* The persona's presence badge occupies the bottom-right corner of the avatar box,
+   so the entity emblem sits at the top-right corner of the same box. */
 .avatar-entity-badge {
   position: absolute;
   right: -4px;
-  bottom: -4px;
+  top: -4px;
   border-radius: var(--radius-sm, 7px);
   background: var(--bg-surface, #111827);
   box-shadow: 0 0 0 2px var(--bg-surface, #111827);
