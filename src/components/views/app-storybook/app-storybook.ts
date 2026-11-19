@@ -95,6 +95,7 @@ import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
 import sidebarGroupMeta from '../../layout/sidebar-group/sidebar-group.story';
 import sidebarItemMeta from '../../layout/sidebar-item/sidebar-item.story';
 import pageHeaderMeta from '../../common/app-page-header/app-page-header.story';
+import detailShellMeta from '../../common/app-detail-shell/app-detail-shell.story';
 
 import metricCardMeta from '../../dashboard/app-metric-card/app-metric-card.story';
 import chartCardMeta from '../../dashboard/app-chart-card/app-chart-card.story';
@@ -224,6 +225,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   sidebarGroupMeta,
   sidebarItemMeta,
   pageHeaderMeta,
+  detailShellMeta,
   metricCardMeta,
   chartCardMeta,
   projectProgressMeta,

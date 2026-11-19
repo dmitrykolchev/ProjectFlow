@@ -74,13 +74,15 @@
   flex-wrap: wrap;
 }
 
-.nav-actions app-button {
+/* Slotted nav buttons live in the host view's shadow tree, so a descendant rule
+   inside the shell cannot reach them — style them through ::slotted() instead. */
+.nav-actions ::slotted(app-button) {
   --control-height-xs: 34px;
   --icon-btn-bg: var(--bg-surface, #111827);
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
 
-.nav-actions app-button:not([action='delete']) {
+.nav-actions ::slotted(app-button:not([action='delete'])) {
   --icon-btn-hover-border: var(--border-subtle, #1e293b);
 }
 

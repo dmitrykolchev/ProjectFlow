@@ -29,10 +29,13 @@ import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
+import {
+  DetailSwitchDetail,
+} from '../../common/app-detail-shell/app-detail-shell';
+import '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-entity-reminders/app-entity-reminders';
-import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-expense-form/app-expense-form';
 import '../../common/app-link/app-link';
 import '../../common/app-project-attachments/app-project-attachments';
@@ -188,299 +191,280 @@ export class AppExpenseDetail extends LitElement {
     });
 
     return html`
-      <div class="page-shell">
-        <div class="top-nav-bar">
-          <div class="nav-left">
-            <app-button
-              variant="outline"
-              size="sm"
-              @click="${() => store.setActiveView('expenses')}"
-            >
-              <span slot="icon-start">${iconChevronLeft(15)}</span>
-              <span>${t.viewTexts.expenseDetail.backToList}</span>
-            </app-button>
-
-            <div class="expense-switcher">
-              <app-entity-selector
+      <app-detail-shell
+        entity="expense"
+        backLabel="${t.viewTexts.expenseDetail.backToList}"
+        switcherPlaceholder="${t.viewTexts.expenseDetail.switcherPlaceholder}"
+        .switcherOptions="${switcherOptions}"
+        switcherValue="${expense.id}"
+        @detail-back="${() => store.setActiveView('expenses')}"
+        @entity-switch="${(e: CustomEvent<DetailSwitchDetail>) => {
+          const nextId = e.detail.value;
+          if (nextId && nextId !== expense.id) {
+            store.openExpenseDetail(nextId);
+          }
+        }}"
+      >
+        ${project
+          ? html`
+              <app-button
+                slot="nav-actions"
                 size="sm"
-                placeholder="${t.viewTexts.expenseDetail.switcherPlaceholder}"
-                .options="${switcherOptions}"
-                .value="${expense.id}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextId = eventValue(e);
-                  if (nextId && nextId !== expense.id) {
-                    store.openExpenseDetail(nextId);
-                  }
-                }}"
-              ></app-entity-selector>
-            </div>
-          </div>
+                variant="outline"
+                @click="${() => store.openProjectDetail(project.id)}"
+              >
+                <span slot="icon-start">${iconFolder(14)}</span>
+                <span>${t.viewTexts.expenseDetail.openProjectBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-          <div class="nav-actions">
-            ${project
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openProjectDetail(project.id)}"
-                  >
-                    <span slot="icon-start">${iconFolder(14)}</span>
-                    <span>${t.viewTexts.expenseDetail.openProjectBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${task
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="outline"
+                @click="${() => store.openTaskDetail(task.id)}"
+              >
+                <span slot="icon-start">${iconFileText(14)}</span>
+                <span>${t.viewTexts.expenseDetail.openTaskBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${task
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openTaskDetail(task.id)}"
-                  >
-                    <span slot="icon-start">${iconFileText(14)}</span>
-                    <span>${t.viewTexts.expenseDetail.openTaskBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${expense.status === 'pending' || expense.status === 'draft'
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="ghost"
+                @click="${() => store.updateExpense({ ...expense, status: 'rejected' })}"
+              >
+                <span slot="icon-start">${iconX(14)}</span>
+                <span>${t.viewTexts.expenseDetail.rejectBtn}</span>
+              </app-button>
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="primary"
+                @click="${() => store.updateExpense({ ...expense, status: 'approved' })}"
+              >
+                <span slot="icon-start">${iconCheck(14)}</span>
+                <span>${t.viewTexts.expenseDetail.approveBtn}</span>
+              </app-button>
+            `
+          : expense.status === 'approved'
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="primary"
+                @click="${() => store.updateExpense({ ...expense, status: 'reimbursed' })}"
+              >
+                <span slot="icon-start">${iconWallet(14)}</span>
+                <span>${t.viewTexts.expenseDetail.reimburseBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${expense.status === 'pending' || expense.status === 'draft'
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="ghost"
-                    @click="${() => store.updateExpense({ ...expense, status: 'rejected' })}"
-                  >
-                    <span slot="icon-start">${iconX(14)}</span>
-                    <span>${t.viewTexts.expenseDetail.rejectBtn}</span>
-                  </app-button>
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.updateExpense({ ...expense, status: 'approved' })}"
-                  >
-                    <span slot="icon-start">${iconCheck(14)}</span>
-                    <span>${t.viewTexts.expenseDetail.approveBtn}</span>
-                  </app-button>
-                `
-              : expense.status === 'approved'
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.updateExpense({ ...expense, status: 'reimbursed' })}"
-                  >
-                    <span slot="icon-start">${iconWallet(14)}</span>
-                    <span>${t.viewTexts.expenseDetail.reimburseBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        <app-button
+          slot="nav-actions"
+          size="sm"
+          variant="secondary"
+          @click="${() => (this.editModalOpen = true)}"
+        >
+          <span slot="icon-start">${iconEdit(14)}</span>
+          <span>${t.common.edit}</span>
+        </app-button>
 
-            <app-button
-              size="sm"
-              variant="secondary"
-              @click="${() => (this.editModalOpen = true)}"
-            >
-              <span slot="icon-start">${iconEdit(14)}</span>
-              <span>${t.common.edit}</span>
-            </app-button>
+        <app-button
+          slot="nav-actions"
+          action="delete"
+          size="xs"
+          variant="icon"
+          title="${t.common.delete}"
+          @click="${() => (this.confirmDeleteOpen = true)}"
+        >
+          <span slot="start">${iconTrash(15)}</span>
+        </app-button>
 
-            <app-button
-              action="delete"
-              size="xs"
-              variant="icon"
-              title="${t.common.delete}"
-              @click="${() => (this.confirmDeleteOpen = true)}"
-            >
-              <span slot="start">${iconTrash(15)}</span>
-            </app-button>
-          </div>
+        <app-entity-emblem
+          slot="hero-meta"
+          entity="expense"
+          variant="pill"
+          size="sm"
+        ></app-entity-emblem>
+        <span slot="hero-meta" class="mono">${expense.date}</span>
+        <span slot="hero-meta" aria-hidden="true">·</span>
+        <span slot="hero-meta">${t.expenses.categories[expense.category]}</span>
+        ${project
+          ? html`
+              <span slot="hero-meta" aria-hidden="true">·</span>
+              <app-link
+                slot="hero-meta"
+                class="link-btn hdr-link"
+                size="md"
+                variant="primary"
+                @click="${() => store.openProjectDetail(project.id)}"
+              >
+                <span class="mono">${project.key}</span>
+              </app-link>
+            `
+          : ''}
+
+        <h1 slot="title" class="expense-title">${expense.title}</h1>
+        <app-status-chip
+          slot="title"
+          domain="expense"
+          status="${expense.status}"
+          appearance="soft"
+          size="md"
+        ></app-status-chip>
+        <app-badge
+          slot="title"
+          variant="${expense.billable ? 'info' : 'default'}"
+          appearance="soft"
+          size="sm"
+        >
+          ${expense.billable
+            ? t.viewTexts.expenseDetail.kpiBillableTrue
+            : t.viewTexts.expenseDetail.kpiBillableFalse}
+        </app-badge>
+
+        <div slot="hero-sub" class="expense-sub">
+          ${expense.vendor ? html`<span>${expense.vendor}</span>` : ''}
+          ${expense.vendor && user ? html`<span aria-hidden="true">·</span>` : ''}
+          ${user
+            ? html`
+                <span class="user-inline">
+                  <app-avatar name="${user.name}" size="xs"></app-avatar>
+                  <span>${user.name}</span>
+                </span>
+              `
+            : ''}
         </div>
 
-        <section class="overview-card">
-          <div class="hero-top">
-            <div class="hero-identity">
-              <app-entity-emblem entity="expense" size="lg"></app-entity-emblem>
-              <div class="title-block">
-                <div class="hero-meta-row">
-                  <app-entity-emblem entity="expense" variant="pill" size="sm"></app-entity-emblem>
-                  <span class="mono">${expense.date}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>${t.expenses.categories[expense.category]}</span>
-                  ${project
-                    ? html`
-                        <span aria-hidden="true">·</span>
-                        <app-link
-                          class="link-btn hdr-link"
-                          size="md"
-                          variant="primary"
-                          @click="${() => store.openProjectDetail(project.id)}"
-                        >
-                          <span class="mono">${project.key}</span>
-                        </app-link>
-                      `
-                    : ''}
-                </div>
+        <div slot="hero-side" class="status-control-box">
+          <app-select
+            size="sm"
+            label="${t.viewTexts.expenseDetail.changeStatusLabel}"
+            .value="${expense.status}"
+            .options="${statusOptions}"
+            @change="${(e: CustomEvent<{ value: string }>) => {
+              const nextStatus = eventValue(e) as ExpenseStatus;
+              if (nextStatus && nextStatus !== expense.status) {
+                store.updateExpense({ ...expense, status: nextStatus });
+              }
+            }}"
+          ></app-select>
+        </div>
 
-                <div class="title-row">
-                  <h1 class="expense-title">${expense.title}</h1>
-                  <app-status-chip
-                    domain="expense"
-                    status="${expense.status}"
-                    appearance="soft"
-                    size="md"
-                  ></app-status-chip>
-                  <app-badge
-                    variant="${expense.billable ? 'info' : 'default'}"
-                    appearance="soft"
-                    size="sm"
-                  >
-                    ${expense.billable
-                      ? t.viewTexts.expenseDetail.kpiBillableTrue
-                      : t.viewTexts.expenseDetail.kpiBillableFalse}
-                  </app-badge>
-                </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.expenseDetail.kpiAmount}</span>
+          <span class="kpi-val accent">${formatMoney(expense.amount, expense.currency)}</span>
+          <span class="kpi-hint">${expense.currency} · ${expense.date}</span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.expenseDetail.kpiRubEquivalent}</span>
+          <span class="kpi-val success">${formatMoney(rubAmount, 'RUB')}</span>
+          <span class="kpi-hint">${t.expenses.categories[expense.category]}</span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.expenseDetail.kpiRebilling}</span>
+          <span class="kpi-val">
+            ${expense.billable
+              ? t.viewTexts.expenseDetail.kpiBillableTrue
+              : t.viewTexts.expenseDetail.kpiBillableFalse}
+          </span>
+          <span class="kpi-hint">
+            ${expense.billable
+              ? t.viewTexts.expenseDetail.kpiBillableTrueHint
+              : t.viewTexts.expenseDetail.kpiBillableFalseHint}
+          </span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.expenseDetail.kpiAttachments}</span>
+          <span class="kpi-val">${docIds.length}</span>
+          <span class="kpi-hint">${t.viewTexts.expenseDetail.kpiFilesHint}</span>
+        </div>
 
-                <div class="expense-sub">
-                  ${expense.vendor ? html`<span>${expense.vendor}</span>` : ''}
-                  ${expense.vendor && user ? html`<span aria-hidden="true">·</span>` : ''}
-                  ${user
-                    ? html`
-                        <span class="user-inline">
-                          <app-avatar name="${user.name}" size="xs"></app-avatar>
-                          <span>${user.name}</span>
-                        </span>
-                      `
-                    : ''}
-                </div>
-              </div>
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelProject}</span>
+          ${project
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openProjectDetail(project.id)}"
+                >
+                  <span slot="start" class="mono">[${project.key}]</span>
+                  <span>${project.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-            <div class="status-control-box">
-              <app-select
-                size="sm"
-                label="${t.viewTexts.expenseDetail.changeStatusLabel}"
-                .value="${expense.status}"
-                .options="${statusOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextStatus = eventValue(e) as ExpenseStatus;
-                  if (nextStatus && nextStatus !== expense.status) {
-                    store.updateExpense({ ...expense, status: nextStatus });
-                  }
-                }}"
-              ></app-select>
-            </div>
-          </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelTask}</span>
+          ${task
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openTaskDetail(task.id)}"
+                >
+                  <span slot="start" class="mono">${task.id}</span>
+                  <span>${task.title}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">${t.viewTexts.expenseDetail.labelNoTask}</span>`}
+        </div>
 
-          <div class="kpi-strip">
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.expenseDetail.kpiAmount}</span>
-              <span class="kpi-val accent">${formatMoney(expense.amount, expense.currency)}</span>
-              <span class="kpi-hint">${expense.currency} · ${expense.date}</span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.expenseDetail.kpiRubEquivalent}</span>
-              <span class="kpi-val success">${formatMoney(rubAmount, 'RUB')}</span>
-              <span class="kpi-hint">${t.expenses.categories[expense.category]}</span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.expenseDetail.kpiRebilling}</span>
-              <span class="kpi-val">
-                ${expense.billable
-                  ? t.viewTexts.expenseDetail.kpiBillableTrue
-                  : t.viewTexts.expenseDetail.kpiBillableFalse}
-              </span>
-              <span class="kpi-hint">
-                ${expense.billable
-                  ? t.viewTexts.expenseDetail.kpiBillableTrueHint
-                  : t.viewTexts.expenseDetail.kpiBillableFalseHint}
-              </span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.expenseDetail.kpiAttachments}</span>
-              <span class="kpi-val">${docIds.length}</span>
-              <span class="kpi-hint">${t.viewTexts.expenseDetail.kpiFilesHint}</span>
-            </div>
-          </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelSubmittedBy}</span>
+          ${user
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openEmployeeDetail(user.id)}"
+                >
+                  <span>${user.name}</span>
+                </app-link>
+                <span class="kpi-hint">${user.role}</span>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-          <div class="context-grid">
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelProject}</span>
-              ${project
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openProjectDetail(project.id)}"
-                    >
-                      <span slot="start" class="mono">[${project.key}]</span>
-                      <span>${project.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelVendor}</span>
+          <span class="meta-val">${expense.vendor || '—'}</span>
+        </div>
 
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelTask}</span>
-              ${task
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openTaskDetail(task.id)}"
-                    >
-                      <span slot="start" class="mono">${task.id}</span>
-                      <span>${task.title}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">${t.viewTexts.expenseDetail.labelNoTask}</span>`}
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelCompany}</span>
+          ${company
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openCompanyDetail(company.id)}"
+                >
+                  <span>${company.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelSubmittedBy}</span>
-              ${user
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openEmployeeDetail(user.id)}"
-                    >
-                      <span>${user.name}</span>
-                    </app-link>
-                    <span class="kpi-hint">${user.role}</span>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelVendor}</span>
-              <span class="meta-val">${expense.vendor || '—'}</span>
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelCompany}</span>
-              ${company
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openCompanyDetail(company.id)}"
-                    >
-                      <span>${company.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.expenseDetail.labelCreatedAt}</span>
-              <span class="meta-val mono">${createdFormatted}</span>
-            </div>
-          </div>
-        </section>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.expenseDetail.labelCreatedAt}</span>
+          <span class="meta-val mono">${createdFormatted}</span>
+        </div>
 
         <!-- Justification Notes -->
         <app-section-card title="${t.viewTexts.expenseDetail.notesTitle}">
@@ -555,7 +539,7 @@ export class AppExpenseDetail extends LitElement {
         </app-section-card>
 
         <app-entity-reminders entity-type="expense" .entityId="${expense.id}"></app-entity-reminders>
-      </div>
+      </app-detail-shell>
 
       <app-expense-form
         .open="${this.editModalOpen}"

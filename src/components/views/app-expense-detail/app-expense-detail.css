@@ -1,11 +1,6 @@
 /* View-specific blocks; the shared detail shell lives in
    ../../common/app-detail-shell/app-detail-shell.css (first entry of static styles). */
 
-.expense-switcher {
-  width: 320px;
-  max-width: 100%;
-}
-
 .expense-title {
   margin: 0;
   font-size: 1.38rem;

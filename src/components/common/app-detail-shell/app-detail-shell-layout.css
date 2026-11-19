@@ -1,0 +1,19 @@
+/* Layout of the shell skeleton itself. The shared detail-view blocks (page-shell,
+   top-nav-bar, overview-card, hero, kpi-strip, context-grid) come from
+   app-detail-shell.css as the first entry of static styles; this file resets the
+   :host template for a nested component and adds the switcher width. */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.switcher {
+  width: 320px;
+  max-width: 100%;
+}
