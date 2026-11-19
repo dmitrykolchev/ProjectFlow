@@ -8,6 +8,7 @@ import {
   iconClock,
   iconEdit,
   iconEye,
+  iconFilter,
   iconPaperclip,
   iconPlus,
   iconTrash,
@@ -29,6 +30,7 @@ import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-modal/app-modal';
 import '../../common/app-time-entry-form/app-time-entry-form';
 import '../../common/app-project-attachments/app-project-attachments';
@@ -63,6 +65,7 @@ export class AppTimeTracking extends LitElement {
   @state() private userFilter = 'all';
   @state() private categoryFilter: 'all' | TimeEntryCategory = 'all';
   @state() private viewMode: 'journal' | 'grid' | 'by-task' = 'journal';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private tablePageSize = store.customization.tablePageSize;
 
@@ -340,28 +343,9 @@ export class AppTimeTracking extends LitElement {
           : ''}
       </section>
 
-      <!-- Filters Toolbar -->
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${t.viewTexts.timeTracking.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'project', type: 'entity', options: projectFilterOptions },
-          { key: 'user', type: 'entity', options: userFilterOptions },
-          { key: 'category', options: categoryFilterOptions },
-        ]}"
-        .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'project') this.projectFilter = eventValue(e);
-          if (e.detail.key === 'user') this.userFilter = eventValue(e);
-          if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <!-- Canonical skeleton order: page header, KPI strip, quick log panel, display-mode
+           switcher with the filter toggle, filter bar, data representation -->
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.viewMode}"
@@ -375,7 +359,40 @@ export class AppTimeTracking extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+            placeholder="${t.viewTexts.timeTracking.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'project', type: 'entity', options: projectFilterOptions },
+              { key: 'user', type: 'entity', options: userFilterOptions },
+              { key: 'category', options: categoryFilterOptions },
+            ]}"
+            .values="${{ project: this.projectFilter, user: this.userFilter, category: this.categoryFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'project') this.projectFilter = eventValue(e);
+              if (e.detail.key === 'user') this.userFilter = eventValue(e);
+              if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.timeTracking.emptyNoEntries}"></app-empty-state>`
