@@ -630,3 +630,88 @@
 .card-actions app-button:not([action]) {
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+/* Counterparties registry reference rich cells: the name link (card weight/size plus
+   the table-cell retune), the rating stars, the bank accounts cell with currency chips
+   and the extra-count marker. */
+.cp-link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-color: var(--text-primary, #f8fafc);
+  --link-hover-color: var(--accent-primary, #6366f1);
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 1rem;
+}
+
+/* the table cell link inherits the smaller cell weight and font size */
+.table-link {
+  --link-font-weight: 600;
+  --control-font-md: 0.83rem;
+}
+
+.rating-stars {
+  color: #f59e0b;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+.bank-currencies {
+  display: flex;
+  align-items: center;
+  gap: 0.28rem;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.currency-chip {
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm, 4px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  color: var(--accent-primary, #6366f1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.table-bank-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.table-bank-name {
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-primary, #f8fafc);
+}
+
+.bank-more-count {
+  font-size: 0.7rem;
+  color: var(--text-muted, #64748b);
+  font-family: var(--font-mono, monospace);
+}
+
+/* the counterparties row actions container keeps its own 0.35rem gap layout; icon
+   buttons at size sm get the historical 6px radius, and the hover border is pinned back
+   for every action except delete (the component colors action="delete" itself) */
+.cp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.cp-actions-row app-button {
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.cp-actions-row app-button:not([action='delete']) {
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
