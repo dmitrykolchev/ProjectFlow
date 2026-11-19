@@ -55,6 +55,7 @@ import {
   normalizeReminderRecurrence,
   parseLocalDateTime as parseRfcLocalDateTime,
 } from '../domain/rfc5545';
+import { statusFromPresence, type PersonaPresence } from '../domain/presence-tokens';
 import {
   initialCalculations,
   initialChatChannels,
@@ -2172,6 +2173,18 @@ export class AppStore {
     this.addNotification('success', this.texts().employees.addedTitle, employee.name);
     this.notify();
     return employee;
+  }
+
+  /** Manual presence choice (the sidebar footer menu): writes the matching employee status. */
+  public setUserPresence(userId: string, presence: PersonaPresence): void {
+    const status = statusFromPresence(presence);
+    if (!status) return;
+    const target = this.users.find((u) => u.id === userId);
+    if (!target || target.status === status) return;
+    this.users = this.users.map((u) => (u.id === userId ? { ...u, status } : u));
+    this.saveEmployees();
+    this.logActivity('update', 'employee', target.name, this.texts().employees.presenceUpdated);
+    this.notify();
   }
 
   public updateEmployee(updated: User): void {

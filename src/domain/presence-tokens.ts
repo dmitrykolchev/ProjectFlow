@@ -50,6 +50,23 @@ export function presenceFromStatus(status?: EmployeeStatus): PersonaPresence {
   }
 }
 
+/** Manual presence -> employee status (the inverse of `presenceFromStatus`);
+   '' for presences that have no employee-status counterpart. */
+export function statusFromPresence(presence: PersonaPresence): EmployeeStatus | '' {
+  switch (presence) {
+    case 'available':
+      return 'active';
+    case 'online':
+      return 'remote';
+    case 'away':
+      return 'vacation';
+    case 'busy':
+      return 'onboarding';
+    default:
+      return '';
+  }
+}
+
 /** Resolve the presence label in the given language ('' when no badge). */
 export function presenceLabel(
   presence: PersonaPresence,
