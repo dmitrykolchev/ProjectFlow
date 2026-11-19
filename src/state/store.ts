@@ -2928,10 +2928,22 @@ export class AppStore {
 
   // --- Project & Project Members CRUD ---
   public addProject(data: Omit<Project, 'id'>): Project {
+    const members = data.members ? [...data.members] : [];
+    // Membership is now enforced by the chat gates, so the creator of a new
+    // project has to be in the roster: otherwise they cannot post in the
+    // default channel of the project they just created.
+    if (members.length === 0 && this.users.some((u) => u.id === this.currentUserId)) {
+      members.push({
+        userId: this.currentUserId,
+        role: 'pm',
+        allocation: 100,
+        joinedAt: new Date().toISOString().slice(0, 10),
+      });
+    }
     const project: Project = {
       ...data,
       id: `proj-${Date.now()}`,
-      members: data.members ? [...data.members] : [],
+      members,
     };
     this.projects = [project, ...this.projects];
     this.saveProjects();
@@ -3341,8 +3353,9 @@ export class AppStore {
   public isUserProjectMember(projectId: string, userId = this.currentUserId): boolean {
     const proj = this.projects.find((p) => p.id === projectId);
     if (!proj) return false;
+    // A project with no members has no members: an empty roster must not make
+    // everyone a member (it used to pass the chat CRUD gates for such projects).
     const members = proj.members || [];
-    if (members.length === 0) return true;
     return members.some((m) => m.userId === userId);
   }
 
