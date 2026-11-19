@@ -115,11 +115,12 @@ export class AppCardsTable extends LitElement {
   }
 
   private handleCardClick(e: MouseEvent, row: Record<string, unknown>) {
-    // clicks on interactive controls (checkboxes, buttons, links) are not card activation
+    // clicks on interactive controls (checkboxes, buttons, links) and on the card footer
+    // chrome are not card activation (the reference pins stopPropagation on the footer)
     const interactive = e.composedPath().some(
       (n) =>
         n instanceof HTMLElement &&
-        ['APP-BUTTON', 'APP-CHECKBOX', 'APP-LINK'].includes(n.tagName.toUpperCase())
+        ['APP-BUTTON', 'APP-CHECKBOX', 'APP-LINK', 'CARD-FOOTER'].includes(n.tagName.toUpperCase())
     );
     if (interactive) return;
     this.dispatchEvent(
