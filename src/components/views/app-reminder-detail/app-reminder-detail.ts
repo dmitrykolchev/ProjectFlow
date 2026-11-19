@@ -513,7 +513,6 @@ export class AppReminderDetail extends LitElement {
               : assignees.map(
                   (u) => html`
                     <app-persona
-                      class="user-pill"
                       size="24"
                       .initials="${u.avatar}"
                       .presence="${presenceFromStatus(u.status)}"

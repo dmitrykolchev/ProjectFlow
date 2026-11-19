@@ -49,18 +49,6 @@ app-detail-shell {
   align-items: center;
 }
 
-/* Assignee personas carry the historical pill chrome on the host: the persona is a
-   ghost button by default, the pill border/background comes from the view. */
-.user-pill {
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: var(--radius-sm, 6px);
-  background: var(--bg-surface, #111827);
-}
-
-.user-pill:hover {
-  border-color: var(--accent-primary, #6366f1);
-}
-
 .related-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
