@@ -46,7 +46,7 @@ import '../../common/app-pagination/app-pagination';
 import '../app-data-grid/app-data-grid';
 import '../../common/app-data-grid-column/app-data-grid-column';
 import '../../common/app-data-table/app-data-table';
-import '../../common/app-table-scroll-column/app-table-scroll-column';
+import '../../common/app-table-column/app-table-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-time-tracking.css';
 import { eventValue } from '../../common/event-value';
@@ -773,10 +773,10 @@ export class AppTimeTracking extends LitElement {
             store.setTablePageSize(e.detail.pageSize);
           }}"
         >
-          <app-table-scroll-column field="date" label="${t.viewTexts.timeTracking.labelDate}" .cellRender="${dateCell}"></app-table-scroll-column>
-          <app-table-scroll-column field="taskId" label="${t.viewTexts.timeTracking.thTaskProject}" .cellRender="${taskCell}"></app-table-scroll-column>
-          <app-table-scroll-column field="userId" label="${t.viewTexts.timeTracking.labelEmployee}" .cellRender="${userCell}"></app-table-scroll-column>
-          <app-table-scroll-column
+          <app-table-column field="date" label="${t.viewTexts.timeTracking.labelDate}" .cellRender="${dateCell}"></app-table-column>
+          <app-table-column field="taskId" label="${t.viewTexts.timeTracking.thTaskProject}" .cellRender="${taskCell}"></app-table-column>
+          <app-table-column field="userId" label="${t.viewTexts.timeTracking.labelEmployee}" .cellRender="${userCell}"></app-table-column>
+          <app-table-column
             field="category"
             label="${t.viewTexts.timeTracking.thCategory}"
             .cellRender="${(row: Record<string, unknown>) => html`
@@ -784,26 +784,26 @@ export class AppTimeTracking extends LitElement {
                 ${t.timeTracking.categories[(row as unknown as TimeEntry).category]}
               </app-badge>
             `}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field="description"
             label="${t.viewTexts.timeTracking.thDescription}"
             .cellRender="${(row: Record<string, unknown>) =>
               html`<div class="desc-cell">${(row as unknown as TimeEntry).description || '—'}</div>`}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field="documentIds"
             label="${t.viewTexts.timeTracking.thAttachments}"
             .cellRender="${(row: Record<string, unknown>) =>
               this.renderEntryAttachmentsCell(this.getAttachedDocs(row as unknown as TimeEntry), t)}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field="hours"
             label="${t.viewTexts.timeTracking.labelHours}"
             .cellRender="${(row: Record<string, unknown>) =>
               html`<span class="hours-cell">${(row as unknown as TimeEntry).hours.toFixed(1)}${t.viewTexts.timeTracking.hoursSuffix}</span>`}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field="billable"
             label="${t.viewTexts.timeTracking.thBilling}"
             .cellRender="${(row: Record<string, unknown>) => html`
@@ -815,8 +815,8 @@ export class AppTimeTracking extends LitElement {
                 ${(row as unknown as TimeEntry).billable ? t.viewTexts.timeTracking.badgeBillableShort : t.viewTexts.timeTracking.badgeInternalShort}
               </app-badge>
             `}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field="status"
             label="${t.viewTexts.timeTracking.statusLabel}"
             .cellRender="${(row: Record<string, unknown>) => html`
@@ -827,8 +827,8 @@ export class AppTimeTracking extends LitElement {
                 size="sm"
               ></app-status-chip>
             `}"
-          ></app-table-scroll-column>
-          <app-table-scroll-column
+          ></app-table-column>
+          <app-table-column
             field=""
             label=""
             align="right"
@@ -877,7 +877,7 @@ export class AppTimeTracking extends LitElement {
                 </div>
               `;
             }}"
-          ></app-table-scroll-column>
+          ></app-table-column>
         </app-data-table>
       </div>
     `;

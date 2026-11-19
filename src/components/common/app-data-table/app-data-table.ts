@@ -2,8 +2,8 @@ import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../app-empty-state/app-empty-state';
 import '../app-pagination/app-pagination';
-import '../app-table-scroll-column/app-table-scroll-column';
-import { AppTableScrollColumn } from '../app-table-scroll-column/app-table-scroll-column';
+import '../app-table-column/app-table-column';
+import { AppTableColumn } from '../app-table-column/app-table-column';
 import { paginateItems } from '../paginate';
 import styles from './app-data-table.css';
 
@@ -22,7 +22,7 @@ export interface DataTablePageChangeDetail {
 
 /**
  * A data table with a fixed header and footer. Columns are declared as child
- * app-table-scroll-column elements (field-driven formatting, mono/code cells,
+ * app-table-column elements (field-driven formatting, mono/code cells,
  * custom cellRender for rich cells and row actions). Sorting is internal: clicking
  * a sortable header sorts the rows and emits sort-change. Pagination is internal
  * too: rows are sliced by page-size, and the footer shows app-pagination whenever
@@ -45,7 +45,7 @@ export class AppDataTable extends LitElement {
 
   static styles = styles;
 
-  private columns: AppTableScrollColumn[] = [];
+  private columns: AppTableColumn[] = [];
 
   connectedCallback() {
     super.connectedCallback();
@@ -64,8 +64,8 @@ export class AppDataTable extends LitElement {
 
   private syncColumns() {
     this.columns = Array.from(
-      this.querySelectorAll(':scope > app-table-scroll-column')
-    ) as AppTableScrollColumn[];
+      this.querySelectorAll(':scope > app-table-column')
+    ) as AppTableColumn[];
   }
 
   updated(changed: Map<PropertyKey, unknown>) {
@@ -94,7 +94,7 @@ export class AppDataTable extends LitElement {
     return rows;
   }
 
-  private toggleSort(col: AppTableScrollColumn) {
+  private toggleSort(col: AppTableColumn) {
     if (this.sortBy === col.field) {
       this.sortDir = this.sortDir === 'asc' ? 'desc' : 'asc';
     } else {
@@ -142,7 +142,7 @@ export class AppDataTable extends LitElement {
     );
   }
 
-  private formatCellValue(col: AppTableScrollColumn, value: unknown): TemplateResult | string {
+  private formatCellValue(col: AppTableColumn, value: unknown): TemplateResult | string {
     if (value === undefined || value === null || value === '') {
       return html`<span style="color: var(--text-muted);">—</span>`;
     }
@@ -162,13 +162,13 @@ export class AppDataTable extends LitElement {
     return String(value);
   }
 
-  private headerClass(col: AppTableScrollColumn): string {
+  private headerClass(col: AppTableColumn): string {
     if (col.align === 'right') return 'align-right';
     if (col.align === 'center') return 'align-center';
     return '';
   }
 
-  private cellClass(col: AppTableScrollColumn): string {
+  private cellClass(col: AppTableColumn): string {
     const classes: string[] = [];
     if (col.code) classes.push('cell-code');
     if (col.mono) classes.push('cell-mono');

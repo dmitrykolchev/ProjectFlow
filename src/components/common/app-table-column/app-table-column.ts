@@ -1,6 +1,6 @@
 import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import styles from './app-table-scroll-column.css';
+import styles from './app-table-column.css';
 
 export type TableCellType = 'text' | 'number' | 'boolean' | 'select';
 export type CellAlign = 'left' | 'center' | 'right';
@@ -14,8 +14,8 @@ export interface ColumnOption {
   label?: string;
 }
 
-@customElement('app-table-scroll-column')
-export class AppTableScrollColumn extends LitElement {
+@customElement('app-table-column')
+export class AppTableColumn extends LitElement {
   @property({ type: String }) field: string = '';
   @property({ type: String }) label: string = '';
   @property({ type: String }) type: TableCellType = 'text';

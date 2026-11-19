@@ -3,7 +3,7 @@ import { ComponentStoryMeta } from '../../../types/storybook';
 import { iconEdit, iconCopy, iconTrash } from '../icons';
 import '../app-switch/app-switch';
 import './app-table-scroll';
-import '../app-table-scroll-column/app-table-scroll-column';
+import '../app-table-column/app-table-column';
 
 type DemoRecord = {
   code: string;
@@ -129,7 +129,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/TableScroll',
   component: 'app-table-scroll',
   description:
-    'Lightweight scrollable table with sticky sortable headers, field-driven cell formatting (text/number/boolean/select), mono and code cells, inactive row dimming, custom render columns and empty state. Columns are declared as child app-table-scroll-column elements.',
+    'Lightweight scrollable table with sticky sortable headers, field-driven cell formatting (text/number/boolean/select), mono and code cells, inactive row dimming, custom render columns and empty state. Columns are declared as child app-table-column elements.',
   category: 'Common',
   propsDoc: {
     rows: 'Array of row objects rendered by the table',
@@ -149,46 +149,46 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 900px;">
           <app-table-scroll .rows="${demoRecords}" sort-by="code" sort-dir="asc">
-            <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
-            <app-table-scroll-column
+            <app-table-column field="code" label="Code" code sortable></app-table-column>
+            <app-table-column
               field="name"
               label="Name"
               sortable
               .cellRender="${renderNameCell}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="category"
               label="Category"
               type="select"
               .options="${categoryOptions}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="billable"
               label="Billable"
               type="boolean"
               align="center"
               yes-label="Yes"
               no-label="No"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="rate"
               label="Rate, ₽/h"
               type="number"
               align="right"
               mono
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="isActive"
               label="Active"
               align="center"
               .cellRender="${renderActiveCell}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field=""
               label="Actions"
               align="right"
               .cellRender="${renderActionsCell}"
-            ></app-table-scroll-column>
+            ></app-table-column>
           </app-table-scroll>
         </div>
       `,
@@ -231,16 +231,16 @@ export const meta: ComponentStoryMeta = {
                 }
               }}"
             >
-              <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
-              <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
-              <app-table-scroll-column
+              <app-table-column field="code" label="Code" code sortable></app-table-column>
+              <app-table-column field="name" label="Name" sortable></app-table-column>
+              <app-table-column
                 field="rate"
                 label="Rate, ₽/h"
                 type="number"
                 align="right"
                 mono
                 sortable
-              ></app-table-scroll-column>
+              ></app-table-column>
             </app-table-scroll>
           </div>
         `;
@@ -253,16 +253,16 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <app-table-scroll .rows="${demoRecords}" striped sort-by="code" sort-dir="asc">
-            <app-table-scroll-column field="code" label="Code" code sortable></app-table-scroll-column>
-            <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
-            <app-table-scroll-column
+            <app-table-column field="code" label="Code" code sortable></app-table-column>
+            <app-table-column field="name" label="Name" sortable></app-table-column>
+            <app-table-column
               field="rate"
               label="Rate, ₽/h"
               type="number"
               align="right"
               mono
               sortable
-            ></app-table-scroll-column>
+            ></app-table-column>
           </app-table-scroll>
         </div>
       `,
@@ -273,8 +273,8 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <table-scroll .rows="${[]}" empty-title="No records found">
-            <app-table-scroll-column field="code" label="Code" sortable></app-table-scroll-column>
-            <app-table-scroll-column field="name" label="Name" sortable></app-table-scroll-column>
+            <app-table-column field="code" label="Code" sortable></app-table-column>
+            <app-table-column field="name" label="Name" sortable></app-table-column>
           </app-table-scroll>
         </div>
       `,

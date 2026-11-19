@@ -2,7 +2,7 @@ import { html, TemplateResult } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import { iconEdit, iconTrash } from '../icons';
 import './app-data-table';
-import '../app-table-scroll-column/app-table-scroll-column';
+import '../app-table-column/app-table-column';
 
 type DemoEntry = {
   date: string;
@@ -90,7 +90,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/DataTable',
   component: 'app-data-table',
   description:
-    'Data table with a fixed header and footer. Columns are declared as child app-table-scroll-column elements (field-driven formatting, mono/code cells, custom cellRender for rich cells and row actions). Sorting and pagination are internal: sortable headers sort the rows and emit sort-change, rows are sliced by page-size and the footer shows app-pagination whenever there is more than one page. The table stretches to display all rendered rows; max-height caps the host so the body gets its own scrollbar.',
+    'Data table with a fixed header and footer. Columns are declared as child app-table-column elements (field-driven formatting, mono/code cells, custom cellRender for rich cells and row actions). Sorting and pagination are internal: sortable headers sort the rows and emit sort-change, rows are sliced by page-size and the footer shows app-pagination whenever there is more than one page. The table stretches to display all rendered rows; max-height caps the host so the body gets its own scrollbar.',
   category: 'Common',
   propsDoc: {
     rows: 'Array of row objects rendered by the table',
@@ -112,47 +112,47 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 960px;">
           <app-data-table .rows="${demoEntries}" page-size="10" sort-by="date" sort-dir="asc">
-            <app-table-scroll-column field="date" label="Date" mono sortable></app-table-scroll-column>
-            <app-table-scroll-column
+            <app-table-column field="date" label="Date" mono sortable></app-table-column>
+            <app-table-column
               field="taskKey"
               label="Task / Project"
               sortable
               .cellRender="${renderTaskCell}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="user"
               label="Employee"
               sortable
               .cellRender="${renderUserCell}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="category"
               label="Category"
               type="select"
               .options="${categoryOptions}"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="hours"
               label="Hours"
               type="number"
               align="right"
               mono
               sortable
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field="billable"
               label="Billable"
               type="boolean"
               align="center"
               yes-label="Yes"
               no-label="No"
-            ></app-table-scroll-column>
-            <app-table-scroll-column
+            ></app-table-column>
+            <app-table-column
               field=""
               label="Actions"
               align="right"
               .cellRender="${renderActionsCell}"
-            ></app-table-scroll-column>
+            ></app-table-column>
           </app-data-table>
         </div>
       `,
@@ -164,16 +164,16 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <app-data-table .rows="${demoEntries}" page-size="25" max-height="340">
-            <app-table-scroll-column field="date" label="Date" mono sortable></app-table-scroll-column>
-            <app-table-scroll-column field="taskKey" label="Task" code sortable></app-table-scroll-column>
-            <app-table-scroll-column
+            <app-table-column field="date" label="Date" mono sortable></app-table-column>
+            <app-table-column field="taskKey" label="Task" code sortable></app-table-column>
+            <app-table-column
               field="hours"
               label="Hours"
               type="number"
               align="right"
               mono
               sortable
-            ></app-table-scroll-column>
+            ></app-table-column>
           </app-data-table>
         </div>
       `,
@@ -185,15 +185,15 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <app-data-table .rows="${demoEntries.slice(0, 6)}" page-size="10">
-            <app-table-scroll-column field="date" label="Date" mono></app-table-scroll-column>
-            <app-table-scroll-column field="taskKey" label="Task" code></app-table-scroll-column>
-            <app-table-scroll-column
+            <app-table-column field="date" label="Date" mono></app-table-column>
+            <app-table-column field="taskKey" label="Task" code></app-table-column>
+            <app-table-column
               field="hours"
               label="Hours"
               type="number"
               align="right"
               mono
-            ></app-table-scroll-column>
+            ></app-table-column>
           </app-data-table>
         </div>
       `,
@@ -204,8 +204,8 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <app-data-table .rows="${[]}" empty-title="No time entries found">
-            <app-table-scroll-column field="date" label="Date" sortable></app-table-scroll-column>
-            <app-table-scroll-column field="taskKey" label="Task" sortable></app-table-scroll-column>
+            <app-table-column field="date" label="Date" sortable></app-table-column>
+            <app-table-column field="taskKey" label="Task" sortable></app-table-column>
           </app-data-table>
         </div>
       `,
