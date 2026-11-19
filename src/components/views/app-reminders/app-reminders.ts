@@ -33,6 +33,7 @@ import {
   iconDatabase,
   iconEdit,
   iconEye,
+  iconFilter,
   iconPaperclip,
   iconPause,
   iconPlay,
@@ -45,6 +46,7 @@ import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-button/app-button';
 import '../../common/app-dropdown-button/app-dropdown-button';
 import '../../common/app-badge/app-badge';
@@ -101,6 +103,7 @@ export class AppReminders extends LitElement {
 
   @state() private scopeTab: ReminderScopeTab = 'all';
   @state() private localSearch = '';
+  @state() private filterVisible: boolean = true;
   @state() private statusFilter = 'all';
   @state() private entityTypeFilter = 'all';
   @state() private priorityFilter = 'all';
@@ -317,50 +320,61 @@ export class AppReminders extends LitElement {
         ></app-metric-card>
       </app-kpi-strip>
 
-      <div class="controls-row">
-        <div class="scope-tabs-wrap">
-          <app-segmented-switch
-            size="sm"
-            .value="${this.scopeTab}"
-            .options="${scopeOptions}"
-            @change="${(e: Event) => {
-              this.scopeTab = eventValue(e) as ReminderScopeTab;
+      <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
+           toggle, filter bar, data representation -->
+      <div class="mode-row">
+        <app-segmented-switch
+          size="sm"
+          .value="${this.scopeTab}"
+          .options="${scopeOptions}"
+          @change="${(e: Event) => {
+            this.scopeTab = eventValue(e) as ReminderScopeTab;
+            store.setActivePage(1, false);
+          }}"
+        ></app-segmented-switch>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${t.viewTexts.reminders.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${filters}"
+            .values="${{
+              status: this.statusFilter,
+              entityType: this.entityTypeFilter,
+              priority: this.priorityFilter,
+            }}"
+            @search-change="${(e: Event) => {
+              this.localSearch = eventValue(e);
               store.setActivePage(1, false);
             }}"
-          ></app-segmented-switch>
-        </div>
-
-        <app-filter-bar
-          style="--filter-search-min: 280px; --filter-search-max: 280px;"
-          placeholder="${t.viewTexts.reminders.searchPlaceholder}"
-          .searchValue="${this.localSearch}"
-          .filters="${filters}"
-          .values="${{
-            status: this.statusFilter,
-            entityType: this.entityTypeFilter,
-            priority: this.priorityFilter,
-          }}"
-          @search-change="${(e: Event) => {
-            this.localSearch = eventValue(e);
-            store.setActivePage(1, false);
-          }}"
-          @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-            const { key, value } = e.detail;
-            if (key === 'status') this.statusFilter = value;
-            else if (key === 'entityType') this.entityTypeFilter = value;
-            else if (key === 'priority') this.priorityFilter = value;
-            store.setActivePage(1, false);
-          }}"
-          @reset="${() => {
-            this.localSearch = '';
-            this.statusFilter = 'all';
-            this.entityTypeFilter = 'all';
-            this.priorityFilter = 'all';
-            this.scopeTab = 'all';
-            store.setActivePage(1, false);
-          }}"
-        ></app-filter-bar>
-      </div>
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              const { key, value } = e.detail;
+              if (key === 'status') this.statusFilter = value;
+              else if (key === 'entityType') this.entityTypeFilter = value;
+              else if (key === 'priority') this.priorityFilter = value;
+              store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.statusFilter = 'all';
+              this.entityTypeFilter = 'all';
+              this.priorityFilter = 'all';
+              this.scopeTab = 'all';
+              store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`
