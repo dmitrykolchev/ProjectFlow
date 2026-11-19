@@ -94,11 +94,14 @@ button.persona:disabled {
    glyph). The persona only positions it: the badge sits in the bottom-right corner of
    the square circumscribed around the avatar circle, so its offset is (avatar - badge)
    at every size and it is always tangent to the avatar edge — no size looks crooked.
-   Sizes <= 32 render a colour-only dot with no glyph (the auto rule of the icon). */
+   Sizes <= 32 render a colour-only dot with no glyph (the auto rule of the icon).
+   The host element is square (it wraps the round inner dot), so the ring box-shadow
+   needs border-radius on the host to follow the circle, not the square. */
 .presence {
   position: absolute;
   left: var(--persona-badge-x, 28px);
   top: var(--persona-badge-y, 28px);
+  border-radius: 50%;
   box-shadow: 0 0 0 var(--persona-badge-ring, 2px) var(--persona-ring-color, var(--bg-surface, #111827));
 }
 
