@@ -49,6 +49,7 @@ import '../../common/app-reminder-form/app-reminder-form';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-tags-row/app-tags-row';
+import detailShellStyles from '../../common/app-detail-shell/app-detail-shell.css';
 import styles from './app-reminder-detail.css';
 
 const ENTITY_EMBLEM_MAP: Record<ReminderEntityType, EntityEmblemKind> = {
@@ -79,7 +80,7 @@ export class AppReminderDetail extends LitElement {
 
   private unsubscribe?: () => void;
 
-  static styles = styles;
+  static styles = [detailShellStyles, styles];
 
   connectedCallback() {
     super.connectedCallback();

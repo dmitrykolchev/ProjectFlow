@@ -37,6 +37,7 @@ import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-time-entry-form/app-time-entry-form';
+import detailShellStyles from '../../common/app-detail-shell/app-detail-shell.css';
 import styles from './app-timeentry-detail.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -53,7 +54,7 @@ export class AppTimeEntryDetail extends LitElement {
 
   private unsubscribe?: () => void;
 
-  static styles = styles;
+  static styles = [detailShellStyles, styles];
 
   connectedCallback() {
     super.connectedCallback();

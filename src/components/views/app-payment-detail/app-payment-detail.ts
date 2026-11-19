@@ -34,6 +34,7 @@ import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-status-chip/app-status-chip';
+import detailShellStyles from '../../common/app-detail-shell/app-detail-shell.css';
 import styles from './app-payment-detail.css';
 
 const FX_TO_RUB: Record<string, number> = {
@@ -58,7 +59,7 @@ export class AppPaymentDetail extends LitElement {
 
   private unsubscribe?: () => void;
 
-  static styles = styles;
+  static styles = [detailShellStyles, styles];
 
   connectedCallback() {
     super.connectedCallback();
