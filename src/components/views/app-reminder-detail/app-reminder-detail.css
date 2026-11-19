@@ -1,11 +1,6 @@
 /* View-specific blocks and shell overrides; the shared detail shell lives in
    ../../common/app-detail-shell/app-detail-shell.css (first entry of static styles). */
 
-.rem-switcher {
-  width: 320px;
-  max-width: 100%;
-}
-
 .rem-title {
   margin: 0;
   font-size: 1.38rem;
@@ -33,8 +28,9 @@
 }
 
 /* shell overrides */
-.title-block {
-  gap: 0.5rem;
+app-detail-shell {
+  /* The hero title block originally used a 0.5rem column gap. */
+  --detail-title-gap: 0.5rem;
 }
 
 .kpi-val {

@@ -117,7 +117,9 @@
 .title-block {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  /* Views whose original hero used a wider title gap restore it locally via
+     --detail-title-gap on the shell host (custom properties cross shadow trees). */
+  gap: var(--detail-title-gap, 0.45rem);
   min-width: 0;
   flex: 1;
 }
