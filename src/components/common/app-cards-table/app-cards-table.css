@@ -71,3 +71,115 @@ card-footer {
     grid-template-columns: 1fr;
   }
 }
+
+/* Projects cards reference content classes (rendered in the component's shadow tree through
+   cardRender): the head row with the title line (color dot, mono key chip, name), the muted
+   description, the two-column meta panel on the subtle surface, the team summary line with
+   mono strong counts and muted separators, and the footer start button group. The shared
+   proj-title-row, color-dot and proj-key rules match the table-mode reference exactly. */
+.proj-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.proj-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.color-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.proj-key {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-strong, #334155);
+}
+
+.proj-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
+.proj-desc {
+  margin: 0;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.proj-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.9rem;
+  padding: 0.8rem;
+  background: var(--bg-subtle, #1a2438);
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.78rem;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.meta-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.meta-val {
+  color: var(--text-primary, #f8fafc);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.team-summary-line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.team-summary-line strong {
+  color: var(--text-primary, #f8fafc);
+  font-family: var(--font-mono, monospace);
+}
+
+.sep {
+  color: var(--text-muted, #64748b);
+}
+
+.footer-left-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
