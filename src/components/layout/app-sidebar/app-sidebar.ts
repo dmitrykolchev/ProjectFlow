@@ -120,7 +120,9 @@ export class AppSidebar extends LitElement {
       host: this,
       closeOnBackdrop: true,
       onClose: () => {
-        this.portalHandle = null;
+        // The portal fires this on backdrop click and Escape; the layer stays mounted
+        // until close() is called, so close through the handle, not just the reference.
+        this.closePresenceMenu();
       },
     });
   }
