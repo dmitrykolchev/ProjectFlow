@@ -1517,6 +1517,10 @@ export const ru = {
     },
     header: {
       langToggleTitle: 'Сменить язык (RU / EN)',
+      langNames: {
+        ru: 'Русский',
+        en: 'English',
+      },
       themeNames: {
         dark: 'Тёмная',
         light: 'Светлая',
