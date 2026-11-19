@@ -28,9 +28,12 @@ import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
+import {
+  DetailSwitchDetail,
+} from '../../common/app-detail-shell/app-detail-shell';
+import '../../common/app-detail-shell/app-detail-shell';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-entity-emblem/app-entity-emblem';
-import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-link/app-link';
 import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-section-card/app-section-card';
@@ -183,298 +186,277 @@ export class AppTimeEntryDetail extends LitElement {
     });
 
     return html`
-      <div class="page-shell">
-        <div class="top-nav-bar">
-          <div class="nav-left">
-            <app-button
-              variant="outline"
-              size="sm"
-              @click="${() => store.setActiveView('time-tracking')}"
-            >
-              <span slot="icon-start">${iconChevronLeft(15)}</span>
-              <span>${t.viewTexts.timeentryDetail.backToList}</span>
-            </app-button>
-
-            <div class="entry-switcher">
-              <app-entity-selector
+      <app-detail-shell
+        entity="timeEntry"
+        backLabel="${t.viewTexts.timeentryDetail.backToList}"
+        switcherPlaceholder="${t.viewTexts.timeentryDetail.switcherPlaceholder}"
+        .switcherOptions="${switcherOptions}"
+        switcherValue="${entry.id}"
+        @detail-back="${() => store.setActiveView('time-tracking')}"
+        @entity-switch="${(e: CustomEvent<DetailSwitchDetail>) => {
+          const nextId = e.detail.value;
+          if (nextId && nextId !== entry.id) {
+            store.openTimeEntryDetail(nextId);
+          }
+        }}"
+      >
+        ${task
+          ? html`
+              <app-button
+                slot="nav-actions"
                 size="sm"
-                placeholder="${t.viewTexts.timeentryDetail.switcherPlaceholder}"
-                .options="${switcherOptions}"
-                .value="${entry.id}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextId = eventValue(e);
-                  if (nextId && nextId !== entry.id) {
-                    store.openTimeEntryDetail(nextId);
-                  }
-                }}"
-              ></app-entity-selector>
-            </div>
-          </div>
+                variant="outline"
+                @click="${() => store.openTaskDetail(task.id)}"
+              >
+                <span slot="icon-start">${iconFileText(14)}</span>
+                <span>${t.viewTexts.timeentryDetail.openTaskBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-          <div class="nav-actions">
-            ${task
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openTaskDetail(task.id)}"
-                  >
-                    <span slot="icon-start">${iconFileText(14)}</span>
-                    <span>${t.viewTexts.timeentryDetail.openTaskBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${project
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="outline"
+                @click="${() => store.openProjectDetail(project.id)}"
+              >
+                <span slot="icon-start">${iconFolder(14)}</span>
+                <span>${t.viewTexts.timeentryDetail.openProjectBtn}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${project
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => store.openProjectDetail(project.id)}"
-                  >
-                    <span slot="icon-start">${iconFolder(14)}</span>
-                    <span>${t.viewTexts.timeentryDetail.openProjectBtn}</span>
-                  </app-button>
-                `
-              : ''}
+        ${entry.status !== 'approved'
+          ? html`
+              <app-button
+                slot="nav-actions"
+                size="sm"
+                variant="primary"
+                @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
+              >
+                <span slot="icon-start">${iconCheck(14)}</span>
+                <span>${t.viewTexts.timeTracking.approveEntryTitle}</span>
+              </app-button>
+            `
+          : ''}
 
-            ${entry.status !== 'approved'
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.updateTimeEntry({ ...entry, status: 'approved' })}"
-                  >
-                    <span slot="icon-start">${iconCheck(14)}</span>
-                    <span>${t.viewTexts.timeTracking.approveEntryTitle}</span>
-                  </app-button>
-                `
-              : ''}
+        <app-button
+          slot="nav-actions"
+          size="sm"
+          variant="secondary"
+          @click="${() => (this.editModalOpen = true)}"
+        >
+          <span slot="icon-start">${iconEdit(14)}</span>
+          <span>${t.common.edit}</span>
+        </app-button>
 
-            <app-button
-              size="sm"
-              variant="secondary"
-              @click="${() => (this.editModalOpen = true)}"
-            >
-              <span slot="icon-start">${iconEdit(14)}</span>
-              <span>${t.common.edit}</span>
-            </app-button>
+        <app-button
+          slot="nav-actions"
+          action="delete"
+          size="xs"
+          variant="icon"
+          title="${t.common.delete}"
+          @click="${() => (this.confirmDeleteOpen = true)}"
+        >
+          <span slot="start">${iconTrash(15)}</span>
+        </app-button>
 
-            <app-button
-              action="delete"
-              size="xs"
-              variant="icon"
-              title="${t.common.delete}"
-              @click="${() => (this.confirmDeleteOpen = true)}"
-            >
-              <span slot="start">${iconTrash(15)}</span>
-            </app-button>
-          </div>
+        <app-entity-emblem
+          slot="hero-meta"
+          entity="timeEntry"
+          variant="pill"
+          size="sm"
+        ></app-entity-emblem>
+        <span slot="hero-meta" class="mono">${entry.date}</span>
+        <span slot="hero-meta" aria-hidden="true">·</span>
+        <span slot="hero-meta">${t.timeTracking.categories[entry.category]}</span>
+        ${project
+          ? html`
+              <span slot="hero-meta" aria-hidden="true">·</span>
+              <app-link
+                slot="hero-meta"
+                class="link-btn hdr-link"
+                size="md"
+                variant="primary"
+                @click="${() => store.openProjectDetail(project.id)}"
+              >
+                <span class="mono">${project.key}</span>
+              </app-link>
+            `
+          : ''}
+
+        <h1 slot="title" class="entry-title">
+          ${task ? `${task.id} · ${task.title}` : entry.taskId}
+        </h1>
+        <app-status-chip
+          slot="title"
+          domain="timeEntry"
+          status="${entry.status}"
+          appearance="soft"
+          size="md"
+        ></app-status-chip>
+        <app-badge
+          slot="title"
+          variant="${entry.billable ? 'info' : 'default'}"
+          appearance="soft"
+          size="sm"
+        >
+          ${entry.billable
+            ? t.viewTexts.timeTracking.badgeBillableShort
+            : t.viewTexts.timeTracking.badgeInternalShort}
+        </app-badge>
+
+        <div slot="hero-sub" class="entry-sub">
+          ${user
+            ? html`
+                <span class="user-inline">
+                  <app-avatar name="${user.name}" size="xs"></app-avatar>
+                  <span>${user.name}</span>
+                </span>
+              `
+            : ''}
         </div>
 
-        <section class="overview-card">
-          <div class="hero-top">
-            <div class="hero-identity">
-              <app-entity-emblem entity="timeEntry" size="lg"></app-entity-emblem>
-              <div class="title-block">
-                <div class="hero-meta-row">
-                  <app-entity-emblem entity="timeEntry" variant="pill" size="sm"></app-entity-emblem>
-                  <span class="mono">${entry.date}</span>
-                  <span aria-hidden="true">·</span>
-                  <span>${t.timeTracking.categories[entry.category]}</span>
-                  ${project
-                    ? html`
-                        <span aria-hidden="true">·</span>
-                        <app-link
-                          class="link-btn hdr-link"
-                          size="md"
-                          variant="primary"
-                          @click="${() => store.openProjectDetail(project.id)}"
-                        >
-                          <span class="mono">${project.key}</span>
-                        </app-link>
-                      `
-                    : ''}
-                </div>
+        <div slot="hero-side" class="status-control-box">
+          <app-select
+            size="sm"
+            label="${t.viewTexts.timeentryDetail.changeStatusLabel}"
+            .value="${entry.status}"
+            .options="${statusOptions}"
+            @change="${(e: CustomEvent<{ value: string }>) => {
+              const nextStatus = eventValue(e) as TimeEntryStatus;
+              if (nextStatus && nextStatus !== entry.status) {
+                store.updateTimeEntry({ ...entry, status: nextStatus });
+              }
+            }}"
+          ></app-select>
+        </div>
 
-                <div class="title-row">
-                  <h1 class="entry-title">
-                    ${task ? `${task.id} · ${task.title}` : entry.taskId}
-                  </h1>
-                  <app-status-chip
-                    domain="timeEntry"
-                    status="${entry.status}"
-                    appearance="soft"
-                    size="md"
-                  ></app-status-chip>
-                  <app-badge
-                    variant="${entry.billable ? 'info' : 'default'}"
-                    appearance="soft"
-                    size="sm"
-                  >
-                    ${entry.billable
-                      ? t.viewTexts.timeTracking.badgeBillableShort
-                      : t.viewTexts.timeTracking.badgeInternalShort}
-                  </app-badge>
-                </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiHours}</span>
+          <span class="kpi-val accent">${entry.hours.toFixed(2)} ${hUnit}</span>
+          <span class="kpi-hint">${entry.date}</span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiEstimatedCost}</span>
+          <span class="kpi-val ${entry.billable ? 'success' : ''}">
+            ${formatMoney(entry.billable ? estCostRub : 0, 'RUB')}
+          </span>
+          <span class="kpi-hint">
+            ${t.viewTexts.timeentryDetail.kpiRateHint(
+              (entry.billable ? HOURLY_RATE_RUB : 0).toLocaleString(t.common.locale)
+            )}
+          </span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiBillingStatus}</span>
+          <span class="kpi-val">
+            ${entry.billable
+              ? t.viewTexts.timeTracking.badgeBillableShort
+              : t.viewTexts.timeTracking.badgeInternalShort}
+          </span>
+          <span class="kpi-hint">
+            ${entry.billable
+              ? t.viewTexts.timeentryDetail.kpiBillableHint
+              : t.viewTexts.timeentryDetail.kpiInternalHint}
+          </span>
+        </div>
+        <div slot="kpi" class="kpi-cell">
+          <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiAttachments}</span>
+          <span class="kpi-val">${docIds.length}</span>
+          <span class="kpi-hint">${t.viewTexts.timeentryDetail.kpiFilesHint}</span>
+        </div>
 
-                <div class="entry-sub">
-                  ${user
-                    ? html`
-                        <span class="user-inline">
-                          <app-avatar name="${user.name}" size="xs"></app-avatar>
-                          <span>${user.name}</span>
-                        </span>
-                      `
-                    : ''}
-                </div>
-              </div>
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelProject}</span>
+          ${project
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openProjectDetail(project.id)}"
+                >
+                  <span slot="start" class="mono">[${project.key}]</span>
+                  <span>${project.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-            <div class="status-control-box">
-              <app-select
-                size="sm"
-                label="${t.viewTexts.timeentryDetail.changeStatusLabel}"
-                .value="${entry.status}"
-                .options="${statusOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) => {
-                  const nextStatus = eventValue(e) as TimeEntryStatus;
-                  if (nextStatus && nextStatus !== entry.status) {
-                    store.updateTimeEntry({ ...entry, status: nextStatus });
-                  }
-                }}"
-              ></app-select>
-            </div>
-          </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelTask}</span>
+          ${task
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openTaskDetail(task.id)}"
+                >
+                  <span slot="start" class="mono">${task.id}</span>
+                  <span>${task.title}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">${t.viewTexts.timeTracking.removedTask}</span>`}
+        </div>
 
-          <div class="kpi-strip">
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiHours}</span>
-              <span class="kpi-val accent">${entry.hours.toFixed(2)} ${hUnit}</span>
-              <span class="kpi-hint">${entry.date}</span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiEstimatedCost}</span>
-              <span class="kpi-val ${entry.billable ? 'success' : ''}">
-                ${formatMoney(entry.billable ? estCostRub : 0, 'RUB')}
-              </span>
-              <span class="kpi-hint">
-                ${t.viewTexts.timeentryDetail.kpiRateHint(
-                  (entry.billable ? HOURLY_RATE_RUB : 0).toLocaleString(t.common.locale)
-                )}
-              </span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiBillingStatus}</span>
-              <span class="kpi-val">
-                ${entry.billable
-                  ? t.viewTexts.timeTracking.badgeBillableShort
-                  : t.viewTexts.timeTracking.badgeInternalShort}
-              </span>
-              <span class="kpi-hint">
-                ${entry.billable
-                  ? t.viewTexts.timeentryDetail.kpiBillableHint
-                  : t.viewTexts.timeentryDetail.kpiInternalHint}
-              </span>
-            </div>
-            <div class="kpi-cell">
-              <span class="kpi-label">${t.viewTexts.timeentryDetail.kpiAttachments}</span>
-              <span class="kpi-val">${docIds.length}</span>
-              <span class="kpi-hint">${t.viewTexts.timeentryDetail.kpiFilesHint}</span>
-            </div>
-          </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelEmployee}</span>
+          ${user
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openEmployeeDetail(user.id)}"
+                >
+                  <span>${user.name}</span>
+                </app-link>
+                <span class="kpi-hint">${user.role}</span>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-          <div class="context-grid">
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelProject}</span>
-              ${project
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openProjectDetail(project.id)}"
-                    >
-                      <span slot="start" class="mono">[${project.key}]</span>
-                      <span>${project.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelCategory}</span>
+          <span class="meta-val">${t.timeTracking.categories[entry.category]}</span>
+        </div>
 
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelTask}</span>
-              ${task
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openTaskDetail(task.id)}"
-                    >
-                      <span slot="start" class="mono">${task.id}</span>
-                      <span>${task.title}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">${t.viewTexts.timeTracking.removedTask}</span>`}
-            </div>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelCompany}</span>
+          ${company
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openCompanyDetail(company.id)}"
+                >
+                  <span>${company.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">—</span>`}
+        </div>
 
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelEmployee}</span>
-              ${user
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openEmployeeDetail(user.id)}"
-                    >
-                      <span>${user.name}</span>
-                    </app-link>
-                    <span class="kpi-hint">${user.role}</span>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelCategory}</span>
-              <span class="meta-val">${t.timeTracking.categories[entry.category]}</span>
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelCompany}</span>
-              ${company
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openCompanyDetail(company.id)}"
-                    >
-                      <span>${company.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">—</span>`}
-            </div>
-
-            <div class="meta-box">
-              <span class="meta-label">${t.viewTexts.timeentryDetail.labelCounterparty}</span>
-              ${cp
-                ? html`
-                    <app-link
-                      class="link-btn meta-link"
-                      size="md"
-                      variant="primary"
-                      @click="${() => store.openCounterpartyDetail(cp.id)}"
-                    >
-                      <span>${cp.name}</span>
-                    </app-link>
-                  `
-                : html`<span class="meta-val">${createdFormatted}</span>`}
-              ${cp ? html`<span class="kpi-hint mono">${createdFormatted}</span>` : ''}
-            </div>
-          </div>
-        </section>
+        <div slot="context" class="meta-box">
+          <span class="meta-label">${t.viewTexts.timeentryDetail.labelCounterparty}</span>
+          ${cp
+            ? html`
+                <app-link
+                  class="link-btn meta-link"
+                  size="md"
+                  variant="primary"
+                  @click="${() => store.openCounterpartyDetail(cp.id)}"
+                >
+                  <span>${cp.name}</span>
+                </app-link>
+              `
+            : html`<span class="meta-val">${createdFormatted}</span>`}
+          ${cp ? html`<span class="kpi-hint mono">${createdFormatted}</span>` : ''}
+        </div>
 
         <!-- Description -->
         <app-section-card title="${t.viewTexts.timeentryDetail.descriptionTitle}">
@@ -597,7 +579,7 @@ export class AppTimeEntryDetail extends LitElement {
                 </div>
               `}
         </app-section-card>
-      </div>
+      </app-detail-shell>
 
       <app-time-entry-form
         .open="${this.editModalOpen}"
