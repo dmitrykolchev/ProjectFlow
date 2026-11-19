@@ -289,14 +289,13 @@ export class AppEntityReminders extends LitElement {
       <app-confirm-dialog
         ?open="${Boolean(this.deleteTarget)}"
         variant="danger"
-        hide-close
         title="${t.viewTexts.confirmDialogs.reminderDelete.title}"
         action="${this.deleteTarget ? t.viewTexts.confirmDialogs.reminderDelete.action(this.deleteTarget.title) : ''}"
         result="${t.viewTexts.confirmDialogs.reminderDelete.result}"
-        action-label="${t.viewTexts.confirmSectionLabels.action}"
-        result-label="${t.viewTexts.confirmSectionLabels.result}"
-        cancel-label="${t.common.cancel}"
-        confirm-label="${t.common.delete}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
         @cancel="${() => (this.deleteTarget = null)}"
         @confirm="${() => {
           if (this.deleteTarget) {
