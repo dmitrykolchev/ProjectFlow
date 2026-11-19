@@ -122,6 +122,26 @@ export class AppDataTable extends LitElement {
     );
   }
 
+  private handlePageSizeChange(e: CustomEvent<{ pageSize: number }>) {
+    e.stopPropagation();
+    this.pageSize = e.detail.pageSize;
+    this.currentPage = 1;
+    this.dispatchEvent(
+      new CustomEvent<DataTablePageChangeDetail>('page-change', {
+        detail: { page: 1, pageSize: this.pageSize, totalItems: this.rows.length },
+        bubbles: true,
+        composed: true,
+      })
+    );
+    this.dispatchEvent(
+      new CustomEvent<DataTablePageChangeDetail>('page-size-change', {
+        detail: { page: 1, pageSize: this.pageSize, totalItems: this.rows.length },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   private formatCellValue(col: AppTableScrollColumn, value: unknown): TemplateResult | string {
     if (value === undefined || value === null || value === '') {
       return html`<span style="color: var(--text-muted);">—</span>`;
@@ -226,6 +246,7 @@ export class AppDataTable extends LitElement {
                 layout-mode="table"
                 locale="${this.locale}"
                 @page-change="${this.handlePageChange}"
+                @page-size-change="${this.handlePageSizeChange}"
               ></app-pagination>
             </div>
           `

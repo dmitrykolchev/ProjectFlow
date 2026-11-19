@@ -38,21 +38,21 @@
 .data-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8125rem;
+  font-size: 0.83rem;
 }
 
 .data-table thead th {
   position: sticky;
   top: 0;
   z-index: 2;
-  background: var(--bg-surface, #111827);
+  background: var(--bg-subtle, #1a2438);
   border-bottom: 1px solid var(--border-subtle, #1e293b);
-  padding: 0.62rem 0.75rem;
+  padding: 0.8rem 1rem;
   text-align: left;
-  font-size: 0.71rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
   color: var(--text-muted, #64748b);
   white-space: nowrap;
 }
@@ -90,7 +90,6 @@
 }
 
 .data-table tbody tr {
-  border-bottom: 1px solid var(--border-subtle, #1e293b);
   transition: background 0.12s ease;
 }
 
@@ -99,9 +98,14 @@
 }
 
 .data-table tbody td {
-  padding: 0.55rem 0.75rem;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
   vertical-align: middle;
   color: var(--text-primary, #f8fafc);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .cell-mono {
