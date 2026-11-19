@@ -20,6 +20,8 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-pagination/app-pagination';
+import '../../common/app-data-table/app-data-table';
+import '../../common/app-table-column/app-table-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-counterparties.css';
 import { eventValue } from '../../common/event-value';
@@ -353,134 +355,160 @@ export class AppCounterparties extends LitElement {
   }
 
   private renderTable(list: Counterparty[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.tablePageSize);
+    const nameCell = (row: Record<string, unknown>) => {
+      const cp = row as unknown as Counterparty;
+      return html`
+        <div style="font-weight: 600;">
+          <app-link
+            class="cp-link-btn table-link"
+            size="md"
+            variant="primary"
+            @click="${() => store.openCounterpartyDetail(cp.id)}"
+          >
+            ${cp.name}
+          </app-link>
+        </div>
+        <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.legalName} · ${cp.city}</div>
+      `;
+    };
+    const bankCell = (row: Record<string, unknown>) => {
+      const cp = row as unknown as Counterparty;
+      const accounts = cp.bankAccounts || [];
+      const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
+      const primaryAcc = accounts.find((a) => a.isDefault) || accounts[0];
+      return html`
+        ${accounts.length === 0
+          ? html`<span style="font-size: 0.75rem; color: var(--text-muted);">${t.bankAccounts.noAccountsShort}</span>`
+          : html`
+              <div class="table-bank-cell">
+                <span class="table-bank-name">${primaryAcc?.bankName}</span>
+                <div class="bank-currencies">
+                  ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
+                  ${accounts.length > 1
+                    ? html`<span class="bank-more-count">(${accounts.length})</span>`
+                    : ''}
+                </div>
+              </div>
+            `}
+      `;
+    };
+    const contactCell = (row: Record<string, unknown>) => {
+      const cp = row as unknown as Counterparty;
+      const contacts = cp.contacts || [];
+      const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
+      return html`
+        <div>
+          ${primaryContact?.fullName || cp.contactPerson}
+          ${contacts.length > 1
+            ? html`<span class="bank-more-count">(+${contacts.length - 1})</span>`
+            : ''}
+        </div>
+        <div style="font-size: 0.74rem; color: var(--text-muted);">
+          ${primaryContact?.position ? `${primaryContact.position} · ` : ''}${primaryContact?.email || cp.email}
+        </div>
+      `;
+    };
 
     return html`
       <div class="table-card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>${t.viewTexts.counterparties.thCounterparty}</th>
-              <th>${t.viewTexts.counterparties.thType}</th>
-              <th>${t.viewTexts.counterparties.thInn}</th>
-              <th>${t.bankAccounts.thColumn}</th>
-              <th>${t.viewTexts.counterparties.thContact}</th>
-              <th>${t.viewTexts.counterparties.metaRating}</th>
-              <th>${t.viewTexts.counterparties.thContracts}</th>
-              <th>${t.viewTexts.counterparties.thStatus}</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            ${paged.items.map((cp) => {
+        <app-data-table
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
+        >
+          <app-table-column field="name" label="${t.viewTexts.counterparties.thCounterparty}" .cellRender="${nameCell}"></app-table-column>
+          <app-table-column
+            field="type"
+            label="${t.viewTexts.counterparties.thType}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="counterpartyType"
+                status="${(row as unknown as Counterparty).type}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column field="inn" label="${t.viewTexts.counterparties.thInn}" mono></app-table-column>
+          <app-table-column field="bankAccounts" label="${t.bankAccounts.thColumn}" .cellRender="${bankCell}"></app-table-column>
+          <app-table-column field="contacts" label="${t.viewTexts.counterparties.thContact}" .cellRender="${contactCell}"></app-table-column>
+          <app-table-column
+            field="rating"
+            label="${t.viewTexts.counterparties.metaRating}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <span class="rating-stars">${this.renderStars((row as unknown as Counterparty).rating)}</span>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field="id"
+            label="${t.viewTexts.counterparties.thContracts}"
+            mono
+            .cellRender="${(row: Record<string, unknown>) => {
+              const cp = row as unknown as Counterparty;
               const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
               const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
-              const accounts = cp.bankAccounts || [];
-              const currencies = Array.from(new Set(accounts.map((a) => a.currency)));
-              const primaryAcc = accounts.find((a) => a.isDefault) || accounts[0];
-              const contacts = cp.contacts || [];
-              const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
-
+              return html`${cpContracts.length} (${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix})`;
+            }}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.counterparties.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="counterparty"
+                status="${(row as unknown as Counterparty).status}"
+                appearance="outline"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            .cellRender="${(row: Record<string, unknown>) => {
+              const cp = row as unknown as Counterparty;
               return html`
-                <tr>
-                  <td>
-                    <div style="font-weight: 600;">
-                      <app-link
-                        class="cp-link-btn table-link"
-                        size="md"
-                        variant="primary"
-                        @click="${() => store.openCounterpartyDetail(cp.id)}"
-                      >
-                        ${cp.name}
-                      </app-link>
-                    </div>
-                    <div style="font-size: 0.74rem; color: var(--text-muted);">${cp.legalName} · ${cp.city}</div>
-                  </td>
-                  <td>
-                    <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
-                  </td>
-                  <td class="mono">${cp.inn}</td>
-                  <td>
-                    ${accounts.length === 0
-                      ? html`<span style="font-size: 0.75rem; color: var(--text-muted);">${t.bankAccounts.noAccountsShort}</span>`
-                      : html`
-                          <div class="table-bank-cell">
-                            <span class="table-bank-name">${primaryAcc?.bankName}</span>
-                            <div class="bank-currencies">
-                              ${currencies.map((cur) => html`<span class="currency-chip">${cur}</span>`)}
-                              ${accounts.length > 1
-                                ? html`<span class="bank-more-count">(${accounts.length})</span>`
-                                : ''}
-                            </div>
-                          </div>
-                        `}
-                  </td>
-                  <td>
-                    <div>
-                      ${primaryContact?.fullName || cp.contactPerson}
-                      ${contacts.length > 1
-                        ? html`<span class="bank-more-count">(+${contacts.length - 1})</span>`
-                        : ''}
-                    </div>
-                    <div style="font-size: 0.74rem; color: var(--text-muted);">
-                      ${primaryContact?.position ? `${primaryContact.position} · ` : ''}${primaryContact?.email || cp.email}
-                    </div>
-                  </td>
-                  <td><span class="rating-stars">${this.renderStars(cp.rating)}</span></td>
-                  <td class="mono">${cpContracts.length} (${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix})</td>
-                  <td>
-                    <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
-                  </td>
-                  <td>
-                    <div class="card-actions">
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.viewTexts.counterparties.openCardButton}"
-                        @click="${() => store.openCounterpartyDetail(cp.id)}"
-                      >
-                        <span slot="start">${iconChevronRight(15)}</span>
-                      </app-button>
-                      <app-button
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.edit}"
-                        @click="${() => this.openEditModal(cp)}"
-                      >
-                        <span slot="start">${iconEdit(14)}</span>
-                      </app-button>
-                      <app-button
-                        action="delete"
-                        size="sm"
-                        variant="icon"
-                        title="${t.common.delete}"
-                        @click="${() => (this.deletingItem = cp)}"
-                      >
-                        <span slot="start">${iconTrash(14)}</span>
-                      </app-button>
-                    </div>
-                  </td>
-                </tr>
+                <div class="cp-actions-row">
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.viewTexts.counterparties.openCardButton}"
+                    @click="${() => store.openCounterpartyDetail(cp.id)}"
+                  >
+                    <span slot="start">${iconChevronRight(15)}</span>
+                  </app-button>
+                  <app-button
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.edit}"
+                    @click="${() => this.openEditModal(cp)}"
+                  >
+                    <span slot="start">${iconEdit(14)}</span>
+                  </app-button>
+                  <app-button
+                    action="delete"
+                    size="sm"
+                    variant="icon"
+                    title="${t.common.delete}"
+                    @click="${() => (this.deletingItem = cp)}"
+                  >
+                    <span slot="start">${iconTrash(14)}</span>
+                  </app-button>
+                </div>
               `;
-            })}
-          </tbody>
-        </table>
+            }}"
+          ></app-table-column>
+        </app-data-table>
       </div>
-
-      <app-pagination
-        layout-mode="table"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => {
-          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-          this.scrollTop = 0;
-        }}"
-        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setTablePageSize(e.detail.pageSize);
-        }}"
-      ></app-pagination>
     `;
   }
 
