@@ -1517,6 +1517,14 @@ export const ru = {
     },
     header: {
       langToggleTitle: 'Сменить язык (RU / EN)',
+      themeNames: {
+        dark: 'Тёмная',
+        light: 'Светлая',
+        cyberpunk: 'Киберпанк',
+        matrix: 'Матрица',
+        barbie: 'Барби',
+        'high-contrast': 'Контраст',
+      },
     },
     sidebar: {
       themeToggleTitle: 'Переключить тему (Dark / Light / Cyberpunk / Matrix / Barbie / High Contrast)',
