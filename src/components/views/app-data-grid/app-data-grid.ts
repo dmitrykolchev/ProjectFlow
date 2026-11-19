@@ -3,7 +3,8 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import '../../common/app-avatar/app-avatar';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
+import '../../common/app-persona/app-persona';
 import styles from './app-data-grid.css';
 import {
   iconDownload,
@@ -1329,9 +1330,14 @@ export class AppDataGrid extends LitElement {
       case 'assignee': {
         const assignee = store.users.find((u) => u.id === String(val ?? ''));
         return html`
-          <div class="assignee-chip">
-            <app-avatar size="xs" initials="${assignee ? assignee.avatar : '?'}" title="${assignee ? assignee.name : '—'}"></app-avatar>
-            <span>${assignee ? assignee.name.split(' ')[0] : '—'}</span>
+          <div class="assignee-chip" title="${assignee ? assignee.name : '—'}">
+            <app-persona
+              size="24"
+              .initials="${assignee ? assignee.avatar : '?'}"
+              .presence="${assignee ? presenceFromStatus(assignee.status) : 'none'}"
+              .ariaLabel="${assignee ? assignee.name : ''}"
+              .interactive="${false}"
+            ></app-persona>
           </div>
         `;
       }
