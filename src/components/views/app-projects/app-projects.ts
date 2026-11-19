@@ -44,8 +44,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-progress-bar/app-progress-bar';
-import '../../common/app-pagination/app-pagination';
-import { paginateItems } from '../../common/paginate';
+import '../../common/app-cards-table/app-cards-table';
 import styles from './app-projects.css';
 import { eventValue } from '../../common/event-value';
 
@@ -215,127 +214,124 @@ export class AppProjects extends LitElement {
   }
 
   private renderCards(list: Project[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+    const projectCard = (row: Record<string, unknown>) => {
+      const proj = row as unknown as Project;
+      const company = store.companies.find((c) => c.id === proj.companyId);
+      const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
+      const tasksCount = store.tasks.filter((task) => task.projectId === proj.id).length;
+      const members = proj.members || [];
+      const uniqueMembers = new Set(members.map((m) => m.userId)).size;
+
+      const roleCounts = ALL_PROJECT_ROLES.map((role) => ({
+        role,
+        count: members.filter((m) => m.role === role).length,
+      })).filter((item) => item.count > 0);
+
+      return html`
+        <div class="proj-card-head">
+          <div class="proj-title-row">
+            <span class="color-dot" style="background: ${proj.color};"></span>
+            <span class="proj-key">${proj.key}</span>
+            <h3 class="proj-name">${proj.name}</h3>
+          </div>
+          <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
+        </div>
+
+        <p class="proj-desc">${proj.description}</p>
+
+        <app-progress-bar show-label color="${proj.color}" value="${proj.progress}"></app-progress-bar>
+
+        <div class="proj-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label">${t.viewTexts.projects.metaCompany}</span>
+            <span class="meta-val">${company?.name || '—'}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">${t.viewTexts.projects.metaClient}</span>
+            <span class="meta-val">${counterparty?.name || '—'}</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">${t.viewTexts.projects.metaBudget}</span>
+            <span class="meta-val mono">
+              ${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}
+            </span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">${t.viewTexts.projects.metaDueTasks}</span>
+            <span class="meta-val mono">${proj.dueDate} · ${tasksCount}</span>
+          </div>
+        </div>
+
+        <div class="team-summary-line">
+          ${roleCounts.length === 0
+            ? html`<span>${t.viewTexts.projects.noTeamRoles}</span>`
+            : html`
+                <span>${t.viewTexts.projects.teamMembersLabel}: <strong>${uniqueMembers}</strong></span>
+                ${roleCounts.map(
+                  (rc) => html`
+                    <span class="sep">·</span>
+                    <span>${t.projectRoles[rc.role]}: <strong>${rc.count}</strong></span>
+                  `
+                )}
+              `}
+        </div>
+
+        <card-footer>
+          <div slot="start" class="footer-left-actions">
+            <app-button
+              size="sm"
+              variant="primary"
+              @click="${() => store.openProjectDetail(proj.id)}"
+            >
+              <span>${t.projectDetail.openProject}</span>
+              <span slot="icon-end">${iconChevronRight(14)}</span>
+            </app-button>
+
+            <app-button
+              size="sm"
+              variant="outline"
+              @click="${() => {
+                store.selectProject(proj.id);
+                store.setActiveView('kanban');
+              }}"
+            >
+              <span slot="icon-start">${iconKanban()}</span>
+              <span>${t.viewTexts.projects.tasksButton}</span>
+            </app-button>
+          </div>
+
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(proj)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingProject = proj)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
 
     return html`
-      <div class="cards-grid">
-        ${paged.items.map((proj) => {
-          const company = store.companies.find((c) => c.id === proj.companyId);
-          const counterparty = store.counterparties.find((c) => c.id === proj.counterpartyId);
-          const tasksCount = store.tasks.filter((task) => task.projectId === proj.id).length;
-          const members = proj.members || [];
-          const uniqueMembers = new Set(members.map((m) => m.userId)).size;
-          const statusKey = (proj.status || 'active') as ProjectStatus;
-
-          const roleCounts = ALL_PROJECT_ROLES.map((role) => ({
-            role,
-            count: members.filter((m) => m.role === role).length,
-          })).filter((item) => item.count > 0);
-
-          return html`
-            <article class="project-card" @click="${() => store.openProjectDetail(proj.id)}">
-              <div class="proj-card-head">
-                <div class="proj-title-row">
-                  <span class="color-dot" style="background: ${proj.color};"></span>
-                  <span class="proj-key">${proj.key}</span>
-                  <h3 class="proj-name">${proj.name}</h3>
-                </div>
-                <app-status-chip domain="project" status="${proj.status || 'active'}" appearance="soft" size="sm"></app-status-chip>
-              </div>
-
-              <p class="proj-desc">${proj.description}</p>
-
-              <app-progress-bar show-label color="${proj.color}" value="${proj.progress}"></app-progress-bar>
-
-              <div class="proj-meta-grid">
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.projects.metaCompany}</span>
-                  <span class="meta-val">${company?.name || '—'}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.projects.metaClient}</span>
-                  <span class="meta-val">${counterparty?.name || '—'}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.projects.metaBudget}</span>
-                  <span class="meta-val mono">
-                    ${proj.budget ? `${(proj.budget / 1_000_000).toFixed(1)}M ₽` : '—'}
-                  </span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.projects.metaDueTasks}</span>
-                  <span class="meta-val mono">${proj.dueDate} · ${tasksCount}</span>
-                </div>
-              </div>
-
-              <div class="team-summary-line">
-                ${roleCounts.length === 0
-                  ? html`<span>${t.viewTexts.projects.noTeamRoles}</span>`
-                  : html`
-                      <span>${t.viewTexts.projects.teamMembersLabel}: <strong>${uniqueMembers}</strong></span>
-                      ${roleCounts.map(
-                        (rc) => html`
-                          <span class="sep">·</span>
-                          <span>${t.projectRoles[rc.role]}: <strong>${rc.count}</strong></span>
-                        `
-                      )}
-                    `}
-              </div>
-
-              <card-footer @click="${(e: Event) => e.stopPropagation()}">
-                <div slot="start" class="footer-left-actions">
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.openProjectDetail(proj.id)}"
-                  >
-                    <span>${t.projectDetail.openProject}</span>
-                    <span slot="icon-end">${iconChevronRight(14)}</span>
-                  </app-button>
-
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    @click="${() => {
-                      store.selectProject(proj.id);
-                      store.setActiveView('kanban');
-                    }}"
-                  >
-                    <span slot="icon-start">${iconKanban()}</span>
-                    <span>${t.viewTexts.projects.tasksButton}</span>
-                  </app-button>
-                </div>
-
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditModal(proj)}"
-                >
-                  <span slot="start">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingProject = proj)}"
-                >
-                  <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-              </card-footer>
-            </article>
-          `;
-        })}
-      </div>
-
-      <app-pagination
-        layout-mode="cards"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${projectCard}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        clickable
+        @card-click="${(e: CustomEvent<{ item: Record<string, unknown> }>) => store.openProjectDetail((e.detail.item as unknown as Project).id)}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
@@ -344,7 +340,7 @@ export class AppProjects extends LitElement {
           this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
-      ></app-pagination>
+      ></app-cards-table>
     `;
   }
 
