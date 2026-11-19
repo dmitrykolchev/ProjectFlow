@@ -2,6 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
+import { presenceFromStatus } from '../../../domain/presence-tokens';
 import {
   Calculation,
   Expense,
@@ -25,7 +26,6 @@ import {
   iconWallet,
   iconX,
 } from '../../common/icons';
-import '../../common/app-avatar/app-avatar';
 import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -38,6 +38,7 @@ import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-entity-reminders/app-entity-reminders';
 import '../../common/app-expense-form/app-expense-form';
 import '../../common/app-link/app-link';
+import '../../common/app-persona/app-persona';
 import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-select/app-select';
@@ -337,10 +338,14 @@ export class AppExpenseDetail extends LitElement {
           ${expense.vendor && user ? html`<span aria-hidden="true">·</span>` : ''}
           ${user
             ? html`
-                <span class="user-inline">
-                  <app-avatar name="${user.name}" size="xs"></app-avatar>
-                  <span>${user.name}</span>
-                </span>
+                <app-persona
+                  size="24"
+                  .initials="${user.avatar}"
+                  .presence="${presenceFromStatus(user.status)}"
+                  .primaryText="${user.name}"
+                  .secondaryText="${user.role}"
+                  @click="${() => store.openEmployeeDetail(user.id)}"
+                ></app-persona>
               `
             : ''}
         </div>
