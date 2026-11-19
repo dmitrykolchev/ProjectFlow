@@ -4,14 +4,13 @@ import { store } from '../../../state/store';
 import { SidebarGroupMode } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import {
-  PRESENCE_TOKENS,
   presenceFromStatus,
   presenceLabel,
   type PersonaPresence,
 } from '../../../domain/presence-tokens';
 import { PortalHandle, portalManager } from '../../common/app-modal-portal/app-modal-portal';
 import { MenuItem } from '../../common/app-menu/app-menu';
-import { presenceGlyph } from '../../common/app-presence-icon/app-presence-icon';
+import '../../common/app-presence-icon/app-presence-icon';
 import { mapProjectOptions } from '../../common/entity-selector-options';
 import '../../common/app-persona/app-persona';
 import '../../common/app-menu/app-menu';
@@ -93,12 +92,15 @@ export class AppSidebar extends LitElement {
         id: `presence-${p}`,
         label: presenceLabel(p, this.currentLang, t),
         checked: p === current,
-        // The icon TemplateResult renders inside app-menu's shadow root, so the dot
-        // carries inline styles (the sidebar sheet cannot reach that tree).
-        icon: html`<span
-          class="menu-presence-dot"
-          style="background: ${PRESENCE_TOKENS[p]?.color}; width: 12px; height: 12px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff;"
-        >${presenceGlyph(PRESENCE_TOKENS[p]?.glyph || 'ring', 8)}</span>`,
+        // The icon renders inside app-menu's shadow root as a slotted element; it owns
+        // its styles, so no inline geometry is needed (12px dot, explicit 8px glyph).
+        // aria-hidden: the row text already carries the label, the icon is decoration.
+        icon: html`<app-presence-icon
+          size="12"
+          glyph="8"
+          presence="${p}"
+          aria-hidden="true"
+        ></app-presence-icon>`,
       })),
       { id: 'profile-divider', divider: true },
       { id: 'profile', label: t.viewTexts.sidebar.profileMenuItem },
