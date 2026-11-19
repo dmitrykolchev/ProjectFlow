@@ -269,6 +269,16 @@ export class AppHeader extends LitElement {
           </button>
 
           <button
+            class="icon-action-btn lang-toggle-btn"
+            @click="${() =>
+              store.setLanguage(getTranslation(this.currentLang).common.otherLang as 'en' | 'ru')}"
+            title="${t.viewTexts.header.langToggleTitle}"
+            aria-label="${t.viewTexts.header.langToggleTitle}"
+          >
+            <span class="lang-label">${this.currentLang.toUpperCase()}</span>
+          </button>
+
+          <button
             class="icon-action-btn"
             @click="${() => store.toggleActivityPanel()}"
             title="${t.activity.title}"

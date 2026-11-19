@@ -139,6 +139,14 @@
   box-shadow: var(--surface-glow, none);
 }
 
+/* Language toggle (the sidebar footer button moved into the header, right after the
+   theme button): the language code is the control's glyph. */
+.lang-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
 .badge-dot {
   position: absolute;
   top: 6px;
