@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-detail-shell';
-import '../app-avatar/app-avatar';
+import '../app-persona/app-persona';
 import '../app-badge/app-badge';
 import '../app-button/app-button';
 import '../app-link/app-link';
@@ -183,7 +183,7 @@ export const meta: ComponentStoryMeta = {
     'app-link': 'Linked meta value with the link-btn / meta-link token overrides',
     'app-status-chip': 'Domain status chip inside the title row',
     'app-badge': 'Secondary badge inside the title row',
-    'app-avatar': 'User avatar in the hero sub line',
+    'app-persona': 'User persona (avatar + presence badge) in the hero sub line',
     'app-section-card': 'Panel below the overview card',
     'app-entity-emblem': 'Emblem pill inside the hero meta row',
   },
@@ -247,7 +247,13 @@ export const meta: ComponentStoryMeta = {
             <span>Figma Inc.</span>
             <span aria-hidden="true">·</span>
             <span class="user-inline">
-              <app-avatar name="Алексей Смирнов" size="xs"></app-avatar>
+              <app-persona
+                size="24"
+                .initials="${'АС'}"
+                .presence="${'available'}"
+                .ariaLabel="${'Алексей Смирнов'}"
+                .interactive="${false}"
+              ></app-persona>
               <span>Алексей Смирнов</span>
             </span>
           </div>
