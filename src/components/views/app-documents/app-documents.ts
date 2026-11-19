@@ -26,6 +26,7 @@ import {
   iconEye,
   iconFile,
   iconFileCode,
+  iconFilter,
   iconFolderOpen,
   iconImage,
   iconPlus,
@@ -56,6 +57,7 @@ import '../../common/app-tags-row/app-tags-row';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-pagination/app-pagination';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
@@ -72,6 +74,7 @@ export class AppDocuments extends LitElement {
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
   @state() private viewMode: 'cards' | 'table' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private scopeFilter: 'all' | DocumentScope = store.documentFilterScope;
   @state() private categoryFilter: 'all' | DocumentCategory = 'all';
   @state() private statusFilter: 'all' | DocumentStatus = 'all';
@@ -310,58 +313,7 @@ export class AppDocuments extends LitElement {
         @file-selected="${this.handleQuickDropzoneSelect}"
       ></app-file-dropzone>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${t.documents.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        show-reset
-        .filters="${[
-          { key: 'scope', options: scopeOptions },
-          { key: 'category', options: categoryOptions },
-          { key: 'status', options: statusOptions },
-          { key: 'company', options: companyOptions },
-          { key: 'project', options: projectOptions },
-        ]}"
-        .values="${{
-          scope: this.scopeFilter,
-          category: this.categoryFilter,
-          status: this.statusFilter,
-          company: this.companyFilter,
-          project: this.projectFilter,
-        }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          const val = eventValue(e);
-          if (e.detail.key === 'scope') {
-            this.scopeFilter = val as 'all' | DocumentScope;
-            store.setDocumentFilters({ scope: this.scopeFilter });
-          } else if (e.detail.key === 'category') {
-            this.categoryFilter = val as 'all' | DocumentCategory;
-          } else if (e.detail.key === 'status') {
-            this.statusFilter = val as 'all' | DocumentStatus;
-          } else if (e.detail.key === 'company') {
-            this.companyFilter = val;
-            store.setDocumentFilters({ companyId: val });
-          } else if (e.detail.key === 'project') {
-            this.projectFilter = val;
-            store.setDocumentFilters({ projectId: val });
-          }
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @reset="${() => {
-          this.localSearch = '';
-          this.scopeFilter = 'all';
-          this.categoryFilter = 'all';
-          this.statusFilter = 'all';
-          this.companyFilter = 'all';
-          this.projectFilter = 'all';
-          this.currentPage = 1; store.setActivePage(1, false);
-          store.setDocumentFilters({ scope: 'all', companyId: 'all', projectId: 'all' });
-        }}"
-      >
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.viewMode}"
@@ -374,7 +326,71 @@ export class AppDocuments extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${t.documents.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            show-reset
+            .filters="${[
+              { key: 'scope', options: scopeOptions },
+              { key: 'category', options: categoryOptions },
+              { key: 'status', options: statusOptions },
+              { key: 'company', options: companyOptions },
+              { key: 'project', options: projectOptions },
+            ]}"
+            .values="${{
+              scope: this.scopeFilter,
+              category: this.categoryFilter,
+              status: this.statusFilter,
+              company: this.companyFilter,
+              project: this.projectFilter,
+            }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              const val = eventValue(e);
+              if (e.detail.key === 'scope') {
+                this.scopeFilter = val as 'all' | DocumentScope;
+                store.setDocumentFilters({ scope: this.scopeFilter });
+              } else if (e.detail.key === 'category') {
+                this.categoryFilter = val as 'all' | DocumentCategory;
+              } else if (e.detail.key === 'status') {
+                this.statusFilter = val as 'all' | DocumentStatus;
+              } else if (e.detail.key === 'company') {
+                this.companyFilter = val;
+                store.setDocumentFilters({ companyId: val });
+              } else if (e.detail.key === 'project') {
+                this.projectFilter = val;
+                store.setDocumentFilters({ projectId: val });
+              }
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.scopeFilter = 'all';
+              this.categoryFilter = 'all';
+              this.statusFilter = 'all';
+              this.companyFilter = 'all';
+              this.projectFilter = 'all';
+              this.currentPage = 1; store.setActivePage(1, false);
+              store.setDocumentFilters({ scope: 'all', companyId: 'all', projectId: 'all' });
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`
