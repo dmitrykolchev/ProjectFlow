@@ -814,6 +814,7 @@ export const ru = {
     tabTime: 'Затраты времени',
     tabExpenses: 'Расходы',
     tabDiscussions: 'Обсуждения',
+    workspaceTitle: 'Рабочая область',
     filterAll: 'Все',
     filterTime: 'Время',
     filterExpenses: 'Расходы',

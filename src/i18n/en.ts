@@ -814,6 +814,7 @@ export const en = {
     tabTime: 'Time Logged',
     tabExpenses: 'Expenses',
     tabDiscussions: 'Discussions',
+    workspaceTitle: 'Workspace',
     filterAll: 'All',
     filterTime: 'Time',
     filterExpenses: 'Expenses',

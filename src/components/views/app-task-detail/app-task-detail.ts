@@ -631,7 +631,12 @@ export class AppTaskDetail extends LitElement {
         <div class="detail-grid">
           <!-- Primary Column: History, Time, Expenses, Discussions -->
           <div class="main-column">
-            <app-section-card variant="tabbed" collapsible max-height="50rem">
+            <app-section-card
+              variant="tabbed"
+              collapsible
+              max-height="50rem"
+              aria-label="${t.taskDetail.workspaceTitle}"
+            >
               <div slot="header-left">
                 <app-segmented-switch
                   size="sm"
