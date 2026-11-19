@@ -5,8 +5,13 @@ import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
 import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconContrast, iconHeart, iconTerminal, iconZap, iconRefreshCw } from '../../common/icons';
 import '../../common/app-button/app-button';
+import '../../common/app-split-button/app-split-button';
+import { MenuItem } from '../../common/app-menu/app-menu';
+import type { ThemeMode } from '../../../types';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
+
+const THEME_ORDER: ThemeMode[] = ['dark', 'light', 'cyberpunk', 'matrix', 'barbie', 'high-contrast'];
 
 const DETAIL_ENTITY_MAP: Record<string, EntityEmblemKind> = {
   'project-detail': 'project',
@@ -82,6 +87,12 @@ export class AppHeader extends LitElement {
     this.theme = store.customization.theme;
     this.activityCount = store.activityLog.length;
     this.aiBusyCount = store.aiBusyCount;
+  }
+
+  private handleThemeSelect(e: CustomEvent) {
+    e.stopPropagation();
+    const id = String((e.detail as { id?: string })?.id || '');
+    if (id) store.setTheme(id as ThemeMode);
   }
 
   render() {
@@ -190,6 +201,24 @@ export class AppHeader extends LitElement {
 
     const detailEntity = DETAIL_ENTITY_MAP[this.activeView];
 
+    const themeName = t.viewTexts.header.themeNames[this.theme];
+    const themeItems: MenuItem[] = THEME_ORDER.map((th) => ({
+      id: th,
+      label: t.viewTexts.header.themeNames[th],
+      checked: th === this.theme,
+    }));
+    const themeIcon = this.theme === 'high-contrast'
+      ? iconContrast(16)
+      : this.theme === 'barbie'
+      ? iconHeart(16)
+      : this.theme === 'matrix'
+      ? iconTerminal(16)
+      : this.theme === 'cyberpunk'
+      ? iconZap(16)
+      : this.theme === 'dark'
+      ? iconSun(16)
+      : iconMoon(16);
+
     return html`
       <header class="header-container">
         <div class="left-zone">
@@ -239,34 +268,18 @@ export class AppHeader extends LitElement {
               `
             : ''}
 
-          <button
-            class="icon-action-btn"
-            @click="${() => store.toggleTheme()}"
-            title="${this.theme === 'high-contrast'
-              ? 'High Contrast → Dark'
-              : this.theme === 'barbie'
-              ? 'Barbie → High Contrast'
-              : this.theme === 'matrix'
-              ? 'Matrix → Barbie'
-              : this.theme === 'cyberpunk'
-              ? 'Cyberpunk → Matrix'
-              : this.theme === 'dark'
-              ? 'Dark → Light'
-              : 'Light → Cyberpunk'}"
-            aria-label="Toggle Theme"
+          <!-- Theme split button: the main button cycles the themes sequentially as
+             before, the chevron menu picks a specific theme directly. -->
+          <app-split-button
+            variant="secondary"
+            size="md"
+            .label="${themeName}"
+            .items="${themeItems}"
+            @primary-click="${() => store.toggleTheme()}"
+            @select="${this.handleThemeSelect}"
           >
-            ${this.theme === 'high-contrast'
-              ? iconContrast(16)
-              : this.theme === 'barbie'
-              ? iconHeart(16)
-              : this.theme === 'matrix'
-              ? iconTerminal(16)
-              : this.theme === 'cyberpunk'
-              ? iconZap(16)
-              : this.theme === 'dark'
-              ? iconSun(16)
-              : iconMoon(16)}
-          </button>
+            <span slot="start">${themeIcon}</span>
+          </app-split-button>
 
           <button
             class="icon-action-btn lang-toggle-btn"
