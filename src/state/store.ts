@@ -3585,6 +3585,9 @@ export class AppStore {
     taskRefId?: string;
   }): ProjectChatMessage | null {
     const senderId = data.senderId || this.currentUserId || this.users[0]?.id || '';
+    // Chat writes are gated by project membership, as channel CRUD is: a user
+    // outside the roster must not be able to post into a project channel.
+    if (!this.isUserProjectMember(data.projectId, senderId)) return null;
     let resolvedChannel = data.channelId
       ? this.chatChannels.find((c) => c.id === data.channelId && c.projectId === data.projectId)
       : undefined;
