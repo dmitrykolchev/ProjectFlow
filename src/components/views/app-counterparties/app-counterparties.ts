@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconFilter, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-bank-summary/app-bank-summary';
@@ -14,6 +14,7 @@ import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-counterparty-form/app-counterparty-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
@@ -35,6 +36,7 @@ export class AppCounterparties extends LitElement {
   @state() private typeFilter: 'all' | CounterpartyType = 'all';
   @state() private statusFilter: 'all' | CounterpartyStatus = 'all';
   @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -164,27 +166,38 @@ export class AppCounterparties extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
       </div>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'type', options: typeOptions },
-          { key: 'status', options: statusOptions },
-        ]}"
-        .values="${{ type: this.typeFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
-          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      ></app-filter-bar>
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+            placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'type', options: typeOptions },
+              { key: 'status', options: statusOptions },
+            ]}"
+            .values="${{ type: this.typeFilter, status: this.statusFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.counterparties.emptyNoCounterparties}"></app-empty-state>`
