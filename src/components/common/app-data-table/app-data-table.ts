@@ -2,6 +2,7 @@ import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../app-empty-state/app-empty-state';
 import '../app-pagination/app-pagination';
+import '../app-checkbox/app-checkbox';
 import '../app-table-column/app-table-column';
 import { AppTableColumn } from '../app-table-column/app-table-column';
 import { paginateItems } from '../paginate';
@@ -20,6 +21,15 @@ export interface DataTablePageChangeDetail {
   totalItems: number;
 }
 
+export interface DataTableSelectionChangeDetail {
+  selectedIds: string[];
+  selectedItems: Record<string, unknown>[];
+}
+
+export interface DataTableRowClickDetail {
+  row: Record<string, unknown>;
+}
+
 /**
  * A data table with a fixed header and footer. Columns are declared as child
  * app-table-column elements (field-driven formatting, mono/code cells,
@@ -31,6 +41,11 @@ export interface DataTablePageChangeDetail {
  * scrollbar while the header and footer stay in place. The footer is shown
  * whenever the table is not empty: even with a single page it hosts the page-size
  * selector, so the rows-per-page can always be changed from the footer.
+ * With selectable the table gains a leading checkbox column keyed by key-field
+ * (default 'id'); the selection lives in selectedKeys, the selectedItems getter
+ * returns the selected rows, and toggling emits selection-change
+ * { selectedIds, selectedItems }. Clicking a row emits row-click { row }; clicks
+ * on checkboxes, buttons and links inside cells do not activate the row.
  */
 @customElement('app-data-table')
 export class AppDataTable extends LitElement {
@@ -42,6 +57,9 @@ export class AppDataTable extends LitElement {
   @property({ type: Number, attribute: 'max-height' }) maxHeight: number = 0;
   @property({ type: String, attribute: 'empty-title' }) emptyTitle: string = '';
   @property({ type: String }) locale: string = 'ru-RU';
+  @property({ type: Boolean, attribute: 'selectable' }) selectable: boolean = false;
+  @property({ type: String, attribute: 'key-field' }) keyField: string = 'id';
+  @property({ type: Array, attribute: false }) selectedKeys: string[] = [];
 
   @state() private currentPage: number = 1;
 
@@ -179,6 +197,46 @@ export class AppDataTable extends LitElement {
     return classes.join(' ');
   }
 
+  private rowKey(row: Record<string, unknown>): string {
+    return String(row[this.keyField]);
+  }
+
+  /** Rows whose key is currently selected; the consumer reads the selection back. */
+  get selectedItems(): Record<string, unknown>[] {
+    return this.rows.filter((row) => this.selectedKeys.includes(this.rowKey(row)));
+  }
+
+  private toggleSelect(key: string) {
+    const has = this.selectedKeys.includes(key);
+    this.selectedKeys = has
+      ? this.selectedKeys.filter((k) => k !== key)
+      : [...this.selectedKeys, key];
+    this.dispatchEvent(
+      new CustomEvent<DataTableSelectionChangeDetail>('selection-change', {
+        detail: { selectedIds: this.selectedKeys, selectedItems: this.selectedItems },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
+  private handleRowClick(e: MouseEvent, row: Record<string, unknown>) {
+    // clicks on interactive controls (checkboxes, buttons, links) are not row activation
+    const interactive = e.composedPath().some(
+      (n) =>
+        n instanceof HTMLElement &&
+        ['APP-BUTTON', 'APP-CHECKBOX', 'APP-LINK'].includes(n.tagName.toUpperCase())
+    );
+    if (interactive) return;
+    this.dispatchEvent(
+      new CustomEvent<DataTableRowClickDetail>('row-click', {
+        detail: { row },
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   render() {
     this.syncColumns();
     const sorted = this.sortedRows();
@@ -196,6 +254,7 @@ export class AppDataTable extends LitElement {
               <table class="data-table">
                 <thead>
                   <tr>
+                    ${this.selectable ? html`<th class="select-col"></th>` : ''}
                     ${this.columns.map(
                       (col) => html`
                         <th class="${this.headerClass(col)}">
@@ -221,7 +280,17 @@ export class AppDataTable extends LitElement {
                 <tbody>
                   ${slice.items.map(
                     (row) => html`
-                      <tr>
+                      <tr @click="${(e: MouseEvent) => this.handleRowClick(e, row)}">
+                        ${this.selectable
+                          ? html`
+                              <td class="select-col">
+                                <app-checkbox
+                                  .checked="${this.selectedKeys.includes(this.rowKey(row))}"
+                                  @change="${() => this.toggleSelect(this.rowKey(row))}"
+                                ></app-checkbox>
+                              </td>
+                            `
+                          : ''}
                         ${this.columns.map(
                           (col) => html`
                             <td class="${this.cellClass(col)}">

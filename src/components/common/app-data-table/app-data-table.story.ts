@@ -104,6 +104,12 @@ export const meta: ComponentStoryMeta = {
     'sort-change event': 'Emitted with detail { field, dir } when a header sort button is clicked',
     'page-change event': 'Emitted with detail { page, pageSize, totalItems } when pagination changes',
     'page-size-change event': 'Emitted with detail { page: 1, pageSize, totalItems } when the footer page-size selector changes; rows are re-sliced at the new size and the page resets to 1',
+    selectable: 'Leading checkbox column keyed by key-field (default id); header cell stays empty, select-all lives in the consumer toolbar',
+    'key-field': 'Row field used as the selection key (default id)',
+    'selected-keys': 'Array of currently selected row keys (property binding); toggling a checkbox updates it and emits selection-change',
+    'selectedItems getter': 'Rows whose key is in selectedKeys — the consumer reads the selection back from the table',
+    'selection-change event': 'Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles',
+    'row-click event': 'Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row',
   },
   stories: [
     {
@@ -186,6 +192,35 @@ export const meta: ComponentStoryMeta = {
       render: () => html`
         <div style="max-width: 700px;">
           <app-data-table .rows="${demoEntries.slice(0, 6)}" page-size="10">
+            <app-table-column field="date" label="Date" mono></app-table-column>
+            <app-table-column field="taskKey" label="Task" code></app-table-column>
+            <app-table-column
+              field="hours"
+              label="Hours"
+              type="number"
+              align="right"
+              mono
+            ></app-table-column>
+          </app-data-table>
+        </div>
+      `,
+    },
+    {
+      name: 'Selectable Rows',
+      description:
+        'selectable adds a leading checkbox column keyed by row id; the selection lives in selectedKeys, the selectedItems getter returns the chosen rows, toggling emits selection-change, and clicking a row (outside controls) emits row-click',
+      render: () => html`
+        <div style="max-width: 700px;">
+          <app-data-table
+            .rows="${demoEntries.map((e, i) => ({ ...e, id: `row-${i}` }))}"
+            page-size="6"
+            selectable
+            key-field="id"
+            @selection-change="${(e: CustomEvent<{ selectedIds: string[] }>) =>
+              console.log('selection-change', e.detail.selectedIds)}"
+            @row-click="${(e: CustomEvent<Record<string, unknown>>) =>
+              console.log('row-click', (e.detail.row as { taskKey: string }).taskKey)}"
+          >
             <app-table-column field="date" label="Date" mono></app-table-column>
             <app-table-column field="taskKey" label="Task" code></app-table-column>
             <app-table-column
