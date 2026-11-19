@@ -658,20 +658,12 @@
   border-color: var(--accent-border, rgba(99, 102, 241, 0.2));
 }
 
-.msg-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--accent-gradient, var(--accent-primary, #6366f1));
-  color: var(--text-on-accent, #ffffff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.78rem;
-  font-weight: 700;
+/* Author persona column: fixed width so message bodies align across rows; the
+   persona button fills the column and the name/role lines truncate inside it. */
+.msg-author {
   flex-shrink: 0;
-  border: none;
-  cursor: pointer;
+  width: 150px;
+  --persona-button-width: 100%;
 }
 
 .msg-content {
@@ -696,31 +688,6 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   min-width: 0;
-}
-
-.author-btn {
-  border: none;
-  background: transparent;
-  padding: 0;
-  font-size: 0.88rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  cursor: pointer;
-  font-family: inherit;
-}
-
-.author-btn:hover {
-  color: var(--accent-primary, #6366f1);
-  text-decoration: underline;
-}
-
-.role-tag {
-  font-size: 0.68rem;
-  font-weight: 600;
-  padding: 0.1rem 0.42rem;
-  border-radius: 4px;
-  background: var(--bg-subtle, #1a2438);
-  color: var(--text-secondary, #94a3b8);
 }
 
 .msg-time {
@@ -1058,94 +1025,26 @@
   gap: 0.35rem;
 }
 
+/* Member row: the persona is a ghost button and carries the click, so the row
+   itself is a plain div. */
 .member-item {
   width: 100%;
-  text-align: left;
-  border: 1px solid transparent;
-  background: transparent;
   border-radius: var(--radius-md, 8px);
   padding: 0.55rem 0.65rem;
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  cursor: pointer;
-  color: inherit;
-  font-family: inherit;
-  transition: background-color 130ms ease, border-color 130ms ease;
+  transition: background-color 130ms ease;
 }
 
 .member-item:hover {
   background: var(--bg-hover, rgba(255, 255, 255, 0.04));
-  border-color: var(--border-subtle, #1e293b);
 }
 
-.member-avatar-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.member-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-gradient, var(--accent-primary, #6366f1));
-  color: var(--text-on-accent, #ffffff);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.74rem;
-  font-weight: 700;
-}
-
-.status-dot {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  border: 2px solid var(--bg-surface, #111827);
-}
-
-.status-dot.active {
-  background: #10b981;
-}
-
-.status-dot.remote {
-  background: #0284c7;
-}
-
-.status-dot.vacation {
-  background: #f59e0b;
-}
-
-.status-dot.onboarding {
-  background: #6366f1;
-}
-
-.member-meta {
-  min-width: 0;
+.member-persona {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.12rem;
-}
-
-.member-name {
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.member-role {
-  font-size: 0.72rem;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+  --persona-button-width: 100%;
 }
 
 .member-alloc {
@@ -1153,6 +1052,7 @@
   font-size: 0.7rem;
   color: var(--text-secondary, #94a3b8);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 @media (max-width: 1120px) {
