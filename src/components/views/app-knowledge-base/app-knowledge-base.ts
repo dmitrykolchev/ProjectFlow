@@ -101,6 +101,17 @@ export class AppKnowledgeBase extends LitElement {
     } else if (!this.detailKnowledgeId || !this.articles.some((a) => a.id === this.detailKnowledgeId)) {
       this.detailKnowledgeId = this.articles[0]?.id || '';
     }
+    // strict-mode fallback: the project and company filters are mirrored in the store, so a stale value
+    // is cleared through setKnowledgeFilters — otherwise the next sync copies it back, the select renders
+    // its placeholder (the value is not in the option list) and the list stays silently empty.
+    if (this.projectFilter !== 'all' && !store.projects.some((p) => p.id === this.projectFilter)) {
+      store.setKnowledgeFilters({ projectId: 'all' });
+      this.projectFilter = 'all';
+    }
+    if (this.companyFilter !== 'all' && !store.companies.some((c) => c.id === this.companyFilter)) {
+      store.setKnowledgeFilters({ companyId: 'all' });
+      this.companyFilter = 'all';
+    }
   }
 
   private getFilteredArticles(): KnowledgeArticle[] {
