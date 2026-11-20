@@ -1,0 +1,43 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-canvas, #090d16);
+  padding: 1.5rem;
+  gap: 1.25rem;
+}
+
+/* Canonical skeleton order: page header, display-mode switcher, filter, data representation. The
+   mode row holds the Standard/Compact density app-segmented-switch (size="sm") and the filter
+   toggle (app-toggle-button size="sm", funnel icon + label; pressed = the filter bar is visible,
+   unpressed = hidden, the view mirrors the pressed state in filterVisible); it sits directly
+   before the filter bar. The switch host is inline-flex and the toggle host is inline-block, so
+   the row keeps the intrinsic widths left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Data Grid View: the framed card owns the border and radius; the grid fills the frame and keeps
+   its own toolbar, table and footer areas. */
+.data-grid-frame {
+  flex: 1;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm), var(--surface-glow, none);
+}
