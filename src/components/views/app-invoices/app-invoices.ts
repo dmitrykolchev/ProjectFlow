@@ -28,7 +28,6 @@ import {
   iconPlus,
   iconReceipt,
   iconSend,
-  iconTable,
   iconTrash,
 } from '../../common/icons';
 import '../../common/app-badge/app-badge';
@@ -139,7 +138,8 @@ export class AppInvoices extends LitElement {
     this.globalSearch = store.searchQuery;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
-    this.displayMode = (store.viewModeFor('invoices') as 'cards' | 'table') ?? 'cards';
+    const mode = store.viewModeFor('invoices');
+    this.displayMode = mode === 'table' ? 'table' : 'cards';
 
     if (this.previewInvoice) {
       this.previewInvoice = this.invoices.find((i) => i.id === this.previewInvoice!.id) || null;
@@ -188,10 +188,10 @@ export class AppInvoices extends LitElement {
         const ctr = this.contracts.find((c) => c.id === inv.contractId);
         const cp = this.counterparties.find((c) => c.id === inv.counterpartyId);
         const comp = this.companies.find((c) => c.id === inv.companyId);
-        const itemText = inv.items.map((i) => i.title).join(' ').toLowerCase();
+        const itemText = (inv.items || []).map((i) => i.title || '').join(' ').toLowerCase();
         return (
-          inv.number.toLowerCase().includes(query) ||
-          inv.notes.toLowerCase().includes(query) ||
+          (inv.number || '').toLowerCase().includes(query) ||
+          (inv.notes || '').toLowerCase().includes(query) ||
           itemText.includes(query) ||
           (ctr?.number.toLowerCase().includes(query) ?? false) ||
           (ctr?.title.toLowerCase().includes(query) ?? false) ||
@@ -199,7 +199,7 @@ export class AppInvoices extends LitElement {
           (comp?.name.toLowerCase().includes(query) ?? false)
         );
       })
-      .sort((a, b) => b.issueDate.localeCompare(a.issueDate));
+      .sort((a, b) => (b.issueDate || '').localeCompare(a.issueDate || ''));
   }
 
   private renderDueControlBadge(
@@ -373,8 +373,11 @@ export class AppInvoices extends LitElement {
             { value: 'table', label: t.viewTexts.invoices.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
-            store.setViewMode('invoices', this.displayMode);
+            const nextMode = eventValue(e) === 'table' ? 'table' : 'cards';
+            this.displayMode = nextMode;
+            this.currentPage = 1;
+            store.setActivePage(1, false);
+            store.setViewMode('invoices', nextMode);
           }}"
         ></app-segmented-switch>
         <app-toggle-button
@@ -395,39 +398,54 @@ export class AppInvoices extends LitElement {
               style="--filter-search-min: 280px; --filter-search-max: 280px;"
               placeholder="${t.viewTexts.invoices.searchPlaceholder}"
               .searchValue="${this.localSearch}"
+              show-reset
               .filters="${[
                 {
                   key: 'status',
-                  value: this.statusFilter,
                   options: statusOptions,
                 },
                 {
                   key: 'contract',
-                  value: this.contractFilter,
                   options: contractOptions,
                 },
                 {
                   key: 'counterparty',
-                  value: this.counterpartyFilter,
                   options: counterpartyOptions,
                 },
                 {
                   key: 'company',
-                  value: this.companyFilter,
                   options: companyOptions,
                 },
               ]}"
+              .values="${{
+                status: this.statusFilter,
+                contract: this.contractFilter,
+                counterparty: this.counterpartyFilter,
+                company: this.companyFilter,
+              }}"
               @search-change="${(e: CustomEvent<{ value: string }>) => {
                 this.localSearch = eventValue(e);
+                this.currentPage = 1;
                 store.setActivePage(1, false);
               }}"
               @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+                const val = eventValue(e);
                 if (e.detail.key === 'status') {
-                  this.statusFilter = e.detail.value as 'all' | 'overdue_due' | InvoiceStatus;
+                  this.statusFilter = val as 'all' | 'overdue_due' | InvoiceStatus;
                 }
-                if (e.detail.key === 'contract') this.contractFilter = e.detail.value;
-                if (e.detail.key === 'counterparty') this.counterpartyFilter = e.detail.value;
-                if (e.detail.key === 'company') this.companyFilter = e.detail.value;
+                if (e.detail.key === 'contract') this.contractFilter = val;
+                if (e.detail.key === 'counterparty') this.counterpartyFilter = val;
+                if (e.detail.key === 'company') this.companyFilter = val;
+                this.currentPage = 1;
+                store.setActivePage(1, false);
+              }}"
+              @reset="${() => {
+                this.localSearch = '';
+                this.statusFilter = 'all';
+                this.contractFilter = 'all';
+                this.counterpartyFilter = 'all';
+                this.companyFilter = 'all';
+                this.currentPage = 1;
                 store.setActivePage(1, false);
               }}"
             ></app-filter-bar>
@@ -438,7 +456,7 @@ export class AppInvoices extends LitElement {
         ? html`
             <app-empty-state
               title="${t.viewTexts.invoices.emptyTitle}"
-              description="${t.viewTexts.invoices.emptySubtitle}"
+              message="${t.viewTexts.invoices.emptySubtitle}"
             ></app-empty-state>
           `
         : this.displayMode === 'cards'
@@ -454,8 +472,8 @@ export class AppInvoices extends LitElement {
   }
 
   private renderCards(filtered: Invoice[], t: ReturnType<typeof getTranslation>) {
-    const cardRender = (item: unknown) => {
-      const inv = item as Invoice;
+    const cardRender = (item: Record<string, unknown>) => {
+      const inv = item as unknown as Invoice;
       const ctr = this.contracts.find((c) => c.id === inv.contractId);
       const cp = this.counterparties.find((c) => c.id === inv.counterpartyId);
       const comp = this.companies.find((c) => c.id === inv.companyId);
@@ -589,9 +607,9 @@ export class AppInvoices extends LitElement {
         ${inv.notes ? html`<p class="inv-notes">${inv.notes}</p>` : ''}
 
         <card-footer>
-          <div class="stats-row">
+          <div slot="start" class="stats-row">
             <span class="stat-pill">
-              <strong>${inv.items.length}</strong> ${t.viewTexts.invoices.itemsCountSuffix}
+              <strong>${(inv.items || []).length}</strong> ${t.viewTexts.invoices.itemsCountSuffix}
             </span>
             <span class="stat-pill">
               <strong>${invPayments.length}</strong> ${t.viewTexts.invoices.paymentsCountSuffix}
@@ -600,7 +618,7 @@ export class AppInvoices extends LitElement {
               ${inv.vatRate > 0 ? `${t.viewTexts.contracts.vatLabel} ${inv.vatRate}%` : t.viewTexts.contracts.noVatLabel}
             </span>
           </div>
-          <div class="inv-footer-actions">
+          <div slot="end" class="inv-footer-actions">
             ${inv.status === 'draft'
               ? html`
                   <app-button
@@ -696,13 +714,19 @@ export class AppInvoices extends LitElement {
 
     return html`
       <app-cards-table
-        .items="${filtered}"
+        .rows="${filtered as unknown as Record<string, unknown>[]}"
         .cardRender="${cardRender}"
-        .pageSize="${this.cardPageSize}"
-        .pageSizeOptions="${[6, 12, 24, 48]}"
-        .currentPage="${this.currentPage}"
-        @page-change="${(e: CustomEvent<{ page: number }>) => store.setActivePage(e.detail.page)}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        empty-title="${t.viewTexts.invoices.emptyTitle}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page;
+          store.setActivePage(e.detail.page);
+          this.scrollTop = 0;
+        }}"
         @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
           store.setCardGridPageSize(e.detail.pageSize);
           store.setActivePage(1, false);
         }}"
@@ -719,7 +743,7 @@ export class AppInvoices extends LitElement {
           <span>${inv.number}</span>
         </div>
         <div class="cell-sub">
-          ${inv.items.length} ${t.viewTexts.calculations.itemsSuffix} ·
+          ${(inv.items || []).length} ${t.viewTexts.calculations.itemsSuffix} ·
           ${inv.vatRate > 0 ? `${t.viewTexts.contracts.vatLabel} ${inv.vatRate}%` : t.viewTexts.contracts.noVatLabel}
         </div>
       `;
@@ -973,24 +997,63 @@ export class AppInvoices extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
-          .data="${filtered}"
-          .pageSize="${this.tablePageSize}"
-          .pageSizeOptions="${[5, 10, 20, 50]}"
-          .currentPage="${this.currentPage}"
-          @page-change="${(e: CustomEvent<{ page: number }>) => store.setActivePage(e.detail.page)}"
+          .rows="${filtered as unknown as Record<string, unknown>[]}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          empty-title="${t.viewTexts.invoices.emptyTitle}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page;
+            store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
           @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1;
             store.setTablePageSize(e.detail.pageSize);
             store.setActivePage(1, false);
           }}"
         >
-          <app-table-column header="${t.viewTexts.invoices.thInvoice}" .cellRender="${numberCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thContract}" .cellRender="${contractCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thCounterpartyCompany}" .cellRender="${partiesCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thDatesControl}" .cellRender="${datesCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thTotalVat}" .cellRender="${amountCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thPaymentProgress}" .cellRender="${payCell}"></app-table-column>
-          <app-table-column header="${t.viewTexts.invoices.thStatus}" .cellRender="${statusCell}"></app-table-column>
-          <app-table-column header="" align="right" .cellRender="${actionsCell}"></app-table-column>
+          <app-table-column
+            field="number"
+            label="${t.viewTexts.invoices.thInvoice}"
+            .cellRender="${numberCell}"
+          ></app-table-column>
+          <app-table-column
+            field="contractId"
+            label="${t.viewTexts.invoices.thContract}"
+            .cellRender="${contractCell}"
+          ></app-table-column>
+          <app-table-column
+            field="counterpartyId"
+            label="${t.viewTexts.invoices.thCounterpartyCompany}"
+            .cellRender="${partiesCell}"
+          ></app-table-column>
+          <app-table-column
+            field="dueDate"
+            label="${t.viewTexts.invoices.thDatesControl}"
+            .cellRender="${datesCell}"
+          ></app-table-column>
+          <app-table-column
+            field="totalAmount"
+            label="${t.viewTexts.invoices.thTotalVat}"
+            .cellRender="${amountCell}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.invoices.thPaymentProgress}"
+            .cellRender="${payCell}"
+          ></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.invoices.thStatus}"
+            .cellRender="${statusCell}"
+          ></app-table-column>
+          <app-table-column
+            field=""
+            label=""
+            align="right"
+            .cellRender="${actionsCell}"
+          ></app-table-column>
         </app-data-table>
       </div>
     `;
