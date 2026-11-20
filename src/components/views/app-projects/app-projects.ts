@@ -204,6 +204,7 @@ export class AppProjects extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px;"
             placeholder="${t.viewTexts.projects.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[
               { key: 'status', options: statusOptions },
               { key: 'company', options: companyFilterOptions },
@@ -216,6 +217,12 @@ export class AppProjects extends LitElement {
             @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
               if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ProjectStatus;
               if (e.detail.key === 'company') this.companyFilter = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.statusFilter = 'all';
+              this.companyFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
