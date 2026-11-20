@@ -19,7 +19,7 @@
    gap canonical default is 1rem. */
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(var(--cards-min-width, 360px), 1fr));
+  grid-template-columns: repeat(var(--cards-columns, auto-fill), minmax(var(--cards-min-width, 360px), 1fr));
   gap: var(--cards-gap, 1rem);
 }
 
@@ -55,6 +55,11 @@
   background: var(--bg-surface-elevated, #161f33);
 }
 
+/* additive hook for a completed/dimmed row look supplied through cardClass */
+.card-shell.is-dimmed {
+  opacity: var(--card-dimmed-opacity, 0.68);
+}
+
 /* card-footer web component keeps its own chrome; the shell pins it to the bottom with the
    projects reference gap and padding-top, and passes the start/end gaps at the card-footer
    defaults. The view-facing tokens carry the cards- prefix (cards-footer-gap and friends): a
@@ -75,6 +80,14 @@ card-footer {
 
 @media (max-width: 640px) {
   .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* additive hook: views that reference a single-column collapse at wider widths set the
+   wide-collapse attribute; default off keeps every consumer pixel-identical */
+@media (max-width: 1024px) {
+  :host[wide-collapse] .cards-grid {
     grid-template-columns: 1fr;
   }
 }
