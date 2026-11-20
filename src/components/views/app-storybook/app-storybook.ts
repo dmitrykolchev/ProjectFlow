@@ -126,8 +126,10 @@ import employeesMeta from '../app-employees/app-employees.story';
 import employeeDetailMeta from '../app-employee-detail/app-employee-detail.story';
 import counterpartiesMeta from '../app-counterparties/app-counterparties.story';
 import counterpartyDetailMeta from '../app-counterparty-detail/app-counterparty-detail.story';
+import contactsMeta from '../app-contacts/app-contacts.story';
 import contractsMeta from '../app-contracts/app-contracts.story';
 import contractDetailMeta from '../app-contract-detail/app-contract-detail.story';
+import invoicesMeta from '../app-invoices/app-invoices.story';
 import calculationsMeta from '../app-calculations/app-calculations.story';
 import calculationDetailMeta from '../app-calculation-detail/app-calculation-detail.story';
 import paymentsMeta from '../app-payments/app-payments.story';
@@ -258,8 +260,10 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   employeeDetailMeta,
   counterpartiesMeta,
   counterpartyDetailMeta,
+  contactsMeta,
   contractsMeta,
   contractDetailMeta,
+  invoicesMeta,
   calculationsMeta,
   calculationDetailMeta,
   paymentsMeta,

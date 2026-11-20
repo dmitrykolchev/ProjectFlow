@@ -29,6 +29,8 @@ import {
   iconCalculator,
   iconDatabase,
   iconBell,
+  iconUser,
+  iconReceipt,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -70,8 +72,10 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   counterparties: () => import('./components/views/app-counterparties/app-counterparties'),
   'counterparty-detail': () =>
     import('./components/views/app-counterparty-detail/app-counterparty-detail'),
+  contacts: () => import('./components/views/app-contacts/app-contacts'),
   contracts: () => import('./components/views/app-contracts/app-contracts'),
   'contract-detail': () => import('./components/views/app-contract-detail/app-contract-detail'),
+  invoices: () => import('./components/views/app-invoices/app-invoices'),
   calculations: () => import('./components/views/app-calculations/app-calculations'),
   'calculation-detail': () =>
     import('./components/views/app-calculation-detail/app-calculation-detail'),
@@ -372,9 +376,21 @@ export class AppRoot extends LitElement {
           ></sidebar-item>
 
           <sidebar-item
+            value="contacts"
+            label="${t.navigation.contacts}"
+            .icon="${iconUser()}"
+          ></sidebar-item>
+
+          <sidebar-item
             value="contracts"
             label="${t.navigation.contracts}"
             .icon="${iconFileText()}"
+          ></sidebar-item>
+
+          <sidebar-item
+            value="invoices"
+            label="${t.navigation.invoices}"
+            .icon="${iconReceipt()}"
           ></sidebar-item>
 
           <sidebar-item
@@ -497,10 +513,14 @@ export class AppRoot extends LitElement {
         return html`<app-counterparties></app-counterparties>`;
       case 'counterparty-detail':
         return html`<app-counterparty-detail></app-counterparty-detail>`;
+      case 'contacts':
+        return html`<app-contacts></app-contacts>`;
       case 'contracts':
         return html`<app-contracts></app-contracts>`;
       case 'contract-detail':
         return html`<app-contract-detail></app-contract-detail>`;
+      case 'invoices':
+        return html`<app-invoices></app-invoices>`;
       case 'calculations':
         return html`<app-calculations></app-calculations>`;
       case 'calculation-detail':

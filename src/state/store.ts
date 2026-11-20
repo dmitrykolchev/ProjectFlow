@@ -1489,8 +1489,10 @@ export class AppStore {
       view === 'employee-detail' ||
       view === 'counterparties' ||
       view === 'counterparty-detail' ||
+      view === 'contacts' ||
       view === 'contracts' ||
       view === 'contract-detail' ||
+      view === 'invoices' ||
       view === 'calculations' ||
       view === 'calculation-detail' ||
       view === 'payments' ||

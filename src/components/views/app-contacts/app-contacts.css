@@ -1,0 +1,120 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--bg-canvas, #090d16);
+  padding: 1.5rem;
+  gap: 1.25rem;
+}
+
+:host::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+:host::-webkit-scrollbar-track {
+  background: var(--scrollbar-track, var(--bg-canvas));
+}
+
+:host::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb, var(--border-strong));
+  border-radius: 4px;
+}
+
+:host::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover, var(--accent-primary));
+}
+
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+app-cards-table {
+  --cards-min-width: 340px;
+  --cards-gap: 1.1rem;
+  --card-padding: 1.25rem;
+  --card-gap: 0.85rem;
+  --card-hover-border: var(--accent-border, rgba(99, 102, 241, 0.35));
+  --card-hover-transform: translateY(-1px);
+  --card-hover-shadow: var(--shadow-sm), var(--surface-glow, none);
+  --cards-footer-gap: 0.75rem;
+  --cards-footer-padding-top: 0.65rem;
+}
+
+.table-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  background: var(--bg-surface, #111827);
+  border: 1px solid var(--border-subtle, #1e293b);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm), var(--surface-glow, none);
+}
+
+.table-card app-data-table {
+  flex: 1;
+  min-height: 0;
+  background: transparent;
+  --dt-th-padding: 0.75rem 1rem;
+  --dt-td-padding: 0.75rem 1rem;
+}
+
+.col-span-2 {
+  grid-column: span 2;
+}
+
+.form-error {
+  font-size: 0.8rem;
+  color: var(--color-danger, #ef4444);
+  font-weight: 500;
+}
+
+.switch-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.switch-field > label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  visibility: hidden;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.switch-box {
+  height: var(--control-height-md, 38px);
+  padding: 0 0.75rem;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+@media (max-width: 640px) {
+  :host {
+    padding: 1rem;
+  }
+
+  .col-span-2 {
+    grid-column: span 1;
+  }
+}

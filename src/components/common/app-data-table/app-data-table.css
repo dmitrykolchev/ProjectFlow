@@ -1084,3 +1084,45 @@ div.contract-link-btn {
   color: var(--text-secondary, #94a3b8);
   white-space: nowrap;
 }
+
+/* Contacts page reference rich cells */
+.cnt-person-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.cnt-person-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.cnt-person-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.cnt-person-name {
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+}
+
+.cnt-email-link {
+  color: var(--accent-primary, #6366f1);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cnt-email-link:hover {
+  text-decoration: underline;
+}
+
+.cnt-copy-ok {
+  --icon-btn-color: var(--color-success, #10b981);
+  --icon-btn-border: rgba(16, 185, 129, 0.35);
+}
