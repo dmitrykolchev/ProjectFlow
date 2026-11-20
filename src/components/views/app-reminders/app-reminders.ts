@@ -10,6 +10,7 @@ import {
 } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-reminders.css';
+import cardContentStyles from './app-reminders.content.css';
 import { eventValue } from '../../common/event-value';
 import type { FilterDef } from '../../common/app-filter-bar/app-filter-bar';
 import type { MenuItem } from '../../common/app-menu/app-menu';
@@ -380,6 +381,7 @@ export class AppReminders extends LitElement {
           `
         : html`
             <app-cards-table
+              .contentStyles="${cardContentStyles}"
               .rows="${filtered}"
               .cardRender="${(row: Record<string, unknown>) => {
                 const rem = row as unknown as Reminder;
