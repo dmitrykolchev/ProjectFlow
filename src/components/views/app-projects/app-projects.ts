@@ -48,6 +48,8 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-progress-bar/app-progress-bar';
 import '../../common/app-cards-table/app-cards-table';
 import styles from './app-projects.css';
+import tableContentStyles from './app-projects.table.content.css';
+import cardContentStyles from './app-projects.content.css';
 import { eventValue } from '../../common/event-value';
 
 const ALL_PROJECT_ROLES: ProjectRole[] = [
@@ -342,6 +344,7 @@ export class AppProjects extends LitElement {
 
     return html`
       <app-cards-table
+        .contentStyles="${cardContentStyles}"
         .rows="${list}"
         .cardRender="${projectCard}"
         page-size="${this.cardPageSize}"
@@ -385,6 +388,7 @@ export class AppProjects extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${list}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"

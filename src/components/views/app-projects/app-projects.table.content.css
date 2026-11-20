@@ -1,0 +1,66 @@
+/* app-projects table content styles. The markup is produced by this view's cellRender callbacks and
+   rendered inside the app-data-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The table shell (header, body, footer,
+   pagination) stays in app-data-table. */
+
+/* Requirements registry reference rich cells: title main/sub lines */
+/* Projects table reference rich cells: title row with color dot and key chip */
+.proj-title-row{
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.color-dot{
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.proj-key{
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  border: 1px solid var(--border-strong, #334155);
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.actions-row{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+/* Row icon actions are app-button web components at size sm: the historical hover kept
+   the subtle border unchanged for plain actions, so the hover border token is pinned back
+   for every action except accept and delete (the component supplies the success and danger
+   palettes for those actions), and the historical 6px radius replaces md */
+.actions-row app-button{
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']){
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
