@@ -9,6 +9,8 @@ import { statusLabel, statusVariant, type StatusDomain } from '../../../domain/s
 export class AppStatusChip extends LitElement {
   @property({ type: String }) domain: StatusDomain = 'task';
   @property({ type: String }) status: string = '';
+  /** Custom label text rendered instead of the domain label (the variant stays domain-driven). */
+  @property({ type: String, attribute: 'label-override' }) labelOverride: string = '';
   // canonical control size scale, delegated to app-badge
   @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'sm';
   @property({ type: String }) appearance: 'soft' | 'solid' | 'outline' = 'soft';
@@ -38,7 +40,7 @@ export class AppStatusChip extends LitElement {
     const lang = store.customization.language;
     const t = getTranslation(lang);
     const variant = statusVariant(this.domain, this.status);
-    const label = statusLabel(this.domain, this.status, lang, t);
+    const label = this.labelOverride || statusLabel(this.domain, this.status, lang, t);
     return html`
       <app-badge
         variant="${variant}"

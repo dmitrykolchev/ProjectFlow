@@ -1102,10 +1102,11 @@ Domain-driven status chip: resolves label and badge variant from central STATUS_
 
 | Property | Type / default | Description |
 |---|---|---|
-| `domain` | String, default `'task'` | Status vocabulary: task, contract, invoice, project, ... |
+| `domain` | String, default `'task'` | Status vocabulary: task, contract, invoice, project, dueControl, ... |
 | `status` | String, default `''` | Status code within the domain (rendered with its label and color) |
-| `size` | String, default `'sm'` | Visual density: sm / md |
-| `appearance` | String, default `'soft'` | Rendering style: soft fill / outline |
+| `labelOverride` | String, default `''` | Custom label text rendered instead of the domain label; the badge variant stays domain-driven (empty = domain label) |
+| `size` | String, default `'sm'` | Visual density: sm / md / lg |
+| `appearance` | String, default `'soft'` | Rendering style: soft fill / solid / outline |
 | `dot` | Boolean, default `false` | Shows a leading status dot |
 
 #### `app-task-ai-panel` — `AppTaskAiPanel`

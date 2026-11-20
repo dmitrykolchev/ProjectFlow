@@ -23,7 +23,8 @@ export type StatusDomain =
   | 'requirementPriority'
   | 'reminder'
   | 'reminderPriority'
-  | 'blog';
+  | 'blog'
+  | 'dueControl';
 
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
@@ -156,6 +157,13 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     draft: { variant: 'default', i18nPath: ['blog', 'statuses'] },
     published: { variant: 'success', i18nPath: ['blog', 'statuses'] },
     archived: { variant: 'default', i18nPath: ['blog', 'statuses'] },
+  },
+  dueControl: {
+    paid_on_time: { variant: 'success', label: { ru: 'Оплачен вовремя', en: 'Paid on time' } },
+    paid_late: { variant: 'warning', label: { ru: 'Просроченная оплата', en: 'Late payment' } },
+    overdue: { variant: 'danger', label: { ru: 'Просрочен', en: 'Overdue' } },
+    due_soon: { variant: 'warning', label: { ru: 'Скоро срок', en: 'Due soon' } },
+    on_track: { variant: 'info', label: { ru: 'В графике', en: 'On track' } },
   },
 };
 

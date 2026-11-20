@@ -5967,6 +5967,13 @@
     "def": "''"
    },
    {
+    "name": "labelOverride",
+    "type": "String",
+    "attr": "label-override",
+    "reflect": false,
+    "def": "''"
+   },
+   {
     "name": "size",
     "type": "String",
     "reflect": false,
@@ -5990,19 +5997,23 @@
   "propsDoc": [
    {
     "k": "domain",
-    "v": "Status vocabulary: task, contract, invoice, project, ..."
+    "v": "Status vocabulary: task, contract, invoice, project, dueControl, ..."
    },
    {
     "k": "status",
     "v": "Status code within the domain (rendered with its label and color)"
    },
    {
+    "k": "labelOverride",
+    "v": "Custom label text rendered instead of the domain label; the badge variant stays domain-driven (empty = domain label)"
+   },
+   {
     "k": "size",
-    "v": "Visual density: sm / md"
+    "v": "Visual density: sm / md / lg"
    },
    {
     "k": "appearance",
-    "v": "Rendering style: soft fill / outline"
+    "v": "Rendering style: soft fill / solid / outline"
    },
    {
     "k": "dot",
