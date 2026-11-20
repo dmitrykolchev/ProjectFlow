@@ -325,17 +325,17 @@ export class AppDirectoryRecordModal extends LitElement {
         `;
       }
       return html`
-        <div class="switch-field">
-          <label>${label}</label>
-          <div class="switch-box">
-            <app-switch
-              label="${label}"
-              .checked="${Boolean(val)}"
-              @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                this.updateExtra(field.key, Boolean(e.detail?.checked))}"
-            ></app-switch>
-          </div>
-        </div>
+        <app-switch
+          class="switch-row"
+          size="md"
+          frame="transparent"
+          field-label-style="ghost"
+          field-label="${label}"
+          label="${label}"
+          .checked="${Boolean(val)}"
+          @change="${(e: CustomEvent<{ checked: boolean }>) =>
+            this.updateExtra(field.key, Boolean(e.detail?.checked))}"
+        ></app-switch>
       `;
     }
 

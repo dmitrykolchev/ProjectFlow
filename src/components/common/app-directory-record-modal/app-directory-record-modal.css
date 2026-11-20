@@ -29,37 +29,10 @@
   margin-top: 0.25rem;
 }
 
-/* boolean fields mirror app-input: label row + control box of identical
-   --control-height-md, so switch rows align with text/number neighbours */
-.switch-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.switch-field label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-secondary, #94a3b8);
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  /* ghost label: real caption text keeps the row in layout (identical to
-     app-input's label line), the visible caption lives inside the switch */
-  visibility: hidden;
-}
-
-.switch-box {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: var(--control-height-md, 38px);
-  background: var(--bg-surface, #111827);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-md, 8px);
-  padding: 0 0.75rem;
-}
+/* Boolean fields render the canonical app-switch with frame="transparent" and
+   field-label-style="ghost": the component draws the label row and the control box with the
+   app-input geometry (control-height-md, radius-md, 0.75rem padding) on the native modal
+   background, so switch rows align level with text/number neighbours. */
 
 /* activity indicator: plain switch spanning the full row, no label row, no frame */
 .active-switch {
