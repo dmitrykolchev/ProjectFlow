@@ -67,6 +67,7 @@ export class AppCounterparties extends LitElement {
     this.globalSearch = store.searchQuery;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
+    this.displayMode = (store.viewModeFor('counterparties') as 'cards' | 'table') ?? 'cards';
   }
 
   private getFiltered(): Counterparty[] {
@@ -161,8 +162,8 @@ export class AppCounterparties extends LitElement {
             { value: 'table', label: t.viewTexts.counterparties.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('counterparties', eventValue(e) as 'cards' | 'table');
           }}"
         ></app-segmented-switch>
 

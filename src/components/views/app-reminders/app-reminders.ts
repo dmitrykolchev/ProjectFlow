@@ -11,10 +11,6 @@ import {
 import { getTranslation } from '../../../i18n';
 import styles from './app-reminders.css';
 import { eventValue } from '../../common/event-value';
-import {
-  CARD_GRID_PAGE_SIZE_OPTIONS,
-  paginateItems,
-} from '../../common/paginate';
 import type { FilterDef } from '../../common/app-filter-bar/app-filter-bar';
 import type { MenuItem } from '../../common/app-menu/app-menu';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
@@ -54,7 +50,7 @@ import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-tags-row/app-tags-row';
 import '../../common/app-empty-state/app-empty-state';
-import '../../common/app-pagination/app-pagination';
+import '../../common/app-cards-table/app-cards-table';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-reminder-form/app-reminder-form';
 
@@ -132,6 +128,7 @@ export class AppReminders extends LitElement {
     this.reminders = store.reminders;
     this.pageSize = store.customization.cardGridPageSize;
     this.currentPage = store.activePage;
+    this.scopeTab = (store.viewModeFor('reminders') as ReminderScopeTab) ?? 'all';
   }
 
   private handleSnoozePreset(rem: Reminder, presetId: string) {
@@ -219,8 +216,6 @@ export class AppReminders extends LitElement {
         if (aDone !== bDone) return aDone - bDone;
         return store.getEffectiveReminderDueAt(a).localeCompare(store.getEffectiveReminderDueAt(b));
       });
-
-    const slice = paginateItems(filtered, this.currentPage, this.pageSize);
 
     const scopeOptions = [
       { value: 'all', label: t.viewTexts.reminders.scopeAll },
@@ -328,8 +323,8 @@ export class AppReminders extends LitElement {
           .value="${this.scopeTab}"
           .options="${scopeOptions}"
           @change="${(e: Event) => {
-            this.scopeTab = eventValue(e) as ReminderScopeTab;
             store.setActivePage(1, false);
+            store.setViewMode('reminders', eventValue(e) as ReminderScopeTab);
           }}"
         ></app-segmented-switch>
 
@@ -384,8 +379,10 @@ export class AppReminders extends LitElement {
             ></app-empty-state>
           `
         : html`
-            <div class="cards-grid">
-              ${slice.items.map((rem) => {
+            <app-cards-table
+              .rows="${filtered}"
+              .cardRender="${(row: Record<string, unknown>) => {
+                const rem = row as unknown as Reminder;
                 const overdue = store.isReminderOverdue(rem);
                 const dueToday = store.isReminderDueToday(rem);
                 const effectiveDue = store.getEffectiveReminderDueAt(rem);
@@ -428,9 +425,8 @@ export class AppReminders extends LitElement {
                 const isDone = rem.status === 'completed' || rem.status === 'cancelled';
 
                 return html`
-                  <article class="reminder-card ${isDone ? 'is-completed' : ''}">
-                    <div class="card-head">
-                      <div class="chips-row">
+                  <div class="rem-card-head">
+                      <div class="rem-chips-row">
                         <app-status-chip domain="reminder" status="${rem.status}" size="sm"></app-status-chip>
                         <app-status-chip domain="reminderPriority" status="${rem.priority}" size="sm"></app-status-chip>
                         ${overdue
@@ -441,22 +437,22 @@ export class AppReminders extends LitElement {
                       </div>
                     </div>
 
-                    <h3 class="card-title ${isDone ? 'is-done' : ''}">
+                    <h3 class="rem-card-title ${isDone ? 'is-done' : ''}">
                       <button
                         type="button"
-                        class="card-title-btn"
+                        class="rem-card-title-btn"
                         title="${t.reminders.actionDetails}"
                         @click="${() => store.openReminderDetail(rem.id)}"
                       >
                         ${rem.title}
                       </button>
                     </h3>
-                    ${rem.description ? html`<p class="card-desc">${rem.description}</p>` : ''}
+                    ${rem.description ? html`<p class="rem-card-desc">${rem.description}</p>` : ''}
 
-                    <div class="entity-link-bar">
+                    <div class="rem-entity-bar">
                       <button
                         type="button"
-                        class="entity-link-btn"
+                        class="rem-entity-btn"
                         ?disabled="${!entityInfo.navigable}"
                         title="${entityInfo.navigable ? t.reminders.actionOpenEntity : ''}"
                         @click="${() => store.navigateToReminderEntity(rem.entityType, rem.entityId)}"
@@ -465,28 +461,28 @@ export class AppReminders extends LitElement {
                           entity="${ENTITY_EMBLEM_MAP[rem.entityType] || 'reminder'}"
                           size="xs"
                         ></app-entity-emblem>
-                        <span class="entity-text-col">
-                          <span class="entity-type-tag">${entityInfo.typeLabel}</span>
-                          <span class="entity-name">${entityInfo.label}</span>
+                        <span class="rem-entity-col">
+                          <span class="rem-entity-type">${entityInfo.typeLabel}</span>
+                          <span class="rem-entity-name">${entityInfo.label}</span>
                         </span>
                         ${entityInfo.navigable ? iconArrowUpRight(14) : ''}
                       </button>
                     </div>
 
-                    <div class="schedule-meta">
-                      <span class="meta-item ${overdue ? 'is-overdue' : dueToday ? 'is-today' : ''}">
+                    <div class="rem-schedule">
+                      <span class="rem-meta-item ${overdue ? 'is-overdue' : dueToday ? 'is-today' : ''}">
                         ${iconClock(13)}
                         <span>${formattedDue}</span>
                       </span>
-                      <span class="meta-dot">·</span>
-                      <span class="meta-item" title="${summary || tplLabel}">
+                      <span class="rem-meta-dot">·</span>
+                      <span class="rem-meta-item" title="${summary || tplLabel}">
                         ${iconRepeat(13)}
                         <span>${tplLabel}</span>
                       </span>
                       ${isRecurring
                         ? html`
-                            <span class="meta-dot">·</span>
-                            <span class="meta-item">
+                            <span class="rem-meta-dot">·</span>
+                            <span class="rem-meta-item">
                               ${t.reminders.occurrenceBadge(
                                 rem.recurrence.occurrenceCount,
                                 rem.recurrence.endType === 'max_occurrences' ? rem.recurrence.maxOccurrences : undefined
@@ -496,16 +492,16 @@ export class AppReminders extends LitElement {
                         : ''}
                       ${owner
                         ? html`
-                            <span class="meta-dot">·</span>
-                            <span class="meta-item">${owner.name}</span>
+                            <span class="rem-meta-dot">·</span>
+                            <span class="rem-meta-item">${owner.name}</span>
                           `
                         : ''}
                       ${(rem.attachmentIds || []).length > 0
                         ? html`
-                            <span class="meta-dot">·</span>
+                            <span class="rem-meta-dot">·</span>
                             <button
                               type="button"
-                              class="attachments-meta-btn"
+                              class="rem-attach-btn"
                               title="${t.reminders.actionDetails}"
                               @click="${() => store.openReminderDetail(rem.id)}"
                             >
@@ -518,14 +514,14 @@ export class AppReminders extends LitElement {
 
                     ${rruleToken
                       ? html`
-                          <div class="rrule-badge-row">
+                          <div class="rem-rrule-row">
                             <button
                               type="button"
-                              class="rrule-token-btn"
+                              class="rem-rrule-btn"
                               title="${t.reminders.rruleCopyBtn}"
                               @click="${() => this.copyRRuleText(rruleToken, t)}"
                             >
-                              <span class="rrule-token-text">${rruleToken}</span>
+                              <span class="rem-rrule-text">${rruleToken}</span>
                               ${iconCopy(12)}
                             </button>
                           </div>
@@ -536,30 +532,30 @@ export class AppReminders extends LitElement {
                       ? html`<app-tags-row .tags="${rem.tags}" max-visible="4"></app-tags-row>`
                       : ''}
 
-                    <div class="rules-box">
-                      <div class="rules-list">
+                    <div class="rem-rules-box">
+                      <div class="rem-rules-list">
                         ${enabledRules.map(
                           (rule) => html`
-                            <span class="rule-chip">
+                            <span class="rem-rule-chip">
                               ${iconBellRing(11)}
                               <span>${this.formatRuleChip(rule, t)}</span>
                             </span>
                           `
                         )}
                         ${rem.notifications.requireAck
-                          ? html`<span class="policy-chip">${t.viewTexts.reminders.policiesAckChip}</span>`
+                          ? html`<span class="rem-policy-chip">${t.viewTexts.reminders.policiesAckChip}</span>`
                           : ''}
                         ${rem.notifications.soundEnabled
-                          ? html`<span class="policy-chip">${t.viewTexts.reminders.policiesSoundChip}</span>`
+                          ? html`<span class="rem-policy-chip">${t.viewTexts.reminders.policiesSoundChip}</span>`
                           : ''}
                         ${rem.notifications.quietHoursRespect
-                          ? html`<span class="policy-chip">${t.viewTexts.reminders.policiesQuietChip}</span>`
+                          ? html`<span class="rem-policy-chip">${t.viewTexts.reminders.policiesQuietChip}</span>`
                           : ''}
                       </div>
                     </div>
 
-                    <div class="card-footer-actions">
-                      <div class="footer-left">
+                    <div class="rem-footer-actions">
+                      <div class="rem-footer-left">
                         ${!isDone
                           ? html`
                               <app-button
@@ -598,7 +594,7 @@ export class AppReminders extends LitElement {
                           : ''}
                       </div>
 
-                      <div class="footer-right">
+                      <div class="rem-footer-right">
                         <app-button
                           size="sm"
                           variant="ghost"
@@ -636,28 +632,27 @@ export class AppReminders extends LitElement {
                         </app-button>
                       </div>
                     </div>
-                  </article>
                 `;
-              })}
-            </div>
-          `}
-
-      ${filtered.length > 0
-        ? html`
-            <app-pagination
-              layout-mode="cards"
-              .page="${slice.page}"
-              .totalItems="${slice.totalItems}"
-              .pageSize="${slice.pageSize}"
-              .pageSizeOptions="${CARD_GRID_PAGE_SIZE_OPTIONS}"
-              @page-change="${(e: CustomEvent<{ page: number }>) => store.setActivePage(e.detail.page, true)}"
-              @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                store.setCardGridPageSize(e.detail.pageSize);
-                store.setActivePage(1, false);
               }}"
-            ></app-pagination>
-          `
-        : ''}
+              .cardClass="${(row: Record<string, unknown>) => {
+                const rem = row as unknown as Reminder;
+                return rem.status === 'completed' || rem.status === 'cancelled' ? 'is-dimmed' : '';
+              }}"
+              page-size="${this.pageSize}"
+              page="${this.currentPage}"
+              locale="${t.common.locale}"
+              wide-collapse
+              @page-change="${(e: CustomEvent<{ page: number }>) => {
+                this.currentPage = e.detail.page;
+                store.setActivePage(e.detail.page, true);
+              }}"
+              @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+                this.currentPage = 1;
+                store.setActivePage(1, false);
+                store.setCardGridPageSize(e.detail.pageSize);
+              }}"
+            ></app-cards-table>
+          `}
 
       <app-reminder-form
         ?open="${this.formOpen}"

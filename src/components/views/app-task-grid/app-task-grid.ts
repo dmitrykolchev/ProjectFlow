@@ -105,8 +105,9 @@ export class AppTaskGrid extends LitElement {
             { value: 'compact', label: t.grid.compactMode },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            store.setDensity(eventValue(e) === 'compact' ? 'compact' : 'comfortable');
             store.setActivePage(1, false);
+            store.setViewMode('grid', eventValue(e));
+            store.setDensity(eventValue(e) === 'compact' ? 'compact' : 'comfortable');
           }}"
         ></app-segmented-switch>
 

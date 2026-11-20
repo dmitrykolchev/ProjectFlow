@@ -105,6 +105,7 @@ export class AppPayments extends LitElement {
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
+    this.viewTab = (store.viewModeFor('payments') as 'due_control' | 'ledger') ?? 'due_control';
   }
 
   private toRub(amount: number, currency: BankCurrency): number {
@@ -381,8 +382,8 @@ export class AppPayments extends LitElement {
           .value="${this.viewTab}"
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewTab = eventValue(e) as 'due_control' | 'ledger';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('payments', eventValue(e) as 'due_control' | 'ledger');
           }}"
         ></app-segmented-switch>
 

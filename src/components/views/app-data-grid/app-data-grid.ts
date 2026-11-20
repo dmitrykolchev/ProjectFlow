@@ -5,6 +5,7 @@ import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { effectivePresence } from '../../../domain/presence-tokens';
 import '../../common/app-persona/app-persona';
+import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-data-grid.css';
 import {
   iconDownload,

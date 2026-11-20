@@ -115,6 +115,7 @@ export class AppRequirements extends LitElement {
     this.globalSearch = store.searchQuery;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
+    this.displayMode = (store.viewModeFor('requirements') as 'cards' | 'table' | 'grid') ?? 'cards';
     if (store.requirementFilterProjectId && store.requirementFilterProjectId !== this.projectFilter) {
       this.projectFilter = store.requirementFilterProjectId;
     }
@@ -250,8 +251,8 @@ export class AppRequirements extends LitElement {
             { value: 'grid', label: t.viewTexts.requirements.viewGrid },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table' | 'grid';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('requirements', eventValue(e) as 'cards' | 'table' | 'grid');
           }}"
         ></app-segmented-switch>
 

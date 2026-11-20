@@ -54,7 +54,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/CardsTable',
   component: 'app-cards-table',
   description:
-    'A grid of entity cards built from a per-view template. The card content is produced by the cardRender function property (row) => TemplateResult, the same pattern as the cellRender of app-data-table; the card shell (surface background, border, radius, padding, hover lift, selection highlight) and the grid geometry belong to the component and are retuned locally through the geometry tokens. Pagination is internal: items are sliced by page-size and app-pagination (layout-mode="cards") sits in the footer below the grid whenever the grid is not empty. With clickable the shell activates on click and emits card-click; with selectable the selection lives in selectedKeys keyed by key-field, the chosen cards get the is-selected shell class, and toggling emits selection-change.',
+    'A grid of entity cards built from a per-view template. The card content is produced by the cardRender function property (row) => TemplateResult, the same pattern as the cellRender of app-data-table; the card shell (surface background, border, radius, padding, hover lift, selection highlight) and the grid geometry belong to the component and are retuned locally through the geometry tokens. Pagination is internal: items are sliced by page-size and app-pagination (layout-mode="cards") sits in the footer below the grid whenever the grid is not empty. With clickable the shell activates on click and emits card-click; with selectable the selection lives in selectedKeys keyed by key-field, the chosen cards get the is-selected shell class, and toggling emits selection-change. Additive hooks with pixel-identical defaults: --cards-columns pins the column count (default auto-fill), the wide-collapse attribute collapses to one column at viewport <= 1024px (default off), cardClass(row) appends extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68).',
   category: 'Common',
   propsDoc: {
     rows: 'Array of card items rendered by the grid',
@@ -67,6 +67,9 @@ export const meta: ComponentStoryMeta = {
     selectedKeys: 'Array of currently selected keys; toggleSelect(key) flips one key',
     locale: 'Formatting locale passed to the footer pagination',
     'empty-title': 'Title of the compact app-empty-state shown for empty rows',
+    cardClass: 'Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68)',
+    'wide-collapse': 'Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off)',
+    '--cards-columns': 'Grid column count token (default auto-fill); a view can pin an exact number of columns',
   },
   stories: [
     {

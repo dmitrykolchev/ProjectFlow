@@ -113,6 +113,7 @@ export class AppTimeTracking extends LitElement {
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
+    this.viewMode = (store.viewModeFor('time-tracking') as 'journal' | 'grid' | 'by-task') ?? 'journal';
     if (!store.projects.some((p) => p.id === this.quickProjectId)) {
       this.quickProjectId = store.projects[0]?.id || '';
     }
@@ -355,8 +356,8 @@ export class AppTimeTracking extends LitElement {
             { value: 'by-task', label: t.timeTracking.viewByTask },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewMode = eventValue(e) as 'journal' | 'grid' | 'by-task';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('time-tracking', eventValue(e) as 'journal' | 'grid' | 'by-task');
           }}"
         ></app-segmented-switch>
 

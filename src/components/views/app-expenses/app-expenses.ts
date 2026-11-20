@@ -90,6 +90,7 @@ export class AppExpenses extends LitElement {
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
     this.cardPageSize = store.customization.cardGridPageSize;
+    this.viewMode = (store.viewModeFor('expenses') as 'registry' | 'grid' | 'budgets') ?? 'registry';
     if (this.previewDoc) {
       this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
     }
@@ -214,8 +215,8 @@ export class AppExpenses extends LitElement {
             { value: 'budgets', label: t.expenses.viewBudgets },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewMode = eventValue(e) as 'registry' | 'grid' | 'budgets';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('expenses', eventValue(e) as 'registry' | 'grid' | 'budgets');
           }}"
         ></app-segmented-switch>
 

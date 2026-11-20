@@ -35,6 +35,10 @@ export interface CardsTableCardClickDetail {
  * 'id'), the selected items get the is-selected shell class, the selectedItems getter returns
  * the selected rows, toggleSelect(key) flips one key, and toggling emits selection-change
  * { selectedIds, selectedItems }. Empty rows render a compact app-empty-state.
+ * Additive hooks with pixel-identical defaults: --cards-columns pins the grid column count
+ * (default auto-fill), the wide-collapse attribute collapses to one column at viewport <= 1024px
+ * (default off), and cardClass(row) appends extra shell classes per row (the is-dimmed rule reads
+ * --card-dimmed-opacity, default 0.68).
  */
 @customElement('app-cards-table')
 export class AppCardsTable extends LitElement {
@@ -48,6 +52,11 @@ export class AppCardsTable extends LitElement {
   @property({ type: Boolean, attribute: 'selectable' }) selectable: boolean = false;
   @property({ type: String, attribute: 'key-field' }) keyField: string = 'id';
   @property({ type: Array, attribute: false }) selectedKeys: string[] = [];
+  // additive hook: extra shell classes per row (e.g. a completed look); default undefined keeps
+  // every consumer pixel-identical
+  @property({ attribute: false }) cardClass?: (row: Record<string, unknown>) => string;
+  // additive hook: single-column grid collapse at viewport <= 1024px; default off
+  @property({ type: Boolean, attribute: 'wide-collapse', reflect: true }) wideCollapse: boolean = false;
 
   @state() private currentPage: number = 1;
 
@@ -150,7 +159,7 @@ export class AppCardsTable extends LitElement {
                     class="card-shell ${this.clickable ? 'is-clickable' : ''} ${this.selectable &&
                     this.selectedKeys.includes(this.rowKey(row))
                       ? 'is-selected'
-                      : ''}"
+                      : ''} ${this.cardClass ? this.cardClass(row) : ''}"
                     @click="${(e: MouseEvent) => this.handleCardClick(e, row)}"
                   >
                     ${this.cardRender(row)}

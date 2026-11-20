@@ -1700,6 +1700,15 @@ export class AppStore {
     else delete modes[view];
     this.customization.viewModes = modes;
     this.saveCustomization();
+    // the knowledge-base scope lives in the knowledge filters, keep it in sync with the recorded mode
+    if (view === 'knowledge-base') {
+      this.knowledgeFilterScope = loc.mode ? (loc.mode as 'all' | KnowledgeScope) : 'all';
+    }
+    // the task-grid density is global customization, keep it in sync with the recorded mode
+    if (view === 'grid') {
+      this.customization.density = loc.mode === 'compact' ? 'compact' : 'comfortable';
+      this.saveCustomization();
+    }
     this.expandSidebarGroupFor(view);
     this.notify();
     this.historyApplying = false;
