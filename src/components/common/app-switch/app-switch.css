@@ -54,3 +54,56 @@
   font-weight: 500;
   color: var(--text-primary, #f8fafc);
 }
+
+/* additive hooks with pixel-identical defaults (frame none, label-style none): framed switches span
+   the row like app-input. frame normal draws the control box with the app-input geometry
+   (control-height-md, bg-surface, border-subtle, radius-md, 0.75rem horizontal padding); frame
+   transparent keeps the identical box with background and border transparent, so the switch occupies a
+   form row like an input without visible chrome. The frame tokens retune the box locally. */
+:host([frame="normal"]),
+:host([frame="transparent"]) {
+  display: flex;
+  width: 100%;
+}
+
+.switch-container.frame-normal,
+.switch-container.frame-transparent {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--switch-frame-height, var(--control-height-md, 38px));
+  padding: var(--switch-frame-padding, 0 0.75rem);
+  border-radius: var(--switch-frame-radius, var(--radius-md, 8px));
+  border: var(--switch-frame-border, 1px solid var(--border-subtle, #334155));
+  background: var(--switch-frame-bg, var(--bg-surface, #111827));
+}
+
+.switch-container.frame-transparent {
+  background: transparent;
+  border-color: transparent;
+}
+
+/* label row variants (the external label row attached to the frame; the caption inside the control is
+   untouched): the host stacks the label row and the control with the app-input form-group gap; normal
+   shows the caption (app-input label typography), ghost keeps the row invisible so it holds its place
+   in the form grid */
+:host([field-label-style="normal"]),
+:host([field-label-style="ghost"]) {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  gap: var(--switch-label-gap, 0.35rem);
+}
+
+.field-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.field-label.is-ghost {
+  visibility: hidden;
+}
