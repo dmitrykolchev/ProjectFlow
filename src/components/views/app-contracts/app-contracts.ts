@@ -107,6 +107,7 @@ export class AppContracts extends LitElement {
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
+    this.viewTab = (store.viewModeFor('contracts') as 'contracts' | 'calculations' | 'invoices' | 'payments') ?? 'contracts';
   }
 
   private getTypeLabel(type: ContractType, t: ReturnType<typeof getTranslation>): string {
@@ -999,8 +1000,8 @@ export class AppContracts extends LitElement {
           .value="${this.viewTab}"
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewTab = eventValue(e) as 'contracts' | 'calculations' | 'invoices' | 'payments';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('contracts', eventValue(e) as 'contracts' | 'calculations' | 'invoices' | 'payments');
           }}"
         ></app-segmented-switch>
 
