@@ -121,6 +121,13 @@ export class AppRequirements extends LitElement {
     if (store.requirementFilterProjectId && store.requirementFilterProjectId !== this.projectFilter) {
       this.projectFilter = store.requirementFilterProjectId;
     }
+    // strict-mode fallback: a project filter pointing at a project that no longer exists in the store
+    // would keep the select on its placeholder and leave the list silently empty, so the stale value
+    // falls back to "all". The store mirror is cleared as well, otherwise the next sync re-applies it.
+    if (this.projectFilter !== 'all' && !store.projects.some((p) => p.id === this.projectFilter)) {
+      this.projectFilter = 'all';
+      store.requirementFilterProjectId = 'all';
+    }
 
     if (!store.projects.some((p) => p.id === this.specProjectId)) {
       this.specProjectId = store.projects[0]?.id || '';
