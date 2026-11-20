@@ -17,7 +17,6 @@ import {
   iconFolder,
   iconPin,
   iconPlus,
-  iconSearch,
   iconShieldCheck,
   iconThumbsUp,
   iconTrash,
@@ -33,6 +32,7 @@ import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-page-header/app-page-header';
+import '../../common/app-filter-bar/app-filter-bar';
 import styles from './app-knowledge-base.css';
 import { eventValue } from '../../common/event-value';
 
@@ -204,14 +204,6 @@ export class AppKnowledgeBase extends LitElement {
       })),
     ];
 
-    const hasActiveFilters =
-      this.scopeFilter !== 'all' ||
-      this.projectFilter !== 'all' ||
-      this.companyFilter !== 'all' ||
-      this.categoryFilter !== 'all' ||
-      this.statusFilter !== 'all' ||
-      Boolean(this.localSearch.trim());
-
     return html`
       <div class="kb-shell">
         <app-page-header title="${kb.title}" subtitle="${kb.subtitle}">
@@ -243,7 +235,7 @@ export class AppKnowledgeBase extends LitElement {
         </div>
 
         <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
-             toggle, filter toolbar, data representation -->
+             toggle, filter bar, data representation -->
         <div class="mode-row">
           <app-segmented-switch
             size="sm"
@@ -275,68 +267,34 @@ export class AppKnowledgeBase extends LitElement {
         </div>
 
         ${this.filterVisible
-          ? html`<div class="kb-toolbar">
-              <div class="toolbar-left">
-                <div class="toolbar-search">
-                  <app-input
-                    size="sm"
-                    placeholder="${kb.searchPlaceholder}"
-                    .value="${this.localSearch}"
-                    clearable
-                    @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
-                  >
-                    <span slot="icon">${iconSearch(14)}</span>
-                  </app-input>
-                </div>
-              </div>
-
-          <div class="toolbar-filters">
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.projectFilter}"
-                .options="${projectOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ projectId: eventValue(e) })}"
-              ></app-select>
-            </div>
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.companyFilter}"
-                .options="${companyOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ companyId: eventValue(e) })}"
-              ></app-select>
-            </div>
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.categoryFilter}"
-                .options="${categoryOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.categoryFilter = eventValue(e) as 'all' | KnowledgeCategory)}"
-              ></app-select>
-            </div>
-            <div class="filter-select" style="width: 150px;">
-              <app-select
-                size="sm"
-                .value="${this.statusFilter}"
-                .options="${statusOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.statusFilter = eventValue(e) as 'all' | KnowledgeArticleStatus)}"
-              ></app-select>
-            </div>
-            ${hasActiveFilters
-              ? html`
-                  <app-button size="sm" variant="ghost" @click="${() => this.clearAllFilters()}">
-                    ${kb.clearFilters}
-                  </app-button>
-                `
-              : ''}
-          </div>
-        </div>`
-        : ''}
+          ? html`<app-filter-bar
+              style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+              placeholder="${kb.searchPlaceholder}"
+              .searchValue="${this.localSearch}"
+              .filters="${[
+                { key: 'project', options: projectOptions },
+                { key: 'company', options: companyOptions },
+                { key: 'category', options: categoryOptions },
+                { key: 'status', options: statusOptions },
+              ]}"
+              .values="${{
+                project: this.projectFilter,
+                company: this.companyFilter,
+                category: this.categoryFilter,
+                status: this.statusFilter,
+              }}"
+              show-reset
+              @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+              @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+                const val = eventValue(e);
+                if (e.detail.key === 'project') store.setKnowledgeFilters({ projectId: val });
+                if (e.detail.key === 'company') store.setKnowledgeFilters({ companyId: val });
+                if (e.detail.key === 'category') this.categoryFilter = val as 'all' | KnowledgeCategory;
+                if (e.detail.key === 'status') this.statusFilter = val as 'all' | KnowledgeArticleStatus;
+              }}"
+              @reset="${() => this.clearAllFilters()}"
+            ></app-filter-bar>`
+          : ''}
 
         <!-- Two-Pane Workspace -->
         <div class="kb-workspace">
