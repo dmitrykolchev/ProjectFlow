@@ -8,6 +8,7 @@ import styles from './app-switch.css';
 // the track, the default slot overriding it) is unchanged in every variant
 export type SwitchFrame = 'none' | 'normal' | 'transparent';
 export type SwitchFieldLabelStyle = 'none' | 'normal' | 'ghost';
+export type SwitchSize = 'sm' | 'md' | 'lg'; // canonical control scale (docs/ComponentApiSpecs.md, Priority E)
 
 @customElement('app-switch')
 export class AppSwitch extends LitElement {
@@ -26,6 +27,11 @@ export class AppSwitch extends LitElement {
   @property({ type: String, attribute: 'field-label' }) fieldLabel: string = '';
   @property({ type: String, attribute: 'field-label-style', reflect: true })
   fieldLabelStyle: SwitchFieldLabelStyle = 'none';
+  // additive hook: the canonical control size scale sm | md | lg (30/38/44px frame heights, the root
+  // control-height tokens). md is the historical geometry, so every existing consumer stays
+  // pixel-identical; sm and lg scale the track, thumb, caption and the framed box together. The size
+  // tokens retune the switch locally in a view.
+  @property({ type: String }) size: SwitchSize = 'md';
 
   static styles = styles;
 
@@ -40,7 +46,7 @@ export class AppSwitch extends LitElement {
     return html`
       ${labelRow}
       <div
-        class="switch-container ${this.frame === 'normal' ? 'frame-normal' : this.frame === 'transparent' ? 'frame-transparent' : ''}"
+        class="switch-container size-${this.size} ${this.frame === 'normal' ? 'frame-normal' : this.frame === 'transparent' ? 'frame-transparent' : ''}"
         @click="${this.toggle}"
       >
         <div class="track ${this.checked ? 'is-checked' : ''}">

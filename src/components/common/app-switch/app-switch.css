@@ -14,13 +14,13 @@
 .switch-container {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
+  gap: var(--switch-gap, 0.65rem);
 }
 
 .track {
   position: relative;
-  width: 40px;
-  height: 22px;
+  width: var(--switch-track-width, 40px);
+  height: var(--switch-track-height, 22px);
   background: var(--bg-hover, #223049);
   border: 1px solid var(--border-strong, #334155);
   border-radius: 9999px;
@@ -35,10 +35,10 @@
 
 .thumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 18px;
-  height: 18px;
+  top: var(--switch-thumb-offset, 2px);
+  left: var(--switch-thumb-offset, 2px);
+  width: var(--switch-thumb-size, 18px);
+  height: var(--switch-thumb-size, 18px);
   background: #ffffff;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -46,11 +46,11 @@
 }
 
 .track.is-checked .thumb {
-  transform: translateX(18px);
+  transform: translateX(var(--switch-thumb-travel, 18px));
 }
 
 .label-text {
-  font-size: 0.8125rem;
+  font-size: var(--switch-caption-font-size, 0.8125rem);
   font-weight: 500;
   color: var(--text-primary, #f8fafc);
 }
@@ -80,6 +80,42 @@
 .switch-container.frame-transparent {
   background: transparent;
   border-color: transparent;
+}
+
+/* canonical control size scale sm|md|lg (docs/ComponentApiSpecs.md, Priority E): md is the historical
+   geometry, so every existing consumer stays pixel-identical. sm and lg scale the track, thumb, caption
+   and gap together, and the framed box follows the root control-height scale (30/44px) with the app-input
+   horizontal paddings (0.6rem / 1rem). The geometry lives in tokens — --switch-track-width,
+   --switch-track-height, --switch-thumb-size, --switch-thumb-offset, --switch-thumb-travel,
+   --switch-caption-font-size, --switch-gap — so a view retunes the switch locally. */
+.switch-container.size-sm {
+  --switch-track-width: 34px;
+  --switch-track-height: 18px;
+  --switch-thumb-size: 14px;
+  --switch-thumb-travel: 16px;
+  --switch-caption-font-size: 0.75rem;
+  --switch-gap: 0.5rem;
+}
+
+.switch-container.size-lg {
+  --switch-track-width: 46px;
+  --switch-track-height: 26px;
+  --switch-thumb-size: 22px;
+  --switch-thumb-travel: 20px;
+  --switch-caption-font-size: 0.875rem;
+  --switch-gap: 0.8rem;
+}
+
+.switch-container.size-sm.frame-normal,
+.switch-container.size-sm.frame-transparent {
+  height: var(--switch-frame-height, var(--control-height-sm, 30px));
+  padding: var(--switch-frame-padding, 0 0.6rem);
+}
+
+.switch-container.size-lg.frame-normal,
+.switch-container.size-lg.frame-transparent {
+  height: var(--switch-frame-height, var(--control-height-lg, 44px));
+  padding: var(--switch-frame-padding, 0 1rem);
 }
 
 /* label row variants (the external label row attached to the frame; the caption inside the control is
