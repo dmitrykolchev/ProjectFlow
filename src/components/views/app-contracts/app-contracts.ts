@@ -400,6 +400,7 @@ export class AppContracts extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px;"
             placeholder="${t.viewTexts.contracts.searchContracts}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[{ key: 'status', options: statusOptions }, { key: 'type', options: typeOptions }]}"
             .values="${{ status: this.statusFilter, type: this.typeFilter }}"
             @search-change="${(e: CustomEvent<{ value: string }>) => {
@@ -409,6 +410,12 @@ export class AppContracts extends LitElement {
             @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
               if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
               if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.statusFilter = 'all';
+              this.typeFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
