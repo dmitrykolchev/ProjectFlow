@@ -1014,17 +1014,17 @@ export class AppContacts extends LitElement {
             ></app-date-input>
           </div>
 
-          <div class="switch-field">
-            <label>${t.contactPersons.isPrimaryLabel}</label>
-            <div class="switch-box">
-              <app-switch
-                label="${t.contactPersons.isPrimaryLabel}"
-                .checked="${this.fIsPrimary}"
-                @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                  (this.fIsPrimary = Boolean(e.detail?.checked))}"
-              ></app-switch>
-            </div>
-          </div>
+          <app-switch
+            class="switch-field"
+            size="md"
+            frame="normal"
+            field-label-style="ghost"
+            field-label="${t.contactPersons.isPrimaryLabel}"
+            label="${t.contactPersons.isPrimaryLabel}"
+            .checked="${this.fIsPrimary}"
+            @change="${(e: CustomEvent<{ checked: boolean }>) =>
+              (this.fIsPrimary = Boolean(e.detail?.checked))}"
+          ></app-switch>
 
           <div class="col-span-2">
             <app-textarea
