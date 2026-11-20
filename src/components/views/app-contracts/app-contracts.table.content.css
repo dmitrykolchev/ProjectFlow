@@ -1,0 +1,289 @@
+/* app-contracts table content styles. The markup is produced by this view's cellRender callbacks and
+   rendered inside the app-data-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The table shell (header, body, footer,
+   pagination) stays in app-data-table. */
+
+.project-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* the project pill dot is 8px (registry reference), scoped so it does not change the
+   journal project-sub dot which stays 7px */
+.project-pill .dot{
+  width: 8px;
+  height: 8px;
+}
+
+.project-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.amount-cell{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.amount-cell.incoming{
+  color: #10b981;
+}
+
+.amount-cell.outgoing{
+  color: #f59e0b;
+}
+
+.amount-cell{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Contracts page reference rich cells (shared by the four tab tables): the mono number
+   links (app-link through the additive hooks, plus the div-as-button chip consumer), the
+   title/description lines, the amount and dates cells, the billing sub-line with the
+   calc/paid values, the micro pills, the expiry warning, the project pill with its 8px
+   dot, the due-control tags and the invoice payment progress bar. */
+.contract-link-btn{
+  --link-font: var(--font-mono, monospace);
+  --link-font-weight: 700;
+  --link-numeric: tabular-nums;
+  --link-line-height: normal;
+  --link-white-space: nowrap;
+  --link-gap: 0.45rem;
+  --control-font-md: 1rem;
+  --link-hover-bg: var(--bg-hover, rgba(99, 102, 241, 0.12));
+  --link-hover-color: var(--text-primary, #f8fafc);
+  margin: -0.15rem -0.25rem;
+  vertical-align: baseline;
+  --control-font-md: 0.9524rem;
+}
+
+.contract-link-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary, #6366f1);
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+
+.contract-title{
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.contract-desc{
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.billing-sub{
+  margin-top: 0.22rem;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--text-secondary, #94a3b8);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.billing-sub .paid-val{
+  color: var(--color-success, #10b981);
+}
+
+.billing-sub .calc-val{
+  color: var(--accent-primary, #6366f1);
+}
+
+.micro-pill{
+  display: inline-flex;
+  align-items: center;
+  padding: 0.08rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  color: var(--text-secondary, #94a3b8);
+}
+
+.micro-pill.prior{
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.micro-pill.zero{
+  background: rgba(148, 163, 184, 0.12);
+  border-color: rgba(148, 163, 184, 0.3);
+  color: var(--text-muted, #94a3b8);
+}
+
+.dates-cell{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.expiry-warn{
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  font-family: inherit;
+}
+
+.project-dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* the contracts row actions container excludes the semantic view / submit / accept /
+   reject / delete actions from the hover-border pin (the component supplies the accent,
+   success and danger palettes for those) */
+.ctr-actions-row{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.ctr-actions-row app-button{
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.ctr-actions-row app-button:not([action='view']):not([action='submit']):not([action='accept']):not([action='reject']):not([action='delete']){
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}
+
+.due-tag{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.due-tag.overdue{
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.due-tag.due-soon{
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.due-tag.on-track{
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #334155);
+}
+
+.due-tag.paid-ok{
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.inv-pay-cell{
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  min-width: 150px;
+}
+
+.inv-pay-bar{
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--bg-subtle, #1a2438);
+  overflow: hidden;
+}
+
+.inv-pay-fill{
+  height: 100%;
+  border-radius: 999px;
+  background: #10b981;
+  transition: width 200ms ease;
+}
+
+.inv-pay-fill.partial{
+  background: #f59e0b;
+}
+
+.inv-pay-fill.overdue{
+  background: #ef4444;
+}
+
+.inv-pay-meta{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.73rem;
+  color: var(--text-secondary, #94a3b8);
+  white-space: nowrap;
+}

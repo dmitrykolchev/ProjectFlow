@@ -52,6 +52,7 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import styles from './app-contracts.css';
+import tableContentStyles from './app-contracts.table.content.css';
 import { eventValue } from '../../common/event-value';
 
 @customElement('app-contracts')
@@ -1064,6 +1065,7 @@ export class AppContracts extends LitElement {
           : html`
               <div class="table-card">
                 <app-data-table
+                  .contentStyles="${tableContentStyles}"
                   .rows="${filtered}"
                   page-size="${this.tablePageSize}"
                   page="${this.currentPage}"
@@ -1100,6 +1102,7 @@ export class AppContracts extends LitElement {
           : html`
               <div class="table-card">
                 <app-data-table
+                  .contentStyles="${tableContentStyles}"
                   .rows="${filteredCalculations}"
                   page-size="${this.tablePageSize}"
                   page="${this.currentPage}"
@@ -1149,6 +1152,7 @@ export class AppContracts extends LitElement {
           : html`
               <div class="table-card">
                 <app-data-table
+                  .contentStyles="${tableContentStyles}"
                   .rows="${filteredPayments}"
                   page-size="${this.tablePageSize}"
                   page="${this.currentPage}"
@@ -1208,6 +1212,7 @@ export class AppContracts extends LitElement {
         : html`
             <div class="table-card">
                 <app-data-table
+                  .contentStyles="${tableContentStyles}"
                   .rows="${filteredInvoices}"
                   page-size="${this.tablePageSize}"
                   page="${this.currentPage}"
