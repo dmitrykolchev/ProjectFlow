@@ -23,6 +23,8 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-cards-table/app-cards-table';
 import styles from './app-employees.css';
+import tableContentStyles from './app-employees.table.content.css';
+import cardContentStyles from './app-employees.content.css';
 import { eventValue } from '../../common/event-value';
 
 @customElement('app-employees')
@@ -310,6 +312,7 @@ export class AppEmployees extends LitElement {
 
     return html`
       <app-cards-table
+        .contentStyles="${cardContentStyles}"
         .rows="${list}"
         .cardRender="${empCard}"
         page-size="${this.cardPageSize}"
@@ -352,6 +355,7 @@ export class AppEmployees extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${list}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"

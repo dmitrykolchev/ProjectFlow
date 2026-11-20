@@ -1,0 +1,57 @@
+/* app-employees card content styles. The markup is produced by this view's cardRender template and
+   rendered inside the app-cards-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The card shell and grid geometry stay in
+   app-cards-table. */
+
+/* Employees cards reference content classes (rendered in the component's shadow tree through
+   cardRender): the head row with the persona and the status badge, the details panel on the
+   subtle surface as a stack of label/value rows with right-aligned ellipsis values, and the
+   footer stats line with mono strong counts (the emp- prefixed name keeps the employees geometry
+   — no align-items center, no wrap — distinct from the counterparties stats row). */
+.card-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.details-list{
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.75rem;
+  background: var(--bg-subtle, #1a2438);
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.8rem;
+}
+
+.detail-row{
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.detail-label{
+  color: var(--text-muted, #64748b);
+}
+
+.detail-val{
+  color: var(--text-primary, #f8fafc);
+  font-weight: 500;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emp-stats-row{
+  display: flex;
+  gap: 0.85rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.emp-stats-row strong{
+  color: var(--text-primary, #f8fafc);
+  font-family: var(--font-mono, monospace);
+}
