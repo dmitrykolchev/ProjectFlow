@@ -1,0 +1,164 @@
+/* Calculations card content styles. These rules belong to this view: the markup is produced by
+   its cardRender template and rendered inside the app-cards-table shadow tree, so the styles are
+   passed to the component through the additive contentStyles hook. The card shell and grid
+   geometry stay in app-cards-table. */
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.calc-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.calc-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.15));
+  color: var(--accent-primary, #6366f1);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.calc-names {
+  min-width: 0;
+}
+
+.calc-items-line {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* card number-links are app-link web components at size md restoring the inherited mono
+   glyph, weight 700 and the accent color through the additive link hooks */
+.calc-link-btn {
+  --link-padding: 0;
+  --link-font: var(--font-mono, monospace);
+  --link-font-weight: 700;
+  --link-numeric: tabular-nums;
+  --link-line-height: 1.5;
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 1rem;
+}
+
+.badges-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.calc-notes {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #94a3b8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.calc-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.9rem;
+  padding: 0.75rem;
+  background: var(--bg-subtle, #1a2438);
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.78rem;
+}
+
+.calc-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.calc-meta-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.calc-meta-value {
+  color: var(--text-primary, #f8fafc);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calc-meta-value.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.calc-meta-value.amount {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.calc-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calc-invoice-sub {
+  font-size: 0.74rem;
+  color: var(--color-success, #10b981);
+}
+
+.micro-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.08rem 0.38rem;
+  border-radius: 4px;
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}
+
+/* Calculations cards reference content classes (rendered in the component's shadow tree
+   through cardRender): the head row with the identity block (40px accent icon tile, the
+   mono number link and the items line with the prior/zero micro tags) and the stacked
+   status chip, the muted two-line notes paragraph, the two-column meta panel on the subtle
+   surface with uppercase labels (calc- prefixed names keep the calculations geometry
+   distinct from the contracts meta panel), the mono amount with the linked invoice
+   sub-line, and the accent/grey micro tags shared with the table cells. */

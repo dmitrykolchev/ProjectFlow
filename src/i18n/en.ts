@@ -2015,6 +2015,8 @@ export const en = {
       kpiApprovedSuffix: 'approved report(s)',
       kpiLoggedHours: 'Logged Hours in Reports',
       searchPlaceholder: 'Search calculation, contract, client...',
+      viewCards: 'Cards',
+      viewTable: 'Table',
       thCalculation: 'Calculation',
       thContract: 'Contract',
       thCounterparty: 'Counterparty',

@@ -16,6 +16,7 @@ import {
   iconChevronRight,
   iconEdit,
   iconEye,
+  iconFilter,
   iconPlus,
   iconReceipt,
   iconSend,
@@ -37,8 +38,13 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-entity-emblem/app-entity-emblem';
+import '../../common/app-cards-table/app-cards-table';
+import '../../common/card-footer/card-footer';
+import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import styles from './app-calculations.css';
 import tableContentStyles from './app-calculations.table.content.css';
+import cardContentStyles from './app-calculations.content.css';
 import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
@@ -56,6 +62,9 @@ export class AppCalculations extends LitElement {
   @state() private frequencyFilter: 'all' | CalculationFrequency = 'all';
   @state() private currentPage = 1;
   @state() private tablePageSize = store.customization.tablePageSize;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
+  @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private filterVisible: boolean = true;
 
   @state() private previewCalculation: Calculation | null = null;
   @state() private deletingCalculation: Calculation | null = null;
@@ -88,6 +97,8 @@ export class AppCalculations extends LitElement {
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
+    this.cardPageSize = store.customization.cardGridPageSize;
+    this.displayMode = (store.viewModeFor('calculations') as 'cards' | 'table') ?? 'cards';
     if (this.previewCalculation) {
       this.previewCalculation =
         this.calculations.find((c) => c.id === this.previewCalculation!.id) || null;
@@ -167,6 +178,339 @@ export class AppCalculations extends LitElement {
       { value: 'custom', label: t.calculations.frequencies.custom },
     ];
 
+    const hUnit = t.viewTexts.calculations.hoursUnitShort;
+
+    return html`
+      <app-page-header
+        title="${t.navigation.calculations}"
+        subtitle="${t.viewTexts.pageSubtitles.calculations}"
+      >
+        <span slot="icon">${iconCalculator(28)}</span>
+        <app-button
+          slot="actions"
+          variant="primary"
+          size="md"
+          ?disabled="${this.contracts.length === 0}"
+          @click="${() => this.openCreateModal()}"
+        >
+          <span slot="icon-start">${iconPlus(16)}</span>
+          <span>${t.calculations.newCalculation}</span>
+        </app-button>
+      </app-page-header>
+
+      <app-kpi-strip columns="4">
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiTotalCalcs}" value="${this.calculations.length}" subtitle="${t.viewTexts.calculations.kpiInvoicedPrefix} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiPendingApproval}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiApprovedReady}" value="${formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${t.viewTexts.calculations.kpiApprovedSuffix}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiLoggedHours}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
+      </app-kpi-strip>
+
+      <div class="mode-row">
+        <app-segmented-switch
+          size="sm"
+          .value="${this.displayMode}"
+          .options="${[
+            { value: 'cards', label: t.viewTexts.calculations.viewCards },
+            { value: 'table', label: t.viewTexts.calculations.viewTable },
+          ]}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('calculations', eventValue(e) as 'cards' | 'table');
+          }}"
+        ></app-segmented-switch>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 215px;"
+            placeholder="${t.viewTexts.calculations.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            show-reset
+            .filters="${[
+              { key: 'status', options: statusOptions },
+              { key: 'contract', options: contractOptions },
+              { key: 'frequency', options: frequencyOptions },
+            ]}"
+            .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
+              if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
+              if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.statusFilter = 'all';
+              this.contractFilter = 'all';
+              this.frequencyFilter = 'all';
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
+
+      ${filtered.length === 0
+        ? html`
+            <app-empty-state title="${t.contractDetail.noCalculations}">
+              ${this.contracts.length > 0
+                ? html`
+                    <app-button slot="action" variant="secondary" @click="${() => this.openCreateModal()}">
+                      <span slot="icon-start">${iconPlus(15)}</span>
+                      <span>${t.calculations.newCalculation}</span>
+                    </app-button>
+                  `
+                : ''}
+            </app-empty-state>
+          `
+        : this.displayMode === 'cards'
+        ? this.renderCards(filtered, t)
+        : this.renderTable(filtered, t)}
+
+      ${this.renderFormModal(t)}
+      ${this.renderPreviewModal(t)}
+      ${this.renderDeleteModal(t)}
+    `;
+  }
+
+  private renderCards(list: Calculation[], t: ReturnType<typeof getTranslation>) {
+    const hUnit = t.viewTexts.calculations.hoursUnitShort;
+    const calcCard = (row: Record<string, unknown>) => {
+      const calc = row as unknown as Calculation;
+      const ctr = this.contracts.find((c) => c.id === calc.contractId);
+      const cp = store.counterparties.find((c) => c.id === calc.counterpartyId);
+      const linkedInv = calc.invoiceId
+        ? this.invoices.find((i) => i.id === calc.invoiceId)
+        : undefined;
+      const priorCount = calc.items.filter((i) => i.isPriorPeriod).length;
+      const nonBillableItems = calc.items.filter((i) => !i.billable).length;
+
+      return html`
+        <div class="card-top">
+          <div class="calc-identity">
+            <div class="calc-icon">${iconCalculator(20)}</div>
+            <div class="calc-names">
+              <app-link
+                class="calc-link-btn"
+                size="md"
+                variant="primary"
+                @click="${() => store.openCalculationDetail(calc.id)}"
+              >
+                <span>${calc.number}</span>
+              </app-link>
+              <div class="calc-items-line">
+                <span>${calc.items.length} ${t.viewTexts.calculations.itemsSuffix}</span>
+                ${nonBillableItems > 0
+                  ? html`<span class="micro-tag zero">0 ₽: ${nonBillableItems}</span>`
+                  : ''}
+                ${priorCount > 0
+                  ? html`<span class="micro-tag prior">+${priorCount} ${t.calculations.priorBadge}</span>`
+                  : ''}
+              </div>
+            </div>
+          </div>
+          <div class="badges-col">
+            <app-status-chip domain="calculation" status="${calc.status}" appearance="soft" size="sm"></app-status-chip>
+          </div>
+        </div>
+
+        ${calc.notes
+          ? html`<p class="calc-notes" title="${calc.notes}">${calc.notes}</p>`
+          : ''}
+
+        <div class="calc-meta-grid">
+          <div class="calc-meta-item">
+            <span class="calc-meta-label">${t.viewTexts.calculations.thContract}</span>
+            <span class="calc-meta-value">
+              ${ctr
+                ? html`
+                    <app-link
+                      class="calc-link-btn"
+                      size="md"
+                      variant="primary"
+                      @click="${() => store.openContractDetail(ctr.id)}"
+                    >
+                      <span>${ctr.number}</span>
+                    </app-link>
+                    <div class="calc-contract-desc" title="${ctr.title}">${ctr.title}</div>
+                  `
+                : '—'}
+            </span>
+          </div>
+          <div class="calc-meta-item">
+            <span class="calc-meta-label">${t.viewTexts.calculations.thCounterparty}</span>
+            <span class="calc-meta-value" title="${cp?.name || ''}">
+              ${cp
+                ? html`
+                    <app-link
+                      class="calc-link-btn"
+                      size="md"
+                      variant="primary"
+                      @click="${() => store.openCounterpartyDetail(cp.id)}"
+                    >
+                      <span>${cp.name}</span>
+                    </app-link>
+                  `
+                : '—'}
+            </span>
+          </div>
+          <div class="calc-meta-item">
+            <span class="calc-meta-label">${t.viewTexts.calculations.thPeriodCycle}</span>
+            <span class="calc-meta-value mono">
+              ${calc.periodStart} → ${calc.periodEnd}
+              <span class="calc-contract-desc">${t.calculations.frequencies[calc.frequency]}</span>
+            </span>
+          </div>
+          <div class="calc-meta-item">
+            <span class="calc-meta-label">${t.viewTexts.calculations.thLabor}</span>
+            <span class="calc-meta-value mono">
+              ${calc.billableHours} ${hUnit}
+              ${calc.nonBillableHours > 0
+                ? html`<span class="calc-contract-desc">+${calc.nonBillableHours} ${hUnit} (0 ₽)</span>`
+                : ''}
+            </span>
+          </div>
+          <div class="calc-meta-item">
+            <span class="calc-meta-label">${t.viewTexts.calculations.thBillableCol}</span>
+            <span class="calc-meta-value amount">
+              ${formatMoney(calc.billableAmount, calc.currency)}
+              ${linkedInv
+                ? html`<span class="calc-invoice-sub">${linkedInv.number}</span>`
+                : ''}
+            </span>
+          </div>
+        </div>
+
+        <card-footer>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.calculations.previewCalculation}"
+            @click="${() => (this.previewCalculation = calc)}"
+          >
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+          ${calc.status === 'draft' || calc.status === 'rejected'
+            ? html`
+                <app-button
+                  slot="end"
+                  action="submit"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.sendForApproval}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'sent')}"
+                >
+                  <span slot="start">${iconSend(14)}</span>
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'sent'
+            ? html`
+                <app-button
+                  slot="end"
+                  action="accept"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.approveCalc}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'approved')}"
+                >
+                  <span slot="start">${iconCheck(14)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  action="reject"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.rejectCalc}"
+                  @click="${() => store.updateCalculationStatus(calc.id, 'rejected')}"
+                >
+                  <span slot="start">${iconX(14)}</span>
+                </app-button>
+              `
+            : ''}
+          ${calc.status === 'approved' && ctr
+            ? html`
+                <app-button
+                  slot="end"
+                  action="accept"
+                  size="sm"
+                  variant="icon"
+                  title="${t.calculations.createInvoiceFromCalc}"
+                  @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
+                >
+                  <span slot="start">${iconReceipt(15)}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(calc)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          ${ctr
+            ? html`
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
+                  title="${t.contractDetail.openContract}"
+                  @click="${() => store.openContractDetail(ctr.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button
+            slot="end"
+            action="delete"
+            size="sm"
+            variant="icon"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingCalculation = calc)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
+
+    return html`
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${calcCard}"
+        .contentStyles="${cardContentStyles}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1; store.setActivePage(1, false);
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-cards-table>
+    `;
+  }
+
+  private renderTable(list: Calculation[], t: ReturnType<typeof getTranslation>) {
     const hUnit = t.viewTexts.calculations.hoursUnitShort;
     // Calculations registry reference rich cells (rendered inside the app-data-table shadow tree)
     const calcNumberCell = (row: Record<string, unknown>) => {
@@ -358,117 +702,43 @@ export class AppCalculations extends LitElement {
     };
 
     return html`
-      <app-page-header
-        title="${t.navigation.calculations}"
-        subtitle="${t.viewTexts.pageSubtitles.calculations}"
-      >
-        <span slot="icon">${iconCalculator(28)}</span>
-        <app-button
-          slot="actions"
-          variant="primary"
-          size="md"
-          ?disabled="${this.contracts.length === 0}"
-          @click="${() => this.openCreateModal()}"
+      <div class="table-card">
+        <app-data-table
+          .contentStyles="${tableContentStyles}"
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
         >
-          <span slot="icon-start">${iconPlus(16)}</span>
-          <span>${t.calculations.newCalculation}</span>
-        </app-button>
-      </app-page-header>
-
-      <app-kpi-strip columns="4">
-        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiTotalCalcs}" value="${this.calculations.length}" subtitle="${t.viewTexts.calculations.kpiInvoicedPrefix} ${this.calculations.filter((c) => c.status === 'invoiced').length}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiPendingApproval}" value="${sentCalcs.length}" valueColor="#f59e0b" subtitle="${formatMoney(sentAmountRub, 'RUB')}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiApprovedReady}" value="${formatMoney(approvedReadyRub, 'RUB')}" valueColor="#10b981" subtitle="${approvedCalcs.length} ${t.viewTexts.calculations.kpiApprovedSuffix}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.calculations.kpiLoggedHours}" value="${totalBillableHours.toFixed(1)} ${hUnit}" subtitle="+${totalNonBillableHours.toFixed(1)} ${hUnit} non-billable (0 ₽)"></app-metric-card>
-      </app-kpi-strip>
-
-      <app-filter-bar
-        variant="bare"
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 215px;"
-        placeholder="${t.viewTexts.calculations.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        show-reset
-        .filters="${[
-          { key: 'status', options: statusOptions },
-          { key: 'contract', options: contractOptions },
-          { key: 'frequency', options: frequencyOptions },
-        ]}"
-        .values="${{ status: this.statusFilter, contract: this.contractFilter, frequency: this.frequencyFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
-          if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
-          if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @reset="${() => {
-          this.localSearch = '';
-          this.statusFilter = 'all';
-          this.contractFilter = 'all';
-          this.frequencyFilter = 'all';
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      ></app-filter-bar>
-
-      ${filtered.length === 0
-        ? html`
-            <app-empty-state title="${t.contractDetail.noCalculations}">
-              ${this.contracts.length > 0
-                ? html`
-                    <app-button slot="action" variant="secondary" @click="${() => this.openCreateModal()}">
-                      <span slot="icon-start">${iconPlus(15)}</span>
-                      <span>${t.calculations.newCalculation}</span>
-                    </app-button>
-                  `
-                : ''}
-            </app-empty-state>
-          `
-        : html`
-            <div class="table-card">
-              <app-data-table
-                .contentStyles="${tableContentStyles}"
-                .rows="${filtered}"
-                page-size="${this.tablePageSize}"
-                page="${this.currentPage}"
-                locale="${t.common.locale}"
-                @page-change="${(e: CustomEvent<{ page: number }>) => {
-                  this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-                  this.scrollTop = 0;
-                }}"
-                @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                  this.currentPage = 1; store.setActivePage(1, false);
-                  store.setTablePageSize(e.detail.pageSize);
-                }}"
-              >
-                <app-table-column field="number" label="${t.viewTexts.calculations.thCalculation}" .cellRender="${calcNumberCell}"></app-table-column>
-                <app-table-column field="contractId" label="${t.viewTexts.calculations.thContract}" .cellRender="${calcContractCell}"></app-table-column>
-                <app-table-column field="counterpartyId" label="${t.viewTexts.calculations.thCounterparty}" .cellRender="${calcCpCell}"></app-table-column>
-                <app-table-column field="periodStart" label="${t.viewTexts.calculations.thPeriodCycle}" .cellRender="${calcPeriodCell}"></app-table-column>
-                <app-table-column field="billableHours" label="${t.viewTexts.calculations.thLabor}" mono .cellRender="${calcHoursCell}"></app-table-column>
-                <app-table-column field="billableAmount" label="${t.viewTexts.calculations.thBillableCol}" .cellRender="${calcAmountCell}"></app-table-column>
-                <app-table-column
-                  field="status"
-                  label="${t.viewTexts.calculations.thStatus}"
-                  .cellRender="${(row: Record<string, unknown>) => html`
-                    <app-status-chip
-                      domain="calculation"
-                      status="${(row as unknown as Calculation).status}"
-                      appearance="soft"
-                      size="sm"
-                    ></app-status-chip>
-                  `}"
-                ></app-table-column>
-                <app-table-column field="" label="" .cellRender="${calcActionsCell}"></app-table-column>
-              </app-data-table>
-            </div>
-          `}
-
-      ${this.renderFormModal(t)}
-      ${this.renderPreviewModal(t)}
-      ${this.renderDeleteModal(t)}
+          <app-table-column field="number" label="${t.viewTexts.calculations.thCalculation}" .cellRender="${calcNumberCell}"></app-table-column>
+          <app-table-column field="contractId" label="${t.viewTexts.calculations.thContract}" .cellRender="${calcContractCell}"></app-table-column>
+          <app-table-column field="counterpartyId" label="${t.viewTexts.calculations.thCounterparty}" .cellRender="${calcCpCell}"></app-table-column>
+          <app-table-column field="periodStart" label="${t.viewTexts.calculations.thPeriodCycle}" .cellRender="${calcPeriodCell}"></app-table-column>
+          <app-table-column field="billableHours" label="${t.viewTexts.calculations.thLabor}" mono .cellRender="${calcHoursCell}"></app-table-column>
+          <app-table-column field="billableAmount" label="${t.viewTexts.calculations.thBillableCol}" .cellRender="${calcAmountCell}"></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.calculations.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip
+                domain="calculation"
+                status="${(row as unknown as Calculation).status}"
+                appearance="soft"
+                size="sm"
+              ></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column field="" label="" .cellRender="${calcActionsCell}"></app-table-column>
+        </app-data-table>
+      </div>
     `;
   }
 

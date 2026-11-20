@@ -2015,6 +2015,8 @@ export const ru = {
       kpiApprovedSuffix: 'соглас. отчёт(ов)',
       kpiLoggedHours: 'Часы в калькуляциях',
       searchPlaceholder: 'Поиск по номеру, договору, контрагенту...',
+      viewCards: 'Карточки',
+      viewTable: 'Таблица',
       thCalculation: 'Калькуляция',
       thContract: 'Договор',
       thCounterparty: 'Контрагент',

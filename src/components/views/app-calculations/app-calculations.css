@@ -43,6 +43,19 @@
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
 
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode row holds the cards/table app-segmented-switch (size="sm", cards is
+   the default and first mode) and the filter toggle (app-toggle-button size="sm", funnel icon +
+   label; pressed = the filter bar is visible, unpressed = hidden, the view mirrors the pressed
+   state in filterVisible); it sits directly before the filter bar. The switch host is
+   inline-flex and the toggle host is inline-block, so the row keeps the intrinsic widths
+   left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 /* Table mode: the registry is rendered by the canonical app-data-table. The card fills
    the remaining view height (flex:1, min-height:0) and the host fills the card, so the
    body scrolls in its own area when rows overflow while header and footer stay fixed;
