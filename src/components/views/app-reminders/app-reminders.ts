@@ -344,6 +344,7 @@ export class AppReminders extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px;"
             placeholder="${t.viewTexts.reminders.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${filters}"
             .values="${{
               status: this.statusFilter,
