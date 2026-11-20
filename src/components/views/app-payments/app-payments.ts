@@ -404,6 +404,7 @@ export class AppPayments extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 190px;"
             placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${this.viewTab === 'due_control'
               ? [
                   { key: 'due', options: dueFilterOptions },
@@ -449,6 +450,16 @@ export class AppPayments extends LitElement {
               }
               if (e.detail.key === 'counterparty') this.counterpartyFilter = eventValue(e);
               if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.dueFilter = 'all';
+              this.directionFilter = 'all';
+              this.companyFilter = 'all';
+              this.methodFilter = 'all';
+              this.counterpartyFilter = 'all';
+              this.contractFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
