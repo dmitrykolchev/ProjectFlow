@@ -1002,50 +1002,6 @@ card-footer {
   flex-wrap: wrap;
 }
 
-/* Contacts cards content classes (rendered inside app-cards-table shadow root) */
-.cnt-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
-.cnt-person-name {
-  font-size: 0.98rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  line-height: 1.3;
-  word-break: break-word;
-}
-
-.cnt-role {
-  font-size: 0.76rem;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.15rem;
-}
-
-.cnt-email-link {
-  color: var(--accent-primary, #6366f1);
-  text-decoration: none;
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.cnt-email-link:hover {
-  text-decoration: underline;
-}
-
-.cnt-copy-ok {
-  --icon-btn-color: var(--color-success, #10b981);
-  --icon-btn-border: rgba(16, 185, 129, 0.35);
-}
-
 /* Employee Blog feed card classes (rendered inside app-cards-table shadow root) */
 .blog-card-top {
   display: flex;

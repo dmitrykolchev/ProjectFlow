@@ -1,0 +1,175 @@
+/* Contacts card content styles. The markup is produced by this view's cardRender template and
+   rendered inside the app-cards-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The card shell and grid geometry stay in
+   app-cards-table. */
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cp-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.cp-names {
+  min-width: 0;
+}
+
+.badges-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+.cp-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.55rem 0.9rem;
+  padding: 0.75rem;
+  background: var(--bg-subtle, #1a2438);
+  border-radius: var(--radius-md, 8px);
+  font-size: 0.78rem;
+}
+
+.cp-meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.cp-meta-label {
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.cp-meta-value {
+  color: var(--text-primary, #f8fafc);
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnt-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.cnt-person-name {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary, #f8fafc);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.cnt-role {
+  font-size: 0.76rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.15rem;
+}
+
+.cnt-email-link {
+  color: var(--accent-primary, #6366f1);
+  text-decoration: none;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cnt-email-link:hover {
+  text-decoration: underline;
+}
+
+.cnt-copy-ok {
+  --icon-btn-color: var(--color-success, #10b981);
+  --icon-btn-border: rgba(16, 185, 129, 0.35);
+}
+
+.rem-entity-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.5rem 0.7rem;
+  border-radius: var(--radius-sm, 8px);
+  border: 1px solid var(--border-subtle, #1e293b);
+  background: var(--bg-canvas, #090d16);
+}
+
+.rem-entity-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-primary, #f8fafc);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.rem-entity-btn:disabled {
+  cursor: default;
+}
+
+.rem-entity-btn:not(:disabled):hover .rem-entity-name {
+  color: var(--accent-primary, #6366f1);
+  text-decoration: underline;
+}
+
+.rem-entity-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.rem-entity-type {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #64748b);
+}
+
+.rem-entity-name {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inv-notes {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #94a3b8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
