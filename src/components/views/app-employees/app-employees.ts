@@ -66,6 +66,7 @@ export class AppEmployees extends LitElement {
     this.globalSearch = store.searchQuery;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
+    this.displayMode = (store.viewModeFor('employees') as 'cards' | 'table') ?? 'cards';
   }
 
   private getStatusLabel(
@@ -153,8 +154,8 @@ export class AppEmployees extends LitElement {
             { value: 'table', label: t.viewTexts.employees.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('employees', eventValue(e) as 'cards' | 'table');
           }}"
         ></app-segmented-switch>
 
