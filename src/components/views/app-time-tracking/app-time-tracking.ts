@@ -51,6 +51,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-time-tracking.css';
+import tableContentStyles from './app-time-tracking.table.content.css';
 import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
@@ -778,6 +779,7 @@ export class AppTimeTracking extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${filtered}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
