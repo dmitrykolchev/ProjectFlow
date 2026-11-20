@@ -126,6 +126,7 @@ export class AppTaskGrid extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px;"
             placeholder="${t.grid.searchPlaceholder}"
             .searchValue="${this.searchQuery}"
+            show-reset
             .filters="${[
               { key: 'project', type: 'entity', options: projectOptions },
               { key: 'status', options: statusOptions },
@@ -148,6 +149,14 @@ export class AppTaskGrid extends LitElement {
               if (e.detail.key === 'status') store.setFilterStatus(val);
               if (e.detail.key === 'priority') store.setFilterPriority(val);
               if (e.detail.key === 'assignee') store.setFilterAssignee(val);
+              store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              store.setSearchQuery('');
+              store.selectProject('all');
+              store.setFilterStatus('all');
+              store.setFilterPriority('all');
+              store.setFilterAssignee('all');
               store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
