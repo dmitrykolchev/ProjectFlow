@@ -92,6 +92,11 @@ export class AppCalculations extends LitElement {
       this.previewCalculation =
         this.calculations.find((c) => c.id === this.previewCalculation!.id) || null;
     }
+    // strict-mode fallback: a contract filter pointing at a contract that no longer exists would
+    // keep the select on its placeholder and the list empty, so the stale value falls back to "all"
+    if (this.contractFilter !== 'all' && !store.contracts.some((c) => c.id === this.contractFilter)) {
+      this.contractFilter = 'all';
+    }
   }
 
 
