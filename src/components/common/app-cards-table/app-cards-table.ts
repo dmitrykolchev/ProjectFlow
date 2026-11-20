@@ -1,4 +1,4 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { LitElement, html, TemplateResult, type CSSResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../app-empty-state/app-empty-state';
 import '../app-pagination/app-pagination';
@@ -37,8 +37,10 @@ export interface CardsTableCardClickDetail {
  * { selectedIds, selectedItems }. Empty rows render a compact app-empty-state.
  * Additive hooks with pixel-identical defaults: --cards-columns pins the grid column count
  * (default auto-fill), the wide-collapse attribute collapses to one column at viewport <= 1024px
- * (default off), and cardClass(row) appends extra shell classes per row (the is-dimmed rule reads
- * --card-dimmed-opacity, default 0.68).
+ * (default off), cardClass(row) appends extra shell classes per row (the is-dimmed rule reads
+ * --card-dimmed-opacity, default 0.68), and contentStyles injects the view-local CSS for the
+ * content produced by cardRender into the shadow root as a <style> element (default empty), so
+ * card content styles stay in the view that owns them instead of this shared component.
  */
 @customElement('app-cards-table')
 export class AppCardsTable extends LitElement {
@@ -57,6 +59,9 @@ export class AppCardsTable extends LitElement {
   @property({ attribute: false }) cardClass?: (row: Record<string, unknown>) => string;
   // additive hook: single-column grid collapse at viewport <= 1024px; default off
   @property({ type: Boolean, attribute: 'wide-collapse', reflect: true }) wideCollapse: boolean = false;
+  // additive hook: view-local styles for the content produced by cardRender, injected into the
+  // shadow root as a <style> element; default empty keeps every consumer pixel-identical
+  @property({ attribute: false }) contentStyles?: string | CSSResult;
 
   @state() private currentPage: number = 1;
 
@@ -145,6 +150,7 @@ export class AppCardsTable extends LitElement {
     const slice = paginateItems(this.rows, this.currentPage, this.pageSize);
 
     return html`
+      ${this.contentStyles ? html`<style>${String(this.contentStyles)}</style>` : ''}
       ${this.rows.length === 0
         ? html`
             <div class="empty-wrap">

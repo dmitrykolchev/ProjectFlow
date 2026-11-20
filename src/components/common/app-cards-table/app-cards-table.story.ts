@@ -50,6 +50,17 @@ function renderCard(row: Record<string, unknown>): TemplateResult {
   `;
 }
 
+const demoContentCss =
+  '.demo-note { margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--text-secondary, #94a3b8); border-left: 3px solid var(--accent-primary, #6366f1); padding-left: 0.4rem; }';
+
+function renderCardWithNote(row: Record<string, unknown>): TemplateResult {
+  const c = row as unknown as DemoCard;
+  return html`
+    <strong>${c.key} ${c.name}</strong>
+    <p class="demo-note">Content styles come from the view through contentStyles.</p>
+  `;
+}
+
 export const meta: ComponentStoryMeta = {
   title: 'Common/CardsTable',
   component: 'app-cards-table',
@@ -70,6 +81,8 @@ export const meta: ComponentStoryMeta = {
     cardClass: 'Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68)',
     'wide-collapse': 'Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off)',
     '--cards-columns': 'Grid column count token (default auto-fill); a view can pin an exact number of columns',
+    contentStyles:
+      'Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical',
   },
   stories: [
     {
@@ -135,6 +148,22 @@ export const meta: ComponentStoryMeta = {
             style="--cards-min-width: 240px; --cards-gap: 1rem;"
             @selection-change="${(e: CustomEvent<{ selectedIds: string[] }>) =>
               console.log('selection-change', e.detail.selectedIds)}"
+          ></app-cards-table>
+        </div>
+      `,
+    },
+    {
+      name: 'Content Styles',
+      description:
+        'contentStyles injects view-local CSS into the shadow root for the cardRender content (the .demo-note rule lives in the consumer, not in the component); default empty renders no style element',
+      render: () => html`
+        <div style="max-width: 1100px;">
+          <app-cards-table
+            .rows="${demoCards.slice(0, 3)}"
+            .cardRender="${renderCardWithNote}"
+            page-size="6"
+            .contentStyles="${demoContentCss}"
+            style="--cards-min-width: 240px; --cards-gap: 1rem;"
           ></app-cards-table>
         </div>
       `,
