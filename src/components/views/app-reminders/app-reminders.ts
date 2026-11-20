@@ -132,6 +132,7 @@ export class AppReminders extends LitElement {
     this.reminders = store.reminders;
     this.pageSize = store.customization.cardGridPageSize;
     this.currentPage = store.activePage;
+    this.scopeTab = (store.viewModeFor('reminders') as ReminderScopeTab) ?? 'all';
   }
 
   private handleSnoozePreset(rem: Reminder, presetId: string) {
@@ -328,8 +329,8 @@ export class AppReminders extends LitElement {
           .value="${this.scopeTab}"
           .options="${scopeOptions}"
           @change="${(e: Event) => {
-            this.scopeTab = eventValue(e) as ReminderScopeTab;
             store.setActivePage(1, false);
+            store.setViewMode('reminders', eventValue(e) as ReminderScopeTab);
           }}"
         ></app-segmented-switch>
 
