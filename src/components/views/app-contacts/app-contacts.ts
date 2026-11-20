@@ -117,6 +117,11 @@ export class AppContacts extends LitElement {
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
     this.displayMode = (store.viewModeFor('contacts') as 'cards' | 'table') ?? 'cards';
+    // strict-mode fallback: a counterparty filter pointing at a record that no longer exists would
+    // keep the select on its placeholder and the list empty, so the stale value falls back to "all"
+    if (this.counterpartyFilter !== 'all' && !store.counterparties.some((c) => c.id === this.counterpartyFilter)) {
+      this.counterpartyFilter = 'all';
+    }
   }
 
   private getInitials(name: string): string {
@@ -505,6 +510,7 @@ export class AppContacts extends LitElement {
               style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 195px;"
               placeholder="${t.viewTexts.contacts.searchPlaceholder}"
               .searchValue="${this.localSearch}"
+              show-reset
               .filters="${[
                 { key: 'counterparty', options: counterpartyOptions },
                 { key: 'type', options: typeOptions },
@@ -526,6 +532,14 @@ export class AppContacts extends LitElement {
                   this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
                 if (e.detail.key === 'role')
                   this.roleFilter = eventValue(e) as 'all' | 'primary' | 'secondary';
+                this.currentPage = 1;
+                store.setActivePage(1, false);
+              }}"
+              @reset="${() => {
+                this.localSearch = '';
+                this.counterpartyFilter = 'all';
+                this.typeFilter = 'all';
+                this.roleFilter = 'all';
                 this.currentPage = 1;
                 store.setActivePage(1, false);
               }}"
