@@ -10,3 +10,19 @@
   --btn-radius-br: var(--radius-sm, 6px);
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+/* the employees row actions container keeps its own 0.35rem gap layout without the
+   flex-end alignment, and the historical hover restored the subtle border for every
+   action including delete, so the hover border token is pinned back on all buttons */
+.emp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}

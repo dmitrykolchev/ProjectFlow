@@ -55,3 +55,8 @@
   color: var(--text-primary, #f8fafc);
   font-family: var(--font-mono, monospace);
 }
+
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}

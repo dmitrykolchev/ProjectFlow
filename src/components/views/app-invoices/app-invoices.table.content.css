@@ -220,3 +220,79 @@
   color: var(--text-secondary, #94a3b8);
   white-space: nowrap;
 }
+
+.due-tag.paid-ok {
+  background: rgba(16, 185, 129, 0.14);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+/* Calculations page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the mono number/contract links (link-btn restores zero padding, weight 700,
+   line-height 1.5, mono family with tabular numerals and the 0.84rem cell font size pinned
+   through control-font-md; text-link-btn is the counterparty name link with weight 600,
+   text-primary glyph and the accent hover), the cell-sub muted sub-line (flex, 0.35rem gap,
+   wrap), the calculations contract-desc variant (240px ellipsis line, margin-top 0.12rem —
+   narrower than the contracts contract-desc), the mono helper for inline date lines, and
+   the borderless micro-tag with the prior / zero variants (the bill variant stays in the
+   view: it is only used by the preview modal in light DOM). */
+.link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
+}
+
+/* the invoice cell chip is a div-as-button consumer of the same class kept native: it restores
+   the full historical rule with the inherited cell font size and line-height, mono weight 700 tabular
+   numerals, accent glyph, padding offset by negative margins, nowrap and the fast transitions */
+div.contract-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary, #6366f1);
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+
+.due-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.due-tag.overdue {
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.due-tag.due-soon {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.due-tag.on-track {
+  background: rgba(56, 189, 248, 0.1);
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #334155);
+}

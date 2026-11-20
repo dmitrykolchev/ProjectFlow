@@ -64,3 +64,9 @@
 .actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']){
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+.req-code-badge.is-nfr {
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.3);
+}

@@ -122,3 +122,35 @@
 .card-actions app-button:not([action]){
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+.amount-cell.incoming {
+  color: #10b981;
+}
+
+/* the documents row actions container keeps its own 0.3rem gap layout; icon buttons at
+   size sm get the historical 6px radius, and the hover border is pinned back for the
+   plain action (the component colors action view / edit / delete itself) */
+.card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex-shrink: 0;
+}
+
+/* Calculations page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the mono number/contract links (link-btn restores zero padding, weight 700,
+   line-height 1.5, mono family with tabular numerals and the 0.84rem cell font size pinned
+   through control-font-md; text-link-btn is the counterparty name link with weight 600,
+   text-primary glyph and the accent hover), the cell-sub muted sub-line (flex, 0.35rem gap,
+   wrap), the calculations contract-desc variant (240px ellipsis line, margin-top 0.12rem —
+   narrower than the contracts contract-desc), the mono helper for inline date lines, and
+   the borderless micro-tag with the prior / zero variants (the bill variant stays in the
+   view: it is only used by the preview modal in light DOM). */
+.link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
+}

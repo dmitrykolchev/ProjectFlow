@@ -80,3 +80,10 @@
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
 }
+
+/* the requirements row actions container keeps its own 0.4rem gap layout */
+.footer-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}

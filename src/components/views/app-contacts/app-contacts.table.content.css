@@ -91,3 +91,18 @@
 .cnt-email-link:hover{
   text-decoration: underline;
 }
+
+.cnt-copy-ok {
+  --icon-btn-color: var(--color-success, #10b981);
+  --icon-btn-border: rgba(16, 185, 129, 0.35);
+}
+
+/* the counterparties row actions container keeps its own 0.35rem gap layout; icon
+   buttons at size sm get the historical 6px radius, and the hover border is pinned back
+   for every action except delete (the component colors action="delete" itself) */
+.cp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}

@@ -77,3 +77,20 @@
 .cp-actions-row app-button:not([action='delete']){
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+/* the counterparties row actions container keeps its own 0.35rem gap layout; icon
+   buttons at size sm get the historical 6px radius, and the hover border is pinned back
+   for every action except delete (the component colors action="delete" itself) */
+.cp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono {
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}

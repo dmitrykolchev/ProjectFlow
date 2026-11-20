@@ -145,3 +145,10 @@
 .actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']){
   --icon-btn-hover-border: var(--border-subtle, #334155);
 }
+
+/* the project pill dot is 8px (registry reference), scoped so it does not change the
+   journal project-sub dot which stays 7px */
+.project-pill .dot {
+  width: 8px;
+  height: 8px;
+}

@@ -287,3 +287,34 @@
   color: var(--text-secondary, #94a3b8);
   white-space: nowrap;
 }
+
+/* the invoice cell chip is a div-as-button consumer of the same class kept native: it restores
+   the full historical rule with the inherited cell font size and line-height, mono weight 700 tabular
+   numerals, accent glyph, padding offset by negative margins, nowrap and the fast transitions */
+div.contract-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-primary, #6366f1);
+  background: transparent;
+  border: none;
+  padding: 0.15rem 0.25rem;
+  margin: -0.15rem -0.25rem;
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast, 150ms ease), color var(--transition-fast, 150ms ease);
+}
+
+.micro-tag.prior {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+.micro-tag.zero {
+  background: rgba(100, 116, 139, 0.18);
+  color: var(--text-secondary, #94a3b8);
+}

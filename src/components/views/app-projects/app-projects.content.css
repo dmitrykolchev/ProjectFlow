@@ -123,3 +123,9 @@
   gap: 0.5rem;
   flex-wrap: wrap;
 }
+
+.req-code-badge.is-nfr {
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.3);
+}

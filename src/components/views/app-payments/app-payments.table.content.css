@@ -179,3 +179,40 @@
   color: var(--text-secondary, #94a3b8);
   white-space: nowrap;
 }
+
+/* Payments page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the payments contract-desc variant (220px ellipsis line, margin-top
+   0.12rem — narrower than the contracts 320px and the calculations 240px), the block
+   pay-cell-sub muted line (no flex, margin-top 0.18rem), the req-sub requisites line
+   (mono 0.72rem muted with the landmark glyph gap 0.28rem, 240px ellipsis), the signed
+   amount colors incoming / outgoing on the shared amount-cell, and the payments
+   inv-pay-cell variant (min-width 155px — the bar/fill/meta stay shared). The link-btn,
+   text-link-btn, mono, due-tag variants, inv-pay bar classes and ctr-actions-row are
+   reused from the existing sets. */
+.pay-contract-desc {
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 0.12rem;
+}
+
+/* Calculations page reference rich cells (rendered in the component's shadow tree through
+   cellRender): the mono number/contract links (link-btn restores zero padding, weight 700,
+   line-height 1.5, mono family with tabular numerals and the 0.84rem cell font size pinned
+   through control-font-md; text-link-btn is the counterparty name link with weight 600,
+   text-primary glyph and the accent hover), the cell-sub muted sub-line (flex, 0.35rem gap,
+   wrap), the calculations contract-desc variant (240px ellipsis line, margin-top 0.12rem —
+   narrower than the contracts contract-desc), the mono helper for inline date lines, and
+   the borderless micro-tag with the prior / zero variants (the bill variant stays in the
+   view: it is only used by the preview modal in light DOM). */
+.link-btn {
+  --link-padding: 0;
+  --link-font-weight: 700;
+  --link-line-height: 1.5;
+  --link-font: var(--font-mono, monospace);
+  --link-numeric: tabular-nums;
+  --control-font-md: 0.84rem;
+}

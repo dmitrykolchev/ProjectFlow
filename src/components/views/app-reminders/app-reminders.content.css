@@ -251,3 +251,17 @@
   align-items: center;
   gap: 0.4rem;
 }
+
+/* Reminders cards reference content classes (rendered in the component's shadow tree through
+   cardRender): the head row with the status/priority chips and the overdue/due-today badges, the
+   title button, the two-line clamped description, the entity link bar on the canvas surface, the
+   schedule meta line with tabular-nums items and dot separators, the attachments meta button, the
+   rrule token copy button, the notification rules box with rule and policy chips, and the footer
+   action rows. The rem- prefixed names keep the reminders geometry distinct: .meta-item is the
+   projects column layout, so the reminders row item is .rem-meta-item. */
+.rem-card-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
