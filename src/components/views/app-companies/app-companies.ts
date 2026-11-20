@@ -125,6 +125,7 @@ export class AppCompanies extends LitElement {
         style="--filter-search-min: 280px; --filter-search-max: 280px;"
         placeholder="${t.viewTexts.companies.searchPlaceholder}"
         .searchValue="${this.localSearch}"
+        show-reset
         .filters="${[{ key: 'status', options: statusOptions }]}"
         .values="${{ status: this.statusFilter }}"
         @search-change="${(e: CustomEvent<{ value: string }>) => {
@@ -133,6 +134,11 @@ export class AppCompanies extends LitElement {
         }}"
         @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CompanyStatus;
+          this.currentPage = 1; store.setActivePage(1, false);
+        }}"
+        @reset="${() => {
+          this.localSearch = '';
+          this.statusFilter = 'all';
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
       ></app-filter-bar>
