@@ -1,0 +1,173 @@
+/* app-expenses table content styles. The markup is produced by this view's cellRender callbacks and
+   rendered inside the app-data-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The table shell (header, body, footer,
+   pagination) stays in app-data-table. */
+
+/* Registry reference rich cells (expenses journal): title link, vendor line, project
+   pill, task chip, amount with billable sub-line */
+.exp-title{
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.exp-vendor{
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 0.15rem;
+}
+
+.project-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+/* the project pill dot is 8px (registry reference), scoped so it does not change the
+   journal project-sub dot which stays 7px */
+.project-pill .dot{
+  width: 8px;
+  height: 8px;
+}
+
+.project-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.task-chip-btn{
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 0.1rem 0.42rem;
+  border-radius: 5px;
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.35));
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.task-chip-btn:hover{
+  filter: brightness(1.15);
+}
+
+.amount-cell{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.88rem;
+  white-space: nowrap;
+}
+
+.amount-cell.incoming{
+  color: #10b981;
+}
+
+.amount-cell.outgoing{
+  color: #f59e0b;
+}
+
+.amount-cell{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.billable-sub{
+  font-size: 0.7rem;
+  color: #10b981;
+  font-weight: 500;
+  margin-top: 0.15rem;
+  font-family: inherit;
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.attach-chips-list{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: center;
+}
+
+.attach-chip-btn{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 170px;
+  padding: 0.18rem 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid var(--border-subtle, #334155);
+  background: var(--bg-subtle, #1a2438);
+  color: var(--text-primary, #f8fafc);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+
+.attach-chip-btn:hover{
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #6366f1);
+}
+
+.attach-chip-name{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono, monospace);
+}
+
+.actions-row{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+/* Row icon actions are app-button web components at size sm: the historical hover kept
+   the subtle border unchanged for plain actions, so the hover border token is pinned back
+   for every action except accept and delete (the component supplies the success and danger
+   palettes for those actions), and the historical 6px radius replaces md */
+.actions-row app-button{
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.actions-row app-button:not([action='accept']):not([action='reject']):not([action='delete']){
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}

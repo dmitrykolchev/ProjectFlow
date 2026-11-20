@@ -39,6 +39,7 @@ import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-link/app-link';
 import { paginateItems } from '../../common/paginate';
 import styles from './app-expenses.css';
+import tableContentStyles from './app-expenses.table.content.css';
 import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
@@ -647,6 +648,7 @@ export class AppExpenses extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${filtered}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
