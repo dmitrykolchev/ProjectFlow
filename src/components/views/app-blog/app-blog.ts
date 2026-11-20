@@ -48,6 +48,7 @@ import '../../common/app-table-column/app-table-column';
 import '../../common/app-textarea/app-textarea';
 import type { AppTextarea } from '../../common/app-textarea/app-textarea';
 import '../../common/app-toggle-button/app-toggle-button';
+import '../../common/card-footer/card-footer';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-blog.css';
 import tableContentStyles from './app-blog.table.content.css';
