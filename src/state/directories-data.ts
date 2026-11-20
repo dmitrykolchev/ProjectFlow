@@ -542,6 +542,7 @@ export function createInitialDirectories(): DirectoryDefinition[] {
           type: 'boolean',
           align: 'center',
           showInTable: true,
+          framelessSwitch: true,
           defaultValue: false,
         },
       ],
