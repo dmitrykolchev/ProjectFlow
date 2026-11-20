@@ -681,6 +681,8 @@ export interface UserCustomization {
   aiBudget: AiBudgetConfig;
   timezone: string;
   defaultProjectId: string;
+  /** display mode of each view, recorded in the navigation history (#/<view>?mode=<mode>) */
+  viewModes: Record<string, string>;
   gridColumns: {
     id: boolean;
     title: boolean;
