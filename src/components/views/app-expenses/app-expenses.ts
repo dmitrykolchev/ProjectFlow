@@ -95,6 +95,15 @@ export class AppExpenses extends LitElement {
     if (this.previewDoc) {
       this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
     }
+    // strict-mode fallback: filters pointing at records that no longer exist in the store would keep
+    // their selects on the placeholder and leave the list silently empty, so stale values fall back to
+    // "all". The check runs against the same lists the filter options are built from.
+    if (this.projectFilter !== 'all' && !store.projects.some((p) => p.id === this.projectFilter)) {
+      this.projectFilter = 'all';
+    }
+    if (this.userFilter !== 'all' && !store.users.some((u) => u.id === this.userFilter)) {
+      this.userFilter = 'all';
+    }
   }
 
   private toRub(amount: number, currency: 'RUB' | 'USD' | 'EUR'): number {
