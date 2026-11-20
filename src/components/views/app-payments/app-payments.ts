@@ -107,6 +107,18 @@ export class AppPayments extends LitElement {
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
     this.viewTab = (store.viewModeFor('payments') as 'due_control' | 'ledger') ?? 'due_control';
+    // strict-mode fallback: filters pointing at records that no longer exist in the store would keep
+    // their selects on the placeholder and leave the list silently empty, so stale values fall back to
+    // "all". The reset button covers the same fields when the user can see the bar.
+    if (this.counterpartyFilter !== 'all' && !store.counterparties.some((c) => c.id === this.counterpartyFilter)) {
+      this.counterpartyFilter = 'all';
+    }
+    if (this.companyFilter !== 'all' && !store.companies.some((c) => c.id === this.companyFilter)) {
+      this.companyFilter = 'all';
+    }
+    if (this.contractFilter !== 'all' && !store.contracts.some((c) => c.id === this.contractFilter)) {
+      this.contractFilter = 'all';
+    }
   }
 
   private toRub(amount: number, currency: BankCurrency): number {
