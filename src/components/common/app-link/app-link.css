@@ -26,6 +26,12 @@
   white-space: var(--link-white-space, normal);
   overflow: var(--link-overflow, visible);
   text-overflow: var(--link-text-overflow, clip);
+  /* --link-text-align pins the horizontal placement of slotted text inside a stretched slot
+     (a slotted element that fills its flex container, e.g. a table cell title span): the UA
+     button style centers text, and text-align inherits through the slot chain to the slotted
+     content. The default center keeps every existing consumer pixel-identical; consumers that
+     need the content pinned to the start of the cell pass --link-text-align: start on the host. */
+  text-align: var(--link-text-align, center);
   text-decoration: none;
   cursor: pointer;
   user-select: none;
@@ -44,7 +50,7 @@
    --link-width, --link-white-space, --link-overflow, --link-text-overflow,
    --link-align-items, --link-min-height, --link-hover-color, --link-hover-decoration,
    --link-hover-bg, --link-hover-transition, --link-border, --link-border-left,
-   --link-active-bg. */
+   --link-active-bg, --link-text-align. */
 
 ::slotted(*) {
   display: inline-flex;

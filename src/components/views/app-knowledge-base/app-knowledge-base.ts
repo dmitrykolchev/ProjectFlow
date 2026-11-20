@@ -13,10 +13,10 @@ import {
   iconBookOpen,
   iconBuilding,
   iconEdit,
+  iconFilter,
   iconFolder,
   iconPin,
   iconPlus,
-  iconSearch,
   iconShieldCheck,
   iconThumbsUp,
   iconTrash,
@@ -27,10 +27,14 @@ import '../../common/app-markdown/app-markdown';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-select/app-select';
 import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-page-header/app-page-header';
+import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-knowledge-base.css';
 import { eventValue } from '../../common/event-value';
 
@@ -46,6 +50,7 @@ export class AppKnowledgeBase extends LitElement {
   @state() private statusFilter: 'all' | KnowledgeArticleStatus = 'all';
   @state() private localSearch = '';
   @state() private globalSearch = store.searchQuery;
+  @state() private filterVisible: boolean = true;
 
   // Editor Modal state
   @state() private modalOpen = false;
@@ -201,14 +206,6 @@ export class AppKnowledgeBase extends LitElement {
       })),
     ];
 
-    const hasActiveFilters =
-      this.scopeFilter !== 'all' ||
-      this.projectFilter !== 'all' ||
-      this.companyFilter !== 'all' ||
-      this.categoryFilter !== 'all' ||
-      this.statusFilter !== 'all' ||
-      Boolean(this.localSearch.trim());
-
     return html`
       <div class="kb-shell">
         <app-page-header title="${kb.title}" subtitle="${kb.subtitle}">
@@ -219,107 +216,74 @@ export class AppKnowledgeBase extends LitElement {
           </app-button>
         </app-page-header>
 
-        <!-- 4-Cell Summary Strip -->
-        <div class="kpi-strip">
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.totalArticles}</span>
-            <span class="kpi-value">${totalCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.verifiedArticles}</span>
-            <span class="kpi-value" style="color: var(--color-success, #10b981);">${verifiedCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.lessonsAndPostmortems}</span>
-            <span class="kpi-value">${lessonsCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.coverageLabel}</span>
-            <span class="kpi-value">${coveredProjects} / ${coveredCompanies}</span>
-          </div>
+        <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
+             toggle, filter bar, data representation -->
+        <app-kpi-strip columns="4">
+          <app-metric-card size="compact" label="${kb.totalArticles}" value="${totalCount}"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.verifiedArticles}" value="${verifiedCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.lessonsAndPostmortems}" value="${lessonsCount}"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.coverageLabel}" value="${coveredProjects} / ${coveredCompanies}"></app-metric-card>
+        </app-kpi-strip>
+
+        <div class="mode-row">
+          <app-segmented-switch
+            size="sm"
+            .value="${this.scopeFilter}"
+            .options="${[
+              { value: 'all', label: kb.scopeAll },
+              { value: 'project', label: kb.scopeProject },
+              { value: 'company', label: kb.scopeCompany },
+              { value: 'general', label: kb.scopeGeneral },
+            ]}"
+            @change="${(e: CustomEvent<{ value: string }>) => {
+              const nextScope = eventValue(e) as 'all' | KnowledgeScope;
+              store.setKnowledgeFilters({
+                scope: nextScope,
+                projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
+                companyId: nextScope === 'general' ? 'all' : this.companyFilter,
+              });
+            }}"
+          ></app-segmented-switch>
+
+          <app-toggle-button
+            size="sm"
+            .pressed="${this.filterVisible}"
+            @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+          >
+            <span slot="icon-start">${iconFilter(14)}</span>
+            <span>${t.common.filterToggle}</span>
+          </app-toggle-button>
         </div>
 
-        <!-- Filters -->
-        <div class="kb-toolbar">
-          <div class="toolbar-left">
-            <div class="toolbar-search">
-              <app-input
-                size="sm"
-                placeholder="${kb.searchPlaceholder}"
-                .value="${this.localSearch}"
-                clearable
-                @input="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
-              >
-                <span slot="icon">${iconSearch(14)}</span>
-              </app-input>
-            </div>
-
-            <app-segmented-switch
-              size="sm"
-              .value="${this.scopeFilter}"
-              .options="${[
-                { value: 'all', label: kb.scopeAll },
-                { value: 'project', label: kb.scopeProject },
-                { value: 'company', label: kb.scopeCompany },
-                { value: 'general', label: kb.scopeGeneral },
+        ${this.filterVisible
+          ? html`<app-filter-bar
+              style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+              placeholder="${kb.searchPlaceholder}"
+              .searchValue="${this.localSearch}"
+              .filters="${[
+                { key: 'project', options: projectOptions },
+                { key: 'company', options: companyOptions },
+                { key: 'category', options: categoryOptions },
+                { key: 'status', options: statusOptions },
               ]}"
-              @change="${(e: CustomEvent<{ value: string }>) => {
-                const nextScope = eventValue(e) as 'all' | KnowledgeScope;
-                store.setKnowledgeFilters({
-                  scope: nextScope,
-                  projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
-                  companyId: nextScope === 'general' ? 'all' : this.companyFilter,
-                });
+              .values="${{
+                project: this.projectFilter,
+                company: this.companyFilter,
+                category: this.categoryFilter,
+                status: this.statusFilter,
               }}"
-            ></app-segmented-switch>
-          </div>
-
-          <div class="toolbar-filters">
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.projectFilter}"
-                .options="${projectOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ projectId: eventValue(e) })}"
-              ></app-select>
-            </div>
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.companyFilter}"
-                .options="${companyOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  store.setKnowledgeFilters({ companyId: eventValue(e) })}"
-              ></app-select>
-            </div>
-            <div class="filter-select">
-              <app-select
-                size="sm"
-                .value="${this.categoryFilter}"
-                .options="${categoryOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.categoryFilter = eventValue(e) as 'all' | KnowledgeCategory)}"
-              ></app-select>
-            </div>
-            <div class="filter-select" style="width: 150px;">
-              <app-select
-                size="sm"
-                .value="${this.statusFilter}"
-                .options="${statusOptions}"
-                @change="${(e: CustomEvent<{ value: string }>) =>
-                  (this.statusFilter = eventValue(e) as 'all' | KnowledgeArticleStatus)}"
-              ></app-select>
-            </div>
-            ${hasActiveFilters
-              ? html`
-                  <app-button size="sm" variant="ghost" @click="${() => this.clearAllFilters()}">
-                    ${kb.clearFilters}
-                  </app-button>
-                `
-              : ''}
-          </div>
-        </div>
+              show-reset
+              @search-change="${(e: CustomEvent<{ value: string }>) => (this.localSearch = eventValue(e))}"
+              @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+                const val = eventValue(e);
+                if (e.detail.key === 'project') store.setKnowledgeFilters({ projectId: val });
+                if (e.detail.key === 'company') store.setKnowledgeFilters({ companyId: val });
+                if (e.detail.key === 'category') this.categoryFilter = val as 'all' | KnowledgeCategory;
+                if (e.detail.key === 'status') this.statusFilter = val as 'all' | KnowledgeArticleStatus;
+              }}"
+              @reset="${() => this.clearAllFilters()}"
+            ></app-filter-bar>`
+          : ''}
 
         <!-- Two-Pane Workspace -->
         <div class="kb-workspace">

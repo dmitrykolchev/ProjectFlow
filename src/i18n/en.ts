@@ -13,6 +13,7 @@ export const en = {
     close: 'Close',
     search: 'Search...',
     filter: 'Filters',
+    filterToggle: 'Filter',
     all: 'All',
     apply: 'Apply',
     reset: 'Reset',
@@ -1499,7 +1500,15 @@ export const en = {
     loadMore: (count: number) => `Show more (+${count})`,
   },
   viewTexts: {
+    taskGrid: {
+      filterAllProjects: 'All projects',
+      filterAllStatuses: 'All statuses',
+      filterAllPriorities: 'All priorities',
+      filterAllAssignees: 'All assignees',
+    },
     pageSubtitles: {
+      grid: 'Task table across all projects: sorting, grouping, bulk actions, and filters by project, status, priority and assignee',
+      analytics: 'Portfolio analytics: task completion by status and priority, estimated and logged hours, team workload by assignee',
       projects: 'Portfolio projects list. Select any project to open its dedicated page with team roles, tasks, and contracts',
       requirements: 'Registry of Functional (FR) and Non-Functional (NFR) requirements across projects, specification traceability, and AI task decomposition',
       requirementDetail: 'Individual requirement workspace: acceptance criteria, Knowledge Base & specification traceability, task coverage, and Human+AI refinement',

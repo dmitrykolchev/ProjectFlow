@@ -3,7 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { Counterparty, CounterpartyStatus, CounterpartyType } from '../../../types';
 import { getTranslation } from '../../../i18n';
-import { iconChevronRight, iconEdit, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconFilter, iconHandshake, iconPlus, iconTrash } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-bank-summary/app-bank-summary';
@@ -14,15 +14,15 @@ import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/card-footer/card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-counterparty-form/app-counterparty-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
-import '../../common/app-pagination/app-pagination';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
-import { paginateItems } from '../../common/paginate';
+import '../../common/app-cards-table/app-cards-table';
 import styles from './app-counterparties.css';
 import { eventValue } from '../../common/event-value';
 
@@ -35,6 +35,7 @@ export class AppCounterparties extends LitElement {
   @state() private typeFilter: 'all' | CounterpartyType = 'all';
   @state() private statusFilter: 'all' | CounterpartyStatus = 'all';
   @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -151,25 +152,7 @@ export class AppCounterparties extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.counterparties.kpiPortfolio}" value="${(activePortfolioRub / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix}"></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'type', options: typeOptions },
-          { key: 'status', options: statusOptions },
-        ]}"
-        .values="${{ type: this.typeFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
-          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -182,7 +165,38 @@ export class AppCounterparties extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+            placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'type', options: typeOptions },
+              { key: 'status', options: statusOptions },
+            ]}"
+            .values="${{ type: this.typeFilter, status: this.statusFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.counterparties.emptyNoCounterparties}"></app-empty-state>`
@@ -219,129 +233,125 @@ export class AppCounterparties extends LitElement {
   }
 
   private renderCards(list: Counterparty[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+    const cpCard = (row: Record<string, unknown>) => {
+      const cp = row as unknown as Counterparty;
+      const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
+      const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
+      const cpProjects = store.projects.filter((p) => p.counterpartyId === cp.id).length;
+      const contacts = cp.contacts || [];
+      const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
+      const contactLabel = primaryContact
+        ? `${primaryContact.fullName}${contacts.length > 1 ? ` (+${contacts.length - 1})` : ''}`
+        : cp.contactPerson;
+      const contactPhone = primaryContact?.phone || cp.phone;
+      const contactEmail = primaryContact?.email || cp.email;
 
-    return html`
-      <div class="cards-grid">
-        ${paged.items.map((cp) => {
-          const cpContracts = store.contracts.filter((c) => c.counterpartyId === cp.id);
-          const cpSum = cpContracts.reduce((acc, c) => acc + c.amount, 0);
-          const cpProjects = store.projects.filter((p) => p.counterpartyId === cp.id).length;
-          const contacts = cp.contacts || [];
-          const primaryContact = contacts.find((c) => c.isPrimary) || contacts[0];
-          const contactLabel = primaryContact
-            ? `${primaryContact.fullName}${contacts.length > 1 ? ` (+${contacts.length - 1})` : ''}`
-            : cp.contactPerson;
-          const contactPhone = primaryContact?.phone || cp.phone;
-          const contactEmail = primaryContact?.email || cp.email;
-
-          return html`
-            <article class="cp-card">
-              <div class="card-top">
-                <div class="cp-identity">
-                  <div class="cp-icon">${iconHandshake(20)}</div>
-                  <div class="cp-names">
-                    <div class="cp-name">
-                      <app-link
-                        class="cp-link-btn"
-                        size="md"
-                        variant="primary"
-                        @click="${() => store.openCounterpartyDetail(cp.id)}"
-                      >
-                        ${cp.name}
-                      </app-link>
-                    </div>
-                    <div class="cp-legal" title="${cp.legalName}">${cp.legalName}</div>
-                  </div>
-                </div>
-                <div class="badges-col">
-                  <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
-                  <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
-                </div>
-              </div>
-
-              <p class="cp-notes">${cp.notes || '—'}</p>
-
-              <div class="meta-grid">
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.counterparties.metaInnKpp}</span>
-                  <span class="meta-value mono">${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.counterparties.labelCity}</span>
-                  <span class="meta-value">${cp.city}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.counterparties.metaContact}</span>
-                  <span class="meta-value" title="${contacts.map((c) => c.fullName).join(', ')}">${contactLabel}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.counterparties.metaRating}</span>
-                  <span class="meta-value rating-stars">${this.renderStars(cp.rating)}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">${t.viewTexts.counterparties.labelPhone}</span>
-                  <span class="meta-value mono">${contactPhone}</span>
-                </div>
-                <div class="meta-item">
-                  <span class="meta-label">Email</span>
-                  <span class="meta-value">${contactEmail}</span>
-                </div>
-              </div>
-
-              <app-bank-summary .accounts="${cp.bankAccounts || []}"></app-bank-summary>
-
-              <card-footer>
-                <div slot="start" class="stats-row">
-                  <span class="stat-pill">
-                    ${t.viewTexts.counterparties.contractsCountLabel}: <strong>${cpContracts.length}</strong>
-                  </span>
-                  <span class="stat-pill">
-                    ${t.viewTexts.counterparties.projectsCountLabel}: <strong>${cpProjects}</strong>
-                  </span>
-                  <span class="stat-pill">
-                    ${t.viewTexts.counterparties.sumLabel}: <strong>${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix}</strong>
-                  </span>
-                </div>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.viewTexts.counterparties.openCardButton}"
+      return html`
+        <div class="card-top">
+          <div class="cp-identity">
+            <div class="cp-icon">${iconHandshake(20)}</div>
+            <div class="cp-names">
+              <div class="cp-name">
+                <app-link
+                  class="cp-link-btn"
+                  size="md"
+                  variant="primary"
                   @click="${() => store.openCounterpartyDetail(cp.id)}"
                 >
-                  <span slot="start">${iconChevronRight(15)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditModal(cp)}"
-                >
-                  <span slot="start">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingItem = cp)}"
-                >
-                  <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-              </card-footer>
-            </article>
-          `;
-        })}
-      </div>
+                  ${cp.name}
+                </app-link>
+              </div>
+              <div class="cp-legal" title="${cp.legalName}">${cp.legalName}</div>
+            </div>
+          </div>
+          <div class="badges-col">
+            <app-status-chip domain="counterpartyType" status="${cp.type}" appearance="soft" size="sm"></app-status-chip>
+            <app-status-chip domain="counterparty" status="${cp.status}" appearance="outline" size="sm"></app-status-chip>
+          </div>
+        </div>
 
-      <app-pagination
-        layout-mode="cards"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
+        <p class="cp-notes">${cp.notes || '—'}</p>
+
+        <div class="cp-meta-grid">
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">${t.viewTexts.counterparties.metaInnKpp}</span>
+            <span class="cp-meta-value">${cp.inn}${cp.kpp ? ` / ${cp.kpp}` : ''}</span>
+          </div>
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">${t.viewTexts.counterparties.labelCity}</span>
+            <span class="cp-meta-value">${cp.city}</span>
+          </div>
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">${t.viewTexts.counterparties.metaContact}</span>
+            <span class="cp-meta-value" title="${contacts.map((c) => c.fullName).join(', ')}">${contactLabel}</span>
+          </div>
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">${t.viewTexts.counterparties.metaRating}</span>
+            <span class="cp-meta-value rating-stars">${this.renderStars(cp.rating)}</span>
+          </div>
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">${t.viewTexts.counterparties.labelPhone}</span>
+            <span class="cp-meta-value">${contactPhone}</span>
+          </div>
+          <div class="cp-meta-item">
+            <span class="cp-meta-label">Email</span>
+            <span class="cp-meta-value">${contactEmail}</span>
+          </div>
+        </div>
+
+        <app-bank-summary .accounts="${cp.bankAccounts || []}"></app-bank-summary>
+
+        <card-footer>
+          <div slot="start" class="stats-row">
+            <span class="stat-pill">
+              ${t.viewTexts.counterparties.contractsCountLabel}: <strong>${cpContracts.length}</strong>
+            </span>
+            <span class="stat-pill">
+              ${t.viewTexts.counterparties.projectsCountLabel}: <strong>${cpProjects}</strong>
+            </span>
+            <span class="stat-pill">
+              ${t.viewTexts.counterparties.sumLabel}: <strong>${(cpSum / 1_000_000).toFixed(1)}${t.viewTexts.counterparties.millionsSuffix}</strong>
+            </span>
+          </div>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.viewTexts.counterparties.openCardButton}"
+            @click="${() => store.openCounterpartyDetail(cp.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(cp)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingItem = cp)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
+
+    return html`
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${cpCard}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
@@ -350,7 +360,7 @@ export class AppCounterparties extends LitElement {
           this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
-      ></app-pagination>
+      ></app-cards-table>
     `;
   }
 

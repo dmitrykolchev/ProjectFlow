@@ -4,7 +4,7 @@ import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { effectivePresence } from '../../../domain/presence-tokens';
-import { iconChevronRight, iconEdit, iconPlus, iconTrash, iconUsers } from '../../common/icons';
+import { iconChevronRight, iconEdit, iconFilter, iconPlus, iconTrash, iconUsers } from '../../common/icons';
 import '../../common/app-badge/app-badge';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
@@ -12,16 +12,16 @@ import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/card-footer/card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-employee-form/app-employee-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-persona/app-persona';
-import '../../common/app-pagination/app-pagination';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
-import { paginateItems } from '../../common/paginate';
+import '../../common/app-cards-table/app-cards-table';
 import styles from './app-employees.css';
 import { eventValue } from '../../common/event-value';
 
@@ -34,6 +34,7 @@ export class AppEmployees extends LitElement {
   @state() private companyFilter = 'all';
   @state() private statusFilter: 'all' | EmployeeStatus = 'all';
   @state() private displayMode: 'cards' | 'table' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -143,25 +144,7 @@ export class AppEmployees extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.employees.kpiAvgRate}" value="${avgRate.toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}"></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
-        placeholder="${t.viewTexts.employees.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'company', options: companyOptions },
-          { key: 'status', options: statusOptions },
-        ]}"
-        .values="${{ company: this.companyFilter, status: this.statusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'company') this.companyFilter = eventValue(e);
-          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | EmployeeStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -174,7 +157,38 @@ export class AppEmployees extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
+            placeholder="${t.viewTexts.employees.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'company', options: companyOptions },
+              { key: 'status', options: statusOptions },
+            ]}"
+            .values="${{ company: this.companyFilter, status: this.statusFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'company') this.companyFilter = eventValue(e);
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | EmployeeStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${filtered.length === 0
         ? html`<app-empty-state title="${t.viewTexts.employees.emptyNoEmployees}"></app-empty-state>`
@@ -211,99 +225,95 @@ export class AppEmployees extends LitElement {
   }
 
   private renderCards(list: User[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+    const empCard = (row: Record<string, unknown>) => {
+      const emp = row as unknown as User;
+      const company = store.companies.find((c) => c.id === emp.companyId);
+      const taskCount = store.tasks.filter((x) => x.assigneeId === emp.id).length;
+      const projCount = store.projects.filter((p) =>
+        (p.members || []).some((m) => m.userId === emp.id)
+      ).length;
+      const badge = this.getStatusLabel(emp.status, t);
+
+      return html`
+        <div class="card-head">
+          <app-persona
+            size="48"
+            .initials="${emp.avatar}"
+            .presence="${effectivePresence(emp)}"
+            .primaryText="${emp.name}"
+            .secondaryText="${emp.role}"
+            @click="${() => store.openEmployeeDetail(emp.id)}"
+          ></app-persona>
+          <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
+        </div>
+
+        <div class="details-list">
+          <div class="detail-row">
+            <span class="detail-label">${t.viewTexts.employees.detailDept}</span>
+            <span class="detail-val">${emp.department || '—'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">${t.viewTexts.employees.detailCompany}</span>
+            <span class="detail-val">${company?.name || '—'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email</span>
+            <span class="detail-val">${emp.email}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">${t.viewTexts.employees.detailPhoneCity}</span>
+            <span class="detail-val">${emp.phone || '—'} · ${emp.location || '—'}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">${t.viewTexts.employees.detailRate}</span>
+            <span class="detail-val">${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</span>
+          </div>
+        </div>
+
+        <card-footer>
+          <div slot="start" class="emp-stats-row">
+            <span>${t.viewTexts.employees.projectsCountLabel}: <strong>${projCount}</strong></span>
+            <span>${t.viewTexts.employees.tasksCountLabel}: <strong>${taskCount}</strong></span>
+          </div>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.viewTexts.employees.openProfileButton}"
+            @click="${() => store.openEmployeeDetail(emp.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(emp)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingEmployee = emp)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
 
     return html`
-      <div class="cards-grid">
-        ${paged.items.map((emp) => {
-          const company = store.companies.find((c) => c.id === emp.companyId);
-          const taskCount = store.tasks.filter((t) => t.assigneeId === emp.id).length;
-          const projCount = store.projects.filter((p) =>
-            (p.members || []).some((m) => m.userId === emp.id)
-          ).length;
-          const badge = this.getStatusLabel(emp.status, t);
-
-          return html`
-            <article class="employee-card">
-              <div class="card-head">
-                <app-persona
-                  size="48"
-                  .initials="${emp.avatar}"
-                  .presence="${effectivePresence(emp)}"
-                  .primaryText="${emp.name}"
-                  .secondaryText="${emp.role}"
-                  @click="${() => store.openEmployeeDetail(emp.id)}"
-                ></app-persona>
-                <app-badge variant="${badge.variant}" appearance="soft">${badge.text}</app-badge>
-              </div>
-
-              <div class="details-list">
-                <div class="detail-row">
-                  <span class="detail-label">${t.viewTexts.employees.detailDept}</span>
-                  <span class="detail-val">${emp.department || '—'}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">${t.viewTexts.employees.detailCompany}</span>
-                  <span class="detail-val">${company?.name || '—'}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">Email</span>
-                  <span class="detail-val">${emp.email}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">${t.viewTexts.employees.detailPhoneCity}</span>
-                  <span class="detail-val">${emp.phone || '—'} · ${emp.location || '—'}</span>
-                </div>
-                <div class="detail-row">
-                  <span class="detail-label">${t.viewTexts.employees.detailRate}</span>
-                  <span class="detail-val mono">${(emp.hourlyRate || 3500).toLocaleString(t.common.locale)} ${t.viewTexts.employees.rateUnit}</span>
-                </div>
-              </div>
-
-              <card-footer>
-                <div slot="start" class="stats-row">
-                  <span>${t.viewTexts.employees.projectsCountLabel}: <strong>${projCount}</strong></span>
-                  <span>${t.viewTexts.employees.tasksCountLabel}: <strong>${taskCount}</strong></span>
-                </div>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.viewTexts.employees.openProfileButton}"
-                  @click="${() => store.openEmployeeDetail(emp.id)}"
-                >
-                  <span slot="start">${iconChevronRight(15)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditModal(emp)}"
-                >
-                  <span slot="start">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingEmployee = emp)}"
-                >
-                  <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-              </card-footer>
-            </article>
-          `;
-        })}
-      </div>
-
-      <app-pagination
-        layout-mode="cards"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${empCard}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
@@ -312,7 +322,7 @@ export class AppEmployees extends LitElement {
           this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
-      ></app-pagination>
+      ></app-cards-table>
     `;
   }
 

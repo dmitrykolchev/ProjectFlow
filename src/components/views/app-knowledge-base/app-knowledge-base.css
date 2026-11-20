@@ -49,77 +49,24 @@
 }
 
 /* Header */
-/* 4-Cell Unboxed KPI Strip */
-.kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: 10px;
-  background: var(--bg-surface, #111827);
-  overflow: hidden;
-  flex-shrink: 0;
-}
+/* KPI: the canonical app-kpi-strip with compact app-metric-card cells (the component owns the
+   strip shell, so no local kpi classes are needed here). */
 
-.kpi-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.8rem 1.1rem;
-  border-right: 1px solid var(--border-subtle, #1e293b);
-}
-
-.kpi-cell:last-child {
-  border-right: none;
-}
-
-.kpi-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.kpi-value {
-  font-size: 1.3rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  color: var(--text-primary);
-}
-
-/* Toolbar & Filters */
-.kb-toolbar {
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode row holds the scope app-segmented-switch (size="sm") and the filter
+   toggle (app-toggle-button size="sm", funnel icon + label; pressed = the filter bar is visible,
+   unpressed = hidden, the view mirrors the pressed state in filterVisible); it sits directly
+   before the filter bar. The switch host is inline-flex and the toggle host is inline-block, so
+   the row keeps the intrinsic widths left-aligned. */
+.mode-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  flex-shrink: 0;
+  gap: 0.6rem;
 }
 
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  flex: 1;
-  min-width: 0;
-}
-
-.toolbar-search {
-  width: 280px;
-  max-width: 100%;
-}
-
-.toolbar-filters {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  flex-wrap: wrap;
-}
-
-.filter-select {
-  width: 185px;
-}
+/* Filter: the canonical app-filter-bar (search 280px with the project, company, category and
+   status selects at 185px via --filter-select-width, plus the reset button shown when filters are
+   active). The component owns its own shell, so no local toolbar classes are needed here. */
 
 /* Two-Pane Workspace */
 .kb-workspace {
@@ -548,19 +495,6 @@
     padding: 1rem 1.15rem;
   }
 
-  .kpi-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .kpi-cell:nth-child(2) {
-    border-right: none;
-  }
-
-  .kpi-cell:nth-child(1),
-  .kpi-cell:nth-child(2) {
-    border-bottom: 1px solid var(--border-subtle, #1e293b);
-  }
-
   .kb-workspace {
     grid-template-columns: 1fr;
     grid-template-rows: 260px minmax(0, 1fr);
@@ -580,10 +514,5 @@
   .form-grid-2,
   .form-grid-3 {
     grid-template-columns: 1fr;
-  }
-
-  .toolbar-search,
-  .filter-select {
-    width: 100%;
   }
 }

@@ -91,6 +91,7 @@ import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.s
 import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
 import dataTableMeta from '../../common/app-data-table/app-data-table.story';
+import cardsTableMeta from '../../common/app-cards-table/app-cards-table.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
@@ -222,6 +223,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   entityRemindersMeta,
   tableScrollMeta,
   dataTableMeta,
+  cardsTableMeta,
   toastMeta,
   activityMeta,
   headerMeta,

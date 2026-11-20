@@ -20,6 +20,7 @@ import {
   iconCpu,
   iconEdit,
   iconFileText,
+  iconFilter,
   iconLayers,
   iconPlus,
   iconTrash,
@@ -30,7 +31,6 @@ import {
   mapProjectOptions,
 } from '../../common/entity-selector-options';
 import { eventValue } from '../../common/event-value';
-import { paginateItems } from '../../common/paginate';
 import '../../common/app-button/app-button';
 import '../../common/card-footer/card-footer';
 import '../../common/app-checkbox/app-checkbox';
@@ -44,8 +44,9 @@ import '../../common/app-modal/app-modal';
 import '../../common/app-decompose-form/app-decompose-form';
 import '../../common/app-requirement-form/app-requirement-form';
 import '../../common/app-page-header/app-page-header';
-import '../../common/app-pagination/app-pagination';
+import '../../common/app-cards-table/app-cards-table';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
@@ -66,6 +67,7 @@ export class AppRequirements extends LitElement {
   @state() private priorityFilter: 'all' | RequirementPriority = 'all';
   @state() private statusFilter: 'all' | RequirementStatus = 'all';
   @state() private displayMode: 'cards' | 'table' | 'grid' = 'cards';
+  @state() private filterVisible: boolean = true;
   @state() private currentPage = 1;
   @state() private cardPageSize = store.customization.cardGridPageSize;
   @state() private tablePageSize = store.customization.tablePageSize;
@@ -238,38 +240,7 @@ export class AppRequirements extends LitElement {
         ></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${t.viewTexts.requirements.searchPlaceholder}"
-        .searchValue="${this.localSearch}"
-        .filters="${[
-          { key: 'project', type: 'entity', options: projectOptions },
-          { key: 'type', options: typeOptions },
-          { key: 'priority', options: priorityOptions },
-          { key: 'status', options: statusOptions },
-        ]}"
-        .values="${{
-          project: this.projectFilter,
-          type: this.typeFilter,
-          priority: this.priorityFilter,
-          status: this.statusFilter,
-        }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          const val = eventValue(e);
-          if (e.detail.key === 'project') {
-            this.projectFilter = val;
-            store.requirementFilterProjectId = val;
-          }
-          if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
-          if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
-          if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <div class="mode-row">
         <app-segmented-switch
           size="sm"
           .value="${this.displayMode}"
@@ -283,7 +254,51 @@ export class AppRequirements extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${t.viewTexts.requirements.searchPlaceholder}"
+            .searchValue="${this.localSearch}"
+            .filters="${[
+              { key: 'project', type: 'entity', options: projectOptions },
+              { key: 'type', options: typeOptions },
+              { key: 'priority', options: priorityOptions },
+              { key: 'status', options: statusOptions },
+            ]}"
+            .values="${{
+              project: this.projectFilter,
+              type: this.typeFilter,
+              priority: this.priorityFilter,
+              status: this.statusFilter,
+            }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              const val = eventValue(e);
+              if (e.detail.key === 'project') {
+                this.projectFilter = val;
+                store.requirementFilterProjectId = val;
+              }
+              if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
+              if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
+              if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       <div class="bulk-toolbar">
         <div class="bulk-left">
@@ -360,130 +375,129 @@ export class AppRequirements extends LitElement {
   }
 
   private renderCards(list: ProjectRequirement[], t: ReturnType<typeof getTranslation>) {
-    const paged = paginateItems(list, this.currentPage, this.cardPageSize);
+    const reqCard = (row: Record<string, unknown>) => {
+      const req = row as unknown as ProjectRequirement;
+      const proj = store.projects.find((p) => p.id === req.projectId);
+      const linkedTasks = this.getLinkedTasksForReq(req);
+      const kbCount = (req.linkedKnowledgeIds || []).length;
 
-    return html`
-      <div class="cards-grid">
-        ${paged.items.map((req) => {
-          const isSelected = this.selectedReqIds.includes(req.id);
-          const proj = store.projects.find((p) => p.id === req.projectId);
-          const linkedTasks = this.getLinkedTasksForReq(req);
-          const kbCount = (req.linkedKnowledgeIds || []).length;
+      return html`
+        <div class="req-card-head">
+          <div class="req-card-badges">
+            <div @click="${(e: Event) => e.stopPropagation()}">
+              <app-checkbox
+                .checked="${this.selectedReqIds.includes(req.id)}"
+                @change="${() => this.toggleSelectOne(req.id)}"
+              ></app-checkbox>
+            </div>
+            <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
+              ${req.code}
+            </span>
+            <span class="req-type-tag">
+              ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
+            </span>
+            <span class="req-category-pill">${req.category}</span>
+          </div>
+          <app-status-chip
+            domain="requirement"
+            status="${req.status}"
+            appearance="soft"
+            size="sm"
+          ></app-status-chip>
+        </div>
 
-          return html`
-            <article
-              class="req-card ${isSelected ? 'is-selected' : ''}"
+        <h3 class="req-title">${req.title}</h3>
+        ${req.description ? html`<p class="req-desc">${req.description}</p>` : ''}
+
+        <div class="req-meta-row">
+          ${proj
+            ? html`
+                <span class="req-project-pill">
+                  <span class="proj-dot" style="background: ${proj.color};"></span>
+                  <span class="mono">${proj.key}</span>
+                  <span>${proj.name}</span>
+                </span>
+              `
+            : ''}
+          <app-status-chip
+            domain="requirementPriority"
+            status="${req.priority}"
+            appearance="outline"
+            size="sm"
+          ></app-status-chip>
+        </div>
+
+        <div class="req-meta-row">
+          <span class="trace-pill">
+            ${t.viewTexts.requirements.criteriaCount(req.acceptanceCriteria.length)}
+          </span>
+          <span class="trace-pill">
+            ${iconBookOpen(11)}
+            <span>${t.viewTexts.requirements.kbCount(kbCount)}</span>
+          </span>
+          <span class="trace-pill">
+            ${t.viewTexts.requirements.tasksCount(linkedTasks.length)}
+          </span>
+        </div>
+
+        <card-footer>
+          <div slot="start" class="footer-left">
+            <app-button
+              size="sm"
+              variant="primary"
               @click="${() => store.openRequirementDetail(req.id)}"
             >
-              <div class="req-card-head">
-                <div class="req-card-badges">
-                  <div @click="${(e: Event) => e.stopPropagation()}">
-                    <app-checkbox
-                      .checked="${isSelected}"
-                      @change="${() => this.toggleSelectOne(req.id)}"
-                    ></app-checkbox>
-                  </div>
-                  <span class="req-code-badge ${req.type === 'non_functional' ? 'is-nfr' : ''}">
-                    ${req.code}
-                  </span>
-                  <span class="req-type-tag">
-                    ${req.type === 'functional' ? t.requirements.frShort : t.requirements.nfrShort}
-                  </span>
-                  <span class="req-category-pill">${req.category}</span>
-                </div>
-                <app-status-chip
-                  domain="requirement"
-                  status="${req.status}"
-                  appearance="soft"
-                  size="sm"
-                ></app-status-chip>
-              </div>
+              <span>${t.viewTexts.requirements.openDetailBtn}</span>
+              <span slot="icon-end">${iconChevronRight(14)}</span>
+            </app-button>
+            <app-button
+              size="sm"
+              variant="outline"
+              ?disabled="${this.decomposing}"
+              @click="${() => this.handleDecompose([req.id])}"
+            >
+              <span slot="icon-start">${iconZap(13)}</span>
+              <span>${t.viewTexts.requirements.decomposeSingleBtn}</span>
+            </app-button>
+          </div>
 
-              <h3 class="req-title">${req.title}</h3>
-              ${req.description ? html`<p class="req-desc">${req.description}</p>` : ''}
+          <app-button
+            slot="end"
+            class="req-icon-btn"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditReqModal(req)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            class="req-icon-btn"
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingReq = req)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
 
-              <div class="req-meta-row">
-                ${proj
-                  ? html`
-                      <span class="req-project-pill">
-                        <span class="proj-dot" style="background: ${proj.color};"></span>
-                        <span class="mono">${proj.key}</span>
-                        <span>${proj.name}</span>
-                      </span>
-                    `
-                  : ''}
-                <app-status-chip
-                  domain="requirementPriority"
-                  status="${req.priority}"
-                  appearance="outline"
-                  size="sm"
-                ></app-status-chip>
-              </div>
-
-              <div class="req-meta-row">
-                <span class="trace-pill">
-                  ${t.viewTexts.requirements.criteriaCount(req.acceptanceCriteria.length)}
-                </span>
-                <span class="trace-pill">
-                  ${iconBookOpen(11)}
-                  <span>${t.viewTexts.requirements.kbCount(kbCount)}</span>
-                </span>
-                <span class="trace-pill">
-                  ${t.viewTexts.requirements.tasksCount(linkedTasks.length)}
-                </span>
-              </div>
-
-              <card-footer @click="${(e: Event) => e.stopPropagation()}">
-                <div slot="start" class="footer-left">
-                  <app-button
-                    size="sm"
-                    variant="primary"
-                    @click="${() => store.openRequirementDetail(req.id)}"
-                  >
-                    <span>${t.viewTexts.requirements.openDetailBtn}</span>
-                    <span slot="icon-end">${iconChevronRight(14)}</span>
-                  </app-button>
-                  <app-button
-                    size="sm"
-                    variant="outline"
-                    ?disabled="${this.decomposing}"
-                    @click="${() => this.handleDecompose([req.id])}"
-                  >
-                    <span slot="icon-start">${iconZap(13)}</span>
-                    <span>${t.viewTexts.requirements.decomposeSingleBtn}</span>
-                  </app-button>
-                </div>
-
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditReqModal(req)}"
-                >
-                  <span slot="start">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingReq = req)}"
-                >
-                  <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-              </card-footer>
-            </article>
-          `;
-        })}
-      </div>
-
-      <app-pagination
-        layout-mode="cards"
-        .totalItems="${paged.totalItems}"
-        .page="${paged.page}"
-        .pageSize="${paged.pageSize}"
+    return html`
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${reqCard}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        clickable
+        selectable
+        .selectedKeys="${this.selectedReqIds}"
+        @card-click="${(e: CustomEvent<{ item: Record<string, unknown> }>) =>
+          store.openRequirementDetail((e.detail.item as unknown as ProjectRequirement).id)}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
           this.scrollTop = 0;
@@ -492,7 +506,7 @@ export class AppRequirements extends LitElement {
           this.currentPage = 1; store.setActivePage(1, false);
           store.setCardGridPageSize(e.detail.pageSize);
         }}"
-      ></app-pagination>
+      ></app-cards-table>
     `;
   }
 

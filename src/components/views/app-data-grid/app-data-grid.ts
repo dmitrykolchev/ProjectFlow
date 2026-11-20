@@ -116,6 +116,8 @@ export class AppDataGrid extends LitElement {
   @property({ type: String, attribute: 'sort-by' }) sortBy: string = '';
   /** Compact high-density grid mode with tighter rows and cells */
   @property({ type: Boolean }) compact?: boolean;
+  /** Hides the internal density switch for views that own the display-mode row */
+  @property({ type: Boolean, attribute: 'hide-density-switch' }) hideDensitySwitch: boolean = false;
 
   @state() private storeTasks: Task[] = [];
   @state() private columns: ColumnConfig[] = [];
@@ -844,18 +846,20 @@ export class AppDataGrid extends LitElement {
               `
             : ''}
 
-          <app-segmented-switch
-            size="sm"
-            title="${t.grid.densitySwitchTitle}"
-            .value="${this.isCompactMode ? 'compact' : 'standard'}"
-            .options="${[
-              { value: 'standard', label: t.grid.standardMode },
-              { value: 'compact', label: t.grid.compactMode },
-            ]}"
-            @change="${(e: CustomEvent) => {
-              this.localCompact = eventValue(e) === 'compact';
-            }}"
-          ></app-segmented-switch>
+          ${this.hideDensitySwitch
+            ? ''
+            : html`<app-segmented-switch
+                size="sm"
+                title="${t.grid.densitySwitchTitle}"
+                .value="${this.isCompactMode ? 'compact' : 'standard'}"
+                .options="${[
+                  { value: 'standard', label: t.grid.standardMode },
+                  { value: 'compact', label: t.grid.compactMode },
+                ]}"
+                @change="${(e: CustomEvent) => {
+                  this.localCompact = eventValue(e) === 'compact';
+                }}"
+              ></app-segmented-switch>`}
 
           <app-toggle-button
             size="sm"

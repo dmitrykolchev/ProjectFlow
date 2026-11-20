@@ -20,6 +20,7 @@ import {
   iconClock,
   iconCreditCard,
   iconEye,
+  iconFilter,
   iconLandmark,
   iconReceipt,
   iconTrash,
@@ -34,6 +35,7 @@ import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import styles from './app-payments.css';
@@ -58,6 +60,7 @@ export class AppPayments extends LitElement {
   @state() private globalSearch = store.searchQuery;
 
   @state() private viewTab: 'due_control' | 'ledger' = 'due_control';
+  @state() private filterVisible: boolean = true;
   @state() private localSearch = '';
   @state() private dueFilter:
     | 'all'
@@ -370,61 +373,11 @@ export class AppPayments extends LitElement {
         ></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        variant="bare"
-        style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 190px;"
-        placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
-        .searchValue="${this.localSearch}"
-        .filters="${this.viewTab === 'due_control'
-          ? [
-              { key: 'due', options: dueFilterOptions },
-              { key: 'company', options: companyOptions },
-              { key: 'counterparty', options: counterpartyOptions },
-              { key: 'contract', options: contractOptions },
-            ]
-          : [
-              { key: 'direction', options: directionFilterOptions },
-              { key: 'company', options: companyOptions },
-              { key: 'method', options: methodFilterOptions },
-              { key: 'counterparty', options: counterpartyOptions },
-            ]}"
-        .values="${this.viewTab === 'due_control'
-          ? {
-              due: this.dueFilter,
-              company: this.companyFilter,
-              counterparty: this.counterpartyFilter,
-              contract: this.contractFilter,
-            }
-          : {
-              direction: this.directionFilter,
-              company: this.companyFilter,
-              method: this.methodFilter,
-              counterparty: this.counterpartyFilter,
-            }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'due') {
-            this.dueFilter = eventValue(e) as typeof this.dueFilter;
-          }
-          if (e.detail.key === 'direction') {
-            this.directionFilter = eventValue(e) as 'all' | PaymentDirection;
-          }
-          if (e.detail.key === 'company') {
-            this.companyFilter = eventValue(e);
-          }
-          if (e.detail.key === 'method') {
-            this.methodFilter = eventValue(e) as 'all' | PaymentMethod;
-          }
-          if (e.detail.key === 'counterparty') this.counterpartyFilter = eventValue(e);
-          if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
+           toggle, filter bar, data representation -->
+      <div class="mode-row">
         <app-segmented-switch
-          slot="prefix"
+          size="sm"
           .value="${this.viewTab}"
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) => {
@@ -432,7 +385,72 @@ export class AppPayments extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            variant="bare"
+            style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 190px;"
+            placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
+            .searchValue="${this.localSearch}"
+            .filters="${this.viewTab === 'due_control'
+              ? [
+                  { key: 'due', options: dueFilterOptions },
+                  { key: 'company', options: companyOptions },
+                  { key: 'counterparty', options: counterpartyOptions },
+                  { key: 'contract', options: contractOptions },
+                ]
+              : [
+                  { key: 'direction', options: directionFilterOptions },
+                  { key: 'company', options: companyOptions },
+                  { key: 'method', options: methodFilterOptions },
+                  { key: 'counterparty', options: counterpartyOptions },
+                ]}"
+            .values="${this.viewTab === 'due_control'
+              ? {
+                  due: this.dueFilter,
+                  company: this.companyFilter,
+                  counterparty: this.counterpartyFilter,
+                  contract: this.contractFilter,
+                }
+              : {
+                  direction: this.directionFilter,
+                  company: this.companyFilter,
+                  method: this.methodFilter,
+                  counterparty: this.counterpartyFilter,
+                }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'due') {
+                this.dueFilter = eventValue(e) as typeof this.dueFilter;
+              }
+              if (e.detail.key === 'direction') {
+                this.directionFilter = eventValue(e) as 'all' | PaymentDirection;
+              }
+              if (e.detail.key === 'company') {
+                this.companyFilter = eventValue(e);
+              }
+              if (e.detail.key === 'method') {
+                this.methodFilter = eventValue(e) as 'all' | PaymentMethod;
+              }
+              if (e.detail.key === 'counterparty') this.counterpartyFilter = eventValue(e);
+              if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${this.viewTab === 'due_control'
         ? this.renderDueControlTable(filteredDueInvoices, t)

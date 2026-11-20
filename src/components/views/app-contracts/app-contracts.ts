@@ -25,6 +25,7 @@ import {
   iconCreditCard,
   iconEdit,
   iconFileText,
+  iconFilter,
   iconLandmark,
   iconPlus,
   iconReceipt,
@@ -41,6 +42,7 @@ import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 
 import '../../common/app-segmented-switch/app-segmented-switch';
+import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-payment-form/app-payment-form';
 import '../../common/app-contract-form/app-contract-form';
 import '../../common/app-page-header/app-page-header';
@@ -62,6 +64,7 @@ export class AppContracts extends LitElement {
   @state() private globalSearch = store.searchQuery;
   @state() private localSearch = '';
   @state() private viewTab: 'contracts' | 'calculations' | 'invoices' | 'payments' = 'contracts';
+  @state() private filterVisible: boolean = true;
   @state() private statusFilter: 'all' | ContractStatus = 'all';
   @state() private typeFilter: 'all' | ContractType = 'all';
   @state() private calcStatusFilter: 'all' | CalculationStatus = 'all';
@@ -988,48 +991,11 @@ export class AppContracts extends LitElement {
         <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiExpiring}" value="${expiringSoon}" valueColor="${expiringSoon > 0 ? '#f59e0b' : ''}"></app-metric-card>
       </app-kpi-strip>
 
-      <app-filter-bar
-        style="--filter-search-min: 280px; --filter-search-max: 280px;"
-        placeholder="${this.viewTab === 'contracts'
-          ? t.viewTexts.contracts.searchContracts
-          : this.viewTab === 'calculations'
-          ? t.viewTexts.contracts.searchCalculations
-          : this.viewTab === 'payments'
-          ? t.viewTexts.contracts.searchPayments
-          : t.viewTexts.contracts.searchInvoices}"
-        .searchValue="${this.localSearch}"
-        .filters="${this.viewTab === 'contracts'
-          ? [
-              { key: 'status', options: statusOptions },
-              { key: 'type', options: typeOptions },
-            ]
-          : this.viewTab === 'calculations'
-          ? [{ key: 'calcStatus', options: calcStatusOptions }]
-          : this.viewTab === 'payments'
-          ? [{ key: 'payMethod', options: paymentMethodFilterOptions }]
-          : [{ key: 'invoiceStatus', options: invoiceStatusOptions }]}"
-        .values="${this.viewTab === 'contracts'
-          ? { status: this.statusFilter, type: this.typeFilter }
-          : this.viewTab === 'calculations'
-          ? { calcStatus: this.calcStatusFilter }
-          : this.viewTab === 'payments'
-          ? { payMethod: this.paymentMethodFilter }
-          : { invoiceStatus: this.invoiceStatusFilter }}"
-        @search-change="${(e: CustomEvent<{ value: string }>) => {
-          this.localSearch = eventValue(e);
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-        @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-          if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
-          if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
-          if (e.detail.key === 'calcStatus') this.calcStatusFilter = eventValue(e) as 'all' | CalculationStatus;
-          if (e.detail.key === 'payMethod') this.paymentMethodFilter = eventValue(e) as 'all' | PaymentMethod;
-          if (e.detail.key === 'invoiceStatus') this.invoiceStatusFilter = eventValue(e) as 'all' | InvoiceStatus;
-          this.currentPage = 1; store.setActivePage(1, false);
-        }}"
-      >
+      <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
+           toggle, filter bar, data representation -->
+      <div class="mode-row">
         <app-segmented-switch
-          slot="prefix"
+          size="sm"
           .value="${this.viewTab}"
           .options="${tabOptions}"
           @change="${(e: CustomEvent<{ value: string }>) => {
@@ -1037,7 +1003,59 @@ export class AppContracts extends LitElement {
             this.currentPage = 1; store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
-      </app-filter-bar>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${this.viewTab === 'contracts'
+              ? t.viewTexts.contracts.searchContracts
+              : this.viewTab === 'calculations'
+              ? t.viewTexts.contracts.searchCalculations
+              : this.viewTab === 'payments'
+              ? t.viewTexts.contracts.searchPayments
+              : t.viewTexts.contracts.searchInvoices}"
+            .searchValue="${this.localSearch}"
+            .filters="${this.viewTab === 'contracts'
+              ? [
+                  { key: 'status', options: statusOptions },
+                  { key: 'type', options: typeOptions },
+                ]
+              : this.viewTab === 'calculations'
+              ? [{ key: 'calcStatus', options: calcStatusOptions }]
+              : this.viewTab === 'payments'
+              ? [{ key: 'payMethod', options: paymentMethodFilterOptions }]
+              : [{ key: 'invoiceStatus', options: invoiceStatusOptions }]}"
+            .values="${this.viewTab === 'contracts'
+              ? { status: this.statusFilter, type: this.typeFilter }
+              : this.viewTab === 'calculations'
+              ? { calcStatus: this.calcStatusFilter }
+              : this.viewTab === 'payments'
+              ? { payMethod: this.paymentMethodFilter }
+              : { invoiceStatus: this.invoiceStatusFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
+              if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
+              if (e.detail.key === 'calcStatus') this.calcStatusFilter = eventValue(e) as 'all' | CalculationStatus;
+              if (e.detail.key === 'payMethod') this.paymentMethodFilter = eventValue(e) as 'all' | PaymentMethod;
+              if (e.detail.key === 'invoiceStatus') this.invoiceStatusFilter = eventValue(e) as 'all' | InvoiceStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
 
       ${this.viewTab === 'contracts'
         ? filtered.length === 0

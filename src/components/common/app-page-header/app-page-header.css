@@ -15,7 +15,10 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  flex-wrap: wrap;
+  /* No wrapping: the action buttons always stay on the same row as the title block. The left side
+     absorbs the width pressure by capping its own width (see .header-left), so a long page
+     description wraps inside the title block instead of pushing the actions onto a new line. */
+  flex-wrap: nowrap;
 }
 
 .header-left {
@@ -23,6 +26,13 @@
   align-items: flex-start;
   gap: 0.75rem;
   min-width: 0;
+  /* The title block owns exactly half of the header: basis and max-width are both 50% with no
+     shrink, so a long page description wraps inside the title block (the subtitle is a wrapping
+     paragraph) instead of pushing the actions onto a new line, and the left side never collapses
+     when the header gets narrow. --header-left-basis / --header-left-max-width let a consumer
+     retune the split. */
+  flex: 1 0 var(--header-left-basis, 50%);
+  max-width: var(--header-left-max-width, 50%);
 }
 
 slot[name='icon']::slotted(*) {
@@ -58,5 +68,9 @@ slot[name='icon']::slotted(*) {
   align-items: center;
   gap: 0.5rem;
   margin-left: auto;
-  flex-shrink: 0;
+  /* The actions keep their row (the header never wraps), and min-width 0 with shrink allowed lets
+     them compress inside the header when the window is too narrow for both halves, instead of
+     overflowing past the right edge. */
+  flex-shrink: 1;
+  min-width: 0;
 }

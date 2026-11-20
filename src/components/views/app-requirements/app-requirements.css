@@ -17,6 +17,18 @@
   gap: 1.25rem;
 }
 
+/* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
+   representation. The mode row holds the cards/table/grid app-segmented-switch (size="sm") and
+   the filter toggle (app-toggle-button size="sm", funnel icon + label; pressed = the filter bar is
+   visible, unpressed = hidden, the view mirrors the pressed state in filterVisible); it sits
+   directly before the filter bar. The switch host is inline-flex and the toggle host is
+   inline-block, so the row keeps the intrinsic widths left-aligned. */
+.mode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
 :host::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -86,51 +98,32 @@
 }
 
 /* Cards Grid */
-.cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 1rem;
+/* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
+   (surface, border, radius, padding, hover lift, selection highlight), the card content classes
+   (req-card-head, req-card-badges, req-title, req-desc, req-meta-row, trace-pill, footer-left,
+   the compact req-icon-btn, the card-footer pin) live in the component CSS — the cardRender
+   template renders in its shadow tree. The requirements reference geometry is retuned locally
+   through the component tokens: grid minmax 360px with a 1rem gap, the compact card padding
+   1.15rem 1.25rem and card gap 0.75rem, the calmer hover (accent border 0.45, -1px, shadow
+   unchanged), and the card-footer chrome with the historical gaps (gap 0.5rem, start-gap 0.4rem,
+   end-gap 0.4rem, padding-top at the card-footer default 0.65rem). The component is-selected shell
+   matches the reference selection highlight (accent border, elevated surface). */
+app-cards-table {
+  --cards-min-width: 360px;
+  --cards-gap: 1rem;
+  --card-padding: 1.15rem 1.25rem;
+  --card-gap: 0.75rem;
+  --card-hover-border: var(--accent-border, rgba(99, 102, 241, 0.45));
+  --card-hover-transform: translateY(-1px);
+  --card-hover-shadow: var(--shadow-sm), var(--surface-glow, none);
+  --cards-footer-gap: 0.5rem;
+  --cards-footer-start-gap: 0.4rem;
+  --cards-footer-end-gap: 0.4rem;
+  --cards-footer-padding-top: 0.65rem;
 }
 
-.req-card {
-  background: var(--bg-surface, #111827);
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: var(--radius-lg, 12px);
-  padding: 1.15rem 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  box-shadow: var(--shadow-sm), var(--surface-glow, none);
-  transition: border-color var(--transition-fast, 150ms ease), transform var(--transition-fast, 150ms ease);
-  cursor: pointer;
-}
-
-.req-card:hover {
-  border-color: var(--accent-border, rgba(99, 102, 241, 0.45));
-  transform: translateY(-1px);
-}
-
-.req-card.is-selected {
-  border-color: var(--accent-primary, #6366f1);
-  background: var(--bg-surface-elevated, #161f33);
-}
-
-.req-card-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.req-card-badges {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  min-width: 0;
-}
-
+/* draft card badges keep the historical pill geometry (the cards render the same classes in the
+   component shadow tree); the category pill is cards-only and lives in the component CSS */
 .req-code-badge {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
@@ -150,7 +143,6 @@
 }
 
 .req-type-tag,
-.req-category-pill,
 .req-project-pill {
   font-size: 0.7rem;
   font-weight: 600;
@@ -174,67 +166,13 @@
   flex-shrink: 0;
 }
 
-.req-title {
-  margin: 0;
-  font-size: 0.98rem;
-  font-weight: 650;
-  color: var(--text-primary, #f8fafc);
-  line-height: 1.35;
-}
-
-.req-desc {
-  margin: 0;
-  font-size: 0.8125rem;
-  color: var(--text-secondary, #94a3b8);
-  line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.req-meta-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.trace-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  font-size: 0.72rem;
-  color: var(--text-secondary, #94a3b8);
-  padding: 0.16rem 0.5rem;
-  border-radius: var(--radius-sm, 6px);
-  background: var(--bg-canvas, #090d16);
-  border: 1px solid var(--border-subtle, #1e293b);
-  font-variant-numeric: tabular-nums;
-}
-
-/* card-footer web component keeps its own chrome; the view pins it to the bottom
-   of the card and tunes historical gaps. Card icon actions match the historical
-   28px icon-btn with subtle background via app-button custom properties. */
-card-footer {
-  margin-top: auto;
-  --card-footer-gap: 0.5rem;
-  --card-footer-start-gap: 0.4rem;
-  --card-footer-end-gap: 0.4rem;
-}
-
+/* draft icon actions match the historical 28px icon-btn with subtle background via app-button
+   custom properties (the card footer icon actions pin the same tokens through req-icon-btn in
+   the component CSS) */
 app-button[variant="icon"] {
   --control-height-sm: 28px;
   --icon-btn-bg: var(--bg-subtle, rgba(148, 163, 184, 0.08));
   --icon-btn-border: var(--border-subtle, #1e293b);
-}
-
-.footer-left,
-/* card footer buttons live in the slot="start" container */
-.footer-left {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
 }
 
 /* Data Grid View */
@@ -390,9 +328,6 @@ app-button[variant="icon"] {
 }
 
 @media (max-width: 780px) {
-  .cards-grid {
-    grid-template-columns: 1fr;
-  }
 
   .draft-top {
     grid-template-columns: 1fr;
