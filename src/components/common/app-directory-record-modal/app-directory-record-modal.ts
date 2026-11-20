@@ -345,7 +345,6 @@ export class AppDirectoryRecordModal extends LitElement {
       if (field.framelessSwitch) {
         return html`
           <app-switch
-            class="frameless-switch"
             label="${label}"
             .checked="${Boolean(val)}"
             @change="${(e: CustomEvent<{ checked: boolean }>) =>
@@ -355,7 +354,6 @@ export class AppDirectoryRecordModal extends LitElement {
       }
       return html`
         <app-switch
-          class="switch-row"
           size="md"
           frame="transparent"
           field-label-style="ghost"
