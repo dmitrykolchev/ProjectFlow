@@ -5,9 +5,11 @@ import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { effectivePresence } from '../../../domain/presence-tokens';
 import { iconAnalytics } from '../../common/icons';
+import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-analytics.css';
 
 @customElement('app-analytics')
@@ -85,28 +87,34 @@ export class AppAnalytics extends LitElement {
         <span slot="icon">${iconAnalytics(28)}</span>
       </app-page-header>
 
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <span class="kpi-label">${t.analytics.totalTasks}</span>
-          <span class="kpi-value">${total}</span>
-          <span class="kpi-sub">${t.analytics.kpiActiveProjects(store.projects.length)}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.analytics.completedTasks}</span>
-          <span class="kpi-value" style="color: var(--color-success, #10b981);">${completed}</span>
-          <span class="kpi-sub">${t.analytics.kpiCompletedRate(rate)}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.analytics.urgentTasks}</span>
-          <span class="kpi-value" style="color: var(--color-danger, #ef4444);">${urgent}</span>
-          <span class="kpi-sub">${t.analytics.kpiUrgentSub}</span>
-        </div>
-        <div class="kpi-card">
-          <span class="kpi-label">${t.analytics.totalEstimatedHours}</span>
-          <span class="kpi-value">${estimatedHoursTotal}${t.analytics.hoursSuffix}</span>
-          <span class="kpi-sub">${t.analytics.kpiLogged(loggedHoursTotal)}</span>
-        </div>
-      </div>
+      <app-kpi-strip columns="4">
+        <app-metric-card
+          size="compact"
+          label="${t.analytics.totalTasks}"
+          value="${total}"
+          subtitle="${t.analytics.kpiActiveProjects(store.projects.length)}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.analytics.completedTasks}"
+          value="${completed}"
+          valueColor="var(--color-success, #10b981)"
+          subtitle="${t.analytics.kpiCompletedRate(rate)}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.analytics.urgentTasks}"
+          value="${urgent}"
+          valueColor="var(--color-danger, #ef4444)"
+          subtitle="${t.analytics.kpiUrgentSub}"
+        ></app-metric-card>
+        <app-metric-card
+          size="compact"
+          label="${t.analytics.totalEstimatedHours}"
+          value="${estimatedHoursTotal}${t.analytics.hoursSuffix}"
+          subtitle="${t.analytics.kpiLogged(loggedHoursTotal)}"
+        ></app-metric-card>
+      </app-kpi-strip>
 
       <div class="charts-grid">
         <app-section-card variant="plain" title="${t.analytics.statusDistribution}">
