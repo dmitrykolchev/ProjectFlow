@@ -1,0 +1,8174 @@
+[
+ {
+  "group": "common",
+  "tag": "app-activity-panel",
+  "cls": "AppActivityPanel",
+  "hasStory": true,
+  "title": "Feedback/ActivityLog",
+  "category": "Feedback",
+  "desc": "Slide-out drawer containing real-time chronological audit trail of all project events.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "logs",
+    "v": "Activity log entries rendered in the panel"
+   },
+   {
+    "k": "isOpen",
+    "v": "Panel open state"
+   },
+   {
+    "k": "currentLang",
+    "v": "UI language"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-analysis-summary",
+  "cls": "AppAnalysisSummary",
+  "hasStory": true,
+  "title": "FR-02: Session lifecycle",
+  "category": "Common",
+  "desc": "One saved AI analysis summary for a task or requirement: author, model and date header, overview, effort, risks, recommendations; task summaries add suggested subtasks, requirement summaries add the clarification and decomposition into tasks. Action buttons fire events.",
+  "propsList": [
+   {
+    "name": "summary",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "expanded",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "addedTitles",
+    "type": "string[]",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "summary",
+    "v": "AnalysisSummary record (kind task|requirement)"
+   },
+   {
+    "k": "expanded",
+    "v": "Collapsed history entries render only a short overview line"
+   },
+   {
+    "k": "addedTitles",
+    "v": "Subtask titles already present on the owning task"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-avatar",
+  "cls": "AppAvatar",
+  "hasStory": true,
+  "title": "Common/Avatar",
+  "category": "Common",
+  "desc": "Circular initials/image avatar in five sizes, used for employees, assignees, and user profile.",
+  "propsList": [
+   {
+    "name": "initials",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "src",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "initials",
+    "v": "Initials rendered when no image is set"
+   },
+   {
+    "k": "src",
+    "v": "Image URL (falls back to initials on error)"
+   },
+   {
+    "k": "size",
+    "v": "Avatar diameter preset"
+   },
+   {
+    "k": "color",
+    "v": "Background color of the initials tile"
+   },
+   {
+    "k": "title",
+    "v": "Native tooltip text"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-badge",
+  "cls": "AppBadge",
+  "hasStory": true,
+  "title": "Common/Badge",
+  "category": "Common",
+  "desc": "Semantic status, priority, and count badges supporting soft, solid, and outline styles. Canonical start / default / end slots carry leading graphics, badge text, and trailing content; icon is a legacy alias of start.",
+  "propsList": [
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'neutral'"
+   },
+   {
+    "name": "appearance",
+    "type": "String",
+    "reflect": false,
+    "def": "'soft'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "dot",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "removable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "remove"
+  ],
+  "propsDoc": [
+   {
+    "k": "variant",
+    "v": "Semantic color of the badge (neutral, info, success, warning, danger)"
+   },
+   {
+    "k": "appearance",
+    "v": "Rendering style: soft fill / outline"
+   },
+   {
+    "k": "size",
+    "v": "Visual density: sm / md / lg"
+   },
+   {
+    "k": "dot",
+    "v": "Renders a status dot without text"
+   },
+   {
+    "k": "removable",
+    "v": "Shows a remove (×) affordance"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the badge text (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Badge text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the badge text (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon",
+    "v": "Legacy alias of start"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the badge text"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-bank-requisites",
+  "cls": "AppBankRequisites",
+  "hasStory": true,
+  "title": "Common/BankRequisites",
+  "category": "Common",
+  "desc": "Multi-bank, multi-currency bank requisites viewer and inline manager. Supports currency filtering, one-click clipboard copy, primary account selection, and inline add/edit/delete.",
+  "propsList": [
+   {
+    "name": "accounts",
+    "type": "BankRequisite[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "editable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "hideHeader",
+    "type": "Boolean",
+    "attr": "hide-header",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "confirmDelete",
+    "type": "Boolean",
+    "attr": "confirm-delete",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "heading",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "accounts-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "accounts",
+    "v": "Array of BankRequisite records"
+   },
+   {
+    "k": "editable",
+    "v": "Enables Add / Edit / Delete / Set Primary actions"
+   },
+   {
+    "k": "compact",
+    "v": "Uses single-column compact layout suitable inside modal forms"
+   },
+   {
+    "k": "hide-header",
+    "v": "Hides internal header when embedded inside app-section-card"
+   },
+   {
+    "k": "confirm-delete",
+    "v": "Shows app-confirm-dialog before deleting an account"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-bank-summary",
+  "cls": "AppBankSummary",
+  "hasStory": true,
+  "title": "Common/BankSummary",
+  "category": "Common",
+  "desc": "Compact bank requisites summary for entity cards: primary bank name, additional-account count, and currency chips. Read-only display used in company and counterparty card lists.",
+  "propsList": [
+   {
+    "name": "accounts",
+    "type": "BankRequisite[]",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "accounts",
+    "v": "Array of BankRequisite records; the default (or first) account is shown as primary"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-button",
+  "cls": "AppButton",
+  "hasStory": true,
+  "title": "Elements/Button",
+  "category": "Elements",
+  "desc": "Interactive button with multiple semantic variants, sizes, and states. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start / icon-end are legacy aliases of start / end.",
+  "propsList": [
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'primary'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "action",
+    "type": "String",
+    "reflect": true,
+    "def": "'default'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "loading",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "iconOnly",
+    "type": "Boolean",
+    "attr": "icon-only",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "String",
+    "attr": "aria-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "type",
+    "type": "String",
+    "reflect": false,
+    "def": "'button'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "variant",
+    "v": "Visual style: primary, secondary, outline, ghost, danger, icon (compact card action)"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "action",
+    "v": "Business action driving the highlight color: default (neutral), view / edit / submit (accent), accept (success), delete / reject (danger), cancel (muted)"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction and dims the button"
+   },
+   {
+    "k": "loading",
+    "v": "Shows a spinner and blocks clicks"
+   },
+   {
+    "k": "iconOnly",
+    "v": "Renders only the start slot, no text; a button with only an icon becomes square automatically"
+   },
+   {
+    "k": "type",
+    "v": "Native HTML button type (button / submit)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Button label text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon-start",
+    "v": "Legacy alias of start"
+   },
+   {
+    "k": "icon-end",
+    "v": "Legacy alias of end"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-button-group",
+  "cls": "AppButtonGroup",
+  "hasStory": true,
+  "title": "Common/ButtonGroup",
+  "category": "Common",
+  "desc": "Groups related buttons or toggle buttons horizontally or vertically with seamless joined borders. The default slot accepts app-button and app-toggle-button children.",
+  "propsList": [
+   {
+    "name": "orientation",
+    "type": "String",
+    "reflect": false,
+    "def": "'horizontal'"
+   },
+   {
+    "name": "attached",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "orientation",
+    "v": "Layout direction of the group: horizontal / vertical"
+   },
+   {
+    "k": "attached",
+    "v": "Shares borders between children (no gaps)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "app-button and app-toggle-button children rendered side by side (vertical) or joined (horizontal)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Grouped action button child"
+   },
+   {
+    "k": "app-toggle-button",
+    "v": "Grouped toggle button child"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-calculation-form",
+  "cls": "AppCalculationForm",
+  "hasStory": true,
+  "title": "Overlays/CalculationForm",
+  "category": "Overlays",
+  "desc": "Canonical calculation create and edit form. The component owns the contract picker, number, frequency, period start and end, quick period presets, include prior unaccounted, the collected items editor with billable rows, status and report notes, writes the calculation to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Create prefills the active contract, its billing frequency, the default period for that frequency, the next calc number, draft status and the notes template.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "calculation",
+    "type": "Calculation | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetContractId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "showContractSelect",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "calculation",
+    "v": "Calculation being edited (null = create mode)"
+   },
+   {
+    "k": "presetContractId",
+    "v": "Contract prefilled for a context-bound opening (first active by default)"
+   },
+   {
+    "k": "showContractSelect",
+    "v": "Show the contract picker (list view openings)"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-cards-table",
+  "cls": "AppCardsTable",
+  "hasStory": true,
+  "title": "Common/CardsTable",
+  "category": "Common",
+  "desc": "A grid of entity cards built from a per-view template. The card content is produced by the cardRender function property (row) => TemplateResult, the same pattern as the cellRender of app-data-table; the card shell (surface background, border, radius, padding, hover lift, selection highlight) and the grid geometry belong to the component and are retuned locally through the geometry tokens. Pagination is internal: items are sliced by page-size and app-pagination (layout-mode=\"cards\") sits in the footer below the grid whenever the grid is not empty. With clickable the shell activates on click and emits card-click; with selectable the selection lives in selectedKeys keyed by key-field, the chosen cards get the is-selected shell class, and toggling emits selection-change. Additive hooks with pixel-identical defaults: --cards-columns pins the column count (default auto-fill), the wide-collapse attribute collapses to one column at viewport <= 1024px (default off), cardClass(row) appends extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68).",
+  "propsList": [
+   {
+    "name": "rows",
+    "type": "Record<string, unknown>[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "cardRender",
+    "type": "(row: Record<string, unknown>) => TemplateResult",
+    "reflect": false,
+    "def": "() => html``"
+   },
+   {
+    "name": "pageSize",
+    "type": "Number",
+    "attr": "page-size",
+    "reflect": false,
+    "def": "9"
+   },
+   {
+    "name": "page",
+    "type": "Number",
+    "reflect": false,
+    "def": "1"
+   },
+   {
+    "name": "emptyTitle",
+    "type": "String",
+    "attr": "empty-title",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "locale",
+    "type": "String",
+    "reflect": false,
+    "def": "'ru-RU'"
+   },
+   {
+    "name": "clickable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "selectable",
+    "type": "Boolean",
+    "attr": "selectable",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "keyField",
+    "type": "String",
+    "attr": "key-field",
+    "reflect": false,
+    "def": "'id'"
+   },
+   {
+    "name": "selectedKeys",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "cardClass",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "wideCollapse",
+    "type": "Boolean",
+    "attr": "wide-collapse",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "rows",
+    "v": "Array of card items rendered by the grid"
+   },
+   {
+    "k": "cardRender",
+    "v": "Template function (row) => TemplateResult producing the card content"
+   },
+   {
+    "k": "page-size",
+    "v": "Cards per page for the internal pagination (default 9)"
+   },
+   {
+    "k": "page",
+    "v": "Initial page number (clamped to the available pages)"
+   },
+   {
+    "k": "clickable",
+    "v": "The shell activates on click and emits card-click { item } (outside controls)"
+   },
+   {
+    "k": "selectable",
+    "v": "Selection keyed by key-field; chosen cards get the is-selected shell class"
+   },
+   {
+    "k": "key-field",
+    "v": "Field holding the selection key (default id)"
+   },
+   {
+    "k": "selectedKeys",
+    "v": "Array of currently selected keys; toggleSelect(key) flips one key"
+   },
+   {
+    "k": "locale",
+    "v": "Formatting locale passed to the footer pagination"
+   },
+   {
+    "k": "empty-title",
+    "v": "Title of the compact app-empty-state shown for empty rows"
+   },
+   {
+    "k": "cardClass",
+    "v": "Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68)"
+   },
+   {
+    "k": "wide-collapse",
+    "v": "Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off)"
+   },
+   {
+    "k": "--cards-columns",
+    "v": "Grid column count token (default auto-fill); a view can pin an exact number of columns"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-checkbox",
+  "cls": "AppCheckbox",
+  "hasStory": true,
+  "title": "Inputs/Checkbox",
+  "category": "Inputs",
+  "desc": "Checkbox element with checked, unchecked, indeterminate, and disabled states. The default slot overrides the label property with custom label markup.",
+  "propsList": [
+   {
+    "name": "checked",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "indeterminate",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "checked",
+    "v": "Checked state of the box"
+   },
+   {
+    "k": "indeterminate",
+    "v": "Mixed (partial selection) state — square dash instead of tick"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction"
+   },
+   {
+    "k": "label",
+    "v": "Text next to the box"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Label text next to the box (overrides the label property)"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-color-swatches",
+  "cls": "AppColorSwatches",
+  "hasStory": true,
+  "title": "Inputs/ColorSwatches",
+  "category": "Inputs",
+  "desc": "Canonical color swatch picker. A row of round color buttons rendered from a palette array; the component owns the active highlight and a change event carrying { value } so the opening form writes the picked hex into its own field. Used by the project create/edit form for the project color; any view needing a fixed palette choice can pass its own colors array.",
+  "propsList": [
+   {
+    "name": "colors",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "colors",
+    "v": "Palette of hex color strings rendered as round swatch buttons"
+   },
+   {
+    "k": "value",
+    "v": "Currently selected hex (highlighted swatch)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-combobox",
+  "cls": "AppCombobox",
+  "hasStory": true,
+  "title": "Inputs/Combobox",
+  "category": "Inputs",
+  "desc": "Searchable multi-tag combobox input with autocomplete and tag removal. The default slot accepts declarative app-option children whose labels append to the items prop.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "items",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "dataSource",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "selected",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "'Add tag or filter...'"
+   },
+   {
+    "name": "allowCustom",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "items",
+    "v": "Suggestion item definitions (value + label)"
+   },
+   {
+    "k": "dataSource",
+    "v": "Data source for suggestions: array, promise, or function returning an array (sync or async)"
+   },
+   {
+    "k": "selected",
+    "v": "Currently selected values"
+   },
+   {
+    "k": "placeholder",
+    "v": "Text shown in the input when empty"
+   },
+   {
+    "k": "allowCustom",
+    "v": "Typing a new value offers \"+ Add\" to create it"
+   },
+   {
+    "k": "size",
+    "v": "Control size scale sm|md|lg (30/38/44px min-heights, md default)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-option> children adding suggestions (label is the suggestion text)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-option",
+    "v": "Declarative suggestion (label is the suggestion text) appended to the items prop list"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-company-form",
+  "cls": "AppCompanyForm",
+  "hasStory": true,
+  "title": "Overlays/CompanyForm",
+  "category": "Overlays",
+  "desc": "Canonical company create and edit form. The component owns the twelve fields, writes the company to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. The short name is required, an empty legal name falls back to it.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "company",
+    "type": "Company | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "company",
+    "v": "Company being edited (null = create mode)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-confirm-dialog",
+  "cls": "AppConfirmDialog",
+  "hasStory": true,
+  "title": "Common/Confirm Dialog",
+  "category": "Common",
+  "desc": "Confirmation modal built on app-modal: header icon + title, \"выполняемое действие\" and \"ожидаемый результат\" sections, cancel/confirm buttons. Variants: info, success, warning, danger; events confirm and cancel.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'danger'"
+   },
+   {
+    "name": "icon",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "action",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "result",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "message",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "actionLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "resultLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "confirmLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "cancelLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'sm'"
+   }
+  ],
+  "events": [
+   "confirm",
+   "cancel"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the dialog"
+   },
+   {
+    "k": "title",
+    "v": "Header caption"
+   },
+   {
+    "k": "variant",
+    "v": "Semantic color: info / success / warning / danger"
+   },
+   {
+    "k": "icon",
+    "v": "Header icon name"
+   },
+   {
+    "k": "action",
+    "v": "Text of the \"action being performed\" section"
+   },
+   {
+    "k": "result",
+    "v": "Text of the \"expected result\" box"
+   },
+   {
+    "k": "message",
+    "v": "Legacy single-body message (used when action/result are empty)"
+   },
+   {
+    "k": "actionLabel",
+    "v": "Caption of the action section header"
+   },
+   {
+    "k": "resultLabel",
+    "v": "Caption of the result section header"
+   },
+   {
+    "k": "confirmLabel",
+    "v": "Caption of the confirm button"
+   },
+   {
+    "k": "cancelLabel",
+    "v": "Caption of the cancel button"
+   },
+   {
+    "k": "size",
+    "v": "Dialog width preset"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-context-chip",
+  "cls": "AppContextChip",
+  "hasStory": true,
+  "title": "Архитектура кэширования Core 3.0: L1/L2, TTL и инвалидация через Redis Pub/Sub",
+  "category": "Common",
+  "desc": "One context source chip: kind icon badge (requirement / knowledge base / document), entity title and the match reason line. Select mode toggles selection (chip-toggle), the arrow button opens the source entity (chip-open).",
+  "propsList": [
+   {
+    "name": "data",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "mode",
+    "type": "String",
+    "reflect": false,
+    "def": "'display'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "data",
+    "v": "ContextChipData record (key, kind, id, title, reason, selected)"
+   },
+   {
+    "k": "mode",
+    "v": "select = toggleable picker chip; display = read-only chip with open action"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-context-chips-list",
+  "cls": "AppContextChipsList",
+  "hasStory": true,
+  "title": "FR-01: Двухуровневое распределённое кэширование и инвалидация через Pub/Sub",
+  "category": "Common",
+  "desc": "A two-column grid of context source chips with an inner scrollbar. items carries ContextChipData records; mode selects the chip variant. chip-toggle and chip-open events from individual chips bubble through to the parent.",
+  "propsList": [
+   {
+    "name": "items",
+    "type": "ContextChipData[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "mode",
+    "type": "String",
+    "reflect": false,
+    "def": "'display'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "items",
+    "v": "ContextChipData[] — key, kind, id, title, reason, selected"
+   },
+   {
+    "k": "mode",
+    "v": "select = toggleable picker chips; display = read-only chips with open action"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-contract-form",
+  "cls": "AppContractForm",
+  "hasStory": true,
+  "title": "Overlays/ContractForm",
+  "category": "Overlays",
+  "desc": "Canonical contract create and edit form. The component owns all fourteen fields, writes the contract to the store itself on save and emits a saved event with the written record; any close, including cancel, save and backdrop, dispatches a close event so the opening view resets its flag. Every opening renders the same field set; presets fill company, counterparty, project, status and the modal title.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "contract",
+    "type": "Contract | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetCounterpartyId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "presetProjectId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "presetStatus",
+    "type": "String",
+    "reflect": false,
+    "def": "'draft'"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "contract",
+    "v": "Contract being edited (null = create mode)"
+   },
+   {
+    "k": "presetCounterpartyId",
+    "v": "Counterparty prefilled for a quick opening"
+   },
+   {
+    "k": "presetProjectId",
+    "v": "Project prefilled for a context-bound opening"
+   },
+   {
+    "k": "presetStatus",
+    "v": "Status a newly created contract starts with (draft by default)"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-counterparty-contacts",
+  "cls": "AppCounterpartyContacts",
+  "hasStory": true,
+  "title": "Common/CounterpartyContacts",
+  "category": "Common",
+  "desc": "Multi-person counterparty contacts viewer and inline CRUD manager. Supports personal details (full name, job title, department, birth date), multiple communication channels (phones, email, messenger), primary contact selection, and clipboard copy.",
+  "propsList": [
+   {
+    "name": "contacts",
+    "type": "CounterpartyContact[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "editable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "hideHeader",
+    "type": "Boolean",
+    "attr": "hide-header",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "confirmDelete",
+    "type": "Boolean",
+    "attr": "confirm-delete",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "heading",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "contacts-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "contacts",
+    "v": "Array of CounterpartyContact records"
+   },
+   {
+    "k": "editable",
+    "v": "Enables Add / Edit / Delete / Set Primary actions"
+   },
+   {
+    "k": "compact",
+    "v": "Uses single-column compact layout suitable inside modal forms"
+   },
+   {
+    "k": "hide-header",
+    "v": "Hides internal header when embedded inside app-section-card"
+   },
+   {
+    "k": "confirm-delete",
+    "v": "Shows app-confirm-dialog before deleting a contact"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-counterparty-form",
+  "cls": "AppCounterpartyForm",
+  "hasStory": true,
+  "title": "Overlays/CounterpartyForm",
+  "category": "Overlays",
+  "desc": "Canonical counterparty create and edit form. The component owns the twelve fields, writes the counterparty to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. The short name is required, rating stays clamped to one through five.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "counterparty",
+    "type": "Counterparty | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "counterparty",
+    "v": "Counterparty being edited (null = create mode)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-data-grid-column",
+  "cls": "AppDataGridColumn",
+  "hasStory": true,
+  "title": "Архитектура микрофронтендов",
+  "category": "Common",
+  "desc": "Universal declarative column configuration element (<app-data-grid-column>) for <app-data-grid>, supporting caption, hidden, resizable, sortable, groupable, sortValue, and custom JS or HTML <template> cell rendering.",
+  "propsList": [
+   {
+    "name": "field",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "caption",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "header",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "width",
+    "type": "Number",
+    "reflect": false,
+    "def": "150"
+   },
+   {
+    "name": "minWidth",
+    "type": "Number",
+    "attr": "min-width",
+    "reflect": false,
+    "def": "70"
+   },
+   {
+    "name": "sortable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "groupable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "resizable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "reorderable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "override",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "visible",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "hideable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "exportable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "align",
+    "type": "String",
+    "reflect": false,
+    "def": "'left'"
+   },
+   {
+    "name": "cellType",
+    "type": "String",
+    "attr": "cell-type",
+    "reflect": false,
+    "def": "'text'"
+   },
+   {
+    "name": "template",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "renderer",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "sortValue",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "groupFormatter",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "column-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "field",
+    "v": "Property name or dot-path in each row object"
+   },
+   {
+    "k": "caption",
+    "v": "Column header text (falls back to header or field)"
+   },
+   {
+    "k": "hidden",
+    "v": "Hides the column initially while keeping it toggleable in the column menu"
+   },
+   {
+    "k": "resizable",
+    "v": "Enables drag-to-resize handle on the column header (use resizable=\"false\" to lock width)"
+   },
+   {
+    "k": "sortable",
+    "v": "Allows sorting by clicking the header; grouped columns sort automatically first"
+   },
+   {
+    "k": "groupable",
+    "v": "Allows grouping by this column via toolbar selector or drag-to-group bar"
+   },
+   {
+    "k": "reorderable",
+    "v": "Allows drag reordering of the column header"
+   },
+   {
+    "k": "hideable",
+    "v": "Controls whether the column appears in the Columns visibility popover"
+   },
+   {
+    "k": "exportable",
+    "v": "Controls whether the column is included when exporting CSV"
+   },
+   {
+    "k": "align",
+    "v": "Horizontal cell & header alignment: left | center | right"
+   },
+   {
+    "k": "cellType",
+    "v": "Built-in formatter preset (text | key | title | status | priority | assignee | dates | progress | tags | badge)"
+   },
+   {
+    "k": "template",
+    "v": "JS callback (row, value) => TemplateResult | string | number; alternatively pass an HTML <template> child using {{field}} / {{value}} placeholders"
+   },
+   {
+    "k": "sortValue",
+    "v": "Custom comparator value extractor (row, value) => string | number"
+   },
+   {
+    "k": "groupFormatter",
+    "v": "Custom group header label formatter (value) => string"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Optional HTML <template> element with {{field}} / {{value}} placeholders for declarative cell markup"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-data-table",
+  "cls": "AppDataTable",
+  "hasStory": true,
+  "title": "Common/DataTable",
+  "category": "",
+  "desc": "Data table with a fixed header and footer. Columns are declared as child app-table-column elements (field-driven formatting, mono/code cells, custom cellRender for rich cells and row actions). Sorting and pagination are internal: sortable headers sort the rows and emit sort-change, rows are sliced by page-size and the footer shows app-pagination whenever the table is not empty — even with a single page it hosts the page-size selector, so rows-per-page can always be changed from the footer. The table stretches to display all rendered rows; max-height caps the host so the body gets its own scrollbar.",
+  "propsList": [
+   {
+    "name": "rows",
+    "type": "Record<string, unknown>[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "pageSize",
+    "type": "Number",
+    "attr": "page-size",
+    "reflect": false,
+    "def": "10"
+   },
+   {
+    "name": "page",
+    "type": "Number",
+    "reflect": false,
+    "def": "1"
+   },
+   {
+    "name": "sortBy",
+    "type": "String",
+    "attr": "sort-by",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "sortDir",
+    "type": "String",
+    "attr": "sort-dir",
+    "reflect": false,
+    "def": "'asc'"
+   },
+   {
+    "name": "maxHeight",
+    "type": "Number",
+    "attr": "max-height",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "emptyTitle",
+    "type": "String",
+    "attr": "empty-title",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "locale",
+    "type": "String",
+    "reflect": false,
+    "def": "'ru-RU'"
+   },
+   {
+    "name": "selectable",
+    "type": "Boolean",
+    "attr": "selectable",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "keyField",
+    "type": "String",
+    "attr": "key-field",
+    "reflect": false,
+    "def": "'id'"
+   },
+   {
+    "name": "selectedKeys",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "rows",
+    "v": "Array of row objects rendered by the table"
+   },
+   {
+    "k": "page-size",
+    "v": "Rows per page for the internal pagination (default 10)"
+   },
+   {
+    "k": "page",
+    "v": "Initial page number (clamped to the available pages)"
+   },
+   {
+    "k": "sort-by",
+    "v": "Field currently sorted; its header shows the active arrow"
+   },
+   {
+    "k": "sort-dir",
+    "v": "Current sort direction: asc / desc"
+   },
+   {
+    "k": "max-height",
+    "v": "Host height cap in px; 0 (default) stretches the table to show all rendered rows, a positive value gives the body its own scrollbar"
+   },
+   {
+    "k": "empty-title",
+    "v": "Title passed to the compact empty state when rows is empty"
+   },
+   {
+    "k": "locale",
+    "v": "Locale used for number formatting and the pagination summary"
+   },
+   {
+    "k": "sort-change event",
+    "v": "Emitted with detail { field, dir } when a header sort button is clicked"
+   },
+   {
+    "k": "page-change event",
+    "v": "Emitted with detail { page, pageSize, totalItems } when pagination changes"
+   },
+   {
+    "k": "page-size-change event",
+    "v": "Emitted with detail { page: 1, pageSize, totalItems } when the footer page-size selector changes; rows are re-sliced at the new size and the page resets to 1"
+   },
+   {
+    "k": "selectable",
+    "v": "Leading checkbox column keyed by key-field (default id); header cell stays empty, select-all lives in the consumer toolbar"
+   },
+   {
+    "k": "key-field",
+    "v": "Row field used as the selection key (default id)"
+   },
+   {
+    "k": "selected-keys",
+    "v": "Array of currently selected row keys (property binding); toggling a checkbox updates it and emits selection-change"
+   },
+   {
+    "k": "selectedItems getter",
+    "v": "Rows whose key is in selectedKeys — the consumer reads the selection back from the table"
+   },
+   {
+    "k": "selection-change event",
+    "v": "Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles"
+   },
+   {
+    "k": "row-click event",
+    "v": "Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-date-input",
+  "cls": "AppDateInput",
+  "hasStory": true,
+  "title": "Common/DatePicker",
+  "category": "Common",
+  "desc": "Fully custom-styled theme-aware Date Picker with interactive calendar popover, min/max bounds, and localization.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "'YYYY-MM-DD'"
+   },
+   {
+    "name": "min",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "max",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "required",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "error",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "value",
+    "v": "Selected date in YYYY-MM-DD format"
+   },
+   {
+    "k": "placeholder",
+    "v": "Placeholder text shown when empty"
+   },
+   {
+    "k": "min",
+    "v": "Earliest selectable date (YYYY-MM-DD)"
+   },
+   {
+    "k": "max",
+    "v": "Latest selectable date (YYYY-MM-DD)"
+   },
+   {
+    "k": "required",
+    "v": "Marks the field as required"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables editing and the calendar popover"
+   },
+   {
+    "k": "error",
+    "v": "Error message; renders the field in danger state"
+   },
+   {
+    "k": "size",
+    "v": "Control size scale sm|md|lg (30/38/44px heights, md default)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-decompose-form",
+  "cls": "AppDecomposeForm",
+  "hasStory": true,
+  "title": "Спроектировать архитектуру модуля",
+  "category": "Overlays",
+  "desc": "Схема данных, контракты API и выбор библиотек",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "requirementIds",
+    "type": "string[]",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [
+   "close",
+   "decompose-failed",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the draft editor modal (rendered through the portal)"
+   },
+   {
+    "k": "requirementIds",
+    "v": "Requirement ids to decompose, also the fallback links for drafts without requirement ids"
+   },
+   {
+    "k": "decompose",
+    "v": "Public async method running the AI decomposition and opening the editor"
+   },
+   {
+    "k": "openWithDrafts",
+    "v": "Public method opening the editor with a prepared draft list (drafts, model, projectId)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-detail-shell",
+  "cls": "AppDetailShell",
+  "hasStory": true,
+  "title": "[PF-1] Платформа ProjectFlow · Vendor: Figma Inc.",
+  "category": "Layout",
+  "desc": "Shared skeleton of the entity detail views: top navigation bar (back button, entity switcher, action slots), overview card (emblem, title block, KPI strip, context grid) and page shell layout. The view supplies every piece of content through named slots; labels come from the view i18n section, and the shell emits `detail-back` and `entity-switch` so the view decides which entity to open.",
+  "propsList": [
+   {
+    "name": "backLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "switcherPlaceholder",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "switcherOptions",
+    "type": "EntitySelectorOption[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "switcherValue",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "entity",
+    "type": "String",
+    "reflect": false,
+    "def": "'project'"
+   }
+  ],
+  "events": [
+   "detail-back"
+  ],
+  "propsDoc": [
+   {
+    "k": "backLabel",
+    "v": "Label of the back button (view i18n)"
+   },
+   {
+    "k": "switcherPlaceholder",
+    "v": "Entity switcher placeholder (view i18n)"
+   },
+   {
+    "k": "switcherOptions",
+    "v": "Options rendered by the entity switcher"
+   },
+   {
+    "k": "switcherValue",
+    "v": "Id of the entity currently displayed"
+   },
+   {
+    "k": "entity",
+    "v": "Emblem kind rendered in the hero identity"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Section cards and panels rendered below the overview card"
+   },
+   {
+    "k": "nav-actions",
+    "v": "Action buttons on the right of the top navigation bar"
+   },
+   {
+    "k": "hero-meta",
+    "v": "Content of the hero meta row (emblem pill, date, category, project link)"
+   },
+   {
+    "k": "title",
+    "v": "Content of the title row (heading, status chip, badges)"
+   },
+   {
+    "k": "hero-sub",
+    "v": "Secondary hero line (vendor and user, description, tags)"
+   },
+   {
+    "k": "hero-side",
+    "v": "Control placed to the right of the hero identity (status select)"
+   },
+   {
+    "k": "kpi",
+    "v": "KPI cells rendered inside the bordered KPI strip"
+   },
+   {
+    "k": "context",
+    "v": "Meta boxes rendered inside the context grid"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Action button in nav-actions (variant outline / primary / ghost, icon-start slot)"
+   },
+   {
+    "k": "app-link",
+    "v": "Linked meta value with the link-btn / meta-link token overrides"
+   },
+   {
+    "k": "app-status-chip",
+    "v": "Domain status chip inside the title row"
+   },
+   {
+    "k": "app-badge",
+    "v": "Secondary badge inside the title row"
+   },
+   {
+    "k": "app-persona",
+    "v": "User persona (avatar + presence badge) in the hero sub line"
+   },
+   {
+    "k": "app-section-card",
+    "v": "Panel below the overview card"
+   },
+   {
+    "k": "app-entity-emblem",
+    "v": "Emblem pill inside the hero meta row"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-directory-record-modal",
+  "cls": "AppDirectoryRecordModal",
+  "hasStory": true,
+  "title": "Common/DirectoryRecordModal",
+  "category": "Common",
+  "desc": "Schema-driven modal form for creating and editing both simple (code, name, sortOrder) and complex extended classifier records (Units of Measure, Currencies, Activity Types, etc.).",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "directory",
+    "type": "DirectoryDefinition | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "record",
+    "type": "DirectoryRecord | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Controls modal visibility"
+   },
+   {
+    "k": "directory",
+    "v": "DirectoryDefinition schema governing core and extended fields"
+   },
+   {
+    "k": "record",
+    "v": "DirectoryRecord being edited, or null for create mode"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-document-form",
+  "cls": "AppDocumentForm",
+  "hasStory": true,
+  "title": "Overlays/DocumentForm",
+  "category": "Overlays",
+  "desc": "Canonical document create and edit form. The component owns the file dropzone for uploads, the title, file name, category, status, scope with its conditional entity selector, uploading employee, AI summary bar, tags, description, text content and version note, writes the document to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Create prefills draft status, spec category, the target company, the current employee and the initial version note.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "document",
+    "type": "DocumentItem | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetCompanyId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetProjectId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetContractId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetCategory",
+    "type": "DocumentCategory | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetStatus",
+    "type": "DocumentStatus | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetTags",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "document",
+    "v": "Document being edited (null = create mode, dropzone shown)"
+   },
+   {
+    "k": "presetCompanyId",
+    "v": "Company prefilled for a context-bound opening (first company by default)"
+   },
+   {
+    "k": "presetProjectId",
+    "v": "Project prefilled for a context-bound opening, switches the scope to project"
+   },
+   {
+    "k": "presetContractId",
+    "v": "Contract prefilled for a context-bound opening"
+   },
+   {
+    "k": "presetCategory",
+    "v": "Category prefilled for a quick upload (spec by default)"
+   },
+   {
+    "k": "presetStatus",
+    "v": "Status prefilled for a quick upload (draft by default)"
+   },
+   {
+    "k": "presetTags",
+    "v": "Tags prefilled for a quick upload (empty by default)"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-document-previewer",
+  "cls": "AppDocumentPreviewer",
+  "hasStory": true,
+  "title": "Common/Document Previewer",
+  "category": "Common",
+  "desc": "Встроенный просмотрщик документов без скачивания: PDF (через Blob Object URL в iframe), масштабируемые изображения/SVG, форматированный Markdown, табличный CSV, JSON/SQL/код с нумерацией строк и переносом, а также fallback для бинарных форматов.",
+  "propsList": [
+   {
+    "name": "document",
+    "type": "DocumentItem | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "documents",
+    "type": "DocumentItem[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "showHeader",
+    "type": "Boolean",
+    "attr": "show-header",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "showExpand",
+    "type": "Boolean",
+    "attr": "show-expand",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "height",
+    "type": "String",
+    "reflect": false,
+    "def": "'540px'"
+   }
+  ],
+  "events": [
+   "select-document",
+   "expand",
+   "download"
+  ],
+  "propsDoc": [
+   {
+    "k": "document",
+    "v": "Single document to preview (id + metadata)"
+   },
+   {
+    "k": "documents",
+    "v": "Document list with a selector when more than one is provided"
+   },
+   {
+    "k": "compact",
+    "v": "Reduced chrome for embedding inside cards"
+   },
+   {
+    "k": "showHeader",
+    "v": "Shows the document header bar"
+   },
+   {
+    "k": "showExpand",
+    "v": "Shows the expand-to-fullscreen control"
+   },
+   {
+    "k": "height",
+    "v": "Preview viewport height (CSS length)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-draggable-list",
+  "cls": "AppDraggableList",
+  "hasStory": true,
+  "title": "Common/DraggableList",
+  "category": "Common",
+  "desc": "A vertical list of draggable rows with an inner scrollbar. The child element is app-draggable-list-item, used in two modes: property mode — the items array (value, label, checked) renders one child per record; declarative mode — app-draggable-list-item children are declared in the light DOM and rendered through the default slot. The list owns the HTML5 drag state and reorders rows; every reorder is emitted as list-reorder with the new items array. item-toggle and item-remove events pass through to the parent.",
+  "propsList": [
+   {
+    "name": "items",
+    "type": "DraggableItemData[]",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [
+   "list-reorder"
+  ],
+  "propsDoc": [
+   {
+    "k": "items",
+    "v": "DraggableItemData[] — value (entity id), label (title), checked (completion); empty items render the declared light DOM children"
+   },
+   {
+    "k": "child element",
+    "v": "app-draggable-list-item — grip handle, order number, checkbox, title, up / down / remove actions"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-draggable-list-item",
+  "cls": "AppDraggableListItem",
+  "hasStory": true,
+  "title": "Common/DraggableListItem",
+  "category": "Common",
+  "desc": "One draggable row, shaped like a form control: value is the entity id behind the row (task / subtask id), checked is its completion state, label the visible title. Grip handle, order number and up / down / remove actions included. Every action is emitted as a composed bubbling event (item-toggle {value}, item-up {index}, item-down {index}, item-remove {value}, item-drag-*) for the parent app-draggable-list — the child element of that list.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "checked",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "index",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "total",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "dragging",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "drop",
+    "type": "String",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "entity id behind the row (task / subtask id)"
+   },
+   {
+    "k": "label",
+    "v": "visible title text"
+   },
+   {
+    "k": "checked",
+    "v": "completion state (checkbox + struck-through title)"
+   },
+   {
+    "k": "index",
+    "v": "position in the list (order number and up-button disabled state)"
+   },
+   {
+    "k": "total",
+    "v": "list length (down-button disabled state)"
+   },
+   {
+    "k": "dragging",
+    "v": "the row is being dragged (dashed accent border, faded)"
+   },
+   {
+    "k": "drop",
+    "v": "drop indicator on this row: before | after | null"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-dropdown-button",
+  "cls": "AppDropdownButton",
+  "hasStory": true,
+  "title": "Common/DropdownButton",
+  "category": "Common",
+  "desc": "Action button paired with a contextual dropdown menu popover and outside-click dismissal. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start is a legacy alias of start. The default slot accepts declarative app-menu-item, app-menu-header, and app-menu-divider children.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "'Actions'"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'secondary'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "placement",
+    "type": "String",
+    "reflect": false,
+    "def": "'bottom-start'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "items",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [
+   "select"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Button caption"
+   },
+   {
+    "k": "variant",
+    "v": "Visual style of the button surface"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "placement",
+    "v": "Menu placement relative to the button (bottom-start, bottom-end, ...)"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction"
+   },
+   {
+    "k": "items",
+    "v": "Menu item definitions rendered in the dropdown"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label, before the menu chevron — centered vertically"
+   },
+   {
+    "k": "icon-start",
+    "v": "Legacy alias of start"
+   },
+   {
+    "k": "(default)",
+    "v": "Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-menu-header",
+    "v": "Section caption of the dropdown menu (declarative children replace the items prop)"
+   },
+   {
+    "k": "app-menu-item",
+    "v": "Menu row with label, icon, shortcut, checkable state, danger style"
+   },
+   {
+    "k": "app-menu-divider",
+    "v": "Horizontal separator between menu rows"
+   },
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the button label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-employee-form",
+  "cls": "AppEmployeeForm",
+  "hasStory": true,
+  "title": "Overlays/EmployeeForm",
+  "category": "Overlays",
+  "desc": "Canonical employee create and edit form. The component owns the ten fields, writes the employee to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. The full name is required, editing keeps the avatar of the existing record.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "employee",
+    "type": "User | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "employee",
+    "v": "Employee being edited (null = create mode)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-empty-state",
+  "cls": "AppEmptyState",
+  "hasStory": true,
+  "title": "Feedback/Empty State",
+  "category": "Feedback",
+  "desc": "Dashed-border placeholder for empty lists and tables with icon, title, message, and optional action. The icon slot renders an illustration graphic above the title, and the action slot hosts a button below the message.",
+  "propsList": [
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "message",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "title",
+    "v": "Headline of the empty state"
+   },
+   {
+    "k": "message",
+    "v": "Secondary explanation text"
+   },
+   {
+    "k": "compact",
+    "v": "Reduced padding and typography for use inside cards"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Illustration icon above the title"
+   },
+   {
+    "k": "action",
+    "v": "Optional action button below the message"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Action button placed in the action slot"
+   },
+   {
+    "k": "app-material-icon",
+    "v": "Illustration icon placed in the icon slot"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-entity-emblem",
+  "cls": "AppEntityEmblem",
+  "hasStory": true,
+  "title": "Elements/EntityEmblem",
+  "category": "Elements",
+  "desc": "Графический идентификатор сущности (иконка + семантический цветовой акцент) для заголовков карточек, списков и хлебных крошек.",
+  "propsList": [
+   {
+    "name": "entity",
+    "type": "String",
+    "reflect": true,
+    "def": "'project'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": true,
+    "def": "'lg'"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": true,
+    "def": "'emblem'"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "entity",
+    "v": "Тип сущности: project | task | requirement | company | counterparty | contract | calculation | employee"
+   },
+   {
+    "k": "size",
+    "v": "Размер эмблемы: xs | sm | md | lg"
+   },
+   {
+    "k": "variant",
+    "v": "Режим отображения: emblem (квадрат с иконкой) | pill (пилюля с подписью)"
+   },
+   {
+    "k": "color",
+    "v": "Опциональный CSS-цвет акцента (например, цвет проекта)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-entity-reminders",
+  "cls": "AppEntityReminders",
+  "hasStory": true,
+  "title": "Common/Entity Reminders",
+  "category": "Common",
+  "desc": "Embeddable contextual reminders widget for any system entity detail view (company, counterparty, contract, employee, project, task, requirement, calculation, etc.).",
+  "propsList": [
+   {
+    "name": "entityType",
+    "type": "String",
+    "attr": "entity-type",
+    "reflect": false,
+    "def": "'project'"
+   },
+   {
+    "name": "entityId",
+    "type": "String",
+    "attr": "entity-id",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "entity-type",
+    "v": "Linked entity kind (company, contract, task, contact, etc.)"
+   },
+   {
+    "k": "entity-id",
+    "v": "Target entity record identifier"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-entity-selector",
+  "cls": "AppEntitySelector",
+  "hasStory": true,
+  "title": "Tech Lead · Architecture",
+  "category": "Inputs",
+  "desc": "Searchable portal selector for large collections (tasks, employees, counterparties, contracts) with multi-token filtering, match highlighting, secondary metadata, and windowed rendering. The default slot accepts declarative app-option children that append to the options prop.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "options",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "dataSource",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "searchPlaceholder",
+    "type": "String",
+    "attr": "search-placeholder",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "required",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "clearable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "showSelectedDetails",
+    "type": "Boolean",
+    "attr": "show-selected-details",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "maxVisible",
+    "type": "Number",
+    "attr": "max-visible",
+    "reflect": false,
+    "def": "80"
+   },
+   {
+    "name": "error",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "hint",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "change",
+   "search-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "value",
+    "v": "Id of the currently selected entity"
+   },
+   {
+    "k": "options",
+    "v": "Entity option definitions (id, label, meta)"
+   },
+   {
+    "k": "dataSource",
+    "v": "Data source for options: array, promise, or function returning an array (sync or async)"
+   },
+   {
+    "k": "placeholder",
+    "v": "Text shown when nothing is selected"
+   },
+   {
+    "k": "searchPlaceholder",
+    "v": "Placeholder inside the search box of the panel"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables the selector"
+   },
+   {
+    "k": "required",
+    "v": "Marks the field as required"
+   },
+   {
+    "k": "clearable",
+    "v": "Shows a clear (×) button when a value is selected"
+   },
+   {
+    "k": "showSelectedDetails",
+    "v": "Renders meta details of the selected entity under the field"
+   },
+   {
+    "k": "maxVisible",
+    "v": "Maximum options rendered in the panel at once"
+   },
+   {
+    "k": "error",
+    "v": "Error message; renders the field in danger state"
+   },
+   {
+    "k": "hint",
+    "v": "Helper text below the field"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-option> children filling the option list (value, label, code, subtitle, meta, badge, avatar, keywords, start / end graphics)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-option",
+    "v": "Declarative entity row (value, label, code, subtitle, meta, badge, avatar, keywords, start / end slot graphics) appended to the options prop list and included in the search filter"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-expense-form",
+  "cls": "AppExpenseForm",
+  "hasStory": true,
+  "title": "Overlays/ExpenseForm",
+  "category": "Overlays",
+  "desc": "Canonical expense create and edit form. The component owns the twelve fields of title project linked task category submitted by amount currency date status vendor billable and notes, writes the expense to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Create prefills the target project today infrastructure category 15000 amount RUB currency pending status and billable on.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "expense",
+    "type": "Expense | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetProjectId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetTaskId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetUserId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "expense",
+    "v": "Expense being edited (null = create mode)"
+   },
+   {
+    "k": "presetProjectId",
+    "v": "Project prefilled for a context-bound opening (first project by default)"
+   },
+   {
+    "k": "presetTaskId",
+    "v": "Linked task prefilled for a context-bound opening"
+   },
+   {
+    "k": "presetUserId",
+    "v": "Submitter prefilled for a context-bound opening (first user by default)"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-file-dropzone",
+  "cls": "AppFileDropzone",
+  "hasStory": true,
+  "title": "Common/File Dropzone",
+  "category": "Common",
+  "desc": "Интерактивная область загрузки файлов (drag & drop + системный выбор файла) с отображением выбранного файла, его размера и кнопкой очистки.",
+  "propsList": [
+   {
+    "name": "accept",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "selectedFileName",
+    "type": "String",
+    "attr": "selected-file-name",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "selectedFileSize",
+    "type": "Number",
+    "attr": "selected-file-size",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "multiple",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "hint",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "buttonLabel",
+    "type": "String",
+    "attr": "button-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "clearLabel",
+    "type": "String",
+    "attr": "clear-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "selectedLabel",
+    "type": "String",
+    "attr": "selected-label",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "files-selected",
+   "file-selected",
+   "file-cleared"
+  ],
+  "propsDoc": [
+   {
+    "k": "accept",
+    "v": "Accepted file extensions (native accept attribute)"
+   },
+   {
+    "k": "title",
+    "v": "Headline inside the drop area"
+   },
+   {
+    "k": "hint",
+    "v": "Secondary hint text under the headline"
+   },
+   {
+    "k": "buttonLabel",
+    "v": "Caption of the browse button"
+   },
+   {
+    "k": "clearLabel",
+    "v": "Caption of the clear button for a selected file"
+   },
+   {
+    "k": "selectedLabel",
+    "v": "Template caption for the selected-file line"
+   },
+   {
+    "k": "compact",
+    "v": "Reduced height for dense forms"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables drop and browse"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-filter-bar",
+  "cls": "AppFilterBar",
+  "hasStory": true,
+  "title": "Common/Filter Bar",
+  "category": "Common",
+  "desc": "Toolbar with search input, N filter selects, optional reset button and trailing actions slot. The prefix slot renders extra controls before the filter selects, and the default slot appends additional controls after them.",
+  "propsList": [
+   {
+    "name": "searchValue",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "searchEnabled",
+    "type": "Boolean",
+    "attr": "search-enabled",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "filters",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "values",
+    "type": "Object",
+    "reflect": false,
+    "def": "{}"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'card'"
+   },
+   {
+    "name": "showReset",
+    "type": "Boolean",
+    "attr": "show-reset",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "reset",
+   "search-change",
+   "filter-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "searchValue",
+    "v": "Current text of the search box"
+   },
+   {
+    "k": "searchEnabled",
+    "v": "Shows the search input"
+   },
+   {
+    "k": "filters",
+    "v": "Filter definitions (key, options, type select | entity)"
+   },
+   {
+    "k": "values",
+    "v": "Current filter values keyed by filter id"
+   },
+   {
+    "k": "placeholder",
+    "v": "Search box placeholder"
+   },
+   {
+    "k": "variant",
+    "v": "Surface style: card / plain"
+   },
+   {
+    "k": "showReset",
+    "v": "Shows the reset button when filters are active"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "prefix",
+    "v": "Extra controls rendered before the filter selects"
+   },
+   {
+    "k": "(default)",
+    "v": "Additional controls appended after the filter selects"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-segmented-switch",
+    "v": "View-mode switch placed in the default slot after the filter selects"
+   },
+   {
+    "k": "app-button",
+    "v": "Toolbar action placed in the prefix or default slot"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-form-grid",
+  "cls": "AppFormGrid",
+  "hasStory": true,
+  "title": "Common/Form Grid",
+  "category": "Common",
+  "desc": "Two-column grid for modal form fields; collapses to one column below 640px. Slotted children keep their own classes (col-span-2 stays in view CSS).",
+  "propsList": [
+   {
+    "name": "columns",
+    "type": "Number",
+    "reflect": false,
+    "def": "2"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "columns",
+    "v": "Number of form grid columns (children span full width via col-span)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Form fields laid out in the grid (full width via col-span)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-input",
+    "v": "Text field child"
+   },
+   {
+    "k": "app-textarea",
+    "v": "Multiline text field child"
+   },
+   {
+    "k": "app-select",
+    "v": "Dropdown select child"
+   },
+   {
+    "k": "app-entity-selector",
+    "v": "Searchable entity selector child"
+   },
+   {
+    "k": "app-combobox",
+    "v": "Multi-tag combobox child"
+   },
+   {
+    "k": "app-number-input",
+    "v": "Numeric field child"
+   },
+   {
+    "k": "app-date-input",
+    "v": "Date field child"
+   },
+   {
+    "k": "app-checkbox",
+    "v": "Checkbox child"
+   },
+   {
+    "k": "app-switch",
+    "v": "Toggle switch child"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-input",
+  "cls": "AppInput",
+  "hasStory": true,
+  "title": "Inputs/TextInput",
+  "category": "Inputs",
+  "desc": "Single-line text input field supporting labels, helpers, errors, and clear buttons. The icon slot renders a leading graphic inside the field.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "type",
+    "type": "String",
+    "reflect": false,
+    "def": "'text'"
+   },
+   {
+    "name": "required",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "error",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "helper",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "clearable",
+    "type": "Boolean",
+    "attr": "clearable",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [
+   "input",
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "placeholder",
+    "v": "Placeholder text shown when empty"
+   },
+   {
+    "k": "value",
+    "v": "Current input value"
+   },
+   {
+    "k": "type",
+    "v": "Native input type (text, email, password, number, ...)"
+   },
+   {
+    "k": "required",
+    "v": "Marks the field as required (asterisk in label)"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables editing"
+   },
+   {
+    "k": "error",
+    "v": "Error message; renders the field in danger state"
+   },
+   {
+    "k": "helper",
+    "v": "Helper text below the field"
+   },
+   {
+    "k": "clearable",
+    "v": "Shows a clear (×) button when the field has a value"
+   },
+   {
+    "k": "size",
+    "v": "Control size scale sm|md|lg (30/38/44px heights, md default)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Leading icon inside the field"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the leading icon slot inside the field"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-kpi-strip",
+  "cls": "AppKpiStrip",
+  "hasStory": true,
+  "title": "Common/KPI Strip",
+  "category": "Common",
+  "desc": "Responsive grid layout wrapper for KPI cards (app-metric-card), collapsing to 2 columns on tablets and 1 on mobile. The default slot accepts app-metric-card children.",
+  "propsList": [
+   {
+    "name": "columns",
+    "type": "Number",
+    "reflect": false,
+    "def": "4"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'grid'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "columns",
+    "v": "Number of grid columns for the metric cards"
+   },
+   {
+    "k": "variant",
+    "v": "Layout style: grid / strip"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Metric cards (app-metric-card elements)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-metric-card",
+    "v": "KPI card child rendered as a grid cell of the strip (label, value, trend, sparkline)"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-link",
+  "cls": "AppLink",
+  "hasStory": true,
+  "title": "Elements/Link",
+  "category": "Elements",
+  "desc": "Text link with the canonical start / default / end slot API. Renders an anchor when href is set, a button-style link otherwise.",
+  "propsList": [
+   {
+    "name": "href",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "target",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'primary'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "String",
+    "attr": "aria-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "active",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "href",
+    "v": "Link target; with href the element renders as an anchor"
+   },
+   {
+    "k": "target",
+    "v": "Anchor target (_blank adds rel=\"noopener noreferrer\")"
+   },
+   {
+    "k": "variant",
+    "v": "Visual style: primary, secondary, danger"
+   },
+   {
+    "k": "size",
+    "v": "Font scale sm / md / lg from the canonical control tokens"
+   },
+   {
+    "k": "disabled",
+    "v": "Blocks activation and dims the link"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Link label text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the link label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-markdown",
+  "cls": "AppMarkdown",
+  "hasStory": true,
+  "title": "Common/Markdown",
+  "category": "Common",
+  "desc": "Canonical markdown renderer: headings, paragraphs, quotes, bullet / numbered lists, checklists (display-only), GFM pipe tables, LaTeX math via KaTeX and fenced code blocks with a copy action. Markdown source is passed as the content property.",
+  "propsList": [
+   {
+    "name": "content",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "editable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "checklist-toggle"
+  ],
+  "propsDoc": [
+   {
+    "k": "content",
+    "v": "Markdown source text; empty content renders nothing"
+   },
+   {
+    "k": "children",
+    "v": "Markdown declared directly as light-DOM children (slot capture); the content property wins when both are set"
+   },
+   {
+    "k": "editable",
+    "v": "Checklist checkboxes are interactive and emit checklist-toggle {line, checked} when true"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-material-icon",
+  "cls": "AppMaterialIcon",
+  "hasStory": true,
+  "title": "Common/Material Icon",
+  "category": "Common",
+  "desc": "Material Symbols ligature icon (self-hosted variable font) with Google axes fill/weight/grade, family style, app size scale, and status color variants.",
+  "propsList": [
+   {
+    "name": "fill",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "weight",
+    "type": "Number",
+    "reflect": false,
+    "def": "400"
+   },
+   {
+    "name": "grade",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "decorative",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-material-icon-gallery",
+  "cls": "AppMaterialIconGallery",
+  "hasStory": true,
+  "title": "Common/Material Icon Gallery",
+  "category": "Common",
+  "desc": "Material Symbols palette with search by name, category and tags; toolbar controls family, size and Google axes; grid with roving tabindex fires icon-select and params-change events.",
+  "propsList": [
+   {
+    "name": "icons",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "fill",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "weight",
+    "type": "Number",
+    "reflect": false,
+    "def": "400"
+   },
+   {
+    "name": "grade",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-menu",
+  "cls": "AppMenu",
+  "hasStory": true,
+  "title": "Common/Menu",
+  "category": "Common",
+  "desc": "Standalone accessible menu surface supporting both programmatic items arrays and declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> composition.",
+  "propsList": [
+   {
+    "name": "items",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [
+   "select"
+  ],
+  "propsDoc": [
+   {
+    "k": "items",
+    "v": "Menu item definitions (label, icon, action, separators)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-menu-header",
+    "v": "Section caption rendered at the top of the menu"
+   },
+   {
+    "k": "app-menu-item",
+    "v": "Menu row with label, icon, shortcut, checkable state, danger style"
+   },
+   {
+    "k": "app-menu-divider",
+    "v": "Horizontal separator between menu rows"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-menu-divider",
+  "cls": "AppMenuDivider",
+  "hasStory": true,
+  "title": "Common/MenuDivider",
+  "category": "Common",
+  "desc": "Declarative horizontal separator element for dividing sections of items inside <app-menu>.",
+  "propsList": [
+   {
+    "name": "inset",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "inset",
+    "v": "Applies left indentation aligned with icon-prefixed menu item labels"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-menu-header",
+  "cls": "AppMenuHeader",
+  "hasStory": true,
+  "title": "Common/MenuHeader",
+  "category": "Common",
+  "desc": "Declarative section heading element for grouping related <app-menu-item> entries inside <app-menu>. The default slot supplies the header text markup when the label property is omitted.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Section heading text"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Header text markup (used when the label property is omitted)"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-menu-item",
+  "cls": "AppMenuItem",
+  "hasStory": true,
+  "title": "Common/MenuItem",
+  "category": "Common",
+  "desc": "Declarative interactive menu entry used inside <app-menu> with support for icons, shortcuts, checkmarks, danger, and disabled states. Canonical start / default / end slots carry leading graphics, label markup, and trailing content; icon and shortcut are legacy aliases of start / end.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "shortcut",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "danger",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "checked",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "checkable",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "icon",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "select"
+  ],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Action identifier emitted in the select event detail (falls back to id)"
+   },
+   {
+    "k": "label",
+    "v": "Item text caption"
+   },
+   {
+    "k": "shortcut",
+    "v": "Keyboard shortcut hint displayed on the right"
+   },
+   {
+    "k": "disabled",
+    "v": "Prevents clicking and keyboard activation"
+   },
+   {
+    "k": "danger",
+    "v": "Highlights destructive action styling"
+   },
+   {
+    "k": "checked",
+    "v": "Renders active checkmark state"
+   },
+   {
+    "k": "checkable",
+    "v": "Reserves checkmark gutter and toggles checked state on click"
+   },
+   {
+    "k": "icon",
+    "v": "Programmatic leading icon (TemplateResult or string)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Item label markup (used when the label property is omitted)"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered on the right (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon",
+    "v": "Legacy alias of start"
+   },
+   {
+    "k": "shortcut",
+    "v": "Legacy alias of end"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the item label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-meta-grid",
+  "cls": "AppMetaGrid",
+  "hasStory": true,
+  "title": "Common/Meta Grid",
+  "category": "Common",
+  "desc": "Label/value boxes in strip (1×N) or grid (2-column) layout, with mono and danger value variants. The default slot accepts declarative app-meta-item children that append to the items prop.",
+  "propsList": [
+   {
+    "name": "items",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "columns",
+    "type": "Number",
+    "reflect": false,
+    "def": "3"
+   },
+   {
+    "name": "layout",
+    "type": "String",
+    "reflect": false,
+    "def": "'strip'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "items",
+    "v": "Meta field definitions (label + value, mono / danger variants, title tooltip, link { label, onClick })"
+   },
+   {
+    "k": "columns",
+    "v": "Number of columns in the grid"
+   },
+   {
+    "k": "layout",
+    "v": "Rendering style: strip / grid / inline"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-meta-item> children filling the boxes (label, value, mono, danger, start / end graphics)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-meta-item",
+    "v": "Declarative meta box (label, value, mono, danger, start / end slot graphics) appended to the items prop list"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-meta-item",
+  "cls": "AppMetaItem",
+  "hasStory": true,
+  "title": "Common/MetaItem",
+  "category": "Common",
+  "desc": "Declarative meta field carrier for app-meta-grid. Renders nothing; the parent collects its props from the slot.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "mono",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "danger",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Field caption shown above the value"
+   },
+   {
+    "k": "value",
+    "v": "Field value (falls back to the element text)"
+   },
+   {
+    "k": "mono",
+    "v": "Monospaced tabular value style"
+   },
+   {
+    "k": "danger",
+    "v": "Danger-colored value style"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Graphic element rendered before the field value in the parent box (SVG, material icon)"
+   },
+   {
+    "k": "(default)",
+    "v": "Fallback value text used when the value property is omitted"
+   },
+   {
+    "k": "end",
+    "v": "Graphic element rendered after the field value in the parent box (SVG, material icon)"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-modal",
+  "cls": "AppModal",
+  "hasStory": true,
+  "title": "Overlays/Modal",
+  "category": "Overlays",
+  "desc": "Customizable modal dialog with backdrop blur, customizable sizes, header, and footer actions. The title slot replaces the header caption, the default slot is the modal body, and the footer slot hosts footer buttons.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "hideClose",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "headerIcon",
+    "type": "Object",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the modal (rendered through the portal)"
+   },
+   {
+    "k": "title",
+    "v": "Header caption"
+   },
+   {
+    "k": "size",
+    "v": "Modal width preset: sm / md / lg"
+   },
+   {
+    "k": "hideClose",
+    "v": "Hides the header close (×) button"
+   },
+   {
+    "k": "headerIcon",
+    "v": "Icon descriptor rendered before the title"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "title",
+    "v": "Custom header content replacing the title text"
+   },
+   {
+    "k": "(default)",
+    "v": "Modal body content"
+   },
+   {
+    "k": "footer",
+    "v": "Footer area (buttons)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-form-grid",
+    "v": "Form field grid rendered in the modal body"
+   },
+   {
+    "k": "app-button",
+    "v": "Footer action button placed in the footer slot"
+   },
+   {
+    "k": "app-input",
+    "v": "Text field child of the modal body"
+   },
+   {
+    "k": "app-select",
+    "v": "Dropdown select child of the modal body"
+   },
+   {
+    "k": "app-textarea",
+    "v": "Multiline text field child of the modal body"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-modal-portal",
+  "cls": "AppModalPortal",
+  "hasStory": true,
+  "title": "Overlays/ModalPortal",
+  "category": "Overlays",
+  "desc": "Fixed full-viewport portal overlay hosting modals, drawers, and popups while blocking background scroll and pointer events below in z-order.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-money",
+  "cls": "AppMoney",
+  "hasStory": true,
+  "title": "Common/Money",
+  "category": "Common",
+  "desc": "Tabular-numeral currency formatting (RUB/USD/EUR) with full and short (K/M) formats.",
+  "propsList": [
+   {
+    "name": "amount",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "currency",
+    "type": "String",
+    "reflect": false,
+    "def": "'RUB'"
+   },
+   {
+    "name": "format",
+    "type": "String",
+    "reflect": false,
+    "def": "'full'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "amount",
+    "v": "Numeric amount"
+   },
+   {
+    "k": "currency",
+    "v": "Currency code: RUB / USD / EUR (symbol and locale formatting follow UI language)"
+   },
+   {
+    "k": "format",
+    "v": "full = grouped digits; short = K/M compact notation"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-number-input",
+  "cls": "AppNumberInput",
+  "hasStory": true,
+  "title": "Inputs/NumberInput",
+  "category": "Inputs",
+  "desc": "Numeric input with increment/decrement steppers, boundaries, and optional unit indicator.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "min",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "max",
+    "type": "Number",
+    "reflect": false,
+    "def": "1000"
+   },
+   {
+    "name": "step",
+    "type": "Number",
+    "reflect": false,
+    "def": "1"
+   },
+   {
+    "name": "unit",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "value",
+    "v": "Current numeric value"
+   },
+   {
+    "k": "min",
+    "v": "Minimum allowed value"
+   },
+   {
+    "k": "max",
+    "v": "Maximum allowed value"
+   },
+   {
+    "k": "step",
+    "v": "Increment for the stepper buttons"
+   },
+   {
+    "k": "unit",
+    "v": "Unit suffix rendered inside the field"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables editing and steppers"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-option",
+  "cls": "AppOption",
+  "hasStory": true,
+  "title": "Common/Option",
+  "category": "Common",
+  "desc": "Declarative option carrier for option-list components. Renders nothing; the parent component collects its props from the slot.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "icon",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "code",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "subtitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "meta",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "badge",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "badgeColor",
+    "type": "String",
+    "attr": "badge-color",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "avatar",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "description",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "keywords",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Option value emitted by the parent (falls back to the label)"
+   },
+   {
+    "k": "label",
+    "v": "Option caption (falls back to the element text)"
+   },
+   {
+    "k": "color",
+    "v": "Color indicator used by app-select rows"
+   },
+   {
+    "k": "icon",
+    "v": "Programmatic leading icon (TemplateResult or string)"
+   },
+   {
+    "k": "code",
+    "v": "Entity code shown in entity-selector rows"
+   },
+   {
+    "k": "subtitle",
+    "v": "Secondary line in entity-selector rows"
+   },
+   {
+    "k": "meta",
+    "v": "Meta line in entity-selector rows"
+   },
+   {
+    "k": "badge",
+    "v": "Badge text in entity-selector rows"
+   },
+   {
+    "k": "badgeColor",
+    "v": "Badge color in entity-selector rows"
+   },
+   {
+    "k": "avatar",
+    "v": "Avatar source (initials or image url) in entity-selector rows"
+   },
+   {
+    "k": "description",
+    "v": "Description line used by app-radio-group cards"
+   },
+   {
+    "k": "keywords",
+    "v": "Search keywords for the entity-selector filter"
+   },
+   {
+    "k": "disabled",
+    "v": "Option is not selectable"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Graphic element rendered before the option label in the parent row (SVG, material icon)"
+   },
+   {
+    "k": "(default)",
+    "v": "Fallback label text used when the label property is omitted"
+   },
+   {
+    "k": "end",
+    "v": "Graphic element rendered after the option label in the parent row (SVG, material icon)"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-otp-input",
+  "cls": "AppOtpInput",
+  "hasStory": true,
+  "title": "Common/OtpInput",
+  "category": "Common",
+  "desc": "6-cell numeric OTP / TOTP input with mobile autofill (autocomplete=\"one-time-code\"), multi-digit clipboard paste, keyboard navigation, and automatic completion dispatch.",
+  "propsList": [
+   {
+    "name": "length",
+    "type": "Number",
+    "reflect": false,
+    "def": "6"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "error",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "autofocus",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "otp-change",
+   "otp-complete"
+  ],
+  "propsDoc": [
+   {
+    "k": "length",
+    "v": "Number of verification code cells (default 6)."
+   },
+   {
+    "k": "value",
+    "v": "Current numeric code string."
+   },
+   {
+    "k": "disabled",
+    "v": "Disables all cells while verifying."
+   },
+   {
+    "k": "error",
+    "v": "Highlights cells in danger palette and plays shake feedback."
+   },
+   {
+    "k": "autofocus",
+    "v": "Automatically focuses the first cell on mount."
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-page-header",
+  "cls": "AppPageHeader",
+  "hasStory": true,
+  "title": "Layout/Page Header",
+  "category": "Layout",
+  "desc": "Standard page header with title, subtitle, optional leading icon, and an actions zone on the right. The icon slot renders the leading graphic, the default slot adds extra content under the title, and the actions slot hosts action buttons on the right.",
+  "propsList": [
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "subtitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "title",
+    "v": "Page caption"
+   },
+   {
+    "k": "subtitle",
+    "v": "Secondary description line under the caption"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Leading page icon (28px recommended)"
+   },
+   {
+    "k": "(default)",
+    "v": "Extra content under the title and subtitle"
+   },
+   {
+    "k": "actions",
+    "v": "Action buttons on the right of the header"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Action button placed in the actions slot"
+   },
+   {
+    "k": "app-material-icon",
+    "v": "Leading icon placed in the icon slot"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-pagination",
+  "cls": "AppPagination",
+  "hasStory": true,
+  "title": "Common/Pagination",
+  "category": "Common",
+  "desc": "Pagination bar with smart page buttons, range summary, and mode-aware page-size presets for dense tables vs. multi-column card grids.",
+  "propsList": [
+   {
+    "name": "totalItems",
+    "type": "Number",
+    "attr": "total-items",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "page",
+    "type": "Number",
+    "reflect": false,
+    "def": "1"
+   },
+   {
+    "name": "pageSize",
+    "type": "Number",
+    "attr": "page-size",
+    "reflect": false,
+    "def": "10"
+   },
+   {
+    "name": "pageSizeOptions",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "layoutMode",
+    "type": "String",
+    "attr": "layout-mode",
+    "reflect": false,
+    "def": "'table'"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'surface'"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "showPageSize",
+    "type": "Boolean",
+    "attr": "show-page-size",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "showSummary",
+    "type": "Boolean",
+    "attr": "show-summary",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "locale",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "page-change",
+   "page-size-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "totalItems",
+    "v": "Total record count across all pages"
+   },
+   {
+    "k": "page",
+    "v": "Current page number (1-based)"
+   },
+   {
+    "k": "pageSize",
+    "v": "Records per page"
+   },
+   {
+    "k": "pageSizeOptions",
+    "v": "Choices offered in the page-size selector"
+   },
+   {
+    "k": "layoutMode",
+    "v": "Density preset for table vs card grids"
+   },
+   {
+    "k": "variant",
+    "v": "Surface style"
+   },
+   {
+    "k": "compact",
+    "v": "Compact rendering"
+   },
+   {
+    "k": "showPageSize",
+    "v": "Shows the page-size selector"
+   },
+   {
+    "k": "showSummary",
+    "v": "Shows the \"records x–y of z\" summary"
+   },
+   {
+    "k": "locale",
+    "v": "Locale used for number formatting (defaults to UI language)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-payment-form",
+  "cls": "AppPaymentForm",
+  "hasStory": true,
+  "title": "Overlays/PaymentForm",
+  "category": "Overlays",
+  "desc": "Canonical payment registration form supporting incoming and outgoing payments, linked companies, company & counterparty bank requisites, and optional invoice reconciliation.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "invoice",
+    "type": "Invoice | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "payment",
+    "type": "InvoicePayment | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "payableInvoices",
+    "type": "Invoice[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "defaultDirection",
+    "type": "String",
+    "reflect": false,
+    "def": "'incoming'"
+   },
+   {
+    "name": "defaultCompanyId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "defaultCounterpartyId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "invoice",
+    "v": "Optional target invoice the payment is recorded against"
+   },
+   {
+    "k": "payableInvoices",
+    "v": "Invoices the target selector may switch between"
+   },
+   {
+    "k": "defaultDirection",
+    "v": "Initial direction for standalone payments (incoming | outgoing)"
+   },
+   {
+    "k": "defaultCompanyId",
+    "v": "Initial company ID for standalone payments"
+   },
+   {
+    "k": "defaultCounterpartyId",
+    "v": "Initial counterparty ID for standalone payments"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-persona",
+  "cls": "AppPersona",
+  "hasStory": true,
+  "title": "Common/Persona",
+  "category": "Common",
+  "desc": "Person representation: avatar (photo or initials on a colored tile), name, position/role line and a presence badge in seven sizes. The status is graphic only — its words live in the tooltip and the accessible name.",
+  "propsList": [
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'48'"
+   },
+   {
+    "name": "image",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "initials",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "primaryText",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "secondaryText",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "tertiaryText",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "presence",
+    "type": "String",
+    "reflect": false,
+    "def": "'none'"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "interactive",
+    "type": "Boolean",
+    "attr": "interactive",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "personaDisabled",
+    "type": "Boolean",
+    "attr": "persona-disabled",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "size",
+    "v": "Avatar diameter preset (24/32/40/48/56/72/100, default 48)"
+   },
+   {
+    "k": "image",
+    "v": "Photo URL; falls back to initials when empty"
+   },
+   {
+    "k": "initials",
+    "v": "Initials; derived from primaryText when not set (Cyrillic names included)"
+   },
+   {
+    "k": "primaryText",
+    "v": "Name or identification"
+   },
+   {
+    "k": "secondaryText",
+    "v": "Position / project role under the name"
+   },
+   {
+    "k": "tertiaryText",
+    "v": "Extra line, e.g. \"In a meeting\" (sizes 56+)"
+   },
+   {
+    "k": "presence",
+    "v": "Presence badge status (none/online/available/away/busy/dnd/blocked/offline); words go to the tooltip and accessible name, never to visible text"
+   },
+   {
+    "k": "showOverflowTooltip",
+    "v": "Native tooltip with the full text on truncated lines (default true)"
+   },
+   {
+    "k": "color",
+    "v": "Background of the initials tile"
+   },
+   {
+    "k": "ariaLabel",
+    "v": "Accessible name override"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-presence-icon",
+  "cls": "AppPresenceIcon",
+  "hasStory": true,
+  "title": "Common/PresenceIcon",
+  "category": "Common",
+  "desc": "Presence status icon: a colored dot with the state glyph, the same geometry as the persona badge. Owns its styles, so it renders inside other components shadow trees (menu item icons) and can be slotted anywhere.",
+  "propsList": [
+   {
+    "name": "presence",
+    "type": "String",
+    "reflect": false,
+    "def": "'none'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'12'"
+   },
+   {
+    "name": "glyph",
+    "type": "String",
+    "reflect": false,
+    "def": "'auto'"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "presence",
+    "v": "Presence status (none/online/available/away/busy/dnd/blocked/offline); none renders nothing"
+   },
+   {
+    "k": "size",
+    "v": "Dot diameter in px (persona badge sizes are 8/12/16/20/24/32/40)"
+   },
+   {
+    "k": "glyph",
+    "v": "Glyph size in px; auto follows the persona rule (round(size x 0.6), suppressed below 16px), 0 forces a colour-only dot"
+   },
+   {
+    "k": "color",
+    "v": "Dot fill override; defaults to the presence token color"
+   },
+   {
+    "k": "ariaLabel",
+    "v": "Accessible name override; defaults to the presence label"
+   },
+   {
+    "k": "showOverflowTooltip",
+    "v": "Native tooltip with the presence label (default true)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-progress-bar",
+  "cls": "AppProgressBar",
+  "hasStory": true,
+  "title": "Common/Progress Bar",
+  "category": "Common",
+  "desc": "Single-value or segmented progress bar with optional percentage label; sm/md heights.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "segments",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "color",
+    "type": "String",
+    "reflect": false,
+    "def": "'var(--accent-primary, #6366f1)'"
+   },
+   {
+    "name": "showLabel",
+    "type": "Boolean",
+    "attr": "show-label",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Current percentage (0–100)"
+   },
+   {
+    "k": "segments",
+    "v": "Optional segment definitions for multi-color bars"
+   },
+   {
+    "k": "color",
+    "v": "Bar fill color (CSS value / token)"
+   },
+   {
+    "k": "showLabel",
+    "v": "Shows the percentage label"
+   },
+   {
+    "k": "size",
+    "v": "Bar height preset"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-project-attachments",
+  "cls": "AppProjectAttachments",
+  "hasStory": true,
+  "title": "Common/ProjectAttachments",
+  "category": "Common",
+  "desc": "File attachment control for time entries and expenses. Allows uploading new files (saved directly to the project document library) or picking existing documents from the project library, with inline preview and download.",
+  "propsList": [
+   {
+    "name": "projectId",
+    "type": "String",
+    "attr": "project-id",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "documentIds",
+    "type": "string[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "pendingFiles",
+    "type": "PendingAttachmentFile[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "readonly",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "project-id",
+    "v": "Project ID used to scope existing library documents"
+   },
+   {
+    "k": "documentIds",
+    "v": "Array of already-saved DocumentItem IDs attached to the record"
+   },
+   {
+    "k": "pendingFiles",
+    "v": "Array of newly selected browser files awaiting save"
+   },
+   {
+    "k": "label",
+    "v": "Optional section heading override"
+   },
+   {
+    "k": "compact",
+    "v": "Compact display mode without secondary helper hint"
+   },
+   {
+    "k": "readonly",
+    "v": "Disables uploading, linking, and detaching files"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-project-form",
+  "cls": "AppProjectForm",
+  "hasStory": true,
+  "title": "Overlays/ProjectForm",
+  "category": "Overlays",
+  "desc": "Canonical project create and edit form. The component owns the ten fields of name key status due date company counterparty budget progress color swatches and description, writes the project to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Presets fill company counterparty status key budget title and the save button caption.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "project",
+    "type": "Project | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetCompanyId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetCounterpartyId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetStatus",
+    "type": "ProjectStatus | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetKey",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetBudget",
+    "type": "number | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "saveLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "saveDisabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "beforeSave",
+    "type": "((data: { name: string; key: string }) => Promise<boolean>) | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "extraContent",
+    "type": "TemplateResult | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "footerExtra",
+    "type": "TemplateResult | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "project",
+    "v": "Project being edited (null = create mode)"
+   },
+   {
+    "k": "presetCompanyId",
+    "v": "Company prefilled for a context-bound opening"
+   },
+   {
+    "k": "presetCounterpartyId",
+    "v": "Counterparty prefilled for a quick opening"
+   },
+   {
+    "k": "presetStatus",
+    "v": "Status a newly created project starts with (planning by default)"
+   },
+   {
+    "k": "presetKey",
+    "v": "Key prefilled for a quick opening"
+   },
+   {
+    "k": "presetBudget",
+    "v": "Budget prefilled for a quick opening"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   },
+   {
+    "k": "saveLabel",
+    "v": "Primary button caption override (Создать for quick openings)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-project-requirements",
+  "cls": "AppProjectRequirements",
+  "hasStory": true,
+  "title": "Common/ProjectRequirements",
+  "category": "Common",
+  "desc": "Управление функциональными (FR) и нефункциональными (NFR) требованиями проекта, генерация из спецификации, трассировка к базе знаний и декомпозиция в задачи с помощью AI.",
+  "propsList": [
+   {
+    "name": "projectId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "projectId",
+    "v": "Project whose requirements are listed (empty = all projects)"
+   },
+   {
+    "k": "currentLang",
+    "v": "UI language"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-radio-group",
+  "cls": "AppRadioGroup",
+  "hasStory": true,
+  "title": "Common/RadioGroup",
+  "category": "Common",
+  "desc": "Accessible radio selection group with standard, horizontal, and rich card layouts. The default slot accepts declarative app-option children that append to the options prop.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "name",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": true,
+    "def": "''"
+   },
+   {
+    "name": "options",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "dataSource",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "orientation",
+    "type": "String",
+    "reflect": false,
+    "def": "'vertical'"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'default'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the option list"
+   },
+   {
+    "k": "name",
+    "v": "Native radio group name (shared within a page)"
+   },
+   {
+    "k": "value",
+    "v": "Currently selected option value"
+   },
+   {
+    "k": "options",
+    "v": "Option definitions (value + label)"
+   },
+   {
+    "k": "dataSource",
+    "v": "Data source for options: array, promise, or function returning an array (sync or async)"
+   },
+   {
+    "k": "orientation",
+    "v": "Layout direction: vertical / horizontal"
+   },
+   {
+    "k": "variant",
+    "v": "Visual style of the option rows"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables all options"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-option> children filling the option list (value, label, description, disabled, start / end graphics)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-option",
+    "v": "Declarative radio row (value, label, description, disabled, start / end slot graphics) appended to the options prop list"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-recurrence-editor",
+  "cls": "AppRecurrenceEditor",
+  "hasStory": true,
+  "title": "Common/Recurrence Editor (RFC 5545)",
+  "category": "Common",
+  "desc": "Visual, human-friendly recurrence rule builder covering the full RFC 5545 specification (FREQ, INTERVAL, BYMONTH, BYWEEKNO, BYYEARDAY, BYMONTHDAY, BYDAY with ordinals, BYHOUR, BYMINUTE, BYSETPOS, COUNT, UNTIL, WKST) with two-way RRULE string initialization and canonical serialization.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "startDate",
+    "type": "String",
+    "attr": "start-date",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "includePrefix",
+    "type": "Boolean",
+    "attr": "include-prefix",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "allowOneTime",
+    "type": "Boolean",
+    "attr": "allow-one-time",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "hideRruleBar",
+    "type": "Boolean",
+    "attr": "hide-rrule-bar",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Initial and current RFC 5545 RRULE string (with or without RRULE: prefix)"
+   },
+   {
+    "k": "start-date",
+    "v": "Reference DTSTART (YYYY-MM-DDTHH:mm) used for live upcoming dates preview"
+   },
+   {
+    "k": "include-prefix",
+    "v": "Whether emitted RRULE includes the \"RRULE:\" prefix (default true)"
+   },
+   {
+    "k": "allow-one-time",
+    "v": "Allows selecting \"Does not repeat\" empty rule (default true)"
+   },
+   {
+    "k": "compact",
+    "v": "Reduces vertical spacing for embedding inside modals"
+   },
+   {
+    "k": "hide-rrule-bar",
+    "v": "Hides raw RRULE string bar while preserving visual editing"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-reminder-form",
+  "cls": "AppReminderForm",
+  "hasStory": true,
+  "title": "Common/Reminder Form",
+  "category": "Common",
+  "desc": "Modal form for creating and editing polymorphic reminders linked to any system entity, using recurrence templates from Master Classifiers and a flexible multi-rule notifications builder.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "reminder",
+    "type": "Reminder | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetEntityType",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "presetEntityId",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens or closes the reminder form modal dialog"
+   },
+   {
+    "k": "reminder",
+    "v": "Existing Reminder entity to edit (null creates a new reminder)"
+   },
+   {
+    "k": "preset-entity-type",
+    "v": "Preselected target entity type (company, contract, task, contact, etc.)"
+   },
+   {
+    "k": "preset-entity-id",
+    "v": "Preselected target entity identifier"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-requirement-form",
+  "cls": "AppRequirementForm",
+  "hasStory": true,
+  "title": "Overlays/RequirementForm",
+  "category": "Overlays",
+  "desc": "Canonical requirement create and edit form. The component owns the eleven fields of project code type category priority status source spec document linked knowledge articles title description and acceptance criteria, writes the requirement to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Create prefills the target project, its spec document, the next FR code, functional type Core category high priority and approved status.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "requirement",
+    "type": "ProjectRequirement | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetProjectId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "requirement",
+    "v": "Requirement being edited (null = create mode)"
+   },
+   {
+    "k": "presetProjectId",
+    "v": "Project prefilled for a context-bound opening (first project by default)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-section-card",
+  "cls": "AppSectionCard",
+  "hasStory": true,
+  "title": "Common/Section Card",
+  "category": "Common",
+  "desc": "Card container with header (title, subtitle, actions slot) and body; optional collapsible mode. The icon slot renders a leading header graphic, header-left holds content at the left of the header, actions holds controls at the right, and the default slot is the section body.",
+  "propsList": [
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "subtitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "String",
+    "attr": "aria-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'default'"
+   },
+   {
+    "name": "collapsible",
+    "type": "Boolean",
+    "attr": "collapsible",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "collapsed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "maxHeight",
+    "type": "String",
+    "attr": "max-height",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "toggle"
+  ],
+  "propsDoc": [
+   {
+    "k": "title",
+    "v": "Section caption"
+   },
+   {
+    "k": "subtitle",
+    "v": "Secondary line under the caption"
+   },
+   {
+    "k": "variant",
+    "v": "Surface style: default / plain / elevated"
+   },
+   {
+    "k": "collapsible",
+    "v": "Enables collapse toggle in the header"
+   },
+   {
+    "k": "collapsed",
+    "v": "Current collapsed state (only for collapsible sections)"
+   },
+   {
+    "k": "maxHeight",
+    "v": "CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Leading icon in the section header"
+   },
+   {
+    "k": "header-left",
+    "v": "Content at the left of the section header"
+   },
+   {
+    "k": "actions",
+    "v": "Controls at the right of the section header"
+   },
+   {
+    "k": "(default)",
+    "v": "Section body content"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Header control placed in the actions slot"
+   },
+   {
+    "k": "app-badge",
+    "v": "Count badge placed in the header-left slot"
+   },
+   {
+    "k": "app-material-icon",
+    "v": "Leading icon placed in the icon slot"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-segmented-switch",
+  "cls": "AppSegmentedSwitch",
+  "hasStory": true,
+  "title": "Common/SegmentedSwitch",
+  "category": "Common",
+  "desc": "Compact segmented control for switching between mutually exclusive views, timeframes, or filter modes. The default slot accepts declarative app-option children that append to the options prop.",
+  "propsList": [
+   {
+    "name": "options",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "dataSource",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "fullWidth",
+    "type": "Boolean",
+    "attr": "full-width",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "options",
+    "v": "Segment definitions (value + label)"
+   },
+   {
+    "k": "dataSource",
+    "v": "Data source for segments: array, promise, or function returning an array (sync or async)"
+   },
+   {
+    "k": "value",
+    "v": "Currently selected segment value"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "fullWidth",
+    "v": "Segments stretch to fill the container"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables all segments"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-option> children filling the segments (value, label, disabled, start / end graphics)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-option",
+    "v": "Declarative segment (value, label, disabled, start / end slot graphics) appended to the options prop list"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-select",
+  "cls": "AppSelect",
+  "hasStory": true,
+  "title": "Inputs/SelectDropdown",
+  "category": "Inputs",
+  "desc": "Custom dropdown select with indicator dots, keyboard navigation, and smooth popover. The default slot accepts declarative app-option children that append to the options prop.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "options",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "dataSource",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "'Select...'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "value",
+    "v": "Currently selected option value"
+   },
+   {
+    "k": "options",
+    "v": "Option definitions (value + label)"
+   },
+   {
+    "k": "dataSource",
+    "v": "Data source for options: array, promise, or function returning an array (sync or async)"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables the dropdown"
+   },
+   {
+    "k": "placeholder",
+    "v": "Text shown when nothing is selected"
+   },
+   {
+    "k": "size",
+    "v": "Control size scale sm|md|lg (30/38/44px heights, md default)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Declarative <app-option> children filling the dropdown list"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-option",
+    "v": "Declarative option row (value, label, color, start / end slot graphics) appended to the options prop list"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-split-button",
+  "cls": "AppSplitButton",
+  "hasStory": true,
+  "title": "Common/SplitButton",
+  "category": "Common",
+  "desc": "Dual-action button combining a primary action trigger with a secondary options menu. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start is a legacy alias of start. The default slot accepts declarative app-menu-item, app-menu-header, and app-menu-divider children.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "'Save'"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'primary'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "items",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   }
+  ],
+  "events": [
+   "primary-click",
+   "select"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Main button caption"
+   },
+   {
+    "k": "variant",
+    "v": "Visual style of the main button"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables both halves of the button"
+   },
+   {
+    "k": "items",
+    "v": "Menu items opened by the arrow half"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the main label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the main label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon-start",
+    "v": "Legacy alias of start"
+   },
+   {
+    "k": "(default)",
+    "v": "Optional declarative <app-menu-item>, <app-menu-header>, and <app-menu-divider> children"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-menu-header",
+    "v": "Section caption of the dropdown menu (declarative children replace the items prop)"
+   },
+   {
+    "k": "app-menu-item",
+    "v": "Menu row with label, icon, shortcut, checkable state, danger style"
+   },
+   {
+    "k": "app-menu-divider",
+    "v": "Horizontal separator between menu rows"
+   },
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the main label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-status-chip",
+  "cls": "AppStatusChip",
+  "hasStory": true,
+  "title": "Common/Status Chip",
+  "category": "Common",
+  "desc": "Domain-driven status chip: resolves label and badge variant from central STATUS_TOKENS registry.",
+  "propsList": [
+   {
+    "name": "domain",
+    "type": "String",
+    "reflect": false,
+    "def": "'task'"
+   },
+   {
+    "name": "status",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'sm'"
+   },
+   {
+    "name": "appearance",
+    "type": "String",
+    "reflect": false,
+    "def": "'soft'"
+   },
+   {
+    "name": "dot",
+    "type": "Boolean",
+    "attr": "dot",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "domain",
+    "v": "Status vocabulary: task, contract, invoice, project, ..."
+   },
+   {
+    "k": "status",
+    "v": "Status code within the domain (rendered with its label and color)"
+   },
+   {
+    "k": "size",
+    "v": "Visual density: sm / md"
+   },
+   {
+    "k": "appearance",
+    "v": "Rendering style: soft fill / outline"
+   },
+   {
+    "k": "dot",
+    "v": "Shows a leading status dot"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-switch",
+  "cls": "AppSwitch",
+  "hasStory": true,
+  "title": "Inputs/Switch",
+  "category": "Inputs",
+  "desc": "Toggle switch for boolean settings and feature flags. The default slot overrides the label property with custom label markup. Three additive hook groups extend it: size takes the canonical control scale sm|md|lg, frame draws a control box around the switch (the app-input geometry) so the switch can be placed in a modal exactly like a regular input, and field-label / field-label-style attach an external label row to that frame. All hooks default to the historical bare switch (size md, frame none, field-label-style none), so every existing consumer stays pixel-identical, and the caption inside the control behaves as before in every variant. The geometry lives in tokens — --switch-track-width (40px), --switch-track-height (22px), --switch-thumb-size (18px), --switch-thumb-offset (2px), --switch-thumb-travel (18px), --switch-caption-font-size (0.8125rem), --switch-gap (0.65rem) — and the frame box through --switch-frame-height (var(--control-height-md, 38px)), --switch-frame-bg (var(--bg-surface, #111827)), --switch-frame-border (1px solid var(--border-subtle, #334155)), --switch-frame-radius (var(--radius-md, 8px)) and --switch-frame-padding (0 0.75rem); the gap between the external label row and the control is --switch-label-gap (0.35rem, the app-input form-group gap). For frame=transparent the background and border are forced transparent regardless of the tokens.",
+  "propsList": [
+   {
+    "name": "checked",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "frame",
+    "type": "String",
+    "reflect": true,
+    "def": "'none'"
+   },
+   {
+    "name": "fieldLabel",
+    "type": "String",
+    "attr": "field-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "checked",
+    "v": "On/off state of the switch (boolean, default false)"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction (boolean, default false)"
+   },
+   {
+    "k": "label",
+    "v": "Caption inside the control, next to the track (string; the default slot overrides it with custom markup)"
+   },
+   {
+    "k": "size",
+    "v": "Control size scale (string, default md). Values: sm = 30px frame height, track 34x18px, thumb 14px, caption 0.75rem, gap 0.5rem, frame padding 0 0.6rem; md = the historical geometry — 38px frame height, track 40x22px, thumb 18px, caption 0.8125rem, gap 0.65rem, frame padding 0 0.75rem (default); lg = 44px frame height, track 46x26px, thumb 22px, caption 0.875rem, gap 0.8rem, frame padding 0 1rem. The frame heights follow the root control-height tokens (--control-height-sm/md/lg)"
+   },
+   {
+    "k": "frame",
+    "v": "Frame variant (string, reflected as an attribute). Values: none = no frame, the bare switch (default); normal = the app-input control box around the switch — height var(--control-height-md, 38px), background var(--bg-surface), border 1px var(--border-subtle), radius var(--radius-md), padding 0 0.75rem, full row width; transparent = the identical box with background and border transparent, so the switch occupies a form row like an input without visible chrome"
+   },
+   {
+    "k": "fieldLabel",
+    "v": "Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept"
+   },
+   {
+    "k": "fieldLabelStyle",
+    "v": "External label row style (string, reflected as the field-label-style attribute). Values: none = no external label row (default); normal = visible row above the control with the app-input label typography (font-size 0.8125rem, font-weight 500, color var(--text-secondary)); ghost = the same row rendered invisible (visibility hidden) so it keeps its place in the form grid"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Label text next to the switch (overrides the label property)"
+   }
+  ],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-table-column",
+  "cls": "AppTableColumn",
+  "hasStory": false,
+  "title": "",
+  "category": "",
+  "desc": "",
+  "propsList": [
+   {
+    "name": "field",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "type",
+    "type": "String",
+    "reflect": false,
+    "def": "'text'"
+   },
+   {
+    "name": "options",
+    "type": "ColumnOption[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "align",
+    "type": "String",
+    "reflect": false,
+    "def": "'left'"
+   },
+   {
+    "name": "mono",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "code",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "sortable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "yesLabel",
+    "type": "String",
+    "attr": "yes-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "noLabel",
+    "type": "String",
+    "attr": "no-label",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "cellRender",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "valueFn",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "column-change"
+  ],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-table-scroll",
+  "cls": "AppTableScroll",
+  "hasStory": true,
+  "title": "Common/TableScroll",
+  "category": "",
+  "desc": "",
+  "propsList": [
+   {
+    "name": "rows",
+    "type": "Record<string, unknown>[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "sortBy",
+    "type": "String",
+    "attr": "sort-by",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "sortDir",
+    "type": "String",
+    "attr": "sort-dir",
+    "reflect": false,
+    "def": "'asc'"
+   },
+   {
+    "name": "activeKey",
+    "type": "String",
+    "attr": "active-key",
+    "reflect": false,
+    "def": "'isActive'"
+   },
+   {
+    "name": "emptyTitle",
+    "type": "String",
+    "attr": "empty-title",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "locale",
+    "type": "String",
+    "reflect": false,
+    "def": "'ru-RU'"
+   },
+   {
+    "name": "striped",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "rows",
+    "v": "Array of row objects rendered by the table"
+   },
+   {
+    "k": "sort-by",
+    "v": "Field name currently used for sorting (arrow shown on its header)"
+   },
+   {
+    "k": "sort-dir",
+    "v": "Current sort direction: asc / desc"
+   },
+   {
+    "k": "active-key",
+    "v": "Row property holding the active flag; falsy rows render as is-inactive"
+   },
+   {
+    "k": "empty-title",
+    "v": "Title passed to the compact empty state when rows is empty"
+   },
+   {
+    "k": "locale",
+    "v": "Locale used for number formatting (t.common.locale)"
+   },
+   {
+    "k": "striped",
+    "v": "Enables alternating row background coloring (zebra striping)"
+   },
+   {
+    "k": "sort-change event",
+    "v": "Emitted with detail { field, dir } when a header sort button is clicked"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-tags-row",
+  "cls": "AppTagsRow",
+  "hasStory": true,
+  "title": "Elements/TagsRow",
+  "category": "Elements",
+  "desc": "Canonical tags row for document cards, preview bars and readonly displays. The component owns the chip list, the inline add form draft and the add button that toggles it; views pass the tags array, pick a mode (readonly shows plain chips without any editing UI, add-button shows editable chips with an add button opening the inline form, add-form shows editable chips with the form always open) and receive tag-remove / tag-add events carrying { tag } so they write to the store themselves. showEmptyLabel renders the no-tags hint for an empty list.",
+  "propsList": [
+   {
+    "name": "tags",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "showEmptyLabel",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "tag-add",
+   "tag-remove"
+  ],
+  "propsDoc": [
+   {
+    "k": "tags",
+    "v": "Tag strings rendered as chips (source of truth, never mutated by the component); combines with declarative app-option children"
+   },
+   {
+    "k": "mode",
+    "v": "readonly = plain chips; add-button = editable chips + add button opening the inline form; add-form = editable chips with the inline form always open"
+   },
+   {
+    "k": "showEmptyLabel",
+    "v": "Render the no-tags hint when the list is empty (preview bars)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-task-ai-panel",
+  "cls": "AppTaskAiPanel",
+  "hasStory": true,
+  "title": "Архитектурный стандарт кэширования L1/L2",
+  "category": "Common",
+  "desc": "Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиотеки документов, генерация структурированного описания и контекстный анализ рисков, трудоёмкости и подзадач через OpenAI-совместимый API.",
+  "propsList": [
+   {
+    "name": "task",
+    "type": "Object",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "analyses",
+    "type": "AnalysisSummary[]",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "clarifications",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "timeSummary",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "expenseSummary",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "discussionsSummary",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "task",
+    "v": "Task being analyzed"
+   },
+   {
+    "k": "analyses",
+    "v": "Saved analysis summaries, newest first; the panel renders each as app-analysis-summary"
+   },
+   {
+    "k": "clarifications",
+    "v": "Clarification Q&A items"
+   },
+   {
+    "k": "compact",
+    "v": "Reduced layout for embedding inside modals"
+   },
+   {
+    "k": "timeSummary",
+    "v": "Time-tracking summary rendered next to the analysis"
+   },
+   {
+    "k": "expenseSummary",
+    "v": "Expense summary rendered next to the analysis"
+   },
+   {
+    "k": "discussionsSummary",
+    "v": "Discussion summary rendered next to the analysis"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-task-modal",
+  "cls": "AppTaskModal",
+  "hasStory": true,
+  "title": "Overlays/TaskModal",
+  "category": "Overlays",
+  "desc": "Comprehensive task creation and editing modal dialog with subtasks, dates, and assignees.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "isOpen",
+    "v": "Opens the full task editor modal"
+   },
+   {
+    "k": "editingTask",
+    "v": "Task being edited (null = create mode)"
+   },
+   {
+    "k": "currentLang",
+    "v": "UI language of the form"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-textarea",
+  "cls": "AppTextarea",
+  "hasStory": true,
+  "title": "Inputs/Textarea",
+  "category": "Inputs",
+  "desc": "Multiline text input with character counting, custom row limits, and auto-styling.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "placeholder",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "rows",
+    "type": "Number",
+    "reflect": false,
+    "def": "3"
+   },
+   {
+    "name": "required",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "error",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "maxlength",
+    "type": "Number",
+    "reflect": false,
+    "def": "0"
+   },
+   {
+    "name": "monospace",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "input",
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Caption above the field"
+   },
+   {
+    "k": "placeholder",
+    "v": "Placeholder text shown when empty"
+   },
+   {
+    "k": "value",
+    "v": "Current textarea value"
+   },
+   {
+    "k": "rows",
+    "v": "Visible row count (initial height)"
+   },
+   {
+    "k": "required",
+    "v": "Marks the field as required"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables editing"
+   },
+   {
+    "k": "error",
+    "v": "Error message; renders the field in danger state"
+   },
+   {
+    "k": "maxlength",
+    "v": "Maximum character count (0 = unlimited); shows a counter when set"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-time-entry-form",
+  "cls": "AppTimeEntryForm",
+  "hasStory": true,
+  "title": "Overlays/TimeEntryForm",
+  "category": "Overlays",
+  "desc": "Canonical time entry create and edit form. The component owns the nine fields of project task employee date done hours spent category status billable and work description, writes the entry to the store itself on save and emits a saved event with the written record; any close dispatches a close event so the opening view resets its flag. Create prefills the target project its first task today two hours development category logged status and billable on.",
+  "propsList": [
+   {
+    "name": "open",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "entry",
+    "type": "TimeEntry | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetProjectId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetTaskId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "presetUserId",
+    "type": "string | null",
+    "reflect": false,
+    "def": "null"
+   },
+   {
+    "name": "contextTitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "close",
+   "saved"
+  ],
+  "propsDoc": [
+   {
+    "k": "open",
+    "v": "Opens the form modal (rendered through the portal)"
+   },
+   {
+    "k": "entry",
+    "v": "Entry being edited (null = create mode)"
+   },
+   {
+    "k": "presetProjectId",
+    "v": "Project prefilled for a context-bound opening (first project by default)"
+   },
+   {
+    "k": "presetTaskId",
+    "v": "Task prefilled for a context-bound opening (first task of the project by default)"
+   },
+   {
+    "k": "presetUserId",
+    "v": "Employee prefilled for a context-bound opening (first user by default)"
+   },
+   {
+    "k": "contextTitle",
+    "v": "Modal title override for context-bound openings"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-toast",
+  "cls": "AppToast",
+  "hasStory": true,
+  "title": "Feedback/ToastNotifications",
+  "category": "Feedback",
+  "desc": "Automated floating notification stack with auto-dismiss and status colors.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "notifications",
+    "v": "Notification queue rendered as stacked toasts (type, title, message)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-toggle-button",
+  "cls": "AppToggleButton",
+  "hasStory": true,
+  "title": "Common/ToggleButton",
+  "category": "Common",
+  "desc": "Stateful pressable button supporting soft and solid active variants, icons, and accessibility aria-pressed. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; icon-start / icon-end are legacy aliases of start / end.",
+  "propsList": [
+   {
+    "name": "pressed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "variant",
+    "type": "String",
+    "reflect": false,
+    "def": "'soft'"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "iconOnly",
+    "type": "Boolean",
+    "attr": "icon-only",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "pressed",
+    "v": "Pressed (toggled) visual state"
+   },
+   {
+    "k": "variant",
+    "v": "Visual style of the toggle surface"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction"
+   },
+   {
+    "k": "iconOnly",
+    "v": "Renders only the icon, no text"
+   },
+   {
+    "k": "value",
+    "v": "Group value emitted on toggle (for radio-style groups)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Button text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon-start",
+    "v": "Legacy alias of start"
+   },
+   {
+    "k": "icon-end",
+    "v": "Legacy alias of end"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the label"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "card-footer",
+  "cls": "CardFooter",
+  "hasStory": true,
+  "title": "Common/CardFooter",
+  "category": "Common",
+  "desc": "Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Actions aligned to the left edge of the card (app-button, labels, stat pills)"
+   },
+   {
+    "k": "end",
+    "v": "Actions aligned to the right edge of the card (app-button icon actions)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Action button child placed in the start / end slot (size sm matches the historical card icon-btn)"
+   }
+  ]
+ },
+ {
+  "group": "dashboard",
+  "tag": "app-chart-card",
+  "cls": "AppChartCard",
+  "hasStory": true,
+  "title": "Dashboard/ChartCard",
+  "category": "Dashboard",
+  "desc": "Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented donut charts, and area line trends. The actions slot renders controls at the right of the chart header.",
+  "propsList": [
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "subtitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "type",
+    "type": "String",
+    "reflect": false,
+    "def": "'bar'"
+   },
+   {
+    "name": "data",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "centerLabel",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "title",
+    "v": "Chart caption"
+   },
+   {
+    "k": "subtitle",
+    "v": "Secondary line under the caption"
+   },
+   {
+    "k": "type",
+    "v": "Chart type: bar / line / donut"
+   },
+   {
+    "k": "data",
+    "v": "Data points (label + value)"
+   },
+   {
+    "k": "centerLabel",
+    "v": "Caption in the middle of a donut chart"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "actions",
+    "v": "Controls at the right of the chart header"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Header control placed in the actions slot at the right of the chart header"
+   }
+  ]
+ },
+ {
+  "group": "dashboard",
+  "tag": "app-metric-card",
+  "cls": "AppMetricCard",
+  "hasStory": true,
+  "title": "Dashboard/MetricCard",
+  "category": "Dashboard",
+  "desc": "Executive KPI summary card featuring tabular numerals, trend delta, and optional inline SVG sparkline. The icon slot renders a leading graphic before the metric label.",
+  "propsList": [
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "'0'"
+   },
+   {
+    "name": "delta",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "trend",
+    "type": "String",
+    "reflect": false,
+    "def": "'neutral'"
+   },
+   {
+    "name": "subtitle",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "accentColor",
+    "type": "String",
+    "reflect": false,
+    "def": "'var(--accent-primary, #6366f1)'"
+   },
+   {
+    "name": "valueColor",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "sparkline",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "clickable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "size",
+    "type": "String",
+    "reflect": false,
+    "def": "'full'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "label",
+    "v": "Metric caption"
+   },
+   {
+    "k": "value",
+    "v": "Main value text"
+   },
+   {
+    "k": "delta",
+    "v": "Change indicator text (e.g. +12%)"
+   },
+   {
+    "k": "trend",
+    "v": "Delta color semantics: neutral / up / down"
+   },
+   {
+    "k": "subtitle",
+    "v": "Secondary line under the value"
+   },
+   {
+    "k": "accentColor",
+    "v": "Accent color of the card edge"
+   },
+   {
+    "k": "valueColor",
+    "v": "Explicit color of the value text"
+   },
+   {
+    "k": "sparkline",
+    "v": "Sparkline data points (small numbers)"
+   },
+   {
+    "k": "clickable",
+    "v": "Card emits a click event"
+   },
+   {
+    "k": "size",
+    "v": "full = with sparkline; compact = label + value only"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Leading icon before the metric label"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the leading icon slot before the metric label"
+   }
+  ]
+ },
+ {
+  "group": "dashboard",
+  "tag": "app-project-overview",
+  "cls": "AppProjectOverview",
+  "hasStory": true,
+  "title": "Dashboard/ProjectOverview",
+  "category": "Dashboard",
+  "desc": "Interactive D3.js Project Overview dashboard visualizing project progress, logged hours breakdown, and budget utilization.",
+  "propsList": [
+   {
+    "name": "projectId",
+    "type": "String",
+    "reflect": false,
+    "def": "'all'"
+   },
+   {
+    "name": "hideProjectSelector",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   },
+   {
+    "name": "locale",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "projects",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "tasks",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "timeEntries",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "expenses",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "users",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "project-change",
+   "open-project"
+  ],
+  "propsDoc": [
+   {
+    "k": "projectId",
+    "v": "Project scope (all = portfolio overview)"
+   },
+   {
+    "k": "hideProjectSelector",
+    "v": "Hides the project selector row"
+   },
+   {
+    "k": "locale",
+    "v": "Locale for number/date formatting (defaults to UI language)"
+   },
+   {
+    "k": "projects",
+    "v": "Project records"
+   },
+   {
+    "k": "tasks",
+    "v": "Task records"
+   },
+   {
+    "k": "timeEntries",
+    "v": "Time-tracking records"
+   },
+   {
+    "k": "expenses",
+    "v": "Expense records"
+   },
+   {
+    "k": "users",
+    "v": "User records (team workload)"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "dashboard",
+  "tag": "app-project-progress",
+  "cls": "AppProjectProgress",
+  "hasStory": true,
+  "title": "Dashboard/ProjectProgress",
+  "category": "Dashboard",
+  "desc": "Portfolio progress tracker displaying completion bars, task ratios, and click-to-open project filtering. The actions slot renders controls at the right of the section header.",
+  "propsList": [
+   {
+    "name": "title",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "projects",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "tasks",
+    "type": "Array",
+    "reflect": false,
+    "def": "[]"
+   },
+   {
+    "name": "lang",
+    "type": "String",
+    "reflect": false,
+    "def": "'ru'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "title",
+    "v": "Section caption"
+   },
+   {
+    "k": "projects",
+    "v": "Project records to render progress for"
+   },
+   {
+    "k": "tasks",
+    "v": "Task records used to compute progress"
+   },
+   {
+    "k": "lang",
+    "v": "UI language for labels and date formatting"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "actions",
+    "v": "Controls at the right of the section header"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Header control placed in the actions slot at the right of the section header"
+   }
+  ]
+ },
+ {
+  "group": "layout",
+  "tag": "app-header",
+  "cls": "AppHeader",
+  "hasStory": true,
+  "title": "Layout/Header",
+  "category": "Layout",
+  "desc": "Top header bar with breadcrumbs, live search, quick notification badge, and primary action CTA.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "activeView",
+    "v": "Currently active view id (drives the breadcrumb)"
+   },
+   {
+    "k": "selectedProjectId",
+    "v": "Project filter selection in the breadcrumb"
+   },
+   {
+    "k": "detailProjectId",
+    "v": "Project id shown on detail pages"
+   },
+   {
+    "k": "detailContractId",
+    "v": "Contract id shown on detail pages"
+   },
+   {
+    "k": "detailTaskId",
+    "v": "Task code shown on detail pages"
+   },
+   {
+    "k": "theme",
+    "v": "Current theme (dark / light / cyberpunk / matrix / barbie / high-contrast)"
+   },
+   {
+    "k": "currentLang",
+    "v": "UI language"
+   },
+   {
+    "k": "activityCount",
+    "v": "Badge count in the activity button"
+   },
+   {
+    "k": "searchQuery",
+    "v": "Global search text"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "layout",
+  "tag": "app-sidebar",
+  "cls": "AppSidebar",
+  "hasStory": true,
+  "title": "Layout/Sidebar",
+  "category": "Layout",
+  "desc": "Collapsible navigation sidebar composed declaratively with <sidebar-group> and <sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.",
+  "propsList": [
+   {
+    "name": "collapsed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "store.customization.sidebarCollapsed"
+   },
+   {
+    "name": "activeValue",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "groupMode",
+    "type": "String",
+    "attr": "group-mode",
+    "reflect": false,
+    "def": "store.customization.sidebarGroupMode"
+   },
+   {
+    "name": "standalone",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "collapsed",
+    "v": "Icon-only sidebar width"
+   },
+   {
+    "k": "activeValue",
+    "v": "Value of the currently active item"
+   },
+   {
+    "k": "groupMode",
+    "v": "Group behavior: single (accordion) / multiple"
+   },
+   {
+    "k": "standalone",
+    "v": "Rendered outside app-root (manages its own state)"
+   },
+   {
+    "k": "theme",
+    "v": "Current theme for icon accents"
+   },
+   {
+    "k": "currentLang",
+    "v": "UI language"
+   },
+   {
+    "k": "selectedProjectId",
+    "v": "Project filter selection shown in the projects group"
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": [
+   {
+    "k": "sidebar-group",
+    "v": "Collapsible navigation group container composing the sidebar menu"
+   },
+   {
+    "k": "sidebar-item",
+    "v": "Navigation item with icon, badge, and active state (inside a sidebar-group)"
+   }
+  ]
+ },
+ {
+  "group": "layout",
+  "tag": "sidebar-group",
+  "cls": "SidebarGroup",
+  "hasStory": true,
+  "title": "Layout/SidebarGroup",
+  "category": "Layout",
+  "desc": "Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator. The default slot accepts sidebar-item children.",
+  "propsList": [
+   {
+    "name": "groupId",
+    "type": "String",
+    "attr": "group-id",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "expanded",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "true"
+   },
+   {
+    "name": "collapsed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "hasActive",
+    "type": "Boolean",
+    "attr": "has-active",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "sidebar-group-toggle"
+  ],
+  "propsDoc": [
+   {
+    "k": "groupId",
+    "v": "Stable group id used by the sidebar controller"
+   },
+   {
+    "k": "label",
+    "v": "Group caption"
+   },
+   {
+    "k": "expanded",
+    "v": "Group is expanded (items visible)"
+   },
+   {
+    "k": "collapsed",
+    "v": "Sidebar is in icon-only mode"
+   },
+   {
+    "k": "hasActive",
+    "v": "Group contains the active item"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Sidebar items of the group"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "sidebar-item",
+    "v": "Navigation item with icon, badge, and active state rendered inside the group"
+   }
+  ]
+ },
+ {
+  "group": "layout",
+  "tag": "sidebar-item",
+  "cls": "SidebarItem",
+  "hasStory": true,
+  "title": "Layout/SidebarItem",
+  "category": "Layout",
+  "desc": "Declarative navigation item component used to compose <app-sidebar> menus with icons, badges, and collapsed mode. Canonical start / default / end slots carry leading graphics, label markup, and trailing content; icon is a legacy alias of start.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "badge",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "active",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "collapsed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "icon",
+    "type": "String",
+    "reflect": false,
+    "def": ""
+   }
+  ],
+  "events": [
+   "sidebar-select"
+  ],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "View id emitted when the item is clicked"
+   },
+   {
+    "k": "label",
+    "v": "Item caption"
+   },
+   {
+    "k": "badge",
+    "v": "Count badge on the right side"
+   },
+   {
+    "k": "active",
+    "v": "Item is the current view"
+   },
+   {
+    "k": "collapsed",
+    "v": "Sidebar is in icon-only mode"
+   },
+   {
+    "k": "disabled",
+    "v": "Item is not clickable"
+   },
+   {
+    "k": "icon",
+    "v": "Leading icon (SVG template)"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Item label markup (overrides the label property)"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "icon",
+    "v": "Legacy alias of start"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the start / end slot before or after the item label"
+   }
+  ]
+ },
+ {
+  "group": "views",
+  "tag": "app-analytics",
+  "cls": "AppAnalytics",
+  "hasStory": true,
+  "title": "Views/Analytics",
+  "category": "Views",
+  "desc": "Executive project health dashboards, KPI metrics, progress bars, and team workload table.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-auth",
+  "cls": "AppAuth",
+  "hasStory": true,
+  "title": "Views/Auth",
+  "category": "Views",
+  "desc": "Hybrid Authentication Flow view: local credentials with visibility toggle & password manager autofill, Google/Microsoft/Facebook OIDC, collapsible Enterprise SSO, account registration, recovery, and Step 2 TOTP 2FA.",
+  "propsList": [
+   {
+    "name": "preview",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "initialStep",
+    "type": "String",
+    "attr": "initial-step",
+    "reflect": false,
+    "def": "'login'"
+   }
+  ],
+  "events": [
+   "auth-success"
+  ],
+  "propsDoc": [
+   {
+    "k": "preview",
+    "v": "Runs the flow in sandboxed Storybook preview mode without overwriting the active workspace session."
+   },
+   {
+    "k": "initial-step",
+    "v": "Initial screen step to render: \"login\" | \"register\" | \"forgot\" | \"2fa\"."
+   }
+  ],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-blog",
+  "cls": "AppBlog",
+  "hasStory": true,
+  "title": "Views/Blog",
+  "category": "Views",
+  "desc": "Employee corporate blog supporting Markdown authoring with live split preview, formatting toolbar, feed & table views, in-page reader, likes, bookmarks, and team comments.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-calculation-detail",
+  "cls": "AppCalculationDetail",
+  "hasStory": true,
+  "title": "Views/Calculation Detail",
+  "category": "Views",
+  "desc": "Отдельная страница калькуляции: детализация оплачиваемых и неоплачиваемых (0 ₽) работ и расходов, стороны, статус согласования и переход к выставлению счёта.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-calculations",
+  "cls": "AppCalculations",
+  "hasStory": true,
+  "title": "Views/Calculations",
+  "category": "Views",
+  "desc": "Калькуляции: сводный реестр периодических отчётов работ и расходов по договорам, включая non-billable позиции по нулевой цене, согласование с клиентом и передачу в биллинг.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-calendar",
+  "cls": "AppCalendar",
+  "hasStory": true,
+  "title": "Views/Calendar",
+  "category": "Views",
+  "desc": "Interactive project schedule calendar supporting Month, Week, and Day views with task event badges.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-companies",
+  "cls": "AppCompanies",
+  "hasStory": true,
+  "title": "Views/Companies",
+  "category": "Views",
+  "desc": "Directory of group legal entities, tax requisites, leadership, and linked projects/contracts.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-company-detail",
+  "cls": "AppCompanyDetail",
+  "hasStory": true,
+  "title": "Views/Company Detail",
+  "category": "Views",
+  "desc": "Карточка компании: реквизиты, руководитель, штат, проекты, договоры, счета, привязанные файлы и база знаний.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-contacts",
+  "cls": "AppContacts",
+  "hasStory": true,
+  "title": "Views/Contacts",
+  "category": "Views",
+  "desc": "Unified contact persons directory across all counterparties with cards and table views, role/type filtering, quick copy, and full CRUD.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-contract-detail",
+  "cls": "AppContractDetail",
+  "hasStory": true,
+  "title": "Views/Contract Detail",
+  "category": "Views",
+  "desc": "Отдельная страница договора: финансовое исполнение, реквизиты сторон, процедура выставления счетов с автоподбором часов и расходов проекта.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-contracts",
+  "cls": "AppContracts",
+  "hasStory": true,
+  "title": "Views/Contracts",
+  "category": "Views",
+  "desc": "Contracts registry linking internal companies, counterparties, projects, owners, and budgets.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-counterparties",
+  "cls": "AppCounterparties",
+  "hasStory": true,
+  "title": "Views/Counterparties",
+  "category": "Views",
+  "desc": "CRM directory for clients, vendors, partners, and contractors with ratings and contract summaries.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-counterparty-detail",
+  "cls": "AppCounterpartyDetail",
+  "hasStory": true,
+  "title": "Views/Counterparty Detail",
+  "category": "Views",
+  "desc": "Отдельная страница контрагента: реквизиты, контакты, финансовые показатели, договоры, связанные проекты, калькуляции и счета.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-dashboard",
+  "cls": "AppDashboard",
+  "hasStory": true,
+  "title": "Views/Dashboard",
+  "category": "Views",
+  "desc": "Executive project management dashboard combining KPI metric cards, velocity/status/priority charts, project progress, and upcoming deadlines.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-data-grid",
+  "cls": "AppDataGrid",
+  "hasStory": true,
+  "title": "Виртуальная задача #${i + 1}: оптимизация модуля ${proj}",
+  "category": "Views",
+  "desc": "Universal declarative enterprise data grid composed with <app-data-grid-column>, supporting virtual row scrolling, group-first multi-column sorting, multi-level hierarchical grouping, column visibility (hidden), custom templates, drag reorder, and column resize.",
+  "propsList": [
+   {
+    "name": "rows",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "rowKey",
+    "type": "String",
+    "attr": "row-key",
+    "reflect": false,
+    "def": "'id'"
+   },
+   {
+    "name": "selectedKeys",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "selectable",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "virtual",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "emptyText",
+    "type": "String",
+    "attr": "empty-text",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "exportFilename",
+    "type": "String",
+    "attr": "export-filename",
+    "reflect": false,
+    "def": "'projectflow_export'"
+   },
+   {
+    "name": "groupBy",
+    "type": "String",
+    "attr": "group-by",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "sortBy",
+    "type": "String",
+    "attr": "sort-by",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "compact",
+    "type": "Boolean",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "hideDensitySwitch",
+    "type": "Boolean",
+    "attr": "hide-density-switch",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "row-click",
+   "selection-change"
+  ],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": [
+   {
+    "k": "app-data-grid-column",
+    "v": "Declarative column config child (field, caption, width, resizable, hidden, sortable, groupable, template, sortValue)"
+   }
+  ]
+ },
+ {
+  "group": "views",
+  "tag": "app-design-tokens",
+  "cls": "AppDesignTokens",
+  "hasStory": false,
+  "title": "",
+  "category": "",
+  "desc": "",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-directories",
+  "cls": "AppDirectories",
+  "hasStory": true,
+  "title": "Views/Directories",
+  "category": "Views",
+  "desc": "Unified master-detail workbench for administering all grouped reference directories and complex classifiers (Activity Types, Expense Types, Departments, Positions, Currencies, Countries, Units of Measure with live converter, Billing Frequencies, and custom classifiers).",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-documents",
+  "cls": "AppDocuments",
+  "hasStory": true,
+  "title": "Views/Documents Library",
+  "category": "Views",
+  "desc": "Корпоративная библиотека документов: загрузка файлов с диска, предпросмотр изображений и кода/Markdown, версионирование и фильтрация по компаниям и проектам.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-employee-detail",
+  "cls": "AppEmployeeDetail",
+  "hasStory": true,
+  "title": "Views/Employee Detail",
+  "category": "Views",
+  "desc": "Отдельная страница сотрудника: профиль, ставка, загрузка в проектах по ролям, назначенные задачи, списанное время и расходы.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-employees",
+  "cls": "AppEmployees",
+  "hasStory": true,
+  "title": "Views/Employees",
+  "category": "Views",
+  "desc": "Employee directory with card/table switch, department & company filters, rates, and workload summary.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-expense-detail",
+  "cls": "AppExpenseDetail",
+  "hasStory": true,
+  "title": "Views/Expense Detail",
+  "category": "Views",
+  "desc": "Отдельная страница расхода: сумма и рублёвый эквивалент, статус согласования, чеки и документы в библиотеке проекта, перевыставление в калькуляциях и напоминания.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-expenses",
+  "cls": "AppExpenses",
+  "hasStory": true,
+  "title": "Views/Expenses",
+  "category": "Views",
+  "desc": "Учет затрат: реестр расходов по проектам и задачам, статусы согласования, фильтрация и сравнение с бюджетом проектов.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-gantt",
+  "cls": "AppGantt",
+  "hasStory": true,
+  "title": "Views/GanttChart",
+  "category": "Views",
+  "desc": "2D virtualized timeline Gantt chart supporting thousands of tasks and multi-year schedules.",
+  "propsList": [
+   {
+    "name": "virtual",
+    "type": "Boolean",
+    "reflect": false,
+    "def": "true"
+   },
+   {
+    "name": "tasksData",
+    "type": "Array",
+    "reflect": false,
+    "def": ""
+   },
+   {
+    "name": "datasetMode",
+    "type": "String",
+    "attr": "dataset-mode",
+    "reflect": false,
+    "def": "'project'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-invoices",
+  "cls": "AppInvoices",
+  "hasStory": true,
+  "title": "Views/Invoices",
+  "category": "Views",
+  "desc": "Standalone invoices registry across all contracts with cards and table views, payment progress tracking, due-control tags, itemized editor, preview sheet, and payment registration.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-kanban",
+  "cls": "AppKanban",
+  "hasStory": true,
+  "title": "Views/KanbanBoard",
+  "category": "Views",
+  "desc": "Full-featured agile Kanban board with 5 workflow columns and drag-and-drop support.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-knowledge-base",
+  "cls": "AppKnowledgeBase",
+  "hasStory": true,
+  "title": "Views/KnowledgeBase",
+  "category": "Views",
+  "desc": "База знаний по проектам и компаниям: архитектурные решения, регламенты, разборы инцидентов, онбординг и накопление опыта с привязкой к задачам и истории правок.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-material-icons",
+  "cls": "AppMaterialIcons",
+  "hasStory": false,
+  "title": "",
+  "category": "",
+  "desc": "",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-payment-detail",
+  "cls": "AppPaymentDetail",
+  "hasStory": true,
+  "title": "Views/Payment Detail",
+  "category": "Views",
+  "desc": "Отдельная страница платежа: направление (входящий / исходящий), маршрут движения средств, банковские реквизиты компании и контрагента, закрытие счёта и связанные напоминания.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-payments",
+  "cls": "AppPayments",
+  "hasStory": true,
+  "title": "Views/Payments",
+  "category": "Views",
+  "desc": "Платежи: контроль сроков оплаты счетов, учёт частичных и полных платежей, просроченная задолженность и журнал платёжных документов.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-profile-settings",
+  "cls": "AppProfileSettings",
+  "hasStory": true,
+  "title": "Views/ProfileSettings",
+  "category": "Views",
+  "desc": "User profile settings page in the interface-settings layout: user card, language option cards, timezone select with live clock, default project and default activity view.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-project-chat",
+  "cls": "AppProjectChat",
+  "hasStory": true,
+  "title": "Views/AppProjectChat",
+  "category": "Views",
+  "desc": "Внутренний чат сотрудников с разделением по каналам внутри проектов (создание, архивирование, удаление каналов участниками проекта), привязкой к задачам, ответами, закреплением сообщений и реакциями.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-project-detail",
+  "cls": "AppProjectDetail",
+  "hasStory": true,
+  "title": "Views/Project Detail",
+  "category": "Views",
+  "desc": "Dedicated single-project page with project overview, team management grouped by project roles, task summary, and linked contracts.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-projects",
+  "cls": "AppProjects",
+  "hasStory": true,
+  "title": "Views/Projects",
+  "category": "Views",
+  "desc": "Projects portfolio list with cards/table toggle, budgets, role summary, and navigation to single project view.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-reminder-detail",
+  "cls": "AppReminderDetail",
+  "hasStory": true,
+  "title": "Views/Reminder Detail",
+  "category": "Views",
+  "desc": "Отдельная страница напоминания: связанные объекты системы, расписание RFC 5545 и следующие срабатывания, участники, прикреплённые документы и гибкие правила уведомлений.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-reminders",
+  "cls": "AppReminders",
+  "hasStory": true,
+  "title": "Views/Reminders",
+  "category": "Views",
+  "desc": "Workspace Reminders Center with polymorphic linking to any entity, directory-driven recurrence templates, snooze presets, and per-reminder notification rules.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-requirement-detail",
+  "cls": "AppRequirementDetail",
+  "hasStory": true,
+  "title": "Views/Requirement Detail",
+  "category": "Views",
+  "desc": "Страница детальной работы с отдельным требованием: редактирование критериев приёмки, трассировка к спецификации и базе знаний, покрытие задачами, AI-декомпозиция и совместное уточнение с AI.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-requirements",
+  "cls": "AppRequirements",
+  "hasStory": true,
+  "title": "Views/Requirements",
+  "category": "Views",
+  "desc": "Реестр функциональных (FR) и нефункциональных (NFR) требований по проектам с фильтрацией, пагинацией, генерацией из спецификации и AI-декомпозицией в задачи.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-settings",
+  "cls": "AppSettings",
+  "hasStory": true,
+  "title": "Views/Settings",
+  "category": "Views",
+  "desc": "Full workspace personalization hub: Dark/Light theme toggle, 5 accent color themes, density modes, and language switcher.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-storybook",
+  "cls": "AppStorybook",
+  "hasStory": true,
+  "title": "Views/Storybook",
+  "category": "Views",
+  "desc": "In-app design system explorer showcasing all Lit web components, interactive stories, and API specs.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-task-detail",
+  "cls": "AppTaskDetail",
+  "hasStory": true,
+  "title": "Views/TaskDetail",
+  "category": "Views",
+  "desc": "Dedicated Task Detail view unifying full task history: logged time entries, linked expenses, project chat discussions, audit changes, and subtasks.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-task-grid",
+  "cls": "AppTaskGrid",
+  "hasStory": false,
+  "title": "",
+  "category": "",
+  "desc": "",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-time-tracking",
+  "cls": "AppTimeTracking",
+  "hasStory": true,
+  "title": "Views/Time Tracking",
+  "category": "Views",
+  "desc": "Учет времени: быстрые отчёты по задачам, журнал трудозатрат, группировка план/факт по задачам и утверждение часов.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
+  "tag": "app-timeentry-detail",
+  "cls": "AppTimeEntryDetail",
+  "hasStory": true,
+  "title": "Views/Time Entry Detail",
+  "category": "Views",
+  "desc": "Отдельная страница записи о времени: отработанные часы, статус утверждения, биллинг, прикреплённые файлы в библиотеке проекта и включение в калькуляции.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ }
+]

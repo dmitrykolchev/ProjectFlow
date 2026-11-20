@@ -5,8 +5,9 @@
 Всего компонентов: 138 (со стори: 134).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
-После изменений кода референс актуализируется двумя командами:
-`node E:/TEMP/opencode/scan-components.js` и `node E:/TEMP/opencode/gen-reference.js`.
+**После изменений кода референс актуализируется командой `npm run docs:components`**
+(сканирование `src/components` → `docs/components.json` → рендер этого документа). Сгенерированный
+файл коммитится вместе с изменениями кода.
 
 ---
 
