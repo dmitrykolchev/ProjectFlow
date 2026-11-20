@@ -242,6 +242,7 @@ export class AppKnowledgeBase extends LitElement {
                 projectId: nextScope === 'company' || nextScope === 'general' ? 'all' : this.projectFilter,
                 companyId: nextScope === 'general' ? 'all' : this.companyFilter,
               });
+              store.setViewMode('knowledge-base', nextScope);
             }}"
           ></app-segmented-switch>
 
