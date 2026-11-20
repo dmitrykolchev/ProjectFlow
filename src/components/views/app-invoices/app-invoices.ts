@@ -146,6 +146,18 @@ export class AppInvoices extends LitElement {
     if (this.previewInvoice) {
       this.previewInvoice = this.invoices.find((i) => i.id === this.previewInvoice!.id) || null;
     }
+    // strict-mode fallback: filters pointing at records that no longer exist in the store would keep
+    // their selects on the placeholder and leave the list silently empty, so stale values fall back to
+    // "all". The check runs against the same lists the filter options are built from.
+    if (this.counterpartyFilter !== 'all' && !store.counterparties.some((c) => c.id === this.counterpartyFilter)) {
+      this.counterpartyFilter = 'all';
+    }
+    if (this.companyFilter !== 'all' && !store.companies.some((c) => c.id === this.companyFilter)) {
+      this.companyFilter = 'all';
+    }
+    if (this.contractFilter !== 'all' && !store.contracts.some((c) => c.id === this.contractFilter)) {
+      this.contractFilter = 'all';
+    }
   }
 
   private toRub(amount: number, currency: InvoiceCurrency): number {
