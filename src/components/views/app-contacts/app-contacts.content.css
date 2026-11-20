@@ -173,3 +173,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}

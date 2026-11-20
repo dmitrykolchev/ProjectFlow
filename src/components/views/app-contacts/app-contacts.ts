@@ -45,6 +45,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-cards-table/app-cards-table';
 import styles from './app-contacts.css';
+import tableContentStyles from './app-contacts.table.content.css';
 import cardContentStyles from './app-contacts.content.css';
 
 interface ContactDirectoryRow extends CounterpartyContact {
@@ -854,6 +855,7 @@ export class AppContacts extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${list as unknown as Record<string, unknown>[]}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
