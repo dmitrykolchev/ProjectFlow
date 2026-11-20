@@ -51,6 +51,16 @@ export class AppTaskGrid extends LitElement {
     this.currentLang = store.customization.language;
     this.density = store.customization.density;
     this.searchQuery = store.searchQuery;
+    // strict-mode fallback: the grid keeps its filters in the store, so a filter pointing at a record
+    // that no longer exists is cleared through the store setters — otherwise the select renders its
+    // placeholder (the value is not in the option list) while the grid stays silently empty. The
+    // mirrors below read the corrected store values.
+    if (store.selectedProjectId !== 'all' && !store.projects.some((p) => p.id === store.selectedProjectId)) {
+      store.selectProject('all');
+    }
+    if (store.filterAssignee !== 'all' && !store.users.some((u) => u.id === store.filterAssignee)) {
+      store.setFilterAssignee('all');
+    }
     this.projectFilter = store.selectedProjectId;
     this.statusFilter = store.filterStatus;
     this.priorityFilter = store.filterPriority;
