@@ -128,6 +128,15 @@ export class AppBlog extends LitElement {
     if (!store.users.some((u) => u.id === this.commentAuthorId)) {
       this.commentAuthorId = store.currentUserId || store.users[0]?.id || 'user-1';
     }
+    // strict-mode fallback: filters pointing at records that no longer exist in the store would keep
+    // their selects on the placeholder and leave the list silently empty, so stale values fall back to
+    // "all". The check runs against the same lists the filter options are built from.
+    if (this.authorFilter !== 'all' && !store.users.some((u) => u.id === this.authorFilter)) {
+      this.authorFilter = 'all';
+    }
+    if (this.projectFilter !== 'all' && !store.projects.some((p) => p.id === this.projectFilter)) {
+      this.projectFilter = 'all';
+    }
   }
 
   private currentUserId(): string {
