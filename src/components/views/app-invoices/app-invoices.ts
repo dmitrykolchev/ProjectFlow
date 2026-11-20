@@ -211,7 +211,38 @@ export class AppInvoices extends LitElement {
   ) {
     const ctrl = store.getInvoiceDueControl(inv);
     if (ctrl.state === 'draft' || ctrl.state === 'cancelled') return '';
-    const baseCls = cardClass ? 'inv-due-tag' : 'due-tag';
+
+    // Card chrome uses the canonical domain chip; the table keeps its historical pill.
+    if (cardClass) {
+      let status = 'on_track';
+      let text = t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta));
+      if (ctrl.state === 'paid') {
+        if (ctrl.daysDelta < 0) {
+          status = 'paid_late';
+          text = t.payments.paidLate.replace('{n}', String(Math.abs(ctrl.daysDelta)));
+        } else {
+          status = 'paid_on_time';
+          text = t.payments.paidOnTime;
+        }
+      } else if (ctrl.state === 'overdue') {
+        status = 'overdue';
+        text = t.payments.overdueBy.replace('{n}', String(ctrl.daysDelta));
+      } else if (ctrl.state === 'due_soon') {
+        status = 'due_soon';
+        text = ctrl.daysDelta === 0 ? t.payments.dueToday : t.payments.daysLeft.replace('{n}', String(ctrl.daysDelta));
+      }
+      return html`
+        <app-status-chip
+          domain="dueControl"
+          status="${status}"
+          label-override="${text}"
+          appearance="soft"
+          size="sm"
+        ></app-status-chip>
+      `;
+    }
+
+    const baseCls = 'due-tag';
 
     if (ctrl.state === 'paid') {
       if (ctrl.daysDelta < 0) {

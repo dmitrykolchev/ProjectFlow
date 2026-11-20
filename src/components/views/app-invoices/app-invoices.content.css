@@ -2,7 +2,6 @@
    rendered inside the app-cards-table shadow tree, so these rules live in the view file and are
    injected through the additive contentStyles hook. The card shell and grid geometry stay in
    app-cards-table. */
-
 .card-top {
   display: flex;
   align-items: flex-start;
@@ -34,15 +33,6 @@
   min-width: 0;
 }
 
-.cp-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 /* card name-links are app-link web components at size md restoring the inherited text-primary
    glyph and the parent weight through the additive link hooks (the same rule as the view
    reference) */
@@ -72,13 +62,6 @@
   align-items: flex-end;
   gap: 0.3rem;
   flex-shrink: 0;
-}
-
-.cp-notes {
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.45;
-  color: var(--text-secondary, #94a3b8);
 }
 
 .cp-meta-grid {
@@ -125,42 +108,6 @@
 .stat-pill strong {
   color: var(--text-primary, #f8fafc);
   font-family: var(--font-mono, monospace);
-}
-
-/* due-control tags, payment progress bar, notes clamp and compact footer actions row */
-.inv-due-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.28rem;
-  padding: 0.14rem 0.48rem;
-  border-radius: 4px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.inv-due-tag.overdue {
-  background: rgba(239, 68, 68, 0.14);
-  color: #ef4444;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-}
-
-.inv-due-tag.due-soon {
-  background: rgba(245, 158, 11, 0.14);
-  color: #f59e0b;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-}
-
-.inv-due-tag.on-track {
-  background: rgba(56, 189, 248, 0.1);
-  color: var(--text-secondary, #94a3b8);
-  border: 1px solid var(--border-subtle, #334155);
-}
-
-.inv-due-tag.paid-ok {
-  background: rgba(16, 185, 129, 0.14);
-  color: #10b981;
-  border: 1px solid rgba(16, 185, 129, 0.28);
 }
 
 .inv-pay-box {
@@ -236,7 +183,7 @@
   flex-wrap: wrap;
 }
 
-.mono{
+.mono {
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
 }
