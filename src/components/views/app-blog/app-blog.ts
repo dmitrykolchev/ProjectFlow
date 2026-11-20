@@ -118,7 +118,8 @@ export class AppBlog extends LitElement {
     this.currentPage = store.activeView === 'blog' ? store.activePage : 1;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
-    this.displayMode = (store.viewModeFor('blog') as 'cards' | 'table') ?? 'cards';
+    const mode = store.viewModeFor('blog');
+    this.displayMode = mode === 'table' ? 'table' : 'cards';
     if (!store.users.some((u) => u.id === this.commentAuthorId)) {
       this.commentAuthorId = store.currentUserId || store.users[0]?.id || 'user-1';
     }
@@ -172,7 +173,7 @@ export class AppBlog extends LitElement {
     return this.posts
       .filter((post) => {
         if (this.scopeFilter === 'mine' && post.authorId !== uid) return false;
-        if (this.scopeFilter === 'bookmarked' && !post.bookmarkedByUserIds.includes(uid)) return false;
+        if (this.scopeFilter === 'bookmarked' && !(post.bookmarkedByUserIds || []).includes(uid)) return false;
         if (this.scopeFilter === 'drafts' && post.status !== 'draft') return false;
         if (this.categoryFilter !== 'all' && post.category !== this.categoryFilter) return false;
         if (this.authorFilter !== 'all' && post.authorId !== this.authorFilter) return false;
@@ -183,10 +184,10 @@ export class AppBlog extends LitElement {
         const author = store.users.find((u) => u.id === post.authorId);
         const proj = post.projectId ? store.projects.find((p) => p.id === post.projectId) : null;
         const haystack = [
-          post.title,
-          post.subtitle,
-          post.content,
-          post.tags.join(' '),
+          post.title || '',
+          post.subtitle || '',
+          post.content || '',
+          (post.tags || []).join(' '),
           author?.name || '',
           author?.role || '',
           proj?.name || '',
@@ -198,8 +199,8 @@ export class AppBlog extends LitElement {
       })
       .sort((a, b) => {
         if (Boolean(a.featured) !== Boolean(b.featured)) return a.featured ? -1 : 1;
-        const aDate = a.publishedAt || a.updatedAt;
-        const bDate = b.publishedAt || b.updatedAt;
+        const aDate = a.publishedAt || a.updatedAt || '';
+        const bDate = b.publishedAt || b.updatedAt || '';
         return bDate.localeCompare(aDate);
       });
   }
@@ -378,27 +379,27 @@ export class AppBlog extends LitElement {
         <app-metric-card
           size="compact"
           label="${b.kpiTotalPosts}"
-          value="${totalCount}"
-          hint="${b.kpiPublishedHint(publishedCount)}"
+          value="${String(totalCount)}"
+          subtitle="${b.kpiPublishedHint(publishedCount)}"
         ></app-metric-card>
         <app-metric-card
           size="compact"
           label="${b.kpiAuthors}"
-          value="${uniqueAuthors}"
-          hint="${b.kpiAuthorsHint(store.users.length)}"
+          value="${String(uniqueAuthors)}"
+          subtitle="${b.kpiAuthorsHint(store.users.length)}"
         ></app-metric-card>
         <app-metric-card
           size="compact"
           label="${b.kpiDrafts}"
-          value="${draftCount}"
-          hint="${b.kpiDraftsHint}"
+          value="${String(draftCount)}"
+          subtitle="${b.kpiDraftsHint}"
           valueColor="${draftCount > 0 ? 'var(--color-warning, #f59e0b)' : 'var(--text-primary)'}"
         ></app-metric-card>
         <app-metric-card
           size="compact"
           label="${b.kpiEngagement}"
-          value="${totalReactions}"
-          hint="${b.kpiEngagementHint(totalViews)}"
+          value="${String(totalReactions)}"
+          subtitle="${b.kpiEngagementHint(totalViews)}"
           valueColor="var(--color-success, #10b981)"
         ></app-metric-card>
       </app-kpi-strip>
@@ -416,6 +417,7 @@ export class AppBlog extends LitElement {
           @change="${(e: CustomEvent<{ value: string }>) => {
             this.scopeFilter = eventValue(e) as BlogScopeFilter;
             this.currentPage = 1;
+            store.setActivePage(1, false);
           }}"
         ></app-segmented-switch>
 
@@ -427,17 +429,20 @@ export class AppBlog extends LitElement {
             { value: 'table', label: b.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            const next = eventValue(e) as 'cards' | 'table';
+            const next = eventValue(e) === 'table' ? 'table' : 'cards';
+            this.displayMode = next;
+            this.currentPage = 1;
+            store.setActivePage(1, false);
             store.setViewMode('blog', next);
           }}"
         ></app-segmented-switch>
 
         <app-toggle-button
           size="sm"
-          ?active="${this.filterVisible}"
-          @click="${() => (this.filterVisible = !this.filterVisible)}"
+          ?pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
         >
-          <span slot="icon">${iconFilter(14)}</span>
+          <span slot="icon-start">${iconFilter(14)}</span>
           <span>${t.common.filterToggle}</span>
         </app-toggle-button>
       </div>
@@ -448,45 +453,47 @@ export class AppBlog extends LitElement {
               style="--filter-search-min: 280px; --filter-search-max: 280px;"
               placeholder="${b.searchPlaceholder}"
               .searchValue="${this.localSearch}"
+              show-reset
               .filters="${[
                 {
-                  id: 'category',
-                  label: b.filterAllCategories,
-                  value: this.categoryFilter,
+                  key: 'category',
                   options: categoryOptions,
                 },
                 {
-                  id: 'author',
-                  label: b.filterAllAuthors,
-                  value: this.authorFilter,
+                  key: 'author',
                   options: authorOptions,
                 },
                 {
-                  id: 'status',
-                  label: b.filterAllStatuses,
-                  value: this.statusFilter,
+                  key: 'status',
                   options: statusOptions,
                 },
                 {
-                  id: 'project',
-                  label: b.filterAllProjects,
-                  value: this.projectFilter,
+                  key: 'project',
                   options: projectOptions,
                 },
               ]}"
-              @filter-search="${(e: CustomEvent<{ value: string }>) => {
+              .values="${{
+                category: this.categoryFilter,
+                author: this.authorFilter,
+                status: this.statusFilter,
+                project: this.projectFilter,
+              }}"
+              @search-change="${(e: CustomEvent<{ value: string }>) => {
                 this.localSearch = eventValue(e);
                 this.currentPage = 1;
+                store.setActivePage(1, false);
               }}"
-              @filter-change="${(e: CustomEvent<{ filterId: string; value: string }>) => {
-                const { filterId, value } = e.detail;
-                if (filterId === 'category') this.categoryFilter = value as 'all' | BlogCategory;
-                if (filterId === 'author') this.authorFilter = value;
-                if (filterId === 'status') this.statusFilter = value as 'all' | BlogPostStatus;
-                if (filterId === 'project') this.projectFilter = value;
+              @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+                const { key } = e.detail;
+                const value = eventValue(e);
+                if (key === 'category') this.categoryFilter = value as 'all' | BlogCategory;
+                if (key === 'author') this.authorFilter = value;
+                if (key === 'status') this.statusFilter = value as 'all' | BlogPostStatus;
+                if (key === 'project') this.projectFilter = value;
                 this.currentPage = 1;
+                store.setActivePage(1, false);
               }}"
-              @filter-reset="${() => {
+              @reset="${() => {
                 this.localSearch = '';
                 this.categoryFilter = 'all';
                 this.authorFilter = 'all';
@@ -494,6 +501,7 @@ export class AppBlog extends LitElement {
                 this.projectFilter = 'all';
                 this.scopeFilter = 'all';
                 this.currentPage = 1;
+                store.setActivePage(1, false);
               }}"
             ></app-filter-bar>
           `
@@ -521,142 +529,153 @@ export class AppBlog extends LitElement {
     const b = t.viewTexts.blog;
     const catLabels = t.blog.categories;
 
+    const cardRender = (row: Record<string, unknown>): TemplateResult => {
+      const post = row as unknown as BlogPost;
+      const author = store.users.find((u) => u.id === post.authorId);
+      const proj = post.projectId ? store.projects.find((p) => p.id === post.projectId) : null;
+      const isLiked = (post.likedByUserIds || []).includes(uid);
+      const isBookmarked = (post.bookmarkedByUserIds || []).includes(uid);
+      const readMin = store.estimateReadingTimeMin(post.content);
+      const displayDate = this.formatDate(post.publishedAt || post.updatedAt);
+
+      return html`
+        <div class="blog-card-top">
+          <button
+            type="button"
+            class="blog-author-btn"
+            title="${b.openAuthorBtn}"
+            @click="${() => author && store.openEmployeeDetail(author.id)}"
+          >
+            <app-avatar
+              size="sm"
+              initials="${this.getInitials(author?.name || '?')}"
+              src="${author?.avatar || ''}"
+            ></app-avatar>
+            <div class="blog-author-meta">
+              <span class="blog-author-name">${author?.name || post.authorId}</span>
+              <span class="blog-author-role">${author?.role || author?.department || ''}</span>
+            </div>
+          </button>
+
+          <div class="blog-status-cluster">
+            ${post.featured
+              ? html`<span class="blog-featured-mark">${iconPin(13)} ${b.featuredLabel}</span>`
+              : ''}
+            <app-status-chip domain="blog" status="${post.status}" size="sm"></app-status-chip>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          class="blog-title-btn"
+          @click="${() => store.selectBlogPost(post.id)}"
+        >
+          ${post.title}
+        </button>
+
+        ${post.subtitle ? html`<p class="blog-excerpt">${post.subtitle}</p>` : ''}
+
+        <div class="blog-meta-line">
+          <span class="blog-meta-cat">${catLabels[post.category] || post.category}</span>
+          ${proj
+            ? html`
+                <span>·</span>
+                <button
+                  type="button"
+                  class="blog-meta-link"
+                  @click="${() => store.openProjectDetail(proj.id)}"
+                >
+                  ${proj.key} · ${proj.name}
+                </button>
+              `
+            : ''}
+          <span>·</span>
+          <span>${b.readTimeMinutes(readMin)}</span>
+          <span>·</span>
+          <span>${displayDate}</span>
+        </div>
+
+        ${(post.tags || []).length > 0
+          ? html`<div class="blog-tags-line">${post.tags.map((tag) => `#${tag}`).join(' · ')}</div>`
+          : ''}
+
+        <card-footer>
+          <div slot="start" class="blog-footer-stats">
+            <button
+              type="button"
+              class="blog-stat-btn ${isLiked ? 'is-liked' : ''}"
+              title="${b.likeBtn}"
+              @click="${() => store.toggleLikeBlogPost(post.id)}"
+            >
+              ${iconHeart(13)}
+              <span>${(post.likedByUserIds || []).length}</span>
+            </button>
+            <button
+              type="button"
+              class="blog-stat-btn"
+              @click="${() => store.selectBlogPost(post.id)}"
+            >
+              ${iconMessageSquare(13)}
+              <span>${post.comments?.length || 0}</span>
+            </button>
+            <button
+              type="button"
+              class="blog-stat-btn ${isBookmarked ? 'is-bookmarked' : ''}"
+              title="${isBookmarked ? b.bookmarkedBtn : b.bookmarkBtn}"
+              @click="${() => store.toggleBookmarkBlogPost(post.id)}"
+            >
+              ${iconBookmark(13, isBookmarked)}
+            </button>
+            <span class="blog-stat-muted">
+              ${iconEye(13)}
+              <span>${post.viewsCount || 0}</span>
+            </span>
+          </div>
+
+          <div slot="end" class="blog-footer-stats">
+            <app-button
+              size="sm"
+              variant="icon"
+              title="${t.common.edit}"
+              @click="${() => this.openEditModal(post)}"
+            >
+              <span slot="start">${iconEdit(14)}</span>
+            </app-button>
+            <app-button
+              size="sm"
+              variant="icon"
+              action="delete"
+              title="${t.common.delete}"
+              @click="${() => (this.deletingPost = post)}"
+            >
+              <span slot="start">${iconTrash(14)}</span>
+            </app-button>
+            <app-link size="sm" @click="${() => store.selectBlogPost(post.id)}">
+              <span>${b.readArticleBtn}</span>
+              <span slot="end">${iconArrowUpRight(13)}</span>
+            </app-link>
+          </div>
+        </card-footer>
+      `;
+    };
+
     return html`
       <app-cards-table
-        .data="${posts}"
-        .pageSize="${this.cardPageSize}"
-        .currentPage="${this.currentPage}"
+        .rows="${posts as unknown as Record<string, unknown>[]}"
+        .cardRender="${cardRender}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        empty-title="${b.emptyTitle}"
         @page-change="${(e: CustomEvent<{ page: number }>) => {
           this.currentPage = e.detail.page;
           store.setActivePage(e.detail.page);
+          this.scrollTop = 0;
         }}"
-        .cardRender="${(post: BlogPost): TemplateResult => {
-          const author = store.users.find((u) => u.id === post.authorId);
-          const proj = post.projectId ? store.projects.find((p) => p.id === post.projectId) : null;
-          const isLiked = post.likedByUserIds.includes(uid);
-          const isBookmarked = post.bookmarkedByUserIds.includes(uid);
-          const readMin = store.estimateReadingTimeMin(post.content);
-          const displayDate = this.formatDate(post.publishedAt || post.updatedAt);
-
-          return html`
-            <div class="blog-card-top">
-              <button
-                type="button"
-                class="blog-author-btn"
-                title="${b.openAuthorBtn}"
-                @click="${() => author && store.openEmployeeDetail(author.id)}"
-              >
-                <app-avatar
-                  size="sm"
-                  initials="${this.getInitials(author?.name || '?')}"
-                  src="${author?.avatar || ''}"
-                ></app-avatar>
-                <div class="blog-author-meta">
-                  <span class="blog-author-name">${author?.name || post.authorId}</span>
-                  <span class="blog-author-role">${author?.role || author?.department || ''}</span>
-                </div>
-              </button>
-
-              <div class="blog-status-cluster">
-                ${post.featured
-                  ? html`<span class="blog-featured-mark">${iconPin(13)} ${b.featuredLabel}</span>`
-                  : ''}
-                <app-status-chip domain="blog" status="${post.status}" size="sm"></app-status-chip>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              class="blog-title-btn"
-              @click="${() => store.selectBlogPost(post.id)}"
-            >
-              ${post.title}
-            </button>
-
-            ${post.subtitle ? html`<p class="blog-excerpt">${post.subtitle}</p>` : ''}
-
-            <div class="blog-meta-line">
-              <span class="blog-meta-cat">${catLabels[post.category] || post.category}</span>
-              ${proj
-                ? html`
-                    <span>·</span>
-                    <button
-                      type="button"
-                      class="blog-meta-link"
-                      @click="${() => store.openProjectDetail(proj.id)}"
-                    >
-                      ${proj.key} · ${proj.name}
-                    </button>
-                  `
-                : ''}
-              <span>·</span>
-              <span>${b.readTimeMinutes(readMin)}</span>
-              <span>·</span>
-              <span>${displayDate}</span>
-            </div>
-
-            ${post.tags.length > 0
-              ? html`<div class="blog-tags-line">${post.tags.map((tag) => `#${tag}`).join(' · ')}</div>`
-              : ''}
-
-            <card-footer>
-              <div slot="start" class="blog-footer-stats">
-                <button
-                  type="button"
-                  class="blog-stat-btn ${isLiked ? 'is-liked' : ''}"
-                  title="${b.likeBtn}"
-                  @click="${() => store.toggleLikeBlogPost(post.id)}"
-                >
-                  ${iconHeart(13)}
-                  <span>${post.likedByUserIds.length}</span>
-                </button>
-                <button
-                  type="button"
-                  class="blog-stat-btn"
-                  @click="${() => store.selectBlogPost(post.id)}"
-                >
-                  ${iconMessageSquare(13)}
-                  <span>${post.comments?.length || 0}</span>
-                </button>
-                <button
-                  type="button"
-                  class="blog-stat-btn ${isBookmarked ? 'is-bookmarked' : ''}"
-                  title="${isBookmarked ? b.bookmarkedBtn : b.bookmarkBtn}"
-                  @click="${() => store.toggleBookmarkBlogPost(post.id)}"
-                >
-                  ${iconBookmark(13, isBookmarked)}
-                </button>
-                <span class="blog-stat-muted">
-                  ${iconEye(13)}
-                  <span>${post.viewsCount || 0}</span>
-                </span>
-              </div>
-
-              <div slot="end" class="blog-footer-stats">
-                <app-button
-                  size="sm"
-                  variant="icon"
-                  title="${t.common.edit}"
-                  @click="${() => this.openEditModal(post)}"
-                >
-                  <span slot="icon">${iconEdit(14)}</span>
-                </app-button>
-                <app-button
-                  size="sm"
-                  variant="icon"
-                  action="delete"
-                  title="${t.common.delete}"
-                  @click="${() => (this.deletingPost = post)}"
-                >
-                  <span slot="icon">${iconTrash(14)}</span>
-                </app-button>
-                <app-link size="sm" @click="${() => store.selectBlogPost(post.id)}">
-                  <span>${b.readArticleBtn}</span>
-                  <span slot="end">${iconArrowUpRight(13)}</span>
-                </app-link>
-              </div>
-            </card-footer>
-          `;
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1;
+          store.setCardGridPageSize(e.detail.pageSize);
+          store.setActivePage(1, false);
         }}"
       ></app-cards-table>
     `;
@@ -666,153 +685,191 @@ export class AppBlog extends LitElement {
     const b = t.viewTexts.blog;
     const catLabels = t.blog.categories;
 
+    const articleCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      return html`
+        <div>
+          <button
+            type="button"
+            class="blog-tbl-title-btn"
+            @click="${() => store.selectBlogPost(post.id)}"
+          >
+            ${post.featured ? html`${iconPin(12)} ` : ''}${post.title}
+          </button>
+          ${post.subtitle ? html`<div class="blog-tbl-sub">${post.subtitle}</div>` : ''}
+          ${(post.tags || []).length > 0
+            ? html`<div class="td-title-sub">${post.tags.map((tag) => `#${tag}`).join(' · ')}</div>`
+            : ''}
+        </div>
+      `;
+    };
+
+    const authorCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      const author = store.users.find((u) => u.id === post.authorId);
+      return html`
+        <div class="user-cell">
+          <app-avatar
+            size="sm"
+            initials="${this.getInitials(author?.name || '?')}"
+            src="${author?.avatar || ''}"
+          ></app-avatar>
+          <div>
+            <app-link
+              size="sm"
+              @click="${() => author && store.openEmployeeDetail(author.id)}"
+            >
+              ${author?.name || post.authorId}
+            </app-link>
+            <div class="td-title-sub">${author?.role || ''}</div>
+          </div>
+        </div>
+      `;
+    };
+
+    const categoryCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      const proj = post.projectId ? store.projects.find((p) => p.id === post.projectId) : null;
+      return html`
+        <div>
+          <div class="td-title-main">${catLabels[post.category] || post.category}</div>
+          ${proj ? html`<div class="td-title-sub">${proj.key} · ${proj.name}</div>` : ''}
+        </div>
+      `;
+    };
+
+    const metricsCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      const readMin = store.estimateReadingTimeMin(post.content);
+      const isLiked = (post.likedByUserIds || []).includes(uid);
+      return html`
+        <div class="blog-tbl-metrics">
+          <span>${b.readTimeMinutes(readMin)}</span>
+          <span class="blog-tbl-metric ${isLiked ? 'is-liked' : ''}">
+            ${iconHeart(13)} ${(post.likedByUserIds || []).length}
+          </span>
+          <span class="blog-tbl-metric">
+            ${iconMessageSquare(13)} ${post.comments?.length || 0}
+          </span>
+          <span class="blog-tbl-metric">
+            ${iconEye(13)} ${post.viewsCount || 0}
+          </span>
+        </div>
+      `;
+    };
+
+    const updatedCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      return html`<span class="dates-cell">${this.formatDate(post.publishedAt || post.updatedAt)}</span>`;
+    };
+
+    const statusCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      return html`<app-status-chip domain="blog" status="${post.status}" size="sm"></app-status-chip>`;
+    };
+
+    const actionsCell = (row: Record<string, unknown>) => {
+      const post = row as unknown as BlogPost;
+      const isBookmarked = (post.bookmarkedByUserIds || []).includes(uid);
+      return html`
+        <div class="actions-row">
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${b.readArticleBtn}"
+            @click="${() => store.selectBlogPost(post.id)}"
+          >
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${isBookmarked ? b.bookmarkedBtn : b.bookmarkBtn}"
+            @click="${() => store.toggleBookmarkBlogPost(post.id)}"
+          >
+            <span slot="start">${iconBookmark(14, isBookmarked)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(post)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingPost = post)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </div>
+      `;
+    };
+
     return html`
       <div class="table-card">
         <app-data-table
-          .data="${posts}"
-          .pageSize="${this.tablePageSize}"
-          .currentPage="${this.currentPage}"
+          .rows="${posts as unknown as Record<string, unknown>[]}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          empty-title="${b.emptyTitle}"
           @page-change="${(e: CustomEvent<{ page: number }>) => {
             this.currentPage = e.detail.page;
             store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1;
+            store.setTablePageSize(e.detail.pageSize);
+            store.setActivePage(1, false);
           }}"
         >
           <app-table-column
-            header="${b.thArticle}"
-            .cellRender="${(post: BlogPost) => html`
-              <div>
-                <button
-                  type="button"
-                  class="blog-tbl-title-btn"
-                  @click="${() => store.selectBlogPost(post.id)}"
-                >
-                  ${post.featured ? html`${iconPin(12)} ` : ''}${post.title}
-                </button>
-                ${post.subtitle ? html`<div class="blog-tbl-sub">${post.subtitle}</div>` : ''}
-                ${post.tags.length > 0
-                  ? html`<div class="td-title-sub">${post.tags.map((tag) => `#${tag}`).join(' · ')}</div>`
-                  : ''}
-              </div>
-            `}"
+            field="title"
+            label="${b.thArticle}"
+            .cellRender="${articleCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${b.thAuthor}"
-            .cellRender="${(post: BlogPost) => {
-              const author = store.users.find((u) => u.id === post.authorId);
-              return html`
-                <div class="user-cell">
-                  <app-avatar
-                    size="sm"
-                    initials="${this.getInitials(author?.name || '?')}"
-                    src="${author?.avatar || ''}"
-                  ></app-avatar>
-                  <div>
-                    <app-link
-                      size="sm"
-                      @click="${() => author && store.openEmployeeDetail(author.id)}"
-                    >
-                      ${author?.name || post.authorId}
-                    </app-link>
-                    <div class="td-title-sub">${author?.role || ''}</div>
-                  </div>
-                </div>
-              `;
-            }}"
+            field="authorId"
+            label="${b.thAuthor}"
+            .cellRender="${authorCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${b.thCategory}"
-            .cellRender="${(post: BlogPost) => {
-              const proj = post.projectId ? store.projects.find((p) => p.id === post.projectId) : null;
-              return html`
-                <div>
-                  <div class="td-title-main">${catLabels[post.category] || post.category}</div>
-                  ${proj ? html`<div class="td-title-sub">${proj.key} · ${proj.name}</div>` : ''}
-                </div>
-              `;
-            }}"
+            field="category"
+            label="${b.thCategory}"
+            .cellRender="${categoryCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${b.thMetrics}"
-            .cellRender="${(post: BlogPost) => {
-              const readMin = store.estimateReadingTimeMin(post.content);
-              const isLiked = post.likedByUserIds.includes(uid);
-              return html`
-                <div class="blog-tbl-metrics">
-                  <span>${b.readTimeMinutes(readMin)}</span>
-                  <span class="blog-tbl-metric ${isLiked ? 'is-liked' : ''}">
-                    ${iconHeart(13)} ${post.likedByUserIds.length}
-                  </span>
-                  <span class="blog-tbl-metric">
-                    ${iconMessageSquare(13)} ${post.comments?.length || 0}
-                  </span>
-                  <span class="blog-tbl-metric">
-                    ${iconEye(13)} ${post.viewsCount || 0}
-                  </span>
-                </div>
-              `;
-            }}"
+            field="viewsCount"
+            label="${b.thMetrics}"
+            .cellRender="${metricsCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${b.thUpdated}"
-            .cellRender="${(post: BlogPost) => html`
-              <span class="dates-cell">${this.formatDate(post.publishedAt || post.updatedAt)}</span>
-            `}"
+            field="updatedAt"
+            label="${b.thUpdated}"
+            .cellRender="${updatedCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${b.thStatus}"
-            .cellRender="${(post: BlogPost) => html`
-              <app-status-chip domain="blog" status="${post.status}" size="sm"></app-status-chip>
-            `}"
+            field="status"
+            label="${b.thStatus}"
+            .cellRender="${statusCell}"
           ></app-table-column>
 
           <app-table-column
-            header="${t.common.actions}"
+            field=""
+            label="${t.common.actions}"
             align="right"
-            .cellRender="${(post: BlogPost) => {
-              const isBookmarked = post.bookmarkedByUserIds.includes(uid);
-              return html`
-                <div class="actions-row">
-                  <app-button
-                    size="sm"
-                    variant="icon"
-                    title="${b.readArticleBtn}"
-                    @click="${() => store.selectBlogPost(post.id)}"
-                  >
-                    <span slot="icon">${iconEye(14)}</span>
-                  </app-button>
-                  <app-button
-                    size="sm"
-                    variant="icon"
-                    title="${isBookmarked ? b.bookmarkedBtn : b.bookmarkBtn}"
-                    @click="${() => store.toggleBookmarkBlogPost(post.id)}"
-                  >
-                    <span slot="icon">${iconBookmark(14, isBookmarked)}</span>
-                  </app-button>
-                  <app-button
-                    size="sm"
-                    variant="icon"
-                    title="${t.common.edit}"
-                    @click="${() => this.openEditModal(post)}"
-                  >
-                    <span slot="icon">${iconEdit(14)}</span>
-                  </app-button>
-                  <app-button
-                    size="sm"
-                    variant="icon"
-                    action="delete"
-                    title="${t.common.delete}"
-                    @click="${() => (this.deletingPost = post)}"
-                  >
-                    <span slot="icon">${iconTrash(14)}</span>
-                  </app-button>
-                </div>
-              `;
-            }}"
+            .cellRender="${actionsCell}"
           ></app-table-column>
         </app-data-table>
       </div>
@@ -884,7 +941,7 @@ export class AppBlog extends LitElement {
               title="${t.common.delete}"
               @click="${() => (this.deletingPost = post)}"
             >
-              <span slot="icon">${iconTrash(15)}</span>
+              <span slot="start">${iconTrash(15)}</span>
             </app-button>
           </div>
         </div>
@@ -1015,7 +1072,7 @@ export class AppBlog extends LitElement {
                               title="${t.common.delete}"
                               @click="${() => (this.deletingComment = { postId: post.id, comment: c })}"
                             >
-                              <span slot="icon">${iconTrash(13)}</span>
+                              <span slot="start">${iconTrash(13)}</span>
                             </app-button>
                           </div>
                         </div>
@@ -1361,15 +1418,15 @@ export class AppBlog extends LitElement {
 
     return html`
       <app-confirm-dialog
-        ?open="${Boolean(this.deletingPost)}"
+        .open="${Boolean(this.deletingPost)}"
         variant="danger"
         title="${dlgPost.title}"
-        actionLabel="${t.viewTexts.confirmSectionLabels.action}"
-        resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         action="${this.deletingPost ? dlgPost.action(this.deletingPost.title) : ''}"
         result="${dlgPost.result}"
-        confirmLabel="${t.common.delete}"
-        cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        .cancelLabel="${t.common.cancel}"
         @confirm="${() => {
           if (this.deletingPost) store.deleteBlogPost(this.deletingPost.id);
           this.deletingPost = null;
@@ -1378,15 +1435,15 @@ export class AppBlog extends LitElement {
       ></app-confirm-dialog>
 
       <app-confirm-dialog
-        ?open="${Boolean(this.deletingComment)}"
+        .open="${Boolean(this.deletingComment)}"
         variant="danger"
         title="${dlgComment.title}"
-        actionLabel="${t.viewTexts.confirmSectionLabels.action}"
-        resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
         action="${dlgComment.action}"
         result="${dlgComment.result}"
-        confirmLabel="${t.common.delete}"
-        cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        .cancelLabel="${t.common.cancel}"
         @confirm="${() => {
           if (this.deletingComment) {
             store.deleteBlogComment(
