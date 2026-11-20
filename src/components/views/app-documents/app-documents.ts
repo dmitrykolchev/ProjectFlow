@@ -65,6 +65,8 @@ import '../../common/app-textarea/app-textarea';
 import '../../dashboard/app-metric-card/app-metric-card';
 import { eventValue } from '../../common/event-value';
 import styles from './app-documents.css';
+import tableContentStyles from './app-documents.table.content.css';
+import cardContentStyles from './app-documents.content.css';
 
 @customElement('app-documents')
 export class AppDocuments extends LitElement {
@@ -541,6 +543,7 @@ export class AppDocuments extends LitElement {
 
     return html`
       <app-cards-table
+        .contentStyles="${cardContentStyles}"
         .rows="${filtered}"
         .cardRender="${docCard}"
         page-size="${this.cardPageSize}"
@@ -607,6 +610,7 @@ export class AppDocuments extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${filtered}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"

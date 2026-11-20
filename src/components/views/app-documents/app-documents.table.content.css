@@ -1,0 +1,124 @@
+/* app-documents table content styles. The markup is produced by this view's cellRender callbacks and
+   rendered inside the app-data-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The table shell (header, body, footer,
+   pagination) stays in app-data-table. */
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Documents library reference rich cells: file-type tile (extension square with the
+   image/code palette variants), the title/filename column, the table doc cell row,
+   the name-links through app-link hooks, and the row actions container. */
+.file-type-tile{
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  flex-shrink: 0;
+}
+
+.file-type-tile.is-image{
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--color-success, #10b981);
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+.file-type-tile.is-code{
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.ext-text{
+  font-family: var(--font-mono, monospace);
+  font-size: 0.56rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.doc-titles{
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.doc-title-btn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-primary, #f8fafc);
+  font: inherit;
+  font-size: 0.96rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 150ms ease;
+}
+
+.doc-title-btn:hover{
+  color: var(--accent-primary, #6366f1);
+}
+
+.doc-filename{
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-doc-cell{
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 220px;
+}
+
+/* table name-links are app-link web components at size md restoring the historical block
+   filling label through the additive link hooks */
+.link-btn{
+  --link-host-display: block;
+  --link-width: 100%;
+  --link-padding: 0;
+  --link-font-weight: 600;
+  --link-line-height: 1.5;
+  --link-white-space: nowrap;
+  --link-overflow: hidden;
+  --link-text-overflow: ellipsis;
+  --control-font-md: 0.76rem;
+}
+
+.card-actions app-button{
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.card-actions app-button:not([action]){
+  --icon-btn-hover-border: var(--border-subtle, #334155);
+}

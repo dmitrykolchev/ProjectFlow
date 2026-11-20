@@ -1,0 +1,156 @@
+/* app-documents card content styles. The markup is produced by this view's cardRender template and
+   rendered inside the app-cards-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The card shell and grid geometry stay in
+   app-cards-table. */
+
+.meta-item{
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.meta-item is the
+   projects column layout, so the reminders row item is .rem-meta-item. */
+.rem-card-head{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.meta-label{
+  font-size: 0.6875rem;
+  color: var(--text-muted, #64748b);
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Counterparties cards reference content classes (rendered in the component's shadow tree
+   through cardRender): the head row with the identity block (40px accent icon tile, the name
+   link and the legal line) and the stacked status chips, the muted notes paragraph, the
+   two-column meta panel on the subtle surface with uppercase labels (the cp- prefixed names
+   keep the counterparties geometry distinct from the projects meta panel), the amber rating
+   stars, and the footer stats row with mono strong counts. */
+.card-top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* Documents cards reference content classes (rendered in the component's shadow tree through
+   cardRender): the identity block with the 42px file type tile (accent, image-green and code-amber
+   variants with the mono uppercase extension text), the title column (the borderless two-line
+   clamped title button opening the preview, the mono muted filename ellipsis line), the two-line
+   clamped description), and the footer uploader slot with the name fallback ellipsis. The card
+   meta panel is the canonical app-meta-grid component, so no local meta classes are needed. */
+.doc-identity{
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.file-type-tile{
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.14));
+  color: var(--accent-primary, #6366f1);
+  border: 1px solid var(--accent-border, rgba(99, 102, 241, 0.3));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  flex-shrink: 0;
+}
+
+.file-type-tile.is-image{
+  background: rgba(16, 185, 129, 0.14);
+  color: var(--color-success, #10b981);
+  border-color: rgba(16, 185, 129, 0.32);
+}
+
+.file-type-tile.is-code{
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.ext-text{
+  font-family: var(--font-mono, monospace);
+  font-size: 0.56rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.doc-titles{
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.doc-title-btn{
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-primary, #f8fafc);
+  font: inherit;
+  font-size: 0.96rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 150ms ease;
+}
+
+.doc-title-btn:hover{
+  color: var(--accent-primary, #6366f1);
+}
+
+.doc-filename{
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-desc{
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-secondary, #94a3b8);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.uploader-info{
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary, #94a3b8);
+}
+
+.uploader-name{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
