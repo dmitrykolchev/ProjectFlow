@@ -76,12 +76,6 @@ app-cards-table {
   grid-column: span 2;
 }
 
-.form-error {
-  font-size: 0.8rem;
-  color: var(--color-danger, #ef4444);
-  font-weight: 500;
-}
-
 /* Primary-contact switch: the canonical app-switch with frame="normal" and field-label-style="ghost"
    (the component draws the label row, the control box geometry and the form-group gap). The view only
    retunes the frame background to the historical switch-box fill. */
