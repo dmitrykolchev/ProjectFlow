@@ -39,6 +39,7 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
   'requirement-detail': 'requirement-detail',
   'project-chat': 'project-chat',
   'knowledge-base': 'knowledge-base',
+  blog: 'blog',
   documents: 'documents',
   'task-detail': 'task-detail',
   'time-tracking': 'time-tracking',

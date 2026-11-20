@@ -8,6 +8,10 @@ import {
   AuthSession,
   BackgroundPreset,
   BankRequisite,
+  BlogCategory,
+  BlogComment,
+  BlogPost,
+  BlogPostStatus,
   Calculation,
   CalculationStatus,
   Company,
@@ -57,6 +61,7 @@ import {
   parseLocalDateTime as parseRfcLocalDateTime,
 } from '../domain/rfc5545';
 import {
+  initialBlogPosts,
   initialCalculations,
   initialChatChannels,
   initialChatMessages,
@@ -96,6 +101,7 @@ const STORAGE_KEY_EXPENSES = 'projectflow_expenses_v1';
 const STORAGE_KEY_CHAT = 'projectflow_chat_v1';
 const STORAGE_KEY_CHAT_CHANNELS = 'projectflow_chat_channels_v1';
 const STORAGE_KEY_KNOWLEDGE = 'projectflow_knowledge_v1';
+const STORAGE_KEY_BLOG = 'projectflow_blog_v1';
 const STORAGE_KEY_DOCUMENTS = 'projectflow_documents_v1';
 const STORAGE_KEY_REQUIREMENTS = 'projectflow_requirements_v1';
 const STORAGE_KEY_DIRECTORIES = 'projectflow_directories_v1';
@@ -308,6 +314,7 @@ export class AppStore {
   public chatMessages: ProjectChatMessage[] = [];
   public chatChannels: ProjectChatChannel[] = [];
   public knowledgeArticles: KnowledgeArticle[] = [];
+  public blogPosts: BlogPost[] = [];
   public documents: DocumentItem[] = [];
   public requirements: ProjectRequirement[] = [];
   public directories: DirectoryDefinition[] = [];
@@ -321,6 +328,7 @@ export class AppStore {
   public detailEmployeeId: string = '';
   public detailTaskId: string = '';
   public detailKnowledgeId: string = '';
+  public detailBlogPostId: string = '';
   public detailRequirementId: string = '';
   public detailCalculationId: string = '';
   public detailTimeEntryId: string = '';
@@ -673,6 +681,17 @@ export class AppStore {
         ? JSON.parse(storedKnowledge)
         : [...initialKnowledgeArticles];
 
+      const storedBlog = localStorage.getItem(STORAGE_KEY_BLOG);
+      this.blogPosts = storedBlog
+        ? JSON.parse(storedBlog)
+        : initialBlogPosts.map((p) => ({
+            ...p,
+            tags: [...p.tags],
+            likedByUserIds: [...p.likedByUserIds],
+            bookmarkedByUserIds: [...p.bookmarkedByUserIds],
+            comments: p.comments.map((c) => ({ ...c })),
+          }));
+
       const storedDocuments = localStorage.getItem(STORAGE_KEY_DOCUMENTS);
       if (storedDocuments) {
         const parsedDocs: DocumentItem[] = JSON.parse(storedDocuments);
@@ -890,6 +909,13 @@ export class AppStore {
       this.chatChannels = initialChatChannels.map((c) => ({ ...c }));
       this.chatMessages = initialChatMessages.map((m) => ({ ...m }));
       this.knowledgeArticles = [...initialKnowledgeArticles];
+      this.blogPosts = initialBlogPosts.map((p) => ({
+        ...p,
+        tags: [...p.tags],
+        likedByUserIds: [...p.likedByUserIds],
+        bookmarkedByUserIds: [...p.bookmarkedByUserIds],
+        comments: p.comments.map((c) => ({ ...c })),
+      }));
       this.documents = [...initialDocuments];
       this.directories = createInitialDirectories();
       this.reminders = [...initialReminders];
@@ -1004,6 +1030,14 @@ export class AppStore {
   private saveKnowledgeArticles(): void {
     try {
       localStorage.setItem(STORAGE_KEY_KNOWLEDGE, JSON.stringify(this.knowledgeArticles));
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  private saveBlogPosts(): void {
+    try {
+      localStorage.setItem(STORAGE_KEY_BLOG, JSON.stringify(this.blogPosts));
     } catch (e) {
       console.error(e);
     }
@@ -1468,6 +1502,7 @@ export class AppStore {
       view === 'requirement-detail' ||
       view === 'project-chat' ||
       view === 'knowledge-base' ||
+      view === 'blog' ||
       view === 'documents' ||
       view === 'reminders' ||
       view === 'reminder-detail' ||
@@ -1619,6 +1654,8 @@ export class AppStore {
         return this.detailReminderId || undefined;
       case 'project-chat':
         return this.chatProjectId || undefined;
+      case 'blog':
+        return this.detailBlogPostId || undefined;
       case 'directories':
         return this.activeDirectoryId || undefined;
       default:
@@ -1690,6 +1727,9 @@ export class AppStore {
       if (this.chatProjectId) {
         this.resolveActiveChannelForProject(this.chatProjectId);
       }
+    } else if (view === 'blog') {
+      if (id && this.blogPosts.some((p) => p.id === id)) this.detailBlogPostId = id;
+      else this.detailBlogPostId = '';
     } else if (view === 'directories') {
       if (id && this.directories.some((d) => d.id === id)) this.activeDirectoryId = id;
       else if (!this.activeDirectoryId) this.activeDirectoryId = this.directories[0]?.id || '';
@@ -1857,6 +1897,19 @@ export class AppStore {
       }
     }
     this.setActiveView('knowledge-base');
+  }
+
+  public openBlogPost(postId?: string): void {
+    if (postId && this.blogPosts.some((p) => p.id === postId)) {
+      this.detailBlogPostId = postId;
+      this.blogPosts = this.blogPosts.map((p) =>
+        p.id === postId ? { ...p, viewsCount: (p.viewsCount || 0) + 1 } : p
+      );
+      this.saveBlogPosts();
+    } else {
+      this.detailBlogPostId = '';
+    }
+    this.setActiveView('blog');
   }
 
   public setCurrentUser(userId: string): void {
@@ -3898,6 +3951,209 @@ export class AppStore {
     this.notify();
   }
 
+  // --- Employee Blog CRUD ---
+  public estimateReadingTimeMin(markdown: string): number {
+    const words = (markdown || '')
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/[#>*`~\-\[\]()|]/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean).length;
+    return Math.max(1, Math.ceil(words / 180));
+  }
+
+  public selectBlogPost(id: string): void {
+    if (!id) {
+      if (!this.detailBlogPostId) return;
+      this.detailBlogPostId = '';
+      this.notify();
+      this.syncHistory(false);
+      return;
+    }
+    if (!this.blogPosts.some((p) => p.id === id)) return;
+    if (this.detailBlogPostId !== id) {
+      this.detailBlogPostId = id;
+      this.blogPosts = this.blogPosts.map((p) =>
+        p.id === id ? { ...p, viewsCount: (p.viewsCount || 0) + 1 } : p
+      );
+      this.saveBlogPosts();
+    }
+    this.notify();
+    this.syncHistory(false);
+  }
+
+  public addBlogPost(data: {
+    title: string;
+    subtitle: string;
+    content: string;
+    authorId?: string;
+    category: BlogCategory;
+    status: BlogPostStatus;
+    tags: string[];
+    projectId?: string;
+    featured?: boolean;
+  }): BlogPost {
+    const now = new Date().toISOString();
+    const authorId = data.authorId || this.currentUserId || this.users[0]?.id || 'user-1';
+    const post: BlogPost = {
+      id: `blog-${Date.now().toString().slice(-6)}`,
+      title: data.title.trim(),
+      subtitle: data.subtitle.trim(),
+      content: data.content,
+      authorId,
+      category: data.category,
+      status: data.status,
+      tags: data.tags,
+      projectId: data.projectId || undefined,
+      featured: Boolean(data.featured),
+      likedByUserIds: [],
+      bookmarkedByUserIds: [],
+      viewsCount: 1,
+      comments: [],
+      publishedAt: data.status === 'published' ? now : undefined,
+      createdAt: now,
+      updatedAt: now,
+    };
+    this.blogPosts = [post, ...this.blogPosts];
+    this.detailBlogPostId = post.id;
+    this.saveBlogPosts();
+    this.logActivity(
+      'create',
+      'blog',
+      post.title,
+      this.texts().blog.addedActivity(post.category),
+      post.id
+    );
+    this.addNotification('success', this.texts().blog.title, this.texts().blog.publishedMessage(post.title));
+    this.notify();
+    if (this.activeView === 'blog') this.syncHistory(false);
+    return post;
+  }
+
+  public updateBlogPost(updated: BlogPost): void {
+    const now = new Date().toISOString();
+    const prev = this.blogPosts.find((p) => p.id === updated.id);
+    const publishedAt =
+      updated.status === 'published'
+        ? updated.publishedAt || prev?.publishedAt || now
+        : updated.publishedAt;
+    const next: BlogPost = {
+      ...updated,
+      publishedAt,
+      updatedAt: now,
+    };
+    this.blogPosts = this.blogPosts.map((p) => (p.id === next.id ? next : p));
+    this.saveBlogPosts();
+    this.logActivity('update', 'blog', next.title, this.texts().blog.updatedActivity, next.id);
+    this.addNotification('info', this.texts().blog.title, this.texts().blog.updatedMessage(next.title));
+    this.notify();
+  }
+
+  public deleteBlogPost(id: string): void {
+    const target = this.blogPosts.find((p) => p.id === id);
+    if (!target) return;
+    this.blogPosts = this.blogPosts.filter((p) => p.id !== id);
+    const clearedDetail = this.detailBlogPostId === id;
+    if (clearedDetail) {
+      this.detailBlogPostId = '';
+    }
+    this.saveBlogPosts();
+    this.logActivity('delete', 'blog', target.title, this.texts().blog.deletedActivity, target.id);
+    this.addNotification('warning', this.texts().titleDeleted, this.texts().blog.deletedMessage(target.title));
+    this.notify();
+    if (clearedDetail && this.activeView === 'blog') this.syncHistory(false);
+  }
+
+  public toggleLikeBlogPost(id: string, userId?: string): void {
+    const uid = userId || this.currentUserId || this.users[0]?.id || 'user-1';
+    this.blogPosts = this.blogPosts.map((p) => {
+      if (p.id !== id) return p;
+      const exists = p.likedByUserIds.includes(uid);
+      return {
+        ...p,
+        likedByUserIds: exists
+          ? p.likedByUserIds.filter((u) => u !== uid)
+          : [...p.likedByUserIds, uid],
+      };
+    });
+    this.saveBlogPosts();
+    this.notify();
+  }
+
+  public toggleBookmarkBlogPost(id: string, userId?: string): void {
+    const uid = userId || this.currentUserId || this.users[0]?.id || 'user-1';
+    this.blogPosts = this.blogPosts.map((p) => {
+      if (p.id !== id) return p;
+      const exists = p.bookmarkedByUserIds.includes(uid);
+      return {
+        ...p,
+        bookmarkedByUserIds: exists
+          ? p.bookmarkedByUserIds.filter((u) => u !== uid)
+          : [...p.bookmarkedByUserIds, uid],
+      };
+    });
+    this.saveBlogPosts();
+    this.notify();
+  }
+
+  public toggleFeatureBlogPost(id: string): void {
+    const target = this.blogPosts.find((p) => p.id === id);
+    if (!target) return;
+    const nextFeatured = !target.featured;
+    this.blogPosts = this.blogPosts.map((p) =>
+      p.id === id ? { ...p, featured: nextFeatured } : p
+    );
+    this.saveBlogPosts();
+    this.logActivity(
+      'update',
+      'blog',
+      target.title,
+      nextFeatured ? this.texts().blog.featuredOn : this.texts().blog.featuredOff,
+      target.id
+    );
+    this.notify();
+  }
+
+  public addBlogComment(postId: string, text: string, authorId?: string): BlogComment | null {
+    const trimmed = text.trim();
+    if (!trimmed) return null;
+    const target = this.blogPosts.find((p) => p.id === postId);
+    if (!target) return null;
+    const uid = authorId || this.currentUserId || this.users[0]?.id || 'user-1';
+    const authorName = this.users.find((u) => u.id === uid)?.name || uid;
+    const comment: BlogComment = {
+      id: `bcom-${Date.now().toString().slice(-6)}`,
+      postId,
+      authorId: uid,
+      text: trimmed,
+      createdAt: new Date().toISOString(),
+    };
+    this.blogPosts = this.blogPosts.map((p) =>
+      p.id === postId ? { ...p, comments: [...(p.comments || []), comment] } : p
+    );
+    this.saveBlogPosts();
+    this.logActivity(
+      'update',
+      'blog',
+      target.title,
+      this.texts().blog.commentAddedActivity(authorName),
+      target.id
+    );
+    this.addNotification('success', this.texts().blog.title, this.texts().blog.commentAddedMessage);
+    this.notify();
+    return comment;
+  }
+
+  public deleteBlogComment(postId: string, commentId: string): void {
+    this.blogPosts = this.blogPosts.map((p) =>
+      p.id === postId
+        ? { ...p, comments: (p.comments || []).filter((c) => c.id !== commentId) }
+        : p
+    );
+    this.saveBlogPosts();
+    this.notify();
+  }
+
   // --- Documents Library CRUD ---
   public setDocumentFilters(filters: {
     scope?: 'all' | DocumentScope;
@@ -5058,6 +5314,8 @@ export class AppStore {
         return this.requirements.some((r) => r.id === targetId);
       case 'knowledge':
         return this.knowledgeArticles.some((k) => k.id === targetId);
+      case 'blog':
+        return this.blogPosts.some((p) => p.id === targetId);
       case 'document':
         return this.documents.some((d) => d.id === targetId);
       case 'invoice':
@@ -5128,6 +5386,9 @@ export class AppStore {
         break;
       case 'knowledge':
         this.openKnowledgeBase({ articleId: targetId });
+        break;
+      case 'blog':
+        this.openBlogPost(targetId);
         break;
       case 'document':
         this.openDocuments();

@@ -94,6 +94,8 @@ export class AppMarkdown extends LitElement {
               return html`<h2>${renderInlineMarkdown(block.text || '')}</h2>`;
             case 'h3':
               return html`<h3>${renderInlineMarkdown(block.text || '')}</h3>`;
+            case 'hr':
+              return html`<hr class="prose-hr" />`;
             case 'quote':
               return html`<div class="prose-quote">${renderInlineMarkdown(block.text || '')}</div>`;
             case 'ul':

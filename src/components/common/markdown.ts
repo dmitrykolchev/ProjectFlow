@@ -8,7 +8,7 @@ export interface MarkdownCell {
 }
 
 export interface MarkdownBlock {
-  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table' | 'math';
+  type: 'h1' | 'h2' | 'h3' | 'p' | 'quote' | 'ul' | 'ol' | 'checklist' | 'code' | 'table' | 'math' | 'hr';
   text?: string;
   lang?: string;
   items?: { text: string; checked?: boolean; line?: number }[];
@@ -124,6 +124,12 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       continue;
     }
 
+    if (/^(-{3,}|\*{3,}|_{3,})$/.test(trimmed)) {
+      blocks.push({ type: 'hr' });
+      i += 1;
+      continue;
+    }
+
     if (trimmed.startsWith('### ')) {
       blocks.push({ type: 'h3', text: trimmed.slice(4) });
       i += 1;
@@ -210,6 +216,7 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
       !lines[i].trim().startsWith('|') &&
       !lines[i].trim().startsWith('$$') &&
       !lines[i].trim().startsWith('\\[') &&
+      !/^(-{3,}|\*{3,}|_{3,})$/.test(lines[i].trim()) &&
       !/^[-*] /.test(lines[i].trim()) &&
       !/^\d+\. /.test(lines[i].trim())
     ) {
@@ -222,15 +229,48 @@ export function parseMarkdownBlocks(raw: string): MarkdownBlock[] {
   return blocks;
 }
 
-/** Inline markdown: `code` spans, **bold** runs and `$...$` / `\( ... \)` math become elements. */
+function isSafeHref(url: string): boolean {
+  const trimmed = url.trim();
+  return (
+    trimmed.startsWith('https://') ||
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('/#/') ||
+    trimmed.startsWith('#/')
+  );
+}
+
+/** Inline markdown: `code` spans, **bold**, *italic*, ~~strike~~, [links](url), and `$...$` / `\( ... \)` math. */
 export function renderInlineMarkdown(text: string): (string | TemplateResult)[] {
-  const tokens = text.split(/(`[^`]+`|\*\*[^*]+\*\*|\$[^$\n]+\$|\\\([^)]*\\\))/g);
+  const tokens = text.split(
+    /(`[^`]+`|\[[^\]\n]+\]\([^)\s\n]+\)|\*\*[^*]+\*\*|~~[^~]+~~|\*[^*\n]+\*|\$[^$\n]+\$|\\\([^)]*\\\))/g
+  );
   return tokens.map((part) => {
     if (part.startsWith('`') && part.endsWith('`') && part.length >= 2) {
       return html`<code>${part.slice(1, -1)}</code>`;
     }
+    const linkMatch = /^\[([^\]\n]+)\]\(([^)\s\n]+)\)$/.exec(part);
+    if (linkMatch) {
+      const [, label, href] = linkMatch;
+      if (isSafeHref(href)) {
+        const isExternal = href.startsWith('http://') || href.startsWith('https://');
+        return html`<a
+          class="prose-link"
+          href="${href}"
+          target="${isExternal ? '_blank' : '_self'}"
+          rel="${isExternal ? 'noopener noreferrer' : ''}"
+          >${label}</a
+        >`;
+      }
+      return label;
+    }
     if (part.startsWith('**') && part.endsWith('**') && part.length >= 4) {
       return html`<strong>${part.slice(2, -2)}</strong>`;
+    }
+    if (part.startsWith('~~') && part.endsWith('~~') && part.length >= 4) {
+      return html`<del>${part.slice(2, -2)}</del>`;
+    }
+    if (part.startsWith('*') && part.endsWith('*') && part.length >= 3) {
+      return html`<em>${part.slice(1, -1)}</em>`;
     }
     if (part.startsWith('$') && part.endsWith('$') && part.length >= 3) {
       return renderMath(part.slice(1, -1), false);

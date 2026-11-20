@@ -119,6 +119,7 @@ import requirementsMeta from '../app-requirements/app-requirements.story';
 import requirementDetailMeta from '../app-requirement-detail/app-requirement-detail.story';
 import projectChatMeta from '../app-project-chat/app-project-chat.story';
 import knowledgeBaseMeta from '../app-knowledge-base/app-knowledge-base.story';
+import blogMeta from '../app-blog/app-blog.story';
 import documentsMeta from '../app-documents/app-documents.story';
 import companiesMeta from '../app-companies/app-companies.story';
 import companyDetailMeta from '../app-company-detail/app-company-detail.story';
@@ -253,6 +254,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   requirementDetailMeta,
   projectChatMeta,
   knowledgeBaseMeta,
+  blogMeta,
   documentsMeta,
   companiesMeta,
   companyDetailMeta,

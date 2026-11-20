@@ -498,6 +498,7 @@ export type ActiveView =
   | 'requirement-detail'
   | 'project-chat'
   | 'knowledge-base'
+  | 'blog'
   | 'documents'
   | 'task-detail'
   | 'time-tracking'
@@ -532,6 +533,7 @@ export interface ActivityLogItem {
     | 'expense'
     | 'chat'
     | 'knowledge'
+    | 'blog'
     | 'document'
     | 'requirement'
     | 'settings';
@@ -892,5 +894,41 @@ export interface Reminder {
   updatedAt: string;
 }
 
+export type BlogCategory =
+  | 'engineering'
+  | 'product'
+  | 'design'
+  | 'culture'
+  | 'release'
+  | 'tutorial'
+  | 'opinion';
 
+export type BlogPostStatus = 'draft' | 'published' | 'archived';
 
+export interface BlogComment {
+  id: string;
+  postId: string;
+  authorId: string;
+  text: string;
+  createdAt: string;
+}
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  subtitle: string;
+  content: string;
+  authorId: string;
+  category: BlogCategory;
+  status: BlogPostStatus;
+  tags: string[];
+  projectId?: string;
+  featured?: boolean;
+  likedByUserIds: string[];
+  bookmarkedByUserIds: string[];
+  viewsCount: number;
+  comments: BlogComment[];
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}

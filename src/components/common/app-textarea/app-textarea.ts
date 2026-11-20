@@ -12,8 +12,39 @@ export class AppTextarea extends LitElement {
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) error: string = '';
   @property({ type: Number }) maxlength: number = 0;
+  @property({ type: Boolean }) monospace: boolean = false;
 
   static styles = styles;
+
+  /**
+   * Wrap current selection (or insert placeholder) with prefix/suffix, update value,
+   * and emit a bubbling input event so parent bindings stay synced.
+   */
+  public wrapSelection(prefix: string, suffix = '', placeholder = ''): string {
+    const textarea = this.shadowRoot?.querySelector('textarea');
+    const cur = this.value || '';
+    if (!textarea) {
+      const next = cur + (cur && !cur.endsWith('\n') ? '\n' : '') + prefix + placeholder + suffix;
+      this.value = next;
+      this.dispatchEvent(new CustomEvent('input', { detail: { value: next }, bubbles: true, composed: true }));
+      return next;
+    }
+    const start = textarea.selectionStart ?? cur.length;
+    const end = textarea.selectionEnd ?? cur.length;
+    const selected = cur.slice(start, end) || placeholder;
+    const inserted = `${prefix}${selected}${suffix}`;
+    const next = `${cur.slice(0, start)}${inserted}${cur.slice(end)}`;
+    this.value = next;
+    textarea.value = next;
+    this.dispatchEvent(new CustomEvent('input', { detail: { value: next }, bubbles: true, composed: true }));
+    const caretStart = start + prefix.length;
+    const caretEnd = caretStart + selected.length;
+    requestAnimationFrame(() => {
+      textarea.focus();
+      textarea.setSelectionRange(caretStart, caretEnd);
+    });
+    return next;
+  }
 
   render() {
     return html`
@@ -38,7 +69,7 @@ export class AppTextarea extends LitElement {
           ?required="${this.required}"
           ?disabled="${this.disabled}"
           maxlength="${this.maxlength > 0 ? this.maxlength : undefined}"
-          class="${this.error ? 'has-error' : ''}"
+          class="${this.error ? 'has-error' : ''} ${this.monospace ? 'is-mono' : ''}"
           @input="${this.handleInput}"
           @change="${this.handleChange}"
         ></textarea>

@@ -57,6 +57,32 @@ textarea {
   outline: none;
   transition: border-color var(--transition-fast, 150ms ease),
               box-shadow var(--transition-fast, 150ms ease);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+textarea.is-mono {
+  font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  font-size: 0.825rem;
+  line-height: 1.55;
+}
+
+textarea::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 textarea:focus {

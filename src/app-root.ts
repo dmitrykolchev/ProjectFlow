@@ -31,6 +31,7 @@ import {
   iconBell,
   iconUser,
   iconReceipt,
+  iconFeather,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
@@ -62,6 +63,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
     import('./components/views/app-requirement-detail/app-requirement-detail'),
   'project-chat': () => import('./components/views/app-project-chat/app-project-chat'),
   'knowledge-base': () => import('./components/views/app-knowledge-base/app-knowledge-base'),
+  blog: () => import('./components/views/app-blog/app-blog'),
   documents: () => import('./components/views/app-documents/app-documents'),
   reminders: () => import('./components/views/app-reminders/app-reminders'),
   'reminder-detail': () => import('./components/views/app-reminder-detail/app-reminder-detail'),
@@ -103,6 +105,7 @@ export class AppRoot extends LitElement {
   @state() private requirementsCount = store.requirements.length;
   @state() private chatCount = store.chatMessages.length;
   @state() private knowledgeCount = store.knowledgeArticles.length;
+  @state() private blogCount = store.blogPosts.length;
   @state() private documentCount = store.documents.length;
   @state() private dueRemindersCount = store.getDueRemindersCount();
   @state() private isAuthenticated = store.isAuthenticated;
@@ -133,6 +136,7 @@ export class AppRoot extends LitElement {
     this.requirementsCount = store.requirements.length;
     this.chatCount = store.chatMessages.length;
     this.knowledgeCount = store.knowledgeArticles.length;
+    this.blogCount = store.blogPosts.length;
     this.documentCount = store.documents.length;
     this.dueRemindersCount = store.getDueRemindersCount();
     this.isAuthenticated = store.isAuthenticated;
@@ -322,6 +326,13 @@ export class AppRoot extends LitElement {
           ></sidebar-item>
 
           <sidebar-item
+            value="blog"
+            label="${t.navigation.blog}"
+            badge="${String(this.blogCount)}"
+            .icon="${iconFeather()}"
+          ></sidebar-item>
+
+          <sidebar-item
             value="documents"
             label="${t.navigation.documents}"
             badge="${String(this.documentCount)}"
@@ -495,6 +506,8 @@ export class AppRoot extends LitElement {
         return html`<app-project-chat></app-project-chat>`;
       case 'knowledge-base':
         return html`<app-knowledge-base></app-knowledge-base>`;
+      case 'blog':
+        return html`<app-blog></app-blog>`;
       case 'documents':
         return html`<app-documents></app-documents>`;
       case 'reminders':

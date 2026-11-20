@@ -53,6 +53,34 @@ slot {
   font-weight: 600;
 }
 
+.prose em {
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+.prose del {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.prose-link {
+  color: var(--accent-primary, #6366f1);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+}
+
+.prose-link:hover {
+  color: var(--text-primary);
+}
+
+.prose-hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle, #1e293b);
+  margin: 0.4rem 0;
+  width: 100%;
+}
+
 .prose code {
   font-family: var(--font-mono, 'JetBrains Mono', monospace);
   font-size: 0.83em;

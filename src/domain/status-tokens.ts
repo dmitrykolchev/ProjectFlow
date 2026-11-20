@@ -22,7 +22,8 @@ export type StatusDomain =
   | 'requirement'
   | 'requirementPriority'
   | 'reminder'
-  | 'reminderPriority';
+  | 'reminderPriority'
+  | 'blog';
 
 export interface StatusToken {
   /** Badge variant used by app-status-chip / app-badge. */
@@ -150,6 +151,11 @@ export const STATUS_TOKENS: Record<StatusDomain, Record<string, StatusToken>> = 
     medium: { variant: 'info', i18nPath: ['priority'] },
     high: { variant: 'warning', i18nPath: ['priority'] },
     urgent: { variant: 'danger', i18nPath: ['priority'] },
+  },
+  blog: {
+    draft: { variant: 'default', i18nPath: ['blog', 'statuses'] },
+    published: { variant: 'success', i18nPath: ['blog', 'statuses'] },
+    archived: { variant: 'default', i18nPath: ['blog', 'statuses'] },
   },
 };
 
