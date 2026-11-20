@@ -176,6 +176,7 @@ export class AppEmployees extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
             placeholder="${t.viewTexts.employees.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[
               { key: 'company', options: companyOptions },
               { key: 'status', options: statusOptions },
@@ -188,6 +189,12 @@ export class AppEmployees extends LitElement {
             @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
               if (e.detail.key === 'company') this.companyFilter = eventValue(e);
               if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | EmployeeStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.companyFilter = 'all';
+              this.statusFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
