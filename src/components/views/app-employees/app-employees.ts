@@ -69,6 +69,11 @@ export class AppEmployees extends LitElement {
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
     this.displayMode = (store.viewModeFor('employees') as 'cards' | 'table') ?? 'cards';
+    // strict-mode fallback: a company filter pointing at a company that no longer exists would
+    // keep the select on its placeholder and the list empty, so the stale value falls back to "all"
+    if (this.companyFilter !== 'all' && !store.companies.some((c) => c.id === this.companyFilter)) {
+      this.companyFilter = 'all';
+    }
   }
 
   private getStatusLabel(
