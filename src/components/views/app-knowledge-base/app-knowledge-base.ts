@@ -33,6 +33,8 @@ import '../../common/app-textarea/app-textarea';
 import '../../common/app-empty-state/app-empty-state';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-filter-bar/app-filter-bar';
+import '../../common/app-kpi-strip/app-kpi-strip';
+import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-knowledge-base.css';
 import { eventValue } from '../../common/event-value';
 
@@ -214,28 +216,15 @@ export class AppKnowledgeBase extends LitElement {
           </app-button>
         </app-page-header>
 
-        <!-- 4-Cell Summary Strip -->
-        <div class="kpi-strip">
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.totalArticles}</span>
-            <span class="kpi-value">${totalCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.verifiedArticles}</span>
-            <span class="kpi-value" style="color: var(--color-success, #10b981);">${verifiedCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.lessonsAndPostmortems}</span>
-            <span class="kpi-value">${lessonsCount}</span>
-          </div>
-          <div class="kpi-cell">
-            <span class="kpi-label">${kb.coverageLabel}</span>
-            <span class="kpi-value">${coveredProjects} / ${coveredCompanies}</span>
-          </div>
-        </div>
-
         <!-- Canonical skeleton order: page header, KPI strip, display-mode switcher with the filter
              toggle, filter bar, data representation -->
+        <app-kpi-strip columns="4">
+          <app-metric-card size="compact" label="${kb.totalArticles}" value="${totalCount}"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.verifiedArticles}" value="${verifiedCount}" valueColor="var(--color-success, #10b981)"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.lessonsAndPostmortems}" value="${lessonsCount}"></app-metric-card>
+          <app-metric-card size="compact" label="${kb.coverageLabel}" value="${coveredProjects} / ${coveredCompanies}"></app-metric-card>
+        </app-kpi-strip>
+
         <div class="mode-row">
           <app-segmented-switch
             size="sm"

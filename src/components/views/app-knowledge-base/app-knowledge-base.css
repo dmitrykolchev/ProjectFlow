@@ -49,42 +49,8 @@
 }
 
 /* Header */
-/* 4-Cell Unboxed KPI Strip */
-.kpi-strip {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  border: 1px solid var(--border-subtle, #1e293b);
-  border-radius: 10px;
-  background: var(--bg-surface, #111827);
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.kpi-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 0.8rem 1.1rem;
-  border-right: 1px solid var(--border-subtle, #1e293b);
-}
-
-.kpi-cell:last-child {
-  border-right: none;
-}
-
-.kpi-label {
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.kpi-value {
-  font-size: 1.3rem;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  color: var(--text-primary);
-}
+/* KPI: the canonical app-kpi-strip with compact app-metric-card cells (the component owns the
+   strip shell, so no local kpi classes are needed here). */
 
 /* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
    representation. The mode row holds the scope app-segmented-switch (size="sm") and the filter
@@ -527,19 +493,6 @@
 @container (max-width: 1024px) {
   .kb-shell {
     padding: 1rem 1.15rem;
-  }
-
-  .kpi-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .kpi-cell:nth-child(2) {
-    border-right: none;
-  }
-
-  .kpi-cell:nth-child(1),
-  .kpi-cell:nth-child(2) {
-    border-bottom: 1px solid var(--border-subtle, #1e293b);
   }
 
   .kb-workspace {
