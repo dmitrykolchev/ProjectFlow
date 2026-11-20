@@ -49,6 +49,7 @@ import type { AppTextarea } from '../../common/app-textarea/app-textarea';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-blog.css';
+import tableContentStyles from './app-blog.table.content.css';
 import cardContentStyles from './app-blog.content.css';
 
 type BlogScopeFilter = 'all' | 'mine' | 'bookmarked' | 'drafts';
@@ -815,6 +816,7 @@ export class AppBlog extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${posts as unknown as Record<string, unknown>[]}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
