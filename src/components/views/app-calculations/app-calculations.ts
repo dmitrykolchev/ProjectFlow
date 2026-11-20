@@ -463,19 +463,16 @@ export class AppCalculations extends LitElement {
           >
             <span slot="start">${iconEdit(14)}</span>
           </app-button>
-          ${ctr
-            ? html`
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.contractDetail.openContract}"
-                  @click="${() => store.openContractDetail(ctr.id)}"
-                >
-                  <span slot="start">${iconChevronRight(15)}</span>
-                </app-button>
-              `
-            : ''}
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.calculations.openCalculation}"
+            @click="${() => store.openCalculationDetail(calc.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
           <app-button
             slot="end"
             action="delete"
@@ -676,18 +673,15 @@ export class AppCalculations extends LitElement {
           >
             <span slot="start">${iconEdit(14)}</span>
           </app-button>
-          ${ctr
-            ? html`
-                <app-button
-                  size="sm"
-                  variant="icon"
-                  title="${t.contractDetail.openContract}"
-                  @click="${() => store.openContractDetail(ctr.id)}"
-                >
-                  <span slot="start">${iconChevronRight(15)}</span>
-                </app-button>
-              `
-            : ''}
+          <app-button
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.calculations.openCalculation}"
+            @click="${() => store.openCalculationDetail(calc.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
           <app-button
             action="delete"
             size="sm"
