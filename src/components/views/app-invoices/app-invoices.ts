@@ -715,18 +715,15 @@ export class AppInvoices extends LitElement {
                   </app-button>
                 `
               : ''}
-            ${ctr
-              ? html`
-                  <app-button
-                    size="sm"
-                    variant="icon"
-                    title="${t.viewTexts.invoices.openContract}"
-                    @click="${() => store.openContractDetail(ctr.id)}"
-                  >
-                    <span slot="start">${iconChevronRight(14)}</span>
-                  </app-button>
-                `
-              : ''}
+            <app-button
+              size="sm"
+              variant="icon"
+              action="view"
+              title="${t.viewTexts.invoices.openInvoice}"
+              @click="${() => store.openInvoiceDetail(inv.id)}"
+            >
+              <span slot="start">${iconChevronRight(14)}</span>
+            </app-button>
             <app-button
               size="sm"
               variant="icon"
@@ -1015,18 +1012,15 @@ export class AppInvoices extends LitElement {
           >
             <span slot="start">${iconEdit(14)}</span>
           </app-button>
-          ${ctr
-            ? html`
-                <app-button
-                  size="sm"
-                  variant="icon"
-                  title="${t.viewTexts.invoices.openContract}"
-                  @click="${() => store.openContractDetail(ctr.id)}"
-                >
-                  <span slot="start">${iconChevronRight(14)}</span>
-                </app-button>
-              `
-            : ''}
+          <app-button
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.viewTexts.invoices.openInvoice}"
+            @click="${() => store.openInvoiceDetail(inv.id)}"
+          >
+            <span slot="start">${iconChevronRight(14)}</span>
+          </app-button>
           <app-button
             action="delete"
             size="sm"
