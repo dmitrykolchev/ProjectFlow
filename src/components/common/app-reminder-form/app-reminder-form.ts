@@ -776,7 +776,6 @@ export class AppReminderForm extends LitElement {
               ></app-select>
 
               <app-switch
-                class="switch-row"
                 size="md"
                 frame="transparent"
                 field-label-style="ghost"
