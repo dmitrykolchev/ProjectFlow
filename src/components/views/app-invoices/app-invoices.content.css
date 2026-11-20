@@ -235,3 +235,8 @@
   gap: 0.3rem;
   flex-wrap: wrap;
 }
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}

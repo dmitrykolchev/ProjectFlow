@@ -55,6 +55,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-cards-table/app-cards-table';
 import styles from './app-invoices.css';
+import tableContentStyles from './app-invoices.table.content.css';
 import cardContentStyles from './app-invoices.content.css';
 
 const HOURLY_RATE_RUB = 3200;
@@ -999,6 +1000,7 @@ export class AppInvoices extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${filtered as unknown as Record<string, unknown>[]}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
