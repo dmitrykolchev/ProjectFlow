@@ -331,6 +331,7 @@ export class AppStore {
   public detailBlogPostId: string = '';
   public detailRequirementId: string = '';
   public detailCalculationId: string = '';
+  public detailInvoiceId: string = '';
   public detailTimeEntryId: string = '';
   public detailExpenseId: string = '';
   public detailPaymentId: string = '';
@@ -1528,6 +1529,7 @@ export class AppStore {
       view === 'contracts' ||
       view === 'contract-detail' ||
       view === 'invoices' ||
+      view === 'invoice-detail' ||
       view === 'calculations' ||
       view === 'calculation-detail' ||
       view === 'payments' ||
@@ -1644,6 +1646,8 @@ export class AppStore {
         return this.detailRequirementId || undefined;
       case 'calculation-detail':
         return this.detailCalculationId || undefined;
+      case 'invoice-detail':
+        return this.detailInvoiceId || undefined;
       case 'timeentry-detail':
         return this.detailTimeEntryId || undefined;
       case 'expense-detail':
@@ -1709,6 +1713,9 @@ export class AppStore {
     } else if (view === 'calculation-detail') {
       if (id && this.calculations.some((c) => c.id === id)) this.detailCalculationId = id;
       else view = 'calculations';
+    } else if (view === 'invoice-detail') {
+      if (id && this.invoices.some((i) => i.id === id)) this.detailInvoiceId = id;
+      else view = 'invoices';
     } else if (view === 'timeentry-detail') {
       if (id && this.timeEntries.some((t) => t.id === id)) this.detailTimeEntryId = id;
       else view = 'time-tracking';
@@ -1932,6 +1939,11 @@ export class AppStore {
   public openCalculationDetail(calculationId: string): void {
     this.detailCalculationId = calculationId;
     this.setActiveView('calculation-detail');
+  }
+
+  public openInvoiceDetail(invoiceId: string): void {
+    this.detailInvoiceId = invoiceId;
+    this.setActiveView('invoice-detail');
   }
 
   public openTimeEntryDetail(timeEntryId: string): void {
@@ -5395,8 +5407,8 @@ export class AppStore {
         break;
       case 'invoice': {
         const inv = this.invoices.find((i) => i.id === targetId);
-        if (inv) this.openContractDetail(inv.contractId);
-        else this.setActiveView('payments');
+        if (inv) this.openInvoiceDetail(targetId);
+        else this.setActiveView('invoices');
         break;
       }
       case 'payment':
@@ -5587,8 +5599,8 @@ export class AppStore {
         break;
       case 'invoice': {
         const inv = this.invoices.find((i) => i.id === id);
-        if (inv) this.openContractDetail(inv.contractId);
-        else this.setActiveView('payments');
+        if (inv) this.openInvoiceDetail(id);
+        else this.setActiveView('invoices');
         break;
       }
       case 'calculation':

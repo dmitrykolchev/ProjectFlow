@@ -81,6 +81,7 @@ const VIEW_LOADERS: Record<ActiveView, () => Promise<unknown>> = {
   calculations: () => import('./components/views/app-calculations/app-calculations'),
   'calculation-detail': () =>
     import('./components/views/app-calculation-detail/app-calculation-detail'),
+  'invoice-detail': () => import('./components/views/app-invoice-detail/app-invoice-detail'),
   payments: () => import('./components/views/app-payments/app-payments'),
   'payment-detail': () => import('./components/views/app-payment-detail/app-payment-detail'),
   directories: () => import('./components/views/app-directories/app-directories'),
@@ -255,6 +256,8 @@ export class AppRoot extends LitElement {
           ? 'companies'
           : this.activeView === 'calculation-detail'
           ? 'calculations'
+          : this.activeView === 'invoice-detail'
+          ? 'invoices'
           : this.activeView === 'payment-detail'
           ? 'payments'
           : this.activeView === 'timeentry-detail'
@@ -538,6 +541,8 @@ export class AppRoot extends LitElement {
         return html`<app-calculations></app-calculations>`;
       case 'calculation-detail':
         return html`<app-calculation-detail></app-calculation-detail>`;
+      case 'invoice-detail':
+        return html`<app-invoice-detail></app-invoice-detail>`;
       case 'payments':
         return html`<app-payments></app-payments>`;
       case 'payment-detail':

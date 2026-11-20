@@ -485,6 +485,7 @@ export type ActiveView =
   | 'contracts'
   | 'contract-detail'
   | 'invoices'
+  | 'invoice-detail'
   | 'calculations'
   | 'calculation-detail'
   | 'payments'
