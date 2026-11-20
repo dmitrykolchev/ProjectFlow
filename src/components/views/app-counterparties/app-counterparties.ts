@@ -184,6 +184,7 @@ export class AppCounterparties extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
             placeholder="${t.viewTexts.counterparties.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[
               { key: 'type', options: typeOptions },
               { key: 'status', options: statusOptions },
@@ -196,6 +197,12 @@ export class AppCounterparties extends LitElement {
             @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
               if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | CounterpartyType;
               if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CounterpartyStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.typeFilter = 'all';
+              this.statusFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
