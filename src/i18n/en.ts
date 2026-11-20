@@ -2315,6 +2315,8 @@ export const en = {
       kpiActiveVolume: 'Active Volume (RUB)',
       kpiExpiring: 'Expiring ≤ 45d',
       searchContracts: 'Search number, title, counterparty...',
+      viewCards: 'Cards',
+      viewTable: 'Table',
       searchCalculations: 'Search calculation, contract, counterparty...',
       searchPayments: 'Search payment doc, invoice, counterparty...',
       searchInvoices: 'Search invoice, contract, counterparty...',

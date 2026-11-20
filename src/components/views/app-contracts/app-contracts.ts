@@ -36,8 +36,12 @@ import '../../common/app-kpi-strip/app-kpi-strip';
 import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
+import '../../common/app-cards-table/app-cards-table';
+import '../../common/card-footer/card-footer';
+import '../../common/app-segmented-switch/app-segmented-switch';
 import styles from './app-contracts.css';
 import tableContentStyles from './app-contracts.table.content.css';
+import cardContentStyles from './app-contracts.content.css';
 import { eventValue } from '../../common/event-value';
 
 @customElement('app-contracts')
@@ -53,6 +57,8 @@ export class AppContracts extends LitElement {
   @state() private typeFilter: 'all' | ContractType = 'all';
   @state() private currentPage = 1;
   @state() private tablePageSize = store.customization.tablePageSize;
+  @state() private cardPageSize = store.customization.cardGridPageSize;
+  @state() private displayMode: 'cards' | 'table' = 'cards';
 
   @state() private modalOpen = false;
   @state() private editingContract: Contract | null = null;
@@ -86,6 +92,8 @@ export class AppContracts extends LitElement {
     this.currentLang = store.customization.language;
     this.globalSearch = store.searchQuery;
     this.tablePageSize = store.customization.tablePageSize;
+    this.cardPageSize = store.customization.cardGridPageSize;
+    this.displayMode = (store.viewModeFor('contracts') as 'cards' | 'table') ?? 'cards';
   }
 
   private getTypeLabel(type: ContractType, t: ReturnType<typeof getTranslation>): string {
@@ -153,6 +161,349 @@ export class AppContracts extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const filtered = this.getFiltered();
+
+    const activeList = this.contracts.filter((c) => c.status === 'active');
+    const rubTotal = activeList
+      .filter((c) => c.currency === 'RUB')
+      .reduce((acc, c) => acc + c.amount, 0);
+
+    const rubInvoices = this.invoices.filter((i) => i.currency === 'RUB' && i.status !== 'cancelled');
+    const rubInvoicedTotal = rubInvoices.reduce((acc, i) => acc + i.totalAmount, 0);
+    const rubPaidTotal = rubInvoices.reduce((acc, i) => acc + store.getInvoicePaidAmount(i.id), 0);
+    const overdueInvoices = rubInvoices.filter((i) => store.getInvoiceDueControl(i).state === 'overdue');
+    const rubOverdueDebt = overdueInvoices.reduce(
+      (acc, i) => acc + store.getInvoiceRemainingAmount(i),
+      0
+    );
+    const expiringSoon = activeList.filter((c) => {
+      const days = this.getDaysRemaining(c.endDate);
+      return days !== null && days >= 0 && days <= 45;
+    }).length;
+
+    const payableInvoices = this.invoices.filter(
+      (i) => i.status !== 'draft' && i.status !== 'cancelled' && store.getInvoiceRemainingAmount(i) > 0
+    );
+
+    const statusOptions = [
+      { value: 'all', label: t.viewTexts.contracts.filterAllStatuses },
+      { value: 'draft', label: t.viewTexts.contracts.statusDraft, color: '#64748b' },
+      { value: 'on_approval', label: t.viewTexts.contracts.statusOnApproval, color: '#f59e0b' },
+      { value: 'active', label: t.viewTexts.contracts.statusActive, color: '#10b981' },
+      { value: 'completed', label: t.viewTexts.contracts.statusCompleted, color: '#0284c7' },
+      { value: 'terminated', label: t.viewTexts.contracts.statusTerminated, color: '#ef4444' },
+    ];
+
+    const typeOptions = [
+      { value: 'all', label: t.viewTexts.counterparties.filterAllTypes },
+      { value: 'service', label: t.viewTexts.counterpartyDetail.typeService },
+      { value: 'supply', label: t.viewTexts.counterpartyDetail.typeSupply },
+      { value: 'license', label: t.viewTexts.counterpartyDetail.typeLicense },
+      { value: 'sla', label: 'SLA' },
+      { value: 'nda', label: 'NDA' },
+    ];
+
+
+    return html`
+      <app-page-header
+        title="${t.viewTexts.contracts.pageTitle}"
+        subtitle="${t.viewTexts.pageSubtitles.contracts}"
+      >
+        <span slot="icon">${iconFileText(28)}</span>
+        <div slot="actions" style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
+          ${payableInvoices.length > 0
+            ? html`
+                <app-button
+                  variant="secondary"
+                  size="md"
+                  @click="${() => this.openPaymentModal(payableInvoices[0])}"
+                >
+                  <span slot="icon-start">${iconCreditCard(16)}</span>
+                  <span>${t.payments.recordPayment}</span>
+                </app-button>
+              `
+            : ''}
+          <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
+            <span slot="icon-start">${iconPlus(16)}</span>
+            <span>${t.viewTexts.contracts.newContractButton}</span>
+          </app-button>
+        </div>
+      </app-page-header>
+
+      <app-kpi-strip columns="6">
+        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiTotal}" value="${this.contracts.length}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiActiveVolume}" value="${(rubTotal / 1_000_000).toFixed(2)}M ₽"></app-metric-card>
+        <app-metric-card size="compact" label="${t.contractDetail.invoicedTotal} (RUB)" value="${(rubInvoicedTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--accent-primary, #6366f1)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.contractDetail.paidTotal} (RUB)" value="${(rubPaidTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--color-success, #10b981)"></app-metric-card>
+        <app-metric-card size="compact" label="${t.payments.overdueAlert} (${overdueInvoices.length})" value="${(rubOverdueDebt / 1_000_000).toFixed(2)}M ₽" valueColor="${rubOverdueDebt > 0 ? '#ef4444' : ''}"></app-metric-card>
+        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiExpiring}" value="${expiringSoon}" valueColor="${expiringSoon > 0 ? '#f59e0b' : ''}"></app-metric-card>
+      </app-kpi-strip>
+
+      <!-- Canonical skeleton order: page header, KPI strip, filter toggle, filter bar, data
+           representation. The calculations/invoices/payments tabs were removed from this view;
+           those registries live in their own sidebar views. -->
+      <div class="mode-row">
+        <app-segmented-switch
+          size="sm"
+          .value="${this.displayMode}"
+          .options="${[
+            { value: 'cards', label: t.viewTexts.contracts.viewCards },
+            { value: 'table', label: t.viewTexts.contracts.viewTable },
+          ]}"
+          @change="${(e: CustomEvent<{ value: string }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('contracts', eventValue(e) as 'cards' | 'table');
+          }}"
+        ></app-segmented-switch>
+
+        <app-toggle-button
+          size="sm"
+          .pressed="${this.filterVisible}"
+          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+        >
+          <span slot="icon-start">${iconFilter(14)}</span>
+          <span>${t.common.filterToggle}</span>
+        </app-toggle-button>
+      </div>
+
+      ${this.filterVisible
+        ? html`<app-filter-bar
+            style="--filter-search-min: 280px; --filter-search-max: 280px;"
+            placeholder="${t.viewTexts.contracts.searchContracts}"
+            .searchValue="${this.localSearch}"
+            show-reset
+            .filters="${[{ key: 'status', options: statusOptions }, { key: 'type', options: typeOptions }]}"
+            .values="${{ status: this.statusFilter, type: this.typeFilter }}"
+            @search-change="${(e: CustomEvent<{ value: string }>) => {
+              this.localSearch = eventValue(e);
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
+              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
+              if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.statusFilter = 'all';
+              this.typeFilter = 'all';
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+          ></app-filter-bar>`
+        : ''}
+
+      ${filtered.length === 0
+        ? html`<app-empty-state compact title="${t.viewTexts.contracts.emptyNoContracts}"></app-empty-state>`
+        : this.displayMode === 'cards'
+        ? this.renderCards(filtered, t)
+        : this.renderTable(filtered, t)}
+
+      <app-contract-form
+        .open="${this.modalOpen}"
+        .contract="${this.editingContract}"
+        @close="${() => (this.modalOpen = false)}"
+        @saved="${() => (this.modalOpen = false)}"
+      ></app-contract-form>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingContract)}"
+        size="sm"
+        title="${t.viewTexts.confirmDialogs.contractDelete.title}"
+        action="${t.viewTexts.confirmDialogs.contractDelete.action(this.deletingContract?.number || '')}"
+        result="${t.viewTexts.confirmDialogs.contractDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingContract = null)}"
+        @confirm="${() => {
+          if (this.deletingContract) {
+            store.deleteContract(this.deletingContract.id);
+            this.deletingContract = null;
+          }
+        }}"
+      ></app-confirm-dialog>
+
+      ${this.renderPaymentModal(t, payableInvoices)}
+    `;
+  }
+
+  private renderCards(list: Contract[], t: ReturnType<typeof getTranslation>) {
+    const ctrCard = (row: Record<string, unknown>) => {
+      const ctr = row as unknown as Contract;
+      const company = store.companies.find((c) => c.id === ctr.companyId);
+      const cp = store.counterparties.find((c) => c.id === ctr.counterpartyId);
+      const owner = store.users.find((u) => u.id === ctr.ownerId);
+      const proj = store.projects.find((p) => p.id === ctr.projectId);
+      const billing = this.getContractBillingStats(ctr.id);
+      const daysLeft = ctr.status === 'active' ? this.getDaysRemaining(ctr.endDate) : null;
+
+      return html`
+        <div class="card-top">
+          <div class="ctr-identity">
+            <div class="ctr-icon">${iconFileText(20)}</div>
+            <div class="ctr-names">
+              <app-link
+                class="ctr-link-btn"
+                size="md"
+                variant="primary"
+                title="${t.contractDetail.openContract}"
+                @click="${() => store.openContractDetail(ctr.id)}"
+              >
+                <span>${ctr.number}</span>
+              </app-link>
+              <div class="ctr-type-line">
+                ${this.getTypeLabel(ctr.type, t)}${ctr.billingFrequency
+                  ? ` · ${t.calculations.frequencies[ctr.billingFrequency]}`
+                  : ''}
+              </div>
+            </div>
+          </div>
+          <div class="badges-col">
+            <app-status-chip domain="contract" status="${ctr.status}" size="sm"></app-status-chip>
+          </div>
+        </div>
+
+        <p class="ctr-subject" title="${ctr.title}">${ctr.title}</p>
+
+        <div class="ctr-meta-grid">
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.entityTypes.counterparty}</span>
+            <span class="ctr-meta-value" title="${cp?.name || ''}">${cp?.name || '—'}</span>
+          </div>
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.entityTypes.company}</span>
+            <span class="ctr-meta-value" title="${company?.name || ''}">${company?.name || '—'}</span>
+          </div>
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.viewTexts.contracts.labelOwner}</span>
+            <span class="ctr-meta-value">${owner?.name || '—'}</span>
+          </div>
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.viewTexts.timeTracking.labelProject}</span>
+            <span class="ctr-meta-value">
+              ${proj
+                ? html`
+                    <span class="project-pill">
+                      <span class="project-dot" style="background: ${proj.color};"></span>
+                      <span>${proj.key}</span>
+                    </span>
+                  `
+                : '—'}
+            </span>
+          </div>
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.viewTexts.contracts.labelContractAmount}</span>
+            <span class="ctr-meta-value amount">${formatMoney(ctr.amount, ctr.currency)}</span>
+          </div>
+          <div class="ctr-meta-item">
+            <span class="ctr-meta-label">${t.viewTexts.contracts.thTerm}</span>
+            <span class="ctr-meta-value ctr-dates">
+              ${ctr.startDate} → ${ctr.endDate}
+              ${daysLeft !== null && daysLeft >= 0 && daysLeft <= 45
+                ? html`<span class="expiry-warn">${t.viewTexts.contracts.daysLeftTemplate(daysLeft)}</span>`
+                : ''}
+            </span>
+          </div>
+        </div>
+
+        ${billing.calcCount > 0 || billing.count > 0
+          ? html`
+              <div class="billing-row">
+                ${billing.calcCount > 0
+                  ? html`<span class="calc-val">
+                      ${t.viewTexts.contracts.calcShort}:
+                      <strong>${billing.calcCount}${billing.approvedCalcs > 0 ? ` (${billing.approvedCalcs} ✓)` : ''}</strong>
+                    </span>`
+                  : ''}
+                ${billing.count > 0
+                  ? html`<span>
+                      ${t.viewTexts.contracts.invShort}: <strong>${formatMoney(billing.invoiced, ctr.currency)}</strong>
+                    </span>`
+                  : ''}
+                ${billing.paid > 0
+                  ? html`<span class="paid-val">
+                      ${t.viewTexts.contracts.paidShort}: <strong>${formatMoney(billing.paid, ctr.currency)}</strong>
+                    </span>`
+                  : ''}
+              </div>
+            `
+          : ''}
+
+        <card-footer>
+          <app-button
+            slot="end"
+            action="view"
+            size="sm"
+            variant="icon"
+            title="${t.contractDetail.openContract}"
+            @click="${() => store.openContractDetail(ctr.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            action="submit"
+            size="sm"
+            variant="icon"
+            title="${t.contractDetail.createCalculation}"
+            @click="${() => store.openContractDetail(ctr.id, 'calculation')}"
+          >
+            <span slot="start">${iconTable()}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            action="accept"
+            size="sm"
+            variant="icon"
+            title="${t.contractDetail.issueInvoice}"
+            @click="${() => store.openContractDetail(ctr.id, 'invoice')}"
+          >
+            <span slot="start">${iconReceipt(15)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.common.edit}"
+            @click="${() => this.openEditModal(ctr)}"
+          >
+            <span slot="start">${iconEdit(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            action="delete"
+            size="sm"
+            variant="icon"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingContract = ctr)}"
+          >
+            <span slot="start">${iconTrash(14)}</span>
+          </app-button>
+        </card-footer>
+      `;
+    };
+
+    return html`
+      <app-cards-table
+        .rows="${list}"
+        .cardRender="${ctrCard}"
+        .contentStyles="${cardContentStyles}"
+        page-size="${this.cardPageSize}"
+        page="${this.currentPage}"
+        locale="${t.common.locale}"
+        @page-change="${(e: CustomEvent<{ page: number }>) => {
+          this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+          this.scrollTop = 0;
+        }}"
+        @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+          this.currentPage = 1; store.setActivePage(1, false);
+          store.setCardGridPageSize(e.detail.pageSize);
+        }}"
+      ></app-cards-table>
+    `;
+  }
+
+  private renderTable(list: Contract[], t: ReturnType<typeof getTranslation>) {
     // Contracts registry reference rich cells (rendered inside the app-data-table shadow tree)
     const ctrNumberCell = (row: Record<string, unknown>) => {
       const ctr = row as unknown as Contract;
@@ -305,186 +656,39 @@ export class AppContracts extends LitElement {
       `;
     };
 
-    const activeList = this.contracts.filter((c) => c.status === 'active');
-    const rubTotal = activeList
-      .filter((c) => c.currency === 'RUB')
-      .reduce((acc, c) => acc + c.amount, 0);
-
-    const rubInvoices = this.invoices.filter((i) => i.currency === 'RUB' && i.status !== 'cancelled');
-    const rubInvoicedTotal = rubInvoices.reduce((acc, i) => acc + i.totalAmount, 0);
-    const rubPaidTotal = rubInvoices.reduce((acc, i) => acc + store.getInvoicePaidAmount(i.id), 0);
-    const overdueInvoices = rubInvoices.filter((i) => store.getInvoiceDueControl(i).state === 'overdue');
-    const rubOverdueDebt = overdueInvoices.reduce(
-      (acc, i) => acc + store.getInvoiceRemainingAmount(i),
-      0
-    );
-    const expiringSoon = activeList.filter((c) => {
-      const days = this.getDaysRemaining(c.endDate);
-      return days !== null && days >= 0 && days <= 45;
-    }).length;
-
-    const payableInvoices = this.invoices.filter(
-      (i) => i.status !== 'draft' && i.status !== 'cancelled' && store.getInvoiceRemainingAmount(i) > 0
-    );
-
-    const statusOptions = [
-      { value: 'all', label: t.viewTexts.contracts.filterAllStatuses },
-      { value: 'draft', label: t.viewTexts.contracts.statusDraft, color: '#64748b' },
-      { value: 'on_approval', label: t.viewTexts.contracts.statusOnApproval, color: '#f59e0b' },
-      { value: 'active', label: t.viewTexts.contracts.statusActive, color: '#10b981' },
-      { value: 'completed', label: t.viewTexts.contracts.statusCompleted, color: '#0284c7' },
-      { value: 'terminated', label: t.viewTexts.contracts.statusTerminated, color: '#ef4444' },
-    ];
-
-    const typeOptions = [
-      { value: 'all', label: t.viewTexts.counterparties.filterAllTypes },
-      { value: 'service', label: t.viewTexts.counterpartyDetail.typeService },
-      { value: 'supply', label: t.viewTexts.counterpartyDetail.typeSupply },
-      { value: 'license', label: t.viewTexts.counterpartyDetail.typeLicense },
-      { value: 'sla', label: 'SLA' },
-      { value: 'nda', label: 'NDA' },
-    ];
-
-
     return html`
-      <app-page-header
-        title="${t.viewTexts.contracts.pageTitle}"
-        subtitle="${t.viewTexts.pageSubtitles.contracts}"
-      >
-        <span slot="icon">${iconFileText(28)}</span>
-        <div slot="actions" style="display: flex; gap: 0.6rem; flex-wrap: wrap;">
-          ${payableInvoices.length > 0
-            ? html`
-                <app-button
-                  variant="secondary"
-                  size="md"
-                  @click="${() => this.openPaymentModal(payableInvoices[0])}"
-                >
-                  <span slot="icon-start">${iconCreditCard(16)}</span>
-                  <span>${t.payments.recordPayment}</span>
-                </app-button>
-              `
-            : ''}
-          <app-button variant="primary" size="md" @click="${() => this.openCreateModal()}">
-            <span slot="icon-start">${iconPlus(16)}</span>
-            <span>${t.viewTexts.contracts.newContractButton}</span>
-          </app-button>
-        </div>
-      </app-page-header>
-
-      <app-kpi-strip columns="6">
-        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiTotal}" value="${this.contracts.length}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiActiveVolume}" value="${(rubTotal / 1_000_000).toFixed(2)}M ₽"></app-metric-card>
-        <app-metric-card size="compact" label="${t.contractDetail.invoicedTotal} (RUB)" value="${(rubInvoicedTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--accent-primary, #6366f1)"></app-metric-card>
-        <app-metric-card size="compact" label="${t.contractDetail.paidTotal} (RUB)" value="${(rubPaidTotal / 1_000_000).toFixed(2)}M ₽" valueColor="var(--color-success, #10b981)"></app-metric-card>
-        <app-metric-card size="compact" label="${t.payments.overdueAlert} (${overdueInvoices.length})" value="${(rubOverdueDebt / 1_000_000).toFixed(2)}M ₽" valueColor="${rubOverdueDebt > 0 ? '#ef4444' : ''}"></app-metric-card>
-        <app-metric-card size="compact" label="${t.viewTexts.contracts.kpiExpiring}" value="${expiringSoon}" valueColor="${expiringSoon > 0 ? '#f59e0b' : ''}"></app-metric-card>
-      </app-kpi-strip>
-
-      <!-- Canonical skeleton order: page header, KPI strip, filter toggle, filter bar, data
-           representation. The calculations/invoices/payments tabs were removed from this view;
-           those registries live in their own sidebar views. -->
-      <div class="mode-row">
-        <app-toggle-button
-          size="sm"
-          .pressed="${this.filterVisible}"
-          @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.filterVisible = e.detail.pressed)}"
+      <div class="table-card">
+        <app-data-table
+          .contentStyles="${tableContentStyles}"
+          .rows="${list}"
+          page-size="${this.tablePageSize}"
+          page="${this.currentPage}"
+          locale="${t.common.locale}"
+          @page-change="${(e: CustomEvent<{ page: number }>) => {
+            this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
+            this.scrollTop = 0;
+          }}"
+          @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
+            this.currentPage = 1; store.setActivePage(1, false);
+            store.setTablePageSize(e.detail.pageSize);
+          }}"
         >
-          <span slot="icon-start">${iconFilter(14)}</span>
-          <span>${t.common.filterToggle}</span>
-        </app-toggle-button>
+          <app-table-column field="number" label="${t.viewTexts.contracts.thNumber}" .cellRender="${ctrNumberCell}"></app-table-column>
+          <app-table-column field="title" label="${t.viewTexts.counterpartyDetail.labelSubject}" .cellRender="${ctrTitleCell}"></app-table-column>
+          <app-table-column field="counterpartyId" label="${t.viewTexts.contracts.thParties}" .cellRender="${ctrPartiesCell}"></app-table-column>
+          <app-table-column field="projectId" label="${t.viewTexts.timeTracking.labelProject}" .cellRender="${ctrProjectCell}"></app-table-column>
+          <app-table-column field="amount" label="${t.viewTexts.contracts.thAmountBilled}" .cellRender="${ctrAmountCell}"></app-table-column>
+          <app-table-column field="startDate" label="${t.viewTexts.contracts.thTerm}" .cellRender="${ctrTermCell}"></app-table-column>
+          <app-table-column
+            field="status"
+            label="${t.viewTexts.counterparties.thStatus}"
+            .cellRender="${(row: Record<string, unknown>) => html`
+              <app-status-chip domain="contract" status="${(row as unknown as Contract).status}" size="sm"></app-status-chip>
+            `}"
+          ></app-table-column>
+          <app-table-column field="" label="" .cellRender="${ctrActionsCell}"></app-table-column>
+        </app-data-table>
       </div>
-
-      ${this.filterVisible
-        ? html`<app-filter-bar
-            style="--filter-search-min: 280px; --filter-search-max: 280px;"
-            placeholder="${t.viewTexts.contracts.searchContracts}"
-            .searchValue="${this.localSearch}"
-            show-reset
-            .filters="${[{ key: 'status', options: statusOptions }, { key: 'type', options: typeOptions }]}"
-            .values="${{ status: this.statusFilter, type: this.typeFilter }}"
-            @search-change="${(e: CustomEvent<{ value: string }>) => {
-              this.localSearch = eventValue(e);
-              this.currentPage = 1; store.setActivePage(1, false);
-            }}"
-            @filter-change="${(e: CustomEvent<{ key: string; value: string }>) => {
-              if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | ContractStatus;
-              if (e.detail.key === 'type') this.typeFilter = eventValue(e) as 'all' | ContractType;
-              this.currentPage = 1; store.setActivePage(1, false);
-            }}"
-            @reset="${() => {
-              this.localSearch = '';
-              this.statusFilter = 'all';
-              this.typeFilter = 'all';
-              this.currentPage = 1; store.setActivePage(1, false);
-            }}"
-          ></app-filter-bar>`
-        : ''}
-
-      ${filtered.length === 0
-        ? html`<app-empty-state compact title="${t.viewTexts.contracts.emptyNoContracts}"></app-empty-state>`
-        : html`
-              <div class="table-card">
-                <app-data-table
-                  .contentStyles="${tableContentStyles}"
-                  .rows="${filtered}"
-                  page-size="${this.tablePageSize}"
-                  page="${this.currentPage}"
-                  locale="${t.common.locale}"
-                  @page-change="${(e: CustomEvent<{ page: number }>) => {
-                    this.currentPage = e.detail.page; store.setActivePage(e.detail.page);
-                    this.scrollTop = 0;
-                  }}"
-                  @page-size-change="${(e: CustomEvent<{ pageSize: number }>) => {
-                    this.currentPage = 1; store.setActivePage(1, false);
-                    store.setTablePageSize(e.detail.pageSize);
-                  }}"
-                >
-                  <app-table-column field="number" label="${t.viewTexts.contracts.thNumber}" .cellRender="${ctrNumberCell}"></app-table-column>
-                  <app-table-column field="title" label="${t.viewTexts.counterpartyDetail.labelSubject}" .cellRender="${ctrTitleCell}"></app-table-column>
-                  <app-table-column field="counterpartyId" label="${t.viewTexts.contracts.thParties}" .cellRender="${ctrPartiesCell}"></app-table-column>
-                  <app-table-column field="projectId" label="${t.viewTexts.timeTracking.labelProject}" .cellRender="${ctrProjectCell}"></app-table-column>
-                  <app-table-column field="amount" label="${t.viewTexts.contracts.thAmountBilled}" .cellRender="${ctrAmountCell}"></app-table-column>
-                  <app-table-column field="startDate" label="${t.viewTexts.contracts.thTerm}" .cellRender="${ctrTermCell}"></app-table-column>
-                  <app-table-column
-                    field="status"
-                    label="${t.viewTexts.counterparties.thStatus}"
-                    .cellRender="${(row: Record<string, unknown>) => html`
-                      <app-status-chip domain="contract" status="${(row as unknown as Contract).status}" size="sm"></app-status-chip>
-                    `}"
-                  ></app-table-column>
-                  <app-table-column field="" label="" .cellRender="${ctrActionsCell}"></app-table-column>
-                </app-data-table>
-              </div>
-            `}
-
-      <app-contract-form
-        .open="${this.modalOpen}"
-        .contract="${this.editingContract}"
-        @close="${() => (this.modalOpen = false)}"
-        @saved="${() => (this.modalOpen = false)}"
-      ></app-contract-form>
-
-      <app-confirm-dialog
-        .open="${Boolean(this.deletingContract)}"
-        size="sm"
-        title="${t.viewTexts.confirmDialogs.contractDelete.title}"
-        action="${t.viewTexts.confirmDialogs.contractDelete.action(this.deletingContract?.number || '')}"
-        result="${t.viewTexts.confirmDialogs.contractDelete.result}"
-        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
-        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-        .cancelLabel="${t.common.cancel}"
-        .confirmLabel="${t.common.delete}"
-        @cancel="${() => (this.deletingContract = null)}"
-        @confirm="${() => {
-          if (this.deletingContract) {
-            store.deleteContract(this.deletingContract.id);
-            this.deletingContract = null;
-          }
-        }}"
-      ></app-confirm-dialog>
-
-      ${this.renderPaymentModal(t, payableInvoices)}
     `;
   }
 

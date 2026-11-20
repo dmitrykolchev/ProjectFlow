@@ -2315,6 +2315,8 @@ export const ru = {
       kpiActiveVolume: 'Активная сумма (RUB)',
       kpiExpiring: 'Истекают ≤ 45 дн.',
       searchContracts: 'Поиск по номеру, предмету, контрагенту...',
+      viewCards: 'Карточки',
+      viewTable: 'Таблица',
       searchCalculations: 'Поиск по номеру калькуляции, договору, контрагенту...',
       searchPayments: 'Поиск по платёжному документу, счёту, контрагенту...',
       searchInvoices: 'Поиск по номеру счёта, договору, контрагенту...',

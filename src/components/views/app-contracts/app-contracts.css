@@ -36,8 +36,8 @@
 }
 
 /* Canonical skeleton order: page header, KPI strip, display-mode switcher, filter, data
-   representation. The mode row holds the tab app-segmented-switch (size="sm": Реестр договоров /
-   Калькуляции / Выставленные счета / Платежи и сроки) and the filter toggle (app-toggle-button
+   representation. The mode row holds the cards/table app-segmented-switch (size="sm", cards is
+   the default and first mode) and the filter toggle (app-toggle-button
    size="sm", funnel icon + label; pressed = the filter bar is visible, unpressed = hidden, the view
    mirrors the pressed state in filterVisible); it sits directly before the filter bar. The switch
    host is inline-flex and the toggle host is inline-block, so the row keeps the intrinsic widths
@@ -48,15 +48,14 @@
   gap: 0.6rem;
 }
 
-/* Table mode: all four tab tables (Реестр договоров, Калькуляции, Выставленные счета,
-   Платежи и сроки) are rendered by the canonical app-data-table. The card fills the
+/* Table mode: the registry table is rendered by the canonical app-data-table. The card fills the
    remaining view height (flex:1, min-height:0) and the host fills the card, so the body
    scrolls in its own area when rows overflow while header and footer stay fixed; the
    host is transparent so the card shell paints the background and rounds the corners.
    The contracts reference geometry (0.83rem body, 0.8rem 1rem padding on header and
    cells, the uppercase 0.75rem header with 0.03em letter-spacing) is exactly the
    component default, so no geometry tokens are retuned here. All rich-cell classes of
-   these tables (contract-link-btn, contract-title, contract-desc, amount-cell,
+   the table (contract-link-btn, contract-title, contract-desc, amount-cell,
    billing-sub, micro-pill, dates-cell, expiry-warn, project-pill, project-dot,
    ctr-actions-row, due-tag variants, inv-pay bar classes) live in the component CSS:
    the cellRender templates render in its shadow tree. */
