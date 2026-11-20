@@ -24,6 +24,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-cards-table/app-cards-table';
 import styles from './app-counterparties.css';
+import cardContentStyles from './app-counterparties.content.css';
 import { eventValue } from '../../common/event-value';
 
 @customElement('app-counterparties')
@@ -350,6 +351,7 @@ export class AppCounterparties extends LitElement {
       <app-cards-table
         .rows="${list}"
         .cardRender="${cpCard}"
+        .contentStyles="${cardContentStyles}"
         page-size="${this.cardPageSize}"
         page="${this.currentPage}"
         locale="${t.common.locale}"
