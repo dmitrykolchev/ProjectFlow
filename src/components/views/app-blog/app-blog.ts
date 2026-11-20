@@ -9,6 +9,7 @@ import {
   iconArrowLeft,
   iconArrowUpRight,
   iconBookmark,
+  iconChevronRight,
   iconCode,
   iconColumns,
   iconEdit,
@@ -652,10 +653,15 @@ export class AppBlog extends LitElement {
             >
               <span slot="start">${iconTrash(14)}</span>
             </app-button>
-            <app-link size="sm" @click="${() => store.selectBlogPost(post.id)}">
-              <span>${b.readArticleBtn}</span>
-              <span slot="end">${iconArrowUpRight(13)}</span>
-            </app-link>
+            <app-button
+              action="view"
+              size="sm"
+              variant="icon"
+              title="${b.readArticleBtn}"
+              @click="${() => store.selectBlogPost(post.id)}"
+            >
+              <span slot="start">${iconChevronRight(15)}</span>
+            </app-button>
           </div>
         </card-footer>
       `;
