@@ -1,4 +1,4 @@
-import { LitElement, html, TemplateResult } from 'lit';
+import { LitElement, html, TemplateResult, type CSSResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import '../app-empty-state/app-empty-state';
 import '../app-pagination/app-pagination';
@@ -45,7 +45,9 @@ export interface DataTableRowClickDetail {
  * (default 'id'); the selection lives in selectedKeys, the selectedItems getter
  * returns the selected rows, and toggling emits selection-change
  * { selectedIds, selectedItems }. Clicking a row emits row-click { row }; clicks
- * on checkboxes, buttons and links inside cells do not activate the row.
+ * on checkboxes, buttons and links inside cells do not activate the row. The additive hook
+ * contentStyles injects view-local CSS for the markup produced by custom cellRender callbacks, so
+ * module-specific cell classes stop living inside this shared component.
  */
 @customElement('app-data-table')
 export class AppDataTable extends LitElement {
@@ -60,6 +62,7 @@ export class AppDataTable extends LitElement {
   @property({ type: Boolean, attribute: 'selectable' }) selectable: boolean = false;
   @property({ type: String, attribute: 'key-field' }) keyField: string = 'id';
   @property({ type: Array, attribute: false }) selectedKeys: string[] = [];
+  @property({ attribute: false }) contentStyles?: string | CSSResult;
 
   @state() private currentPage: number = 1;
 
@@ -243,6 +246,7 @@ export class AppDataTable extends LitElement {
     const slice = paginateItems(sorted, this.currentPage, this.pageSize);
 
     return html`
+      ${this.contentStyles ? html`<style>${String(this.contentStyles)}</style>` : ''}
       <div class="table-body">
         ${sorted.length === 0
           ? html`

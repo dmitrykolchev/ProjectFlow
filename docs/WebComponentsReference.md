@@ -325,6 +325,7 @@ A grid of entity cards built from a per-view template. The card content is produ
 | `cardClass` | String | Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68) |
 | `wide-collapse` | Boolean, default `false` | Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off) |
 | `--cards-columns` | CSS var | Grid column count token (default auto-fill); a view can pin an exact number of columns |
+| `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical |
 
 #### `app-confirm-dialog` — `AppConfirmDialog`
 
@@ -1841,6 +1842,7 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 | `selectedItems getter` | — | Rows whose key is in selectedKeys — the consumer reads the selection back from the table |
 | `selection-change event` | — | Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles |
 | `row-click event` | — | Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row |
+| `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical |
 
 #### `app-table-column` — `AppTableColumn`
 

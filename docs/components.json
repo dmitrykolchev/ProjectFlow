@@ -654,6 +654,12 @@
     "attr": "wide-collapse",
     "reflect": true,
     "def": "false"
+   },
+   {
+    "name": "contentStyles",
+    "type": "String",
+    "reflect": false,
+    "def": ""
    }
   ],
   "events": [],
@@ -709,6 +715,10 @@
    {
     "k": "--cards-columns",
     "v": "Grid column count token (default auto-fill); a view can pin an exact number of columns"
+   },
+   {
+    "k": "contentStyles",
+    "v": "Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical"
    }
   ],
   "slotsDoc": [],
@@ -1633,6 +1643,12 @@
     "type": "Array",
     "reflect": false,
     "def": "[]"
+   },
+   {
+    "name": "contentStyles",
+    "type": "String",
+    "reflect": false,
+    "def": ""
    }
   ],
   "events": [],
@@ -1704,6 +1720,10 @@
    {
     "k": "row-click event",
     "v": "Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row"
+   },
+   {
+    "k": "contentStyles",
+    "v": "Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical"
    }
   ],
   "slotsDoc": [],

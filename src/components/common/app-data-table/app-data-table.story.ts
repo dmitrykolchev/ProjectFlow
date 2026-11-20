@@ -86,6 +86,17 @@ function renderActionsCell(row: Record<string, unknown>): TemplateResult {
   `;
 }
 
+const demoContentCss =
+  '.demo-note { margin: 0; font-size: 0.78rem; line-height: 1.45; color: var(--text-secondary, #94a3b8); border-left: 3px solid var(--accent-primary, #6366f1); padding-left: 0.4rem; }';
+
+function renderCellWithNote(row: Record<string, unknown>): TemplateResult {
+  const e = row as unknown as DemoEntry;
+  return html`
+    <strong>${e.taskKey} ${e.taskTitle}</strong>
+    <p class="demo-note">Content styles come from the view through contentStyles.</p>
+  `;
+}
+
 export const meta: ComponentStoryMeta = {
   title: 'Common/DataTable',
   component: 'app-data-table',
@@ -110,6 +121,8 @@ export const meta: ComponentStoryMeta = {
     'selectedItems getter': 'Rows whose key is in selectedKeys — the consumer reads the selection back from the table',
     'selection-change event': 'Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles',
     'row-click event': 'Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row',
+    contentStyles:
+      'Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical',
   },
   stories: [
     {
@@ -242,6 +255,27 @@ export const meta: ComponentStoryMeta = {
           <app-data-table .rows="${[]}" empty-title="No time entries found">
             <app-table-column field="date" label="Date" sortable></app-table-column>
             <app-table-column field="taskKey" label="Task" sortable></app-table-column>
+          </app-data-table>
+        </div>
+      `,
+    },
+    {
+      name: 'Content Styles',
+      description:
+        'contentStyles injects view-local CSS into the shadow root for the cellRender content (the .demo-note rule lives in the consumer, not in the component); default empty renders no style element',
+      render: () => html`
+        <div style="max-width: 700px;">
+          <app-data-table
+            .rows="${demoEntries.slice(0, 4)}"
+            page-size="4"
+            .contentStyles="${demoContentCss}"
+          >
+            <app-table-column field="date" label="Date" mono></app-table-column>
+            <app-table-column
+              field="taskKey"
+              label="Task"
+              .cellRender="${renderCellWithNote}"
+            ></app-table-column>
           </app-data-table>
         </div>
       `,
