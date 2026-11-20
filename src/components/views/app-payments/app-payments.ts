@@ -39,6 +39,7 @@ import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import styles from './app-payments.css';
+import tableContentStyles from './app-payments.table.content.css';
 import { eventValue } from '../../common/event-value';
 
 const RUB_RATES: Record<BankCurrency, number> = {
@@ -582,6 +583,7 @@ export class AppPayments extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${invoices}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
@@ -786,6 +788,7 @@ export class AppPayments extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${payments}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"
