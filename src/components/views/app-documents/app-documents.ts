@@ -136,6 +136,17 @@ export class AppDocuments extends LitElement {
     if (this.previewDoc) {
       this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
     }
+    // strict-mode fallback: the company and project filters are mirrored in the store, so a stale value
+    // is cleared through setDocumentFilters — otherwise the next sync copies it back, the select renders
+    // its placeholder (the value is not in the option list) and the list stays silently empty.
+    if (this.companyFilter !== 'all' && !store.companies.some((c) => c.id === this.companyFilter)) {
+      store.setDocumentFilters({ companyId: 'all' });
+      this.companyFilter = 'all';
+    }
+    if (this.projectFilter !== 'all' && !store.projects.some((p) => p.id === this.projectFilter)) {
+      store.setDocumentFilters({ projectId: 'all' });
+      this.projectFilter = 'all';
+    }
   }
 
   private getFilteredDocuments(): DocumentItem[] {
