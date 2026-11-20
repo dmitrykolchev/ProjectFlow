@@ -172,41 +172,6 @@ app-cards-table {
   border-bottom: 1px solid var(--border-subtle, #1e293b);
 }
 
-.byline-author {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
-  color: var(--text-primary, #f8fafc);
-}
-
-.byline-author:hover .byline-name {
-  color: var(--accent-primary, #818cf8);
-  text-decoration: underline;
-}
-
-.byline-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-}
-
-.byline-name {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-primary, #f8fafc);
-}
-
-.byline-role {
-  font-size: 0.78rem;
-  color: var(--text-muted, #64748b);
-}
-
 .byline-stats {
   display: flex;
   align-items: center;
@@ -304,29 +269,6 @@ app-cards-table {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-}
-
-.comment-author-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: transparent;
-  border: none;
-  padding: 0;
-  font: inherit;
-  color: var(--text-primary, #f8fafc);
-  cursor: pointer;
-}
-
-.comment-author-btn:hover .comment-author-name {
-  color: var(--accent-primary, #818cf8);
-  text-decoration: underline;
-}
-
-.comment-author-name {
-  font-size: 0.83rem;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
 }
 
 .comment-head-right {
