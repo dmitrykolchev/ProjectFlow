@@ -1176,17 +1176,17 @@ export class AppBlog extends LitElement {
               @input="${(e: CustomEvent) => (this.formTags = eventValue(e))}"
             ></app-input>
 
-            <div class="switch-field">
-              <label>${b.fieldFeatured}</label>
-              <div class="switch-box">
-                <app-switch
-                  label="${b.fieldFeatured}"
-                  ?checked="${this.formFeatured}"
-                  @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                    (this.formFeatured = e.detail.checked)}"
-                ></app-switch>
-              </div>
-            </div>
+            <app-switch
+              class="switch-field"
+              size="md"
+              frame="normal"
+              field-label-style="ghost"
+              field-label="${b.fieldFeatured}"
+              label="${b.fieldFeatured}"
+              ?checked="${this.formFeatured}"
+              @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                (this.formFeatured = e.detail.checked)}"
+            ></app-switch>
           </app-form-grid>
 
           <div class="studio-bar">
