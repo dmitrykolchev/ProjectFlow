@@ -88,21 +88,12 @@
   gap: 0.375rem;
 }
 
-.switch-ghost-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  visibility: hidden;
-  user-select: none;
-}
-
-.switch-box {
-  height: var(--control-height-md, 38px);
-  padding: 0 0.75rem;
-  border-radius: var(--radius-md, 8px);
-  border: 1px solid var(--border-subtle, #1e293b);
-  background: var(--bg-surface, #111827);
-  display: flex;
-  align-items: center;
+/* Skip-weekends switch: the canonical app-switch with frame="transparent" (the control occupies the
+   form row like an input, without visible chrome) and field-label-style="ghost" (the invisible label
+   row holds its place in the grid). The component draws the row and the label; the view only retunes
+   the label-to-control gap to the historical .switch-field value. */
+.switch-row {
+  --switch-label-gap: 0.375rem;
 }
 
 .field-caption {

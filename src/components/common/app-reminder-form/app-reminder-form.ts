@@ -775,17 +775,17 @@ export class AppReminderForm extends LitElement {
                 @change="${(e: Event) => this.applyRecurrenceTemplate(eventValue(e))}"
               ></app-select>
 
-              <div class="switch-field">
-                <label class="switch-ghost-label">${t.reminders.fieldSkipWeekends}</label>
-                <div class="switch-box">
-                  <app-switch
-                    label="${t.reminders.fieldSkipWeekends}"
-                    ?checked="${this.fSkipWeekends}"
-                    @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                      (this.fSkipWeekends = Boolean(e.detail?.checked))}"
-                  ></app-switch>
-                </div>
-              </div>
+              <app-switch
+                class="switch-row"
+                size="md"
+                frame="transparent"
+                field-label-style="ghost"
+                field-label="${t.reminders.fieldSkipWeekends}"
+                label="${t.reminders.fieldSkipWeekends}"
+                ?checked="${this.fSkipWeekends}"
+                @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                  (this.fSkipWeekends = Boolean(e.detail?.checked))}"
+              ></app-switch>
             </app-form-grid>
 
             <app-recurrence-editor
