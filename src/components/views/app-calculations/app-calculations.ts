@@ -382,6 +382,7 @@ export class AppCalculations extends LitElement {
         style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 215px;"
         placeholder="${t.viewTexts.calculations.searchPlaceholder}"
         .searchValue="${this.localSearch}"
+        show-reset
         .filters="${[
           { key: 'status', options: statusOptions },
           { key: 'contract', options: contractOptions },
@@ -396,6 +397,13 @@ export class AppCalculations extends LitElement {
           if (e.detail.key === 'status') this.statusFilter = eventValue(e) as 'all' | CalculationStatus;
           if (e.detail.key === 'contract') this.contractFilter = eventValue(e);
           if (e.detail.key === 'frequency') this.frequencyFilter = eventValue(e) as 'all' | CalculationFrequency;
+          this.currentPage = 1; store.setActivePage(1, false);
+        }}"
+        @reset="${() => {
+          this.localSearch = '';
+          this.statusFilter = 'all';
+          this.contractFilter = 'all';
+          this.frequencyFilter = 'all';
           this.currentPage = 1; store.setActivePage(1, false);
         }}"
       ></app-filter-bar>
