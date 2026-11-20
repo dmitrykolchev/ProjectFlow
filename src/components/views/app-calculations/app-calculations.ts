@@ -38,6 +38,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import styles from './app-calculations.css';
+import tableContentStyles from './app-calculations.table.content.css';
 import { eventValue } from '../../common/event-value';
 
 const HOURLY_RATE_RUB = 3200;
@@ -415,6 +416,7 @@ export class AppCalculations extends LitElement {
         : html`
             <div class="table-card">
               <app-data-table
+                .contentStyles="${tableContentStyles}"
                 .rows="${filtered}"
                 page-size="${this.tablePageSize}"
                 page="${this.currentPage}"
