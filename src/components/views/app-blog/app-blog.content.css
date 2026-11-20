@@ -2,54 +2,11 @@
    rendered inside the app-cards-table shadow tree, so these rules live in the view file and are
    injected through the additive contentStyles hook. The card shell and grid geometry stay in
    app-cards-table. */
-
 .blog-card-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.65rem;
-}
-
-.blog-author-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  background: transparent;
-  border: none;
-  padding: 0;
-  color: var(--text-primary, #f8fafc);
-  cursor: pointer;
-  text-align: left;
-  font: inherit;
-}
-
-.blog-author-btn:hover .blog-author-name {
-  color: var(--accent-primary, #6366f1);
-  text-decoration: underline;
-}
-
-.blog-author-meta {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.blog-author-name {
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--text-primary, #f8fafc);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.blog-author-role {
-  font-size: 0.72rem;
-  color: var(--text-muted, #64748b);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .blog-status-cluster {

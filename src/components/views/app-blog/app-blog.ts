@@ -3,6 +3,7 @@ import { customElement, query, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { BlogCategory, BlogComment, BlogPost, BlogPostStatus } from '../../../types';
+import { effectivePresence } from '../../../domain/presence-tokens';
 import { eventValue } from '../../common/event-value';
 import {
   iconArchive,
@@ -25,7 +26,6 @@ import {
   iconSend,
   iconTrash,
 } from '../../common/icons';
-import '../../common/app-avatar/app-avatar';
 import '../../common/app-button/app-button';
 import '../../common/app-cards-table/app-cards-table';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
@@ -39,6 +39,7 @@ import '../../common/app-link/app-link';
 import '../../common/app-markdown/app-markdown';
 import '../../common/app-modal/app-modal';
 import '../../common/app-page-header/app-page-header';
+import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
@@ -131,13 +132,6 @@ export class AppBlog extends LitElement {
 
   private currentUserId(): string {
     return store.currentUserId || store.users[0]?.id || 'user-1';
-  }
-
-  private getInitials(name: string): string {
-    const parts = (name || '').trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return '?';
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
   }
 
   private formatDate(iso: string): string {
@@ -544,22 +538,13 @@ export class AppBlog extends LitElement {
 
       return html`
         <div class="blog-card-top">
-          <button
-            type="button"
-            class="blog-author-btn"
-            title="${b.openAuthorBtn}"
+          <app-persona
+            size="24"
+            .primaryText="${author?.name || post.authorId}"
+            .secondaryText="${author?.role || author?.department || ''}"
+            .presence="${author ? effectivePresence(author) : 'none'}"
             @click="${() => author && store.openEmployeeDetail(author.id)}"
-          >
-            <app-avatar
-              size="sm"
-              initials="${this.getInitials(author?.name || '?')}"
-              src="${author?.avatar || ''}"
-            ></app-avatar>
-            <div class="blog-author-meta">
-              <span class="blog-author-name">${author?.name || post.authorId}</span>
-              <span class="blog-author-role">${author?.role || author?.department || ''}</span>
-            </div>
-          </button>
+          ></app-persona>
 
           <div class="blog-status-cluster">
             ${post.featured
@@ -718,22 +703,13 @@ export class AppBlog extends LitElement {
       const post = row as unknown as BlogPost;
       const author = store.users.find((u) => u.id === post.authorId);
       return html`
-        <div class="user-cell">
-          <app-avatar
-            size="sm"
-            initials="${this.getInitials(author?.name || '?')}"
-            src="${author?.avatar || ''}"
-          ></app-avatar>
-          <div>
-            <app-link
-              size="sm"
-              @click="${() => author && store.openEmployeeDetail(author.id)}"
-            >
-              ${author?.name || post.authorId}
-            </app-link>
-            <div class="td-title-sub">${author?.role || ''}</div>
-          </div>
-        </div>
+        <app-persona
+          size="24"
+          .primaryText="${author?.name || post.authorId}"
+          .secondaryText="${author?.role || ''}"
+          .presence="${author ? effectivePresence(author) : 'none'}"
+          @click="${() => author && store.openEmployeeDetail(author.id)}"
+        ></app-persona>
       `;
     };
 
@@ -988,24 +964,13 @@ export class AppBlog extends LitElement {
           ${post.subtitle ? html`<p class="article-lead">${post.subtitle}</p>` : ''}
 
           <div class="article-byline">
-            <button
-              type="button"
-              class="byline-author"
-              title="${b.openAuthorBtn}"
+            <app-persona
+              size="40"
+              .primaryText="${author?.name || post.authorId}"
+              .secondaryText="${[author?.role, author?.department].filter(Boolean).join(' · ')}"
+              .presence="${author ? effectivePresence(author) : 'none'}"
               @click="${() => author && store.openEmployeeDetail(author.id)}"
-            >
-              <app-avatar
-                size="md"
-                initials="${this.getInitials(author?.name || '?')}"
-                src="${author?.avatar || ''}"
-              ></app-avatar>
-              <div class="byline-info">
-                <span class="byline-name">${author?.name || post.authorId}</span>
-                <span class="byline-role">
-                  ${[author?.role, author?.department].filter(Boolean).join(' · ')}
-                </span>
-              </div>
-            </button>
+            ></app-persona>
 
             <div class="byline-stats">
               <span>${displayDate}</span>
@@ -1061,18 +1026,12 @@ export class AppBlog extends LitElement {
                     return html`
                       <div class="comment-item">
                         <div class="comment-head">
-                          <button
-                            type="button"
-                            class="comment-author-btn"
+                          <app-persona
+                            size="24"
+                            .primaryText="${cAuthor?.name || c.authorId}"
+                            .presence="${cAuthor ? effectivePresence(cAuthor) : 'none'}"
                             @click="${() => cAuthor && store.openEmployeeDetail(cAuthor.id)}"
-                          >
-                            <app-avatar
-                              size="sm"
-                              initials="${this.getInitials(cAuthor?.name || '?')}"
-                              src="${cAuthor?.avatar || ''}"
-                            ></app-avatar>
-                            <span class="comment-author-name">${cAuthor?.name || c.authorId}</span>
-                          </button>
+                          ></app-persona>
 
                           <div class="comment-head-right">
                             <span class="comment-time">${this.formatDateTime(c.createdAt)}</span>
