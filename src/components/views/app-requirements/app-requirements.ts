@@ -55,6 +55,8 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-data-grid-column/app-data-grid-column';
 import styles from './app-requirements.css';
+import tableContentStyles from './app-requirements.table.content.css';
+import cardContentStyles from './app-requirements.content.css';
 
 @customElement('app-requirements')
 export class AppRequirements extends LitElement {
@@ -489,6 +491,7 @@ export class AppRequirements extends LitElement {
 
     return html`
       <app-cards-table
+        .contentStyles="${cardContentStyles}"
         .rows="${list}"
         .cardRender="${reqCard}"
         page-size="${this.cardPageSize}"
@@ -780,6 +783,7 @@ export class AppRequirements extends LitElement {
     return html`
       <div class="table-card">
         <app-data-table
+          .contentStyles="${tableContentStyles}"
           .rows="${list}"
           page-size="${this.tablePageSize}"
           page="${this.currentPage}"

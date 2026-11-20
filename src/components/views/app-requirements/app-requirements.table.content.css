@@ -1,0 +1,82 @@
+/* app-requirements table content styles. The markup is produced by this view's cellRender callbacks and
+   rendered inside the app-data-table shadow tree, so these rules live in the view file and are
+   injected through the additive contentStyles hook. The table shell (header, body, footer,
+   pagination) stays in app-data-table. */
+
+/* Requirements registry reference rich cells: code badge, FR/NFR type tag, project
+   pill with 7px dot, title main/sub lines */
+.req-code-badge{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.16rem 0.48rem;
+  border-radius: var(--radius-sm, 6px);
+  background: rgba(56, 189, 248, 0.14);
+  color: var(--color-info, #38bdf8);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+}
+
+.req-code-badge.is-nfr{
+  background: rgba(168, 85, 247, 0.14);
+  color: #c084fc;
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.req-type-tag,
+.req-project-pill{
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.14rem 0.45rem;
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-subtle, rgba(148, 163, 184, 0.1));
+  color: var(--text-secondary, #94a3b8);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+.req-project-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.proj-dot{
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.td-title-main{
+  font-weight: 600;
+  color: var(--text-primary, #f8fafc);
+}
+
+.td-title-sub{
+  font-size: 0.74rem;
+  color: var(--text-muted, #64748b);
+  margin-top: 2px;
+}
+
+.footer-right app-button{
+  --btn-radius-tl: var(--radius-sm, 6px);
+  --btn-radius-tr: var(--radius-sm, 6px);
+  --btn-radius-bl: var(--radius-sm, 6px);
+  --btn-radius-br: var(--radius-sm, 6px);
+}
+
+.footer-right app-button:not([action='delete']){
+  --icon-btn-hover-border: var(--border-subtle, #1e293b);
+}
+
+/* Rich cells rendered through column cellRender live in this shadow tree, so the
+   component owns their classes (the journal reference styles). */
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
+
+.mono{
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+}
