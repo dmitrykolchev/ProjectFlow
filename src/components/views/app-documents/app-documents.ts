@@ -130,6 +130,7 @@ export class AppDocuments extends LitElement {
     this.projectFilter = store.documentFilterProjectId;
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
+    this.viewMode = (store.viewModeFor('documents') as 'cards' | 'table') ?? 'cards';
     if (this.previewDoc) {
       this.previewDoc = store.documents.find((d) => d.id === this.previewDoc!.id) || null;
     }
@@ -321,8 +322,8 @@ export class AppDocuments extends LitElement {
             { value: 'table', label: t.documents.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.viewMode = eventValue(e) as 'cards' | 'table';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('documents', eventValue(e) as 'cards' | 'table');
           }}"
         ></app-segmented-switch>
 
