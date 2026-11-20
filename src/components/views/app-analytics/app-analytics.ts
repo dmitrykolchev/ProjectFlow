@@ -4,6 +4,8 @@ import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import { effectivePresence } from '../../../domain/presence-tokens';
+import { iconAnalytics } from '../../common/icons';
+import '../../common/app-page-header/app-page-header';
 import '../../common/app-persona/app-persona';
 import '../../common/app-section-card/app-section-card';
 import styles from './app-analytics.css';
@@ -76,6 +78,13 @@ export class AppAnalytics extends LitElement {
     };
 
     return html`
+      <app-page-header
+        title="${t.navigation.analytics}"
+        subtitle="${t.viewTexts.pageSubtitles.analytics}"
+      >
+        <span slot="icon">${iconAnalytics(28)}</span>
+      </app-page-header>
+
       <div class="kpi-grid">
         <div class="kpi-card">
           <span class="kpi-label">${t.analytics.totalTasks}</span>
