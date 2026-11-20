@@ -256,6 +256,18 @@ export class AppDirectoryRecordModal extends LitElement {
     const val = this.formExtra[field.key];
 
     if (field.type === 'boolean') {
+      // framelessSwitch: the plain switch with its own caption, no ghost label row and no box frame
+      if (field.framelessSwitch) {
+        return html`
+          <app-switch
+            class="frameless-switch"
+            label="${label}"
+            .checked="${Boolean(val)}"
+            @change="${(e: CustomEvent<{ checked: boolean }>) =>
+              this.updateExtra(field.key, Boolean(e.detail?.checked))}"
+          ></app-switch>
+        `;
+      }
       return html`
         <div class="switch-field">
           <label>${label}</label>

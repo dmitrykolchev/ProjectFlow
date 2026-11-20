@@ -67,6 +67,13 @@
   width: 100%;
 }
 
+/* framelessSwitch fields (DirectoryFieldDef.framelessSwitch): the same plain switch inside a grid
+   column — caption and toggle only, no box frame around it */
+.frameless-switch {
+  display: flex;
+  width: 100%;
+}
+
 .error-banner {
   padding: 0.65rem 0.85rem;
   border-radius: var(--radius-md, 8px);

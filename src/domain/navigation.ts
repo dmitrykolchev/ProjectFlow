@@ -3,8 +3,10 @@ import { ActiveView } from '../types';
 export interface NavLocation {
   view: ActiveView;
   id?: string;
-  /** page number for paginated list views (#/<view>/p/<n>) */
+  /** page number for paginated list views (#/<view>?page=<n>) */
   page?: number;
+  /** display mode of the view (#/<view>?mode=<mode>) */
+  mode?: string;
 }
 
 const VIEW_SEGMENTS: Record<ActiveView, string> = {
@@ -49,24 +51,36 @@ const VIEW_SEGMENTS: Record<ActiveView, string> = {
 };
 
 export function pathToLocation(hash: string): NavLocation | null {
-  const clean = hash.replace(/^#\/?/, '');
-  if (!clean) return null;
-  const [segment, second, third] = clean.split('/');
+  const [pathPart, queryPart] = hash.replace(/^#\/?/, '').split('?');
+  if (!pathPart) return null;
+  const [segment, second] = pathPart.split('/');
   const view = (Object.keys(VIEW_SEGMENTS) as ActiveView[]).find(
     (v) => VIEW_SEGMENTS[v] === segment
   );
   if (!view) return null;
-  // page segment "p/<n>" is used by paginated list views
-  if (second === 'p') {
-    const page = Number(third);
-    return { view, page: Number.isInteger(page) && page > 1 ? page : undefined };
-  }
-  return { view, id: second ? decodeURIComponent(second) : undefined };
+  // mode and page live in the query part: #/<view>?mode=<mode>&page=<n>
+  const params = new URLSearchParams(queryPart || '');
+  const mode = params.get('mode');
+  const page = Number(params.get('page'));
+  return {
+    view,
+    id: second ? decodeURIComponent(second) : undefined,
+    mode: mode || undefined,
+    page: Number.isInteger(page) && page > 1 ? page : undefined,
+  };
 }
 
-export function locationToPath(view: ActiveView, id?: string, page?: number): string {
+export function locationToPath(
+  view: ActiveView,
+  id?: string,
+  page?: number,
+  mode?: string
+): string {
   const seg = VIEW_SEGMENTS[view];
-  if (id) return `#/${seg}/${encodeURIComponent(id)}`;
-  if (page !== undefined && page > 1) return `#/${seg}/p/${page}`;
-  return `#/${seg}`;
+  const base = id ? `#/${seg}/${encodeURIComponent(id)}` : `#/${seg}`;
+  const params = new URLSearchParams();
+  if (mode) params.set('mode', mode);
+  if (page !== undefined && page > 1) params.set('page', String(page));
+  const query = params.toString();
+  return query ? `${base}?${query}` : base;
 }

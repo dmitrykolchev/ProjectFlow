@@ -114,6 +114,7 @@ export class AppProjects extends LitElement {
     this.cardPageSize = store.customization.cardGridPageSize;
     this.tablePageSize = store.customization.tablePageSize;
     this.currentPage = store.activeView === 'projects' ? store.activePage : 1;
+    this.displayMode = (store.viewModeFor('projects') as 'cards' | 'table') ?? 'cards';
   }
 
   private getFilteredProjects(): Project[] {
@@ -181,8 +182,8 @@ export class AppProjects extends LitElement {
             { value: 'table', label: t.viewTexts.projects.viewTable },
           ]}"
           @change="${(e: CustomEvent<{ value: string }>) => {
-            this.displayMode = eventValue(e) as 'cards' | 'table';
             this.currentPage = 1; store.setActivePage(1, false);
+            store.setViewMode('projects', eventValue(e) as 'cards' | 'table');
           }}"
         ></app-segmented-switch>
 

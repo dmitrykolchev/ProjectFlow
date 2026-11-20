@@ -124,6 +124,7 @@ const defaultCustomization: UserCustomization = {
   aiBudget: { dailyRequests: 0, dailyTokens: 0 },
   timezone: 'Europe/Moscow',
   defaultProjectId: '',
+  viewModes: {},
   gridColumns: {
     id: true,
     title: true,
@@ -1561,6 +1562,20 @@ export class AppStore {
     this.syncHistory(!push);
   }
 
+  /** Display mode of a view (cards/table/grid, tabs, density). Views read it from the store and
+   * report changes here; push adds a history entry so browser back restores the previous mode. */
+  public viewModeFor(view: ActiveView): string | undefined {
+    return this.customization.viewModes[view];
+  }
+
+  public setViewMode(view: ActiveView, mode: string, push: boolean = true): void {
+    if (this.customization.viewModes[view] === mode) return;
+    this.customization.viewModes = { ...this.customization.viewModes, [view]: mode };
+    this.saveCustomization();
+    this.notify();
+    this.syncHistory(!push);
+  }
+
   private expandSidebarGroupFor(view: ActiveView): void {
     const targetGroup = this.getGroupForView(view);
     const expanded = this.customization.sidebarExpandedGroups || [];
@@ -1613,8 +1628,9 @@ export class AppStore {
     if (this.historyApplying) return;
     const id = this.currentDetailId();
     const page = this.activePage > 1 ? this.activePage : undefined;
-    const path = locationToPath(this.activeView, id, page);
-    const state = { view: this.activeView, id, page };
+    const mode = this.customization.viewModes[this.activeView];
+    const path = locationToPath(this.activeView, id, page, mode);
+    const state = { view: this.activeView, id, page, mode };
     if (location.hash === path) {
       history.replaceState(state, '', path);
       return;
@@ -1678,6 +1694,12 @@ export class AppStore {
     }
     this.activeView = view;
     this.activePage = loc.page ?? 1;
+    // restoring a location without a mode segment means the view's default mode
+    const modes = { ...this.customization.viewModes };
+    if (loc.mode) modes[view] = loc.mode;
+    else delete modes[view];
+    this.customization.viewModes = modes;
+    this.saveCustomization();
     this.expandSidebarGroupFor(view);
     this.notify();
     this.historyApplying = false;
@@ -1685,8 +1707,10 @@ export class AppStore {
 
   public initHistory(): void {
     window.addEventListener('popstate', (e: PopStateEvent) => {
-      const st = e.state as { view: ActiveView; id?: string; page?: number } | null;
-      const loc = st?.view ? { view: st.view, id: st.id, page: st.page } : pathToLocation(location.hash);
+      const st = e.state as { view: ActiveView; id?: string; page?: number; mode?: string } | null;
+      const loc = st?.view
+        ? { view: st.view, id: st.id, page: st.page, mode: st.mode }
+        : pathToLocation(location.hash);
       if (loc) this.applyHistoryLocation(loc);
     });
     const loc = pathToLocation(location.hash);
@@ -1695,10 +1719,11 @@ export class AppStore {
     }
     const initId = this.currentDetailId();
     const initPage = this.activePage > 1 ? this.activePage : undefined;
+    const initMode = this.customization.viewModes[this.activeView];
     history.replaceState(
-      { view: this.activeView, id: initId, page: initPage },
+      { view: this.activeView, id: initId, page: initPage, mode: initMode },
       '',
-      locationToPath(this.activeView, initId, initPage)
+      locationToPath(this.activeView, initId, initPage, initMode)
     );
   }
 

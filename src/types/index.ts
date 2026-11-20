@@ -681,6 +681,8 @@ export interface UserCustomization {
   aiBudget: AiBudgetConfig;
   timezone: string;
   defaultProjectId: string;
+  /** display mode of each view, recorded in the navigation history (#/<view>?mode=<mode>) */
+  viewModes: Record<string, string>;
   gridColumns: {
     id: boolean;
     title: boolean;
@@ -724,6 +726,9 @@ export interface DirectoryFieldDef {
   max?: number;
   options?: DirectoryFieldOption[];
   defaultValue?: string | number | boolean;
+  /** Boolean fields render as a labelled switch inside a framed box (the canonical form row).
+     This flag renders the plain switch with no box, for rows where the frame is not wanted. */
+  framelessSwitch?: boolean;
 }
 
 export interface DirectoryRecord {

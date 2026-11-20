@@ -1375,13 +1375,16 @@ export class AppDataGrid extends LitElement {
 
       case 'assignee': {
         const assignee = store.users.find((u) => u.id === String(val ?? ''));
+        // The name lives inside app-persona as primaryText (the component renders it next to the
+        // avatar, truncates it with its own ellipsis and tooltip, and composes the accessible
+        // name as "name — presence"). Unassigned rows keep the placeholder avatar with no text.
         return html`
-          <div class="assignee-chip" title="${assignee ? assignee.name : '—'}">
+          <div class="assignee-chip">
             <app-persona
               size="24"
               .initials="${assignee ? assignee.avatar : '?'}"
+              .primaryText="${assignee ? assignee.name : ''}"
               .presence="${assignee ? effectivePresence(assignee) : 'none'}"
-              .ariaLabel="${assignee ? assignee.name : ''}"
               .interactive="${false}"
             ></app-persona>
           </div>
