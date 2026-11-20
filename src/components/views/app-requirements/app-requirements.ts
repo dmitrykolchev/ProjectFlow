@@ -273,6 +273,7 @@ export class AppRequirements extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px;"
             placeholder="${t.viewTexts.requirements.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[
               { key: 'project', type: 'entity', options: projectOptions },
               { key: 'type', options: typeOptions },
@@ -298,6 +299,15 @@ export class AppRequirements extends LitElement {
               if (e.detail.key === 'type') this.typeFilter = val as 'all' | RequirementType;
               if (e.detail.key === 'priority') this.priorityFilter = val as 'all' | RequirementPriority;
               if (e.detail.key === 'status') this.statusFilter = val as 'all' | RequirementStatus;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.projectFilter = 'all';
+              store.requirementFilterProjectId = 'all';
+              this.typeFilter = 'all';
+              this.priorityFilter = 'all';
+              this.statusFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
