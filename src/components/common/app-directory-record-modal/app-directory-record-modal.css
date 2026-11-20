@@ -55,10 +55,20 @@
   min-width: 0;
 }
 
-.recurrence-field-label {
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: var(--text-secondary, #94a3b8);
+.rrule-display-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.rrule-display {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  --control-font-md: 0.82rem;
 }
 
 .error-banner {

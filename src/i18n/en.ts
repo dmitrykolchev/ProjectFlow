@@ -2997,6 +2997,8 @@ export const en = {
       converterBaseNote: (baseCode: string, factor: string) => `Base: ${baseCode} (k = ${factor})`,
       recordModalTitleCreate: (dirName: string) => `New record: ${dirName}`,
       recordModalTitleEdit: (dirName: string) => `Edit record: ${dirName}`,
+      recurrenceModalTitle: 'Recurrence Pattern',
+      editRecurrenceTemplateBtn: 'Edit pattern',
       fieldCodeLabel: 'System Code',
       fieldCodePlaceholder: 'HUR, USD, DEV...',
       fieldCodeHelper: 'Unique identifier within this directory (letters, digits, _)',

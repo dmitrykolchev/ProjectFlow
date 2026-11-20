@@ -39,6 +39,9 @@ export class AppDirectoryRecordModal extends LitElement {
   @state() private codeError: string = '';
   @state() private nameError: string = '';
   @state() private formError: string = '';
+  @state() private recurrenceDialogOpen: boolean = false;
+
+  private recurrenceDraft: RecurrenceEditorChangeDetail | null = null;
 
   private unsubscribe?: () => void;
 
@@ -221,6 +224,32 @@ export class AppDirectoryRecordModal extends LitElement {
     this.formError = '';
   }
 
+  private openRecurrenceDialog() {
+    this.recurrenceDraft = null;
+    this.recurrenceDialogOpen = true;
+  }
+
+  private currentRecurrenceDetail(): RecurrenceEditorChangeDetail {
+    if (this.recurrenceDraft) return this.recurrenceDraft;
+    const rrule = String(this.formExtra.rrule || '');
+    const parsed = parseRRule(rrule);
+    return {
+      value: rrule,
+      rrule,
+      rule: parsed.ok ? parsed.rule : null,
+      isValid: parsed.ok,
+      summary: '',
+    };
+  }
+
+  private applyRecurrenceDialog() {
+    const detail = this.currentRecurrenceDetail();
+    if (detail.isValid) {
+      this.handleRecurrenceTemplateChange(detail);
+    }
+    this.recurrenceDialogOpen = false;
+  }
+
   private handleSave() {
     const t = getTranslation(this.currentLang);
     const dir = this.directory;
@@ -377,14 +406,21 @@ export class AppDirectoryRecordModal extends LitElement {
     if (this.directory?.id === 'recurrence_templates' && field.key === 'rrule') {
       return html`
         <div class="col-span-2 recurrence-field-block">
-          <label class="recurrence-field-label">${label}</label>
-          <app-recurrence-editor
-            compact
-            .includePrefix="${false}"
-            .value="${String(val ?? '')}"
-            @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
-              this.handleRecurrenceTemplateChange(e.detail)}"
-          ></app-recurrence-editor>
+          <div class="rrule-display-row">
+            <app-input
+              class="rrule-display"
+              label="${label}"
+              disabled
+              .value="${String(val ?? '')}"
+            ></app-input>
+            <app-button
+              variant="secondary"
+              size="md"
+              @click="${() => this.openRecurrenceDialog()}"
+            >
+              ${t.viewTexts.directories.editRecurrenceTemplateBtn}
+            </app-button>
+          </div>
         </div>
       `;
     }
@@ -517,6 +553,28 @@ export class AppDirectoryRecordModal extends LitElement {
           </app-button>
           <app-button variant="primary" @click="${() => this.handleSave()}">
             ${t.common.save}
+          </app-button>
+        </div>
+      </app-modal>
+
+      <app-modal
+        ?open="${this.recurrenceDialogOpen}"
+        size="md"
+        title="${t.viewTexts.directories.recurrenceModalTitle}"
+        @close="${() => (this.recurrenceDialogOpen = false)}"
+      >
+        <app-recurrence-editor
+          .includePrefix="${false}"
+          .value="${String(this.formExtra.rrule || '')}"
+          @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
+            (this.recurrenceDraft = e.detail)}"
+        ></app-recurrence-editor>
+        <div slot="footer" class="footer-actions">
+          <app-button variant="ghost" @click="${() => (this.recurrenceDialogOpen = false)}">
+            ${t.common.cancel}
+          </app-button>
+          <app-button variant="primary" @click="${() => this.applyRecurrenceDialog()}">
+            ${t.common.apply}
           </app-button>
         </div>
       </app-modal>

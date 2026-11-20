@@ -2997,6 +2997,8 @@ export const ru = {
       converterBaseNote: (baseCode: string, factor: string) => `База: ${baseCode} (k = ${factor})`,
       recordModalTitleCreate: (dirName: string) => `Новая запись: ${dirName}`,
       recordModalTitleEdit: (dirName: string) => `Редактирование: ${dirName}`,
+      recurrenceModalTitle: 'Шаблон повторяемости',
+      editRecurrenceTemplateBtn: 'Изменить шаблон',
       fieldCodeLabel: 'Системный код (Code)',
       fieldCodePlaceholder: 'HUR, USD, DEV...',
       fieldCodeHelper: 'Уникальный идентификатор внутри справочника (латиница, цифры, _)',
