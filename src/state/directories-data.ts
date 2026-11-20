@@ -418,6 +418,7 @@ export function createInitialDirectories(): DirectoryDefinition[] {
           type: 'boolean',
           align: 'center',
           showInTable: true,
+          framelessSwitch: true,
           defaultValue: false,
         },
         {
@@ -426,6 +427,7 @@ export function createInitialDirectories(): DirectoryDefinition[] {
           type: 'boolean',
           align: 'center',
           showInTable: true,
+          framelessSwitch: true,
           defaultValue: true,
         },
       ],
