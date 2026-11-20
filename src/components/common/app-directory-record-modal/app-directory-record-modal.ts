@@ -4,9 +4,11 @@ import {
   DirectoryDefinition,
   DirectoryFieldDef,
   DirectoryRecord,
+  Rfc5545Freq,
   SupportedLang,
 } from '../../../types';
 import { store } from '../../../state/store';
+import { parseRRule, RFC5545_FREQS, serializeRRule } from '../../../domain/rfc5545';
 import { getTranslation, TranslationType } from '../../../i18n';
 import { eventValue } from '../event-value';
 import '../app-modal/app-modal';
@@ -16,6 +18,8 @@ import '../app-textarea/app-textarea';
 import '../app-select/app-select';
 import '../app-switch/app-switch';
 import '../app-button/app-button';
+import '../app-recurrence-editor/app-recurrence-editor';
+import type { RecurrenceEditorChangeDetail } from '../app-recurrence-editor/app-recurrence-editor';
 import styles from './app-directory-record-modal.css';
 
 @customElement('app-directory-record-modal')
@@ -161,7 +165,59 @@ export class AppDirectoryRecordModal extends LitElement {
   }
 
   private updateExtra(key: string, value: string | number | boolean) {
-    this.formExtra = { ...this.formExtra, [key]: value };
+    const nextExtra: Record<string, string | number | boolean> = {
+      ...this.formExtra,
+      [key]: value,
+    };
+
+    if (this.directory?.id === 'recurrence_templates') {
+      if (key === 'freq') {
+        const freqVal = String(value).toUpperCase();
+        if (freqVal === 'NONE') {
+          nextExtra.rrule = '';
+          nextExtra.interval = 1;
+          nextExtra.isRecurring = false;
+        } else if (RFC5545_FREQS.includes(freqVal as Rfc5545Freq)) {
+          const parsed = parseRRule(String(nextExtra.rrule || ''));
+          const baseRule = parsed.ok
+            ? { ...parsed.rule, freq: freqVal as Rfc5545Freq }
+            : {
+                freq: freqVal as Rfc5545Freq,
+                interval: Math.max(1, Number(nextExtra.interval || 1)),
+                wkst: 'MO' as const,
+              };
+          nextExtra.rrule = serializeRRule(baseRule, false);
+          nextExtra.isRecurring = true;
+        }
+      } else if (key === 'interval' && typeof value === 'number' && !Number.isNaN(value)) {
+        const freqVal = String(nextExtra.freq || 'NONE').toUpperCase();
+        if (RFC5545_FREQS.includes(freqVal as Rfc5545Freq)) {
+          const parsed = parseRRule(String(nextExtra.rrule || ''));
+          const safeInt = Math.max(1, Math.round(value));
+          const baseRule = parsed.ok
+            ? { ...parsed.rule, interval: safeInt }
+            : {
+                freq: freqVal as Rfc5545Freq,
+                interval: safeInt,
+                wkst: 'MO' as const,
+              };
+          nextExtra.rrule = serializeRRule(baseRule, false);
+        }
+      }
+    }
+
+    this.formExtra = nextExtra;
+    this.formError = '';
+  }
+
+  private handleRecurrenceTemplateChange(detail: RecurrenceEditorChangeDetail) {
+    this.formExtra = {
+      ...this.formExtra,
+      rrule: detail.rrule,
+      freq: detail.rule ? detail.rule.freq : 'NONE',
+      interval: detail.rule ? Math.max(1, Math.round(detail.rule.interval || 1)) : 1,
+      isRecurring: Boolean(detail.rule),
+    };
     this.formError = '';
   }
 
@@ -314,6 +370,21 @@ export class AppDirectoryRecordModal extends LitElement {
               this.updateExtra(field.key, Number.isNaN(parsed) ? '' : parsed);
             }}"
           ></app-input>
+        </div>
+      `;
+    }
+
+    if (this.directory?.id === 'recurrence_templates' && field.key === 'rrule') {
+      return html`
+        <div class="col-span-2 recurrence-field-block">
+          <label class="recurrence-field-label">${label}</label>
+          <app-recurrence-editor
+            compact
+            .includePrefix="${false}"
+            .value="${String(val ?? '')}"
+            @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
+              this.handleRecurrenceTemplateChange(e.detail)}"
+          ></app-recurrence-editor>
         </div>
       `;
     }

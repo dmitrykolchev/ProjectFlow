@@ -88,6 +88,7 @@ import draggableListItemMeta from '../../common/app-draggable-list-item/app-drag
 import draggableListMeta from '../../common/app-draggable-list/app-draggable-list.story';
 import directoryRecordModalMeta from '../../common/app-directory-record-modal/app-directory-record-modal.story';
 import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.story';
+import recurrenceEditorMeta from '../../common/app-recurrence-editor/app-recurrence-editor.story';
 import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
 import dataTableMeta from '../../common/app-data-table/app-data-table.story';
@@ -188,6 +189,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   documentFormMeta,
   decomposeFormMeta,
   reminderFormMeta,
+  recurrenceEditorMeta,
   tagsRowMeta,
   colorSwatchesMeta,
   emptyStateMeta,

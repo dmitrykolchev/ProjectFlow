@@ -96,6 +96,8 @@ export {
 } from './app-project-attachments/app-project-attachments';
 export { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
 export { AppReminderForm } from './app-reminder-form/app-reminder-form';
+export { AppRecurrenceEditor } from './app-recurrence-editor/app-recurrence-editor';
+export type { RecurrenceEditorChangeDetail } from './app-recurrence-editor/app-recurrence-editor';
 export { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 export { AppTableScroll, type SortDirection, type SortChangeDetail } from './app-table-scroll/app-table-scroll';
 export {
@@ -166,6 +168,7 @@ import { AppCounterpartyContacts } from './app-counterparty-contacts/app-counter
 import { AppProjectAttachments } from './app-project-attachments/app-project-attachments';
 import { AppDirectoryRecordModal } from './app-directory-record-modal/app-directory-record-modal';
 import { AppReminderForm } from './app-reminder-form/app-reminder-form';
+import { AppRecurrenceEditor } from './app-recurrence-editor/app-recurrence-editor';
 import { AppEntityReminders } from './app-entity-reminders/app-entity-reminders';
 import { AppTableScroll } from './app-table-scroll/app-table-scroll';
 import { AppTableColumn } from './app-table-column/app-table-column';
@@ -222,6 +225,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-project-attachments': AppProjectAttachments,
   'app-directory-record-modal': AppDirectoryRecordModal,
   'app-reminder-form': AppReminderForm,
+  'app-recurrence-editor': AppRecurrenceEditor,
   'app-entity-reminders': AppEntityReminders,
   'app-table-scroll': AppTableScroll,
   'app-table-column': AppTableColumn,

@@ -2,7 +2,6 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import {
-  RecurrenceEndType,
   Reminder,
   ReminderEntityType,
   ReminderLeadUnit,
@@ -12,16 +11,9 @@ import {
   ReminderRecurrence,
   ReminderRecipientMode,
   ReminderStatus,
-  Rfc5545ByDay,
-  Rfc5545Freq,
-  Rfc5545Weekday,
 } from '../../../types';
 import {
-  RFC5545_FREQS,
-  RFC5545_WEEKDAYS,
-  Rfc5545Rule,
   buildRecurrenceFromRRule,
-  formatRRuleHumanSummary,
   parseRRule,
   recurrenceToRRule,
   serializeRRule,
@@ -33,7 +25,6 @@ import {
   iconBell,
   iconBellRing,
   iconCalendar,
-  iconCopy,
   iconPaperclip,
   iconPlus,
   iconRepeat,
@@ -51,6 +42,8 @@ import '../app-entity-selector/app-entity-selector';
 import type { AppEntitySelector } from '../app-entity-selector/app-entity-selector';
 import '../app-switch/app-switch';
 import '../app-button/app-button';
+import '../app-recurrence-editor/app-recurrence-editor';
+import type { RecurrenceEditorChangeDetail } from '../app-recurrence-editor/app-recurrence-editor';
 import {
   AttachmentsChangeDetail,
   commitPendingAttachments,
@@ -100,27 +93,11 @@ export class AppReminderForm extends LitElement {
   @state() private fAttachmentIds: string[] = [];
   @state() private fPendingFiles: PendingAttachmentFile[] = [];
 
-  // RFC 5545 Recurrence fields
+  // RFC 5545 Recurrence fields (delegated to <app-recurrence-editor>)
   @state() private fTemplateCode = 'ONCE';
-  @state() private fFreq: Rfc5545Freq | 'NONE' = 'NONE';
-  @state() private fInterval = 1;
-  @state() private fWkst: Rfc5545Weekday = 'MO';
-  @state() private fByDay: Rfc5545ByDay[] = [];
-  @state() private fByDayOrdinal = 0;
-  @state() private fByMonthDayText = '';
-  @state() private fByMonth: number[] = [];
-  @state() private fBySetPosText = '';
-  @state() private fByYearDay?: number[];
-  @state() private fByWeekNo?: number[];
-  @state() private fByHour?: number[];
-  @state() private fByMinute?: number[];
   @state() private fSkipWeekends = false;
-  @state() private fEndType: RecurrenceEndType = 'never';
-  @state() private fEndDate = '';
-  @state() private fMaxOccurrences = 5;
   @state() private fOccurrenceCount = 0;
   @state() private fRruleInput = '';
-  @state() private fRruleError = '';
 
   // Notifications config
   @state() private fRules: ReminderNotificationRule[] = [];
@@ -159,116 +136,10 @@ export class AppReminderForm extends LitElement {
     }
   }
 
-  private parseIntListText(raw: string, min: number, max: number): number[] | undefined {
-    const tokens = raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (tokens.length === 0) return undefined;
-    const nums: number[] = [];
-    for (const tok of tokens) {
-      if (!/^[+-]?\d+$/.test(tok)) continue;
-      const n = Number(tok);
-      if (Number.isInteger(n) && n !== 0 && n >= min && n <= max && !nums.includes(n)) {
-        nums.push(n);
-      }
-    }
-    return nums.length > 0 ? nums : undefined;
-  }
-
-  private applyRuleToFields(rule: Rfc5545Rule | null) {
-    if (!rule) {
-      this.fFreq = 'NONE';
-      this.fInterval = 1;
-      this.fWkst = 'MO';
-      this.fByDay = [];
-      this.fByDayOrdinal = 0;
-      this.fByMonthDayText = '';
-      this.fByMonth = [];
-      this.fBySetPosText = '';
-      this.fByYearDay = undefined;
-      this.fByWeekNo = undefined;
-      this.fByHour = undefined;
-      this.fByMinute = undefined;
-      this.fEndType = 'never';
-      this.fEndDate = '';
-      this.fMaxOccurrences = 5;
-      this.fRruleInput = '';
-      this.fRruleError = '';
-      return;
-    }
-
-    this.fFreq = rule.freq;
-    this.fInterval = Math.max(1, rule.interval || 1);
-    this.fWkst = rule.wkst || 'MO';
-    this.fByDay = rule.byDay ? rule.byDay.map((b) => ({ ...b })) : [];
-    const firstNth = rule.byDay?.find((b) => b.nth !== undefined && b.nth !== 0)?.nth;
-    this.fByDayOrdinal = firstNth ?? 0;
-    this.fByMonthDayText = rule.byMonthDay?.length ? rule.byMonthDay.join(', ') : '';
-    this.fByMonth = rule.byMonth ? [...rule.byMonth] : [];
-    this.fBySetPosText = rule.bySetPos?.length ? rule.bySetPos.join(', ') : '';
-    this.fByYearDay = rule.byYearDay ? [...rule.byYearDay] : undefined;
-    this.fByWeekNo = rule.byWeekNo ? [...rule.byWeekNo] : undefined;
-    this.fByHour = rule.byHour ? [...rule.byHour] : undefined;
-    this.fByMinute = rule.byMinute ? [...rule.byMinute] : undefined;
-
-    if (rule.until) {
-      this.fEndType = 'until_date';
-      this.fEndDate = rule.until.slice(0, 10);
-    } else if (rule.count && rule.count >= 1) {
-      this.fEndType = 'max_occurrences';
-      this.fMaxOccurrences = rule.count;
-    } else {
-      this.fEndType = 'never';
-      this.fEndDate = '';
-    }
-
-    this.fRruleInput = serializeRRule(rule, true);
-    this.fRruleError = '';
-  }
-
-  private buildCurrentRfcRule(): Rfc5545Rule | null {
-    if (this.fFreq === 'NONE') return null;
-    const byMonthDay = this.parseIntListText(this.fByMonthDayText, -31, 31);
-    const bySetPos = this.parseIntListText(this.fBySetPosText, -366, 366);
-
-    const allowOrdinal = this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY';
-    const byDay =
-      this.fByDay.length > 0
-        ? this.fByDay.map((b) =>
-            allowOrdinal && this.fByDayOrdinal !== 0
-              ? { day: b.day, nth: this.fByDayOrdinal }
-              : { day: b.day }
-          )
-        : undefined;
-
-    return {
-      freq: this.fFreq,
-      interval: Math.max(1, Math.round(Number(this.fInterval) || 1)),
-      count:
-        this.fEndType === 'max_occurrences'
-          ? Math.max(1, Math.round(Number(this.fMaxOccurrences) || 1))
-          : undefined,
-      until: this.fEndType === 'until_date' && this.fEndDate ? this.fEndDate : undefined,
-      byMonth:
-        (this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY') && this.fByMonth.length > 0
-          ? [...this.fByMonth].sort((a, b) => a - b)
-          : undefined,
-      byMonthDay:
-        this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY' ? byMonthDay : undefined,
-      byDay,
-      bySetPos:
-        this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY' ? bySetPos : undefined,
-      byYearDay: this.fByYearDay?.length ? [...this.fByYearDay] : undefined,
-      byWeekNo: this.fByWeekNo?.length ? [...this.fByWeekNo] : undefined,
-      byHour: this.fByHour?.length ? [...this.fByHour] : undefined,
-      byMinute: this.fByMinute?.length ? [...this.fByMinute] : undefined,
-      wkst: this.fWkst || 'MO',
-    };
-  }
-
   private buildDraftRecurrence(): ReminderRecurrence {
-    const rule = this.buildCurrentRfcRule();
+    const trimmed = this.fRruleInput.trim();
+    const parsed = trimmed ? parseRRule(trimmed) : null;
+    const rule = parsed && parsed.ok ? parsed.rule : null;
     return buildRecurrenceFromRRule(rule, {
       templateCode: this.fTemplateCode || (rule ? 'CUSTOM' : 'ONCE'),
       skipWeekends: this.fSkipWeekends,
@@ -276,15 +147,8 @@ export class AppReminderForm extends LitElement {
     });
   }
 
-  private syncRruleTextFromControls() {
-    const rule = this.buildCurrentRfcRule();
-    this.fRruleInput = rule ? serializeRRule(rule, true) : '';
-    this.fRruleError = '';
-  }
-
   private initFields() {
     this.formError = '';
-    this.fRruleError = '';
     if (this.reminder) {
       const rem = this.reminder;
       const [datePart, timePart] = (rem.dueAt || '').split('T');
@@ -307,7 +171,7 @@ export class AppReminderForm extends LitElement {
       this.fOccurrenceCount = rem.recurrence.occurrenceCount || 0;
 
       const parsed = recurrenceToRRule(rem.recurrence);
-      this.applyRuleToFields(parsed);
+      this.fRruleInput = parsed ? serializeRRule(parsed, true) : '';
 
       this.fRules = rem.notifications.rules.map((r) => ({
         ...r,
@@ -353,7 +217,7 @@ export class AppReminderForm extends LitElement {
     this.fTemplateCode = 'ONCE';
     this.fSkipWeekends = false;
     this.fOccurrenceCount = 0;
-    this.applyRuleToFields(null);
+    this.fRruleInput = '';
 
     this.fRules = [
       {
@@ -401,16 +265,22 @@ export class AppReminderForm extends LitElement {
     this.fSkipWeekends = skipWeekends;
 
     if (!rruleStr || rawFreq === 'NONE' || code === 'ONCE') {
-      this.applyRuleToFields(null);
+      this.fRruleInput = '';
     } else {
       const parsed = parseRRule(rruleStr);
       if (parsed.ok) {
-        this.applyRuleToFields(parsed.rule);
+        this.fRruleInput = serializeRRule(parsed.rule, true);
       } else {
-        const freq = RFC5545_FREQS.includes(rawFreq as Rfc5545Freq)
-          ? (rawFreq as Rfc5545Freq)
-          : 'WEEKLY';
-        this.applyRuleToFields({ freq, interval, wkst: 'MO' });
+        const freq =
+          rawFreq === 'MINUTELY' ||
+          rawFreq === 'HOURLY' ||
+          rawFreq === 'DAILY' ||
+          rawFreq === 'WEEKLY' ||
+          rawFreq === 'MONTHLY' ||
+          rawFreq === 'YEARLY'
+            ? rawFreq
+            : 'WEEKLY';
+        this.fRruleInput = serializeRRule({ freq, interval, wkst: 'MO' }, true);
       }
     }
 
@@ -433,34 +303,14 @@ export class AppReminderForm extends LitElement {
     }
   }
 
-  private applyQuickPattern(
-    rruleStr: string,
-    templateCode: string,
-    skipWeekends: boolean = false
-  ) {
-    const parsed = parseRRule(rruleStr);
-    if (!parsed.ok) return;
-    this.fTemplateCode = templateCode;
-    this.fSkipWeekends = skipWeekends;
-    this.applyRuleToFields(parsed.rule);
-  }
-
-  private applyRawRRule(): boolean {
-    const t = getTranslation(this.currentLang);
-    const raw = this.fRruleInput.trim();
-    if (!raw) {
+  private handleRecurrenceEditorChange(detail: RecurrenceEditorChangeDetail) {
+    this.fRruleInput = detail.rrule;
+    if (!detail.rule) {
       this.fTemplateCode = 'ONCE';
-      this.applyRuleToFields(null);
-      return true;
-    }
-    const parsed = parseRRule(raw);
-    if (!parsed.ok) {
-      this.fRruleError = t.reminders.rruleErrors[parsed.errorCode];
-      return false;
+      return;
     }
 
-    // Match against directory templates if an identical canonical rule exists
-    const canonical = serializeRRule(parsed.rule, false);
+    const canonical = serializeRRule(detail.rule, false);
     const matchingTpl = store.getRecurrenceTemplates().find((tpl) => {
       const tplRaw = String(tpl.extra?.rrule || '').trim();
       if (!tplRaw) return false;
@@ -468,54 +318,6 @@ export class AppReminderForm extends LitElement {
       return tplParsed.ok && serializeRRule(tplParsed.rule, false) === canonical;
     });
     this.fTemplateCode = matchingTpl ? matchingTpl.code : 'CUSTOM';
-    this.applyRuleToFields(parsed.rule);
-    return true;
-  }
-
-  private async copyRRule() {
-    const t = getTranslation(this.currentLang);
-    const rule = this.buildCurrentRfcRule();
-    const text = rule ? serializeRRule(rule, true) : this.fRruleInput.trim();
-    if (!text) return;
-    try {
-      await navigator.clipboard?.writeText(text);
-      store.addNotification('info', t.reminders.rruleCopiedToast, text);
-    } catch {
-      store.addNotification('info', t.reminders.rruleCopiedToast, text);
-    }
-  }
-
-  private toggleWeekday(day: Rfc5545Weekday) {
-    const exists = this.fByDay.some((b) => b.day === day);
-    let next: Rfc5545ByDay[];
-    if (exists) {
-      // Allow emptying BYDAY in MONTHLY/YEARLY so BYMONTHDAY alone works (e.g. every 15th)
-      if (this.fFreq === 'WEEKLY' && this.fByDay.length <= 1) {
-        return;
-      }
-      next = this.fByDay.filter((b) => b.day !== day);
-    } else {
-      const nth =
-        (this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY') && this.fByDayOrdinal !== 0
-          ? this.fByDayOrdinal
-          : undefined;
-      next = [...this.fByDay, nth ? { day, nth } : { day }];
-      next.sort(
-        (a, b) => RFC5545_WEEKDAYS.indexOf(a.day) - RFC5545_WEEKDAYS.indexOf(b.day)
-      );
-    }
-    this.fByDay = next;
-    this.fTemplateCode = 'CUSTOM';
-    this.syncRruleTextFromControls();
-  }
-
-  private toggleMonth(month1to12: number) {
-    const exists = this.fByMonth.includes(month1to12);
-    this.fByMonth = exists
-      ? this.fByMonth.filter((m) => m !== month1to12)
-      : [...this.fByMonth, month1to12].sort((a, b) => a - b);
-    this.fTemplateCode = 'CUSTOM';
-    this.syncRruleTextFromControls();
   }
 
   private addAssignee(userId: string) {
@@ -664,16 +466,6 @@ export class AppReminderForm extends LitElement {
       return;
     }
 
-    // If user typed directly in the RRULE field without pressing Apply, validate & sync it
-    const currentRule = this.buildCurrentRfcRule();
-    const expectedText = currentRule ? serializeRRule(currentRule, true) : '';
-    if (this.fRruleInput.trim() !== expectedText) {
-      const applied = this.applyRawRRule();
-      if (!applied) {
-        return;
-      }
-    }
-
     const dueAt = `${this.fDueDate}T${(this.fDueTime || '10:00').slice(0, 5)}`;
     const recurrence = this.buildDraftRecurrence();
 
@@ -764,42 +556,6 @@ export class AppReminderForm extends LitElement {
       label: useEnNames && rec.nameEn ? rec.nameEn : rec.name,
     }));
 
-    const freqOptions: Array<{ value: Rfc5545Freq | 'NONE'; label: string }> = [
-      { value: 'NONE', label: t.reminders.rfcFreqs.NONE },
-      ...RFC5545_FREQS.map((f) => ({ value: f, label: t.reminders.rfcFreqs[f] })),
-    ];
-
-    const wkstOptions = RFC5545_WEEKDAYS.map((w) => ({
-      value: w,
-      label: `${t.reminders.rfcWeekdaysShort[w]} (${w})`,
-    }));
-
-    const ordinalOptions = [
-      { value: '0', label: t.reminders.byDayNthOptions.any },
-      { value: '1', label: t.reminders.byDayNthOptions.pos1 },
-      { value: '2', label: t.reminders.byDayNthOptions.pos2 },
-      { value: '3', label: t.reminders.byDayNthOptions.pos3 },
-      { value: '4', label: t.reminders.byDayNthOptions.pos4 },
-      { value: '-1', label: t.reminders.byDayNthOptions.neg1 },
-    ];
-
-    const setPosOptions = [
-      { value: '', label: t.reminders.setPosPresets.none },
-      { value: '1', label: t.reminders.setPosPresets.first },
-      { value: '-1', label: t.reminders.setPosPresets.last },
-      ...(this.fBySetPosText &&
-      this.fBySetPosText !== '1' &&
-      this.fBySetPosText !== '-1'
-        ? [{ value: this.fBySetPosText, label: `BYSETPOS=${this.fBySetPosText}` }]
-        : []),
-    ];
-
-    const endTypeOptions: Array<{ value: RecurrenceEndType; label: string }> = [
-      { value: 'never', label: t.reminders.endTypes.never },
-      { value: 'until_date', label: t.reminders.endTypes.until_date },
-      { value: 'max_occurrences', label: t.reminders.endTypes.max_occurrences },
-    ];
-
     const priorityOptions: Array<{ value: ReminderPriority; label: string }> = [
       { value: 'low', label: t.priority.low },
       { value: 'medium', label: t.priority.medium },
@@ -839,27 +595,7 @@ export class AppReminderForm extends LitElement {
       ...store.users.map((u) => ({ value: u.id, label: `${u.name} (${u.role})` })),
     ];
 
-    const draftRecurrence = this.buildDraftRecurrence();
     const baseDueStr = `${this.fDueDate || store.formatLocalDateTime(new Date()).slice(0, 10)}T${this.fDueTime || '10:00'}`;
-    const previewDates =
-      this.fFreq !== 'NONE'
-        ? store.getUpcomingReminderOccurrences(baseDueStr, draftRecurrence, 4)
-        : [];
-    const humanSummary =
-      this.fFreq !== 'NONE'
-        ? formatRRuleHumanSummary(draftRecurrence, {
-            freqEvery: t.reminders.rfcFreqEvery,
-            weekdaysShortMap: t.reminders.rfcWeekdaysShort,
-            monthsShort: t.reminders.monthsShort,
-            nthPrefix: t.reminders.nthPrefix,
-            monthDayPrefix: t.reminders.monthDayPrefix,
-            setPosLabel: t.reminders.setPosLabel,
-          })
-        : '';
-
-    const showByDay =
-      this.fFreq === 'WEEKLY' || this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY';
-    const showMonthControls = this.fFreq === 'MONTHLY' || this.fFreq === 'YEARLY';
 
     return html`
       <app-modal
@@ -1022,7 +758,7 @@ export class AppReminderForm extends LitElement {
             </app-form-grid>
           </section>
 
-          <!-- Section 2: RFC 5545 Recurrence & Directory Templates -->
+          <!-- Section 2: Visual RFC 5545 Recurrence Editor & Directory Templates -->
           <section class="form-section">
             <div class="section-head">
               <span class="section-title">
@@ -1031,334 +767,34 @@ export class AppReminderForm extends LitElement {
               </span>
             </div>
 
-            <div class="template-row">
-              <div class="template-select-wrap">
-                <app-select
-                  label="${t.reminders.fieldTemplate}"
-                  .value="${this.fTemplateCode}"
-                  .options="${templateOptions}"
-                  @change="${(e: Event) => this.applyRecurrenceTemplate(eventValue(e))}"
-                ></app-select>
-              </div>
-            </div>
-
-            <div class="quick-patterns-bar">
-              <span class="quick-patterns-label">${t.reminders.quickPatternsTitle}</span>
-              <div class="quick-patterns-btns">
-                <button
-                  type="button"
-                  class="pattern-btn ${this.fRruleInput === 'RRULE:FREQ=MONTHLY;BYMONTHDAY=13;BYDAY=FR' ? 'is-active' : ''}"
-                  @click="${() =>
-                    this.applyQuickPattern(
-                      'RRULE:FREQ=MONTHLY;BYDAY=FR;BYMONTHDAY=13',
-                      'FRIDAY_13',
-                      false
-                    )}"
-                >
-                  ${t.reminders.quickFriday13}
-                </button>
-                <button
-                  type="button"
-                  class="pattern-btn ${this.fRruleInput === 'RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1' ? 'is-active' : ''}"
-                  @click="${() =>
-                    this.applyQuickPattern(
-                      'RRULE:FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1',
-                      'LAST_WORKDAY',
-                      false
-                    )}"
-                >
-                  ${t.reminders.quickLastWorkday}
-                </button>
-                <button
-                  type="button"
-                  class="pattern-btn ${this.fRruleInput === 'RRULE:FREQ=MONTHLY;BYMONTHDAY=-1' ? 'is-active' : ''}"
-                  @click="${() =>
-                    this.applyQuickPattern(
-                      'RRULE:FREQ=MONTHLY;BYMONTHDAY=-1',
-                      'CUSTOM',
-                      false
-                    )}"
-                >
-                  ${t.reminders.quickLastDay}
-                </button>
-                <button
-                  type="button"
-                  class="pattern-btn ${this.fRruleInput === 'RRULE:FREQ=MONTHLY;INTERVAL=3' ? 'is-active' : ''}"
-                  @click="${() =>
-                    this.applyQuickPattern(
-                      'RRULE:FREQ=MONTHLY;INTERVAL=3',
-                      'QUARTERLY',
-                      true
-                    )}"
-                >
-                  ${t.reminders.quickQuarterly}
-                </button>
-              </div>
-            </div>
-
             <app-form-grid columns="2">
               <app-select
-                label="${t.reminders.fieldUnit}"
-                .value="${this.fFreq}"
-                .options="${freqOptions}"
-                @change="${(e: Event) => {
-                  const next = eventValue(e) as Rfc5545Freq | 'NONE';
-                  this.fFreq = next;
-                  this.fTemplateCode = next === 'NONE' ? 'ONCE' : 'CUSTOM';
-                  if (next === 'WEEKLY' && this.fByDay.length === 0) {
-                    this.fByDay = [{ day: 'MO' }];
-                  }
-                  if (next !== 'MONTHLY' && next !== 'YEARLY') {
-                    this.fByDayOrdinal = 0;
-                    this.fByDay = this.fByDay.map((b) => ({ day: b.day }));
-                  }
-                  this.syncRruleTextFromControls();
-                }}"
+                label="${t.reminders.fieldTemplate}"
+                .value="${this.fTemplateCode}"
+                .options="${templateOptions}"
+                @change="${(e: Event) => this.applyRecurrenceTemplate(eventValue(e))}"
               ></app-select>
 
-              <app-number-input
-                label="${t.reminders.fieldInterval}"
-                min="1"
-                max="365"
-                step="1"
-                ?disabled="${this.fFreq === 'NONE'}"
-                .value="${this.fInterval}"
-                @change="${(e: Event) => {
-                  this.fInterval = Math.max(1, Number(eventValue(e)) || 1);
-                  this.fTemplateCode = 'CUSTOM';
-                  this.syncRruleTextFromControls();
-                }}"
-              ></app-number-input>
-
-              ${showByDay
-                ? html`
-                    <div class="weekdays-field col-span-2">
-                      <span class="field-caption">${t.reminders.fieldDaysOfWeek}</span>
-                      <div class="weekdays-row">
-                        ${RFC5545_WEEKDAYS.map((wd) => {
-                          const active = this.fByDay.some((b) => b.day === wd);
-                          return html`
-                            <button
-                              type="button"
-                              class="weekday-btn ${active ? 'is-active' : ''}"
-                              @click="${() => this.toggleWeekday(wd)}"
-                            >
-                              ${t.reminders.rfcWeekdaysShort[wd]}
-                            </button>
-                          `;
-                        })}
-                      </div>
-                    </div>
-                  `
-                : ''}
-
-              ${showMonthControls
-                ? html`
-                    <app-select
-                      label="${t.reminders.fieldByDayOrdinal}"
-                      .value="${String(this.fByDayOrdinal)}"
-                      .options="${ordinalOptions}"
-                      @change="${(e: Event) => {
-                        const ord = Number(eventValue(e)) || 0;
-                        this.fByDayOrdinal = ord;
-                        if (this.fByDay.length > 0) {
-                          this.fByDay = this.fByDay.map((b) =>
-                            ord !== 0 ? { day: b.day, nth: ord } : { day: b.day }
-                          );
-                        }
-                        this.fTemplateCode = 'CUSTOM';
-                        this.syncRruleTextFromControls();
-                      }}"
-                    ></app-select>
-
-                    <app-select
-                      label="${t.reminders.fieldBySetPos}"
-                      .value="${this.fBySetPosText}"
-                      .options="${setPosOptions}"
-                      @change="${(e: Event) => {
-                        this.fBySetPosText = eventValue(e);
-                        this.fTemplateCode = 'CUSTOM';
-                        this.syncRruleTextFromControls();
-                      }}"
-                    ></app-select>
-
-                    <app-input
-                      class="col-span-2"
-                      label="${t.reminders.fieldDayOfMonth}"
-                      placeholder="${t.reminders.fieldByMonthDayPlaceholder}"
-                      .value="${this.fByMonthDayText}"
-                      @input="${(e: Event) => {
-                        this.fByMonthDayText = eventValue(e);
-                        this.fTemplateCode = 'CUSTOM';
-                        this.syncRruleTextFromControls();
-                      }}"
-                    ></app-input>
-
-                    <div class="weekdays-field col-span-2">
-                      <span class="field-caption">${t.reminders.fieldByMonth}</span>
-                      <div class="months-grid">
-                        ${t.reminders.monthsShort.map((mLabel, idx) => {
-                          const mNum = idx + 1;
-                          const active = this.fByMonth.includes(mNum);
-                          return html`
-                            <button
-                              type="button"
-                              class="month-btn ${active ? 'is-active' : ''}"
-                              @click="${() => this.toggleMonth(mNum)}"
-                            >
-                              ${mLabel}
-                            </button>
-                          `;
-                        })}
-                      </div>
-                    </div>
-                  `
-                : ''}
-
-              ${this.fFreq !== 'NONE'
-                ? html`
-                    <app-select
-                      label="${t.reminders.fieldWkst}"
-                      .value="${this.fWkst}"
-                      .options="${wkstOptions}"
-                      @change="${(e: Event) => {
-                        this.fWkst = eventValue(e) as Rfc5545Weekday;
-                        this.fTemplateCode = 'CUSTOM';
-                        this.syncRruleTextFromControls();
-                      }}"
-                    ></app-select>
-
-                    <div class="switch-field">
-                      <label class="switch-ghost-label">${t.reminders.fieldSkipWeekends}</label>
-                      <div class="switch-box">
-                        <app-switch
-                          label="${t.reminders.fieldSkipWeekends}"
-                          ?checked="${this.fSkipWeekends}"
-                          @change="${(e: CustomEvent<{ checked: boolean }>) =>
-                            (this.fSkipWeekends = Boolean(e.detail?.checked))}"
-                        ></app-switch>
-                      </div>
-                    </div>
-
-                    <app-select
-                      label="${t.reminders.fieldEndType}"
-                      .value="${this.fEndType}"
-                      .options="${endTypeOptions}"
-                      @change="${(e: Event) => {
-                        this.fEndType = eventValue(e) as RecurrenceEndType;
-                        this.syncRruleTextFromControls();
-                      }}"
-                    ></app-select>
-
-                    ${this.fEndType === 'until_date'
-                      ? html`
-                          <app-date-input
-                            label="${t.reminders.fieldEndDate}"
-                            .value="${this.fEndDate}"
-                            @change="${(e: Event) => {
-                              this.fEndDate = eventValue(e);
-                              this.syncRruleTextFromControls();
-                            }}"
-                          ></app-date-input>
-                        `
-                      : this.fEndType === 'max_occurrences'
-                      ? html`
-                          <app-number-input
-                            label="${t.reminders.fieldMaxOccurrences}"
-                            min="1"
-                            max="999"
-                            step="1"
-                            .value="${this.fMaxOccurrences}"
-                            @change="${(e: Event) => {
-                              this.fMaxOccurrences = Math.max(1, Number(eventValue(e)) || 1);
-                              this.syncRruleTextFromControls();
-                            }}"
-                          ></app-number-input>
-                        `
-                      : ''}
-                  `
-                : ''}
-            </app-form-grid>
-
-            <!-- RFC 5545 RRULE Canonical Text Representation -->
-            <div class="rrule-editor-box">
-              <div class="rrule-input-row">
-                <div class="rrule-input-wrap">
-                  <app-input
-                    class="rrule-mono-input"
-                    label="${t.reminders.rruleInputLabel}"
-                    placeholder="${t.reminders.rruleInputPlaceholder}"
-                    .value="${this.fRruleInput}"
-                    @input="${(e: Event) => {
-                      this.fRruleInput = eventValue(e);
-                      this.fRruleError = '';
-                    }}"
-                    @keydown="${(e: KeyboardEvent) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        this.applyRawRRule();
-                      }
-                    }}"
-                  ></app-input>
-                </div>
-                <div class="rrule-actions">
-                  <app-button
-                    size="md"
-                    variant="outline"
-                    @click="${() => this.applyRawRRule()}"
-                  >
-                    <span>${t.reminders.rruleApplyBtn}</span>
-                  </app-button>
-                  <app-button
-                    size="md"
-                    variant="ghost"
-                    title="${t.reminders.rruleCopyBtn}"
-                    ?disabled="${!this.fRruleInput.trim()}"
-                    @click="${() => this.copyRRule()}"
-                  >
-                    <span slot="icon-start">${iconCopy(14)}</span>
-                    <span>${t.reminders.rruleCopyBtn}</span>
-                  </app-button>
+              <div class="switch-field">
+                <label class="switch-ghost-label">${t.reminders.fieldSkipWeekends}</label>
+                <div class="switch-box">
+                  <app-switch
+                    label="${t.reminders.fieldSkipWeekends}"
+                    ?checked="${this.fSkipWeekends}"
+                    @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                      (this.fSkipWeekends = Boolean(e.detail?.checked))}"
+                  ></app-switch>
                 </div>
               </div>
+            </app-form-grid>
 
-              ${this.fRruleError
-                ? html`<div class="rrule-error-msg">${this.fRruleError}</div>`
-                : humanSummary
-                ? html`
-                    <div class="rrule-summary-line">
-                      <span class="rrule-summary-label">${t.reminders.rruleSummaryLabel}</span>
-                      <span class="rrule-summary-text">${humanSummary}</span>
-                    </div>
-                  `
-                : ''}
-            </div>
-
-            <div class="preview-box">
-              <span class="preview-label">${t.reminders.previewNextTitle}</span>
-              ${this.fFreq === 'NONE'
-                ? html`<span class="field-caption">${t.reminders.previewSingleOnly}</span>`
-                : previewDates.length === 0
-                ? html`<span class="field-caption">${t.reminders.previewNoMatch}</span>`
-                : html`
-                    <div class="preview-dates">
-                      ${previewDates.map(
-                        (dt) => html`
-                          <span class="preview-date-chip">
-                            ${store.parseLocalDateTime(dt).toLocaleString(t.common.locale, {
-                              weekday: 'short',
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                        `
-                      )}
-                    </div>
-                  `}
-            </div>
+            <app-recurrence-editor
+              compact
+              .value="${this.fRruleInput}"
+              .startDate="${baseDueStr}"
+              @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
+                this.handleRecurrenceEditorChange(e.detail)}"
+            ></app-recurrence-editor>
           </section>
 
           <!-- Section 3: Notification Rules & Policies -->

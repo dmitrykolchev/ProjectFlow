@@ -215,11 +215,17 @@ export function serializeRRule(rule: Rfc5545Rule, includePrefix: boolean = true)
   }
 
   if (rule.byWeekNo && rule.byWeekNo.length > 0) {
-    parts.push(`BYWEEKNO=${rule.byWeekNo.join(',')}`);
+    const valid = Array.from(
+      new Set(rule.byWeekNo.filter((w) => w !== 0 && w >= -53 && w <= 53))
+    ).sort((a, b) => a - b);
+    if (valid.length > 0) parts.push(`BYWEEKNO=${valid.join(',')}`);
   }
 
   if (rule.byYearDay && rule.byYearDay.length > 0) {
-    parts.push(`BYYEARDAY=${rule.byYearDay.join(',')}`);
+    const valid = Array.from(
+      new Set(rule.byYearDay.filter((y) => y !== 0 && y >= -366 && y <= 366))
+    ).sort((a, b) => a - b);
+    if (valid.length > 0) parts.push(`BYYEARDAY=${valid.join(',')}`);
   }
 
   if (rule.byMonthDay && rule.byMonthDay.length > 0) {
@@ -243,11 +249,17 @@ export function serializeRRule(rule: Rfc5545Rule, includePrefix: boolean = true)
   }
 
   if (rule.byHour && rule.byHour.length > 0) {
-    parts.push(`BYHOUR=${rule.byHour.join(',')}`);
+    const valid = Array.from(
+      new Set(rule.byHour.filter((h) => Number.isInteger(h) && h >= 0 && h <= 23))
+    ).sort((a, b) => a - b);
+    if (valid.length > 0) parts.push(`BYHOUR=${valid.join(',')}`);
   }
 
   if (rule.byMinute && rule.byMinute.length > 0) {
-    parts.push(`BYMINUTE=${rule.byMinute.join(',')}`);
+    const valid = Array.from(
+      new Set(rule.byMinute.filter((m) => Number.isInteger(m) && m >= 0 && m <= 59))
+    ).sort((a, b) => a - b);
+    if (valid.length > 0) parts.push(`BYMINUTE=${valid.join(',')}`);
   }
 
   if (rule.bySetPos && rule.bySetPos.length > 0) {
@@ -1131,6 +1143,11 @@ export interface RRuleDisplayTranslations {
   nthPrefix: (nth: number) => string;
   monthDayPrefix: (days: string) => string;
   setPosLabel: (pos: string) => string;
+  weekNoPrefix?: (weeks: string) => string;
+  yearDayPrefix?: (days: string) => string;
+  timePrefix?: (times: string) => string;
+  countLabel?: (count: number) => string;
+  untilLabel?: (until: string) => string;
 }
 
 export function formatRRuleHumanSummary(
@@ -1149,6 +1166,14 @@ export function formatRRuleHumanSummary(
     if (mLabels.length > 0) parts.push(mLabels.join(', '));
   }
 
+  if (rule.byWeekNo && rule.byWeekNo.length > 0 && labels.weekNoPrefix) {
+    parts.push(labels.weekNoPrefix(rule.byWeekNo.join(', ')));
+  }
+
+  if (rule.byYearDay && rule.byYearDay.length > 0 && labels.yearDayPrefix) {
+    parts.push(labels.yearDayPrefix(rule.byYearDay.join(', ')));
+  }
+
   if (rule.byDay && rule.byDay.length > 0) {
     const dLabels = rule.byDay.map((b) => {
       const wd = labels.weekdaysShortMap[b.day];
@@ -1163,6 +1188,18 @@ export function formatRRuleHumanSummary(
 
   if (rule.bySetPos && rule.bySetPos.length > 0) {
     parts.push(labels.setPosLabel(rule.bySetPos.join(', ')));
+  }
+
+  if ((rule.byHour?.length || rule.byMinute?.length) && labels.timePrefix) {
+    const hrs = rule.byHour?.length ? rule.byHour.map((h) => pad2(h)).join(',') : '*';
+    const mins = rule.byMinute?.length ? rule.byMinute.map((m) => pad2(m)).join(',') : '00';
+    parts.push(labels.timePrefix(`${hrs}:${mins}`));
+  }
+
+  if (rule.count && rule.count >= 1 && labels.countLabel) {
+    parts.push(labels.countLabel(rule.count));
+  } else if (rule.until && labels.untilLabel) {
+    parts.push(labels.untilLabel(rule.until.slice(0, 10)));
   }
 
   return parts.join(' · ');
