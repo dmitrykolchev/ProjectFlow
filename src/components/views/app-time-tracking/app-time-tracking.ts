@@ -377,6 +377,7 @@ export class AppTimeTracking extends LitElement {
             style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 185px;"
             placeholder="${t.viewTexts.timeTracking.searchPlaceholder}"
             .searchValue="${this.localSearch}"
+            show-reset
             .filters="${[
               { key: 'project', type: 'entity', options: projectFilterOptions },
               { key: 'user', type: 'entity', options: userFilterOptions },
@@ -391,6 +392,13 @@ export class AppTimeTracking extends LitElement {
               if (e.detail.key === 'project') this.projectFilter = eventValue(e);
               if (e.detail.key === 'user') this.userFilter = eventValue(e);
               if (e.detail.key === 'category') this.categoryFilter = eventValue(e) as 'all' | TimeEntryCategory;
+              this.currentPage = 1; store.setActivePage(1, false);
+            }}"
+            @reset="${() => {
+              this.localSearch = '';
+              this.projectFilter = 'all';
+              this.userFilter = 'all';
+              this.categoryFilter = 'all';
               this.currentPage = 1; store.setActivePage(1, false);
             }}"
           ></app-filter-bar>`
