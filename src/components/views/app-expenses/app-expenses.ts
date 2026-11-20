@@ -595,6 +595,7 @@ export class AppExpenses extends LitElement {
         <app-link
           size="md"
           variant="primary"
+          style="--link-text-align: start;"
           title="${t.viewTexts.expenses.openDetailsTitle}"
           @click="${() => store.openExpenseDetail(exp.id)}"
         >
