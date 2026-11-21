@@ -499,7 +499,10 @@
   flex-wrap: wrap;
 }
 
-.doc-filter-pill {
+.doc-filter-pill {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: 1px solid var(--border-subtle, #334155);
   background: transparent;
   color: var(--text-secondary, #94a3b8);
@@ -549,7 +552,10 @@
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
 
-.doc-select-card {
+.doc-select-card {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 100%;
   display: flex;
   align-items: flex-start;
