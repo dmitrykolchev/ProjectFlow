@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-otp-input.css';
 
+// detail of the `otp-change` and `otp-complete` events (AGENTS.md §6)
+export interface OtpInputDetail {
+  value: string;
+}
+
 @customElement('app-otp-input')
 export class AppOtpInput extends LitElement {
   @property({ type: Number }) length: number = 6;
@@ -72,7 +77,7 @@ export class AppOtpInput extends LitElement {
     });
 
     this.dispatchEvent(
-      new CustomEvent('otp-change', {
+      new CustomEvent<OtpInputDetail>('otp-change', {
         detail: { value: joined },
         bubbles: true,
         composed: true,
@@ -81,7 +86,7 @@ export class AppOtpInput extends LitElement {
 
     if (emitCompleteIfFull && joined.length === this.length) {
       this.dispatchEvent(
-        new CustomEvent('otp-complete', {
+        new CustomEvent<OtpInputDetail>('otp-complete', {
           detail: { value: joined },
           bubbles: true,
           composed: true,
