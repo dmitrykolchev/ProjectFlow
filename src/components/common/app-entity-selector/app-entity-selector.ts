@@ -10,6 +10,16 @@ import { DeclarativeOption, OptionDataSource, optionsFromElements, resolveDataSo
 import { iconCheck, iconChevronDown, iconSearch, iconX } from '../icons';
 import styles from './app-entity-selector.css';
 
+// details of the `change` and `search-change` events (AGENTS.md §6)
+export interface EntitySelectorChangeDetail {
+  value: string;
+  option: EntitySelectorOption | null;
+}
+
+export interface EntitySelectorSearchDetail {
+  query: string;
+}
+
 export interface EntitySelectorOption {
   value: string;
   label: string;
@@ -696,7 +706,7 @@ export class AppEntitySelector extends LitElement {
 
   private dispatchChange(option: EntitySelectorOption | null) {
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<EntitySelectorChangeDetail>('change', {
         detail: { value: this.value, option },
         bubbles: true,
         composed: true,
@@ -706,7 +716,7 @@ export class AppEntitySelector extends LitElement {
 
   private dispatchSearchChange() {
     this.dispatchEvent(
-      new CustomEvent('search-change', {
+      new CustomEvent<EntitySelectorSearchDetail>('search-change', {
         detail: { query: this.searchQuery },
         bubbles: true,
         composed: true,
