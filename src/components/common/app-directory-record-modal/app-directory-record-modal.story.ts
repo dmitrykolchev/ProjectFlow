@@ -15,6 +15,13 @@ export const meta: ComponentStoryMeta = {
     directory: 'DirectoryDefinition schema governing core and extended fields',
     record: 'DirectoryRecord being edited, or null for create mode',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the modal is dismissed without saving' },
+    saved: {
+      detail: '{ directoryId: string, record: DirectoryRecord | null }',
+      description: 'Fires after a successful save with the stored record',
+    },
+  },
   stories: [
     {
       name: 'Extended Classifier (Units of Measure)',
