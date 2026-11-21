@@ -4,6 +4,15 @@ import type { MenuItem } from '../app-menu/app-menu';
 import { iconCheck } from '../icons';
 import styles from './app-menu-item.css';
 
+// detail of the `select` event (named event-detail interface, AGENTS.md §6)
+export interface MenuItemSelectDetail {
+  item: MenuItem;
+  id: string;
+  value: string;
+  checked?: boolean;
+  element: AppMenuItem;
+}
+
 @customElement('app-menu-item')
 export class AppMenuItem extends LitElement {
   @property({ type: String }) value: string = '';
@@ -63,7 +72,7 @@ export class AppMenuItem extends LitElement {
 
     const item = this.toMenuItem();
     this.dispatchEvent(
-      new CustomEvent('select', {
+      new CustomEvent<MenuItemSelectDetail>('select', {
         detail: {
           item,
           id: item.id,
