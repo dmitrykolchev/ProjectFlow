@@ -406,13 +406,6 @@ app-cards-table {
   font-weight: 500;
 }
 
-/* Featured switch: the canonical app-switch with frame="normal" and field-label-style="ghost"
-   (the component draws the label row, the control box geometry and the form-group gap). The view
-   only retunes the frame background to the historical switch-box fill. */
-.switch-field {
-  --switch-frame-bg: var(--bg-subtle, #1a2438);
-}
-
 .studio-bar {
   display: flex;
   align-items: center;

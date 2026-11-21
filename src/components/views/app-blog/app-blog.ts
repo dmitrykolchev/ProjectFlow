@@ -1311,9 +1311,8 @@ export class AppBlog extends LitElement {
             ></app-input>
 
             <app-switch
-              class="switch-field"
               size="md"
-              frame="normal"
+              frame="transparent"
               field-label-style="ghost"
               field-label="${b.fieldFeatured}"
               label="${b.fieldFeatured}"
