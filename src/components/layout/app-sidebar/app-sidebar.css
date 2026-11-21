@@ -78,7 +78,10 @@
   animation: var(--cyber-gradient-anim, none);
 }
 
-.collapse-btn {
+.collapse-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   position: absolute;
   top: calc(var(--density-header-height, 60px) / 2);
   right: -13px;
@@ -166,7 +169,10 @@
   gap: 0.35rem;
 }
 
-.logout-btn {
+.logout-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 30px;
   height: 30px;
   border-radius: var(--radius-sm, 6px);
