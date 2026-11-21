@@ -412,7 +412,6 @@ export class AppPayments extends LitElement {
 
       ${this.filterVisible
         ? html`<app-filter-bar
-            variant="bare"
             style="--filter-search-min: 280px; --filter-search-max: 280px; --filter-select-width: 190px;"
             placeholder="${this.viewTab === 'due_control' ? t.viewTexts.payments.searchDueControl : t.viewTexts.payments.searchLedger}"
             .searchValue="${this.localSearch}"
