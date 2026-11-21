@@ -2,7 +2,7 @@
 
 Дата: 20.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 139 (со стори: 138).
+Всего компонентов: 139 (со стори: 139).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -136,7 +136,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-split-button` | common | Common | Dual-action button combining a primary action trigger with a secondary options menu. |
 | `app-status-chip` | common | Common | Domain-driven status chip: resolves label and badge variant from central STATUS_TOKENS re… |
 | `app-switch` | common | Inputs | Toggle switch for boolean settings and feature flags. |
-| `app-table-column` | common | — | — |
+| `app-table-column` | common | — | Declarative column config child of app-table-scroll: field / label / type (text, number, … |
 | `app-table-scroll` | common | — | — |
 | `app-tags-row` | common | Elements | Canonical tags row for document cards, preview bars and readonly displays. |
 | `app-task-ai-panel` | common | Common | Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиоте… |
@@ -1855,22 +1855,24 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 
 #### `app-table-column` — `AppTableColumn`
 
-`src/components/common/app-table-column/` (без стори)
+`src/components/common/app-table-column/`
+
+Declarative column config child of app-table-scroll: field / label / type (text, number, boolean, select), alignment, mono and code cells, sortable headers, yes/no labels for booleans, option mapping for selects, plus cellRender and valueFn hooks. The element renders nothing itself — the table reads its properties.
 
 | Property | Type / default | Description |
 |---|---|---|
-| `field` | String, default `''` | — |
-| `label` | String, default `''` | — |
-| `type` | String, default `'text'` | — |
-| `options` | ColumnOption[], default `[]` | — |
-| `align` | String, default `'left'` | — |
-| `mono` | Boolean, default `false` | — |
-| `code` | Boolean, default `false` | — |
-| `sortable` | Boolean, default `false` | — |
-| `yesLabel` | String, default `''` | — |
-| `noLabel` | String, default `''` | — |
-| `cellRender` | String | — |
-| `valueFn` | String | — |
+| `field` | String, default `''` | Row property the column reads (empty label column when combined with cellRender) |
+| `label` | String, default `''` | Header caption shown in the sticky header row |
+| `type` | String, default `'text'` | Cell formatting preset: text \| number \| boolean \| select |
+| `options` | ColumnOption[], default `[]` | Value → label pairs used by type="select" cells |
+| `align` | String, default `'left'` | Horizontal alignment of header and cells: left \| center \| right |
+| `mono` | Boolean, default `false` | Renders the value in the mono font family with tabular numerals |
+| `code` | Boolean, default `false` | Renders the value as a code chip |
+| `sortable` | Boolean, default `false` | Header shows the sort button; clicking emits sort-change on the table |
+| `yes-label` | String, default `''` | Text for boolean true (falls back to the localized yes) |
+| `no-label` | String, default `''` | Text for boolean false (falls back to the localized no) |
+| `cellRender` | String | Custom cell renderer (row, value) => TemplateResult \| string \| number |
+| `valueFn` | String | Custom value extractor (row) => unknown, replacing the plain row[field] read |
 
 **Events:** `column-change`
 
@@ -2385,10 +2387,9 @@ The task table view: canonical skeleton (page header, Standard/Compact density s
 
 ---
 
-## 8. Компоненты без стори (1)
+## 8. Компоненты без стори (0)
 
 Не зарегистрированы в app-storybook: мета отсутствует, API описан по исходнику (помечены «без стори»
 в своих группах). По правилу проекта каждый компонент обязан иметь `.story.ts` — для этих компонентов
 стори нужно добавить:
 
-- `app-table-column` (common) — описание отсутствует

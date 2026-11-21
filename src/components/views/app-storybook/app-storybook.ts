@@ -92,6 +92,7 @@ import reminderFormMeta from '../../common/app-reminder-form/app-reminder-form.s
 import recurrenceEditorMeta from '../../common/app-recurrence-editor/app-recurrence-editor.story';
 import entityRemindersMeta from '../../common/app-entity-reminders/app-entity-reminders.story';
 import tableScrollMeta from '../../common/app-table-scroll/app-table-scroll.story';
+import tableColumnMeta from '../../common/app-table-column/app-table-column.story';
 import dataTableMeta from '../../common/app-data-table/app-data-table.story';
 import cardsTableMeta from '../../common/app-cards-table/app-cards-table.story';
 
@@ -232,6 +233,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   directoryRecordModalMeta,
   entityRemindersMeta,
   tableScrollMeta,
+  tableColumnMeta,
   dataTableMeta,
   cardsTableMeta,
   toastMeta,

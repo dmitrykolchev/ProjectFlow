@@ -6269,10 +6269,10 @@
   "group": "common",
   "tag": "app-table-column",
   "cls": "AppTableColumn",
-  "hasStory": false,
-  "title": "",
+  "hasStory": true,
+  "title": "Common/TableColumn",
   "category": "",
-  "desc": "",
+  "desc": "Declarative column config child of app-table-scroll: field / label / type (text, number, boolean, select), alignment, mono and code cells, sortable headers, yes/no labels for booleans, option mapping for selects, plus cellRender and valueFn hooks. The element renders nothing itself — the table reads its properties.",
   "propsList": [
    {
     "name": "field",
@@ -6352,7 +6352,56 @@
   "events": [
    "column-change"
   ],
-  "propsDoc": [],
+  "propsDoc": [
+   {
+    "k": "field",
+    "v": "Row property the column reads (empty label column when combined with cellRender)"
+   },
+   {
+    "k": "label",
+    "v": "Header caption shown in the sticky header row"
+   },
+   {
+    "k": "type",
+    "v": "Cell formatting preset: text | number | boolean | select"
+   },
+   {
+    "k": "options",
+    "v": "Value → label pairs used by type=\"select\" cells"
+   },
+   {
+    "k": "align",
+    "v": "Horizontal alignment of header and cells: left | center | right"
+   },
+   {
+    "k": "mono",
+    "v": "Renders the value in the mono font family with tabular numerals"
+   },
+   {
+    "k": "code",
+    "v": "Renders the value as a code chip"
+   },
+   {
+    "k": "sortable",
+    "v": "Header shows the sort button; clicking emits sort-change on the table"
+   },
+   {
+    "k": "yes-label",
+    "v": "Text for boolean true (falls back to the localized yes)"
+   },
+   {
+    "k": "no-label",
+    "v": "Text for boolean false (falls back to the localized no)"
+   },
+   {
+    "k": "cellRender",
+    "v": "Custom cell renderer (row, value) => TemplateResult | string | number"
+   },
+   {
+    "k": "valueFn",
+    "v": "Custom value extractor (row) => unknown, replacing the plain row[field] read"
+   }
+  ],
   "slotsDoc": [],
   "childrenDoc": []
  },
