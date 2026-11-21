@@ -3,6 +3,12 @@ import { customElement, property } from 'lit/decorators.js';
 import { iconChevronDown } from '../../common/icons';
 import styles from './app-sidebar-group.css';
 
+// detail of the `sidebar-group-toggle` event (named event-detail interface, AGENTS.md §6)
+export interface SidebarGroupToggleDetail {
+  groupId: string;
+  expanded: boolean;
+}
+
 @customElement('app-sidebar-group')
 export class AppSidebarGroup extends LitElement {
   @property({ type: String, attribute: 'group-id' }) groupId: string = '';
@@ -50,7 +56,7 @@ export class AppSidebarGroup extends LitElement {
     const nextExpanded = !this.expanded;
     this.expanded = nextExpanded;
     this.dispatchEvent(
-      new CustomEvent('sidebar-group-toggle', {
+      new CustomEvent<SidebarGroupToggleDetail>('sidebar-group-toggle', {
         detail: {
           groupId: this.groupId || this.label,
           expanded: nextExpanded,
