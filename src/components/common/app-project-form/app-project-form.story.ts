@@ -25,6 +25,13 @@ export const meta: ComponentStoryMeta = {
     extraContent: "TemplateResult rendered in an extra section of the body — create mode only (attribute: false)",
     footerExtra: 'TemplateResult rendered in the modal footer before the primary button (attribute: false)',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ project: Project }',
+      description: 'Fires after a successful save with the stored project',
+    },
+  },
   stories: [
     {
       name: 'Create Project',
