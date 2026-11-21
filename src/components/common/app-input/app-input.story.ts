@@ -26,6 +26,16 @@ export const meta: ComponentStoryMeta = {
     clearable: 'Shows a clear (×) button when the field has a value',
     size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
+  eventsDoc: {
+    input: {
+      detail: '{ value: string }',
+      description: 'Fires on every keystroke',
+    },
+    change: {
+      detail: '{ value: string }',
+      description: 'Fires on blur or Enter',
+    },
+  },
   stories: [
     {
       name: 'Size Scale',
