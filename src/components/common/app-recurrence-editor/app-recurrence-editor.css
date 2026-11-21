@@ -261,7 +261,10 @@
   overflow: hidden;
 }
 
-.re-step-btn {
+.re-step-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 30px;
   height: 100%;
   border: none;
@@ -465,7 +468,10 @@
   font-weight: 600;
 }
 
-.re-chip-x {
+.re-chip-x {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
