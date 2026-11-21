@@ -1,13 +1,16 @@
 import { LitElement, html, type TemplateResult } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-header.css';
+import { eventValue } from '../../common/event-value';
 import { iconBell, iconPlus, iconSearch, iconSun, iconMoon, iconMenu, iconContrast, iconHeart, iconTerminal, iconZap, iconRefreshCw } from '../../common/icons';
 import '../../common/app-button/app-button';
 import '../../common/app-split-button/app-split-button';
+import '../../common/app-search-input/app-search-input';
 import { MenuItem } from '../../common/app-menu/app-menu';
 import type { ThemeMode } from '../../../types';
+import type { ButtonSize } from '../../common/app-button/app-button';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import type { EntityEmblemKind } from '../../common/app-entity-emblem/app-entity-emblem';
 
@@ -48,6 +51,10 @@ const DETAIL_ENTITY_MAP: Record<string, EntityEmblemKind> = {
 
 @customElement('app-header')
 export class AppHeader extends LitElement {
+  // canonical control scale for every control in the header; md default keeps the
+  // historical 38px controls pixel-identical. Reflected so :host.size-* rules apply
+  @property({ type: String, reflect: true }) size: ButtonSize = 'md';
+
   @state() private activeView = store.activeView;
   @state() private selectedProjectId = store.selectedProjectId;
   @state() private detailProjectId = store.detailProjectId;
@@ -57,6 +64,7 @@ export class AppHeader extends LitElement {
   @state() private detailCompanyId = store.detailCompanyId;
   @state() private detailCounterpartyId = store.detailCounterpartyId;
   @state() private detailCalculationId = store.detailCalculationId;
+  @state() private detailInvoiceId = store.detailInvoiceId;
   @state() private detailEmployeeId = store.detailEmployeeId;
   @state() private detailTimeEntryId = store.detailTimeEntryId;
   @state() private detailExpenseId = store.detailExpenseId;
@@ -95,6 +103,7 @@ export class AppHeader extends LitElement {
     this.detailCompanyId = store.detailCompanyId;
     this.detailCounterpartyId = store.detailCounterpartyId;
     this.detailCalculationId = store.detailCalculationId;
+    this.detailInvoiceId = store.detailInvoiceId;
     this.detailEmployeeId = store.detailEmployeeId;
     this.detailTimeEntryId = store.detailTimeEntryId;
     this.detailExpenseId = store.detailExpenseId;
@@ -151,6 +160,10 @@ export class AppHeader extends LitElement {
       this.activeView === 'calculation-detail'
         ? store.calculations.find((c) => c.id === this.detailCalculationId)
         : undefined;
+    const detailInvoice =
+      this.activeView === 'invoice-detail'
+        ? store.invoices.find((i) => i.id === this.detailInvoiceId)
+        : undefined;
     const detailEmployee =
       this.activeView === 'employee-detail'
         ? store.users.find((u) => u.id === this.detailEmployeeId)
@@ -183,6 +196,7 @@ export class AppHeader extends LitElement {
       kanban: t.navigation.kanban,
       'task-detail': detailTask ? `${detailTask.id} · ${detailTask.title}` : t.navigation.kanban,
       'knowledge-base': t.navigation.knowledgeBase,
+      blog: t.navigation.blog,
       documents: t.navigation.documents,
       reminders: t.navigation.reminders,
       'reminder-detail': detailReminder ? detailReminder.title : t.navigation.reminders,
@@ -200,8 +214,11 @@ export class AppHeader extends LitElement {
       'counterparty-detail': detailCounterparty
         ? detailCounterparty.name
         : t.navigation.counterparties,
+      contacts: t.viewTexts.contacts.pageTitle,
       contracts: t.navigation.contracts,
       'contract-detail': detailContract ? `${detailContract.number} · ${detailContract.title}` : t.navigation.contracts,
+      invoices: t.navigation.invoices,
+      'invoice-detail': detailInvoice ? detailInvoice.number : t.navigation.invoices,
       calculations: t.navigation.calculations,
       'calculation-detail': detailCalculation
         ? detailCalculation.number
@@ -278,16 +295,14 @@ export class AppHeader extends LitElement {
         </div>
 
         <div class="right-zone">
-          <div class="search-wrapper">
-            <span class="search-icon">${iconSearch(14)}</span>
-            <input
-              type="text"
-              class="search-input"
-              placeholder="${t.common.search}"
-              .value="${this.searchQuery}"
-              @input="${(e: Event) => store.setSearchQuery((e.target as HTMLInputElement).value)}"
-            />
-          </div>
+          <app-search-input
+            size="${this.size}"
+            placeholder="${t.common.search}"
+            .value="${this.searchQuery}"
+            @input="${(e: CustomEvent) => store.setSearchQuery(eventValue(e))}"
+          >
+            <span slot="icon">${iconSearch(14)}</span>
+          </app-search-input>
 
           ${this.aiBusyCount > 0
             ? html`
@@ -303,7 +318,7 @@ export class AppHeader extends LitElement {
              its name, the current one checked. -->
           <app-split-button
             variant="secondary"
-            size="md"
+            size="${this.size}"
             icon-only
             .label="${''}"
             .items="${themeItems}"
@@ -317,7 +332,7 @@ export class AppHeader extends LitElement {
              before (the current code), the chevron menu picks a language directly. -->
           <app-split-button
             variant="secondary"
-            size="md"
+            size="${this.size}"
             .label="${this.currentLang.toUpperCase()}"
             .items="${langItems}"
             @primary-click="${() =>
@@ -326,19 +341,24 @@ export class AppHeader extends LitElement {
           >
           </app-split-button>
 
-          <button
-            class="icon-action-btn"
-            @click="${() => store.toggleActivityPanel()}"
+          <!-- Activity log toggle as a canonical icon-only secondary control; the badge
+               dot indicator rides in the end slot, positioned off the button host -->
+          <app-button
+            class="activity-btn"
+            variant="secondary"
+            size="${this.size}"
+            icon-only
             title="${t.activity.title}"
             aria-label="Activity Log"
+            @click="${() => store.toggleActivityPanel()}"
           >
-            ${iconBell(16)}
-            ${this.activityCount > 0 ? html`<span class="badge-dot"></span>` : ''}
-          </button>
+            <span slot="start">${iconBell(16)}</span>
+            ${this.activityCount > 0 ? html`<span slot="end" class="badge-dot"></span>` : ''}
+          </app-button>
 
           <app-button
             variant="primary"
-            size="md"
+            size="${this.size}"
             @click="${() => store.openCreateTaskModal()}"
           >
             <span slot="icon-start">${iconPlus(16)}</span>

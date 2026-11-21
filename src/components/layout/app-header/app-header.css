@@ -1,9 +1,21 @@
 :host {
   display: block;
-  height: var(--density-header-height, 60px);
+  height: var(--header-height, var(--density-header-height, 60px));
   background: var(--bg-surface, #111827);
   border-bottom: 1px solid var(--border-subtle, #1e293b);
   z-index: 40;
+}
+
+/* size scale (sm/md/lg): explicit header heights = density base (60px) ± the
+   control-height delta, breadcrumbs font follows the control font; md keeps the
+   historical tokens pixel-identical. The size class lives on the host element */
+:host.size-sm {
+  height: 52px;
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+:host.size-lg {
+  height: 68px;
+  font-size: var(--control-font-lg, 1rem);
 }
 
 .header-container {
@@ -74,69 +86,10 @@
   flex-shrink: 0;
 }
 
-.search-wrapper {
+/* the activity toggle is a canonical icon-only secondary app-button; the host is made
+   relative so the badge dot indicator in the end slot positions off its corner */
+.activity-btn {
   position: relative;
-  display: flex;
-  align-items: center;
-  width: 240px;
-  transition: width var(--transition-fast, 150ms ease);
-}
-
-.search-wrapper:focus-within {
-  width: 280px;
-}
-
-.search-input {
-  box-sizing: border-box;
-  width: 100%;
-  height: var(--control-height-md, 38px);
-  padding: 0 0.75rem 0 2.25rem;
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-primary, #f8fafc);
-  font-size: 0.8125rem;
-  outline: none;
-  transition: border-color var(--transition-fast, 150ms ease),
-              box-shadow var(--transition-fast, 150ms ease);
-}
-
-.search-input:focus {
-  border-color: var(--accent-primary, #6366f1);
-  box-shadow: 0 0 0 1px var(--accent-primary, #6366f1);
-}
-
-.search-icon {
-  position: absolute;
-  left: 0.75rem;
-  color: var(--text-muted, #64748b);
-  pointer-events: none;
-  display: flex;
-  align-items: center;
-}
-
-.icon-action-btn {
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--control-height-md, 38px);
-  height: var(--control-height-md, 38px);
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #334155);
-  border-radius: var(--radius-md, 8px);
-  color: var(--text-secondary, #94a3b8);
-  cursor: pointer;
-  transition: background-color var(--transition-fast, 150ms ease),
-              color var(--transition-fast, 150ms ease);
-}
-
-.icon-action-btn:hover {
-  background: var(--bg-hover, #223049);
-  border-color: var(--accent-border, var(--border-strong, #475569));
-  color: var(--text-primary, #f8fafc);
-  box-shadow: var(--surface-glow, none);
 }
 
 .badge-dot {
@@ -179,15 +132,15 @@
   }
 }
 
+/* search field lives in the canonical app-search-input component (240/280px width
+   behavior, icon slot, sm/md/lg scale); the mobile shrink is applied on the host */
 @media (max-width: 768px) {
   .mobile-menu-btn {
     display: flex;
   }
-  .search-wrapper {
-    width: 140px;
-  }
-  .search-wrapper:focus-within {
-    width: 180px;
+  app-search-input {
+    --search-input-width: 140px;
+    --search-input-focus-width: 180px;
   }
 }
 

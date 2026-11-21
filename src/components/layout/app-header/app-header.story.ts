@@ -8,6 +8,7 @@ export const meta: ComponentStoryMeta = {
   description: 'Top header bar with breadcrumbs, live search, quick notification badge, and primary action CTA.',
   category: 'Layout',
   propsDoc: {
+    size: 'Control scale of every header control: sm / md / lg (md default keeps the historical geometry)',
     activeView: 'Currently active view id (drives the breadcrumb)',
     selectedProjectId: 'Project filter selection in the breadcrumb',
     detailProjectId: 'Project id shown on detail pages',
