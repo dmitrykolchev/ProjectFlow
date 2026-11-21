@@ -273,13 +273,12 @@
   flex-wrap: wrap;
 }
 
-/* reader header icon actions are app-button web components at size xs pinned to the
-   historical 32px square with a 7px radius; hover keeps the subtle border unchanged for
-   plain actions, the pinned state reuses the historical accent colors through custom
-   properties, and the delete button declares action="delete" so the component supplies
-   the danger hover palette */
+/* reader header icon actions are app-button web components: the reader row is an sm toolbar, so the
+   pin and delete icon buttons render at the canonical sm step; a 7px radius stays pinned through the
+   component radius hooks; hover keeps the subtle border unchanged for plain actions, the pinned state
+   reuses the historical accent colors through custom properties, and the delete button declares
+   action="delete" so the component supplies the danger hover palette */
 .reader-actions app-button {
-  --control-height-xs: 32px;
   --btn-radius-tl: 7px;
   --btn-radius-tr: 7px;
   --btn-radius-bl: 7px;

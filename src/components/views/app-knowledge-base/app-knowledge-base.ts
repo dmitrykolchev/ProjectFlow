@@ -453,7 +453,7 @@ export class AppKnowledgeBase extends LitElement {
         <div class="reader-actions">
           <app-button
             class="pin-action ${article.pinned ? 'is-active' : ''}"
-            size="xs"
+            size="sm"
             variant="icon"
             title="${article.pinned ? kb.unpinArticle : kb.pinArticle}"
             @click="${() => store.togglePinKnowledgeArticle(article.id)}"
@@ -481,7 +481,7 @@ export class AppKnowledgeBase extends LitElement {
 
           <app-button
             action="delete"
-            size="xs"
+            size="sm"
             variant="icon"
             title="${t.common.delete}"
             @click="${() => (this.deletingArticle = article)}"
