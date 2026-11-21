@@ -21,7 +21,10 @@
   padding-right: 0.25rem;
 }
 
-.tag-remove-btn {
+.tag-remove-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: none;
   background: transparent;
   color: var(--text-muted, #64748b);
@@ -39,7 +42,10 @@
   background: rgba(239, 68, 68, 0.14);
 }
 
-.tag-add-btn {
+.tag-add-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: 1px dashed var(--border-strong, #334155);
   background: transparent;
   color: var(--text-muted, #94a3b8);
@@ -64,7 +70,10 @@
   gap: 0.22rem;
 }
 
-.inline-tag-input {
+.inline-tag-input {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 112px;
   height: 22px;
   padding: 0 0.42rem;
@@ -81,7 +90,10 @@
   border-color: var(--accent-primary, #6366f1);
 }
 
-.inline-tag-action {
+.inline-tag-action {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 22px;
   height: 22px;
   border-radius: var(--radius-xs, 4px);
