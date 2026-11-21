@@ -17,6 +17,16 @@ import styles from './app-pagination.css';
 
 export type PaginationVariant = 'surface' | 'bare';
 
+// details of the `page-change` and `page-size-change` events (AGENTS.md §6)
+export interface PaginationPageChangeDetail {
+  page: number;
+}
+
+export interface PaginationPageSizeChangeDetail {
+  pageSize: number;
+  layoutMode: PaginationLayoutMode;
+}
+
 @customElement('app-pagination')
 export class AppPagination extends LitElement {
   @property({ type: Number, attribute: 'total-items' }) totalItems: number = 0;
@@ -88,7 +98,7 @@ export class AppPagination extends LitElement {
     if (clamped === this.page) return;
     this.page = clamped;
     this.dispatchEvent(
-      new CustomEvent('page-change', {
+      new CustomEvent<PaginationPageChangeDetail>('page-change', {
         detail: { page: clamped },
         bubbles: true,
         composed: true,
@@ -102,7 +112,7 @@ export class AppPagination extends LitElement {
     this.pageSize = nextSize;
     this.page = 1;
     this.dispatchEvent(
-      new CustomEvent('page-size-change', {
+      new CustomEvent<PaginationPageSizeChangeDetail>('page-size-change', {
         detail: { pageSize: nextSize, layoutMode: this.layoutMode },
         bubbles: true,
         composed: true,
