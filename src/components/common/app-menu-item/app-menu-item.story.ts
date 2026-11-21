@@ -29,6 +29,12 @@ export const meta: ComponentStoryMeta = {
     checkable: 'Reserves checkmark gutter and toggles checked state on click',
     icon: 'Programmatic leading icon (TemplateResult or string)',
   },
+  eventsDoc: {
+    select: {
+      detail: '{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }',
+      description: 'Fires when the item is clicked',
+    },
+  },
   stories: [
     {
       name: 'Item Variants & States',
