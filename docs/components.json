@@ -7582,7 +7582,7 @@
    },
    {
     "name": "size",
-    "type": "'xxs' | 'sm' | 'md' | 'lg'",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    },

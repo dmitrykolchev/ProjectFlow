@@ -211,6 +211,15 @@
   Cyberpunk/Matrix/Barbie, ambient `body::after` — cyberpunk и matrix (`7f15595`).
   Проба: 67 token rows, live-значения matrix/barbie/high-contrast совпадают
   (#020603/#00ff41, #fff1f7/#d61f77, #000000/#fde047), headerH 69px, errors 0.
+- Удаление наследия `xxs` шага контролов: тулбар `app-document-previewer` (10 кнопок)
+  переведён на sm, кнопка Копировать стала icon-only с title (`1e643a1`); после этого
+  потребителей `xxs` не осталось — шаг удалён из `app-button` (`08b4335`),
+  `app-toggle-button` (`18fdbfb`), токен `--control-height-xxs` удалён из `index.css`,
+  view и DesignTokens.md сверены (`14e939b`). Шкала контролов: xs/sm/md/lg =
+  24/30/38/44px. Иконки `app-material-icon` сохранили свою шкалу xxs…xxl (12…36px) —
+  это отдельный канон, не высота контролов. Проба: controlHeights-категория — 4 ряда
+  без xxs, chip 24/30/38/44px, btn default md=38 xs=24, toggle md=38; regenerated
+  components.json/WebComponentsReference.md без xxs; errors 0.
 - Браузерные пробы оставляют следы в localStorage: режимы
   contacts=table, invoices=cards, documents=cards, расчётный режим всех
   карточных view выставлен в `cards` при проверке футеров; перед сдачей сессии

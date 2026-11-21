@@ -1268,7 +1268,7 @@ Stateful pressable button supporting soft and solid active variants, icons, and 
 |---|---|---|
 | `pressed` | boolean, default `false` | Pressed (toggled) visual state |
 | `variant` | 'soft' | 'solid', default `'soft'` | Visual style of the toggle surface |
-| `size` | 'xxs' | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
+| `size` | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
 | `disabled` | boolean, default `false` | Disables interaction |
 | `iconOnly` | boolean, default `false` | Renders only the icon, no text |
 | `value` | string, default `''` | Group value emitted on toggle (for radio-style groups) |
