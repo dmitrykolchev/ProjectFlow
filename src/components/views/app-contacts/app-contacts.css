@@ -96,3 +96,9 @@ app-cards-table {
 :host([hidden]) {
   display: none;
 }
+
+/* native form controls do not inherit font in shadow DOM (the global
+   font-family: inherit reset in index.css reaches light DOM only) */
+.rem-entity-btn {
+  font-family: var(--font-sans, inherit);
+}
