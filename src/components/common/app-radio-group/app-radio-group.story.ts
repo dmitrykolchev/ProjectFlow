@@ -26,6 +26,12 @@ export const meta: ComponentStoryMeta = {
     variant: 'Visual style of the option rows',
     disabled: 'Disables all options',
   },
+  eventsDoc: {
+    change: {
+      detail: '{ value: string, option: RadioOption }',
+      description: 'Fires when an option is picked',
+    },
+  },
   stories: [
     {
       name: 'Declarative Options',
