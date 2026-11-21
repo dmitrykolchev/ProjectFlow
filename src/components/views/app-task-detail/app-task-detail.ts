@@ -47,6 +47,7 @@ import '../../common/app-date-input/app-date-input';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-number-input/app-number-input';
 import '../../common/app-project-attachments/app-project-attachments';
 import '../../common/app-segmented-switch/app-segmented-switch';
@@ -139,6 +140,7 @@ export class AppTaskDetail extends LitElement {
   // Subtasks
   @state() private newSubtaskTitle: string = '';
   @state() private confirmDeleteOpen: boolean = false;
+  @state() private confirmRemoveSubtaskId: string | null = null;
   @state() private storeVersion = 0;
 
   private unsubscribe?: () => void;
@@ -726,7 +728,7 @@ export class AppTaskDetail extends LitElement {
                       <app-draggable-list
                         .items="${task.subtasks.map((s) => ({ value: s.id, label: s.title, checked: s.completed }))}"
                         @item-toggle="${(e: CustomEvent<{ value: string }>) => this.toggleSubtask(task, e.detail.value)}"
-                        @item-remove="${(e: CustomEvent<{ value: string }>) => this.removeSubtask(task, e.detail.value)}"
+                        @item-remove="${(e: CustomEvent<{ value: string }>) => (this.confirmRemoveSubtaskId = e.detail.value)}"
                         @list-reorder="${(e: CustomEvent<{ items: { value: string; label: string; checked?: boolean }[] }>) => {
                           const byId = new Map(task.subtasks.map((s) => [s.id, s]));
                           store.updateTask({ ...task, subtasks: e.detail.items.map((it) => byId.get(it.value)!).filter(Boolean) });
@@ -795,31 +797,47 @@ export class AppTaskDetail extends LitElement {
         </div>
       </div>
 
-      <app-modal
-        ?open="${this.confirmDeleteOpen}"
+      <app-confirm-dialog
+        .open="${this.confirmDeleteOpen}"
         size="sm"
-        @close="${() => (this.confirmDeleteOpen = false)}"
-      >
-        <span slot="title">${t.common.delete}</span>
-        <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
-          ${t.common.confirmDelete} (${task.id} · ${task.title})
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.confirmDeleteOpen = false)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              this.confirmDeleteOpen = false;
-              store.deleteTask(task.id);
-              store.setActiveView('kanban');
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        variant="danger"
+        title="${t.viewTexts.confirmDialogs.taskDelete.title}"
+        action="${t.viewTexts.confirmDialogs.taskDelete.action(task.title)}"
+        result="${t.viewTexts.confirmDialogs.taskDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmDeleteOpen = false)}"
+        @confirm="${() => {
+          this.confirmDeleteOpen = false;
+          store.deleteTask(task.id);
+          store.setActiveView('kanban');
+        }}"
+      ></app-confirm-dialog>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.confirmRemoveSubtaskId)}"
+        size="sm"
+        variant="danger"
+        title="${t.viewTexts.confirmDialogs.subtaskDelete.title}"
+        action="${t.viewTexts.confirmDialogs.subtaskDelete.action(
+          (task.subtasks.find((s) => s.id === this.confirmRemoveSubtaskId) || { title: '' }).title
+        )}"
+        result="${t.viewTexts.confirmDialogs.subtaskDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmRemoveSubtaskId = null)}"
+        @confirm="${() => {
+          const id = this.confirmRemoveSubtaskId;
+          this.confirmRemoveSubtaskId = null;
+          if (id) {
+            this.removeSubtask(task, id);
+          }
+        }}"
+      ></app-confirm-dialog>
 
       <app-modal
         ?open="${this.previewDoc !== null}"

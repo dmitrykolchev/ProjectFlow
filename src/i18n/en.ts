@@ -27,7 +27,6 @@ export const en = {
     details: 'Details',
     confirm: 'Confirm',
     unlink: 'Unlink',
-    confirmDelete: 'Are you sure you want to delete this item?',
     required: 'Required field',
     total: 'Total',
     hours: 'h',

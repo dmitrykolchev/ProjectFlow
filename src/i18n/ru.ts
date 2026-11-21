@@ -27,7 +27,6 @@ export const ru = {
     details: 'Подробнее',
     confirm: 'Подтвердить',
     unlink: 'Отвязать',
-    confirmDelete: 'Вы уверены, что хотите удалить этот элемент?',
     required: 'Обязательное поле',
     total: 'Всего',
     hours: 'ч',
