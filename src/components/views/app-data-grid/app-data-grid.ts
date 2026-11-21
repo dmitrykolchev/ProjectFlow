@@ -1,5 +1,6 @@
 import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { Task } from '../../../types';
 import { getTranslation } from '../../../i18n';
@@ -515,6 +516,26 @@ export class AppDataGrid extends LitElement {
   }
 
   /**
+   * Keyed-render key: base = row-key value (default 'id'), fallback row-<idx>.
+   * Duplicate explicit values get a deterministic #N suffix so Lit repeat never
+   * throws "multiple keys"; rows without any key keep positional behavior.
+   */
+  private nextUniqueKey(seen: Map<string, number>, base: string): string {
+    const count = seen.get(base);
+    if (count === undefined) {
+      seen.set(base, 1);
+      return base;
+    }
+    seen.set(base, count + 1);
+    return `${base}#${count + 1}`;
+  }
+
+  private uniqueKeys(rows: Record<string, unknown>[], prefix = ''): string[] {
+    const seen = new Map<string, number>();
+    return rows.map((row, idx) => this.nextUniqueKey(seen, `${prefix}${this.getRowId(row, idx)}`));
+  }
+
+  /**
    * Group columns MUST be sorted first in group hierarchy order, followed by
    * all remaining active sort rules.
    */
@@ -564,10 +585,11 @@ export class AppDataGrid extends LitElement {
     sortedRows: Record<string, unknown>[],
     t: ReturnType<typeof getTranslation>
   ): VirtualRowItem[] {
+    const seen = new Map<string, number>();
     if (this.groupByFields.length === 0) {
       return sortedRows.map((row, idx) => ({
         kind: 'data',
-        key: this.getRowId(row, idx),
+        key: this.nextUniqueKey(seen, this.getRowId(row, idx)),
         row,
       }));
     }
@@ -602,7 +624,7 @@ export class AppDataGrid extends LitElement {
 
         items.push({
           kind: 'group',
-          key: `grp:${groupPath}`,
+          key: this.nextUniqueKey(seen, `grp:${groupPath}`),
           level,
           groupPath,
           fieldLabel: groupCol?.caption || field,
@@ -619,7 +641,7 @@ export class AppDataGrid extends LitElement {
               const row = groupRows[i];
               items.push({
                 kind: 'data',
-                key: `${groupPath}|${this.getRowId(row, i)}`,
+                key: this.nextUniqueKey(seen, `${groupPath}|${this.getRowId(row, i)}`),
                 row,
               });
             }
@@ -795,6 +817,7 @@ export class AppDataGrid extends LitElement {
     const paginatedRows = isGrouped
       ? sortedRows
       : sortedRows.slice(startIndex, startIndex + this.rowsPerPage);
+    const paginatedKeys = this.uniqueKeys(paginatedRows);
 
     const selectionScope = this.virtual || isGrouped ? sortedRows : paginatedRows;
     const allCurrentSelected =
@@ -1141,7 +1164,11 @@ export class AppDataGrid extends LitElement {
               ? this.renderVirtualizedBody(virtualItems, activeCols, t)
               : isGrouped
               ? this.renderGroupLevel(sortedRows, 0, '', activeCols, t)
-              : paginatedRows.map((row, idx) => this.renderDataRow(row, activeCols, t, idx))}
+              : repeat(
+                  paginatedRows,
+                  (row, idx) => paginatedKeys[idx],
+                  (row, idx) => this.renderDataRow(row, activeCols, t, idx),
+                )}
           </tbody>
         </table>
       </div>
@@ -1225,7 +1252,7 @@ export class AppDataGrid extends LitElement {
       ${topPx > 0
         ? html`<tr class="virtual-spacer-row" aria-hidden="true" style="height: ${topPx}px;"><td colspan="${colSpan}"></td></tr>`
         : ''}
-      ${slice.map((item, idx) => {
+      ${repeat(slice, (item) => item.key, (item, idx) => {
         if (item.kind === 'group') {
           const levelClass = `level-${Math.min(item.level, 3)}`;
           const indentPx = 14 + item.level * 22;
@@ -1258,7 +1285,7 @@ export class AppDataGrid extends LitElement {
     parentPath: string,
     activeCols: ColumnConfig[],
     t: ReturnType<typeof getTranslation>
-  ): TemplateResult[] {
+  ): unknown[] {
     const field = this.groupByFields[level];
     const groupCol = this.columns.find((c) => c.field === field);
     const groups = new Map<string, Record<string, unknown>[]>();
@@ -1281,35 +1308,46 @@ export class AppDataGrid extends LitElement {
     const colSpan = activeCols.length + (this.selectable ? 1 : 0);
     const hasChildLevel = level + 1 < this.groupByFields.length;
 
-    return entries.map(([groupKey, groupRows]) => {
-      const groupPath = parentPath ? `${parentPath}|${field}=${groupKey}` : `${field}=${groupKey}`;
-      const isCollapsed = this.collapsedGroups.has(groupPath);
-      const displayLabel = groupCol?.groupFormatter
-        ? groupCol.groupFormatter(groupKey)
-        : this.formatGroupValue(field, groupKey, t);
-      const levelClass = `level-${Math.min(level, 3)}`;
-      const indentPx = 14 + level * 22;
+    return [
+      repeat(
+        entries,
+        ([groupKey]) => `${parentPath ? `${parentPath}|${field}=${groupKey}` : `${field}=${groupKey}`}`,
+        ([groupKey, groupRows]) => {
+          const groupPath = parentPath ? `${parentPath}|${field}=${groupKey}` : `${field}=${groupKey}`;
+          const isCollapsed = this.collapsedGroups.has(groupPath);
+          const displayLabel = groupCol?.groupFormatter
+            ? groupCol.groupFormatter(groupKey)
+            : this.formatGroupValue(field, groupKey, t);
+          const levelClass = `level-${Math.min(level, 3)}`;
+          const indentPx = 14 + level * 22;
+          const groupRowKeys = this.uniqueKeys(groupRows, `${groupPath}|`);
 
-      return html`
-        <tr class="group-row ${levelClass}" @click="${() => this.toggleGroupCollapse(groupPath)}">
-          <td colspan="${colSpan}" class="group-cell" style="padding-left: ${indentPx}px;">
-            <div class="group-header-inner">
-              <span class="group-chevron ${!isCollapsed ? 'is-expanded' : ''}">
-                ${iconChevronRight(14)}
-              </span>
-              <span class="group-field-label">${groupCol?.caption || field}:</span>
-              <span>${displayLabel}</span>
-              <app-badge size="sm" variant="neutral">${groupRows.length}</app-badge>
-            </div>
-          </td>
-        </tr>
-        ${!isCollapsed
-          ? hasChildLevel
-            ? this.renderGroupLevel(groupRows, level + 1, groupPath, activeCols, t)
-            : groupRows.map((row, idx) => this.renderDataRow(row, activeCols, t, idx))
-          : ''}
-      `;
-    });
+          return html`
+            <tr class="group-row ${levelClass}" @click="${() => this.toggleGroupCollapse(groupPath)}">
+              <td colspan="${colSpan}" class="group-cell" style="padding-left: ${indentPx}px;">
+                <div class="group-header-inner">
+                  <span class="group-chevron ${!isCollapsed ? 'is-expanded' : ''}">
+                    ${iconChevronRight(14)}
+                  </span>
+                  <span class="group-field-label">${groupCol?.caption || field}:</span>
+                  <span>${displayLabel}</span>
+                  <app-badge size="sm" variant="neutral">${groupRows.length}</app-badge>
+                </div>
+              </td>
+            </tr>
+            ${!isCollapsed
+              ? hasChildLevel
+                ? this.renderGroupLevel(groupRows, level + 1, groupPath, activeCols, t)
+                : repeat(
+                    groupRows,
+                    (row, idx) => groupRowKeys[idx],
+                    (row, idx) => this.renderDataRow(row, activeCols, t, idx),
+                  )
+              : ''}
+          `;
+        },
+      ),
+    ];
   }
 
   private renderDataRow(
