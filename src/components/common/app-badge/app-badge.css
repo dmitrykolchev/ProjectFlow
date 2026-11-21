@@ -147,7 +147,10 @@
   flex-shrink: 0;
 }
 
-.remove-btn {
+.remove-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: currentColor;
