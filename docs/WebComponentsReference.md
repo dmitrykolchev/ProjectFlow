@@ -2,7 +2,7 @@
 
 Дата: 20.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 138 (со стори: 134).
+Всего компонентов: 139 (со стори: 135).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -177,6 +177,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-expense-detail` | views | Views | Отдельная страница расхода: сумма и рублёвый эквивалент, статус согласования, чеки и доку… |
 | `app-expenses` | views | Views | Учет затрат: реестр расходов по проектам и задачам, статусы согласования, фильтрация и ср… |
 | `app-gantt` | views | Views | 2D virtualized timeline Gantt chart supporting thousands of tasks and multi-year schedule… |
+| `app-invoice-detail` | views | Views | Отдельная страница счёта: суммы с НДС, оплата и остаток, стороны, договор- и калькуляция-… |
 | `app-invoices` | views | Views | Standalone invoices registry across all contracts with cards and table views, payment pro… |
 | `app-kanban` | views | Views | Full-featured agile Kanban board with 5 workflow columns and drag-and-drop support. |
 | `app-knowledge-base` | views | Views | База знаний по проектам и компаниям: архитектурные решения, регламенты, разборы инциденто… |
@@ -2070,9 +2071,9 @@ Portfolio progress tracker displaying completion bars, task ratios, and click-to
 |---|---|
 | `app-button` | Header control placed in the actions slot at the right of the section header |
 
-## 7. Группа `views` (43)
+## 7. Группа `views` (44)
 
-### Views (40)
+### Views (41)
 
 #### `app-analytics` — `AppAnalytics`
 
@@ -2238,6 +2239,12 @@ Employee directory with card/table switch, department & company filters, rates, 
 | `virtual` | Boolean, default `true` | — |
 | `tasksData` | Array | — |
 | `datasetMode` | String, default `'project'` | — |
+
+#### `app-invoice-detail` — `AppInvoiceDetail`
+
+`src/components/views/app-invoice-detail/`
+
+Отдельная страница счёта: суммы с НДС, оплата и остаток, стороны, договор- и калькуляция-основание, позиции счёта, платежи по счёту и запись оплаты.
 
 #### `app-invoices` — `AppInvoices`
 

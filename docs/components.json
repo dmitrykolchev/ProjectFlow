@@ -7924,6 +7924,20 @@
  },
  {
   "group": "views",
+  "tag": "app-invoice-detail",
+  "cls": "AppInvoiceDetail",
+  "hasStory": true,
+  "title": "Views/Invoice Detail",
+  "category": "Views",
+  "desc": "Отдельная страница счёта: суммы с НДС, оплата и остаток, стороны, договор- и калькуляция-основание, позиции счёта, платежи по счёту и запись оплаты.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": []
+ },
+ {
+  "group": "views",
   "tag": "app-invoices",
   "cls": "AppInvoices",
   "hasStory": true,
