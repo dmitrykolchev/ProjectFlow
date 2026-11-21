@@ -12,6 +12,12 @@ export interface SegmentedOption {
   end?: Node[];
 }
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface SegmentedSwitchChangeDetail {
+  value: string;
+  option: SegmentedOption;
+}
+
 @customElement('app-segmented-switch')
 export class AppSegmentedSwitch extends LitElement {
   @property({ type: Array }) options: SegmentedOption[] = [];
@@ -92,7 +98,7 @@ export class AppSegmentedSwitch extends LitElement {
     if (this.disabled || opt.disabled || this.value === opt.value) return;
     this.value = opt.value;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<SegmentedSwitchChangeDetail>('change', {
         detail: { value: this.value, option: opt },
         bubbles: true,
         composed: true,
