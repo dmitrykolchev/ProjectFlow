@@ -6,7 +6,7 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD `7b22fa3`; origin/main = `585be96`, 13 незапушенных
+- Слияния в `main`: HEAD `44be540`; origin/main = `585be96`, 34 незапушенных
   коммитов.
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
@@ -41,6 +41,26 @@
 - Storybook: история `app-invoice-detail` зарегистрирована в `ALL_STORIES`
   (файл истории был, импорта не было); документация компонентов регенерирована
   (`docs/components.json`, `docs/WebComponentsReference.md`).
+- Storybook закрыт полностью: добавлены 4 отсутствующие истории
+  (`app-table-column`, `app-design-tokens`, `app-material-icons`, `app-task-grid`)
+  и зарегистрированы в `ALL_STORIES` — 139 компонентов, 139 со story, 139 с
+  описанием; сам `app-storybook` в реестр не входит (листать самого себя
+  нельзя), поэтому сайдбар показывает 138 элементов. propsDoc заполнен до
+  полного покрытия (`app-data-grid` 11/11, `app-gantt`, `app-material-icon`,
+  `app-material-icon-gallery`, `app-project-form`, `app-file-dropzone`,
+  `app-data-grid-column`, `app-link`, `app-persona`, `app-section-card`,
+  `app-textarea`, `app-payment-form`, `app-bank-requisites`,
+  `app-counterparty-contacts`); ключ propsDoc — camelCase имя свойства.
+  Аудит (`E:\TEMP\opencode\props-gap.js`) даёт 0 пропусков.
+- Унификация префикса тегов: `sidebar-item` → `app-sidebar-item`,
+  `sidebar-group` → `app-sidebar-group`, `card-footer` → `app-card-footer`
+  (папка, файл, тег, класс `App*`; скан берёт тег из имени папки). Все 140
+  custom-элементов теперь с префиксом `app-`. Сохранены стабильные API: события
+  `sidebar-select` / `sidebar-group-toggle`, методы store
+  (`setSidebarGroupMode`, `toggleSidebarGroup`), тип `SidebarGroupMode`, CSS-хуки
+  `--card-footer-gap` / `-padding-top` / `-start-gap` / `-end-gap`, локальный
+  класс `.card-footer` в `app-auth`. Заголовки историй префикс не носят
+  (`Layout/SidebarItem`, `Common/CardFooter`).
 
 ## Не закрыто
 
@@ -56,18 +76,22 @@
   stale CSS.
 - В `invoice-detail` намеренно нет редактирования счёта (согласовано);
   правка — из реестра счетов.
-- Аудит документации компонентов (`npm run docs:components`): 139 компонентов,
-  135 со story. Без историй 4 (`app-table-column`, `app-design-tokens`,
-  `app-material-icons`, `app-task-grid`), без описания 1 (`app-table-scroll`),
-  propsDoc неполный у 15 (худшие: `app-data-grid` 0/11, `app-gantt` 0/3,
-  `app-material-icon` 0/4, `app-material-icon-gallery` 0/5). Заполнение — по
-  решению пользователя.
+- Аудит документации компонентов закрыт (см. «Сделано»). `docs/ComponentApiSpecs.md`
+  упоминает только имена событий (`sidebar-select`, `sidebar-group-toggle`) — они
+  намеренно сохранены, переименования не требуется.
 - Предупреждение `change-in-update` в `app-data-grid` (`firstUpdated()` +
   `updated()` → `recomputeVirtualWindow()`, slotchange → `readSlottedColumns()`)
   — фикс обсуждён, не начат (ждём команды).
 - Браузерные пробы оставляют следы в localStorage: режимы
-  contacts=table, invoices=cards, documents=cards; перед сдачей сессии чистить
-  `viewModes`, поисковый запрос и активный view.
+  contacts=table, invoices=cards, documents=cards, расчётный режим всех
+  карточных view выставлен в `cards` при проверке футеров; перед сдачей сессии
+  чистить `viewModes`, поисковый запрос и активный view.
+- Проверено в браузере (dev-server, порт 3002, кэш `.vite` очищен): сайдбар —
+  4 `app-sidebar-group` + 29 `app-sidebar-item`, сворачивание/разворачивание
+  группы работает, активный пункт сохраняется; карточные режимы 12 view —
+  1352 `app-card-footer` с родной хромированной строкой (border-top 1px, flex,
+  space-between), легаси-тегов 0; истории SidebarItem / SidebarGroup /
+  CardFooter / TableColumn / Table Scroll рендерятся. Console errors 0.
 
 ## Бэклог идей (обсуждено, не начато)
 
