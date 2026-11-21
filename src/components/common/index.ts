@@ -132,6 +132,7 @@ import { AppMenuDivider } from './app-menu-divider/app-menu-divider';
 import { AppSegmentedSwitch } from './app-segmented-switch/app-segmented-switch';
 import { AppSwitch } from './app-switch/app-switch';
 import { AppInput } from './app-input/app-input';
+import { AppSearchInput } from './app-search-input/app-search-input';
 import { AppOtpInput } from './app-otp-input/app-otp-input';
 import { AppTextarea } from './app-textarea/app-textarea';
 import { AppNumberInput } from './app-number-input/app-number-input';
@@ -189,6 +190,7 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-segmented-switch': AppSegmentedSwitch,
   'app-switch': AppSwitch,
   'app-input': AppInput,
+  'app-search-input': AppSearchInput,
   'app-otp-input': AppOtpInput,
   'app-textarea': AppTextarea,
   'app-number-input': AppNumberInput,

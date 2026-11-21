@@ -6243,6 +6243,87 @@
  },
  {
   "group": "common",
+  "tag": "app-search-input",
+  "cls": "AppSearchInput",
+  "hasStory": true,
+  "title": "Common/SearchInput",
+  "category": "Common",
+  "desc": "Search input with a leading graphic slot, canonical sm/md/lg control scale, and focus width expansion — the header search behavior as a standalone component. The wrapper rests at 240px (280px on focus) and emits input/change events with the current value.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "string",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "placeholder",
+    "type": "string",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "size",
+    "type": "SearchInputSize",
+    "reflect": false,
+    "def": "'md'"
+   },
+   {
+    "name": "disabled",
+    "type": "boolean",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "input",
+   "change"
+  ],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Current search text"
+   },
+   {
+    "k": "placeholder",
+    "v": "Placeholder shown while the field is empty"
+   },
+   {
+    "k": "size",
+    "v": "Control height: sm / md / lg"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables the input"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "icon",
+    "v": "Leading graphic rendered inside the field at the left edge (SVG icon, material icon)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-material-icon",
+    "v": "Icon rendered in the icon slot"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "input",
+    "detail": "{ value: string }",
+    "description": "Fires on every keystroke with the current value"
+   },
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires when the input value is committed"
+   }
+  ]
+ },
+ {
+  "group": "common",
   "tag": "app-section-card",
   "cls": "AppSectionCard",
   "hasStory": true,
@@ -8072,9 +8153,20 @@
   "title": "Layout/Header",
   "category": "Layout",
   "desc": "Top header bar with breadcrumbs, live search, quick notification badge, and primary action CTA.",
-  "propsList": [],
+  "propsList": [
+   {
+    "name": "size",
+    "type": "ButtonSize",
+    "reflect": true,
+    "def": "'md'"
+   }
+  ],
   "events": [],
   "propsDoc": [
+   {
+    "k": "size",
+    "v": "Control scale of every header control: sm / md / lg (md default keeps the historical geometry)"
+   },
    {
     "k": "activeView",
     "v": "Currently active view id (drives the breadcrumb)"

@@ -2,7 +2,7 @@
 
 Дата: 21.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 139 (со стори: 139).
+Всего компонентов: 140 (со стори: 140).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -131,6 +131,7 @@ propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла комп
 | `app-recurrence-editor` | common | Common | Visual, human-friendly recurrence rule builder covering the full RFC 5545 specification (… |
 | `app-reminder-form` | common | Common | Modal form for creating and editing polymorphic reminders linked to any system entity. |
 | `app-requirement-form` | common | Overlays | Canonical requirement create and edit form. |
+| `app-search-input` | common | Common | Search input with a leading graphic slot, canonical sm/md/lg control scale, and focus wid… |
 | `app-section-card` | common | Common | Card container with header (title, subtitle, actions slot) and body; optional collapsible… |
 | `app-segmented-switch` | common | Common | Compact segmented control for switching between mutually exclusive views, timeframes, or … |
 | `app-select` | common | Inputs | Custom dropdown select with indicator dots, keyboard navigation, and smooth popover. |
@@ -201,9 +202,9 @@ propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла комп
 
 ---
 
-## 4. Группа `common` (87)
+## 4. Группа `common` (88)
 
-### Common (52)
+### Common (53)
 
 #### `app-analysis-summary` — `AppAnalysisSummary`
 
@@ -1101,6 +1102,32 @@ Modal form for creating and editing polymorphic reminders linked to any system e
 |---|---|---|
 | `close` | `—` | Fires when the form is dismissed without saving |
 | `saved` | `{ reminder: Reminder }` | Fires after a successful save with the stored reminder |
+
+#### `app-search-input` — `AppSearchInput`
+
+`src/components/common/app-search-input/`
+
+Search input with a leading graphic slot, canonical sm/md/lg control scale, and focus width expansion — the header search behavior as a standalone component. The wrapper rests at 240px (280px on focus) and emits input/change events with the current value.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `value` | string, default `''` | Current search text |
+| `placeholder` | string, default `''` | Placeholder shown while the field is empty |
+| `size` | SearchInputSize, default `'md'` | Control height: sm / md / lg |
+| `disabled` | boolean, default `false` | Disables the input |
+
+| Event | Detail | Description |
+|---|---|---|
+| `input` | `{ value: string }` | Fires on every keystroke with the current value |
+| `change` | `{ value: string }` | Fires when the input value is committed |
+
+| Slot | Content |
+|---|---|
+| `icon` | Leading graphic rendered inside the field at the left edge (SVG icon, material icon) |
+
+| Child element | Role |
+|---|---|
+| `app-material-icon` | Icon rendered in the icon slot |
 
 #### `app-section-card` — `AppSectionCard`
 
@@ -2077,6 +2104,7 @@ Top header bar with breadcrumbs, live search, quick notification badge, and prim
 
 | Property | Type / default | Description |
 |---|---|---|
+| `size` | ButtonSize, default `'md'` | Control scale of every header control: sm / md / lg (md default keeps the historical geometry) |
 | `activeView` | — | Currently active view id (drives the breadcrumb) |
 | `selectedProjectId` | — | Project filter selection in the breadcrumb |
 | `detailProjectId` | — | Project id shown on detail pages |

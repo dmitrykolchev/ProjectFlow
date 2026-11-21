@@ -1,0 +1,85 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* the wrapper carries the historical header search geometry: 240px resting width,
+   280px on focus, icon inset at the left edge */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: var(--search-input-width, 240px);
+  transition: width var(--transition-fast, 150ms ease);
+}
+
+.search-wrapper:focus-within {
+  width: var(--search-input-focus-width, 280px);
+}
+
+.search-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: var(--control-height-md, 38px);
+  padding: 0 0.75rem 0 2.25rem;
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #334155);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-primary, #f8fafc);
+  /* form controls do not inherit font in shadow DOM (the global font-family: inherit
+     reset in index.css reaches light DOM only) — declare the page family explicitly */
+  font-family: var(--font-sans, inherit);
+  font-size: var(--control-font-md, 0.875rem);
+  outline: none;
+  transition: border-color var(--transition-fast, 150ms ease),
+              box-shadow var(--transition-fast, 150ms ease);
+}
+
+.search-input:focus {
+  border-color: var(--accent-primary, #6366f1);
+  box-shadow: 0 0 0 1px var(--accent-primary, #6366f1);
+}
+
+.search-input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* canonical control scale (Priority E): sm/md/lg heights and control fonts */
+.size-sm .search-input {
+  height: var(--control-height-sm, 30px);
+  font-size: var(--control-font-sm, 0.8125rem);
+}
+.size-md .search-input {
+  height: var(--control-height-md, 38px);
+  font-size: var(--control-font-md, 0.875rem);
+}
+.size-lg .search-input {
+  height: var(--control-height-lg, 44px);
+  font-size: var(--control-font-lg, 1rem);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  color: var(--text-muted, #64748b);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+}
+
+/* canonical slot API: slotted graphics center on the vertical axis (an inline SVG
+   in a light-DOM span rides on the text baseline, which drops it below center) */
+.search-icon ::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:host([hidden]) {
+  display: none;
+}
