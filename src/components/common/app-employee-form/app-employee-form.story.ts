@@ -14,6 +14,13 @@ export const meta: ComponentStoryMeta = {
     open: 'Opens the form modal (rendered through the portal)',
     employee: 'Employee being edited (null = create mode)',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ employee: User }',
+      description: 'Fires after a successful save with the stored employee',
+    },
+  },
   stories: [
     {
       name: 'Create Employee',
