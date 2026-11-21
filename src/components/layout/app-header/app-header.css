@@ -34,7 +34,10 @@
   min-width: 0;
 }
 
-.mobile-menu-btn {
+.mobile-menu-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: none;
   background: transparent;
   border: none;
