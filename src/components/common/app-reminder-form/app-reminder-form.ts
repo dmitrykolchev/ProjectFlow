@@ -14,6 +14,7 @@ import {
 } from '../../../types';
 import {
   buildRecurrenceFromRRule,
+  formatRRuleHumanSummary,
   parseRRule,
   recurrenceToRRule,
   serializeRRule,
@@ -151,6 +152,31 @@ export class AppReminderForm extends LitElement {
       skipWeekends: this.fSkipWeekends,
       occurrenceCount: this.fOccurrenceCount,
     });
+  }
+
+  // human-readable description of the current rule — same canon as the summary card in
+  // app-recurrence-editor (formatRRuleHumanSummary over the parsed fRruleInput), so the reminder
+  // dialog shows the plain-language template description next to the raw RRULE code
+  private humanRuleSummary(t: ReturnType<typeof getTranslation>): string {
+    const trimmed = this.fRruleInput.trim();
+    const parsed = trimmed ? parseRRule(trimmed) : null;
+    const rule = parsed && parsed.ok ? parsed.rule : null;
+    if (!rule) return t.viewTexts.recurrenceEditor.summaryOnce;
+    return formatRRuleHumanSummary(
+      buildRecurrenceFromRRule(rule, {
+        templateCode: this.fTemplateCode,
+        skipWeekends: this.fSkipWeekends,
+        occurrenceCount: this.fOccurrenceCount,
+      }),
+      {
+        freqEvery: t.reminders.rfcFreqEvery,
+        weekdaysShortMap: t.reminders.rfcWeekdaysShort,
+        monthsShort: t.reminders.monthsShort,
+        nthPrefix: t.reminders.nthPrefix,
+        monthDayPrefix: t.reminders.monthDayPrefix,
+        setPosLabel: t.reminders.setPosLabel,
+      },
+    );
   }
 
   private initFields() {
@@ -805,6 +831,16 @@ export class AppReminderForm extends LitElement {
                   (this.fSkipWeekends = Boolean(e.detail?.checked))}"
               ></app-switch>
             </app-form-grid>
+
+            <div class="summary-card">
+              <div class="summary-main">
+                <span class="summary-icon">${iconRepeat(15)}</span>
+                <div class="summary-copy">
+                  <span class="summary-kicker">${t.viewTexts.recurrenceEditor.summaryLabel}</span>
+                  <span class="summary-text">${this.humanRuleSummary(t)}</span>
+                </div>
+              </div>
+            </div>
 
             <div class="rrule-display-row">
               <app-input
