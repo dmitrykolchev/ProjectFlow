@@ -66,6 +66,16 @@ export const meta: ComponentStoryMeta = {
     compact: 'High-density row layout (30px rows, tighter padding); falls back to the global density customization',
     hideDensitySwitch: 'Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch)',
   },
+  eventsDoc: {
+    'row-click': {
+      detail: '{ row: Record<string, unknown>, id: string }',
+      description: 'Fires when a row is clicked; carries the row data and its id',
+    },
+    'selection-change': {
+      detail: '{ selectedIds: string[], selectedRows: Record<string, unknown>[] }',
+      description: 'Fires when row selection changes',
+    },
+  },
   stories: [
     {
       name: 'Interactive Declarative Data Grid',
