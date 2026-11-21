@@ -17,6 +17,12 @@ export const meta: ComponentStoryMeta = {
     compact: 'Compact display mode without secondary helper hint',
     readonly: 'Disables uploading, linking, and detaching files',
   },
+  eventsDoc: {
+    'attachments-change': {
+      detail: '{ documentIds: string[], pendingFiles: PendingAttachmentFile[] }',
+      description: 'Fires when documents are attached/removed or pending files staged',
+    },
+  },
   stories: [
     {
       name: 'With Linked Project Files',
