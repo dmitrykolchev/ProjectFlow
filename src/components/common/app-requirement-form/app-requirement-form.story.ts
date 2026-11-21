@@ -15,6 +15,13 @@ export const meta: ComponentStoryMeta = {
     requirement: 'Requirement being edited (null = create mode)',
     presetProjectId: 'Project prefilled for a context-bound opening (first project by default)',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ requirement: ProjectRequirement }',
+      description: 'Fires after a successful save with the stored requirement',
+    },
+  },
   stories: [
     {
       name: 'Create Requirement',
