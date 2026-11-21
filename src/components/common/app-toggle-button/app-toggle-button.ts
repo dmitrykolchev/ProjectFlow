@@ -2,6 +2,12 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import styles from './app-toggle-button.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface ToggleButtonChangeDetail {
+  pressed: boolean;
+  value: string;
+}
+
 @customElement('app-toggle-button')
 export class AppToggleButton extends LitElement {
   @property({ type: Boolean, reflect: true }) pressed: boolean = false;
@@ -73,7 +79,7 @@ export class AppToggleButton extends LitElement {
     if (this.disabled) return;
     this.pressed = !this.pressed;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<ToggleButtonChangeDetail>('change', {
         detail: { pressed: this.pressed, value: this.value },
         bubbles: true,
         composed: true,
