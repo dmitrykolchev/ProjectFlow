@@ -18,6 +18,10 @@ export const meta: ComponentStoryMeta = {
     maxlength: 'Maximum character count (0 = unlimited); shows a counter when set',
     monospace: 'Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values',
   },
+  eventsDoc: {
+    input: { detail: '{ value: string }', description: 'Fires on every keystroke' },
+    change: { detail: '{ value: string }', description: 'Fires on blur' },
+  },
   stories: [
     {
       name: 'Default',
