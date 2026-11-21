@@ -49,6 +49,24 @@ export const meta: ComponentStoryMeta = {
     expenseSummary: 'Expense summary rendered next to the analysis',
     discussionsSummary: 'Discussion summary rendered next to the analysis',
   },
+  eventsDoc: {
+    'analyses-update': {
+      detail: '{ analyses: AnalysisSummary[] }',
+      description: 'Fires after the analysis list changes',
+    },
+    'clarification-update': {
+      detail: '{ messages: TaskAiClarificationMessage[] }',
+      description: 'Fires when clarification messages change',
+    },
+    'apply-description': {
+      detail: "{ description: string, mode: 'replace' | 'append' }",
+      description: 'Fires when an AI draft is applied to the task description',
+    },
+    'add-subtask': {
+      detail: '{ title: string }',
+      description: 'Fires when a suggested subtask is accepted',
+    },
+  },
   stories: [
     {
       name: 'Full Task Analysis Panel',
