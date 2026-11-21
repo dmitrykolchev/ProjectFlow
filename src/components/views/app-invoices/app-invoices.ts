@@ -541,7 +541,7 @@ export class AppInvoices extends LitElement {
               <app-link
                 class="cp-link-btn"
                 size="md"
-                @click="${() => (this.previewInvoice = inv)}"
+                @click="${() => store.openInvoiceDetail(inv.id)}"
               >
                 <span class="mono">${inv.number}</span>
               </app-link>
