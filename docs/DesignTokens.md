@@ -1,6 +1,7 @@
 # Design Tokens — система тем ProjectFlow
 
-Источник истины: `src/index.css`. Механизм применения: `store.applyThemeAndCustomization()` (`src/state/store.ts`).
+Дата: 21.11.2026. Источник истины: `src/index.css`. Механизм применения:
+`store.applyThemeAndCustomization()` (`src/state/store.ts`).
 
 ## Как работает система
 
@@ -23,7 +24,7 @@
 | Тени | `--shadow-sm/md/lg/xl` |
 | Скроллбары | `--scrollbar-track`, `--scrollbar-thumb`, `--scrollbar-thumb-hover` |
 | Статусные цвета | `--color-{success,warning,danger,info}` + суффиксы `-solid`, `-bg`, `-border` |
-| Плотность | `--control-height-sm/md/lg`, `--density-padding-base/compact`, `--density-row-height`, `--density-header-height`, `--sidebar-width`, `--sidebar-collapsed-width` |
+| Плотность | `--control-height-xxs/xs/sm/md/lg`, `--density-padding-base/compact`, `--density-row-height`, `--density-header-height`, `--sidebar-width`, `--sidebar-collapsed-width` |
 | Акцент | `--accent-primary`, `--accent-hover`, `--accent-soft`, `--accent-border`, `--accent-gradient` |
 | Glow/анимации (cyberpunk) | `--surface-glow`, `--accent-glow`, `--accent-glow-hover`, `--cyber-text-shadow`, `--cyber-pulse-anim`, `--cyber-surface-anim`, `--cyber-gradient-anim` |
 
@@ -36,7 +37,7 @@
 | `--radius-sm / md / lg / xl` | `6px / 8px / 12px / 16px` |
 | `--transition-fast` | `150ms cubic-bezier(0.16, 1, 0.3, 1)` |
 | `--transition-normal` | `200ms cubic-bezier(0.16, 1, 0.3, 1)` |
-| `--control-height-sm / md / lg` | `30px / 38px / 44px` |
+| `--control-height-xxs / xs / sm / md / lg` | `28px / 24px / 30px / 38px / 44px` (масштаб контролов: `xs` никогда не рендерится крупнее `sm`) |
 | `--density-padding-base / compact` | `0.75rem / 0.5rem` |
 | `--density-row-height / header-height` | `44px / 60px` |
 | `--sidebar-width / collapsed` | `260px / 68px` |
