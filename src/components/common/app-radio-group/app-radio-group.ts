@@ -13,6 +13,12 @@ export interface RadioOption {
   end?: Node[];
 }
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface RadioGroupChangeDetail {
+  value: string;
+  option: RadioOption;
+}
+
 @customElement('app-radio-group')
 export class AppRadioGroup extends LitElement {
   @property({ type: String }) label: string = '';
@@ -131,7 +137,7 @@ export class AppRadioGroup extends LitElement {
     if (this.disabled || opt.disabled || this.value === opt.value) return;
     this.value = opt.value;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<RadioGroupChangeDetail>('change', {
         detail: { value: this.value, option: opt },
         bubbles: true,
         composed: true,
