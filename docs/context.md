@@ -199,6 +199,18 @@
   половину шапки; токен `--header-left-max-width` удалён из кода (consumers не было),
   `--header-left-basis` остаётся ручкой. Pixel-проба идентична: 5 view, leftW = 50%
   headerW (491/981, 498/996, 493/986), headerH 69px.
+- Актуализация документации и view `/design-tokens`: аудит токенов скриптом против
+  `index.css` (`88a39f8` — добавлены `--control-height-xxs/xs`); регенерация
+  reference с датой 21.11 (`317e744`); статусные пометки planning-доков (`5210655`).
+  View `app-design-tokens` получил полный набор токенов: statusColors c
+  `-bg/-border` (16), категории radii, controlHeights, density, transitions,
+  typography, glow, sidebar + i18n-заголовки (`130656c`). `DesignTokens.md`:
+  шести тем (ThemeMode — light/dark/cyberpunk/matrix/barbie/high-contrast), все
+  таблицы сверены с `index.css` скриптом; примечания: пресеты фона — только
+  Light/Dark, вариации акцента `[data-accent] :not high-contrast` — Light/Dark/
+  Cyberpunk/Matrix/Barbie, ambient `body::after` — cyberpunk и matrix (`7f15595`).
+  Проба: 67 token rows, live-значения matrix/barbie/high-contrast совпадают
+  (#020603/#00ff41, #fff1f7/#d61f77, #000000/#fde047), headerH 69px, errors 0.
 - Браузерные пробы оставляют следы в localStorage: режимы
   contacts=table, invoices=cards, documents=cards, расчётный режим всех
   карточных view выставлен в `cards` при проверке футеров; перед сдачей сессии
