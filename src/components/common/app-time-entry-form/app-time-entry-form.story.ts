@@ -19,6 +19,13 @@ export const meta: ComponentStoryMeta = {
     presetUserId: 'Employee prefilled for a context-bound opening (first user by default)',
     contextTitle: 'Modal title override for context-bound openings',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ entry: TimeEntry }',
+      description: 'Fires after a successful save with the stored time entry',
+    },
+  },
   stories: [
     {
       name: 'Create Time Entry',
