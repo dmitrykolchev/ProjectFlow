@@ -209,7 +209,7 @@ export const meta: ComponentStoryMeta = {
             <span slot="icon-start">${iconEdit(14)}</span>
             <span>Редактировать</span>
           </app-button>
-          <app-button slot="nav-actions" action="delete" size="xs" variant="icon" title="Удалить">
+          <app-button slot="nav-actions" action="delete" size="sm" variant="icon" title="Удалить">
             <span slot="start">${iconTrash(15)}</span>
           </app-button>
 

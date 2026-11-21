@@ -75,9 +75,11 @@
 }
 
 /* Slotted nav buttons live in the host view's shadow tree, so a descendant rule
-   inside the shell cannot reach them — style them through ::slotted() instead. */
+   inside the shell cannot reach them — style them through ::slotted() instead.
+   The canonical control scale is NOT overridden here: xs stays the dense step
+   below sm (24px), so a nav row never renders an xs button taller than its sm
+   neighbours. */
 .nav-actions ::slotted(app-button) {
-  --control-height-xs: 34px;
   --icon-btn-bg: var(--bg-surface, #111827);
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
