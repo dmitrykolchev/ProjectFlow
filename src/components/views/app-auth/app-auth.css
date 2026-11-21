@@ -522,7 +522,10 @@
   cursor: not-allowed;
 }
 
-.pw-toggle-btn {
+.pw-toggle-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   position: absolute;
   right: 0.4rem;
   width: 30px;
