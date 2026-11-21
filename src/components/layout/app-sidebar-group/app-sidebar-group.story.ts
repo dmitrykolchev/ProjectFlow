@@ -31,6 +31,12 @@ export const meta: ComponentStoryMeta = {
     collapsed: 'Sidebar is in icon-only mode',
     hasActive: 'Group contains the active item',
   },
+  eventsDoc: {
+    'sidebar-group-toggle': {
+      detail: '{ groupId: string, expanded: boolean }',
+      description: 'Fires when the group is collapsed or expanded',
+    },
+  },
   stories: [
     {
       name: 'Expanded & Collapsed Groups',
