@@ -2,7 +2,7 @@
 
 Дата: 20.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 139 (со стори: 135).
+Всего компонентов: 139 (со стори: 136).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -169,7 +169,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-counterparty-detail` | views | Views | Отдельная страница контрагента: реквизиты, контакты, финансовые показатели, договоры, свя… |
 | `app-dashboard` | views | Views | Executive project management dashboard combining KPI metric cards, velocity/status/priori… |
 | `app-data-grid` | views | Views | Universal declarative enterprise data grid composed with <app-data-grid-column>, supporti… |
-| `app-design-tokens` | views | — | — |
+| `app-design-tokens` | views | Views | Live CSS custom property reference: token swatches grouped by category (backgrounds, text… |
 | `app-directories` | views | Views | Unified master-detail workbench for administering all grouped reference directories and c… |
 | `app-documents` | views | Views | Корпоративная библиотека документов: загрузка файлов с диска, предпросмотр изображений и … |
 | `app-employee-detail` | views | Views | Отдельная страница сотрудника: профиль, ставка, загрузка в проектах по ролям, назначенные… |
@@ -2084,7 +2084,7 @@ Portfolio progress tracker displaying completion bars, task ratios, and click-to
 
 ## 7. Группа `views` (44)
 
-### Views (41)
+### Views (42)
 
 #### `app-analytics` — `AppAnalytics`
 
@@ -2202,6 +2202,12 @@ Universal declarative enterprise data grid composed with <app-data-grid-column>,
 | Child element | Role |
 |---|---|
 | `app-data-grid-column` | Declarative column config child (field, caption, width, resizable, hidden, sortable, groupable, template, sortValue) |
+
+#### `app-design-tokens` — `AppDesignTokens`
+
+`src/components/views/app-design-tokens/`
+
+Live CSS custom property reference: token swatches grouped by category (backgrounds, text, borders, accent, status colors, scrollbars, shadows) with a theme switch across Light, Dark, Cyberpunk, Matrix, Barbie and High Contrast — values read live from the active theme.
 
 #### `app-directories` — `AppDirectories`
 
@@ -2365,11 +2371,7 @@ Dedicated Task Detail view unifying full task history: logged time entries, link
 
 Отдельная страница записи о времени: отработанные часы, статус утверждения, биллинг, прикреплённые файлы в библиотеке проекта и включение в калькуляции.
 
-### Other (3)
-
-#### `app-design-tokens` — `AppDesignTokens`
-
-`src/components/views/app-design-tokens/` (без стори)
+### Other (2)
 
 #### `app-material-icons` — `AppMaterialIcons`
 
@@ -2381,13 +2383,12 @@ Dedicated Task Detail view unifying full task history: logged time entries, link
 
 ---
 
-## 8. Компоненты без стори (4)
+## 8. Компоненты без стори (3)
 
 Не зарегистрированы в app-storybook: мета отсутствует, API описан по исходнику (помечены «без стори»
 в своих группах). По правилу проекта каждый компонент обязан иметь `.story.ts` — для этих компонентов
 стори нужно добавить:
 
 - `app-table-column` (common) — описание отсутствует
-- `app-design-tokens` (views) — описание отсутствует
 - `app-material-icons` (views) — описание отсутствует
 - `app-task-grid` (views) — описание отсутствует

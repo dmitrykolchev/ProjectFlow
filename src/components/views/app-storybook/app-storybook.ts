@@ -146,6 +146,7 @@ import directoriesMeta from '../app-directories/app-directories.story';
 import remindersMeta from '../app-reminders/app-reminders.story';
 import reminderDetailMeta from '../app-reminder-detail/app-reminder-detail.story';
 import authMeta from '../app-auth/app-auth.story';
+import designTokensMeta from '../app-design-tokens/app-design-tokens.story';
 
 const ALL_STORIES: ComponentStoryMeta[] = [
   buttonMeta,
@@ -281,6 +282,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   expenseDetailMeta,
   settingsMeta,
   profileSettingsMeta,
+  designTokensMeta,
   authMeta,
 ];
 
