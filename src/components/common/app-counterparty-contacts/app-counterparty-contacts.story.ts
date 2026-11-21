@@ -55,6 +55,12 @@ export const meta: ComponentStoryMeta = {
     hideHeader: 'Hides internal header when embedded inside app-section-card (attribute form hide-header)',
     heading: 'Caption of the internal header; falls back to the localized contact-persons title when empty',
   },
+  eventsDoc: {
+    'contacts-change': {
+      detail: '{ contacts: CounterpartyContact[] }',
+      description: 'Fires after a contact is added, edited or removed; carries the full updated list',
+    },
+  },
   stories: [
     {
       name: 'Interactive Contacts Manager',
