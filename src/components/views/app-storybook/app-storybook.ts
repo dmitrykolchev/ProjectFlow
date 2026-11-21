@@ -22,6 +22,7 @@ import badgeMeta from '../../common/app-badge/app-badge.story';
 import entityEmblemMeta from '../../common/app-entity-emblem/app-entity-emblem.story';
 import materialIconMeta from '../../common/app-material-icon/app-material-icon.story';
 import materialIconGalleryMeta from '../../common/app-material-icon-gallery/app-material-icon-gallery.story';
+import materialIconsViewMeta from '../app-material-icons/app-material-icons.story';
 import segmentedSwitchMeta from '../../common/app-segmented-switch/app-segmented-switch.story';
 import radioGroupMeta from '../../common/app-radio-group/app-radio-group.story';
 import optionMeta from '../../common/app-option/app-option.story';
@@ -162,6 +163,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   entityEmblemMeta,
   materialIconMeta,
   materialIconGalleryMeta,
+  materialIconsViewMeta,
   linkMeta,
   segmentedSwitchMeta,
   radioGroupMeta,

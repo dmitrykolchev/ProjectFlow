@@ -2,7 +2,7 @@
 
 Дата: 20.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 139 (со стори: 136).
+Всего компонентов: 139 (со стори: 137).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -181,7 +181,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-invoices` | views | Views | Standalone invoices registry across all contracts with cards and table views, payment pro… |
 | `app-kanban` | views | Views | Full-featured agile Kanban board with 5 workflow columns and drag-and-drop support. |
 | `app-knowledge-base` | views | Views | База знаний по проектам и компаниям: архитектурные решения, регламенты, разборы инциденто… |
-| `app-material-icons` | views | — | — |
+| `app-material-icons` | views | Views | Material Symbols palette page: every ligature glyph of the self-hosted variable fonts (39… |
 | `app-payment-detail` | views | Views | Отдельная страница платежа: направление (входящий / исходящий), маршрут движения средств,… |
 | `app-payments` | views | Views | Платежи: контроль сроков оплаты счетов, учёт частичных и полных платежей, просроченная за… |
 | `app-profile-settings` | views | Views | User profile settings page in the interface-settings layout: user card, language option c… |
@@ -2084,7 +2084,7 @@ Portfolio progress tracker displaying completion bars, task ratios, and click-to
 
 ## 7. Группа `views` (44)
 
-### Views (42)
+### Views (43)
 
 #### `app-analytics` — `AppAnalytics`
 
@@ -2281,6 +2281,12 @@ Full-featured agile Kanban board with 5 workflow columns and drag-and-drop suppo
 
 База знаний по проектам и компаниям: архитектурные решения, регламенты, разборы инцидентов, онбординг и накопление опыта с привязкой к задачам и истории правок.
 
+#### `app-material-icons` — `AppMaterialIcons`
+
+`src/components/views/app-material-icons/`
+
+Material Symbols palette page: every ligature glyph of the self-hosted variable fonts (3945 icons) with search by name, category and tags; the gallery toolbar drives the snippet panel, Enter/Space on a cell copies its name into the snippet, and the copy button writes the snippet to the clipboard.
+
 #### `app-payment-detail` — `AppPaymentDetail`
 
 `src/components/views/app-payment-detail/`
@@ -2371,11 +2377,7 @@ Dedicated Task Detail view unifying full task history: logged time entries, link
 
 Отдельная страница записи о времени: отработанные часы, статус утверждения, биллинг, прикреплённые файлы в библиотеке проекта и включение в калькуляции.
 
-### Other (2)
-
-#### `app-material-icons` — `AppMaterialIcons`
-
-`src/components/views/app-material-icons/` (без стори)
+### Other (1)
 
 #### `app-task-grid` — `AppTaskGrid`
 
@@ -2383,12 +2385,11 @@ Dedicated Task Detail view unifying full task history: logged time entries, link
 
 ---
 
-## 8. Компоненты без стори (3)
+## 8. Компоненты без стори (2)
 
 Не зарегистрированы в app-storybook: мета отсутствует, API описан по исходнику (помечены «без стори»
 в своих группах). По правилу проекта каждый компонент обязан иметь `.story.ts` — для этих компонентов
 стори нужно добавить:
 
 - `app-table-column` (common) — описание отсутствует
-- `app-material-icons` (views) — описание отсутствует
 - `app-task-grid` (views) — описание отсутствует
