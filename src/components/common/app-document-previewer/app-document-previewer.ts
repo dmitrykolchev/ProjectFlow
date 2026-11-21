@@ -435,7 +435,7 @@ export class AppDocumentPreviewer extends LitElement {
                     ? html`
                         <div class="nav-pager">
                           <app-button
-                          size="xxs"
+                          size="sm"
                             variant="icon"
                             title="${t.documents.prevDoc}"
                             .disabled="${!hasPrev}"
@@ -445,7 +445,7 @@ export class AppDocumentPreviewer extends LitElement {
                           </app-button>
                           <span class="nav-index">${currentIdx + 1}/${docList.length}</span>
                           <app-button
-                          size="xxs"
+                          size="sm"
                             variant="icon"
                             title="${t.documents.nextDoc}"
                             .disabled="${!hasNext}"
@@ -459,7 +459,7 @@ export class AppDocumentPreviewer extends LitElement {
                   ${this.showExpand
                     ? html`
                         <app-button
-                        size="xxs"
+                        size="sm"
                           variant="icon"
                           title="${t.documents.expandPreview}"
                           @click="${() => this.emitExpand(doc)}"
@@ -526,7 +526,7 @@ export class AppDocumentPreviewer extends LitElement {
         <div class="toolbar-bar">
           <div class="toolbar-group">
             <app-button
-              size="xxs"
+              size="sm"
               variant="icon"
               title="${t.documents.zoomOut}"
               .disabled="${this.zoom <= 0.5}"
@@ -536,7 +536,7 @@ export class AppDocumentPreviewer extends LitElement {
             </app-button>
             <app-button
               class="mono"
-              size="xxs"
+              size="sm"
               variant="icon"
               title="${t.documents.zoomReset}"
               @click="${() => (this.zoom = 1)}"
@@ -544,7 +544,7 @@ export class AppDocumentPreviewer extends LitElement {
               <span>${pct}%</span>
             </app-button>
             <app-button
-              size="xxs"
+              size="sm"
               variant="icon"
               title="${t.documents.zoomIn}"
               .disabled="${this.zoom >= 2.0}"
@@ -555,7 +555,7 @@ export class AppDocumentPreviewer extends LitElement {
           </div>
           <div class="toolbar-group">
             <app-toggle-button
-              size="xxs"
+              size="sm"
               ?pressed="${this.checkerboardBg}"
               title="${t.documents.toggleGridBg}"
               @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.checkerboardBg = e.detail.pressed)}"
@@ -592,7 +592,7 @@ export class AppDocumentPreviewer extends LitElement {
             ${showingSource
               ? html`
                   <app-toggle-button
-                    size="xxs"
+                    size="sm"
                     ?pressed="${this.showLineNumbers}"
                     @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.showLineNumbers = e.detail.pressed)}"
                   >
@@ -600,7 +600,7 @@ export class AppDocumentPreviewer extends LitElement {
                     <span>${t.documents.lineNumbers}</span>
                   </app-toggle-button>
                   <app-toggle-button
-                    size="xxs"
+                    size="sm"
                     ?pressed="${this.wordWrap}"
                     @change="${(e: CustomEvent<{ pressed: boolean }>) => (this.wordWrap = e.detail.pressed)}"
                   >
@@ -614,16 +614,12 @@ export class AppDocumentPreviewer extends LitElement {
           <div class="toolbar-group">
             <span class="toolbar-pill-info">${t.documents.linesCount(lineCount)}</span>
             <app-button
-              size="xxs"
+              size="sm"
               variant="icon"
+              title="${t.viewTexts.documents.copyContent}"
               @click="${() => this.handleCopyText(formattedText)}"
             >
               <span slot="start">${this.copiedContent ? iconCheck('sm') : iconCopy('sm')}</span>
-              <span>
-                ${this.copiedContent
-                  ? t.viewTexts.documents.copiedContent
-                  : t.viewTexts.documents.copyContent}
-              </span>
             </app-button>
           </div>
         </div>
