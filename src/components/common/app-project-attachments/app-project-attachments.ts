@@ -18,6 +18,7 @@ import '../app-button/app-button';
 import '../app-file-dropzone/app-file-dropzone';
 import '../app-select/app-select';
 import '../app-modal/app-modal';
+import '../app-confirm-dialog/app-confirm-dialog';
 import '../app-document-previewer/app-document-previewer';
 import styles from './app-project-attachments.css';
 
@@ -111,6 +112,7 @@ export class AppProjectAttachments extends LitElement {
   @state() private pickerValue: string = '';
   @state() private truncatedNote: string = '';
   @state() private previewingDoc: DocumentItem | null = null;
+  @state() private detachingDoc: DocumentItem | null = null;
 
   private unsubscribe?: () => void;
 
@@ -345,7 +347,7 @@ export class AppProjectAttachments extends LitElement {
                               variant="icon"
                               action="delete"
                               title="${t.viewTexts.attachments.removeButton}"
-                              @click="${() => this.handleDetachExisting(doc.id)}"
+                              @click="${() => (this.detachingDoc = doc)}"
                             >
                               <span slot="start">${iconX(13)}</span>
                             </app-button>
@@ -422,6 +424,29 @@ export class AppProjectAttachments extends LitElement {
             `
           : ''}
       </app-modal>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.detachingDoc)}"
+        size="sm"
+        variant="danger"
+        title="${t.viewTexts.confirmDialogs.attachmentDetach.title}"
+        action="${t.viewTexts.confirmDialogs.attachmentDetach.action(
+          this.detachingDoc?.title || ''
+        )}"
+        result="${t.viewTexts.confirmDialogs.attachmentDetach.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.viewTexts.attachments.removeButton}"
+        @cancel="${() => (this.detachingDoc = null)}"
+        @confirm="${() => {
+          if (this.detachingDoc) {
+            const id = this.detachingDoc.id;
+            this.detachingDoc = null;
+            this.handleDetachExisting(id);
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 }

@@ -2757,6 +2757,11 @@ export const en = {
         action: (title: string) => `Article "${title}" will be removed from the knowledge base.`,
         result: 'Links from tasks and requirements to this article will remain without the article text.',
       },
+      attachmentDetach: {
+        title: 'Detach document?',
+        action: (name: string) => `Document "${name}" will be detached from the current card.`,
+        result: 'The file stays in the document library; its link to the card is removed.',
+      },
     },
     materialIcons: {
       selected: 'Selected icon',
