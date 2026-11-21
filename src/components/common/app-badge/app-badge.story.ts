@@ -24,6 +24,9 @@ export const meta: ComponentStoryMeta = {
     dot: 'Renders a status dot without text',
     removable: 'Shows a remove (×) affordance',
   },
+  eventsDoc: {
+    remove: { detail: '—', description: 'Fires when the badge remove button is clicked' },
+  },
   stories: [
     {
       name: 'Size Scale',
