@@ -14,6 +14,12 @@ const meta: ComponentStoryMeta = {
     'initial-step':
       'Initial screen step to render: "login" | "register" | "forgot" | "2fa".',
   },
+  eventsDoc: {
+    'auth-success': {
+      detail: '{ userId: string, email: string, provider: AuthProviderId, tenantId?: string, twoFactorVerified: boolean, trustedDevice: boolean }',
+      description: 'Fires after a successful authentication session',
+    },
+  },
   stories: [
     {
       name: 'Hybrid Sign In (Step 1)',
