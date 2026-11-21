@@ -103,7 +103,14 @@ export class AppModal extends LitElement {
   }
 
   private scheduleRestoreFromPortal() {
-    this.isVisualOpen = false;
+    // Снимать визуальное состояние вне цикла обновления: сет @state внутри
+    // updated() планирует второй цикл (lit dev-mode «change-in-update»).
+    // Микрозадача выполняется до paint, анимация закрытия не меняется.
+    queueMicrotask(() => {
+      if (!this.open) {
+        this.isVisualOpen = false;
+      }
+    });
     this.portalHandle?.setActive(false);
 
     if (this.closeTimer !== null) {
