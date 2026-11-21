@@ -24,6 +24,13 @@ export const meta: ComponentStoryMeta = {
     defaultCompanyId: 'Initial company ID for standalone payments',
     defaultCounterpartyId: 'Initial counterparty ID for standalone payments',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ payment: InvoicePayment }',
+      description: 'Fires after a successful save with the stored payment',
+    },
+  },
   stories: [
     {
       name: 'Record Invoice Payment',
