@@ -417,6 +417,10 @@
     "v": "Renders only the start slot, no text; a button with only an icon becomes square automatically"
    },
    {
+    "k": "ariaLabel",
+    "v": "Accessible name exposed as aria-label — for icon-only buttons and rows of icon actions where the label is graphical (the row title is mirrored here)"
+   },
+   {
     "k": "type",
     "v": "Native HTML button type (button / submit)"
    }

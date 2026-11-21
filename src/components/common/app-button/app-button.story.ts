@@ -26,6 +26,7 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Disables interaction and dims the button',
     loading: 'Shows a spinner and blocks clicks',
     iconOnly: 'Renders only the start slot, no text; a button with only an icon becomes square automatically',
+    ariaLabel: 'Accessible name exposed as aria-label — for icon-only buttons and rows of icon actions where the label is graphical (the row title is mirrored here)',
     type: 'Native HTML button type (button / submit)',
   },
   stories: [
