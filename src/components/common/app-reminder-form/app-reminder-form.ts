@@ -1129,7 +1129,7 @@ export class AppReminderForm extends LitElement {
         </div>
 
         <div slot="footer" class="footer-actions">
-          <app-button variant="outline" @click="${() => this.closeModal()}">
+          <app-button variant="ghost" @click="${() => this.closeModal()}">
             ${t.common.cancel}
           </app-button>
           <app-button variant="primary" @click="${() => this.handleSave()}">
