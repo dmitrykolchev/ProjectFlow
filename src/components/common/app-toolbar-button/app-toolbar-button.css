@@ -1,0 +1,101 @@
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  /* the row scale is inherited from app-toolbar; standalone use falls back to
+     the canonical md control tokens */
+  height: var(--tb-height, var(--control-height-md, 38px));
+  font-size: var(--tb-font, var(--control-font-md, 0.875rem));
+  padding: 0 var(--tb-pad-x, var(--control-padding-x-md, 0.875rem));
+  --mi-icon: var(--tb-icon, var(--control-icon-md, 20px));
+  border-radius: var(--tb-btn-radius, var(--radius-sm, 6px));
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  transition: background-color var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease),
+              color var(--transition-fast, 150ms ease);
+}
+
+/* canonical slot API: start / default / end.
+   The button is a flex container with align-items: center, so every slotted
+   element (text, SVG icon, material icon) sits centered on the vertical axis. */
+::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:hover:not(:disabled) {
+  background: var(--bg-surface, #111827);
+  border-color: var(--border-subtle, #1e293b);
+  color: var(--text-primary, #f8fafc);
+}
+
+/* toggle pressed state — canonical accent treatment */
+button.is-pressed {
+  background: var(--accent-soft, rgba(99, 102, 241, 0.16));
+  border-color: var(--accent-primary, #6366f1);
+  color: var(--accent-primary, #818cf8);
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-surface, #111827), 0 0 0 4px var(--accent-primary, #6366f1);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* icon-only button is a canonical square control (same as app-button icon-only);
+   an icon-only dropdown renders with normal padding so the chevron fits */
+button.icon-only {
+  width: var(--tb-height, var(--control-height-md, 38px));
+  padding: 0;
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.75;
+}
+
+/* portal dropdown popover (the portal adopts this stylesheet) */
+.popover-menu {
+  position: fixed;
+  z-index: 1;
+  pointer-events: auto;
+  min-width: 200px;
+  max-width: calc(100vw - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: popIn 140ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:host([hidden]) {
+  display: none;
+}
