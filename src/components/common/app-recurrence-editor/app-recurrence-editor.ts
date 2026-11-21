@@ -1632,7 +1632,6 @@ export class AppRecurrenceEditor extends LitElement {
                     <span slot="icon-start">
                       ${this.copiedRecent ? iconCheck(13) : iconCopy(13)}
                     </span>
-                    <span>${t.reminders.rruleCopyBtn}</span>
                   </app-button>
                 </div>
               `
