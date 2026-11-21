@@ -16,6 +16,16 @@ export const meta: ComponentStoryMeta = {
     grade: 'Initial GRAD axis value for the toolbar (-50..200); changes fire params-change',
     disabled: 'Blocks search, toolbar and grid interaction — the gallery renders read-only',
   },
+  eventsDoc: {
+    'icon-select': {
+      detail: '{ name: string }',
+      description: 'Fires when an icon is picked',
+    },
+    'params-change': {
+      detail: '{ family: GalleryFamily, size: GallerySize | number, fill: number, weight: number, grade: number }',
+      description: 'Fires when a toolbar parameter changes',
+    },
+  },
   stories: [
     {
       name: 'Full Palette',
