@@ -13,6 +13,11 @@ import { getTranslation } from '../../../i18n';
 import { formatMoney } from '../app-money/app-money';
 import { iconArrowDownLeft, iconArrowUpRight } from '../icons';
 import styles from './app-payment-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface PaymentFormSavedDetail {
+  payment: InvoicePayment;
+}
 import { eventValue } from '../event-value';
 import '../app-modal/app-modal';
 import '../app-form-grid/app-form-grid';
@@ -294,7 +299,7 @@ export class AppPaymentForm extends LitElement {
       store.updateInvoicePayment(updatedPayment);
       this.open = false;
       this.dispatchEvent(
-        new CustomEvent('saved', {
+        new CustomEvent<PaymentFormSavedDetail>('saved', {
           detail: { payment: updatedPayment },
           bubbles: true,
           composed: true,
@@ -321,7 +326,7 @@ export class AppPaymentForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<PaymentFormSavedDetail>('saved', {
         detail: { payment: created },
         bubbles: true,
         composed: true,
