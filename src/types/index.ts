@@ -909,8 +909,8 @@ export interface BlogComment {
   authorId: string;
   text: string;
   createdAt: string;
-  /** Root comment id for a single-level reply; absent (undefined) for top-level comments. */
-  parentId?: string;
+  /** Message being answered (root of the dialogue stays the top-level comment; hierarchy is one level). */
+  replyToId?: string;
 }
 
 export interface BlogPost {

@@ -2757,13 +2757,13 @@ export const ru = {
       },
       blogCommentDelete: {
         title: 'Удалить комментарий?',
-        action: (replies: number): string =>
-          replies > 0
-            ? `Выбранный комментарий и ответы на него (${replies}) будут удалены из обсуждения статьи.`
+        action: (messages: number): string =>
+          messages > 1
+            ? `Выбранный комментарий и все сообщения диалога (${messages}) будут удалены из обсуждения статьи.`
             : 'Выбранный комментарий будет удалён из обсуждения статьи.',
-        result: (replies: number): string =>
-          replies > 0
-            ? 'Комментарий и вся ветка ответов исчезнут у всех читателей блога.'
+        result: (messages: number): string =>
+          messages > 1
+            ? 'Диалог целиком исчезнет у всех читателей блога.'
             : 'Комментарий исчезнет у всех читателей блога.',
       },
       knowledgeArticleDelete: {
@@ -3780,6 +3780,7 @@ export const ru = {
       replySubmitBtn: 'Отправить ответ',
       replyCancelBtn: 'Отменить ответ',
       replyToLabel: (author: string): string => `Ответ ${author}`,
+      quoteSourceLabel: 'Цитировать сообщение',
       thArticle: 'Статья',
       thAuthor: 'Автор',
       thCategory: 'Рубрика',

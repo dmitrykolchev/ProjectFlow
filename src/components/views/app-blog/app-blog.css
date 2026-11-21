@@ -276,6 +276,33 @@ app-cards-table {
   border-left: 2px solid var(--accent, #6366f1);
 }
 
+/* Quoted source message inside a reply (optional, toggled in the composer). */
+.comment-quote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  border-left: 3px solid var(--border-strong, #334155);
+  background: var(--bg-surface, #0a101f);
+  border-radius: var(--radius-sm, 6px);
+}
+
+.quote-author {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+}
+
+.quote-text {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--text-muted, #64748b);
+  white-space: pre-wrap;
+}
+
 .reply-to-chip {
   display: inline-flex;
   align-self: flex-start;

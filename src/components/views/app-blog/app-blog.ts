@@ -81,9 +81,10 @@ export class AppBlog extends LitElement {
   @state() private commentText = '';
   @state() private commentAuthorId = store.currentUserId || store.users[0]?.id || 'user-1';
   @state() private deletingComment: { postId: string; comment: BlogComment } | null = null;
-  // Root comment id currently being replied to (single-level replies: a reply is always a child of
-  // a top-level comment, which is the root of its dialogue).
+  // Message being answered (one-level dialogues: a reply may answer any message of the post; the
+  // top-level comment stays the root of its dialogue).
   @state() private replyToId: string | null = null;
+  @state() private replyQuote = true;
 
   // Editor modal state
   @state() private modalOpen = false;
@@ -315,11 +316,14 @@ export class AppBlog extends LitElement {
     this.modalOpen = false;
   }
 
-  private submitComment(postId: string, parentId?: string) {
+  private submitComment(postId: string, replyToId?: string) {
     if (!this.commentText.trim()) return;
-    store.addBlogComment(postId, this.commentText, this.commentAuthorId, parentId);
+    store.addBlogComment(postId, this.commentText, this.commentAuthorId, replyToId);
     this.commentText = '';
-    if (parentId) this.replyToId = null;
+    if (replyToId) {
+      this.replyToId = null;
+      this.replyQuote = true;
+    }
   }
 
   render() {
@@ -1036,16 +1040,29 @@ export class AppBlog extends LitElement {
             : html`
                 <div class="comments-thread">
                   ${post.comments
-                    .filter((c) => !c.parentId)
+                    .filter((c) => !c.replyToId)
                     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
                     .map((root) => {
-                      const replies = post.comments
-                        .filter((c) => c.parentId === root.id)
+                      const dialogue = post.comments
+                        .filter((q) => {
+                          let cur: BlogComment = q;
+                          const byId = new Map(post.comments.map((x) => [x.id, x]));
+                          while (cur.replyToId && byId.has(cur.replyToId)) {
+                            cur = byId.get(cur.replyToId)!;
+                          }
+                          return cur.id === root.id;
+                        })
                         .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-                      const renderComment = (c: BlogComment, isRoot: boolean) => {
+                      const renderMessage = (c: BlogComment) => {
                         const cAuthor = store.users.find((u) => u.id === c.authorId);
+                        const source = c.replyToId
+                          ? post.comments.find((q) => q.id === c.replyToId)
+                          : undefined;
+                        const sourceAuthor = source
+                          ? store.users.find((u) => u.id === source.authorId)
+                          : undefined;
                         return html`
-                          <div class="comment-item ${isRoot ? '' : 'comment-reply'}">
+                          <div class="comment-item ${c.replyToId ? 'comment-reply' : ''}">
                             <div class="comment-head">
                               <app-persona
                                 size="24"
@@ -1056,22 +1073,18 @@ export class AppBlog extends LitElement {
 
                               <div class="comment-head-right">
                                 <span class="comment-time">${this.formatDateTime(c.createdAt)}</span>
-                                ${isRoot
-                                  ? html`
-                                      <app-button
-                                        size="sm"
-                                        variant="icon"
-                                        action="add"
-                                        title="${b.replyBtn}"
-                                        @click="${() => {
-                                          this.replyToId = root.id;
-                                          this.commentText = '';
-                                        }}"
-                                      >
-                                        <span slot="start">${iconCornerUpLeft(13)}</span>
-                                      </app-button>
-                                    `
-                                  : ''}
+                                <app-button
+                                  size="sm"
+                                  variant="icon"
+                                  action="add"
+                                  title="${b.replyBtn}"
+                                  @click="${() => {
+                                    this.replyToId = c.id;
+                                    this.commentText = '';
+                                  }}"
+                                >
+                                  <span slot="start">${iconCornerUpLeft(13)}</span>
+                                </app-button>
                                 <app-button
                                   size="sm"
                                   variant="icon"
@@ -1083,20 +1096,31 @@ export class AppBlog extends LitElement {
                                 </app-button>
                               </div>
                             </div>
+                            ${source
+                              ? html`
+                                  <span class="reply-to-chip">${b.replyToLabel(
+                                    sourceAuthor?.name || source.authorId
+                                  )}</span>
+                                  <blockquote class="comment-quote">
+                                    <span class="quote-author">${sourceAuthor?.name ||
+                                      source.authorId}</span>
+                                    <p class="quote-text">${source.text}</p>
+                                  </blockquote>
+                                `
+                              : ''}
                             <p class="comment-text">${c.text}</p>
                           </div>
                         `;
                       };
                       return html`
                         <div class="comment-root">
-                          ${renderComment(root, true)}
-                          ${replies.map((r) => renderComment(r, false))}
-                          ${this.replyToId === root.id
+                          ${dialogue.map((c) => renderMessage(c))}
+                          ${this.replyToId && dialogue.some((c) => c.id === this.replyToId)
                             ? html`
                                 <div class="reply-composer">
                                   <span class="reply-to-chip">${b.replyToLabel(
-                                    store.users.find((u) => u.id === root.authorId)?.name ||
-                                      root.authorId
+                                    store.users.find((u) => u.id === this.replyToId)?.name ||
+                                      this.replyToId!
                                   )}</span>
                                   <app-textarea
                                     rows="2"
@@ -1104,6 +1128,16 @@ export class AppBlog extends LitElement {
                                     .value="${this.commentText}"
                                     @input="${(e: CustomEvent) => (this.commentText = eventValue(e))}"
                                   ></app-textarea>
+                                  <app-switch
+                                    size="sm"
+                                    frame="transparent"
+                                    field-label-style="ghost"
+                                    field-label="${b.quoteSourceLabel}"
+                                    label="${b.quoteSourceLabel}"
+                                    .checked="${this.replyQuote}"
+                                    @change="${(e: CustomEvent<{ checked: boolean }>) =>
+                                      (this.replyQuote = e.detail.checked)}"
+                                  ></app-switch>
                                   <div class="reply-composer-actions">
                                     <app-button
                                       variant="ghost"
@@ -1111,6 +1145,7 @@ export class AppBlog extends LitElement {
                                       @click="${() => {
                                         this.replyToId = null;
                                         this.commentText = '';
+                                        this.replyQuote = true;
                                       }}"
                                     >
                                       ${b.replyCancelBtn}
@@ -1119,7 +1154,7 @@ export class AppBlog extends LitElement {
                                       variant="primary"
                                       size="sm"
                                       ?disabled="${!this.commentText.trim()}"
-                                      @click="${() => this.submitComment(post.id, root.id)}"
+                                      @click="${() => this.submitComment(post.id, this.replyToId!)}"
                                     >
                                       <span slot="icon-start">${iconSend(14)}</span>
                                       <span>${b.replySubmitBtn}</span>
@@ -1470,10 +1505,21 @@ export class AppBlog extends LitElement {
   private renderDeleteDialogs(t: ReturnType<typeof getTranslation>) {
     const dlgPost = t.viewTexts.confirmDialogs.blogDelete;
     const dlgComment = t.viewTexts.confirmDialogs.blogCommentDelete;
-    const deletingReplyCount = this.deletingComment
-      ? (this.posts.find((p) => p.id === this.deletingComment!.postId)?.comments || []).filter(
-          (c) => c.parentId === this.deletingComment!.comment.id
-        ).length
+    // Deleting any message of a dialogue removes the whole dialogue, so the dialog names its size.
+    const deletingDialogueSize = this.deletingComment
+      ? (() => {
+          const comments = this.posts.find((p) => p.id === this.deletingComment!.postId)?.comments || [];
+          const byId = new Map(comments.map((x) => [x.id, x]));
+          const chainRoot = (c: BlogComment): string => {
+            let cur = c;
+            while (cur.replyToId && byId.has(cur.replyToId)) {
+              cur = byId.get(cur.replyToId)!;
+            }
+            return cur.id;
+          };
+          const rootId = chainRoot(this.deletingComment!.comment);
+          return comments.filter((c) => chainRoot(c) === rootId).length;
+        })()
       : 0;
 
     return html`
@@ -1500,8 +1546,8 @@ export class AppBlog extends LitElement {
         title="${dlgComment.title}"
         .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
         .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-        action="${dlgComment.action(deletingReplyCount)}"
-        result="${dlgComment.result(deletingReplyCount)}"
+        action="${dlgComment.action(deletingDialogueSize)}"
+        result="${dlgComment.result(deletingDialogueSize)}"
         .confirmLabel="${t.common.delete}"
         .cancelLabel="${t.common.cancel}"
         @confirm="${() => {

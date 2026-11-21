@@ -4130,17 +4130,16 @@ export class AppStore {
     postId: string,
     text: string,
     authorId?: string,
-    parentId?: string
+    replyToId?: string
   ): BlogComment | null {
     const trimmed = text.trim();
     if (!trimmed) return null;
     const target = this.blogPosts.find((p) => p.id === postId);
     if (!target) return null;
-    // Single-level replies: a reply is only accepted when it points at a top-level comment.
-    const parent = parentId
-      ? (target.comments || []).find((c) => c.id === parentId && !c.parentId)
-      : undefined;
-    if (parentId && !parent) return null;
+    // One-level dialogues: a reply may answer any message of the post (root or reply), it is appended
+    // to the end of the dialogue rooted at the top-level comment.
+    const replyTo = replyToId ? (target.comments || []).find((c) => c.id === replyToId) : undefined;
+    if (replyToId && !replyTo) return null;
     const uid = authorId || this.currentUserId || this.users[0]?.id || 'user-1';
     const authorName = this.users.find((u) => u.id === uid)?.name || uid;
     const comment: BlogComment = {
@@ -4149,7 +4148,7 @@ export class AppStore {
       authorId: uid,
       text: trimmed,
       createdAt: new Date().toISOString(),
-      ...(parent ? { parentId: parent.id } : {}),
+      ...(replyTo ? { replyToId: replyTo.id } : {}),
     };
     this.blogPosts = this.blogPosts.map((p) =>
       p.id === postId ? { ...p, comments: [...(p.comments || []), comment] } : p
@@ -4168,17 +4167,24 @@ export class AppStore {
   }
 
   public deleteBlogComment(postId: string, commentId: string): void {
-    // A top-level comment is the root of its dialogue, so deleting it removes its replies too.
-    this.blogPosts = this.blogPosts.map((p) =>
-      p.id === postId
-        ? {
-            ...p,
-            comments: (p.comments || []).filter(
-              (c) => c.id !== commentId && c.parentId !== commentId
-            ),
-          }
-        : p
-    );
+    // A top-level comment is the root of its dialogue; deleting any message of a dialogue removes the
+    // whole dialogue (the root and every message whose reply-chain leads to that root).
+    const chainRoot = (c: BlogComment): string => {
+      let cur = c;
+      const byId = new Map((this.blogPosts.find((p) => p.id === postId)?.comments || []).map((x) => [x.id, x]));
+      while (cur.replyToId && byId.has(cur.replyToId)) {
+        cur = byId.get(cur.replyToId)!;
+      }
+      return cur.id;
+    };
+    this.blogPosts = this.blogPosts.map((p) => {
+      if (p.id !== postId) return p;
+      const comments = p.comments || [];
+      const target = comments.find((c) => c.id === commentId);
+      if (!target) return p;
+      const rootId = chainRoot(target);
+      return { ...p, comments: comments.filter((c) => chainRoot(c) !== rootId) };
+    });
     this.saveBlogPosts();
     this.notify();
   }

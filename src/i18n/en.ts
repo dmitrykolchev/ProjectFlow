@@ -2757,13 +2757,13 @@ export const en = {
       },
       blogCommentDelete: {
         title: 'Delete comment?',
-        action: (replies: number) =>
-          replies > 0
-            ? `The selected comment and its replies (${replies}) will be removed from this article discussion.`
+        action: (messages: number): string =>
+          messages > 1
+            ? `The selected comment and all messages of its dialogue (${messages}) will be removed from this article discussion.`
             : 'The selected comment will be removed from this article discussion.',
-        result: (replies: number) =>
-          replies > 0
-            ? 'The comment and its whole reply thread will disappear for all readers.'
+        result: (messages: number): string =>
+          messages > 1
+            ? 'The whole dialogue will disappear for all readers.'
             : 'The comment will disappear for all readers.',
       },
       knowledgeArticleDelete: {
@@ -3779,7 +3779,8 @@ export const en = {
       replyPlaceholder: 'Write a reply to this comment...',
       replySubmitBtn: 'Post Reply',
       replyCancelBtn: 'Cancel reply',
-      replyToLabel: (author: string) => `Reply to ${author}`,
+      replyToLabel: (author: string): string => `Reply to ${author}`,
+      quoteSourceLabel: 'Quote source message',
       thArticle: 'Article',
       thAuthor: 'Author',
       thCategory: 'Category',
