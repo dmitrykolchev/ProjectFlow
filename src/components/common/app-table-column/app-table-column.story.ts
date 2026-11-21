@@ -54,6 +54,12 @@ export const meta: ComponentStoryMeta = {
     cellRender: 'Custom cell renderer (row, value) => TemplateResult | string | number',
     valueFn: 'Custom value extractor (row) => unknown, replacing the plain row[field] read',
   },
+  eventsDoc: {
+    'column-change': {
+      detail: '—',
+      description: 'Fires when any column property changes; the parent table re-reads the columns',
+    },
+  },
   stories: [
     {
       name: 'Column Types',
