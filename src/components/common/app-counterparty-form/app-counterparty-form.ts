@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { Counterparty, CounterpartyContact, CounterpartyStatus, CounterpartyType, BankRequisite } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-counterparty-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface CounterpartyFormSavedDetail {
+  counterparty: Counterparty;
+}
 import { eventValue } from '../event-value';
 import '../app-modal/app-modal';
 import '../app-form-grid/app-form-grid';
@@ -156,7 +161,7 @@ export class AppCounterpartyForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<CounterpartyFormSavedDetail>('saved', {
         detail: { counterparty: saved },
         bubbles: true,
         composed: true,
