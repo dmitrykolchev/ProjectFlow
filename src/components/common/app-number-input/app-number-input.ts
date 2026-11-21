@@ -2,6 +2,11 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-number-input.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface NumberInputChangeDetail {
+  value: number;
+}
+
 @customElement('app-number-input')
 export class AppNumberInput extends LitElement {
   @property({ type: String }) label: string = '';
@@ -73,7 +78,7 @@ export class AppNumberInput extends LitElement {
   private setValue(newVal: number) {
     this.value = newVal;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<NumberInputChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
