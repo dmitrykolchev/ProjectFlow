@@ -403,7 +403,10 @@
   border-color: var(--accent-border, rgba(99, 102, 241, 0.4));
 }
 
-.linked-task-main {
+.linked-task-main {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   flex: 1;
   min-width: 0;
   background: transparent;
@@ -492,7 +495,10 @@
   color: var(--text-secondary, #94a3b8);
 }
 
-.ai-quick-chip {
+.ai-quick-chip {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -609,7 +615,10 @@
   gap: 0.55rem;
 }
 
-.ai-input {
+.ai-input {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 100%;
   min-height: 68px;
   resize: vertical;
@@ -686,7 +695,10 @@
   background: var(--bg-canvas, #090d16);
 }
 
-.trace-item-btn {
+.trace-item-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   flex: 1;
   min-width: 0;
   background: transparent;
