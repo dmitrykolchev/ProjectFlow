@@ -179,10 +179,13 @@
   color: var(--text-muted, #64748b);
 }
 
+/* section-body is not a flex-with-gap, so the divider needs clearance above the
+   line: padding-top alone leaves the border touching the bottom edge of the row above */
 .base-palettes-row {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  margin-top: 0.75rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--border-subtle, #1e293b);
 }
@@ -298,6 +301,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin-top: 0.75rem;
   padding-top: 0.5rem;
   border-top: 1px solid var(--border-subtle, #1e293b);
   flex-wrap: wrap;
