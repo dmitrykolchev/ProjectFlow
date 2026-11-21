@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { EmployeeStatus, User } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-employee-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface EmployeeFormSavedDetail {
+  employee: User;
+}
 import { eventValue } from '../event-value';
 import '../app-modal/app-modal';
 import '../app-form-grid/app-form-grid';
@@ -133,7 +138,7 @@ export class AppEmployeeForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<EmployeeFormSavedDetail>('saved', {
         detail: { employee: saved },
         bubbles: true,
         composed: true,
