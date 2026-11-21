@@ -194,6 +194,11 @@
   Событие/Detail/Описание и рядом `change { checked: boolean }`, app-data-grid —
   row-click + selection-change, app-button без событий — секции нет (корректно),
   errors 0.
+- `app-page-header`: убран `max-width: var(--header-left-max-width, 50%)` из
+  `.header-left` (`f8a4de7) — `flex: 1 0 var(--header-left-basis, 50%)` сам держит
+  половину шапки; токен `--header-left-max-width` удалён из кода (consumers не было),
+  `--header-left-basis` остаётся ручкой. Pixel-проба идентична: 5 view, leftW = 50%
+  headerW (491/981, 498/996, 493/986), headerH 69px.
 - Браузерные пробы оставляют следы в localStorage: режимы
   contacts=table, invoices=cards, documents=cards, расчётный режим всех
   карточных view выставлен в `cards` при проверке футеров; перед сдачей сессии
