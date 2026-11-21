@@ -156,7 +156,10 @@
   gap: 0.5rem;
 }
 
-.base-color-input {
+.base-color-input {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 34px;
   height: 28px;
   border: 1px solid var(--border-strong, #334155);
@@ -202,7 +205,10 @@
   gap: 0.6rem;
 }
 
-.base-palette-btn {
+.base-palette-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -317,7 +323,10 @@
   padding: 0.35rem 0.75rem;
 }
 
-.color-input {
+.color-input {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 28px;
   height: 28px;
   border: none;
