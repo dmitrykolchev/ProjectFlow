@@ -22,6 +22,11 @@ import '../app-input/app-input';
 import '../app-select/app-select';
 import styles from './app-bank-requisites.css';
 
+// detail of the `accounts-change` event (named event-detail interface, AGENTS.md §6)
+export interface BankRequisitesChangeDetail {
+  accounts: BankRequisite[];
+}
+
 const BANK_CURRENCIES: BankCurrency[] = ['RUB', 'USD', 'EUR', 'CNY', 'GBP', 'KZT', 'AED'];
 
 /**
@@ -115,7 +120,7 @@ export class AppBankRequisites extends LitElement {
 
   private emitAccounts(nextAccounts: BankRequisite[]) {
     this.dispatchEvent(
-      new CustomEvent('accounts-change', {
+      new CustomEvent<BankRequisitesChangeDetail>('accounts-change', {
         detail: { accounts: nextAccounts },
         bubbles: true,
         composed: true,
