@@ -22,6 +22,13 @@ export const meta: ComponentStoryMeta = {
     presetTags: 'Tags prefilled for a quick upload (empty by default)',
     contextTitle: 'Modal title override for context-bound openings',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ document: DocumentItem }',
+      description: 'Fires after a successful save with the stored document',
+    },
+  },
   stories: [
     {
       name: 'Create Document',
