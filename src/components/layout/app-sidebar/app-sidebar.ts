@@ -17,9 +17,9 @@ import {
   iconChevronRight,
   iconLogOut,
 } from '../../common/icons';
-import { SidebarItem } from '../sidebar-item/sidebar-item';
+import { AppSidebarItem } from '../app-sidebar-item/app-sidebar-item';
 import { SidebarGroup } from '../sidebar-group/sidebar-group';
-import '../sidebar-item/sidebar-item';
+import '../app-sidebar-item/app-sidebar-item';
 import '../sidebar-group/sidebar-group';
 
 @customElement('app-sidebar')
@@ -189,8 +189,8 @@ export class AppSidebar extends LitElement {
     const assigned = slot.assignedElements({ flatten: true });
     for (const el of assigned) {
       const tag = el.tagName.toLowerCase();
-      if (tag === 'sidebar-item') {
-        const item = el as SidebarItem;
+      if (tag === 'app-sidebar-item') {
+        const item = el as AppSidebarItem;
         item.collapsed = this.collapsed;
         if (this.activeValue) {
           item.active = item.value === this.activeValue;
@@ -202,9 +202,9 @@ export class AppSidebar extends LitElement {
         group.expanded = this.expandedGroups.includes(gid);
 
         let groupHasActive = false;
-        const childItems = group.querySelectorAll('sidebar-item');
+        const childItems = group.querySelectorAll('app-sidebar-item');
         childItems.forEach((child) => {
-          const item = child as SidebarItem;
+          const item = child as AppSidebarItem;
           item.collapsed = this.collapsed;
           if (this.activeValue) {
             const isItemActive = item.value === this.activeValue;

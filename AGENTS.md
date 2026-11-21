@@ -123,7 +123,7 @@ render() {
 1. `ActiveView` union в `src/types/index.ts`;
 2. loader в `VIEW_LOADERS` (`src/app-root.ts`);
 3. `case` в рендере `app-root.ts`;
-4. sidebar-item в группе сайдбара (`app-root.ts`, `.icon="${icon...()}"`, label из `t.navigation`);
+4. app-sidebar-item в группе сайдбара (`app-root.ts`, `.icon="${icon...()}"`, label из `t.navigation`);
 5. метка в `navigation` секции `ru.ts`/`en.ts`.
 
 ## 3. Карточки

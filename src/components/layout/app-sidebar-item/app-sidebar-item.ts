@@ -1,9 +1,9 @@
 import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import styles from './sidebar-item.css';
+import styles from './app-sidebar-item.css';
 
-@customElement('sidebar-item')
-export class SidebarItem extends LitElement {
+@customElement('app-sidebar-item')
+export class AppSidebarItem extends LitElement {
   @property({ type: String }) value: string = '';
   @property({ type: String }) label: string = '';
   @property({ type: String }) badge: string = '';

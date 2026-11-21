@@ -35,7 +35,7 @@ import {
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
 import './components/layout/sidebar-group/sidebar-group';
-import './components/layout/sidebar-item/sidebar-item';
+import './components/layout/app-sidebar-item/app-sidebar-item';
 import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
 import './components/common/app-activity-panel/app-activity-panel';
@@ -270,192 +270,192 @@ export class AppRoot extends LitElement {
         @sidebar-select="${this.handleSidebarSelect}"
       >
         <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
-          <sidebar-item
+          <app-sidebar-item
             value="dashboard"
             label="${t.navigation.dashboard}"
             .icon="${iconDashboard()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="projects"
             label="${t.navigation.projects}"
             .icon="${iconFolder()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="requirements"
             label="${t.navigation.requirements}"
             badge="${String(this.requirementsCount)}"
             .icon="${iconLayers()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="kanban"
             label="${t.navigation.kanban}"
             badge="${String(this.taskCount)}"
             .icon="${iconKanban()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="gantt"
             label="${t.navigation.gantt}"
             .icon="${iconGantt()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="time-tracking"
             label="${t.navigation.timeTracking}"
             .icon="${iconClock()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="expenses"
             label="${t.navigation.expenses}"
             .icon="${iconWallet()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="project-chat"
             label="${t.navigation.projectChat}"
             badge="${String(this.chatCount)}"
             .icon="${iconMessageSquare()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="knowledge-base"
             label="${t.navigation.knowledgeBase}"
             badge="${String(this.knowledgeCount)}"
             .icon="${iconBookOpen()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="blog"
             label="${t.navigation.blog}"
             badge="${String(this.blogCount)}"
             .icon="${iconFeather()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="documents"
             label="${t.navigation.documents}"
             badge="${String(this.documentCount)}"
             .icon="${iconFolderOpen()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="reminders"
             label="${t.navigation.reminders}"
             badge="${this.dueRemindersCount > 0 ? String(this.dueRemindersCount) : ''}"
             .icon="${iconBell()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
-          <sidebar-item
+          <app-sidebar-item
             value="grid"
             label="${t.navigation.grid}"
             .icon="${iconTable()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="calendar"
             label="${t.navigation.calendar}"
             .icon="${iconCalendar()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="analytics"
             label="${t.navigation.analytics}"
             .icon="${iconAnalytics()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="directory" label="${t.navigation.groupDirectory}">
-          <sidebar-item
+          <app-sidebar-item
             value="companies"
             label="${t.navigation.companies}"
             .icon="${iconBuilding()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="employees"
             label="${t.navigation.employees}"
             .icon="${iconUsers()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="counterparties"
             label="${t.navigation.counterparties}"
             .icon="${iconHandshake()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="contacts"
             label="${t.navigation.contacts}"
             .icon="${iconUser()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="contracts"
             label="${t.navigation.contracts}"
             .icon="${iconFileText()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="invoices"
             label="${t.navigation.invoices}"
             .icon="${iconReceipt()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="calculations"
             label="${t.navigation.calculations}"
             .icon="${iconCalculator()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="payments"
             label="${t.navigation.payments}"
             .icon="${iconCreditCard()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="directories"
             label="${t.navigation.directories}"
             .icon="${iconDatabase()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
         </sidebar-group>
 
         <sidebar-group group-id="system" label="${t.navigation.groupSystem}">
-          <sidebar-item
+          <app-sidebar-item
             value="activity"
             label="${t.navigation.activity}"
             .icon="${iconActivity()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="storybook"
             label="${t.navigation.storybook}"
             .icon="${iconStorybook()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="material-icons"
             label="${t.navigation.materialIcons}"
             .icon="${iconGrid(18)}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="design-tokens"
             label="${t.navigation.designTokens}"
             .icon="${iconLayers()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
 
-          <sidebar-item
+          <app-sidebar-item
             value="settings"
             label="${t.navigation.settings}"
             .icon="${iconSettings()}"
-          ></sidebar-item>
+          ></app-sidebar-item>
         </sidebar-group>
       </app-sidebar>
 
