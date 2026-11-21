@@ -2,6 +2,11 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-checkbox.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface CheckboxChangeDetail {
+  checked: boolean;
+}
+
 @customElement('app-checkbox')
 export class AppCheckbox extends LitElement {
   @property({ type: Boolean, reflect: true }) checked: boolean = false;
@@ -48,7 +53,7 @@ export class AppCheckbox extends LitElement {
     this.checked = !this.checked;
     this.indeterminate = false;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<CheckboxChangeDetail>('change', {
         detail: { checked: this.checked },
         bubbles: true,
         composed: true,
