@@ -1016,7 +1016,7 @@ Visual, human-friendly recurrence rule builder covering the full RFC 5545 specif
 
 `src/components/common/app-reminder-form/`
 
-Modal form for creating and editing polymorphic reminders linked to any system entity. The recurrence rule is picked from Master Classifiers templates, typed manually directly in the RRULE field (live RFC 5545 validation with the rruleErrors canon, template re-matching), or configured through the app-recurrence-editor dialog reused from the recurrence templates directory; a summary card shows the plain-language rule description next to the code, same canon as the editor live summary; notifications use a flexible multi-rule builder.
+Modal form for creating and editing polymorphic reminders linked to any system entity. The recurrence rule is picked from Master Classifiers templates, typed manually directly in the RRULE field (live RFC 5545 validation with the rruleErrors canon, template re-matching), or configured through the app-recurrence-editor dialog reused from the recurrence templates directory; a summary card shows the plain-language rule description next to the code, same canon as the editor live summary; notifications use a flexible multi-rule builder, and removing a notification rule (danger button) is guarded by app-confirm-dialog naming the rule.
 
 | Property | Type / default | Description |
 |---|---|---|

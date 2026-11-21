@@ -34,6 +34,7 @@ import {
   iconX,
 } from '../icons';
 import '../app-modal/app-modal';
+import '../app-confirm-dialog/app-confirm-dialog';
 import '../app-form-grid/app-form-grid';
 import '../app-input/app-input';
 import '../app-select/app-select';
@@ -101,6 +102,9 @@ export class AppReminderForm extends LitElement {
   @state() private fOccurrenceCount = 0;
   @state() private fRruleInput = '';
   @state() private fRruleError = '';
+
+  // dangerous action canon: the notification rule trash button opens app-confirm-dialog before removeRule
+  @state() private confirmRemoveRuleId: string | null = null;
 
   // the rule is picked from the directory templates, or configured individually in the same
   // app-recurrence-editor dialog used by the recurrence templates directory (app-directory-record-modal):
@@ -179,6 +183,17 @@ export class AppReminderForm extends LitElement {
         setPosLabel: t.reminders.setPosLabel,
       },
     );
+  }
+
+  // human-readable rule name for the delete confirmation — channel label + lead offset from i18n
+  private ruleDisplayName(
+    rule: ReminderNotificationRule | null,
+    t: ReturnType<typeof getTranslation>,
+  ): string {
+    if (!rule) return '';
+    const unit = t.reminders.leadUnits[rule.offsetUnit];
+    const offset = rule.offsetUnit === 'at_time' ? unit : `${rule.offsetValue} ${unit}`;
+    return `${t.reminders.channels[rule.channel]} · ${offset}`;
   }
 
   private initFields() {
@@ -990,10 +1005,10 @@ export class AppReminderForm extends LitElement {
 
                       <app-button
                         size="sm"
-                        variant="ghost"
+                        action="delete"
                         title="${t.reminders.removeRuleTitle}"
                         ?disabled="${this.fRules.length <= 1}"
-                        @click="${() => this.removeRule(rule.id)}"
+                        @click="${() => (this.confirmRemoveRuleId = rule.id)}"
                       >
                         <span slot="icon-start">${iconTrash(14)}</span>
                       </app-button>
@@ -1146,6 +1161,32 @@ export class AppReminderForm extends LitElement {
           </app-button>
         </div>
       </app-modal>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.confirmRemoveRuleId)}"
+        size="sm"
+        variant="danger"
+        title="${t.viewTexts.confirmDialogs.notificationRuleDelete.title}"
+        action="${t.viewTexts.confirmDialogs.notificationRuleDelete.action(
+          this.ruleDisplayName(
+            this.fRules.find((r) => r.id === this.confirmRemoveRuleId) || null,
+            t,
+          )
+        )}"
+        result="${t.viewTexts.confirmDialogs.notificationRuleDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmRemoveRuleId = null)}"
+        @confirm="${() => {
+          const id = this.confirmRemoveRuleId;
+          this.confirmRemoveRuleId = null;
+          if (id) {
+            this.removeRule(id);
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 }

@@ -2710,6 +2710,11 @@ export const en = {
         action: (title: string) => `Subtask "${title}" will be deleted.`,
         result: 'The subtask list and task progress will be recalculated.',
       },
+      notificationRuleDelete: {
+        title: 'Delete notification channel?',
+        action: (name: string) => `Rule "${name}" will be removed from the reminder notification set.`,
+        result: 'The notification set becomes shorter, the reminder trigger schedule is recalculated.',
+      },
       bulkTaskDelete: {
         title: 'Bulk delete tasks?',
         action: (count: number) => `${count} selected tasks will be deleted.`,
