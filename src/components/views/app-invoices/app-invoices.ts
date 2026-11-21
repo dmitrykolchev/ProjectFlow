@@ -664,6 +664,23 @@ export class AppInvoices extends LitElement {
             </span>
           </div>
           <div slot="end" class="inv-footer-actions">
+            <app-button
+              size="sm"
+              variant="icon"
+              action="view"
+              title="${t.viewTexts.invoices.openInvoice}"
+              @click="${() => store.openInvoiceDetail(inv.id)}"
+            >
+              <span slot="start">${iconChevronRight(14)}</span>
+            </app-button>
+            <app-button
+              size="sm"
+              variant="icon"
+              title="${t.invoices.previewInvoice}"
+              @click="${() => (this.previewInvoice = inv)}"
+            >
+              <span slot="start">${iconEye(14)}</span>
+            </app-button>
             ${inv.status === 'draft'
               ? html`
                   <app-button
@@ -715,23 +732,6 @@ export class AppInvoices extends LitElement {
                   </app-button>
                 `
               : ''}
-            <app-button
-              size="sm"
-              variant="icon"
-              action="view"
-              title="${t.viewTexts.invoices.openInvoice}"
-              @click="${() => store.openInvoiceDetail(inv.id)}"
-            >
-              <span slot="start">${iconChevronRight(14)}</span>
-            </app-button>
-            <app-button
-              size="sm"
-              variant="icon"
-              title="${t.invoices.previewInvoice}"
-              @click="${() => (this.previewInvoice = inv)}"
-            >
-              <span slot="start">${iconEye(14)}</span>
-            </app-button>
             <app-button
               size="sm"
               variant="icon"
@@ -944,6 +944,23 @@ export class AppInvoices extends LitElement {
       const canPay = inv.status !== 'draft' && inv.status !== 'cancelled' && invRemaining > 0;
       return html`
         <div class="ctr-actions-row">
+          <app-button
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.viewTexts.invoices.openInvoice}"
+            @click="${() => store.openInvoiceDetail(inv.id)}"
+          >
+            <span slot="start">${iconChevronRight(14)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
+            title="${t.invoices.previewInvoice}"
+            @click="${() => (this.previewInvoice = inv)}"
+          >
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
           ${inv.status === 'draft'
             ? html`
                 <app-button
@@ -999,27 +1016,10 @@ export class AppInvoices extends LitElement {
           <app-button
             size="sm"
             variant="icon"
-            title="${t.invoices.previewInvoice}"
-            @click="${() => (this.previewInvoice = inv)}"
-          >
-            <span slot="start">${iconEye(14)}</span>
-          </app-button>
-          <app-button
-            size="sm"
-            variant="icon"
             title="${t.common.edit}"
             @click="${() => this.openEditInvoiceModal(inv)}"
           >
             <span slot="start">${iconEdit(14)}</span>
-          </app-button>
-          <app-button
-            size="sm"
-            variant="icon"
-            action="view"
-            title="${t.viewTexts.invoices.openInvoice}"
-            @click="${() => store.openInvoiceDetail(inv.id)}"
-          >
-            <span slot="start">${iconChevronRight(14)}</span>
           </app-button>
           <app-button
             action="delete"
