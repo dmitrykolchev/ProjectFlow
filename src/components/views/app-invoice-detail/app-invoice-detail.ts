@@ -221,7 +221,7 @@ export class AppInvoiceDetail extends LitElement {
 
             <app-button
               action="delete"
-              size="xs"
+              size="sm"
               variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"
