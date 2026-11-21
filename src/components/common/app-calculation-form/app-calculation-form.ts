@@ -10,6 +10,11 @@ import {
 } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-calculation-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface CalculationFormSavedDetail {
+  calculation: Calculation;
+}
 import { eventValue } from '../event-value';
 import { iconPlus, iconTrash } from '../icons';
 import { formatMoney } from '../app-money/app-money';
@@ -461,7 +466,7 @@ export class AppCalculationForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<CalculationFormSavedDetail>('saved', {
         detail: { calculation: saved },
         bubbles: true,
         composed: true,
