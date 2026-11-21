@@ -25,6 +25,9 @@ export const meta: ComponentStoryMeta = {
     placeholder: 'Text shown when nothing is selected',
     size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
+  eventsDoc: {
+    change: { detail: '{ value: string }', description: 'Fires when an option is picked' },
+  },
   stories: [
     {
       name: 'Declarative Options',
