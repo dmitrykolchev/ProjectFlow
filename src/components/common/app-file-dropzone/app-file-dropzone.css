@@ -55,7 +55,10 @@
   cursor: not-allowed;
 }
 
-.file-input {
+.file-input {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: none;
 }
 
@@ -152,7 +155,10 @@
   flex-shrink: 0;
 }
 
-.clear-btn {
+.clear-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 22px;
   height: 22px;
   border-radius: var(--radius-xs, 4px);
