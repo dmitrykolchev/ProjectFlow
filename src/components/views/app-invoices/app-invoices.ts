@@ -781,7 +781,7 @@ export class AppInvoices extends LitElement {
     const numberCell = (row: Record<string, unknown>) => {
       const inv = row as unknown as Invoice;
       return html`
-        <div class="contract-link-btn" @click="${() => (this.previewInvoice = inv)}">
+        <div class="contract-link-btn" @click="${() => store.openInvoiceDetail(inv.id)}">
           ${iconReceipt(15)}
           <span>${inv.number}</span>
         </div>
