@@ -4126,11 +4126,21 @@ export class AppStore {
     this.notify();
   }
 
-  public addBlogComment(postId: string, text: string, authorId?: string): BlogComment | null {
+  public addBlogComment(
+    postId: string,
+    text: string,
+    authorId?: string,
+    parentId?: string
+  ): BlogComment | null {
     const trimmed = text.trim();
     if (!trimmed) return null;
     const target = this.blogPosts.find((p) => p.id === postId);
     if (!target) return null;
+    // Single-level replies: a reply is only accepted when it points at a top-level comment.
+    const parent = parentId
+      ? (target.comments || []).find((c) => c.id === parentId && !c.parentId)
+      : undefined;
+    if (parentId && !parent) return null;
     const uid = authorId || this.currentUserId || this.users[0]?.id || 'user-1';
     const authorName = this.users.find((u) => u.id === uid)?.name || uid;
     const comment: BlogComment = {
@@ -4139,6 +4149,7 @@ export class AppStore {
       authorId: uid,
       text: trimmed,
       createdAt: new Date().toISOString(),
+      ...(parent ? { parentId: parent.id } : {}),
     };
     this.blogPosts = this.blogPosts.map((p) =>
       p.id === postId ? { ...p, comments: [...(p.comments || []), comment] } : p
@@ -4157,9 +4168,15 @@ export class AppStore {
   }
 
   public deleteBlogComment(postId: string, commentId: string): void {
+    // A top-level comment is the root of its dialogue, so deleting it removes its replies too.
     this.blogPosts = this.blogPosts.map((p) =>
       p.id === postId
-        ? { ...p, comments: (p.comments || []).filter((c) => c.id !== commentId) }
+        ? {
+            ...p,
+            comments: (p.comments || []).filter(
+              (c) => c.id !== commentId && c.parentId !== commentId
+            ),
+          }
         : p
     );
     this.saveBlogPosts();

@@ -2757,8 +2757,14 @@ export const en = {
       },
       blogCommentDelete: {
         title: 'Delete comment?',
-        action: 'The selected comment will be removed from this article discussion.',
-        result: 'The comment will disappear for all readers.',
+        action: (replies: number) =>
+          replies > 0
+            ? `The selected comment and its replies (${replies}) will be removed from this article discussion.`
+            : 'The selected comment will be removed from this article discussion.',
+        result: (replies: number) =>
+          replies > 0
+            ? 'The comment and its whole reply thread will disappear for all readers.'
+            : 'The comment will disappear for all readers.',
       },
       knowledgeArticleDelete: {
         title: 'Delete knowledge base article?',
@@ -3769,6 +3775,11 @@ export const en = {
       commentAuthorLabel: 'Commenting as',
       commentPlaceholder: 'Share thoughts, questions, or feedback on this post...',
       commentSubmitBtn: 'Post Comment',
+      replyBtn: 'Reply',
+      replyPlaceholder: 'Write a reply to this comment...',
+      replySubmitBtn: 'Post Reply',
+      replyCancelBtn: 'Cancel reply',
+      replyToLabel: (author: string) => `Reply to ${author}`,
       thArticle: 'Article',
       thAuthor: 'Author',
       thCategory: 'Category',

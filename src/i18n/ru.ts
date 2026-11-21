@@ -2757,8 +2757,14 @@ export const ru = {
       },
       blogCommentDelete: {
         title: 'Удалить комментарий?',
-        action: 'Выбранный комментарий будет удалён из обсуждения статьи.',
-        result: 'Комментарий исчезнет у всех читателей блога.',
+        action: (replies: number): string =>
+          replies > 0
+            ? `Выбранный комментарий и ответы на него (${replies}) будут удалены из обсуждения статьи.`
+            : 'Выбранный комментарий будет удалён из обсуждения статьи.',
+        result: (replies: number): string =>
+          replies > 0
+            ? 'Комментарий и вся ветка ответов исчезнут у всех читателей блога.'
+            : 'Комментарий исчезнет у всех читателей блога.',
       },
       knowledgeArticleDelete: {
         title: 'Удалить статью базы знаний?',
@@ -3769,6 +3775,11 @@ export const ru = {
       commentAuthorLabel: 'От имени сотрудника',
       commentPlaceholder: 'Напишите отзыв, вопрос или дополнение к статье...',
       commentSubmitBtn: 'Отправить комментарий',
+      replyBtn: 'Ответить',
+      replyPlaceholder: 'Напишите ответ этому комментарию...',
+      replySubmitBtn: 'Отправить ответ',
+      replyCancelBtn: 'Отменить ответ',
+      replyToLabel: (author: string): string => `Ответ ${author}`,
       thArticle: 'Статья',
       thAuthor: 'Автор',
       thCategory: 'Рубрика',

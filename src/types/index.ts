@@ -909,6 +909,8 @@ export interface BlogComment {
   authorId: string;
   text: string;
   createdAt: string;
+  /** Root comment id for a single-level reply; absent (undefined) for top-level comments. */
+  parentId?: string;
 }
 
 export interface BlogPost {

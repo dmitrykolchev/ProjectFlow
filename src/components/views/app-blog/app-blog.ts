@@ -13,6 +13,7 @@ import {
   iconChevronRight,
   iconCode,
   iconColumns,
+  iconCornerUpLeft,
   iconEdit,
   iconEye,
   iconFeather,
@@ -80,6 +81,9 @@ export class AppBlog extends LitElement {
   @state() private commentText = '';
   @state() private commentAuthorId = store.currentUserId || store.users[0]?.id || 'user-1';
   @state() private deletingComment: { postId: string; comment: BlogComment } | null = null;
+  // Root comment id currently being replied to (single-level replies: a reply is always a child of
+  // a top-level comment, which is the root of its dialogue).
+  @state() private replyToId: string | null = null;
 
   // Editor modal state
   @state() private modalOpen = false;
@@ -311,10 +315,11 @@ export class AppBlog extends LitElement {
     this.modalOpen = false;
   }
 
-  private submitComment(postId: string) {
+  private submitComment(postId: string, parentId?: string) {
     if (!this.commentText.trim()) return;
-    store.addBlogComment(postId, this.commentText, this.commentAuthorId);
+    store.addBlogComment(postId, this.commentText, this.commentAuthorId, parentId);
     this.commentText = '';
+    if (parentId) this.replyToId = null;
   }
 
   render() {
@@ -1030,67 +1035,138 @@ export class AppBlog extends LitElement {
             ? html`<div class="comments-empty">${b.commentsEmpty}</div>`
             : html`
                 <div class="comments-thread">
-                  ${post.comments.map((c) => {
-                    const cAuthor = store.users.find((u) => u.id === c.authorId);
-                    return html`
-                      <div class="comment-item">
-                        <div class="comment-head">
-                          <app-persona
-                            size="24"
-                            .primaryText="${cAuthor?.name || c.authorId}"
-                            .presence="${cAuthor ? effectivePresence(cAuthor) : 'none'}"
-                            @click="${() => cAuthor && store.openEmployeeDetail(cAuthor.id)}"
-                          ></app-persona>
+                  ${post.comments
+                    .filter((c) => !c.parentId)
+                    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+                    .map((root) => {
+                      const replies = post.comments
+                        .filter((c) => c.parentId === root.id)
+                        .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+                      const renderComment = (c: BlogComment, isRoot: boolean) => {
+                        const cAuthor = store.users.find((u) => u.id === c.authorId);
+                        return html`
+                          <div class="comment-item ${isRoot ? '' : 'comment-reply'}">
+                            <div class="comment-head">
+                              <app-persona
+                                size="24"
+                                .primaryText="${cAuthor?.name || c.authorId}"
+                                .presence="${cAuthor ? effectivePresence(cAuthor) : 'none'}"
+                                @click="${() => cAuthor && store.openEmployeeDetail(cAuthor.id)}"
+                              ></app-persona>
 
-                          <div class="comment-head-right">
-                            <span class="comment-time">${this.formatDateTime(c.createdAt)}</span>
-                            <app-button
-                              size="sm"
-                              variant="icon"
-                              action="delete"
-                              title="${t.common.delete}"
-                              @click="${() => (this.deletingComment = { postId: post.id, comment: c })}"
-                            >
-                              <span slot="start">${iconTrash(13)}</span>
-                            </app-button>
+                              <div class="comment-head-right">
+                                <span class="comment-time">${this.formatDateTime(c.createdAt)}</span>
+                                ${isRoot
+                                  ? html`
+                                      <app-button
+                                        size="sm"
+                                        variant="icon"
+                                        action="add"
+                                        title="${b.replyBtn}"
+                                        @click="${() => {
+                                          this.replyToId = root.id;
+                                          this.commentText = '';
+                                        }}"
+                                      >
+                                        <span slot="start">${iconCornerUpLeft(13)}</span>
+                                      </app-button>
+                                    `
+                                  : ''}
+                                <app-button
+                                  size="sm"
+                                  variant="icon"
+                                  action="delete"
+                                  title="${t.common.delete}"
+                                  @click="${() => (this.deletingComment = { postId: post.id, comment: c })}"
+                                >
+                                  <span slot="start">${iconTrash(13)}</span>
+                                </app-button>
+                              </div>
+                            </div>
+                            <p class="comment-text">${c.text}</p>
                           </div>
+                        `;
+                      };
+                      return html`
+                        <div class="comment-root">
+                          ${renderComment(root, true)}
+                          ${replies.map((r) => renderComment(r, false))}
+                          ${this.replyToId === root.id
+                            ? html`
+                                <div class="reply-composer">
+                                  <span class="reply-to-chip">${b.replyToLabel(
+                                    store.users.find((u) => u.id === root.authorId)?.name ||
+                                      root.authorId
+                                  )}</span>
+                                  <app-textarea
+                                    rows="2"
+                                    placeholder="${b.replyPlaceholder}"
+                                    .value="${this.commentText}"
+                                    @input="${(e: CustomEvent) => (this.commentText = eventValue(e))}"
+                                  ></app-textarea>
+                                  <div class="reply-composer-actions">
+                                    <app-button
+                                      variant="ghost"
+                                      size="sm"
+                                      @click="${() => {
+                                        this.replyToId = null;
+                                        this.commentText = '';
+                                      }}"
+                                    >
+                                      ${b.replyCancelBtn}
+                                    </app-button>
+                                    <app-button
+                                      variant="primary"
+                                      size="sm"
+                                      ?disabled="${!this.commentText.trim()}"
+                                      @click="${() => this.submitComment(post.id, root.id)}"
+                                    >
+                                      <span slot="icon-start">${iconSend(14)}</span>
+                                      <span>${b.replySubmitBtn}</span>
+                                    </app-button>
+                                  </div>
+                                </div>
+                              `
+                            : ''}
                         </div>
-                        <p class="comment-text">${c.text}</p>
-                      </div>
-                    `;
-                  })}
+                      `;
+                    })}
                 </div>
               `}
 
-          <div class="comment-composer">
-            <app-textarea
-              rows="3"
-              placeholder="${b.commentPlaceholder}"
-              .value="${this.commentText}"
-              @input="${(e: CustomEvent) => (this.commentText = eventValue(e))}"
-            ></app-textarea>
+          ${this.replyToId
+            ? ''
+            : html`
+                <div class="comment-composer">
+                  <app-textarea
+                    rows="3"
+                    placeholder="${b.commentPlaceholder}"
+                    .value="${this.commentText}"
+                    @input="${(e: CustomEvent) => (this.commentText = eventValue(e))}"
+                  ></app-textarea>
 
-            <div class="comment-composer-controls">
-              <div class="comment-author-select">
-                <app-select
-                  label="${b.commentAuthorLabel}"
-                  .value="${this.commentAuthorId}"
-                  .options="${authorOptions}"
-                  @change="${(e: CustomEvent) => (this.commentAuthorId = eventValue(e))}"
-                ></app-select>
-              </div>
+                  <div class="comment-composer-controls">
+                    <div class="comment-author-select">
+                      <app-select
+                        label="${b.commentAuthorLabel}"
+                        .value="${this.commentAuthorId}"
+                        .options="${authorOptions}"
+                        @change="${(e: CustomEvent) => (this.commentAuthorId = eventValue(e))}"
+                      ></app-select>
+                    </div>
 
-              <app-button
-                variant="primary"
-                size="md"
-                ?disabled="${!this.commentText.trim()}"
-                @click="${() => this.submitComment(post.id)}"
-              >
-                <span slot="icon-start">${iconSend(14)}</span>
-                <span>${b.commentSubmitBtn}</span>
-              </app-button>
-            </div>
-          </div>
+                    <app-button
+                      variant="primary"
+                      size="md"
+                      ?disabled="${!this.commentText.trim()}"
+                      @click="${() => this.submitComment(post.id)}"
+                    >
+                      <span slot="icon-start">${iconSend(14)}</span>
+                      <span>${b.commentSubmitBtn}</span>
+                    </app-button>
+                  </div>
+                </div>
+              `}
         </app-section-card>
       </div>
     `;
@@ -1394,6 +1470,11 @@ export class AppBlog extends LitElement {
   private renderDeleteDialogs(t: ReturnType<typeof getTranslation>) {
     const dlgPost = t.viewTexts.confirmDialogs.blogDelete;
     const dlgComment = t.viewTexts.confirmDialogs.blogCommentDelete;
+    const deletingReplyCount = this.deletingComment
+      ? (this.posts.find((p) => p.id === this.deletingComment!.postId)?.comments || []).filter(
+          (c) => c.parentId === this.deletingComment!.comment.id
+        ).length
+      : 0;
 
     return html`
       <app-confirm-dialog
@@ -1419,8 +1500,8 @@ export class AppBlog extends LitElement {
         title="${dlgComment.title}"
         .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
         .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-        action="${dlgComment.action}"
-        result="${dlgComment.result}"
+        action="${dlgComment.action(deletingReplyCount)}"
+        result="${dlgComment.result(deletingReplyCount)}"
         .confirmLabel="${t.common.delete}"
         .cancelLabel="${t.common.cancel}"
         @confirm="${() => {
