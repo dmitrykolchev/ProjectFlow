@@ -25,6 +25,12 @@ const meta: ComponentStoryMeta = {
     compact: 'Reduces vertical spacing for embedding inside modals',
     'hide-rrule-bar': 'Hides raw RRULE string bar while preserving visual editing',
   },
+  eventsDoc: {
+    change: {
+      detail: '{ value: string, rrule: string, rule: Rfc5545Rule | null, isValid: boolean, summary: string }',
+      description: 'Fires when the recurrence rule changes',
+    },
+  },
   stories: [
     {
       name: 'Friday the 13th (Monthly Intersection)',
