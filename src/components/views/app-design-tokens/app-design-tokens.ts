@@ -121,7 +121,6 @@ const CATEGORIES: CategoryDef[] = [
   {
     key: 'controlHeights',
     tokens: [
-      { name: 'control-height-xxs', swatch: false },
       { name: 'control-height-xs', swatch: false },
       { name: 'control-height-sm', swatch: false },
       { name: 'control-height-md', swatch: false },
@@ -388,7 +387,7 @@ ${tx.viewTexts.designTokens.demos.glowCodeComment}</code></pre>
           <code>--radius-xl: 16px</code>
           <code>--transition-fast: 150ms</code>
           <code>--transition-normal: 200ms</code>
-          <code>--control-height-xxs/xs/sm/md/lg: 28/24/30/38/44px</code>
+          <code>--control-height-xs/sm/md/lg: 24/30/38/44px</code>
           <code>--sidebar-width: 260px</code>
         </div>
       </app-section-card>
