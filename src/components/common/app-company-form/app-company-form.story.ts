@@ -14,6 +14,13 @@ export const meta: ComponentStoryMeta = {
     open: 'Opens the form modal (rendered through the portal)',
     company: 'Company being edited (null = create mode)',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ company: Company }',
+      description: 'Fires after a successful save with the stored company',
+    },
+  },
   stories: [
     {
       name: 'Create Company',
