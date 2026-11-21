@@ -4,6 +4,9 @@
 :host {
   display: inline-flex;
   vertical-align: middle;
+  /* --tb-width lets a consumer stretch the row (default auto keeps every
+     existing toolbar content-sized and pixel-identical) */
+  width: var(--tb-width, auto);
 }
 
 :host[size="xs"] {
@@ -40,6 +43,10 @@
   display: inline-flex;
   align-items: center;
   flex-wrap: wrap;
+  /* when the host is stretched via --tb-width, the row fills it; with the
+     default auto width the row stays content-sized */
+  flex: 1 1 auto;
+  min-width: 0;
   gap: var(--tb-gap, 0.3rem);
   padding: var(--tb-padding-y, 0.4rem) var(--tb-padding-x, 0.6rem);
   border-radius: var(--radius-md, 8px);
