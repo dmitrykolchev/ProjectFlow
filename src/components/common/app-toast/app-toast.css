@@ -62,7 +62,10 @@
   line-height: 1.4;
 }
 
-.toast-action-link {
+.toast-action-link {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
@@ -86,7 +89,10 @@
   color: var(--text-on-accent, #ffffff);
 }
 
-.toast-close {
+.toast-close {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: var(--text-muted, #64748b);
