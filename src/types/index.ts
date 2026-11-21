@@ -731,9 +731,6 @@ export interface DirectoryFieldDef {
   max?: number;
   options?: DirectoryFieldOption[];
   defaultValue?: string | number | boolean;
-  /** Boolean fields render as a labelled switch inside a framed box (the canonical form row).
-     This flag renders the plain switch with no box, for rows where the frame is not wanted. */
-  framelessSwitch?: boolean;
 }
 
 export interface DirectoryRecord {
