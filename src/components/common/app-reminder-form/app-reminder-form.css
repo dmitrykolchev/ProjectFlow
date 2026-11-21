@@ -182,7 +182,10 @@
   font-size: 0.76rem;
 }
 
-.chip-remove-btn {
+.chip-remove-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: var(--text-muted, #64748b);
