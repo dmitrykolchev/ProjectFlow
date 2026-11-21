@@ -2,7 +2,7 @@ import { LitElement, html } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ButtonSize, ButtonVariant } from '../app-button/app-button';
 import { MenuItem } from '../app-menu/app-menu';
-import type { AppMenuItem } from '../app-menu-item/app-menu-item';
+import type { AppMenuItem, MenuItemSelectDetail } from '../app-menu-item/app-menu-item';
 import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-portal';
 import { iconChevronDown } from '../icons';
 import '../app-button/app-button';
@@ -203,7 +203,7 @@ export class AppDropdownButton extends LitElement {
     }
     this.isOpen = false;
     this.dispatchEvent(
-      new CustomEvent('select', {
+      new CustomEvent<MenuItemSelectDetail>('select', {
         detail: e.detail,
         bubbles: true,
         composed: true,
