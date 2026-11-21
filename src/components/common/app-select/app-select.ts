@@ -13,6 +13,11 @@ export interface SelectOption {
 
 export type SelectSize = 'sm' | 'md' | 'lg'; // canonical control scale (docs/ComponentApiSpecs.md, Priority E)
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface SelectChangeDetail {
+  value: string;
+}
+
 @customElement('app-select')
 export class AppSelect extends LitElement {
   @property({ type: String }) label: string = '';
@@ -210,7 +215,7 @@ export class AppSelect extends LitElement {
     this.value = val;
     this.isOpen = false;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<SelectChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
