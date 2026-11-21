@@ -819,6 +819,14 @@ export class AppContacts extends LitElement {
           <app-button
             size="sm"
             variant="icon"
+            title="${t.viewTexts.contacts.openCounterparty}"
+            @click="${() => store.openCounterpartyDetail(row.counterpartyId)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
             class="${isCopied ? 'cnt-copy-ok' : ''}"
             title="${isCopied ? t.contactPersons.copied : t.contactPersons.copyContact}"
             @click="${() => this.copyContact(row)}"
@@ -837,14 +845,6 @@ export class AppContacts extends LitElement {
                 </app-button>
               `
             : ''}
-          <app-button
-            size="sm"
-            variant="icon"
-            title="${t.viewTexts.contacts.openCounterparty}"
-            @click="${() => store.openCounterpartyDetail(row.counterpartyId)}"
-          >
-            <span slot="start">${iconChevronRight(15)}</span>
-          </app-button>
           <app-button
             size="sm"
             variant="icon"
