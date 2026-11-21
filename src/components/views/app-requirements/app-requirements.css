@@ -101,12 +101,12 @@
 /* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
    (surface, border, radius, padding, hover lift, selection highlight), the card content classes
    (req-card-head, req-card-badges, req-title, req-desc, req-meta-row, trace-pill, footer-left,
-   the compact req-icon-btn, the card-footer pin) live in the component CSS — the cardRender
+   the compact req-icon-btn, the app-card-footer pin) live in the component CSS — the cardRender
    template renders in its shadow tree. The requirements reference geometry is retuned locally
    through the component tokens: grid minmax 360px with a 1rem gap, the compact card padding
    1.15rem 1.25rem and card gap 0.75rem, the calmer hover (accent border 0.45, -1px, shadow
-   unchanged), and the card-footer chrome with the historical gaps (gap 0.5rem, start-gap 0.4rem,
-   end-gap 0.4rem, padding-top at the card-footer default 0.65rem). The component is-selected shell
+   unchanged), and the app-card-footer chrome with the historical gaps (gap 0.5rem, start-gap 0.4rem,
+   end-gap 0.4rem, padding-top at the app-card-footer default 0.65rem). The component is-selected shell
    matches the reference selection highlight (accent border, elevated surface). */
 app-cards-table {
   --cards-min-width: 360px;

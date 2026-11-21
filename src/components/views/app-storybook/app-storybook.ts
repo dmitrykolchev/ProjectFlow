@@ -27,7 +27,7 @@ import segmentedSwitchMeta from '../../common/app-segmented-switch/app-segmented
 import radioGroupMeta from '../../common/app-radio-group/app-radio-group.story';
 import optionMeta from '../../common/app-option/app-option.story';
 import metaItemMeta from '../../common/app-meta-item/app-meta-item.story';
-import cardFooterMeta from '../../common/card-footer/card-footer.story';
+import cardFooterMeta from '../../common/app-card-footer/app-card-footer.story';
 import linkMeta from '../../common/app-link/app-link.story';
 import inputMeta from '../../common/app-input/app-input.story';
 import otpInputMeta from '../../common/app-otp-input/app-otp-input.story';

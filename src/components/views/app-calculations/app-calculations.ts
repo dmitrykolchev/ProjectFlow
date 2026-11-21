@@ -39,7 +39,7 @@ import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-entity-emblem/app-entity-emblem';
 import '../../common/app-cards-table/app-cards-table';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import styles from './app-calculations.css';
@@ -392,7 +392,7 @@ export class AppCalculations extends LitElement {
           </div>
         </div>
 
-        <card-footer>
+        <app-card-footer>
           <app-button
             slot="end"
             size="sm"
@@ -483,7 +483,7 @@ export class AppCalculations extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

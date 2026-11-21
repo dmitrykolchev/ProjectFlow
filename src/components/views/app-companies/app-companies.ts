@@ -19,7 +19,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-company-form/app-company-form';
 import '../../common/app-page-header/app-page-header';
 import '../../common/app-empty-state/app-empty-state';
@@ -238,7 +238,7 @@ export class AppCompanies extends LitElement {
 
               <app-bank-summary .accounts="${company.bankAccounts || []}"></app-bank-summary>
 
-              <card-footer>
+              <app-card-footer>
                 <div slot="start" class="stats-row">
                   <span class="stat-pill">
                     ${t.viewTexts.companies.staffCountLabel}: <strong>${empCount}</strong>
@@ -296,7 +296,7 @@ export class AppCompanies extends LitElement {
                 >
                   <span slot="start">${iconTrash(14)}</span>
                 </app-button>
-              </card-footer>
+              </app-card-footer>
             </article>
           `;
         })}

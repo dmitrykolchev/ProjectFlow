@@ -49,7 +49,7 @@ import '../../common/app-table-column/app-table-column';
 import '../../common/app-textarea/app-textarea';
 import type { AppTextarea } from '../../common/app-textarea/app-textarea';
 import '../../common/app-toggle-button/app-toggle-button';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-blog.css';
 import tableContentStyles from './app-blog.table.content.css';
@@ -597,7 +597,7 @@ export class AppBlog extends LitElement {
           ? html`<div class="blog-tags-line">${post.tags.map((tag) => `#${tag}`).join(' · ')}</div>`
           : ''}
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="blog-footer-stats">
             <button
               type="button"
@@ -658,7 +658,7 @@ export class AppBlog extends LitElement {
               <span slot="start">${iconTrash(14)}</span>
             </app-button>
           </div>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

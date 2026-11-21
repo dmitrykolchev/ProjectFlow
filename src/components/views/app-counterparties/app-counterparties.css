@@ -31,11 +31,11 @@
 /* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
    (surface, border, radius, padding, hover lift) and all card content classes (card-top,
    cp-identity, cp-icon, cp-names, cp-name, cp-legal, badges-col, cp-notes, cp-meta-grid,
-   cp-meta-item/label/value, stats-row, stat-pill, the card-footer pin) live in the component CSS
+   cp-meta-item/label/value, stats-row, stat-pill, the app-card-footer pin) live in the component CSS
    — the cardRender template renders in its shadow tree. The counterparties reference geometry is
    retuned locally through the component tokens: grid minmax 340px with a 1.1rem gap, card padding
    1.25rem and card gap 0.85rem, the calmer hover (accent border 0.35, -1px, shadow unchanged),
-   and the card-footer chrome at its own defaults (gap 0.75rem, padding-top 0.65rem). */
+   and the app-card-footer chrome at its own defaults (gap 0.75rem, padding-top 0.65rem). */
 app-cards-table {
   --cards-min-width: 340px;
   --cards-gap: 1.1rem;

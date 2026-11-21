@@ -2,7 +2,7 @@ import { html, TemplateResult } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import '../app-button/app-button';
 import '../app-badge/app-badge';
-import '../card-footer/card-footer';
+import '../app-card-footer/app-card-footer';
 import { AppCardsTable } from './app-cards-table';
 import './app-cards-table';
 
@@ -41,12 +41,12 @@ function renderCard(row: Record<string, unknown>): TemplateResult {
       <span style="color: var(--text-muted);">Client</span><span>${c.client}</span>
       <span style="color: var(--text-muted);">Budget</span><span>${c.budget}</span>
     </div>
-    <card-footer>
+    <app-card-footer>
       <span slot="start" style="font-size: 0.78rem; color: var(--text-secondary);">Team: <strong>${c.team}</strong></span>
       <app-button slot="end" size="sm" variant="primary" @click="${() => console.log('open', c.key)}">
         <span>Open</span>
       </app-button>
-    </card-footer>
+    </app-card-footer>
   `;
 }
 

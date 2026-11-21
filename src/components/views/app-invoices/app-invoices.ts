@@ -37,7 +37,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-modal/app-modal';
@@ -651,7 +651,7 @@ export class AppInvoices extends LitElement {
 
         ${inv.notes ? html`<p class="inv-notes">${inv.notes}</p>` : ''}
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="stats-row">
             <span class="stat-pill">
               <strong>${(inv.items || []).length}</strong> ${t.viewTexts.invoices.itemsCountSuffix}
@@ -750,7 +750,7 @@ export class AppInvoices extends LitElement {
               <span slot="start">${iconTrash(14)}</span>
             </app-button>
           </div>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

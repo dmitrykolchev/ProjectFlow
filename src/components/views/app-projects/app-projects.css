@@ -31,7 +31,7 @@
 /* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
    (surface, border, radius, padding, hover lift) and all card content classes (proj-card-head,
    proj-name, proj-desc, proj-meta-grid, meta-item/label/val, team-summary-line, sep,
-   footer-left-actions, the card-footer pin) live in the component CSS — the cardRender template
+   footer-left-actions, the app-card-footer pin) live in the component CSS — the cardRender template
    renders in its shadow tree. The projects cards reference geometry is exactly the component
    default (minmax 360px, gap 1.15rem, padding 1.3rem, card gap 0.9rem, hover -2px shadow-md),
    so no tokens are retuned here. proj-title-row, color-dot and proj-key stay for the table-mode

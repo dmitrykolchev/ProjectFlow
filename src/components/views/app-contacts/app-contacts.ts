@@ -28,7 +28,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-modal/app-modal';
@@ -654,7 +654,7 @@ export class AppContacts extends LitElement {
 
         ${row.comment ? html`<p class="inv-notes" title="${row.comment}">${row.comment}</p>` : ''}
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start">
             <app-status-chip
               domain="counterparty"
@@ -703,7 +703,7 @@ export class AppContacts extends LitElement {
               <span slot="start">${iconTrash(14)}</span>
             </app-button>
           </div>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

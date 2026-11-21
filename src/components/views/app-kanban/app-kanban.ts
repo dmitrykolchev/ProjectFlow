@@ -9,7 +9,7 @@ import { mapUserOptions } from '../../common/entity-selector-options';
 import '../../common/app-button/app-button';
 import '../../common/app-select/app-select';
 import '../../common/app-entity-selector/app-entity-selector';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 
 const COLUMNS: { id: TaskStatus; color: string }[] = [
   { id: 'backlog', color: '#64748b' },
@@ -168,7 +168,7 @@ export class AppKanban extends LitElement {
                               `
                             : ''}
 
-                          <card-footer>
+                          <app-card-footer>
                             <span slot="start" class="date-info">
                               ${iconClock(12)}
                               <span>${task.dueDate.slice(5)}</span>
@@ -176,7 +176,7 @@ export class AppKanban extends LitElement {
                             <div slot="end" class="assignee-avatar" title="${assignee ? assignee.name : 'Unassigned'}">
                               ${assignee ? assignee.avatar : '?'}
                             </div>
-                          </card-footer>
+                          </app-card-footer>
                         </div>
                       `;
                     })}

@@ -224,9 +224,9 @@
   border-radius: 2px;
 }
 
-/* card-footer web component keeps its own chrome; the view inherits its compact
+/* app-card-footer web component keeps its own chrome; the view inherits its compact
    typography into slotted content and matches the historical 0.35rem padding-top */
-card-footer {
+app-card-footer {
   font-size: 0.75rem;
   color: var(--text-muted, #64748b);
   --card-footer-padding-top: 0.35rem;

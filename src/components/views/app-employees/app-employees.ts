@@ -10,7 +10,7 @@ import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-employee-form/app-employee-form';
@@ -285,7 +285,7 @@ export class AppEmployees extends LitElement {
           </div>
         </div>
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="emp-stats-row">
             <span>${t.viewTexts.employees.projectsCountLabel}: <strong>${projCount}</strong></span>
             <span>${t.viewTexts.employees.tasksCountLabel}: <strong>${taskCount}</strong></span>
@@ -318,7 +318,7 @@ export class AppEmployees extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

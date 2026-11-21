@@ -43,7 +43,7 @@ import '../../common/app-badge/app-badge';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
 import '../../common/app-meta-grid/app-meta-grid';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-document-previewer/app-document-previewer';
 import '../../common/app-empty-state/app-empty-state';
@@ -496,7 +496,7 @@ export class AppDocuments extends LitElement {
             this.commitTagToDoc(doc, e.detail.tag)}"
         ></app-tags-row>
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="uploader-info">
             ${uploader
               ? html`<app-persona
@@ -548,7 +548,7 @@ export class AppDocuments extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

@@ -37,7 +37,7 @@ import '../../dashboard/app-metric-card/app-metric-card';
 import '../../common/app-data-table/app-data-table';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-cards-table/app-cards-table';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import styles from './app-contracts.css';
 import tableContentStyles from './app-contracts.table.content.css';
@@ -429,7 +429,7 @@ export class AppContracts extends LitElement {
             `
           : ''}
 
-        <card-footer>
+        <app-card-footer>
           <app-button
             slot="end"
             action="view"
@@ -479,7 +479,7 @@ export class AppContracts extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

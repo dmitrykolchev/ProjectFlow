@@ -587,6 +587,34 @@
  },
  {
   "group": "common",
+  "tag": "app-card-footer",
+  "cls": "AppCardFooter",
+  "hasStory": true,
+  "title": "Common/CardFooter",
+  "category": "Common",
+  "desc": "Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Actions aligned to the left edge of the card (app-button, labels, stat pills)"
+   },
+   {
+    "k": "end",
+    "v": "Actions aligned to the right edge of the card (app-button icon actions)"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-button",
+    "v": "Action button child placed in the start / end slot (size sm matches the historical card icon-btn)"
+   }
+  ]
+ },
+ {
+  "group": "common",
   "tag": "app-cards-table",
   "cls": "AppCardsTable",
   "hasStory": true,
@@ -6980,34 +7008,6 @@
    {
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the label"
-   }
-  ]
- },
- {
-  "group": "common",
-  "tag": "card-footer",
-  "cls": "CardFooter",
-  "hasStory": true,
-  "title": "Common/CardFooter",
-  "category": "Common",
-  "desc": "Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.",
-  "propsList": [],
-  "events": [],
-  "propsDoc": [],
-  "slotsDoc": [
-   {
-    "k": "start",
-    "v": "Actions aligned to the left edge of the card (app-button, labels, stat pills)"
-   },
-   {
-    "k": "end",
-    "v": "Actions aligned to the right edge of the card (app-button icon actions)"
-   }
-  ],
-  "childrenDoc": [
-   {
-    "k": "app-button",
-    "v": "Action button child placed in the start / end slot (size sm matches the historical card icon-btn)"
    }
   ]
  },

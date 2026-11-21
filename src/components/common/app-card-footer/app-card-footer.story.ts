@@ -1,11 +1,11 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
-import './card-footer';
+import './app-card-footer';
 import '../app-button/app-button';
 
 export const meta: ComponentStoryMeta = {
   title: 'Common/CardFooter',
-  component: 'card-footer',
+  component: 'app-card-footer',
   description:
     'Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.',
   category: 'Common',
@@ -25,7 +25,7 @@ export const meta: ComponentStoryMeta = {
           <div style="font-size: 0.875rem; color: var(--text-primary, #f8fafc); padding-bottom: 0.5rem;">
             Contract ДГ-2026/001
           </div>
-          <card-footer>
+          <app-card-footer>
             <app-button slot="start" size="sm" variant="primary">Open contract</app-button>
             <app-button slot="end" size="sm" variant="outline">
               <span slot="start">${html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11l9-9V11z"/><path d="M15 8l6 6"/></svg>`}</span>
@@ -33,7 +33,7 @@ export const meta: ComponentStoryMeta = {
             <app-button slot="end" size="sm" variant="outline">
               <span slot="start">${html`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg>`}</span>
             </app-button>
-          </card-footer>
+          </app-card-footer>
         </div>
       `,
     },

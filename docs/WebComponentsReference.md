@@ -68,6 +68,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-button` | common | Elements | Interactive button with multiple semantic variants, sizes, and states. |
 | `app-button-group` | common | Common | Groups related buttons or toggle buttons horizontally or vertically with seamless joined … |
 | `app-calculation-form` | common | Overlays | Canonical calculation create and edit form. |
+| `app-card-footer` | common | Common | Card footer row with a border-top chrome. |
 | `app-cards-table` | common | Common | A grid of entity cards built from a per-view template. |
 | `app-checkbox` | common | Inputs | Checkbox element with checked, unchecked, indeterminate, and disabled states. |
 | `app-color-swatches` | common | Inputs | Canonical color swatch picker. |
@@ -145,7 +146,6 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-time-entry-form` | common | Overlays | Canonical time entry create and edit form. |
 | `app-toast` | common | Feedback | Automated floating notification stack with auto-dismiss and status colors. |
 | `app-toggle-button` | common | Common | Stateful pressable button supporting soft and solid active variants, icons, and accessibi… |
-| `card-footer` | common | Common | Card footer row with a border-top chrome. |
 | `app-header` | layout | Layout | Top header bar with breadcrumbs, live search, quick notification badge, and primary actio… |
 | `app-sidebar` | layout | Layout | Collapsible navigation sidebar composed declaratively with <app-sidebar-group> and <app-s… |
 | `app-sidebar-group` | layout | Layout | Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse a… |
@@ -306,6 +306,21 @@ Groups related buttons or toggle buttons horizontally or vertically with seamles
 |---|---|
 | `app-button` | Grouped action button child |
 | `app-toggle-button` | Grouped toggle button child |
+
+#### `app-card-footer` — `AppCardFooter`
+
+`src/components/common/app-card-footer/`
+
+Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.
+
+| Slot | Content |
+|---|---|
+| `start` | Actions aligned to the left edge of the card (app-button, labels, stat pills) |
+| `end` | Actions aligned to the right edge of the card (app-button icon actions) |
+
+| Child element | Role |
+|---|---|
+| `app-button` | Action button child placed in the start / end slot (size sm matches the historical card icon-btn) |
 
 #### `app-cards-table` — `AppCardsTable`
 
@@ -1182,21 +1197,6 @@ Stateful pressable button supporting soft and solid active variants, icons, and 
 | Child element | Role |
 |---|---|
 | `app-material-icon` | Icon rendered in the start / end slot before or after the label |
-
-#### `card-footer` — `CardFooter`
-
-`src/components/common/card-footer/`
-
-Card footer row with a border-top chrome. Actions in the start slot align to the left edge of the card, actions in the end slot align to the right edge.
-
-| Slot | Content |
-|---|---|
-| `start` | Actions aligned to the left edge of the card (app-button, labels, stat pills) |
-| `end` | Actions aligned to the right edge of the card (app-button icon actions) |
-
-| Child element | Role |
-|---|---|
-| `app-button` | Action button child placed in the start / end slot (size sm matches the historical card icon-btn) |
 
 ### Elements (4)
 

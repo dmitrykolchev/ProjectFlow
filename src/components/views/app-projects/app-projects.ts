@@ -33,7 +33,7 @@ import '../../common/app-table-column/app-table-column';
 import '../../common/app-filter-bar/app-filter-bar';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-entity-selector/app-entity-selector';
 import '../../common/app-file-dropzone/app-file-dropzone';
 import '../../common/app-switch/app-switch';
@@ -307,7 +307,7 @@ export class AppProjects extends LitElement {
               `}
         </div>
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="footer-left-actions">
             <app-button
               size="sm"
@@ -350,7 +350,7 @@ export class AppProjects extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

@@ -12,7 +12,7 @@ import '../../common/app-form-grid/app-form-grid';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-button/app-button';
 import '../../common/app-link/app-link';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-counterparty-form/app-counterparty-form';
@@ -311,7 +311,7 @@ export class AppCounterparties extends LitElement {
 
         <app-bank-summary .accounts="${cp.bankAccounts || []}"></app-bank-summary>
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="stats-row">
             <span class="stat-pill">
               ${t.viewTexts.counterparties.contractsCountLabel}: <strong>${cpContracts.length}</strong>
@@ -351,7 +351,7 @@ export class AppCounterparties extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

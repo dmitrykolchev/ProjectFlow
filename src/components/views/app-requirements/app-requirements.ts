@@ -32,7 +32,7 @@ import {
 } from '../../common/entity-selector-options';
 import { eventValue } from '../../common/event-value';
 import '../../common/app-button/app-button';
-import '../../common/card-footer/card-footer';
+import '../../common/app-card-footer/app-card-footer';
 import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-empty-state/app-empty-state';
@@ -460,7 +460,7 @@ export class AppRequirements extends LitElement {
           </span>
         </div>
 
-        <card-footer>
+        <app-card-footer>
           <div slot="start" class="footer-left">
             <app-button
               size="sm"
@@ -502,7 +502,7 @@ export class AppRequirements extends LitElement {
           >
             <span slot="start">${iconTrash(14)}</span>
           </app-button>
-        </card-footer>
+        </app-card-footer>
       `;
     };
 

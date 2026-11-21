@@ -15,7 +15,7 @@ export { AppButton } from './app-button/app-button';
 export type { ButtonVariant, ButtonSize } from './app-button/app-button';
 
 export { AppLink } from './app-link/app-link';
-export { CardFooter } from './card-footer/card-footer';
+export { AppCardFooter } from './app-card-footer/app-card-footer';
 export type { LinkVariant, LinkSize } from './app-link/app-link';
 
 export { AppButtonGroup } from './app-button-group/app-button-group';

@@ -50,11 +50,11 @@
 /* Cards mode is rendered by the canonical app-cards-table: the grid geometry, the card shell
    (surface, border, radius, padding, hover lift), the card content classes (card-top, doc-identity,
    the file type tile, doc-titles, doc-title-btn, doc-filename, doc-desc, uploader-info,
-   uploader-name, the card-footer pin) live in the component CSS — the cardRender template renders
+   uploader-name, the app-card-footer pin) live in the component CSS — the cardRender template renders
    in its shadow tree. The documents reference geometry is retuned locally through the component
    tokens: grid minmax 340px with a 1.1rem gap, card padding 1.2rem and card gap 0.85rem, the calm
-   hover (accent border 0.35, -1px, shadow unchanged), and the card-footer chrome pinned to the
-   bottom with the historical gaps (gap 0.65rem, end-gap 0.3rem, padding-top at the card-footer
+   hover (accent border 0.35, -1px, shadow unchanged), and the app-card-footer chrome pinned to the
+   bottom with the historical gaps (gap 0.65rem, end-gap 0.3rem, padding-top at the app-card-footer
    default 0.65rem). */
 app-cards-table {
   --cards-min-width: 340px;

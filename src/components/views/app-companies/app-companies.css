@@ -148,10 +148,10 @@
   font-family: var(--font-mono, monospace);
 }
 
-/* card-footer web component keeps its own chrome; the view pins it to the
+/* app-card-footer web component keeps its own chrome; the view pins it to the
    bottom of the card; the delete button declares action="delete" and app-button supplies
    the danger hover palette */
-card-footer {
+app-card-footer {
   margin-top: auto;
 }
 
