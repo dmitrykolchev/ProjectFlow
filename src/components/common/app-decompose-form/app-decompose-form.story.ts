@@ -49,6 +49,17 @@ export const meta: ComponentStoryMeta = {
     decompose: 'Public async method running the AI decomposition and opening the editor',
     openWithDrafts: 'Public method opening the editor with a prepared draft list (drafts, model, projectId)',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    'decompose-failed': {
+      detail: '{ message: string }',
+      description: 'Fires when decomposition cannot start',
+    },
+    saved: {
+      detail: '{ taskIds: string[] }',
+      description: 'Fires after subtasks are created; carries their ids',
+    },
+  },
   stories: [
     {
       name: 'Decompose Selected Requirement',
