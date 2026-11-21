@@ -124,6 +124,28 @@ export const meta: ComponentStoryMeta = {
     contentStyles:
       'Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical',
   },
+  eventsDoc: {
+    'sort-change': {
+      detail: '{ field: string, dir: SortDirection }',
+      description: 'Fires when a sortable header is clicked',
+    },
+    'page-change': {
+      detail: '{ page: number, pageSize: number, totalItems: number }',
+      description: 'Fires when the page is changed',
+    },
+    'page-size-change': {
+      detail: '{ page: number, pageSize: number, totalItems: number }',
+      description: 'Fires when the page size is changed',
+    },
+    'selection-change': {
+      detail: '{ selectedIds: string[], selectedItems: Record<string, unknown>[] }',
+      description: 'Fires when row selection changes',
+    },
+    'row-click': {
+      detail: '{ row: Record<string, unknown> }',
+      description: 'Fires when a row is clicked; carries the row data',
+    },
+  },
   stories: [
     {
       name: 'Time Journal Table',
