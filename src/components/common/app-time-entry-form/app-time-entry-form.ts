@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { TimeEntry, TimeEntryCategory, TimeEntryStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-time-entry-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface TimeEntryFormSavedDetail {
+  entry: TimeEntry;
+}
 import { eventValue } from '../event-value';
 import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../entity-selector-options';
 import '../app-modal/app-modal';
@@ -175,7 +180,7 @@ export class AppTimeEntryForm extends LitElement {
     this.fPendingFiles = [];
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<TimeEntryFormSavedDetail>('saved', {
         detail: { entry: saved },
         bubbles: true,
         composed: true,
