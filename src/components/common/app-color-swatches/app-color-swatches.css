@@ -6,7 +6,10 @@
   padding-top: 0.35rem;
 }
 
-.color-swatch {
+.color-swatch {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 28px;
   height: 28px;
   border-radius: 50%;
