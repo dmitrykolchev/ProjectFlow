@@ -30,6 +30,12 @@ export const meta: ComponentStoryMeta = {
     collapsed: 'Current collapsed state (only for collapsible sections)',
     maxHeight: "CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow",
   },
+  eventsDoc: {
+    toggle: {
+      detail: '{ collapsed: boolean }',
+      description: 'Fires when the card is collapsed or expanded',
+    },
+  },
   stories: [
     {
       name: 'Default',
