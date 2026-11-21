@@ -21,6 +21,11 @@ import {
 } from '../../../domain/rfc5545';
 import { getTranslation } from '../../../i18n';
 import styles from './app-reminder-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface ReminderFormSavedDetail {
+  reminder: Reminder;
+}
 import { eventValue } from '../event-value';
 import {
   iconAlertTriangle,
@@ -623,7 +628,7 @@ export class AppReminderForm extends LitElement {
 
     this.fPendingFiles = [];
     this.dispatchEvent(
-      new CustomEvent('saved', { detail: { reminder: saved }, bubbles: true, composed: true })
+      new CustomEvent<ReminderFormSavedDetail>('saved', { detail: { reminder: saved }, bubbles: true, composed: true })
     );
     this.closeModal();
   }
