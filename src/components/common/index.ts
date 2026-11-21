@@ -22,6 +22,16 @@ export { AppButtonGroup } from './app-button-group/app-button-group';
 export { AppDropdownButton } from './app-dropdown-button/app-dropdown-button';
 export { AppSplitButton } from './app-split-button/app-split-button';
 
+export { AppToolbar } from './app-toolbar/app-toolbar';
+export { AppToolbarButton } from './app-toolbar-button/app-toolbar-button';
+export type { ToolbarButtonChangeDetail } from './app-toolbar-button/app-toolbar-button';
+export { AppToolbarSeparator } from './app-toolbar-separator/app-toolbar-separator';
+
+export { AppTabs } from './app-tabs/app-tabs';
+export type { TabsChangeDetail } from './app-tabs/app-tabs';
+export { AppTabItem } from './app-tab-item/app-tab-item';
+export type { TabItemSelectDetail } from './app-tab-item/app-tab-item';
+
 export { AppMenu } from './app-menu/app-menu';
 export type { MenuItem } from './app-menu/app-menu';
 export { AppMenuItem } from './app-menu-item/app-menu-item';
@@ -125,6 +135,11 @@ import { AppButton } from './app-button/app-button';
 import { AppButtonGroup } from './app-button-group/app-button-group';
 import { AppDropdownButton } from './app-dropdown-button/app-dropdown-button';
 import { AppSplitButton } from './app-split-button/app-split-button';
+import { AppToolbar } from './app-toolbar/app-toolbar';
+import { AppToolbarButton } from './app-toolbar-button/app-toolbar-button';
+import { AppToolbarSeparator } from './app-toolbar-separator/app-toolbar-separator';
+import { AppTabs } from './app-tabs/app-tabs';
+import { AppTabItem } from './app-tab-item/app-tab-item';
 import { AppMenu } from './app-menu/app-menu';
 import { AppMenuItem } from './app-menu-item/app-menu-item';
 import { AppMenuHeader } from './app-menu-header/app-menu-header';
@@ -183,6 +198,11 @@ export const UI_LIBRARY_ELEMENTS = {
   'app-button-group': AppButtonGroup,
   'app-dropdown-button': AppDropdownButton,
   'app-split-button': AppSplitButton,
+  'app-toolbar': AppToolbar,
+  'app-toolbar-button': AppToolbarButton,
+  'app-toolbar-separator': AppToolbarSeparator,
+  'app-tabs': AppTabs,
+  'app-tab-item': AppTabItem,
   'app-menu': AppMenu,
   'app-menu-item': AppMenuItem,
   'app-menu-header': AppMenuHeader,

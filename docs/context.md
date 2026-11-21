@@ -6,11 +6,11 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD — `ce5941d` (серия `app-split-button`), origin/main =
-  `d9c245f`; незапушенных 2 коммита (`2bf2f4d`, `ce5941d`). Запушены: серия
-  актуализации документации и полного покрытия `design-tokens`
-  (`88a39f8`…`7f15595`, `30ada03`) и серия удаления legacy-шага `xxs`
-  (`1e643a1`…`d9c245f`).
+- Слияния в `main`: HEAD — серия новых компонентов `app-toolbar` /
+  `app-toolbar-button` / `app-toolbar-separator` / `app-tabs` / `app-tab-item`
+  (5 коммитов по компоненту + регистрация и docs), origin/main = `1b617cf`.
+  Запушены: серия repeat() (grid/chat/blog), серия шрифтов native-контролов
+  shadow DOM (42 компонента) и documentation-серии.
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
   `git checkout -b feature/<name>` от `main` (процесс — §0 `AGENTS.md`).
@@ -18,6 +18,22 @@
   `npx tsc --noEmit` и `npm run build`.
 
 ## Сделано в последних сериях коммитов
+
+- Новая canonical-семейка toolbar/tabs: `app-toolbar` (row-контейнер, публикует
+  канонический масштаб `--tb-height/--tb-font/--tb-icon/--tb-pad-x` на `:host[size]`,
+  высота ряда = высота контрола), `app-toolbar-button` (type normal — push; при
+  slotted `app-menu-item` детях ведёт себя как dropdown через portal-клонирование
+  split-button паттерна, эмитит `select`; type toggle — stateful, эмитит
+  `change {pressed, value}`; canonical start/default/end слоты, auto icon-only),
+  `app-toolbar-separator` (линия, высота = `--tb-height - 10px`), `app-tabs` +
+  `app-tab-item` (active владеет strip, composed `tab-select` → `tab-change
+  {value}`, arrow-key навигация, scale наследуется от `app-tabs`). Все 5
+  зарегистрированы в `common/index.ts` и `ALL_STORIES`, stories с propsDoc/
+  slotsDoc/childrenDoc/eventsDoc; docs регенерированы (145 компонентов).
+  Проба в браузере: кнопки/табы 38px (md-канон), separator 28px, toggle change,
+  dropdown popup + select 'dup' + закрытие, tabs active-sync + tab-change,
+  шрифты Manrope, console errors 0. Toolbar модалки редактирования статьи блога
+  пока остаётся локальной `.md-toolbar` — миграция на новые компоненты следующая.
 
 - Карточные представления Договоров и Калькуляций (карточки — режим по
   умолчанию, канонический скелет view с mode-row и фильтром).

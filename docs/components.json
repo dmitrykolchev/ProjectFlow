@@ -6953,6 +6953,74 @@
  },
  {
   "group": "common",
+  "tag": "app-tab-item",
+  "cls": "AppTabItem",
+  "hasStory": true,
+  "title": "Common/TabItem",
+  "category": "Common",
+  "desc": "A single tab inside an app-tabs strip. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; the row geometry is inherited from the parent app-tabs. Clicking emits the canonical tab-select event.",
+  "propsList": [
+   {
+    "name": "value",
+    "type": "string",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "active",
+    "type": "boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "boolean",
+    "reflect": true,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "tab-select"
+  ],
+  "propsDoc": [
+   {
+    "k": "value",
+    "v": "Identifier of the tab, matched against the active property of app-tabs"
+   },
+   {
+    "k": "active",
+    "v": "Selected visual state, reflected"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Tab text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   }
+  ],
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "tab-select",
+    "detail": "{ value: string }",
+    "description": "Fires when the tab is clicked (handled by app-tabs in a strip)"
+   }
+  ]
+ },
+ {
+  "group": "common",
   "tag": "app-table-column",
   "cls": "AppTableColumn",
   "hasStory": true,
@@ -7214,6 +7282,61 @@
     "k": "sort-change",
     "detail": "{ field: string, dir: SortDirection }",
     "description": "Fires when a sortable header is clicked"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-tabs",
+  "cls": "AppTabs",
+  "hasStory": true,
+  "title": "Common/Tabs",
+  "category": "Common",
+  "desc": "Tab strip container for app-tab-item children. The active property owns the selection: clicking a tab emits tab-change and moves the active state; setting active from code syncs the items. Arrow keys move between enabled tabs. The size publishes the canonical control scale, so tabs share the toolbar row geometry.",
+  "propsList": [
+   {
+    "name": "size",
+    "type": "ButtonSize",
+    "reflect": true,
+    "def": "'md'"
+   },
+   {
+    "name": "active",
+    "type": "string",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "tab-change"
+  ],
+  "propsDoc": [
+   {
+    "k": "size",
+    "v": "Canonical control scale of the strip: xs / sm / md / lg; published to children as inherited tokens"
+   },
+   {
+    "k": "active",
+    "v": "Value of the selected app-tab-item"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Tab items — app-tab-item children rendered in the strip"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-tab-item",
+    "v": "A single tab in the strip"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "tab-change",
+    "detail": "{ value: string }",
+    "description": "Fires when the selected tab changes"
    }
   ]
  },
@@ -7762,6 +7885,170 @@
     "description": "Fires when the button is toggled"
    }
   ]
+ },
+ {
+  "group": "common",
+  "tag": "app-toolbar",
+  "cls": "AppToolbar",
+  "hasStory": true,
+  "title": "Common/Toolbar",
+  "category": "Common",
+  "desc": "Row container for toolbar buttons and separators. The size property sets the canonical control scale once and publishes it as inherited custom properties, so the row and its buttons always share one geometry (xs / sm / md / lg).",
+  "propsList": [
+   {
+    "name": "size",
+    "type": "ButtonSize",
+    "reflect": true,
+    "def": "'md'"
+   }
+  ],
+  "events": [],
+  "propsDoc": [
+   {
+    "k": "size",
+    "v": "Canonical control scale of the row: xs / sm / md / lg; published to children as inherited tokens"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Toolbar content — app-toolbar-button, app-toolbar-separator and any inline controls"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-toolbar-button",
+    "v": "Push, dropdown or toggle button rendered in the toolbar row"
+   },
+   {
+    "k": "app-toolbar-separator",
+    "v": "Visual divider between toolbar buttons, sized to the row scale"
+   }
+  ],
+  "eventsDoc": []
+ },
+ {
+  "group": "common",
+  "tag": "app-toolbar-button",
+  "cls": "AppToolbarButton",
+  "hasStory": true,
+  "title": "Common/ToolbarButton",
+  "category": "Common",
+  "desc": "Toolbar control with two types: normal (push button; behaves as a dropdown when its light DOM contains app-menu-item children) and toggle (stateful press button). Canonical start / default / end slots carry leading graphics, label text, and trailing graphics. The row scale is inherited from the parent app-toolbar.",
+  "propsList": [
+   {
+    "name": "type",
+    "type": "'normal' | 'toggle'",
+    "reflect": true,
+    "def": "'normal'"
+   },
+   {
+    "name": "pressed",
+    "type": "boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "disabled",
+    "type": "boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "value",
+    "type": "string",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "ariaLabel",
+    "type": "string",
+    "attr": "aria-label",
+    "reflect": false,
+    "def": "''"
+   }
+  ],
+  "events": [
+   "change",
+   "select"
+  ],
+  "propsDoc": [
+   {
+    "k": "type",
+    "v": "Button behavior: normal (push / dropdown) or toggle (stateful)"
+   },
+   {
+    "k": "pressed",
+    "v": "Pressed (toggled) visual state, reflected — for toggle buttons"
+   },
+   {
+    "k": "disabled",
+    "v": "Disables interaction"
+   },
+   {
+    "k": "value",
+    "v": "Value emitted in the change event detail"
+   },
+   {
+    "k": "ariaLabel",
+    "v": "Accessible name and tooltip of the button"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "start",
+    "v": "Content rendered before the label (text, SVG icon, material icon) — centered vertically"
+   },
+   {
+    "k": "(default)",
+    "v": "Button text — centered vertically"
+   },
+   {
+    "k": "end",
+    "v": "Content rendered after the label (text, SVG icon, material icon) — centered vertically"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-menu-item",
+    "v": "Dropdown menu entry; when present the button opens a portal menu on click"
+   },
+   {
+    "k": "app-menu-header",
+    "v": "Declarative menu header inside the dropdown"
+   },
+   {
+    "k": "app-menu-divider",
+    "v": "Declarative menu divider inside the dropdown"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ pressed: boolean, value: string }",
+    "description": "Fires when a toggle button is pressed"
+   },
+   {
+    "k": "select",
+    "detail": "{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }",
+    "description": "Fires when an entry of the dropdown menu is selected"
+   }
+  ]
+ },
+ {
+  "group": "common",
+  "tag": "app-toolbar-separator",
+  "cls": "AppToolbarSeparator",
+  "hasStory": true,
+  "title": "Common/ToolbarSeparator",
+  "category": "Common",
+  "desc": "Visual divider between toolbar buttons. It renders inside an app-toolbar and reads the inherited row scale (--tb-height), so the separator matches the control scale of its row.",
+  "propsList": [],
+  "events": [],
+  "propsDoc": [],
+  "slotsDoc": [],
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "dashboard",

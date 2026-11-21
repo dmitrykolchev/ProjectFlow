@@ -14,6 +14,11 @@ import buttonGroupMeta from '../../common/app-button-group/app-button-group.stor
 import toggleButtonMeta from '../../common/app-toggle-button/app-toggle-button.story';
 import dropdownButtonMeta from '../../common/app-dropdown-button/app-dropdown-button.story';
 import splitButtonMeta from '../../common/app-split-button/app-split-button.story';
+import toolbarMeta from '../../common/app-toolbar/app-toolbar.story';
+import toolbarButtonMeta from '../../common/app-toolbar-button/app-toolbar-button.story';
+import toolbarSeparatorMeta from '../../common/app-toolbar-separator/app-toolbar-separator.story';
+import tabsMeta from '../../common/app-tabs/app-tabs.story';
+import tabItemMeta from '../../common/app-tab-item/app-tab-item.story';
 import menuMeta from '../../common/app-menu/app-menu.story';
 import menuItemMeta from '../../common/app-menu-item/app-menu-item.story';
 import menuHeaderMeta from '../../common/app-menu-header/app-menu-header.story';
@@ -157,6 +162,11 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   toggleButtonMeta,
   dropdownButtonMeta,
   splitButtonMeta,
+  toolbarMeta,
+  toolbarButtonMeta,
+  toolbarSeparatorMeta,
+  tabsMeta,
+  tabItemMeta,
   menuMeta,
   menuItemMeta,
   menuHeaderMeta,

@@ -2,7 +2,7 @@
 
 Дата: 21.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 140 (со стори: 140).
+Всего компонентов: 145 (со стори: 145).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -138,8 +138,10 @@ propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла комп
 | `app-split-button` | common | Common | Dual-action button combining a primary action trigger with a secondary options menu. |
 | `app-status-chip` | common | Common | Domain-driven status chip: resolves label and badge variant from central STATUS_TOKENS re… |
 | `app-switch` | common | Inputs | Toggle switch for boolean settings and feature flags. |
+| `app-tab-item` | common | Common | A single tab inside an app-tabs strip. |
 | `app-table-column` | common | — | Declarative column config child of app-table-scroll: field / label / type (text, number, … |
 | `app-table-scroll` | common | Common | Scrollable table shell with sticky sortable headers, zebra striping, inactive-row dimming… |
+| `app-tabs` | common | Common | Tab strip container for app-tab-item children. |
 | `app-tags-row` | common | Elements | Canonical tags row for document cards, preview bars and readonly displays. |
 | `app-task-ai-panel` | common | Common | Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиоте… |
 | `app-task-modal` | common | Overlays | Comprehensive task creation and editing modal dialog with subtasks, dates, and assignees. |
@@ -147,6 +149,9 @@ propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла комп
 | `app-time-entry-form` | common | Overlays | Canonical time entry create and edit form. |
 | `app-toast` | common | Feedback | Automated floating notification stack with auto-dismiss and status colors. |
 | `app-toggle-button` | common | Common | Stateful pressable button supporting soft and solid active variants, icons, and accessibi… |
+| `app-toolbar` | common | Common | Row container for toolbar buttons and separators. |
+| `app-toolbar-button` | common | Common | Toolbar control with two types: normal (push button; behaves as a dropdown when its light… |
+| `app-toolbar-separator` | common | Common | Visual divider between toolbar buttons. |
 | `app-header` | layout | Layout | Top header bar with breadcrumbs, live search, quick notification badge, and primary actio… |
 | `app-sidebar` | layout | Layout | Collapsible navigation sidebar composed declaratively with <app-sidebar-group> and <app-s… |
 | `app-sidebar-group` | layout | Layout | Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse a… |
@@ -202,9 +207,9 @@ propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла комп
 
 ---
 
-## 4. Группа `common` (88)
+## 4. Группа `common` (93)
 
-### Common (53)
+### Common (58)
 
 #### `app-analysis-summary` — `AppAnalysisSummary`
 
@@ -1238,6 +1243,28 @@ Domain-driven status chip: resolves label and badge variant from central STATUS_
 | `appearance` | 'soft' | 'solid' | 'outline', default `'soft'` | Rendering style: soft fill / solid / outline |
 | `dot` | boolean, default `false` | Shows a leading status dot |
 
+#### `app-tab-item` — `AppTabItem`
+
+`src/components/common/app-tab-item/`
+
+A single tab inside an app-tabs strip. Canonical start / default / end slots carry leading graphics, label text, and trailing graphics; the row geometry is inherited from the parent app-tabs. Clicking emits the canonical tab-select event.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `value` | string, default `''` | Identifier of the tab, matched against the active property of app-tabs |
+| `active` | boolean, default `false` | Selected visual state, reflected |
+| `disabled` | boolean, default `false` | Disables interaction |
+
+| Event | Detail | Description |
+|---|---|---|
+| `tab-select` | `{ value: string }` | Fires when the tab is clicked (handled by app-tabs in a strip) |
+
+| Slot | Content |
+|---|---|
+| `start` | Content rendered before the label (text, SVG icon, material icon) — centered vertically |
+| `(default)` | Tab text — centered vertically |
+| `end` | Content rendered after the label (text, SVG icon, material icon) — centered vertically |
+
 #### `app-table-scroll` — `AppTableScroll`
 
 `src/components/common/app-table-scroll/`
@@ -1262,6 +1289,29 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | Event | Detail | Description |
 |---|---|---|
 | `sort-change` | `{ field: string, dir: SortDirection }` | Fires when a sortable header is clicked |
+
+#### `app-tabs` — `AppTabs`
+
+`src/components/common/app-tabs/`
+
+Tab strip container for app-tab-item children. The active property owns the selection: clicking a tab emits tab-change and moves the active state; setting active from code syncs the items. Arrow keys move between enabled tabs. The size publishes the canonical control scale, so tabs share the toolbar row geometry.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `size` | ButtonSize, default `'md'` | Canonical control scale of the strip: xs / sm / md / lg; published to children as inherited tokens |
+| `active` | string, default `''` | Value of the selected app-tab-item |
+
+| Event | Detail | Description |
+|---|---|---|
+| `tab-change` | `{ value: string }` | Fires when the selected tab changes |
+
+| Slot | Content |
+|---|---|
+| `(default)` | Tab items — app-tab-item children rendered in the strip |
+
+| Child element | Role |
+|---|---|
+| `app-tab-item` | A single tab in the strip |
 
 #### `app-task-ai-panel` — `AppTaskAiPanel`
 
@@ -1316,6 +1366,62 @@ Stateful pressable button supporting soft and solid active variants, icons, and 
 | Child element | Role |
 |---|---|
 | `app-material-icon` | Icon rendered in the start / end slot before or after the label |
+
+#### `app-toolbar` — `AppToolbar`
+
+`src/components/common/app-toolbar/`
+
+Row container for toolbar buttons and separators. The size property sets the canonical control scale once and publishes it as inherited custom properties, so the row and its buttons always share one geometry (xs / sm / md / lg).
+
+| Property | Type / default | Description |
+|---|---|---|
+| `size` | ButtonSize, default `'md'` | Canonical control scale of the row: xs / sm / md / lg; published to children as inherited tokens |
+
+| Slot | Content |
+|---|---|
+| `(default)` | Toolbar content — app-toolbar-button, app-toolbar-separator and any inline controls |
+
+| Child element | Role |
+|---|---|
+| `app-toolbar-button` | Push, dropdown or toggle button rendered in the toolbar row |
+| `app-toolbar-separator` | Visual divider between toolbar buttons, sized to the row scale |
+
+#### `app-toolbar-button` — `AppToolbarButton`
+
+`src/components/common/app-toolbar-button/`
+
+Toolbar control with two types: normal (push button; behaves as a dropdown when its light DOM contains app-menu-item children) and toggle (stateful press button). Canonical start / default / end slots carry leading graphics, label text, and trailing graphics. The row scale is inherited from the parent app-toolbar.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `type` | 'normal' | 'toggle', default `'normal'` | Button behavior: normal (push / dropdown) or toggle (stateful) |
+| `pressed` | boolean, default `false` | Pressed (toggled) visual state, reflected — for toggle buttons |
+| `disabled` | boolean, default `false` | Disables interaction |
+| `value` | string, default `''` | Value emitted in the change event detail |
+| `ariaLabel` | string, default `''` | Accessible name and tooltip of the button |
+
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ pressed: boolean, value: string }` | Fires when a toggle button is pressed |
+| `select` | `{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }` | Fires when an entry of the dropdown menu is selected |
+
+| Slot | Content |
+|---|---|
+| `start` | Content rendered before the label (text, SVG icon, material icon) — centered vertically |
+| `(default)` | Button text — centered vertically |
+| `end` | Content rendered after the label (text, SVG icon, material icon) — centered vertically |
+
+| Child element | Role |
+|---|---|
+| `app-menu-item` | Dropdown menu entry; when present the button opens a portal menu on click |
+| `app-menu-header` | Declarative menu header inside the dropdown |
+| `app-menu-divider` | Declarative menu divider inside the dropdown |
+
+#### `app-toolbar-separator` — `AppToolbarSeparator`
+
+`src/components/common/app-toolbar-separator/`
+
+Visual divider between toolbar buttons. It renders inside an app-toolbar and reads the inherited row scale (--tb-height), so the separator matches the control scale of its row.
 
 ### Elements (4)
 
