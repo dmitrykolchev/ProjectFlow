@@ -45,8 +45,22 @@
 .split-toggle {
   border-top-right-radius: var(--radius-md, 8px);
   border-bottom-right-radius: var(--radius-md, 8px);
-  padding: 0 0.55rem;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0 0.25rem;
+  /* --split-divider lets a consumer soften the seam between the two halves */
+  border-left: 1px solid var(--split-divider, rgba(255, 255, 255, 0.12));
+}
+
+/* icon-only main half is a canonical square control (same as app-button icon-only):
+   no label span is rendered, so the slotted icon centers with no phantom gap */
+.icon-only.split-main {
+  padding: 0;
+  width: var(--control-height-md, 38px);
+}
+.size-sm .icon-only.split-main {
+  width: var(--control-height-sm, 30px);
+}
+.size-lg .icon-only.split-main {
+  width: var(--control-height-lg, 44px);
 }
 
 /* Sizes — canonical control scale (Priority E); slotted app-material-icon inherits the icon slot size */

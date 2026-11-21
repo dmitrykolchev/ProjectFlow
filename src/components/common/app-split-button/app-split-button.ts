@@ -16,6 +16,7 @@ export class AppSplitButton extends LitElement {
   @property({ type: String }) variant: 'primary' | 'secondary' | 'outline' = 'primary';
   @property({ type: String }) size: ButtonSize = 'md';
   @property({ type: Boolean }) disabled: boolean = false;
+  @property({ type: Boolean, attribute: 'icon-only' }) iconOnly: boolean = false;
   @property({ type: Array }) items: MenuItem[] = [];
 
   @state() private isOpen: boolean = false;
@@ -144,7 +145,7 @@ export class AppSplitButton extends LitElement {
       <div class="split-wrapper variant-${this.variant} size-${this.size}">
         <button
           type="button"
-          class="split-main"
+          class="split-main ${this.iconOnly ? 'icon-only' : ''}"
           ?disabled="${this.disabled}"
           @click="${this.handlePrimaryClick}"
         >
@@ -152,7 +153,7 @@ export class AppSplitButton extends LitElement {
           <slot name="start">
             <slot name="icon-start"></slot>
           </slot>
-          <span>${this.label}</span>
+          ${this.iconOnly ? '' : html`<span>${this.label}</span>`}
           <slot name="end"></slot>
         </button>
 

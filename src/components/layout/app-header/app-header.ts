@@ -304,6 +304,7 @@ export class AppHeader extends LitElement {
           <app-split-button
             variant="secondary"
             size="md"
+            icon-only
             .label="${''}"
             .items="${themeItems}"
             @primary-click="${() => store.toggleTheme()}"

@@ -6604,6 +6604,13 @@
     "def": "false"
    },
    {
+    "name": "iconOnly",
+    "type": "boolean",
+    "attr": "icon-only",
+    "reflect": false,
+    "def": "false"
+   },
+   {
     "name": "items",
     "type": "MenuItem[]",
     "reflect": false,
@@ -6630,6 +6637,10 @@
    {
     "k": "disabled",
     "v": "Disables both halves of the button"
+   },
+   {
+    "k": "iconOnly",
+    "v": "Main half renders only the slotted icon as a canonical square control (no label span, no phantom gap)"
    },
    {
     "k": "items",

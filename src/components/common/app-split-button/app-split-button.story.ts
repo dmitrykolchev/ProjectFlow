@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { ComponentStoryMeta } from '../../../types/storybook';
 import './app-split-button';
-import { iconPlus, iconDownload, iconKanban, iconTable } from '../icons';
+import { iconPlus, iconDownload, iconKanban, iconTable, iconMoon } from '../icons';
 
 export const meta: ComponentStoryMeta = {
   title: 'Common/SplitButton',
@@ -26,6 +26,7 @@ export const meta: ComponentStoryMeta = {
     variant: 'Visual style of the main button',
     size: 'Control height: sm / md / lg',
     disabled: 'Disables both halves of the button',
+    iconOnly: 'Main half renders only the slotted icon as a canonical square control (no label span, no phantom gap)',
     items: 'Menu items opened by the arrow half',
   },
   eventsDoc: {
@@ -72,6 +73,17 @@ export const meta: ComponentStoryMeta = {
               { id: 'json', label: 'JSON архив' },
             ]}"
           ></app-split-button>
+
+          <app-split-button
+            variant="secondary"
+            icon-only
+            .items="${[
+              { id: 'light', label: 'Light' },
+              { id: 'dark', label: 'Dark' },
+            ]}"
+          >
+            <span slot="start">${iconMoon(16)}</span>
+          </app-split-button>
         </div>
       `,
     },

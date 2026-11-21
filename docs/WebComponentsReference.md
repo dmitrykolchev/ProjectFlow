@@ -1174,6 +1174,7 @@ Dual-action button combining a primary action trigger with a secondary options m
 | `variant` | 'primary' | 'secondary' | 'outline', default `'primary'` | Visual style of the main button |
 | `size` | ButtonSize, default `'md'` | Control height: sm / md / lg |
 | `disabled` | boolean, default `false` | Disables both halves of the button |
+| `iconOnly` | boolean, default `false` | Main half renders only the slotted icon as a canonical square control (no label span, no phantom gap) |
 | `items` | MenuItem[], default `[]` | Menu items opened by the arrow half |
 
 | Event | Detail | Description |
