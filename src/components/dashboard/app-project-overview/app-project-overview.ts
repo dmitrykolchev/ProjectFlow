@@ -20,6 +20,11 @@ import '../../common/app-select/app-select';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-button/app-button';
 import styles from './app-project-overview.css';
+
+// detail of the `project-change` and `open-project` events (AGENTS.md §6)
+export interface ProjectOverviewProjectDetail {
+  projectId: string;
+}
 import { eventValue } from '../../common/event-value';
 
 type HoursGroupMode = 'timeline' | 'category' | 'team';
@@ -1145,7 +1150,7 @@ export class AppProjectOverview extends LitElement {
   private selectProjectScope(nextId: string) {
     this.projectId = nextId;
     this.dispatchEvent(
-      new CustomEvent('project-change', {
+      new CustomEvent<ProjectOverviewProjectDetail>('project-change', {
         detail: { projectId: nextId },
         bubbles: true,
         composed: true,
@@ -1157,7 +1162,7 @@ export class AppProjectOverview extends LitElement {
     const proj = this.activeProject;
     if (!proj) return;
     this.dispatchEvent(
-      new CustomEvent('open-project', {
+      new CustomEvent<ProjectOverviewProjectDetail>('open-project', {
         detail: { projectId: proj.id },
         bubbles: true,
         composed: true,
