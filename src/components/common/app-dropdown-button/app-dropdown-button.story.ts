@@ -29,6 +29,12 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Disables interaction',
     items: 'Menu item definitions rendered in the dropdown',
   },
+  eventsDoc: {
+    select: {
+      detail: '{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }',
+      description: 'Passes through the select event of the clicked app-menu-item',
+    },
+  },
   stories: [
     {
       name: 'Dropdown Variants',
