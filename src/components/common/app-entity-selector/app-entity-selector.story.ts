@@ -147,6 +147,16 @@ export const meta: ComponentStoryMeta = {
     error: 'Error message; renders the field in danger state',
     hint: 'Helper text below the field',
   },
+  eventsDoc: {
+    change: {
+      detail: '{ value: string, option: EntitySelectorOption | null }',
+      description: 'Fires when an option is picked',
+    },
+    'search-change': {
+      detail: '{ query: string }',
+      description: 'Fires when the search text changes (async data source)',
+    },
+  },
   stories: [
     {
       name: 'Declarative Options',
