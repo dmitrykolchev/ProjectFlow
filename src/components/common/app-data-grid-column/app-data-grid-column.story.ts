@@ -42,6 +42,12 @@ export const meta: ComponentStoryMeta = {
   slotsDoc: {
     '(default)': 'Optional HTML <template> element with {{field}} / {{value}} placeholders for declarative cell markup',
   },
+  eventsDoc: {
+    'column-change': {
+      detail: '—',
+      description: 'Fires when any column property changes; the parent grid re-reads the columns',
+    },
+  },
   stories: [
     {
       name: 'Declarative Columns with Template & Hidden',
