@@ -182,6 +182,17 @@
   ответа в блоге снимает ровно свой узел; добавление сообщения/ответа попадает
   в свою группу. Составные ключи решено не делать (суррогатная колонка/
   конкатенация в данных).
+- Шрифт native-контролов shadow DOM: глобальный reset `font-family: inherit` из
+  index.css доходит только до light DOM, поэтому tenant-native `<button>/<input>/
+  <textarea>/<select>` без собственной декларации рендерятся Arial'ом (метрики
+  Manrope≠Arial — съезжает типографика). Сканер (`E:\TEMP\opencode\font-scan.js`,
+  native-теги в шаблонах + проверка font-family в парном .css) нашёл 43 компонента;
+  на каждый нативный control-rule добавлен `font-family: var(--font-sans, inherit)`
+  (mono-классы сохранены), классам без правил добавлены минимальные rules.
+  42 коммита по компоненту; выборка в браузере (blog/chat/reminders/task-detail/
+  sidebar/KB) — computed Manrope везде, console errors 0. Урок: после массовой
+  правки CSS перезапускать dev-сервер с очисткой `node_modules\.vite` до пробы
+  (stale-кэш даёт ложные Arial).
 
 ## Не закрыто
 
