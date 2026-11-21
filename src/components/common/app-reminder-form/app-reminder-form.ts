@@ -604,7 +604,7 @@ export class AppReminderForm extends LitElement {
         title="${isEdit ? t.reminders.modalTitleEdit : t.reminders.modalTitleCreate}"
         @close="${() => this.closeModal()}"
       >
-        <div class="reminder-form-scroll">
+        <div class="reminder-form-body">
           ${this.formError ? html`<div class="form-error">${this.formError}</div>` : ''}
 
           <!-- Section 1: Object & Schedule -->

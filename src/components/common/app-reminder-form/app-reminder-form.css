@@ -8,34 +8,14 @@
   display: contents;
 }
 
-.reminder-form-scroll {
+/* the form is a plain layout wrapper inside app-modal: the canonical modal-body owns the scroll
+   (flex:1 + overflow-y auto with the styled scrollbar under the 90vh dialog cap), so this container
+   carries no max-height, no overflow and no local scrollbar styling — the scrollbar belongs to the
+   modal dialog body, exactly as in every other form modal */
+.reminder-form-body {
   display: flex;
   flex-direction: column;
   gap: 1.15rem;
-  max-height: 70vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 0.35rem;
-  scrollbar-width: thin;
-  scrollbar-color: var(--scrollbar-thumb, #334155) var(--scrollbar-track, #090d16);
-}
-
-.reminder-form-scroll::-webkit-scrollbar {
-  width: 6px;
-}
-
-.reminder-form-scroll::-webkit-scrollbar-track {
-  background: var(--scrollbar-track, #090d16);
-  border-radius: 3px;
-}
-
-.reminder-form-scroll::-webkit-scrollbar-thumb {
-  background: var(--scrollbar-thumb, #334155);
-  border-radius: 3px;
-}
-
-.reminder-form-scroll::-webkit-scrollbar-thumb:hover {
-  background: var(--scrollbar-thumb-hover, #6366f1);
 }
 
 .form-section {
