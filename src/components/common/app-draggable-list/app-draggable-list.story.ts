@@ -21,6 +21,12 @@ export const meta: ComponentStoryMeta = {
     items: 'DraggableItemData[] — value (entity id), label (title), checked (completion); empty items render the declared light DOM children',
     'child element': 'app-draggable-list-item — grip handle, order number, checkbox, title, up / down / remove actions',
   },
+  eventsDoc: {
+    'list-reorder': {
+      detail: '{ items: DraggableItemData[] }',
+      description: 'Fires after an item is dropped; carries the new order (property mode)',
+    },
+  },
   stories: [
     {
       name: 'Subtask Rows (property mode)',
