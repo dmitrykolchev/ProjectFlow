@@ -22,6 +22,10 @@ export const meta: ComponentStoryMeta = {
     cancelLabel: 'Caption of the cancel button',
     size: 'Dialog width preset',
   },
+  eventsDoc: {
+    confirm: { detail: '—', description: 'Fires when the primary (confirm) button is pressed' },
+    cancel: { detail: '—', description: 'Fires when the dialog is dismissed' },
+  },
   stories: [
     {
       name: 'Danger Confirm',
