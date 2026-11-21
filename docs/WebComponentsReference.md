@@ -343,6 +343,8 @@ A grid of entity cards built from a per-view template. The card content is produ
 | `--cards-columns` | CSS var | Grid column count token (default auto-fill); a view can pin an exact number of columns |
 | `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical |
 
+**Events:** `selection-change`, `page-change`, `page-size-change`, `card-click`
+
 #### `app-confirm-dialog` — `AppConfirmDialog`
 
 `src/components/common/app-confirm-dialog/`
@@ -707,6 +709,8 @@ Material Symbols palette with search by name, category and tags; toolbar control
 | `category` | String, default `'all'` | — |
 | `family` | GalleryFamily, default `'outlined'` | — |
 
+**Events:** `icon-select`, `params-change`
+
 #### `app-menu` — `AppMenu`
 
 `src/components/common/app-menu/`
@@ -965,6 +969,8 @@ File attachment control for time entries and expenses. Allows uploading new file
 | `compact` | boolean, default `false` | Compact display mode without secondary helper hint |
 | `readonly` | boolean, default `false` | Disables uploading, linking, and detaching files |
 
+**Events:** `attachments-change`
+
 #### `app-project-requirements` — `AppProjectRequirements`
 
 `src/components/common/app-project-requirements/`
@@ -1017,6 +1023,8 @@ Visual, human-friendly recurrence rule builder covering the full RFC 5545 specif
 | `allow-one-time` | boolean, default `true` | Allows selecting "Does not repeat" empty rule (default true) |
 | `compact` | boolean, default `false` | Reduces vertical spacing for embedding inside modals |
 | `hide-rrule-bar` | boolean, default `false` | Hides raw RRULE string bar while preserving visual editing |
+
+**Events:** `change`
 
 #### `app-reminder-form` — `AppReminderForm`
 
@@ -1155,6 +1163,8 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | `striped` | boolean, default `false` | Enables alternating row background coloring (zebra striping) |
 | `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
 
+**Events:** `sort-change`
+
 #### `app-task-ai-panel` — `AppTaskAiPanel`
 
 `src/components/common/app-task-ai-panel/`
@@ -1170,6 +1180,8 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | `timeSummary` | String, default `''` | Time-tracking summary rendered next to the analysis |
 | `expenseSummary` | String, default `''` | Expense summary rendered next to the analysis |
 | `discussionsSummary` | String, default `''` | Discussion summary rendered next to the analysis |
+
+**Events:** `analyses-update`, `clarification-update`, `apply-description`, `add-subtask`
 
 #### `app-toggle-button` — `AppToggleButton`
 
@@ -1509,7 +1521,7 @@ Shared skeleton of the entity detail views: top navigation bar (back button, ent
 | `switcherValue` | String, default `''` | Id of the entity currently displayed |
 | `entity` | EntityEmblemKind, default `'project'` | Emblem kind rendered in the hero identity |
 
-**Events:** `detail-back`
+**Events:** `detail-back`, `entity-switch`
 
 | Slot | Content |
 |---|---|
@@ -1875,6 +1887,8 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 | `selection-change event` | — | Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles |
 | `row-click event` | — | Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row |
 | `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical |
+
+**Events:** `sort-change`, `page-change`, `page-size-change`, `selection-change`, `row-click`
 
 #### `app-table-column` — `AppTableColumn`
 

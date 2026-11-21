@@ -128,7 +128,8 @@ for (const g of fs.readdirSync(srcRoot, { withFileTypes: true }).filter((e) => e
       propsList.push({ name, type, attr, reflect: /reflect:\s*true/.test(opts), def });
     }
 
-    const events = [...new Set([...src.matchAll(/new CustomEvent\(\s*'([^']+)'/g)].map((m) => m[1]))];
+    // typed dispatches carry an optional generic: new CustomEvent<Detail>('name', ...)
+    const events = [...new Set([...src.matchAll(/new CustomEvent(?:<[^>]*>)?\(\s*'([^']+)'/g)].map((m) => m[1]))];
 
     const storyPath = path.join(d.dir, `${d.tag}.story.ts`);
     const hasStory = fs.existsSync(storyPath);

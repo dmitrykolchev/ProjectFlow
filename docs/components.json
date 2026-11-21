@@ -691,7 +691,12 @@
     "def": ""
    }
   ],
-  "events": [],
+  "events": [
+   "selection-change",
+   "page-change",
+   "page-size-change",
+   "card-click"
+  ],
   "propsDoc": [
    {
     "k": "rows",
@@ -1705,7 +1710,13 @@
     "def": ""
    }
   ],
-  "events": [],
+  "events": [
+   "sort-change",
+   "page-change",
+   "page-size-change",
+   "selection-change",
+   "row-click"
+  ],
   "propsDoc": [
    {
     "k": "rows",
@@ -1980,7 +1991,8 @@
    }
   ],
   "events": [
-   "detail-back"
+   "detail-back",
+   "entity-switch"
   ],
   "propsDoc": [
    {
@@ -3763,7 +3775,10 @@
     "def": "false"
    }
   ],
-  "events": [],
+  "events": [
+   "icon-select",
+   "params-change"
+  ],
   "propsDoc": [
    {
     "k": "icons",
@@ -5217,7 +5232,9 @@
     "def": "false"
    }
   ],
-  "events": [],
+  "events": [
+   "attachments-change"
+  ],
   "propsDoc": [
    {
     "k": "project-id",
@@ -5584,7 +5601,9 @@
     "def": "false"
    }
   ],
-  "events": [],
+  "events": [
+   "change"
+  ],
   "propsDoc": [
    {
     "k": "value",
@@ -6495,7 +6514,9 @@
     "def": "false"
    }
   ],
-  "events": [],
+  "events": [
+   "sort-change"
+  ],
   "propsDoc": [
    {
     "k": "rows",
@@ -6650,7 +6671,12 @@
     "def": "''"
    }
   ],
-  "events": [],
+  "events": [
+   "analyses-update",
+   "clarification-update",
+   "apply-description",
+   "add-subtask"
+  ],
   "propsDoc": [
    {
     "k": "task",
