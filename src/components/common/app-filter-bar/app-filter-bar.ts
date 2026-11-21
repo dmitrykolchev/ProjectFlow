@@ -9,6 +9,16 @@ import '../../common/app-button/app-button';
 import { iconSearch } from '../icons';
 import type { EntitySelectorOption } from '../../common/app-entity-selector/app-entity-selector';
 import styles from './app-filter-bar.css';
+
+// details of the `search-change` and `filter-change` events (AGENTS.md §6)
+export interface FilterBarSearchDetail {
+  value: string;
+}
+
+export interface FilterBarFilterChangeDetail {
+  key: string;
+  value: string;
+}
 import { eventValue } from '../event-value';
 
 export interface FilterDef {
@@ -100,13 +110,13 @@ export class AppFilterBar extends LitElement {
 
   private emitSearch(value: string) {
     this.dispatchEvent(
-      new CustomEvent('search-change', { detail: { value }, bubbles: true, composed: true })
+      new CustomEvent<FilterBarSearchDetail>('search-change', { detail: { value }, bubbles: true, composed: true })
     );
   }
 
   private emitFilter(key: string, value: string) {
     this.dispatchEvent(
-      new CustomEvent('filter-change', { detail: { key, value }, bubbles: true, composed: true })
+      new CustomEvent<FilterBarFilterChangeDetail>('filter-change', { detail: { key, value }, bubbles: true, composed: true })
     );
   }
 }
