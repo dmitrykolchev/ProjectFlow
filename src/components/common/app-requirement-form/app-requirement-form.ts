@@ -9,6 +9,11 @@ import {
 } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-requirement-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface RequirementFormSavedDetail {
+  requirement: ProjectRequirement;
+}
 import { eventValue } from '../event-value';
 import { iconBookOpen, iconX } from '../icons';
 import {
@@ -180,7 +185,7 @@ export class AppRequirementForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<RequirementFormSavedDetail>('saved', {
         detail: { requirement: saved },
         bubbles: true,
         composed: true,
