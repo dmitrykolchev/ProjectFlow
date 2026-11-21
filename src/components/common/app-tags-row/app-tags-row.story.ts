@@ -15,6 +15,10 @@ export const meta: ComponentStoryMeta = {
     mode: "readonly = plain chips; add-button = editable chips + add button opening the inline form; add-form = editable chips with the inline form always open",
     showEmptyLabel: 'Render the no-tags hint when the list is empty (preview bars)',
   },
+  eventsDoc: {
+    'tag-add': { detail: '{ tag: string }', description: 'Fires when a tag is added' },
+    'tag-remove': { detail: '{ tag: string }', description: 'Fires when a tag chip is removed' },
+  },
   stories: [
     {
       name: 'Readonly Chips',
