@@ -215,7 +215,10 @@
   flex-shrink: 0;
 }
 
-.project-add-ch-btn {
+.project-add-ch-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 24px;
   height: 24px;
   border-radius: var(--radius-sm, 6px);
@@ -559,7 +562,10 @@
   font-weight: 600;
 }
 
-.pinned-toggle-btn {
+.pinned-toggle-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: none;
   background: transparent;
   color: inherit;
@@ -724,7 +730,10 @@
   opacity: 1;
 }
 
-.msg-action-btn {
+.msg-action-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   height: 26px;
   min-width: 26px;
   padding: 0 0.35rem;
@@ -848,7 +857,10 @@
   margin-top: 0.1rem;
 }
 
-.reaction-chip {
+.reaction-chip {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
