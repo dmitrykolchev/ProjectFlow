@@ -2,6 +2,11 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-color-swatches.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface ColorSwatchesChangeDetail {
+  value: string;
+}
+
 /**
  * Canonical color swatch picker: a row of round color buttons rendered from a
  * palette array. The component owns the active highlight; clicking a swatch
@@ -21,7 +26,7 @@ export class AppColorSwatches extends LitElement {
     if (this.value === hex) return;
     this.value = hex;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<ColorSwatchesChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
