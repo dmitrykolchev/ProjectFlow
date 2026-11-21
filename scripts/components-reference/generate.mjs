@@ -97,7 +97,7 @@ function entry(item, p) {
 const out = [];
 out.push('# ProjectFlow: справочник веб-компонентов');
 out.push('');
-out.push('Дата: 20.11.2026. Режим: **референс, код не изменяется.**');
+out.push('Дата: 21.11.2026. Режим: **референс, код не изменяется.**');
 out.push('');
 out.push(`Всего компонентов: ${items.length} (со стори: ${items.filter((i) => i.hasStory).length}).`);
 out.push('Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /');
