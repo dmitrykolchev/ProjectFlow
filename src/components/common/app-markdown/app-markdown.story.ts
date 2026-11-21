@@ -83,6 +83,12 @@ export const meta: ComponentStoryMeta = {
     children: 'Markdown declared directly as light-DOM children (slot capture); the content property wins when both are set',
     editable: 'Checklist checkboxes are interactive and emit checklist-toggle {line, checked} when true',
   },
+  eventsDoc: {
+    'checklist-toggle': {
+      detail: '{ line: number, checked: boolean }',
+      description: 'Fires when a checklist box is toggled in editable mode',
+    },
+  },
   stories: [
     {
       name: 'Full Document',
