@@ -15,6 +15,16 @@ const meta: ComponentStoryMeta = {
     error: 'Highlights cells in danger palette and plays shake feedback.',
     autofocus: 'Automatically focuses the first cell on mount.',
   },
+  eventsDoc: {
+    'otp-change': {
+      detail: '{ value: string }',
+      description: 'Fires when a digit is entered',
+    },
+    'otp-complete': {
+      detail: '{ value: string }',
+      description: 'Fires when all cells are filled',
+    },
+  },
   stories: [
     {
       name: 'Default 6-Digit Input',
