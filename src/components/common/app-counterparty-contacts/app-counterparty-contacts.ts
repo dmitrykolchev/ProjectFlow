@@ -23,6 +23,11 @@ import '../app-form-grid/app-form-grid';
 import '../app-input/app-input';
 import styles from './app-counterparty-contacts.css';
 
+// detail of the `contacts-change` event (named event-detail interface, AGENTS.md §6)
+export interface CounterpartyContactsChangeDetail {
+  contacts: CounterpartyContact[];
+}
+
 /**
  * Multi-person counterparty contacts viewer and inline manager.
  * Allows adding, editing, deleting, copying, and setting primary contact persons
@@ -114,7 +119,7 @@ export class AppCounterpartyContacts extends LitElement {
 
   private emitContacts(nextContacts: CounterpartyContact[]) {
     this.dispatchEvent(
-      new CustomEvent('contacts-change', {
+      new CustomEvent<CounterpartyContactsChangeDetail>('contacts-change', {
         detail: { contacts: nextContacts },
         bubbles: true,
         composed: true,
