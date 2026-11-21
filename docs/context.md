@@ -32,8 +32,18 @@
   slotsDoc/childrenDoc/eventsDoc; docs регенерированы (145 компонентов).
   Проба в браузере: кнопки/табы 38px (md-канон), separator 28px, toggle change,
   dropdown popup + select 'dup' + закрытие, tabs active-sync + tab-change,
-  шрифты Manrope, console errors 0. Toolbar модалки редактирования статьи блога
-  пока остаётся локальной `.md-toolbar` — миграция на новые компоненты следующая.
+  шрифты Manrope, console errors 0.
+- Toolbar модалки «Редактирование статьи» в `app-blog` мигрирован на новые
+  компоненты (`25398a0`): локальные `.md-tool-btn/.md-tool-sep` удалены,
+  историческая компактная геометрия воспроизведена публичными хуками на
+  `.md-toolbar` (28px mono-кнопки 0.74rem/600, padX 0.5rem, radius-sm, icon gap
+  0.25rem, row padding 0.45rem 0.6rem, separator 1x16 + margin 0.15rem,
+  full-width `--tb-width: 100%`). Хуки добавлены аддитивными коммитами на
+  компоненты (`03a075c` — `--tb-font-family`/`--tb-btn-gap` + push-кнопка больше
+  не stopPropagation, родной click доходит до потребителя; `9e5f96d` —
+  `--tb-sep-inset`/`--tb-sep-margin`; `a46c164` — `--tb-width`). Браузерная проба
+  computed-стилей: все значения совпадают с оригиналом, toolbar заполняет
+  ширину формы модалки, клик H2 вставляет snippet через host-событие.
 
 - Карточные представления Договоров и Калькуляций (карточки — режим по
   умолчанию, канонический скелет view с mode-row и фильтром).
