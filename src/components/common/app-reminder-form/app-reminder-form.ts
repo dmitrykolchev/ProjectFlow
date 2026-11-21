@@ -99,6 +99,12 @@ export class AppReminderForm extends LitElement {
   @state() private fOccurrenceCount = 0;
   @state() private fRruleInput = '';
 
+  // the rule is picked from the directory templates, or configured individually in the same
+  // app-recurrence-editor dialog used by the recurrence templates directory (app-directory-record-modal):
+  // a disabled rrule display + edit button opens the modal, the draft applies on «Применить» only
+  @state() private recurrenceDialogOpen = false;
+  private recurrenceDraft: RecurrenceEditorChangeDetail | null = null;
+
   // Notifications config
   @state() private fRules: ReminderNotificationRule[] = [];
   @state() private fSoundEnabled = false;
@@ -318,6 +324,18 @@ export class AppReminderForm extends LitElement {
       return tplParsed.ok && serializeRRule(tplParsed.rule, false) === canonical;
     });
     this.fTemplateCode = matchingTpl ? matchingTpl.code : 'CUSTOM';
+  }
+
+  private openRecurrenceDialog() {
+    this.recurrenceDraft = null;
+    this.recurrenceDialogOpen = true;
+  }
+
+  private applyRecurrenceDialog() {
+    if (this.recurrenceDraft) {
+      this.handleRecurrenceEditorChange(this.recurrenceDraft);
+    }
+    this.recurrenceDialogOpen = false;
   }
 
   private addAssignee(userId: string) {
@@ -758,7 +776,8 @@ export class AppReminderForm extends LitElement {
             </app-form-grid>
           </section>
 
-          <!-- Section 2: Visual RFC 5545 Recurrence Editor & Directory Templates -->
+          <!-- Section 2: Directory template picker + rrule display with the editor dialog (reused from
+               the recurrence templates directory) -->
           <section class="form-section">
             <div class="section-head">
               <span class="section-title">
@@ -787,13 +806,21 @@ export class AppReminderForm extends LitElement {
               ></app-switch>
             </app-form-grid>
 
-            <app-recurrence-editor
-              compact
-              .value="${this.fRruleInput}"
-              .startDate="${baseDueStr}"
-              @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
-                this.handleRecurrenceEditorChange(e.detail)}"
-            ></app-recurrence-editor>
+            <div class="rrule-display-row">
+              <app-input
+                class="rrule-display"
+                label="${t.reminders.fieldRrule}"
+                disabled
+                .value="${this.fRruleInput}"
+              ></app-input>
+              <app-button
+                variant="secondary"
+                size="md"
+                @click="${() => this.openRecurrenceDialog()}"
+              >
+                ${t.reminders.editRecurrenceBtn}
+              </app-button>
+            </div>
           </section>
 
           <!-- Section 3: Notification Rules & Policies -->
@@ -1009,6 +1036,29 @@ export class AppReminderForm extends LitElement {
           <app-button variant="primary" @click="${() => this.handleSave()}">
             <span slot="icon-start">${iconCalendar()}</span>
             <span>${t.common.save}</span>
+          </app-button>
+        </div>
+      </app-modal>
+
+      <app-modal
+        ?open="${this.recurrenceDialogOpen}"
+        size="md"
+        title="${t.reminders.recurrenceModalTitle}"
+        @close="${() => (this.recurrenceDialogOpen = false)}"
+      >
+        <app-recurrence-editor
+          .includePrefix="${false}"
+          .value="${this.fRruleInput}"
+          .startDate="${baseDueStr}"
+          @change="${(e: CustomEvent<RecurrenceEditorChangeDetail>) =>
+            (this.recurrenceDraft = e.detail)}"
+        ></app-recurrence-editor>
+        <div slot="footer" class="footer-actions">
+          <app-button variant="ghost" @click="${() => (this.recurrenceDialogOpen = false)}">
+            ${t.common.cancel}
+          </app-button>
+          <app-button variant="primary" @click="${() => this.applyRecurrenceDialog()}">
+            ${t.common.apply}
           </app-button>
         </div>
       </app-modal>

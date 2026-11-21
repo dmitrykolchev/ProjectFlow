@@ -18,6 +18,24 @@
   gap: 1.15rem;
 }
 
+/* rrule display row — same canon as the recurrence templates directory (app-directory-record-modal):
+   a disabled mono input showing the rule + a secondary button that opens the editor dialog */
+.rrule-display-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.rrule-display {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  --control-font-md: 0.82rem;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;

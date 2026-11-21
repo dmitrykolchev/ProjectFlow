@@ -8,7 +8,7 @@ const meta: ComponentStoryMeta = {
   component: 'app-reminder-form',
   title: 'Common/Reminder Form',
   description:
-    'Modal form for creating and editing polymorphic reminders linked to any system entity, using recurrence templates from Master Classifiers and a flexible multi-rule notifications builder.',
+    'Modal form for creating and editing polymorphic reminders linked to any system entity. The recurrence rule is picked from Master Classifiers templates, or configured individually through the app-recurrence-editor dialog reused from the recurrence templates directory (a disabled RRULE display with a «Настроить правило» button); notifications use a flexible multi-rule builder.',
   category: 'Common',
   propsDoc: {
     open: 'Opens or closes the reminder form modal dialog',

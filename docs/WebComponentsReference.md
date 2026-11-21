@@ -129,7 +129,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-project-requirements` | common | Common | Управление функциональными (FR) и нефункциональными (NFR) требованиями проекта, генерация… |
 | `app-radio-group` | common | Common | Accessible radio selection group with standard, horizontal, and rich card layouts. |
 | `app-recurrence-editor` | common | Common | Visual, human-friendly recurrence rule builder covering the full RFC 5545 specification (… |
-| `app-reminder-form` | common | Common | Modal form for creating and editing polymorphic reminders linked to any system entity, us… |
+| `app-reminder-form` | common | Common | Modal form for creating and editing polymorphic reminders linked to any system entity. |
 | `app-requirement-form` | common | Overlays | Canonical requirement create and edit form. |
 | `app-section-card` | common | Common | Card container with header (title, subtitle, actions slot) and body; optional collapsible… |
 | `app-segmented-switch` | common | Common | Compact segmented control for switching between mutually exclusive views, timeframes, or … |
@@ -1016,7 +1016,7 @@ Visual, human-friendly recurrence rule builder covering the full RFC 5545 specif
 
 `src/components/common/app-reminder-form/`
 
-Modal form for creating and editing polymorphic reminders linked to any system entity, using recurrence templates from Master Classifiers and a flexible multi-rule notifications builder.
+Modal form for creating and editing polymorphic reminders linked to any system entity. The recurrence rule is picked from Master Classifiers templates, or configured individually through the app-recurrence-editor dialog reused from the recurrence templates directory (a disabled RRULE display with a «Настроить правило» button); notifications use a flexible multi-rule builder.
 
 | Property | Type / default | Description |
 |---|---|---|
