@@ -27,6 +27,12 @@ export const meta: ComponentStoryMeta = {
     iconOnly: 'Renders only the icon, no text',
     value: 'Group value emitted on toggle (for radio-style groups)',
   },
+  eventsDoc: {
+    change: {
+      detail: '{ pressed: boolean, value: string }',
+      description: 'Fires when the button is toggled',
+    },
+  },
   stories: [
     {
       name: 'Toggle States & Variants',
