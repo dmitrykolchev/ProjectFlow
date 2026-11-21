@@ -511,7 +511,6 @@ export class AppCompanyDetail extends LitElement {
         <app-bank-requisites
           editable
           hide-header
-          confirm-delete
           .accounts="${bankAccounts}"
           @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
             this.handleBankAccountsChange(company, e.detail.accounts)}"

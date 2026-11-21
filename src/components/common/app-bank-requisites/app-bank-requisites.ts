@@ -35,7 +35,6 @@ export class AppBankRequisites extends LitElement {
   @property({ type: Boolean }) editable: boolean = false;
   @property({ type: Boolean }) compact: boolean = false;
   @property({ type: Boolean, attribute: 'hide-header' }) hideHeader: boolean = false;
-  @property({ type: Boolean, attribute: 'confirm-delete' }) confirmDelete: boolean = false;
   @property({ type: String }) heading: string = '';
 
   @state() private currentLang = store.customization.language;
@@ -179,11 +178,8 @@ export class AppBankRequisites extends LitElement {
   }
 
   private requestDelete(acc: BankRequisite) {
-    if (this.confirmDelete) {
-      this.deletingAccount = acc;
-      return;
-    }
-    this.performDelete(acc.id);
+    // Deletion is destructive: the confirm dialog is mandatory, there is no opt-out.
+    this.deletingAccount = acc;
   }
 
   private performDelete(id: string) {
@@ -322,32 +318,28 @@ export class AppBankRequisites extends LitElement {
             : ''}
       </div>
 
-      ${this.confirmDelete
-        ? html`
-            <app-confirm-dialog
-              .open="${Boolean(this.deletingAccount)}"
-              size="sm"
-              title="${t.bankAccounts.deleteConfirmTitle}"
-              action="${t.bankAccounts.deleteConfirmAction(
-                this.deletingAccount?.bankName || '',
-                this.deletingAccount?.accountNumber || ''
-              )}"
-              result="${t.bankAccounts.deleteConfirmResult}"
-              .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
-              .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-              .cancelLabel="${t.common.cancel}"
-              .confirmLabel="${t.common.delete}"
-              @cancel="${() => (this.deletingAccount = null)}"
-              @confirm="${() => {
-                if (this.deletingAccount) {
-                  const id = this.deletingAccount.id;
-                  this.deletingAccount = null;
-                  this.performDelete(id);
-                }
-              }}"
-            ></app-confirm-dialog>
-          `
-        : ''}
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingAccount)}"
+        size="sm"
+        title="${t.bankAccounts.deleteConfirmTitle}"
+        action="${t.bankAccounts.deleteConfirmAction(
+          this.deletingAccount?.bankName || '',
+          this.deletingAccount?.accountNumber || ''
+        )}"
+        result="${t.bankAccounts.deleteConfirmResult}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingAccount = null)}"
+        @confirm="${() => {
+          if (this.deletingAccount) {
+            const id = this.deletingAccount.id;
+            this.deletingAccount = null;
+            this.performDelete(id);
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 

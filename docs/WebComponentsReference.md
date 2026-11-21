@@ -262,7 +262,7 @@ Semantic status, priority, and count badges supporting soft, solid, and outline 
 
 `src/components/common/app-bank-requisites/`
 
-Multi-bank, multi-currency bank requisites viewer and inline manager. Supports currency filtering, one-click clipboard copy, primary account selection, and inline add/edit/delete.
+Multi-bank, multi-currency bank requisites viewer and inline manager. Supports currency filtering, one-click clipboard copy, primary account selection, and inline add/edit/delete; deleting an account always goes through app-confirm-dialog (no opt-out).
 
 | Property | Type / default | Description |
 |---|---|---|
@@ -270,9 +270,7 @@ Multi-bank, multi-currency bank requisites viewer and inline manager. Supports c
 | `editable` | Boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
-| `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting an account |
 | `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
-| `confirmDelete` | Boolean, default `false` | Shows app-confirm-dialog before deleting an account (attribute form confirm-delete) |
 | `heading` | String, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
 
 **Events:** `accounts-change`

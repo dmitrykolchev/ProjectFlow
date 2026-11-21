@@ -235,7 +235,7 @@
   "hasStory": true,
   "title": "Common/BankRequisites",
   "category": "Common",
-  "desc": "Multi-bank, multi-currency bank requisites viewer and inline manager. Supports currency filtering, one-click clipboard copy, primary account selection, and inline add/edit/delete.",
+  "desc": "Multi-bank, multi-currency bank requisites viewer and inline manager. Supports currency filtering, one-click clipboard copy, primary account selection, and inline add/edit/delete; deleting an account always goes through app-confirm-dialog (no opt-out).",
   "propsList": [
    {
     "name": "accounts",
@@ -259,13 +259,6 @@
     "name": "hideHeader",
     "type": "Boolean",
     "attr": "hide-header",
-    "reflect": false,
-    "def": "false"
-   },
-   {
-    "name": "confirmDelete",
-    "type": "Boolean",
-    "attr": "confirm-delete",
     "reflect": false,
     "def": "false"
    },
@@ -297,16 +290,8 @@
     "v": "Hides internal header when embedded inside app-section-card"
    },
    {
-    "k": "confirm-delete",
-    "v": "Shows app-confirm-dialog before deleting an account"
-   },
-   {
     "k": "hideHeader",
     "v": "Hides internal header when embedded inside app-section-card (attribute form hide-header)"
-   },
-   {
-    "k": "confirmDelete",
-    "v": "Shows app-confirm-dialog before deleting an account (attribute form confirm-delete)"
    },
    {
     "k": "heading",

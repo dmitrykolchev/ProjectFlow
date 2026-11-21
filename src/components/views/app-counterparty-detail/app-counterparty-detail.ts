@@ -372,7 +372,6 @@ export class AppCounterpartyDetail extends LitElement {
           <app-bank-requisites
             editable
             hide-header
-            confirm-delete
             .accounts="${cp.bankAccounts || []}"
             @accounts-change="${(e: CustomEvent<{ accounts: BankRequisite[] }>) =>
               this.handleBankAccountsChange(cp, e.detail.accounts)}"
