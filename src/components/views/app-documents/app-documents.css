@@ -114,7 +114,10 @@ app-cards-table {
   flex: 1;
 }
 
-.doc-title-btn {
+.doc-title-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   padding: 0;
