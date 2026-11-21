@@ -6,7 +6,7 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD `857e60e`; origin/main = `585be96`, 44 незапушенных
+- Слияния в `main`: HEAD `28d97b8`; origin/main = `585be96`, 49 незапушенных
   коммитов.
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
@@ -99,6 +99,25 @@
   только по «Применить», cancel не трогает форму; совпадение с шаблоном
   справочника сохраняет его код, иначе `CUSTOM`). Ключи `reminders.fieldRrule`
   / `editRecurrenceBtn` / `recurrenceModalTitle`.
+- `app-recurrence-editor` — кнопка копирования RRULE сделана иконочной (лейбл
+  убран, title «Копировать» сохранён).
+- `app-reminder-form` — summary-карточка правила: kicker
+  `t.viewTexts.recurrenceEditor.summaryLabel` + человекочитаемое описание через
+  `formatRRuleHumanSummary` (ONCE → «Не повторяется — сработает один раз»),
+  CSS по канону редактора.
+- `app-reminder-form` — ручной ввод RRULE прямо в поле: `app-input` ряда
+  «Правило повторяемости» стал редактируемым (placeholder
+  `reminders.rruleInputPlaceholder`, live-валидация `parseRRule` при каждом
+  вводе; при парсе без успеха danger-баннер под полем с текстом
+  `reminders.rruleErrors[errorCode]` по канону `.re-error-banner` редактора,
+  состояние `fRruleError`); правило перематчится со справочником по канонической
+  сериализации (совпадение сохраняет код, иначе `CUSTOM`), пустой текст → `ONCE`;
+  сохранение с непарсящимся правилом блокируется тем же текстом в `formError`.
+- `app-reminder-form` — кнопка удаления правила уведомлений (trash в карточке
+  канала) помечена опасной: `action="delete"` вместо ghost, удаление только
+  через `app-confirm-dialog` (`confirmDialogs.notificationRuleDelete`,
+  правило названо каналом и отступом по `reminders.channels` +
+  `reminders.leadUnits`).
 
 ## Не закрыто
 
@@ -153,6 +172,17 @@
   «Каждый день» ставит draft без изменения отображения, cancel сохраняет пусто,
   Применить ставит `FREQ=DAILY` и `fTemplateCode='DAILY'` (совпадение со
   справочником). Проба закрыла модалку, создания в store нет. Console errors 0.
+- Проверено в браузере (dev-server, порт 3002, fresh tab): ручной ввод RRULE —
+  поле редактируемое; `FREQ=WEEKLY;BYDAY=MO,WE,FR` даёт summary «Каждую неделю ·
+  Пн, Ср, Пт» и `fTemplateCode='CUSTOM'` без ошибок; `FREQ=BOGUS` ставит
+  `fRruleError` и баннер «Недопустимое значение FREQ (ожидается MINUTELY, HOURLY,
+  DAILY, WEEKLY, MONTHLY или YEARLY)»; Сохранить блокирует с тем же текстом в
+  `formError`, напоминание не создаётся (store delta 0), форма открыта; очистка
+  поля → `ONCE` и summary «Не повторяется — сработает один раз». Удаление канала
+  уведомлений: trash-кнопка `action="delete"`; диалог «Удалить канал
+  уведомлений?» (danger) называет правило «В системе (In-App) · 30 мин. до»,
+  секции и лейблы корректны, Отмена сохраняет набор (3 → 3), Удалить снимает
+  правило (3 → 2), диалог закрывается. Проба закрыла модалку. Console errors 0.
 
 ## Бэклог идей (обсуждено, не начато)
 
