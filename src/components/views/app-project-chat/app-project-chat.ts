@@ -1,5 +1,6 @@
 import { LitElement, html } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { effectivePresence } from '../../../domain/presence-tokens';
@@ -881,7 +882,10 @@ export class AppProjectChat extends LitElement {
                   ${this.showPinnedExpanded
                     ? html`
                         <div class="pinned-list">
-                          ${pinnedMessages.map((pm) => {
+                          ${repeat(
+                            pinnedMessages,
+                            (pm) => pm.id,
+                            (pm) => {
                             const pAuthor = this.users.find((u) => u.id === pm.senderId);
                             return html`
                               <div class="pinned-item">
@@ -936,17 +940,22 @@ export class AppProjectChat extends LitElement {
                     <span slot="icon">${iconMessageSquare(48)}</span>
                   </app-empty-state>
                 `
-              : groupedByDate.map(
+              : repeat(
+                  groupedByDate,
+                  (group) => group.label,
                   (group) => html`
                     <div class="date-divider"><span>${group.label}</span></div>
-                    ${group.items.map((msg) =>
-                      this.renderMessage(
-                        msg,
-                        activeProject,
-                        channelMessages,
-                        isArchivedChannel,
-                        t
-                      )
+                    ${repeat(
+                      group.items,
+                      (msg) => msg.id,
+                      (msg) =>
+                        this.renderMessage(
+                          msg,
+                          activeProject,
+                          channelMessages,
+                          isArchivedChannel,
+                          t
+                        )
                     )}
                   `
                 )}
