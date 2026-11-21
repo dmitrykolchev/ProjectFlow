@@ -2766,6 +2766,11 @@ export const en = {
             ? 'The whole dialogue will disappear for all readers.'
             : 'The comment will disappear for all readers.',
       },
+      blogCommentDeleteReply: {
+        title: 'Delete reply?',
+        action: 'The reply will be removed from this article discussion, the dialogue root is preserved.',
+        result: 'Messages answering this reply will be re-pointed to its parent.',
+      },
       knowledgeArticleDelete: {
         title: 'Delete knowledge base article?',
         action: (title: string) => `Article "${title}" will be removed from the knowledge base.`,

@@ -316,9 +316,9 @@ export class AppBlog extends LitElement {
     this.modalOpen = false;
   }
 
-  private submitComment(postId: string, replyToId?: string) {
+  private submitComment(postId: string, replyToId?: string, quote?: boolean) {
     if (!this.commentText.trim()) return;
-    store.addBlogComment(postId, this.commentText, this.commentAuthorId, replyToId);
+    store.addBlogComment(postId, this.commentText, this.commentAuthorId, replyToId, quote);
     this.commentText = '';
     if (replyToId) {
       this.replyToId = null;
@@ -1101,6 +1101,10 @@ export class AppBlog extends LitElement {
                                   <span class="reply-to-chip">${b.replyToLabel(
                                     sourceAuthor?.name || source.authorId
                                   )}</span>
+                                `
+                              : ''}
+                            ${source && c.quote
+                              ? html`
                                   <blockquote class="comment-quote">
                                     <span class="quote-author">${sourceAuthor?.name ||
                                       source.authorId}</span>
@@ -1119,8 +1123,13 @@ export class AppBlog extends LitElement {
                             ? html`
                                 <div class="reply-composer">
                                   <span class="reply-to-chip">${b.replyToLabel(
-                                    store.users.find((u) => u.id === this.replyToId)?.name ||
-                                      this.replyToId!
+                                    (() => {
+                                      const target = post.comments.find((q) => q.id === this.replyToId);
+                                      const tAuthor = target
+                                        ? store.users.find((u) => u.id === target.authorId)
+                                        : undefined;
+                                      return tAuthor?.name || (target ? target.authorId : this.replyToId!);
+                                    })()
                                   )}</span>
                                   <app-textarea
                                     rows="2"
@@ -1130,9 +1139,6 @@ export class AppBlog extends LitElement {
                                   ></app-textarea>
                                   <app-switch
                                     size="sm"
-                                    frame="transparent"
-                                    field-label-style="ghost"
-                                    field-label="${b.quoteSourceLabel}"
                                     label="${b.quoteSourceLabel}"
                                     .checked="${this.replyQuote}"
                                     @change="${(e: CustomEvent<{ checked: boolean }>) =>
@@ -1154,7 +1160,7 @@ export class AppBlog extends LitElement {
                                       variant="primary"
                                       size="sm"
                                       ?disabled="${!this.commentText.trim()}"
-                                      @click="${() => this.submitComment(post.id, this.replyToId!)}"
+                                      @click="${() => this.submitComment(post.id, this.replyToId!, this.replyQuote)}"
                                     >
                                       <span slot="icon-start">${iconSend(14)}</span>
                                       <span>${b.replySubmitBtn}</span>
@@ -1505,7 +1511,10 @@ export class AppBlog extends LitElement {
   private renderDeleteDialogs(t: ReturnType<typeof getTranslation>) {
     const dlgPost = t.viewTexts.confirmDialogs.blogDelete;
     const dlgComment = t.viewTexts.confirmDialogs.blogCommentDelete;
-    // Deleting any message of a dialogue removes the whole dialogue, so the dialog names its size.
+    const dlgReply = t.viewTexts.confirmDialogs.blogCommentDeleteReply;
+    // Deleting a top-level comment removes the whole dialogue, so the root dialog names its size;
+    // deleting a reply removes only that message (the root is preserved).
+    const deletingIsReply = Boolean(this.deletingComment?.comment.replyToId);
     const deletingDialogueSize = this.deletingComment
       ? (() => {
           const comments = this.posts.find((p) => p.id === this.deletingComment!.postId)?.comments || [];
@@ -1543,11 +1552,11 @@ export class AppBlog extends LitElement {
       <app-confirm-dialog
         .open="${Boolean(this.deletingComment)}"
         variant="danger"
-        title="${dlgComment.title}"
+        title="${deletingIsReply ? dlgReply.title : dlgComment.title}"
         .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
         .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-        action="${dlgComment.action(deletingDialogueSize)}"
-        result="${dlgComment.result(deletingDialogueSize)}"
+        action="${deletingIsReply ? dlgReply.action : dlgComment.action(deletingDialogueSize)}"
+        result="${deletingIsReply ? dlgReply.result : dlgComment.result(deletingDialogueSize)}"
         .confirmLabel="${t.common.delete}"
         .cancelLabel="${t.common.cancel}"
         @confirm="${() => {

@@ -911,6 +911,8 @@ export interface BlogComment {
   createdAt: string;
   /** Message being answered (root of the dialogue stays the top-level comment; hierarchy is one level). */
   replyToId?: string;
+  /** Optional quote of the source message; true when a reply was posted with the quote toggle on. */
+  quote?: boolean;
 }
 
 export interface BlogPost {

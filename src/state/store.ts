@@ -4130,7 +4130,8 @@ export class AppStore {
     postId: string,
     text: string,
     authorId?: string,
-    replyToId?: string
+    replyToId?: string,
+    quote?: boolean
   ): BlogComment | null {
     const trimmed = text.trim();
     if (!trimmed) return null;
@@ -4148,7 +4149,7 @@ export class AppStore {
       authorId: uid,
       text: trimmed,
       createdAt: new Date().toISOString(),
-      ...(replyTo ? { replyToId: replyTo.id } : {}),
+      ...(replyTo ? { replyToId: replyTo.id, quote: Boolean(quote) } : {}),
     };
     this.blogPosts = this.blogPosts.map((p) =>
       p.id === postId ? { ...p, comments: [...(p.comments || []), comment] } : p
@@ -4167,23 +4168,33 @@ export class AppStore {
   }
 
   public deleteBlogComment(postId: string, commentId: string): void {
-    // A top-level comment is the root of its dialogue; deleting any message of a dialogue removes the
-    // whole dialogue (the root and every message whose reply-chain leads to that root).
-    const chainRoot = (c: BlogComment): string => {
-      let cur = c;
-      const byId = new Map((this.blogPosts.find((p) => p.id === postId)?.comments || []).map((x) => [x.id, x]));
-      while (cur.replyToId && byId.has(cur.replyToId)) {
-        cur = byId.get(cur.replyToId)!;
-      }
-      return cur.id;
-    };
+    // Deleting a top-level comment removes the whole dialogue (the root and every message whose
+    // reply-chain leads to that root). Deleting a reply removes only that message; messages that
+    // answered it are re-pointed to its parent, so the dialogue closes up without losing the root.
     this.blogPosts = this.blogPosts.map((p) => {
       if (p.id !== postId) return p;
       const comments = p.comments || [];
       const target = comments.find((c) => c.id === commentId);
       if (!target) return p;
-      const rootId = chainRoot(target);
-      return { ...p, comments: comments.filter((c) => chainRoot(c) !== rootId) };
+      if (!target.replyToId) {
+        const byId = new Map(comments.map((x) => [x.id, x]));
+        const chainRoot = (c: BlogComment): string => {
+          let cur = c;
+          while (cur.replyToId && byId.has(cur.replyToId)) {
+            cur = byId.get(cur.replyToId)!;
+          }
+          return cur.id;
+        };
+        const rootId = chainRoot(target);
+        return { ...p, comments: comments.filter((c) => chainRoot(c) !== rootId) };
+      }
+      const repoint = target.replyToId;
+      return {
+        ...p,
+        comments: comments
+          .filter((c) => c.id !== commentId)
+          .map((c) => (c.replyToId === commentId ? { ...c, replyToId: repoint } : c)),
+      };
     });
     this.saveBlogPosts();
     this.notify();
