@@ -10,6 +10,15 @@ import {
 } from '../../../services/openai-client';
 import { iconBookOpen, iconCheck } from '../icons';
 import styles from './app-decompose-form.css';
+
+// details of the `saved` and `decompose-failed` events (AGENTS.md §6)
+export interface DecomposeFormSavedDetail {
+  taskIds: string[];
+}
+
+export interface DecomposeFormFailedDetail {
+  message: string;
+}
 import { eventValue } from '../event-value';
 import { mapUserOptions } from '../entity-selector-options';
 import '../app-modal/app-modal';
@@ -98,7 +107,7 @@ export class AppDecomposeForm extends LitElement {
     const targetReqs = store.requirements.filter((r) => this.requirementIds.includes(r.id));
     if (targetReqs.length === 0) {
       this.dispatchEvent(
-        new CustomEvent('decompose-failed', {
+        new CustomEvent<DecomposeFormFailedDetail>('decompose-failed', {
           detail: { message: t.viewTexts.ai.errors.missingSelectedReqs },
           bubbles: true,
           composed: true,
@@ -199,7 +208,7 @@ export class AppDecomposeForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<DecomposeFormSavedDetail>('saved', {
         detail: { taskIds: createdIds },
         bubbles: true,
         composed: true,
