@@ -17,6 +17,9 @@ export const meta: ComponentStoryMeta = {
     size: 'Control height: sm / md / lg',
     disabled: 'Disables editing and steppers',
   },
+  eventsDoc: {
+    change: { detail: '{ value: number }', description: 'Fires when the numeric value changes' },
+  },
   stories: [
     {
       name: 'Size Scale',
