@@ -37,6 +37,11 @@ import '../app-empty-state/app-empty-state';
 import '../app-status-chip/app-status-chip';
 import styles from './app-document-previewer.css';
 
+// detail of the `select-document`, `expand` and `download` events (AGENTS.md §6)
+export interface DocumentPreviewerDocumentDetail {
+  document: DocumentItem;
+}
+
 type PreviewKind = 'pdf' | 'image' | 'markdown' | 'csv' | 'json' | 'text' | 'binary';
 
 @customElement('app-document-previewer')
@@ -155,7 +160,7 @@ export class AppDocumentPreviewer extends LitElement {
 
   private emitSelectDocument(doc: DocumentItem) {
     this.dispatchEvent(
-      new CustomEvent('select-document', {
+      new CustomEvent<DocumentPreviewerDocumentDetail>('select-document', {
         detail: { document: doc },
         bubbles: true,
         composed: true,
@@ -165,7 +170,7 @@ export class AppDocumentPreviewer extends LitElement {
 
   private emitExpand(doc: DocumentItem) {
     this.dispatchEvent(
-      new CustomEvent('expand', {
+      new CustomEvent<DocumentPreviewerDocumentDetail>('expand', {
         detail: { document: doc },
         bubbles: true,
         composed: true,
@@ -469,7 +474,7 @@ export class AppDocumentPreviewer extends LitElement {
                     @click="${() => {
                       downloadDocumentFile(doc);
                       this.dispatchEvent(
-                        new CustomEvent('download', {
+                        new CustomEvent<DocumentPreviewerDocumentDetail>('download', {
                           detail: { document: doc },
                           bubbles: true,
                           composed: true,
