@@ -93,6 +93,20 @@
   word-break: break-word;
 }
 
+/* parse error banner under the RRULE field — same canon as .re-error-banner in app-recurrence-editor */
+.rrule-error {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm, 6px);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger, #ef4444);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
 .form-section {
   display: flex;
   flex-direction: column;

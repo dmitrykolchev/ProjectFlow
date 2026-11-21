@@ -23,6 +23,7 @@ import { getTranslation } from '../../../i18n';
 import styles from './app-reminder-form.css';
 import { eventValue } from '../event-value';
 import {
+  iconAlertTriangle,
   iconBell,
   iconBellRing,
   iconCalendar,
@@ -99,6 +100,7 @@ export class AppReminderForm extends LitElement {
   @state() private fSkipWeekends = false;
   @state() private fOccurrenceCount = 0;
   @state() private fRruleInput = '';
+  @state() private fRruleError = '';
 
   // the rule is picked from the directory templates, or configured individually in the same
   // app-recurrence-editor dialog used by the recurrence templates directory (app-directory-record-modal):
@@ -181,6 +183,7 @@ export class AppReminderForm extends LitElement {
 
   private initFields() {
     this.formError = '';
+    this.fRruleError = '';
     if (this.reminder) {
       const rem = this.reminder;
       const [datePart, timePart] = (rem.dueAt || '').split('T');
@@ -364,6 +367,33 @@ export class AppReminderForm extends LitElement {
     this.recurrenceDialogOpen = false;
   }
 
+  // manual typing directly in the RRULE field: raw text is parsed live, parse errors surface under the
+  // field (t.reminders.rruleErrors canon), and the template code re-matches — a rule equal to a
+  // directory template keeps its code, any other rule becomes CUSTOM; empty text resets to ONCE
+  private handleRruleInput(raw: string) {
+    this.fRruleInput = raw;
+    const trimmed = raw.trim();
+    if (!trimmed) {
+      this.fRruleError = '';
+      this.fTemplateCode = 'ONCE';
+      return;
+    }
+    const parsed = parseRRule(trimmed);
+    if (!parsed.ok) {
+      this.fRruleError = getTranslation(this.currentLang).reminders.rruleErrors[parsed.errorCode];
+      return;
+    }
+    this.fRruleError = '';
+    const canonical = serializeRRule(parsed.rule, false);
+    const matchingTpl = store.getRecurrenceTemplates().find((tpl) => {
+      const tplRaw = String(tpl.extra?.rrule || '').trim();
+      if (!tplRaw) return false;
+      const tplParsed = parseRRule(tplRaw);
+      return tplParsed.ok && serializeRRule(tplParsed.rule, false) === canonical;
+    });
+    this.fTemplateCode = matchingTpl ? matchingTpl.code : 'CUSTOM';
+  }
+
   private addAssignee(userId: string) {
     if (!userId || this.fAssigneeIds.includes(userId)) return;
     this.fAssigneeIds = [...this.fAssigneeIds, userId];
@@ -508,6 +538,15 @@ export class AppReminderForm extends LitElement {
     if (!this.fDueDate) {
       this.formError = t.common.required;
       return;
+    }
+
+    const trimmedRule = this.fRruleInput.trim();
+    if (trimmedRule) {
+      const parsedRule = parseRRule(trimmedRule);
+      if (!parsedRule.ok) {
+        this.formError = t.reminders.rruleErrors[parsedRule.errorCode];
+        return;
+      }
     }
 
     const dueAt = `${this.fDueDate}T${(this.fDueTime || '10:00').slice(0, 5)}`;
@@ -846,8 +885,9 @@ export class AppReminderForm extends LitElement {
               <app-input
                 class="rrule-display"
                 label="${t.reminders.fieldRrule}"
-                disabled
+                placeholder="${t.reminders.rruleInputPlaceholder}"
                 .value="${this.fRruleInput}"
+                @input="${(e: Event) => this.handleRruleInput(eventValue(e))}"
               ></app-input>
               <app-button
                 variant="secondary"
@@ -857,6 +897,14 @@ export class AppReminderForm extends LitElement {
                 ${t.reminders.editRecurrenceBtn}
               </app-button>
             </div>
+            ${this.fRruleError
+              ? html`
+                  <div class="rrule-error">
+                    ${iconAlertTriangle(14)}
+                    <span>${this.fRruleError}</span>
+                  </div>
+                `
+              : ''}
           </section>
 
           <!-- Section 3: Notification Rules & Policies -->
