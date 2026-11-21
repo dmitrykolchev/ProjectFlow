@@ -215,3 +215,13 @@
 :host([hidden]) {
   display: none;
 }
+
+/* native form controls do not inherit font in shadow DOM (the global
+   font-family: inherit reset in index.css reaches light DOM only) */
+.task-chip-btn {
+  font-family: var(--font-sans, inherit);
+}
+
+.attach-chip-btn {
+  font-family: var(--font-sans, inherit);
+}
