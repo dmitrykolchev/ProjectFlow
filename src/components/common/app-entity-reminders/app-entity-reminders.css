@@ -68,7 +68,10 @@
   line-height: 1.35;
 }
 
-.row-title-btn {
+.row-title-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   padding: 0;
@@ -125,7 +128,10 @@
   color: var(--border-strong, #334155);
 }
 
-.attachments-meta-btn {
+.attachments-meta-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.28rem;
