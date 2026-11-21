@@ -73,7 +73,10 @@ label {
   color: var(--text-primary, #f8fafc);
 }
 
-.tag-remove {
+.tag-remove {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: var(--text-muted, #64748b);
