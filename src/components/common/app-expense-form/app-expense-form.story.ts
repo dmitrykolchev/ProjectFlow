@@ -19,6 +19,13 @@ export const meta: ComponentStoryMeta = {
     presetUserId: 'Submitter prefilled for a context-bound opening (first user by default)',
     contextTitle: 'Modal title override for context-bound openings',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ expense: Expense }',
+      description: 'Fires after a successful save with the stored expense',
+    },
+  },
   stories: [
     {
       name: 'Create Expense',
