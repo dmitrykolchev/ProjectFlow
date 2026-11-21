@@ -349,7 +349,6 @@ export class AppCounterpartyDetail extends LitElement {
           <app-counterparty-contacts
             editable
             hide-header
-            confirm-delete
             .contacts="${cpContacts}"
             @contacts-change="${(e: CustomEvent<{ contacts: CounterpartyContact[] }>) =>
               this.handleContactsChange(cp, e.detail.contacts)}"

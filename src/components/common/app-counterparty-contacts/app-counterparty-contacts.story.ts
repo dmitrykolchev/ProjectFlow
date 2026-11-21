@@ -45,16 +45,14 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/CounterpartyContacts',
   component: 'app-counterparty-contacts',
   description:
-    'Multi-person counterparty contacts viewer and inline CRUD manager. Supports personal details (full name, job title, department, birth date), multiple communication channels (phones, email, messenger), primary contact selection, and clipboard copy.',
+    'Multi-person counterparty contacts viewer and inline CRUD manager. Supports personal details (full name, job title, department, birth date), multiple communication channels (phones, email, messenger), primary contact selection, and clipboard copy; deleting a contact always goes through app-confirm-dialog (no opt-out).',
   category: 'Common',
   propsDoc: {
     contacts: 'Array of CounterpartyContact records',
     editable: 'Enables Add / Edit / Delete / Set Primary actions',
     compact: 'Uses single-column compact layout suitable inside modal forms',
     'hide-header': 'Hides internal header when embedded inside app-section-card',
-    'confirm-delete': 'Shows app-confirm-dialog before deleting a contact',
     hideHeader: 'Hides internal header when embedded inside app-section-card (attribute form hide-header)',
-    confirmDelete: 'Shows app-confirm-dialog before deleting a contact (attribute form confirm-delete)',
     heading: 'Caption of the internal header; falls back to the localized contact-persons title when empty',
   },
   stories: [
@@ -66,7 +64,6 @@ export const meta: ComponentStoryMeta = {
         return html`
           <app-counterparty-contacts
             editable
-            confirm-delete
             .contacts="${state}"
             @contacts-change="${(e: CustomEvent<{ contacts: CounterpartyContact[] }>) => {
               state = e.detail.contacts;

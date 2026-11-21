@@ -35,7 +35,6 @@ export class AppCounterpartyContacts extends LitElement {
   @property({ type: Boolean }) editable: boolean = false;
   @property({ type: Boolean }) compact: boolean = false;
   @property({ type: Boolean, attribute: 'hide-header' }) hideHeader: boolean = false;
-  @property({ type: Boolean, attribute: 'confirm-delete' }) confirmDelete: boolean = false;
   @property({ type: String }) heading: string = '';
 
   @state() private currentLang = store.customization.language;
@@ -177,11 +176,8 @@ export class AppCounterpartyContacts extends LitElement {
   }
 
   private requestDelete(contact: CounterpartyContact) {
-    if (this.confirmDelete) {
-      this.deletingContact = contact;
-      return;
-    }
-    this.performDelete(contact.id);
+    // Deletion is destructive: the confirm dialog is mandatory, there is no opt-out.
+    this.deletingContact = contact;
   }
 
   private performDelete(id: string) {
@@ -301,29 +297,25 @@ export class AppCounterpartyContacts extends LitElement {
             : ''}
       </div>
 
-      ${this.confirmDelete
-        ? html`
-            <app-confirm-dialog
-              .open="${Boolean(this.deletingContact)}"
-              size="sm"
-              title="${t.contactPersons.deleteConfirmTitle}"
-              action="${t.contactPersons.deleteConfirmAction(this.deletingContact?.fullName || '')}"
-              result="${t.contactPersons.deleteConfirmResult}"
-              .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
-              .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
-              .cancelLabel="${t.common.cancel}"
-              .confirmLabel="${t.common.delete}"
-              @cancel="${() => (this.deletingContact = null)}"
-              @confirm="${() => {
-                if (this.deletingContact) {
-                  const id = this.deletingContact.id;
-                  this.deletingContact = null;
-                  this.performDelete(id);
-                }
-              }}"
-            ></app-confirm-dialog>
-          `
-        : ''}
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingContact)}"
+        size="sm"
+        title="${t.contactPersons.deleteConfirmTitle}"
+        action="${t.contactPersons.deleteConfirmAction(this.deletingContact?.fullName || '')}"
+        result="${t.contactPersons.deleteConfirmResult}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingContact = null)}"
+        @confirm="${() => {
+          if (this.deletingContact) {
+            const id = this.deletingContact.id;
+            this.deletingContact = null;
+            this.performDelete(id);
+          }
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 

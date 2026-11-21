@@ -392,7 +392,7 @@ A two-column grid of context source chips with an inner scrollbar. items carries
 
 `src/components/common/app-counterparty-contacts/`
 
-Multi-person counterparty contacts viewer and inline CRUD manager. Supports personal details (full name, job title, department, birth date), multiple communication channels (phones, email, messenger), primary contact selection, and clipboard copy.
+Multi-person counterparty contacts viewer and inline CRUD manager. Supports personal details (full name, job title, department, birth date), multiple communication channels (phones, email, messenger), primary contact selection, and clipboard copy; deleting a contact always goes through app-confirm-dialog (no opt-out).
 
 | Property | Type / default | Description |
 |---|---|---|
@@ -400,9 +400,7 @@ Multi-person counterparty contacts viewer and inline CRUD manager. Supports pers
 | `editable` | Boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
-| `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting a contact |
 | `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
-| `confirmDelete` | Boolean, default `false` | Shows app-confirm-dialog before deleting a contact (attribute form confirm-delete) |
 | `heading` | String, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
 
 **Events:** `contacts-change`
