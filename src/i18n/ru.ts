@@ -3804,6 +3804,8 @@ export const ru = {
       thStatus: 'Статус',
       modalTitleCreate: 'Новая статья в блог (Markdown)',
       modalTitleEdit: 'Редактирование статьи',
+      tabBasic: 'Основные',
+      tabContent: 'Текст статьи',
       modeWrite: 'Редактор',
       modeSplit: 'Редактор + Превью',
       modePreview: 'Просмотр',

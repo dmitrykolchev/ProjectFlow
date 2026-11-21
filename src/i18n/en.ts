@@ -3804,6 +3804,8 @@ export const en = {
       thStatus: 'Status',
       modalTitleCreate: 'New Blog Article (Markdown)',
       modalTitleEdit: 'Edit Blog Article',
+      tabBasic: 'Basics',
+      tabContent: 'Article Body',
       modeWrite: 'Write',
       modeSplit: 'Split View',
       modePreview: 'Preview',

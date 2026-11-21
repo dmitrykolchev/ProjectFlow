@@ -96,6 +96,8 @@ export class AppBlog extends LitElement {
   @state() private modalOpen = false;
   @state() private editingPostId: string | null = null;
   @state() private editorMode: BlogEditorMode = 'split';
+  // section tabs of the post editor modal: basic requisites vs text + preview
+  @state() private activeSection: 'basic' | 'content' = 'basic';
   @state() private formTitle = '';
   @state() private formSubtitle = '';
   @state() private formContent = '';
@@ -241,6 +243,7 @@ export class AppBlog extends LitElement {
     const t = getTranslation(this.currentLang).viewTexts.blog;
     this.editingPostId = null;
     this.editorMode = 'split';
+    this.activeSection = 'basic';
     this.formTitle = '';
     this.formSubtitle = '';
     this.formContent = t.defaultTemplate;
@@ -257,6 +260,7 @@ export class AppBlog extends LitElement {
   private openEditModal(post: BlogPost) {
     this.editingPostId = post.id;
     this.editorMode = 'split';
+    this.activeSection = 'basic';
     this.formTitle = post.title;
     this.formSubtitle = post.subtitle;
     this.formContent = post.content;
@@ -1257,7 +1261,18 @@ export class AppBlog extends LitElement {
         @close="${() => (this.modalOpen = false)}"
       >
         <div class="modal-form">
-          <app-form-grid columns="2">
+          <app-tabs
+            size="md"
+            .active="${this.activeSection}"
+            @tab-change="${(e: CustomEvent) => (this.activeSection = e.detail.value)}"
+          >
+            <app-tab-item value="basic"><span>${b.tabBasic}</span></app-tab-item>
+            <app-tab-item value="content"><span>${b.tabContent}</span></app-tab-item>
+          </app-tabs>
+
+          ${this.activeSection === 'basic'
+            ? html`
+                <app-form-grid columns="2">
             <app-input
               class="col-span-2"
               required
@@ -1320,9 +1335,10 @@ export class AppBlog extends LitElement {
               @change="${(e: CustomEvent<{ checked: boolean }>) =>
                 (this.formFeatured = e.detail.checked)}"
             ></app-switch>
-          </app-form-grid>
-
-          <div class="studio-bar">
+                </app-form-grid>
+              `
+            : html`
+                <div class="studio-bar">
             <app-segmented-switch
               size="sm"
               .value="${this.editorMode}"
@@ -1379,6 +1395,7 @@ export class AppBlog extends LitElement {
                     : html`<div class="md-preview-empty">${b.previewEmpty}</div>`}
                 </div>
               `}
+            `}
           ${this.formError ? html`<div class="form-error">${this.formError}</div>` : ''}
         </div>
 
