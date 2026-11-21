@@ -27,6 +27,12 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Item is not clickable',
     icon: 'Leading icon (SVG template)',
   },
+  eventsDoc: {
+    'sidebar-select': {
+      detail: '{ value: string, label: string }',
+      description: 'Fires when the item is clicked',
+    },
+  },
   stories: [
     {
       name: 'States & Badges',
