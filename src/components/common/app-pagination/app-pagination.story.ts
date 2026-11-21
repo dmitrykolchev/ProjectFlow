@@ -20,6 +20,16 @@ export const meta: ComponentStoryMeta = {
     showSummary: 'Shows the "records x–y of z" summary',
     locale: 'Locale used for number formatting (defaults to UI language)',
   },
+  eventsDoc: {
+    'page-change': {
+      detail: '{ page: number }',
+      description: 'Fires when the page changes',
+    },
+    'page-size-change': {
+      detail: '{ pageSize: number, layoutMode: PaginationLayoutMode }',
+      description: 'Fires when the page size changes',
+    },
+  },
   stories: [
     {
       name: 'Table Mode',
