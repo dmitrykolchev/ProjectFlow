@@ -17,6 +17,9 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Disables interaction',
     label: 'Text next to the box',
   },
+  eventsDoc: {
+    change: { detail: '{ checked: boolean }', description: 'Fires when the box is toggled' },
+  },
   stories: [
     {
       name: 'States',
