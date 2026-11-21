@@ -30,6 +30,16 @@ import '../../common/app-checkbox/app-checkbox';
 import '../../common/app-otp-input/app-otp-input';
 import styles from './app-auth.css';
 
+// detail of the `auth-success` event (named event-detail interface, AGENTS.md §6)
+export interface AuthSuccessDetail {
+  userId: string;
+  email: string;
+  provider: AuthProviderId;
+  tenantId?: string;
+  twoFactorVerified: boolean;
+  trustedDevice: boolean;
+}
+
 export type AuthScreenStep = 'login' | 'register' | 'forgot' | '2fa';
 
 interface PendingTwoFactorState {
@@ -182,14 +192,7 @@ export class AppAuth extends LitElement {
     }
   }
 
-  private finishSession(payload: {
-    userId: string;
-    email: string;
-    provider: AuthProviderId;
-    tenantId?: string;
-    twoFactorVerified: boolean;
-    trustedDevice: boolean;
-  }) {
+  private finishSession(payload: AuthSuccessDetail) {
     const t = getTranslation(this.currentLang);
     const providerLabel = t.viewTexts.auth.providers[payload.provider];
     const user = store.users.find((u) => u.id === payload.userId);
@@ -202,7 +205,7 @@ export class AppAuth extends LitElement {
         method: providerLabel,
       };
       this.dispatchEvent(
-        new CustomEvent('auth-success', {
+        new CustomEvent<AuthSuccessDetail>('auth-success', {
           detail: payload,
           bubbles: true,
           composed: true,
