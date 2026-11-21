@@ -19,6 +19,16 @@ export const meta: ComponentStoryMeta = {
     expenses: 'Expense records',
     users: 'User records (team workload)',
   },
+  eventsDoc: {
+    'project-change': {
+      detail: '{ projectId: string }',
+      description: 'Fires when the selected project changes',
+    },
+    'open-project': {
+      detail: '{ projectId: string }',
+      description: 'Fires when a project card is opened',
+    },
+  },
   stories: [
     {
       name: 'Single Project Overview (Core Platform)',
