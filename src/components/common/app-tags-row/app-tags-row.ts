@@ -6,6 +6,11 @@ import { iconCheck, iconX } from '../icons';
 import { DeclarativeOption, optionsFromElements } from '../app-option/app-option';
 import styles from './app-tags-row.css';
 
+// detail of the `tag-add` and `tag-remove` events (AGENTS.md §6)
+export interface TagsRowTagDetail {
+  tag: string;
+}
+
 /**
  * Canonical tags row for document cards, preview bars and readonly displays.
  * The component owns the chip list, the inline add form draft and the add button
@@ -47,7 +52,7 @@ export class AppTagsRow extends LitElement {
     const tag = this.draft.trim();
     if (!tag) return;
     this.dispatchEvent(
-      new CustomEvent('tag-add', { detail: { tag }, bubbles: true, composed: true })
+      new CustomEvent<TagsRowTagDetail>('tag-add', { detail: { tag }, bubbles: true, composed: true })
     );
     this.draft = '';
     if (this.mode === 'add-button') this.addFormOpen = false;
@@ -55,7 +60,7 @@ export class AppTagsRow extends LitElement {
 
   private removeTag(tag: string) {
     this.dispatchEvent(
-      new CustomEvent('tag-remove', { detail: { tag }, bubbles: true, composed: true })
+      new CustomEvent<TagsRowTagDetail>('tag-remove', { detail: { tag }, bubbles: true, composed: true })
     );
   }
 
