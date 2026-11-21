@@ -137,7 +137,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-status-chip` | common | Common | Domain-driven status chip: resolves label and badge variant from central STATUS_TOKENS re… |
 | `app-switch` | common | Inputs | Toggle switch for boolean settings and feature flags. |
 | `app-table-column` | common | — | Declarative column config child of app-table-scroll: field / label / type (text, number, … |
-| `app-table-scroll` | common | — | — |
+| `app-table-scroll` | common | Common | Scrollable table shell with sticky sortable headers, zebra striping, inactive-row dimming… |
 | `app-tags-row` | common | Elements | Canonical tags row for document cards, preview bars and readonly displays. |
 | `app-task-ai-panel` | common | Common | Панель AI-ассистента для задач: автоматический подбор контекста из Базы знаний и Библиоте… |
 | `app-task-modal` | common | Overlays | Comprehensive task creation and editing modal dialog with subtasks, dates, and assignees. |
@@ -203,7 +203,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 
 ## 4. Группа `common` (87)
 
-### Common (51)
+### Common (52)
 
 #### `app-analysis-summary` — `AppAnalysisSummary`
 
@@ -1117,6 +1117,27 @@ Domain-driven status chip: resolves label and badge variant from central STATUS_
 | `appearance` | String, default `'soft'` | Rendering style: soft fill / solid / outline |
 | `dot` | Boolean, default `false` | Shows a leading status dot |
 
+#### `app-table-scroll` — `AppTableScroll`
+
+`src/components/common/app-table-scroll/`
+
+Scrollable table shell with sticky sortable headers, zebra striping, inactive-row dimming and a compact empty state; columns are declared as child app-table-column elements.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `rows` | Record<string, unknown>[], default `[]` | Array of row objects rendered by the table |
+| `sort-by` | String, default `''` | Field name currently used for sorting (arrow shown on its header) |
+| `sort-dir` | String, default `'asc'` | Current sort direction: asc / desc |
+| `active-key` | String, default `'isActive'` | Row property holding the active flag; falsy rows render as is-inactive |
+| `empty-title` | String, default `''` | Title passed to the compact empty state when rows is empty |
+| `sortBy` | String, default `''` | Field name currently used for sorting (attribute form sort-by; arrow shown on its header) |
+| `sortDir` | String, default `'asc'` | Current sort direction asc / desc (attribute form sort-dir) |
+| `activeKey` | String, default `'isActive'` | Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive |
+| `emptyTitle` | String, default `''` | Title passed to the compact empty state when rows is empty (attribute form empty-title) |
+| `locale` | String, default `'ru-RU'` | Locale used for number formatting (t.common.locale) |
+| `striped` | Boolean, default `false` | Enables alternating row background coloring (zebra striping) |
+| `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
+
 #### `app-task-ai-panel` — `AppTaskAiPanel`
 
 `src/components/common/app-task-ai-panel/`
@@ -1824,7 +1845,7 @@ Automated floating notification stack with auto-dismiss and status colors.
 |---|---|---|
 | `notifications` | — | Notification queue rendered as stacked toasts (type, title, message) |
 
-### Other (3)
+### Other (2)
 
 #### `app-data-table` — `AppDataTable`
 
@@ -1875,25 +1896,6 @@ Declarative column config child of app-table-scroll: field / label / type (text,
 | `valueFn` | String | Custom value extractor (row) => unknown, replacing the plain row[field] read |
 
 **Events:** `column-change`
-
-#### `app-table-scroll` — `AppTableScroll`
-
-`src/components/common/app-table-scroll/`
-
-| Property | Type / default | Description |
-|---|---|---|
-| `rows` | Record<string, unknown>[], default `[]` | Array of row objects rendered by the table |
-| `sort-by` | String, default `''` | Field name currently used for sorting (arrow shown on its header) |
-| `sort-dir` | String, default `'asc'` | Current sort direction: asc / desc |
-| `active-key` | String, default `'isActive'` | Row property holding the active flag; falsy rows render as is-inactive |
-| `empty-title` | String, default `''` | Title passed to the compact empty state when rows is empty |
-| `sortBy` | String, default `''` | Field name currently used for sorting (attribute form sort-by; arrow shown on its header) |
-| `sortDir` | String, default `'asc'` | Current sort direction asc / desc (attribute form sort-dir) |
-| `activeKey` | String, default `'isActive'` | Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive |
-| `emptyTitle` | String, default `''` | Title passed to the compact empty state when rows is empty (attribute form empty-title) |
-| `locale` | String, default `'ru-RU'` | Locale used for number formatting (t.common.locale) |
-| `striped` | Boolean, default `false` | Enables alternating row background coloring (zebra striping) |
-| `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
 
 ## 5. Группа `layout` (4)
 

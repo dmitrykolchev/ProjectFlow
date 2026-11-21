@@ -6411,8 +6411,8 @@
   "cls": "AppTableScroll",
   "hasStory": true,
   "title": "Common/TableScroll",
-  "category": "",
-  "desc": "",
+  "category": "Common",
+  "desc": "Scrollable table shell with sticky sortable headers, zebra striping, inactive-row dimming and a compact empty state; columns are declared as child app-table-column elements.",
   "propsList": [
    {
     "name": "rows",

@@ -8,8 +8,8 @@ import '../app-table-column/app-table-column';
 type DemoRecord = {
   code: string;
   name: string;
-  description: string;
-  category: string;
+  notes: string;
+  kind: string;
   billable: boolean;
   rate: number;
   isActive: boolean;
@@ -19,8 +19,8 @@ const demoRecords: DemoRecord[] = [
   {
     code: 'DEV',
     name: 'Development',
-    description: 'Feature and component implementation work',
-    category: 'engineering',
+    notes: 'Feature and component implementation work',
+    kind: 'engineering',
     billable: true,
     rate: 1200,
     isActive: true,
@@ -28,8 +28,8 @@ const demoRecords: DemoRecord[] = [
   {
     code: 'PM',
     name: 'Project Management',
-    description: 'Planning, tracking and reporting',
-    category: 'management',
+    notes: 'Planning, tracking and reporting',
+    kind: 'management',
     billable: true,
     rate: 950,
     isActive: true,
@@ -37,8 +37,8 @@ const demoRecords: DemoRecord[] = [
   {
     code: 'QA',
     name: 'Quality Assurance',
-    description: 'Testing and acceptance of deliverables',
-    category: 'engineering',
+    notes: 'Testing and acceptance of deliverables',
+    kind: 'engineering',
     billable: true,
     rate: 850,
     isActive: true,
@@ -46,8 +46,8 @@ const demoRecords: DemoRecord[] = [
   {
     code: 'OPS',
     name: 'Operations Support',
-    description: 'Production monitoring and maintenance',
-    category: 'operations',
+    notes: 'Production monitoring and maintenance',
+    kind: 'operations',
     billable: false,
     rate: 700,
     isActive: true,
@@ -55,8 +55,8 @@ const demoRecords: DemoRecord[] = [
   {
     code: 'ARCH',
     name: 'Legacy Architecture Review',
-    description: 'Retired audit activity, kept for history',
-    category: 'management',
+    notes: 'Retired audit activity, kept for history',
+    kind: 'management',
     billable: false,
     rate: 600,
     isActive: false,
@@ -73,7 +73,7 @@ function renderNameCell(row: Record<string, unknown>): TemplateResult {
   const rec = row as unknown as DemoRecord;
   return html`
     <div class="cell-name-main">${rec.name}</div>
-    ${rec.description ? html`<div class="cell-name-desc">${rec.description}</div>` : ''}
+    ${rec.notes ? html`<div class="cell-name-desc">${rec.notes}</div>` : ''}
   `;
 }
 
@@ -161,7 +161,7 @@ export const meta: ComponentStoryMeta = {
               .cellRender="${renderNameCell}"
             ></app-table-column>
             <app-table-column
-              field="category"
+              field="kind"
               label="Category"
               type="select"
               .options="${categoryOptions}"
