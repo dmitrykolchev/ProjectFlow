@@ -632,6 +632,15 @@ export class AppBlog extends LitElement {
 
           <div slot="end" class="blog-footer-stats">
             <app-button
+              action="view"
+              size="sm"
+              variant="icon"
+              title="${b.readArticleBtn}"
+              @click="${() => store.selectBlogPost(post.id)}"
+            >
+              <span slot="start">${iconChevronRight(15)}</span>
+            </app-button>
+            <app-button
               size="sm"
               variant="icon"
               title="${t.common.edit}"
@@ -647,15 +656,6 @@ export class AppBlog extends LitElement {
               @click="${() => (this.deletingPost = post)}"
             >
               <span slot="start">${iconTrash(14)}</span>
-            </app-button>
-            <app-button
-              action="view"
-              size="sm"
-              variant="icon"
-              title="${b.readArticleBtn}"
-              @click="${() => store.selectBlogPost(post.id)}"
-            >
-              <span slot="start">${iconChevronRight(15)}</span>
             </app-button>
           </div>
         </card-footer>
