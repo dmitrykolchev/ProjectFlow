@@ -23,6 +23,8 @@ export const meta: ComponentStoryMeta = {
     variant: 'Visual style: primary, secondary, danger',
     size: 'Font scale sm / md / lg from the canonical control tokens',
     disabled: 'Blocks activation and dims the link',
+    ariaLabel: 'Accessible name (aria-label); falls back to title when empty',
+    active: "Segmented pill state: fills the link with the --link-active-bg hook. Default false keeps every existing consumer pixel-identical",
   },
   stories: [
     {

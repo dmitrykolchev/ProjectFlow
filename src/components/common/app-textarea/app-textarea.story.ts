@@ -16,6 +16,7 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Disables editing',
     error: 'Error message; renders the field in danger state',
     maxlength: 'Maximum character count (0 = unlimited); shows a counter when set',
+    monospace: 'Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values',
   },
   stories: [
     {

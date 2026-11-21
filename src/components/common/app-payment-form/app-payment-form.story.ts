@@ -18,6 +18,7 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     open: 'Opens the form modal (rendered through the portal)',
     invoice: 'Optional target invoice the payment is recorded against',
+    payment: 'Existing InvoicePayment to edit (attribute: false, property binding only); null opens the create form',
     payableInvoices: 'Invoices the target selector may switch between',
     defaultDirection: 'Initial direction for standalone payments (incoming | outgoing)',
     defaultCompanyId: 'Initial company ID for standalone payments',

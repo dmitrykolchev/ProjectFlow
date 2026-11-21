@@ -19,6 +19,8 @@ export const meta: ComponentStoryMeta = {
     showOverflowTooltip: 'Native tooltip with the full text on truncated lines (default true)',
     color: 'Background of the initials tile',
     ariaLabel: 'Accessible name override',
+    interactive: 'Renders the persona as a focusable ghost button (default true) so consumers bind @click / persona-click on the host; false renders plain markup',
+    personaDisabled: "Dims the persona and disables its button (attribute persona-disabled); the persona-click event is not dispatched",
   },
   stories: [
     {

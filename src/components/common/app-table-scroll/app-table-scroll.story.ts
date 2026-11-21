@@ -129,7 +129,7 @@ export const meta: ComponentStoryMeta = {
   title: 'Common/TableScroll',
   component: 'app-table-scroll',
   description:
-    'Lightweight scrollable table with sticky sortable headers, field-driven cell formatting (text/number/boolean/select), mono and code cells, inactive row dimming, custom render columns and empty state. Columns are declared as child app-table-column elements.',
+    'Scrollable table shell with sticky sortable headers, zebra striping, inactive-row dimming and a compact empty state; columns are declared as child app-table-column elements.',
   category: 'Common',
   propsDoc: {
     rows: 'Array of row objects rendered by the table',

@@ -24,6 +24,7 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     title: 'Section caption',
     subtitle: 'Secondary line under the caption',
+    ariaLabel: 'Accessible name for the section region (aria-label); falls back to title when empty',
     variant: 'Surface style: default / plain / elevated',
     collapsible: 'Enables collapse toggle in the header',
     collapsed: 'Current collapsed state (only for collapsible sections)',
