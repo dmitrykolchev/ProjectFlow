@@ -17,6 +17,13 @@ export const meta: ComponentStoryMeta = {
     showContractSelect: 'Show the contract picker (list view openings)',
     contextTitle: 'Modal title override for context-bound openings',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ calculation: Calculation }',
+      description: 'Fires after a successful save with the stored calculation',
+    },
+  },
   stories: [
     {
       name: 'Create Calculation',
