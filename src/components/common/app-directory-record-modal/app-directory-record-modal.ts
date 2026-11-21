@@ -336,11 +336,42 @@ export class AppDirectoryRecordModal extends LitElement {
     );
   }
 
-  private renderExtraField(field: DirectoryFieldDef, t: TranslationType) {
+  // Fields fill the two-column form grid in order; a field that starts a fresh row and is the last
+  // child of the grid has no neighbour in its row, so it needs no ghost label row and no frame.
+  private fieldGridSpan(field: DirectoryFieldDef): 1 | 2 {
+    return this.directory?.id === 'recurrence_templates' && field.key === 'rrule' ? 2 : 1;
+  }
+
+  private lastAloneField(fields: DirectoryFieldDef[]): boolean {
+    let cursor = 0;
+    for (let i = 0; i < fields.length; i++) {
+      const span = this.fieldGridSpan(fields[i]);
+      const startsRow = cursor === 0;
+      if (i === fields.length - 1) return startsRow;
+      cursor = startsRow ? span % 2 : (cursor + span) % 2;
+    }
+    return false;
+  }
+
+  private renderExtraField(field: DirectoryFieldDef, t: TranslationType, lastAlone: boolean) {
     const label = this.getFieldLabel(field, t);
     const val = this.formExtra[field.key];
 
     if (field.type === 'boolean') {
+      // a lone switch in the last row carries its own caption: no ghost label row, no frame
+      if (lastAlone) {
+        return html`
+          <app-switch
+            size="md"
+            frame="none"
+            field-label-style="none"
+            label="${label}"
+            .checked="${Boolean(val)}"
+            @change="${(e: CustomEvent<{ checked: boolean }>) =>
+              this.updateExtra(field.key, Boolean(e.detail?.checked))}"
+          ></app-switch>
+        `;
+      }
       return html`
         <app-switch
           size="md"
@@ -427,6 +458,7 @@ export class AppDirectoryRecordModal extends LitElement {
   render() {
     const t = getTranslation(this.currentLang);
     const dir = this.directory;
+    const lastAlone = dir ? this.lastAloneField(dir.fields) : false;
     const dirName = this.getDirectoryDisplayName(t);
     const title = this.record
       ? t.viewTexts.directories.recordModalTitleEdit(dirName)
@@ -526,7 +558,9 @@ export class AppDirectoryRecordModal extends LitElement {
                 <div class="col-span-2 modal-section-heading">
                   ${t.viewTexts.directories.extendedSectionTitle}
                 </div>
-                ${dir.fields.map((field) => this.renderExtraField(field, t))}
+                ${dir.fields.map((field, i) =>
+                  this.renderExtraField(field, t, lastAlone && i === dir.fields.length - 1)
+                )}
               `
             : ''}
           ${this.formError
