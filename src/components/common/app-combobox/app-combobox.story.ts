@@ -24,6 +24,12 @@ export const meta: ComponentStoryMeta = {
     allowCustom: 'Typing a new value offers "+ Add" to create it',
     size: "Control size scale sm|md|lg (30/38/44px min-heights, md default)",
   },
+  eventsDoc: {
+    change: {
+      detail: '{ selected: string[] }',
+      description: 'Fires when the selection changes; carries all selected values',
+    },
+  },
   stories: [
     {
       name: 'Declarative Options',
