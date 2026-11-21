@@ -55,13 +55,12 @@
   flex-wrap: wrap;
 }
 
-/* header icon action is an app-button web component at size xs pinned to the historical
-   34px square with the canonical md radius; the historical surface fill and subtle border
-   are reproduced through custom properties, plain hover keeps the border unchanged, and
-   the delete button declares action="delete" and the component supplies the danger
-   hover palette */
+/* header icon action is an app-button web component: the header row is an sm toolbar, so the
+   trailing icon-only delete button renders at the canonical sm step; the historical surface fill and
+   subtle border are reproduced through custom properties, plain hover keeps the border unchanged,
+   and the delete button declares action="delete" and the component supplies the danger hover
+   palette */
 .nav-actions app-button {
-  --control-height-xs: 34px;
   --icon-btn-bg: var(--bg-surface, #111827);
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
