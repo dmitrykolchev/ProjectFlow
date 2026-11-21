@@ -54,7 +54,10 @@
   border: 1px solid var(--border-subtle, #334155);
 }
 
-.mode-btn {
+.mode-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: var(--text-secondary, #94a3b8);
@@ -340,7 +343,10 @@
   color: var(--text-muted, #64748b);
 }
 
-.week-add-btn {
+.week-add-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 22px;
   height: 22px;
   border-radius: var(--radius-sm, 4px);
