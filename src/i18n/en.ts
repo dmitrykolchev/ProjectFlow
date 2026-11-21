@@ -3819,7 +3819,6 @@ export const en = {
       fieldTags: 'Tags (comma-separated)',
       fieldTagsPlaceholder: 'Frontend, Lit, Architecture, Postmortem...',
       fieldFeatured: 'Pin to Featured Picks',
-      fieldMarkdownContent: 'Article Body (Markdown)',
       fieldMarkdownPlaceholder: '## Introduction\n\nWrite in Markdown: **bold**, *italic*, `code`, tables, lists, blockquotes, and checklists...',
       toolbarH2: 'H2',
       toolbarH3: 'H3',

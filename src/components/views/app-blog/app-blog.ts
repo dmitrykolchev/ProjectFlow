@@ -1348,7 +1348,6 @@ export class AppBlog extends LitElement {
                     rows="16"
                     monospace
                     required
-                    label="${b.fieldMarkdownContent}"
                     placeholder="${b.fieldMarkdownPlaceholder}"
                     .value="${this.formContent}"
                     @input="${(e: CustomEvent) => (this.formContent = eventValue(e))}"
@@ -1368,7 +1367,6 @@ export class AppBlog extends LitElement {
                   rows="16"
                   monospace
                   required
-                  label="${b.fieldMarkdownContent}"
                   placeholder="${b.fieldMarkdownPlaceholder}"
                   .value="${this.formContent}"
                   @input="${(e: CustomEvent) => (this.formContent = eventValue(e))}"

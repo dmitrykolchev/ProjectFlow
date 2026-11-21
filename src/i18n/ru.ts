@@ -3819,7 +3819,6 @@ export const ru = {
       fieldTags: 'Теги (через запятую)',
       fieldTagsPlaceholder: 'Frontend, Lit, Architecture, Postmortem...',
       fieldFeatured: 'Закрепить в подборке «Выбор редакции»',
-      fieldMarkdownContent: 'Текст статьи (Markdown)',
       fieldMarkdownPlaceholder: '## Введение\n\nПишите текст статьи на Markdown: **жирный**, *курсив*, `код`, таблицы, списки, цитаты и чек-листы...',
       toolbarH2: 'H2',
       toolbarH3: 'H3',
