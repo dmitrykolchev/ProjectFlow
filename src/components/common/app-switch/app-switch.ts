@@ -2,6 +2,11 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-switch.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface SwitchChangeDetail {
+  checked: boolean;
+}
+
 // canonical frame and label-row variants (docs/ComponentApiSpecs.md, Priority E); the defaults keep
 // every existing consumer pixel-identical: frame none = the bare switch, field-label-style none = no
 // external label row, and the caption behaviour of the control itself (the label property text next to
@@ -64,7 +69,7 @@ export class AppSwitch extends LitElement {
     if (this.disabled) return;
     this.checked = !this.checked;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<SwitchChangeDetail>('change', {
         detail: { checked: this.checked },
         bubbles: true,
         composed: true,
