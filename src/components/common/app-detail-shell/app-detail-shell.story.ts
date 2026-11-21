@@ -187,6 +187,13 @@ export const meta: ComponentStoryMeta = {
     'app-section-card': 'Panel below the overview card',
     'app-entity-emblem': 'Emblem pill inside the hero meta row',
   },
+  eventsDoc: {
+    'detail-back': { detail: '—', description: 'Fires when the back button is pressed' },
+    'entity-switch': {
+      detail: '{ value: string }',
+      description: 'Fires when the entity switcher picks a target',
+    },
+  },
   stories: [
     {
       name: 'Expense Detail Skeleton',
