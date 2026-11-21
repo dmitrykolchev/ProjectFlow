@@ -763,15 +763,6 @@ export class AppDirectories extends LitElement {
                 <app-button
                   size="sm"
                   variant="icon"
-                  action="delete"
-                  title="${t.viewTexts.directories.actionDelete}"
-                  @click="${() => (this.confirmDeleteRecord = rec)}"
-                >
-                  <span slot="start">${iconTrash(15)}</span>
-                </app-button>
-                <app-button
-                  size="sm"
-                  variant="icon"
                   title="${t.viewTexts.directories.actionDuplicate}"
                   @click="${() => this.handleDuplicateRecord(dir, rec, t)}"
                 >
@@ -785,6 +776,15 @@ export class AppDirectories extends LitElement {
                   @click="${() => this.openEditRecordModal(rec)}"
                 >
                   <span slot="start">${iconEdit(15)}</span>
+                </app-button>
+                <app-button
+                  size="sm"
+                  variant="icon"
+                  action="delete"
+                  title="${t.viewTexts.directories.actionDelete}"
+                  @click="${() => (this.confirmDeleteRecord = rec)}"
+                >
+                  <span slot="start">${iconTrash(15)}</span>
                 </app-button>
               </div>
             `;
