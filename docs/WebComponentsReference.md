@@ -664,10 +664,10 @@ Material Symbols ligature icon (self-hosted variable font) with Google axes fill
 
 | Property | Type / default | Description |
 |---|---|---|
-| `fill` | Number, default `0` | — |
-| `weight` | Number, default `400` | — |
-| `grade` | Number, default `0` | — |
-| `decorative` | Boolean, default `false` | — |
+| `fill` | Number, default `0` | Google FILL axis: 0 (outline) or 1 (filled) |
+| `weight` | Number, default `400` | Google wght axis: 100..700 stroke weight (default 400) |
+| `grade` | Number, default `0` | Google GRAD axis: -50..200 optical grade — thicker glyphs at larger sizes |
+| `decorative` | Boolean, default `false` | Marks the glyph as decoration: aria-hidden, role=presentation, no accessible name from the ligature |
 
 #### `app-material-icon-gallery` — `AppMaterialIconGallery`
 

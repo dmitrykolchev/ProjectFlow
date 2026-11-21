@@ -8,6 +8,12 @@ export const meta: ComponentStoryMeta = {
   description:
     'Material Symbols ligature icon (self-hosted variable font) with Google axes fill/weight/grade, family style, app size scale, and status color variants.',
   category: 'Common',
+  propsDoc: {
+    fill: 'Google FILL axis: 0 (outline) or 1 (filled)',
+    weight: 'Google wght axis: 100..700 stroke weight (default 400)',
+    grade: 'Google GRAD axis: -50..200 optical grade — thicker glyphs at larger sizes',
+    decorative: 'Marks the glyph as decoration: aria-hidden, role=presentation, no accessible name from the ligature',
+  },
   stories: [
     {
       name: 'Size Scale',

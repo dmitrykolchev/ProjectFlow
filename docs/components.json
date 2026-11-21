@@ -3604,7 +3604,24 @@
    }
   ],
   "events": [],
-  "propsDoc": [],
+  "propsDoc": [
+   {
+    "k": "fill",
+    "v": "Google FILL axis: 0 (outline) or 1 (filled)"
+   },
+   {
+    "k": "weight",
+    "v": "Google wght axis: 100..700 stroke weight (default 400)"
+   },
+   {
+    "k": "grade",
+    "v": "Google GRAD axis: -50..200 optical grade — thicker glyphs at larger sizes"
+   },
+   {
+    "k": "decorative",
+    "v": "Marks the glyph as decoration: aria-hidden, role=presentation, no accessible name from the ligature"
+   }
+  ],
   "slotsDoc": [],
   "childrenDoc": []
  },
