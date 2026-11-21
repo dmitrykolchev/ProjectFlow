@@ -15,6 +15,15 @@ export type SlotsDoc = Record<string, string>;
 /** Child components usable inside the component, keyed by tag name with an English description. */
 export type ChildrenDoc = Record<string, string>;
 
+/** One dispatched event: the CustomEvent detail shape (or "—" when there is no detail) and its English description. */
+export interface EventDoc {
+  detail: string;
+  description: string;
+}
+
+/** Per-event documentation keyed by event name (developer documentation). */
+export type EventsDoc = Record<string, EventDoc>;
+
 export interface ComponentStoryMeta {
   title: string;
   component: string;
@@ -32,4 +41,5 @@ export interface ComponentStoryMeta {
   propsDoc?: PropsDoc;
   slotsDoc?: SlotsDoc;
   childrenDoc?: ChildrenDoc;
+  eventsDoc?: EventsDoc;
 }

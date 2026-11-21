@@ -602,6 +602,32 @@ export class AppStorybook extends LitElement {
               </table>
             `}
 
+        ${meta.eventsDoc && Object.keys(meta.eventsDoc).length > 0
+          ? html`
+              <h4 class="sb-subsection-title">${t.viewTexts.storybook.eventsTitle}</h4>
+              <table class="sb-props-table">
+                <thead>
+                  <tr>
+                    <th>${t.viewTexts.storybook.thEvent}</th>
+                    <th>${t.viewTexts.storybook.thDetail}</th>
+                    <th>${t.viewTexts.storybook.thDescription}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${Object.entries(meta.eventsDoc).map(
+                    ([name, ev]) => html`
+                      <tr>
+                        <td><span class="sb-prop-name">${name}</span></td>
+                        <td><code class="sb-prop-default">${ev.detail}</code></td>
+                        <td>${ev.description}</td>
+                      </tr>
+                    `,
+                  )}
+                </tbody>
+              </table>
+            `
+          : ''}
+
         ${(() => {
           const slots = getComponentSlots(meta.component);
           const slotDoc = meta.slotsDoc || {};
