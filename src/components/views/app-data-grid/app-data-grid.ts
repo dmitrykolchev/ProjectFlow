@@ -7,6 +7,17 @@ import { effectivePresence } from '../../../domain/presence-tokens';
 import '../../common/app-persona/app-persona';
 import '../../common/app-progress-bar/app-progress-bar';
 import styles from './app-data-grid.css';
+
+// details of the `row-click` and `selection-change` events (AGENTS.md §6)
+export interface DataGridRowClickDetail {
+  row: Record<string, unknown>;
+  id: string;
+}
+
+export interface DataGridSelectionChangeDetail {
+  selectedIds: string[];
+  selectedRows: Record<string, unknown>[];
+}
 import {
   iconDownload,
   iconTrash,
@@ -1744,7 +1755,7 @@ export class AppDataGrid extends LitElement {
     });
     if (isInteractive) return;
     this.dispatchEvent(
-      new CustomEvent('row-click', {
+      new CustomEvent<DataGridRowClickDetail>('row-click', {
         detail: { row, id: rowId },
         bubbles: true,
         composed: true,
@@ -1757,8 +1768,8 @@ export class AppDataGrid extends LitElement {
       store.openTaskDetail(task.id);
     } else {
       this.dispatchEvent(
-        new CustomEvent('row-click', {
-          detail: { row: task, id: this.getRowId(task as unknown as Record<string, unknown>) },
+        new CustomEvent<DataGridRowClickDetail>('row-click', {
+          detail: { row: task as unknown as Record<string, unknown>, id: this.getRowId(task as unknown as Record<string, unknown>) },
           bubbles: true,
           composed: true,
         })
@@ -1772,7 +1783,7 @@ export class AppDataGrid extends LitElement {
       this.selectedIds.has(this.getRowId(r, i))
     );
     this.dispatchEvent(
-      new CustomEvent('selection-change', {
+      new CustomEvent<DataGridSelectionChangeDetail>('selection-change', {
         detail: { selectedIds, selectedRows },
         bubbles: true,
         composed: true,
