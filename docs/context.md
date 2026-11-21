@@ -7,8 +7,9 @@
 ## Состояние
 
 - Слияния в `main`: HEAD — срез документации серии; origin/main = `ebec314`,
-  незапушенных 6 коммитов (серия внешних рекомендаций: `c8063b6`, `ed998ea`,
-  `4ea5189`, `12a924c`, `cabbb07`, этот срез).
+  незапушенных 53 коммитов (серия внешних рекомендаций: `c8063b6`, `ed998ea`,
+  `4ea5189`, `12a924c`, `cabbb07`, серия event-detail interfaces `d5a3fed`…
+  `19a049a`, этот срез).
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
   `git checkout -b feature/<name>` от `main` (процесс — §0 `AGENTS.md`).
@@ -167,8 +168,16 @@
   (3) `strict` в `tsconfig.json` `4ea5189` (замер: 0 ошибок),
   (4) `:host([hidden])` — 135 `.css` + 2 инлайн-компонента `12a924c`,
   (5) `type:` у 82 `@property` + приоритет TS-аннотации в генераторе документации
-  `cabbb07`. Остались точечные: `repeat()` для динамических списков,
-  `HTMLElementTagNameMap` для публичного API, именованные event-detail interfaces;
+  `cabbb07`, (6) именованные event-detail interfaces — 45 компонентов по одному
+  коммиту (контролы, формы, layout, previewer, entity-selector, project-overview,
+  auth, data-grid; `d5a3fed`…`ed951c3`), генератор документации теперь сканирует
+  типизированные диспетчи `new CustomEvent<XDetail>('name')` (`19a049a`).
+  Событий без detail (`close`, `confirm`, `cancel`, `reset`, `primary-click`) и
+  пустого `detail: {}` (`file-cleared`) правило не касается. Проба: geometry
+  идентична (row 42px, sidebar 260px, header 69px, 16 card footers),
+  selection-change detail `{ ids:['CORE-101'], rows:1 }`, switch detail `false`,
+  errors 0. Остались точечные: `repeat()` для динамических списков,
+  `HTMLElementTagNameMap` для публичного API;
   затем браузерная проба интерактивных сценариев `invoice-detail`;
   **последним и очень внимательно** — перевод 200 статических inline-стилей
   продуктового кода в классы `.css` (129 динамических остаются, 218 в story
