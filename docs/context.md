@@ -155,6 +155,19 @@
 - Предупреждение `change-in-update` в `app-data-grid` (`firstUpdated()` +
   `updated()` → `recomputeVirtualWindow()`, slotchange → `readSlottedColumns()`)
   — фикс обсуждён, не начат (ждём команды).
+- Предупреждение `change-in-update` в `app-modal` — источник подтверждён
+  браузерной пробой (обёртка `requestUpdate`/`performUpdate` на прототипе):
+  при закрытии `updated()` → `scheduleRestoreFromPortal()` синхронно ставит
+  `isVisualOpen = false` (`app-modal.ts:106`) → второй цикл в том же цикле.
+  На открытии чисто (сет в rAF). Фикс: сброс через `queueMicrotask`.
+- Серия внешних рекомендаций зафиксирована в `AGENTS.md` §6/§9. Порядок работ:
+  (1) фикс `app-modal`, (2) фикс `app-data-grid`, (3) `strict` в `tsconfig.json`,
+  (4) `:host([hidden])` — 0 из 143 компонентов, (5) `type:` у 85 `@property`,
+  (6) точечно `repeat()`/`HTMLElementTagNameMap`/event-detail interfaces,
+  (7) браузерная проба интерактивных сценариев `invoice-detail`;
+  **последним и очень внимательно** — перевод 200 статических inline-стилей
+  продуктового кода в классы `.css` (129 динамических остаются, 218 в story
+  — отдельной серией), каждый view отдельным коммитом с pixel-проверкой.
 - Браузерные пробы оставляют следы в localStorage: режимы
   contacts=table, invoices=cards, documents=cards, расчётный режим всех
   карточных view выставлен в `cards` при проверке футеров; перед сдачей сессии
@@ -282,7 +295,8 @@
 - `app-entity-card` по п.18 `docs/ComponentReuseRecommendations.md` + сервис
   preview-поповеров поверх `portalManager` (быстрый просмотр сущностей без
   модалок/страниц). Делать только при появлении второго потребителя карточки.
-- Включение `strict` в `tsconfig.json` (разовая причёска типов).
+- Включение `strict` в `tsconfig.json` — решение принято (замер:
+  `npx tsc --noEmit --strict` = 0 ошибок), выполняется отдельным коммитом.
 - Расщепление `src/state/store.ts` (~6 тыс. строк) на доменные срезы.
 - Тесты (Vitest) поверх чистой логики (`domain/rfc5545.ts`, фильтры-Selectors);
   ESLint/Prettier; кастомные правила под запреты §1/§7 `AGENTS.md`.
