@@ -4,6 +4,11 @@ import styles from './app-input.css';
 
 export type InputSize = 'sm' | 'md' | 'lg'; // canonical control scale (docs/ComponentApiSpecs.md, Priority E)
 
+// detail of the `input` and `change` events (named event-detail interface, AGENTS.md §6)
+export interface InputChangeDetail {
+  value: string;
+}
+
 @customElement('app-input')
 export class AppInput extends LitElement {
   @property({ type: String }) label: string = '';
@@ -65,7 +70,7 @@ export class AppInput extends LitElement {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
     this.dispatchEvent(
-      new CustomEvent('input', {
+      new CustomEvent<InputChangeDetail>('input', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
@@ -77,7 +82,7 @@ export class AppInput extends LitElement {
     const input = e.target as HTMLInputElement;
     this.value = input.value;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<InputChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
@@ -88,14 +93,14 @@ export class AppInput extends LitElement {
   private handleClear() {
     this.value = '';
     this.dispatchEvent(
-      new CustomEvent('input', {
+      new CustomEvent<InputChangeDetail>('input', {
         detail: { value: '' },
         bubbles: true,
         composed: true,
       })
     );
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<InputChangeDetail>('change', {
         detail: { value: '' },
         bubbles: true,
         composed: true,
