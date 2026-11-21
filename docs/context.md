@@ -6,8 +6,8 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD `28d97b8`; origin/main = `585be96`, 49 незапушенных
-  коммитов.
+- Слияния в `main`: HEAD `6bad783`; origin/main = `585be96`, 64 незапушенных
+  коммитов (после этого среза — 65).
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
   `git checkout -b feature/<name>` от `main` (процесс — §0 `AGENTS.md`).
@@ -118,6 +118,18 @@
   через `app-confirm-dialog` (`confirmDialogs.notificationRuleDelete`,
   правило названо каналом и отступом по `reminders.channels` +
   `reminders.leadUnits`).
+- `app-detail-shell` — канон масштаба контролов: slotted-кнопки навигации больше не
+  получают `--control-height-xs: 34px`; xs остаётся плотным шагом 24px ниже sm (30px),
+  ряд никогда не рендерит xs выше соседних sm. Канон ряда заголовка detail-страниц —
+  sm-тулбар, и хвостовая icon-кнопка удаления (`action="delete"`) теперь `size="sm"`
+  в reminder/expense/timeentry/payment/calculation/invoice/task/requirement/employee/
+  counterparty/project + reader-ряд knowledge-base (pin + delete). Локальные
+  `--control-height-xs` выше sm удалены из CSS этих view; плотные row-ряды рендерят
+  канонические 24px (row-оверрайд `.sm-action` 26px сохранён).
+- `app-reminders` — карточка в meta-ряду показывает понятное описание правила рядом с
+  именем шаблона: «Еженедельно — Каждую неделю · Вт, Чт»; для разовых — канон
+  `viewTexts.recurrenceEditor.summaryOnce`. Дубликаты (описание = имя) не повторяются,
+  tooltip — полное описание.
 
 ## Не закрыто
 
@@ -183,6 +195,16 @@
   уведомлений?» (danger) называет правило «В системе (In-App) · 30 мин. до»,
   секции и лейблы корректны, Отмена сохраняет набор (3 → 3), Удалить снимает
   правило (3 → 2), диалог закрывается. Проба закрыла модалку. Console errors 0.
+- Проверено в браузере (dev-server, порт 3002, fresh tab): масштаб контролов в рядах
+  заголовков detail-страниц — все sm-кнопки h30, хвостовая icon-кнопка удаления
+  `action="delete"` h30/w30 (reminder/expense/timeentry/payment/calculation/invoice/
+  task/requirement/counterparty/project/employee + reader-ряд knowledge-base);
+  плотные row-ряды (member-row, row-right) рендерят канонические xs h24/w24 — xs
+  больше не превышает sm. Карточки /reminders: 23 meta-ряда с описанием — «Еженедельно
+  — Каждую неделю · Вт, Чт», «Ежемесячно — Каждый месяц · число: 18», «По рабочим дням
+  (Пн–Пт) — Каждую неделю · Пн, Вт, Ср, Чт, Пт», разовое «Без повтора (разовое) — Не
+  повторяется — сработает один раз»; после `setLanguage('en')` — "Weekly — Every week ·
+  Tue, Thu", "No repeat (One-time) — Does not repeat — triggers once". Console errors 0.
 
 ## Бэклог идей (обсуждено, не начато)
 
