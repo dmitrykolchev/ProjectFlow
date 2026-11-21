@@ -3666,7 +3666,28 @@
    }
   ],
   "events": [],
-  "propsDoc": [],
+  "propsDoc": [
+   {
+    "k": "icons",
+    "v": "MaterialIconDef records rendered by the gallery (property binding, array)"
+   },
+   {
+    "k": "fill",
+    "v": "Initial FILL axis value for the toolbar (0|1); changes fire params-change"
+   },
+   {
+    "k": "weight",
+    "v": "Initial wght axis value for the toolbar (100..700); changes fire params-change"
+   },
+   {
+    "k": "grade",
+    "v": "Initial GRAD axis value for the toolbar (-50..200); changes fire params-change"
+   },
+   {
+    "k": "disabled",
+    "v": "Blocks search, toolbar and grid interaction — the gallery renders read-only"
+   }
+  ],
   "slotsDoc": [],
   "childrenDoc": []
  },

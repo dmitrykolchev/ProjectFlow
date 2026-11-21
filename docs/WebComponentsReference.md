@@ -677,11 +677,11 @@ Material Symbols palette with search by name, category and tags; toolbar control
 
 | Property | Type / default | Description |
 |---|---|---|
-| `icons` | Array, default `[]` | — |
-| `fill` | Number, default `0` | — |
-| `weight` | Number, default `400` | — |
-| `grade` | Number, default `0` | — |
-| `disabled` | Boolean, default `false` | — |
+| `icons` | Array, default `[]` | MaterialIconDef records rendered by the gallery (property binding, array) |
+| `fill` | Number, default `0` | Initial FILL axis value for the toolbar (0\|1); changes fire params-change |
+| `weight` | Number, default `400` | Initial wght axis value for the toolbar (100..700); changes fire params-change |
+| `grade` | Number, default `0` | Initial GRAD axis value for the toolbar (-50..200); changes fire params-change |
+| `disabled` | Boolean, default `false` | Blocks search, toolbar and grid interaction — the gallery renders read-only |
 
 #### `app-menu` — `AppMenu`
 

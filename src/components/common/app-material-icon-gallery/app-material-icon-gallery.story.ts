@@ -9,6 +9,13 @@ export const meta: ComponentStoryMeta = {
   description:
     'Material Symbols palette with search by name, category and tags; toolbar controls family, size and Google axes; grid with roving tabindex fires icon-select and params-change events.',
   category: 'Common',
+  propsDoc: {
+    icons: 'MaterialIconDef records rendered by the gallery (property binding, array)',
+    fill: 'Initial FILL axis value for the toolbar (0|1); changes fire params-change',
+    weight: 'Initial wght axis value for the toolbar (100..700); changes fire params-change',
+    grade: 'Initial GRAD axis value for the toolbar (-50..200); changes fire params-change',
+    disabled: 'Blocks search, toolbar and grid interaction — the gallery renders read-only',
+  },
   stories: [
     {
       name: 'Full Palette',
