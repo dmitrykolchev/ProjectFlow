@@ -301,28 +301,9 @@ export class AppDataGrid extends LitElement {
         this.multiSortEnabled = true;
       }
     }
-  }
-
-  firstUpdated() {
-    this.readSlottedColumns();
-    const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
-    if (container) {
-      this.viewportHeight = container.clientHeight || 520;
-      this.tableResizeObserver = new ResizeObserver((entries) => {
-        for (const entry of entries) {
-          this.viewportHeight = entry.contentRect.height || 520;
-          this.recomputeVirtualWindow();
-        }
-      });
-      this.tableResizeObserver.observe(container);
-      this.recomputeVirtualWindow();
-    }
-  }
-
-  updated(changed: Map<PropertyKey, unknown>) {
-    this.classList.toggle('is-compact', this.isCompactMode);
-    this.style.setProperty('--grid-row-height', `${this.rowHeightPx}px`);
-
+    // Виртуальное окно — производное значение: пересчитывается в willUpdate(),
+    // чтобы сет @state не планировал второй цикл после updated()
+    // (lit dev-mode «change-in-update»). Рендер того же цикла использует окно.
     if (
       changed.has('sortRules') ||
       changed.has('groupByFields') ||
@@ -335,13 +316,47 @@ export class AppDataGrid extends LitElement {
       changed.has('localCompact')
     ) {
       if (changed.has('sortRules') || changed.has('groupByFields') || changed.has('virtual')) {
-        const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
-        if (container) {
-          container.scrollTop = 0;
-        }
         this.currentScrollTop = 0;
       }
       this.recomputeVirtualWindow();
+    }
+  }
+
+  firstUpdated() {
+    // Чтение слотов и окна — вне цикла первого обновления (микрозадача выполняется
+    // до paint): сет columns/viewportHeight/vis*Row внутри firstUpdated()
+    // планировал второй цикл.
+    queueMicrotask(() => {
+      this.readSlottedColumns();
+      const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
+      if (container) {
+        this.viewportHeight = container.clientHeight || 520;
+        this.tableResizeObserver = new ResizeObserver((entries) => {
+          for (const entry of entries) {
+            this.viewportHeight = entry.contentRect.height || 520;
+            this.recomputeVirtualWindow();
+          }
+        });
+        this.tableResizeObserver.observe(container);
+        this.recomputeVirtualWindow();
+      }
+    });
+  }
+
+  updated(changed: Map<PropertyKey, unknown>) {
+    this.classList.toggle('is-compact', this.isCompactMode);
+    this.style.setProperty('--grid-row-height', `${this.rowHeightPx}px`);
+
+    if (
+      changed.has('sortRules') ||
+      changed.has('groupByFields') ||
+      changed.has('virtual')
+    ) {
+      // DOM-сброс скролла (не реактивный) — окно пересчитано в willUpdate().
+      const container = this.shadowRoot?.querySelector('.table-container') as HTMLElement | null;
+      if (container) {
+        container.scrollTop = 0;
+      }
     }
 
     if (this.showColumnMenu) {
