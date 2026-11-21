@@ -28,6 +28,16 @@ export const meta: ComponentStoryMeta = {
     disabled: 'Disables both halves of the button',
     items: 'Menu items opened by the arrow half',
   },
+  eventsDoc: {
+    'primary-click': {
+      detail: '—',
+      description: 'Fires when the primary part of the button is clicked',
+    },
+    select: {
+      detail: '{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }',
+      description: 'Passes through the select event of the clicked app-menu-item',
+    },
+  },
   stories: [
     {
       name: 'Split Button Variants',
