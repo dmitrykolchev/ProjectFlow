@@ -1,0 +1,44 @@
+/* The tab strip publishes the canonical control scale on :host, so slotted
+   app-tab-item children inherit exactly the toolbar row geometry. */
+:host {
+  display: block;
+}
+
+:host[size="xs"] {
+  --tb-height: var(--control-height-xs, 24px);
+  --tb-font: var(--control-font-xs, 0.75rem);
+  --tb-icon: var(--control-icon-xs, 14px);
+  --tb-pad-x: var(--control-padding-x-xs, 0.45rem);
+}
+
+:host[size="sm"] {
+  --tb-height: var(--control-height-sm, 30px);
+  --tb-font: var(--control-font-sm, 0.8125rem);
+  --tb-icon: var(--control-icon-sm, 16px);
+  --tb-pad-x: var(--control-padding-x-sm, 0.65rem);
+}
+
+:host[size="md"] {
+  --tb-height: var(--control-height-md, 38px);
+  --tb-font: var(--control-font-md, 0.875rem);
+  --tb-icon: var(--control-icon-md, 20px);
+  --tb-pad-x: var(--control-padding-x-md, 0.875rem);
+}
+
+:host[size="lg"] {
+  --tb-height: var(--control-height-lg, 44px);
+  --tb-font: var(--control-font-lg, 1rem);
+  --tb-icon: var(--control-icon-lg, 24px);
+  --tb-pad-x: var(--control-padding-x-lg, 1.15rem);
+}
+
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--tabs-gap, 0.25rem);
+  border-bottom: 1px solid var(--border-subtle, #1e293b);
+}
+
+:host([hidden]) {
+  display: none;
+}
