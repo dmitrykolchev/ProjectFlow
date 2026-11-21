@@ -75,7 +75,10 @@
   text-align: center;
 }
 
-.sort-btn {
+.sort-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
