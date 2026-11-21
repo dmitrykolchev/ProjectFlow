@@ -6,10 +6,11 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD — срез документации серии; origin/main = `f8a4de7`,
-  незапушенных нет (слиты и запушены серия внешних рекомендаций `c8063b6`…
-  `19a049a`, серия event-detail interfaces, серия событий Storybook
-  `e4c12bc`…`9bbef45`, фикс `app-page-header` `f8a4de7`).
+- Слияния в `main`: HEAD — `ce5941d` (серия `app-split-button`), origin/main =
+  `d9c245f`; незапушенных 2 коммита (`2bf2f4d`, `ce5941d`). Запушены: серия
+  актуализации документации и полного покрытия `design-tokens`
+  (`88a39f8`…`7f15595`, `30ada03`) и серия удаления legacy-шага `xxs`
+  (`1e643a1`…`d9c245f`).
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
   `git checkout -b feature/<name>` от `main` (процесс — §0 `AGENTS.md`).
@@ -137,6 +138,40 @@
   (`E:\TEMP\opencode\cancel-audit.js`, скобочный разбор тегов `app-button` с
   резолвом лейбла cancel/close) — 30 контролов, из них ровно один outline
   (футер `app-reminder-form`) исправлен на ghost; остальных 29 уже канон.
+- Legacy-шаг `xxs` удалён из канона масштаба контролов: шкала xs/sm/md/lg =
+  24/30/38/44px (material-icon scale xxs..xxl — отдельный канон, не троган).
+  Коммиты: previewer toolbar → sm + copy icon-only (`1e643a1`), `app-button`
+  (`08b4335`), `app-toggle-button` (`18fdbfb`), токен+view+док (`14e939b`),
+  регенерация документов (`d9c245f`).
+- `app-split-button` (`2bf2f4d`, `ce5941d`, незапушены): компактный padding
+  шеврона `0 0.25rem`; канонический `icon-only` — лейбл-спан не рендерится,
+  главная половина квадратная = высота контрола; divider-хук
+  `--split-divider` (фолбэк translucent white), secondary-шов фиксирован на
+  `var(--split-divider, var(--border-subtle))` — шов вторичной половины не
+  ярче рамки контрола (проверено в light и cyberpunk). propsDoc-строка +
+  icon-only демо-история.
+- Новый компонент `app-search-input`: value/placeholder/size(sm|md|lg)/disabled,
+  слот `icon` со slotted-центрированием, хуки ширины `--search-input-width`
+  (240px) / `--search-input-focus-width` (280px на focus-within), события
+  input/change с `SearchInputDetail`. Теневой native-input объявляет
+  `font-family: var(--font-sans)` явно: глобальный reset `font-family: inherit`
+  из index.css до shadow DOM не доходит (без него рендерился Arial). Зарегистрирован
+  в `common/index.ts`, propsDoc + eventsDoc + демо-история, документы регенерированы.
+- `app-header` модернизация: свойство `size` (ButtonSize, reflect, default md —
+  пиксельный baseline headerH 60px сохранён), поиск через `app-search-input`,
+  кнопка «Журнал активности» — `app-button` icon-only с badge-точкой
+  (`<span slot="end" class="badge-dot">` при activityCount>0, accent 7px в
+  header CSS); scale sm/lg = высоты хоста 52/68px (явные значения: self-reference
+  `calc(var(--density-header-height))` циклична), font контролов по canonical
+  токенам (md = 12.25px). Мёртвые `.search-wrapper/.search-input/.icon-action-btn`
+  удалены; propsDoc-строка `size`.
+- Breadcrumbs `app-header`: 4 view'а печатали сырой id view'а (fallback
+  `viewNames[activeView] || activeView`) — добавлены entries `contacts`
+  (`viewTexts.contacts.pageTitle`), `invoices`, `blog` (из `t.navigation`) и
+  ветка `invoice-detail` (lookup по `detailInvoiceId` → номер счёта). Все 42
+  view'а проверены в браузере в обоих языках: сырых id нет; detail-сущности
+  (project/contract/invoice/payment/task/requirement/timeentry/reminder/expense/
+  company/counterparty/employee) показывают локализованные имена/номера.
 
 ## Не закрыто
 
