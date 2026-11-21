@@ -430,46 +430,21 @@ app-cards-table {
   color: var(--text-muted, #64748b);
 }
 
+/* The markdown toolbar of the post editor is a canonical app-toolbar row.
+   The tokens reproduce the historical compact geometry through the public
+   hooks of app-toolbar / app-toolbar-button / app-toolbar-separator:
+   28px mono buttons with 0.5rem padding, 0.25rem icon gap, 16px separators
+   with 0.15rem breathing room, row padding 0.45rem 0.6rem. */
 .md-toolbar {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  padding: 0.45rem 0.6rem;
-  border-radius: var(--radius-md, 8px);
-  background: var(--bg-subtle, #1a2438);
-  border: 1px solid var(--border-subtle, #1e293b);
-}
-
-.md-tool-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.25rem;
-  height: 28px;
-  padding: 0 0.5rem;
-  border-radius: var(--radius-sm, 6px);
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--text-secondary, #94a3b8);
-  font-family: var(--font-mono, 'JetBrains Mono', monospace);
-  font-size: 0.74rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: border-color 130ms ease, background 130ms ease, color 130ms ease;
-}
-
-.md-tool-btn:hover {
-  background: var(--bg-surface, #111827);
-  border-color: var(--border-subtle, #1e293b);
-  color: var(--text-primary, #f8fafc);
-}
-
-.md-tool-sep {
-  width: 1px;
-  height: 16px;
-  background: var(--border-subtle, #1e293b);
-  margin: 0 0.15rem;
+  --tb-width: 100%;
+  --tb-height: 28px;
+  --tb-font: 0.74rem;
+  --tb-pad-x: 0.5rem;
+  --tb-padding-y: 0.45rem;
+  --tb-btn-gap: 0.25rem;
+  --tb-font-family: var(--font-mono, 'JetBrains Mono', monospace);
+  --tb-sep-inset: 12px;
+  --tb-sep-margin: 0.15rem;
 }
 
 .md-split-grid {

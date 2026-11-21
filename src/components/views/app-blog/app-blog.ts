@@ -47,10 +47,15 @@ import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-select/app-select';
 import '../../common/app-status-chip/app-status-chip';
 import '../../common/app-switch/app-switch';
+import '../../common/app-tab-item/app-tab-item';
+import '../../common/app-tabs/app-tabs';
 import '../../common/app-table-column/app-table-column';
 import '../../common/app-textarea/app-textarea';
 import type { AppTextarea } from '../../common/app-textarea/app-textarea';
 import '../../common/app-toggle-button/app-toggle-button';
+import '../../common/app-toolbar/app-toolbar';
+import '../../common/app-toolbar-button/app-toolbar-button';
+import '../../common/app-toolbar-separator/app-toolbar-separator';
 import '../../common/app-card-footer/app-card-footer';
 import '../../dashboard/app-metric-card/app-metric-card';
 import styles from './app-blog.css';
@@ -1398,97 +1403,67 @@ export class AppBlog extends LitElement {
   private renderMarkdownToolbar(b: ReturnType<typeof getTranslation>['viewTexts']['blog']) {
     const tt = b.toolbarTitles;
     return html`
-      <div class="md-toolbar">
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.h2}"
+      <app-toolbar class="md-toolbar" size="md">
+        <app-toolbar-button
+          aria-label="${tt.h2}"
           @click="${() => this.applyToolbarSnippet('\n## ', '\n', b.toolbarH2)}"
-        >
-          ${b.toolbarH2}
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.h3}"
+        >${b.toolbarH2}</app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.h3}"
           @click="${() => this.applyToolbarSnippet('\n### ', '\n', b.toolbarH3)}"
-        >
-          ${b.toolbarH3}
-        </button>
-        <span class="md-tool-sep"></span>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.bold}"
+        >${b.toolbarH3}</app-toolbar-button>
+        <app-toolbar-separator></app-toolbar-separator>
+        <app-toolbar-button
+          aria-label="${tt.bold}"
           @click="${() => this.applyToolbarSnippet('**', '**', b.toolbarBold)}"
-        >
-          ${b.toolbarBold}
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.italic}"
+        >${b.toolbarBold}</app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.italic}"
           @click="${() => this.applyToolbarSnippet('*', '*', b.toolbarItalic)}"
-        >
-          <em>${b.toolbarItalic}</em>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.code}"
+        ><em>${b.toolbarItalic}</em></app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.code}"
           @click="${() => this.applyToolbarSnippet('`', '`', 'code')}"
         >
-          ${iconCode(13)}
+          <span slot="start">${iconCode(13)}</span>
           <span>${b.toolbarCode}</span>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.codeBlock}"
+        </app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.codeBlock}"
           @click="${() => this.applyToolbarSnippet('\n```ts\n', '\n```\n', 'const value = 42;')}"
         >
           <span>${b.toolbarCodeBlock}</span>
-        </button>
-        <span class="md-tool-sep"></span>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.quote}"
+        </app-toolbar-button>
+        <app-toolbar-separator></app-toolbar-separator>
+        <app-toolbar-button
+          aria-label="${tt.quote}"
           @click="${() => this.applyToolbarSnippet('\n> ', '\n', b.toolbarQuote)}"
         >
           <span>${b.toolbarQuote}</span>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.list}"
+        </app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.list}"
           @click="${() => this.applyToolbarSnippet('\n- ', '\n', b.toolbarList)}"
         >
-          ${iconList(13)}
+          <span slot="start">${iconList(13)}</span>
           <span>${b.toolbarList}</span>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.checklist}"
+        </app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.checklist}"
           @click="${() => this.applyToolbarSnippet('\n- [ ] ', '\n', b.toolbarChecklist)}"
         >
           <span>${b.toolbarChecklist}</span>
-        </button>
-        <span class="md-tool-sep"></span>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.link}"
+        </app-toolbar-button>
+        <app-toolbar-separator></app-toolbar-separator>
+        <app-toolbar-button
+          aria-label="${tt.link}"
           @click="${() => this.applyToolbarSnippet('[', '](https://example.com)', b.toolbarLink)}"
         >
-          ${iconLink(13)}
+          <span slot="start">${iconLink(13)}</span>
           <span>${b.toolbarLink}</span>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.table}"
+        </app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.table}"
           @click="${() =>
             this.applyToolbarSnippet(
               '\n| Col 1 | Col 2 |\n| :--- | ---: |\n| A | 100 |\n',
@@ -1496,18 +1471,16 @@ export class AppBlog extends LitElement {
               ''
             )}"
         >
-          ${iconColumns(13)}
+          <span slot="start">${iconColumns(13)}</span>
           <span>${b.toolbarTable}</span>
-        </button>
-        <button
-          type="button"
-          class="md-tool-btn"
-          title="${tt.hr}"
+        </app-toolbar-button>
+        <app-toolbar-button
+          aria-label="${tt.hr}"
           @click="${() => this.applyToolbarSnippet('\n---\n', '', '')}"
         >
           <span>${b.toolbarHr}</span>
-        </button>
-      </div>
+        </app-toolbar-button>
+      </app-toolbar>
     `;
   }
 
