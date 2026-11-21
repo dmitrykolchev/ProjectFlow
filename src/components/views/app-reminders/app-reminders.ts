@@ -179,6 +179,10 @@ export class AppReminders extends LitElement {
     const t = getTranslation(this.currentLang);
     const templates = store.getRecurrenceTemplates();
     const useEnNames = t.common.locale.startsWith('en');
+    // human-readable recurrence line in the card meta row: template name plus the plain-language
+    // summary, canon of the editor/reminder-form summary card; separator is a typographic glyph,
+    // identical in both locales, not a language check
+    const summarySep = ' — ';
 
     const overdueCount = this.reminders.filter((r) => store.isReminderOverdue(r)).length;
     const dueCount = store.getDueRemindersCount();
@@ -409,7 +413,7 @@ export class AppReminders extends LitElement {
                       monthDayPrefix: t.reminders.monthDayPrefix,
                       setPosLabel: t.reminders.setPosLabel,
                     })
-                  : '';
+                  : t.viewTexts.recurrenceEditor.summaryOnce;
                 const tplLabel = !isRecurring
                   ? t.reminders.rfcFreqs.NONE
                   : rem.recurrence.templateCode !== 'CUSTOM' && tpl
@@ -478,9 +482,12 @@ export class AppReminders extends LitElement {
                         <span>${formattedDue}</span>
                       </span>
                       <span class="rem-meta-dot">·</span>
-                      <span class="rem-meta-item" title="${summary || tplLabel}">
+                      <span class="rem-meta-item" title="${summary}">
                         ${iconRepeat(13)}
                         <span>${tplLabel}</span>
+                        ${summary && summary !== tplLabel
+                          ? html`<span class="rem-summary-sep">${summarySep}</span><span class="rem-summary-text">${summary}</span>`
+                          : ''}
                       </span>
                       ${isRecurring
                         ? html`

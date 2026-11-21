@@ -6,7 +6,7 @@ const meta: ComponentStoryMeta = {
   component: 'app-reminders',
   title: 'Views/Reminders',
   description:
-    'Workspace Reminders Center with polymorphic linking to any entity, directory-driven recurrence templates, snooze presets, and per-reminder notification rules.',
+    'Workspace Reminders Center with polymorphic linking to any entity, directory-driven recurrence templates shown in the card meta row together with their plain-language description (editor summary canon), snooze presets, and per-reminder notification rules.',
   category: 'Views',
   stories: [
     {

@@ -2333,7 +2333,7 @@ Projects portfolio list with cards/table toggle, budgets, role summary, and navi
 
 `src/components/views/app-reminders/`
 
-Workspace Reminders Center with polymorphic linking to any entity, directory-driven recurrence templates, snooze presets, and per-reminder notification rules.
+Workspace Reminders Center with polymorphic linking to any entity, directory-driven recurrence templates shown in the card meta row together with their plain-language description (editor summary canon), snooze presets, and per-reminder notification rules.
 
 #### `app-requirement-detail` — `AppRequirementDetail`
 

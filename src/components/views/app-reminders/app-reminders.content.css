@@ -135,6 +135,17 @@
   font-weight: 600;
 }
 
+/* human-readable recurrence description in the schedule meta row: the template name is followed by
+   the plain-language summary (editor summary canon), secondary so the row keeps its rhythm */
+.rem-summary-sep {
+  color: var(--text-tertiary, #64748b);
+}
+
+.rem-summary-text {
+  color: var(--text-secondary, #94a3b8);
+  font-weight: 500;
+}
+
 .rem-meta-dot{
   color: var(--border-strong, #334155);
 }
