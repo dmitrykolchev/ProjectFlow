@@ -24,6 +24,9 @@ export const meta: ComponentStoryMeta = {
     fieldLabelStyle:
       'External label row style (string, reflected as the field-label-style attribute). Values: none = no external label row (default); normal = visible row above the control with the app-input label typography (font-size 0.8125rem, font-weight 500, color var(--text-secondary)); ghost = the same row rendered invisible (visibility hidden) so it keeps its place in the form grid',
   },
+  eventsDoc: {
+    change: { detail: '{ checked: boolean }', description: 'Fires when the switch is toggled' },
+  },
   stories: [
     {
       name: 'Default',
