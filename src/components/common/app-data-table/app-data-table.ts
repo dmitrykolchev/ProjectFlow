@@ -51,7 +51,7 @@ export interface DataTableRowClickDetail {
  */
 @customElement('app-data-table')
 export class AppDataTable extends LitElement {
-  @property({ attribute: false }) rows: Record<string, unknown>[] = [];
+  @property({ type: Array, attribute: false }) rows: Record<string, unknown>[] = [];
   @property({ type: Number, attribute: 'page-size' }) pageSize: number = 10;
   @property({ type: Number }) page: number = 1;
   @property({ type: String, attribute: 'sort-by' }) sortBy: string = '';
@@ -62,7 +62,7 @@ export class AppDataTable extends LitElement {
   @property({ type: Boolean, attribute: 'selectable' }) selectable: boolean = false;
   @property({ type: String, attribute: 'key-field' }) keyField: string = 'id';
   @property({ type: Array, attribute: false }) selectedKeys: string[] = [];
-  @property({ attribute: false }) contentStyles?: string | CSSResult;
+  @property({ type: String, attribute: false }) contentStyles?: string | CSSResult;
 
   @state() private currentPage: number = 1;
 

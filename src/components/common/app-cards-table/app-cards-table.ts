@@ -44,8 +44,8 @@ export interface CardsTableCardClickDetail {
  */
 @customElement('app-cards-table')
 export class AppCardsTable extends LitElement {
-  @property({ attribute: false }) rows: Record<string, unknown>[] = [];
-  @property({ attribute: false }) cardRender: (row: Record<string, unknown>) => TemplateResult = () => html``;
+  @property({ type: Array, attribute: false }) rows: Record<string, unknown>[] = [];
+  @property({ type: Object, attribute: false }) cardRender: (row: Record<string, unknown>) => TemplateResult = () => html``;
   @property({ type: Number, attribute: 'page-size' }) pageSize: number = 9;
   @property({ type: Number }) page: number = 1;
   @property({ type: String, attribute: 'empty-title' }) emptyTitle: string = '';
@@ -56,12 +56,12 @@ export class AppCardsTable extends LitElement {
   @property({ type: Array, attribute: false }) selectedKeys: string[] = [];
   // additive hook: extra shell classes per row (e.g. a completed look); default undefined keeps
   // every consumer pixel-identical
-  @property({ attribute: false }) cardClass?: (row: Record<string, unknown>) => string;
+  @property({ type: Object, attribute: false }) cardClass?: (row: Record<string, unknown>) => string;
   // additive hook: single-column grid collapse at viewport <= 1024px; default off
   @property({ type: Boolean, attribute: 'wide-collapse', reflect: true }) wideCollapse: boolean = false;
   // additive hook: view-local styles for the content produced by cardRender, injected into the
   // shadow root as a <style> element; default empty keeps every consumer pixel-identical
-  @property({ attribute: false }) contentStyles?: string | CSSResult;
+  @property({ type: String, attribute: false }) contentStyles?: string | CSSResult;
 
   @state() private currentPage: number = 1;
 

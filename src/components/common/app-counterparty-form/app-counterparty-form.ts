@@ -24,7 +24,7 @@ import '../app-counterparty-contacts/app-counterparty-contacts';
 @customElement('app-counterparty-form')
 export class AppCounterpartyForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) counterparty: Counterparty | null = null;
+  @property({ type: Object, attribute: false }) counterparty: Counterparty | null = null;
 
   @state() private currentLang = store.customization.language;
   @state() private fName = '';

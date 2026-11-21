@@ -38,10 +38,10 @@ import {
 @customElement('app-expense-form')
 export class AppExpenseForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) expense: Expense | null = null;
-  @property({ attribute: false }) presetProjectId: string | null = null;
-  @property({ attribute: false }) presetTaskId: string | null = null;
-  @property({ attribute: false }) presetUserId: string | null = null;
+  @property({ type: Object, attribute: false }) expense: Expense | null = null;
+  @property({ type: Object, attribute: false }) presetProjectId: string | null = null;
+  @property({ type: Object, attribute: false }) presetTaskId: string | null = null;
+  @property({ type: Object, attribute: false }) presetUserId: string | null = null;
   @property({ type: String }) contextTitle: string = '';
 
   @state() private currentLang = store.customization.language;

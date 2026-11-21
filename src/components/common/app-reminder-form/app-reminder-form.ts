@@ -74,7 +74,7 @@ const REMINDER_ENTITY_TYPES: ReminderEntityType[] = [
 @customElement('app-reminder-form')
 export class AppReminderForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) reminder: Reminder | null = null;
+  @property({ type: Object, attribute: false }) reminder: Reminder | null = null;
   @property({ type: String }) presetEntityType: ReminderEntityType | '' = '';
   @property({ type: String }) presetEntityId: string = '';
 

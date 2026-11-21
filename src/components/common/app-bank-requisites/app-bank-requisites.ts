@@ -31,7 +31,7 @@ const BANK_CURRENCIES: BankCurrency[] = ['RUB', 'USD', 'EUR', 'CNY', 'GBP', 'KZT
  */
 @customElement('app-bank-requisites')
 export class AppBankRequisites extends LitElement {
-  @property({ attribute: false }) accounts: BankRequisite[] = [];
+  @property({ type: Array, attribute: false }) accounts: BankRequisite[] = [];
   @property({ type: Boolean }) editable: boolean = false;
   @property({ type: Boolean }) compact: boolean = false;
   @property({ type: Boolean, attribute: 'hide-header' }) hideHeader: boolean = false;

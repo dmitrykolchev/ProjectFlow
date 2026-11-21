@@ -31,7 +31,7 @@ export type MaterialIconVariant = 'neutral' | 'primary' | 'info' | 'success' | '
 export class AppMaterialIcon extends LitElement {
   static styles = styles;
 
-  @property() name = 'star';
+  @property({ type: String }) name = 'star';
   // canonical scale names, legacy aliases (xsm = xs, xlg = xl), or a numeric px size
   @property({
     converter: {
@@ -45,10 +45,10 @@ export class AppMaterialIcon extends LitElement {
   @property({ type: Number }) fill = 0; // 0 | 1
   @property({ type: Number }) weight = 400; // 100..700
   @property({ type: Number }) grade = 0; // -50..200
-  @property() family: MaterialIconFamily = 'outlined'; // Google style: variable font family
+  @property({ type: String }) family: MaterialIconFamily = 'outlined'; // Google style: variable font family
   @property({ type: Boolean }) decorative = false; // aria-hidden, no label
   // variant — icon color from status tokens (neutral inherits currentColor)
-  @property() variant: MaterialIconVariant = 'neutral';
+  @property({ type: String }) variant: MaterialIconVariant = 'neutral';
 
   protected willUpdate(changed: Map<string, unknown>): void {
     if (changed.has('size')) {

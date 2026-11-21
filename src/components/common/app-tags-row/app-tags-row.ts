@@ -21,7 +21,7 @@ import styles from './app-tags-row.css';
 @customElement('app-tags-row')
 export class AppTagsRow extends LitElement {
   @property({ type: Array }) tags: string[] = [];
-  @property() mode: 'readonly' | 'add-button' | 'add-form' = 'readonly';
+  @property({ type: String }) mode: 'readonly' | 'add-button' | 'add-form' = 'readonly';
   @property({ type: Boolean }) showEmptyLabel = false;
 
   @state() private currentLang = store.customization.language;

@@ -32,7 +32,7 @@ import '../app-button/app-button';
 @customElement('app-contract-form')
 export class AppContractForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) contract: Contract | null = null;
+  @property({ type: Object, attribute: false }) contract: Contract | null = null;
   @property({ type: String }) presetCounterpartyId: string = '';
   @property({ type: String }) presetProjectId: string = '';
   /** status a newly created contract starts with, active for quick openings */

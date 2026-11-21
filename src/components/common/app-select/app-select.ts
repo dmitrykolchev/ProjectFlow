@@ -20,7 +20,7 @@ export class AppSelect extends LitElement {
   @property({ type: Array }) options: SelectOption[] = [];
   // declarative <app-option> children and data sources fill the list as well:
   // array, promise, or a function returning an array (sync or async)
-  @property({ attribute: false }) dataSource?: OptionDataSource;
+  @property({ type: Object, attribute: false }) dataSource?: OptionDataSource;
   @property({ type: Boolean }) disabled: boolean = false;
   @property({ type: String }) placeholder: string = 'Select...';
   // canonical control size scale, md default = historical pixel-identical look

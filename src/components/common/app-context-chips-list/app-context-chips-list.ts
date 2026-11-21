@@ -12,7 +12,7 @@ import styles from './app-context-chips-list.css';
  */
 @customElement('app-context-chips-list')
 export class AppContextChipsList extends LitElement {
-  @property({ attribute: false }) items: ContextChipData[] = [];
+  @property({ type: Array, attribute: false }) items: ContextChipData[] = [];
   @property({ type: String }) mode: 'select' | 'display' = 'display';
 
   static styles = styles;

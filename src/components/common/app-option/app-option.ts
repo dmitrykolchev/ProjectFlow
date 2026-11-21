@@ -35,7 +35,7 @@ export class AppOption extends LitElement {
   @property({ type: String }) value: string = '';
   @property({ type: String }) label: string = '';
   @property({ type: String }) color: string = '';
-  @property({ attribute: false }) icon?: TemplateResult | string;
+  @property({ type: Object, attribute: false }) icon?: TemplateResult | string;
   @property({ type: String }) code: string = '';
   @property({ type: String }) subtitle: string = '';
   @property({ type: String }) meta: string = '';

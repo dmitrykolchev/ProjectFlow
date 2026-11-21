@@ -37,10 +37,10 @@ import {
 @customElement('app-time-entry-form')
 export class AppTimeEntryForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) entry: TimeEntry | null = null;
-  @property({ attribute: false }) presetProjectId: string | null = null;
-  @property({ attribute: false }) presetTaskId: string | null = null;
-  @property({ attribute: false }) presetUserId: string | null = null;
+  @property({ type: Object, attribute: false }) entry: TimeEntry | null = null;
+  @property({ type: Object, attribute: false }) presetProjectId: string | null = null;
+  @property({ type: Object, attribute: false }) presetTaskId: string | null = null;
+  @property({ type: Object, attribute: false }) presetUserId: string | null = null;
   @property({ type: String }) contextTitle: string = '';
 
   @state() private currentLang = store.customization.language;

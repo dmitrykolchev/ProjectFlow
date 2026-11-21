@@ -19,15 +19,15 @@ export class AppTableColumn extends LitElement {
   @property({ type: String }) field: string = '';
   @property({ type: String }) label: string = '';
   @property({ type: String }) type: TableCellType = 'text';
-  @property({ attribute: false }) options: ColumnOption[] = [];
+  @property({ type: Array, attribute: false }) options: ColumnOption[] = [];
   @property({ type: String }) align: CellAlign = 'left';
   @property({ type: Boolean }) mono: boolean = false;
   @property({ type: Boolean }) code: boolean = false;
   @property({ type: Boolean }) sortable: boolean = false;
   @property({ type: String, attribute: 'yes-label' }) yesLabel: string = '';
   @property({ type: String, attribute: 'no-label' }) noLabel: string = '';
-  @property({ attribute: false }) cellRender?: CellRenderFn;
-  @property({ attribute: false }) valueFn?: (row: Record<string, unknown>) => unknown;
+  @property({ type: Object, attribute: false }) cellRender?: CellRenderFn;
+  @property({ type: Object, attribute: false }) valueFn?: (row: Record<string, unknown>) => unknown;
 
   static styles = styles;
 

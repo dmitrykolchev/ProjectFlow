@@ -101,8 +101,8 @@ export function commitPendingAttachments(options: {
 @customElement('app-project-attachments')
 export class AppProjectAttachments extends LitElement {
   @property({ type: String, attribute: 'project-id' }) projectId: string = '';
-  @property({ attribute: false }) documentIds: string[] = [];
-  @property({ attribute: false }) pendingFiles: PendingAttachmentFile[] = [];
+  @property({ type: Array, attribute: false }) documentIds: string[] = [];
+  @property({ type: Array, attribute: false }) pendingFiles: PendingAttachmentFile[] = [];
   @property({ type: String }) label: string = '';
   @property({ type: Boolean }) compact: boolean = false;
   @property({ type: Boolean }) readonly: boolean = false;

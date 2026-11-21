@@ -12,7 +12,7 @@ export class AppCombobox extends LitElement {
   @property({ type: Array }) items: string[] = []; // available suggestions
   // declarative <app-option> children and data sources add suggestions as well:
   // array, promise, or a function returning an array (sync or async)
-  @property({ attribute: false }) dataSource?: OptionDataSource;
+  @property({ type: Object, attribute: false }) dataSource?: OptionDataSource;
   @property({ type: Array }) selected: string[] = []; // selected tags/values
   @property({ type: String }) placeholder: string = 'Add tag or filter...';
   @property({ type: Boolean }) allowCustom: boolean = true;

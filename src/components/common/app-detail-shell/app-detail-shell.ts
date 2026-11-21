@@ -36,7 +36,7 @@ export class AppDetailShell extends LitElement {
   @property({ type: String }) switcherPlaceholder = '';
 
   /** Options rendered by the entity switcher. */
-  @property({ attribute: false }) switcherOptions: EntitySelectorOption[] = [];
+  @property({ type: Array, attribute: false }) switcherOptions: EntitySelectorOption[] = [];
 
   /** Id of the entity currently displayed. */
   @property({ type: String }) switcherValue = '';

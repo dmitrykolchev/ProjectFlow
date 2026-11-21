@@ -22,7 +22,7 @@ import '../app-bank-requisites/app-bank-requisites';
 @customElement('app-company-form')
 export class AppCompanyForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) company: Company | null = null;
+  @property({ type: Object, attribute: false }) company: Company | null = null;
 
   @state() private currentLang = store.customization.language;
   @state() private fName = '';

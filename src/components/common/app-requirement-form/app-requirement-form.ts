@@ -39,8 +39,8 @@ import '../app-button/app-button';
 @customElement('app-requirement-form')
 export class AppRequirementForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) requirement: ProjectRequirement | null = null;
-  @property({ attribute: false }) presetProjectId: string | null = null;
+  @property({ type: Object, attribute: false }) requirement: ProjectRequirement | null = null;
+  @property({ type: Object, attribute: false }) presetProjectId: string | null = null;
 
   @state() private currentLang = store.customization.language;
   @state() private fProjectId = '';

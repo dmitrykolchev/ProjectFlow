@@ -16,7 +16,7 @@ import styles from './app-context-chip.css';
  */
 @customElement('app-context-chip')
 export class AppContextChip extends LitElement {
-  @property({ attribute: false }) data?: ContextChipData;
+  @property({ type: Object, attribute: false }) data?: ContextChipData;
   // select = toggleable picker chip, display = read-only chip with open action
   @property({ type: String }) mode: 'select' | 'display' = 'display';
 

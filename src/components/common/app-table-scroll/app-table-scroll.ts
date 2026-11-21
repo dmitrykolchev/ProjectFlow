@@ -13,7 +13,7 @@ export interface SortChangeDetail {
 
 @customElement('app-table-scroll')
 export class AppTableScroll extends LitElement {
-  @property({ attribute: false }) rows: Record<string, unknown>[] = [];
+  @property({ type: Array, attribute: false }) rows: Record<string, unknown>[] = [];
   @property({ type: String, attribute: 'sort-by' }) sortBy: string = '';
   @property({ type: String, attribute: 'sort-dir' }) sortDir: SortDirection = 'asc';
   @property({ type: String, attribute: 'active-key' }) activeKey: string = 'isActive';

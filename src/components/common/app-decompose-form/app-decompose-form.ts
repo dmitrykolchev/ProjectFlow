@@ -43,7 +43,7 @@ type DraftWithSelection = DecomposedTaskDraft & { selected: boolean };
 @customElement('app-decompose-form')
 export class AppDecomposeForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) requirementIds: string[] = [];
+  @property({ type: Array, attribute: false }) requirementIds: string[] = [];
 
   @state() private currentLang = store.customization.language;
   @state() private draftTasks: DraftWithSelection[] = [];

@@ -13,7 +13,7 @@ import styles from './app-bank-summary.css';
  */
 @customElement('app-bank-summary')
 export class AppBankSummary extends LitElement {
-  @property({ attribute: false }) accounts: BankRequisite[] = [];
+  @property({ type: Array, attribute: false }) accounts: BankRequisite[] = [];
 
   @state() private currentLang = store.customization.language;
 

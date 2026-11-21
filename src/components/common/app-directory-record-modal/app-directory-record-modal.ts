@@ -25,8 +25,8 @@ import styles from './app-directory-record-modal.css';
 @customElement('app-directory-record-modal')
 export class AppDirectoryRecordModal extends LitElement {
   @property({ type: Boolean }) open: boolean = false;
-  @property({ attribute: false }) directory: DirectoryDefinition | null = null;
-  @property({ attribute: false }) record: DirectoryRecord | null = null;
+  @property({ type: Object, attribute: false }) directory: DirectoryDefinition | null = null;
+  @property({ type: Object, attribute: false }) record: DirectoryRecord | null = null;
 
   @state() private currentLang: SupportedLang = store.customization.language;
   @state() private formCode: string = '';

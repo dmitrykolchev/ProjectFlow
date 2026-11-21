@@ -98,10 +98,10 @@ export class AppDataGridColumn extends LitElement {
   @property({ type: String }) align: 'left' | 'center' | 'right' = 'left';
   @property({ type: String, attribute: 'cell-type' }) cellType: DataGridCellType = 'text';
 
-  @property({ attribute: false }) template?: DataGridCellTemplate;
-  @property({ attribute: false }) renderer?: DataGridCellTemplate;
-  @property({ attribute: false }) sortValue?: (row: Record<string, unknown>, value: unknown) => string | number;
-  @property({ attribute: false }) groupFormatter?: (value: unknown) => string;
+  @property({ type: Object, attribute: false }) template?: DataGridCellTemplate;
+  @property({ type: Object, attribute: false }) renderer?: DataGridCellTemplate;
+  @property({ type: Object, attribute: false }) sortValue?: (row: Record<string, unknown>, value: unknown) => string | number;
+  @property({ type: Object, attribute: false }) groupFormatter?: (value: unknown) => string;
 
   static styles = styles;
 

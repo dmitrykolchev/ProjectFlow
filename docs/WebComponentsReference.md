@@ -213,7 +213,7 @@ One saved AI analysis summary for a task or requirement: author, model and date 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `summary` | String | AnalysisSummary record (kind task\|requirement) |
+| `summary` | Object | AnalysisSummary record (kind task\|requirement) |
 | `expanded` | Boolean, default `true` | Collapsed history entries render only a short overview line |
 | `addedTitles` | string[], default `[]` | Subtask titles already present on the owning task |
 
@@ -225,11 +225,11 @@ Circular initials/image avatar in five sizes, used for employees, assignees, and
 
 | Property | Type / default | Description |
 |---|---|---|
-| `initials` | String, default `''` | Initials rendered when no image is set |
-| `src` | String, default `''` | Image URL (falls back to initials on error) |
-| `size` | String, default `'md'` | Avatar diameter preset |
-| `color` | String, default `''` | Background color of the initials tile |
-| `title` | String, default `''` | Native tooltip text |
+| `initials` | string, default `''` | Initials rendered when no image is set |
+| `src` | string, default `''` | Image URL (falls back to initials on error) |
+| `size` | 'xs' | 'sm' | 'md' | 'lg' | 'xl', default `'md'` | Avatar diameter preset |
+| `color` | string, default `''` | Background color of the initials tile |
+| `title` | string, default `''` | Native tooltip text |
 
 #### `app-badge` — `AppBadge`
 
@@ -239,11 +239,11 @@ Semantic status, priority, and count badges supporting soft, solid, and outline 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `variant` | String, default `'neutral'` | Semantic color of the badge (neutral, info, success, warning, danger) |
-| `appearance` | String, default `'soft'` | Rendering style: soft fill / outline |
-| `size` | String, default `'md'` | Visual density: sm / md / lg |
-| `dot` | Boolean, default `false` | Renders a status dot without text |
-| `removable` | Boolean, default `false` | Shows a remove (×) affordance |
+| `variant` | BadgeVariant, default `'neutral'` | Semantic color of the badge (neutral, info, success, warning, danger) |
+| `appearance` | BadgeAppearance, default `'soft'` | Rendering style: soft fill / outline |
+| `size` | BadgeSize, default `'md'` | Visual density: sm / md / lg |
+| `dot` | boolean, default `false` | Renders a status dot without text |
+| `removable` | boolean, default `false` | Shows a remove (×) affordance |
 
 **Events:** `remove`
 
@@ -267,11 +267,11 @@ Multi-bank, multi-currency bank requisites viewer and inline manager. Supports c
 | Property | Type / default | Description |
 |---|---|---|
 | `accounts` | BankRequisite[], default `[]` | Array of BankRequisite records |
-| `editable` | Boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
-| `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
-| `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
-| `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
-| `heading` | String, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
+| `editable` | boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
+| `compact` | boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
+| `hide-header` | boolean, default `false` | Hides internal header when embedded inside app-section-card |
+| `hideHeader` | boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
+| `heading` | string, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
 
 **Events:** `accounts-change`
 
@@ -293,8 +293,8 @@ Groups related buttons or toggle buttons horizontally or vertically with seamles
 
 | Property | Type / default | Description |
 |---|---|---|
-| `orientation` | String, default `'horizontal'` | Layout direction of the group: horizontal / vertical |
-| `attached` | Boolean, default `true` | Shares borders between children (no gaps) |
+| `orientation` | 'horizontal' | 'vertical', default `'horizontal'` | Layout direction of the group: horizontal / vertical |
+| `attached` | boolean, default `true` | Shares borders between children (no gaps) |
 
 | Slot | Content |
 |---|---|
@@ -330,16 +330,16 @@ A grid of entity cards built from a per-view template. The card content is produ
 |---|---|---|
 | `rows` | Record<string, unknown>[], default `[]` | Array of card items rendered by the grid |
 | `cardRender` | (row: Record<string, unknown>) => TemplateResult, default `() => html``` | Template function (row) => TemplateResult producing the card content |
-| `page-size` | Number, default `9` | Cards per page for the internal pagination (default 9) |
-| `page` | Number, default `1` | Initial page number (clamped to the available pages) |
-| `clickable` | Boolean, default `false` | The shell activates on click and emits card-click { item } (outside controls) |
-| `selectable` | Boolean, default `false` | Selection keyed by key-field; chosen cards get the is-selected shell class |
-| `key-field` | String, default `'id'` | Field holding the selection key (default id) |
-| `selectedKeys` | Array, default `[]` | Array of currently selected keys; toggleSelect(key) flips one key |
-| `locale` | String, default `'ru-RU'` | Formatting locale passed to the footer pagination |
-| `empty-title` | String, default `''` | Title of the compact app-empty-state shown for empty rows |
-| `cardClass` | String | Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68) |
-| `wide-collapse` | Boolean, default `false` | Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off) |
+| `page-size` | number, default `9` | Cards per page for the internal pagination (default 9) |
+| `page` | number, default `1` | Initial page number (clamped to the available pages) |
+| `clickable` | boolean, default `false` | The shell activates on click and emits card-click { item } (outside controls) |
+| `selectable` | boolean, default `false` | Selection keyed by key-field; chosen cards get the is-selected shell class |
+| `key-field` | string, default `'id'` | Field holding the selection key (default id) |
+| `selectedKeys` | string[], default `[]` | Array of currently selected keys; toggleSelect(key) flips one key |
+| `locale` | string, default `'ru-RU'` | Formatting locale passed to the footer pagination |
+| `empty-title` | string, default `''` | Title of the compact app-empty-state shown for empty rows |
+| `cardClass` | Object | Additive hook (row) => string appending extra shell classes per row (is-dimmed reads --card-dimmed-opacity, default 0.68) |
+| `wide-collapse` | boolean, default `false` | Additive attribute hook collapsing the grid to one column at viewport <= 1024px (default off) |
 | `--cards-columns` | CSS var | Grid column count token (default auto-fill); a view can pin an exact number of columns |
 | `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical |
 
@@ -351,18 +351,18 @@ Confirmation modal built on app-modal: header icon + title, "выполняем�
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the dialog |
-| `title` | String, default `''` | Header caption |
-| `variant` | String, default `'danger'` | Semantic color: info / success / warning / danger |
-| `icon` | String, default `''` | Header icon name |
-| `action` | String, default `''` | Text of the "action being performed" section |
-| `result` | String, default `''` | Text of the "expected result" box |
-| `message` | String, default `''` | Legacy single-body message (used when action/result are empty) |
-| `actionLabel` | String, default `''` | Caption of the action section header |
-| `resultLabel` | String, default `''` | Caption of the result section header |
-| `confirmLabel` | String, default `''` | Caption of the confirm button |
-| `cancelLabel` | String, default `''` | Caption of the cancel button |
-| `size` | String, default `'sm'` | Dialog width preset |
+| `open` | boolean, default `false` | Opens the dialog |
+| `title` | string, default `''` | Header caption |
+| `variant` | ConfirmVariant, default `'danger'` | Semantic color: info / success / warning / danger |
+| `icon` | string, default `''` | Header icon name |
+| `action` | string, default `''` | Text of the "action being performed" section |
+| `result` | string, default `''` | Text of the "expected result" box |
+| `message` | string, default `''` | Legacy single-body message (used when action/result are empty) |
+| `actionLabel` | string, default `''` | Caption of the action section header |
+| `resultLabel` | string, default `''` | Caption of the result section header |
+| `confirmLabel` | string, default `''` | Caption of the confirm button |
+| `cancelLabel` | string, default `''` | Caption of the cancel button |
+| `size` | 'sm' | 'md' | 'lg' | 'xl', default `'sm'` | Dialog width preset |
 
 **Events:** `confirm`, `cancel`
 
@@ -374,8 +374,8 @@ One context source chip: kind icon badge (requirement / knowledge base / documen
 
 | Property | Type / default | Description |
 |---|---|---|
-| `data` | String | ContextChipData record (key, kind, id, title, reason, selected) |
-| `mode` | String, default `'display'` | select = toggleable picker chip; display = read-only chip with open action |
+| `data` | Object | ContextChipData record (key, kind, id, title, reason, selected) |
+| `mode` | 'select' | 'display', default `'display'` | select = toggleable picker chip; display = read-only chip with open action |
 
 #### `app-context-chips-list` — `AppContextChipsList`
 
@@ -386,7 +386,7 @@ A two-column grid of context source chips with an inner scrollbar. items carries
 | Property | Type / default | Description |
 |---|---|---|
 | `items` | ContextChipData[], default `[]` | ContextChipData[] — key, kind, id, title, reason, selected |
-| `mode` | String, default `'display'` | select = toggleable picker chips; display = read-only chips with open action |
+| `mode` | 'select' | 'display', default `'display'` | select = toggleable picker chips; display = read-only chips with open action |
 
 #### `app-counterparty-contacts` — `AppCounterpartyContacts`
 
@@ -397,11 +397,11 @@ Multi-person counterparty contacts viewer and inline CRUD manager. Supports pers
 | Property | Type / default | Description |
 |---|---|---|
 | `contacts` | CounterpartyContact[], default `[]` | Array of CounterpartyContact records |
-| `editable` | Boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
-| `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
-| `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
-| `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
-| `heading` | String, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
+| `editable` | boolean, default `false` | Enables Add / Edit / Delete / Set Primary actions |
+| `compact` | boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
+| `hide-header` | boolean, default `false` | Hides internal header when embedded inside app-section-card |
+| `hideHeader` | boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
+| `heading` | string, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
 
 **Events:** `contacts-change`
 
@@ -413,27 +413,27 @@ Universal declarative column configuration element (<app-data-grid-column>) for 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `field` | String, default `''` | Property name or dot-path in each row object |
-| `caption` | String, default `''` | Column header text (falls back to header or field) |
+| `field` | string, default `''` | Property name or dot-path in each row object |
+| `caption` | string, default `''` | Column header text (falls back to header or field) |
 | `hidden` | — | Hides the column initially while keeping it toggleable in the column menu |
-| `resizable` | Boolean, default `true` | Enables drag-to-resize handle on the column header (use resizable="false" to lock width) |
-| `sortable` | Boolean, default `false` | Allows sorting by clicking the header; grouped columns sort automatically first |
-| `groupable` | Boolean, default `false` | Allows grouping by this column via toolbar selector or drag-to-group bar |
-| `reorderable` | Boolean, default `true` | Allows drag reordering of the column header |
-| `hideable` | Boolean, default `true` | Controls whether the column appears in the Columns visibility popover |
-| `exportable` | Boolean, default `true` | Controls whether the column is included when exporting CSV |
-| `align` | String, default `'left'` | Horizontal cell & header alignment: left \| center \| right |
-| `cellType` | String, default `'text'` | Built-in formatter preset (text \| key \| title \| status \| priority \| assignee \| dates \| progress \| tags \| badge) |
-| `template` | String | JS callback (row, value) => TemplateResult \| string \| number; alternatively pass an HTML <template> child using {{field}} / {{value}} placeholders |
-| `sortValue` | String | Custom comparator value extractor (row, value) => string \| number |
-| `groupFormatter` | String | Custom group header label formatter (value) => string |
-| `header` | String, default `''` | Secondary header text; used as caption when caption is empty (caption → header → field) |
-| `width` | Number, default `150` | Initial column width in px (default 150); the grid keeps user-resized widths in its own state |
-| `min-width` | Number, default `70` | Smallest width the resize handle can drag to, in px (default 70); declared as min-width, documented as minWidth |
+| `resizable` | boolean, default `true` | Enables drag-to-resize handle on the column header (use resizable="false" to lock width) |
+| `sortable` | boolean, default `false` | Allows sorting by clicking the header; grouped columns sort automatically first |
+| `groupable` | boolean, default `false` | Allows grouping by this column via toolbar selector or drag-to-group bar |
+| `reorderable` | boolean, default `true` | Allows drag reordering of the column header |
+| `hideable` | boolean, default `true` | Controls whether the column appears in the Columns visibility popover |
+| `exportable` | boolean, default `true` | Controls whether the column is included when exporting CSV |
+| `align` | 'left' | 'center' | 'right', default `'left'` | Horizontal cell & header alignment: left \| center \| right |
+| `cellType` | DataGridCellType, default `'text'` | Built-in formatter preset (text \| key \| title \| status \| priority \| assignee \| dates \| progress \| tags \| badge) |
+| `template` | Object | JS callback (row, value) => TemplateResult \| string \| number; alternatively pass an HTML <template> child using {{field}} / {{value}} placeholders |
+| `sortValue` | Object | Custom comparator value extractor (row, value) => string \| number |
+| `groupFormatter` | Object | Custom group header label formatter (value) => string |
+| `header` | string, default `''` | Secondary header text; used as caption when caption is empty (caption → header → field) |
+| `width` | number, default `150` | Initial column width in px (default 150); the grid keeps user-resized widths in its own state |
+| `min-width` | number, default `70` | Smallest width the resize handle can drag to, in px (default 70); declared as min-width, documented as minWidth |
 | `override` | Boolean, default `false` | Property name override for the reflected hidden attribute (declared as `override hidden`); lets a column bind a row field named hidden without colliding |
-| `minWidth` | Number, default `70` | Smallest width the resize handle can drag to, in px (default 70); attribute form min-width |
-| `visible` | Boolean, default `true` | Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover) |
-| `renderer` | String | Alias of template — cell render callback (row, value) => TemplateResult \| string \| number; the grid reads template ?? renderer |
+| `minWidth` | number, default `70` | Smallest width the resize handle can drag to, in px (default 70); attribute form min-width |
+| `visible` | boolean, default `true` | Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover) |
+| `renderer` | Object | Alias of template — cell render callback (row, value) => TemplateResult \| string \| number; the grid reads template ?? renderer |
 
 **Events:** `column-change`
 
@@ -449,15 +449,15 @@ Fully custom-styled theme-aware Date Picker with interactive calendar popover, m
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `value` | String, default `''` | Selected date in YYYY-MM-DD format |
-| `placeholder` | String, default `'YYYY-MM-DD'` | Placeholder text shown when empty |
-| `min` | String, default `''` | Earliest selectable date (YYYY-MM-DD) |
-| `max` | String, default `''` | Latest selectable date (YYYY-MM-DD) |
-| `required` | Boolean, default `false` | Marks the field as required |
-| `disabled` | Boolean, default `false` | Disables editing and the calendar popover |
-| `error` | String, default `''` | Error message; renders the field in danger state |
-| `size` | String, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
+| `label` | string, default `''` | Caption above the field |
+| `value` | string, default `''` | Selected date in YYYY-MM-DD format |
+| `placeholder` | string, default `'YYYY-MM-DD'` | Placeholder text shown when empty |
+| `min` | string, default `''` | Earliest selectable date (YYYY-MM-DD) |
+| `max` | string, default `''` | Latest selectable date (YYYY-MM-DD) |
+| `required` | boolean, default `false` | Marks the field as required |
+| `disabled` | boolean, default `false` | Disables editing and the calendar popover |
+| `error` | string, default `''` | Error message; renders the field in danger state |
+| `size` | 'sm' | 'md' | 'lg', default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
 **Events:** `change`
 
@@ -469,7 +469,7 @@ Schema-driven modal form for creating and editing both simple (code, name, sortO
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Controls modal visibility |
+| `open` | boolean, default `false` | Controls modal visibility |
 | `directory` | DirectoryDefinition | null, default `null` | DirectoryDefinition schema governing core and extended fields |
 | `record` | DirectoryRecord | null, default `null` | DirectoryRecord being edited, or null for create mode |
 
@@ -519,7 +519,7 @@ One draggable row, shaped like a form control: value is the entity id behind the
 | `index` | Number, default `0` | position in the list (order number and up-button disabled state) |
 | `total` | Number, default `0` | list length (down-button disabled state) |
 | `dragging` | Boolean, default `false` | the row is being dragged (dashed accent border, faded) |
-| `drop` | String, default `null` | drop indicator on this row: before \| after \| null |
+| `drop` | 'before' | 'after' | null, default `null` | drop indicator on this row: before \| after \| null |
 
 #### `app-dropdown-button` — `AppDropdownButton`
 
@@ -529,12 +529,12 @@ Action button paired with a contextual dropdown menu popover and outside-click d
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `'Actions'` | Button caption |
-| `variant` | String, default `'secondary'` | Visual style of the button surface |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `placement` | String, default `'bottom-start'` | Menu placement relative to the button (bottom-start, bottom-end, ...) |
-| `disabled` | Boolean, default `false` | Disables interaction |
-| `items` | Array, default `[]` | Menu item definitions rendered in the dropdown |
+| `label` | string, default `'Actions'` | Button caption |
+| `variant` | ButtonVariant, default `'secondary'` | Visual style of the button surface |
+| `size` | ButtonSize, default `'md'` | Control height: sm / md / lg |
+| `placement` | 'bottom-start' | 'bottom-end', default `'bottom-start'` | Menu placement relative to the button (bottom-start, bottom-end, ...) |
+| `disabled` | boolean, default `false` | Disables interaction |
+| `items` | MenuItem[], default `[]` | Menu item definitions rendered in the dropdown |
 
 **Events:** `select`
 
@@ -560,8 +560,8 @@ Embeddable contextual reminders widget for any system entity detail view (compan
 
 | Property | Type / default | Description |
 |---|---|---|
-| `entity-type` | String, default `'project'` | Linked entity kind (company, contract, task, contact, etc.) |
-| `entity-id` | String, default `''` | Target entity record identifier |
+| `entity-type` | ReminderEntityType, default `'project'` | Linked entity kind (company, contract, task, contact, etc.) |
+| `entity-id` | string, default `''` | Target entity record identifier |
 
 #### `app-file-dropzone` — `AppFileDropzone`
 
@@ -571,19 +571,19 @@ Embeddable contextual reminders widget for any system entity detail view (compan
 
 | Property | Type / default | Description |
 |---|---|---|
-| `accept` | String, default `''` | Accepted file extensions (native accept attribute) |
-| `title` | String, default `''` | Headline inside the drop area |
-| `hint` | String, default `''` | Secondary hint text under the headline |
-| `buttonLabel` | String, default `''` | Caption of the browse button |
-| `clearLabel` | String, default `''` | Caption of the clear button for a selected file |
-| `selectedLabel` | String, default `''` | Template caption for the selected-file line |
-| `compact` | Boolean, default `false` | Reduced height for dense forms |
-| `selectedFileName` | String, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
-| `selectedFileSize` | Number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
-| `disabled` | Boolean, default `false` | Disables drop and browse |
-| `selected-file-name` | String, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
-| `selected-file-size` | Number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
-| `multiple` | Boolean, default `false` | Allows picking several files (native multiple on the input); the files event carries all of them, false carries only the first |
+| `accept` | string, default `''` | Accepted file extensions (native accept attribute) |
+| `title` | string, default `''` | Headline inside the drop area |
+| `hint` | string, default `''` | Secondary hint text under the headline |
+| `buttonLabel` | string, default `''` | Caption of the browse button |
+| `clearLabel` | string, default `''` | Caption of the clear button for a selected file |
+| `selectedLabel` | string, default `''` | Template caption for the selected-file line |
+| `compact` | boolean, default `false` | Reduced height for dense forms |
+| `selectedFileName` | string, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
+| `selectedFileSize` | number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
+| `disabled` | boolean, default `false` | Disables drop and browse |
+| `selected-file-name` | string, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
+| `selected-file-size` | number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
+| `multiple` | boolean, default `false` | Allows picking several files (native multiple on the input); the files event carries all of them, false carries only the first |
 
 **Events:** `files-selected`, `file-selected`, `file-cleared`
 
@@ -595,13 +595,13 @@ Toolbar with search input, N filter selects, optional reset button and trailing 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `searchValue` | String, default `''` | Current text of the search box |
-| `searchEnabled` | Boolean, default `true` | Shows the search input |
-| `filters` | Array, default `[]` | Filter definitions (key, options, type select \| entity) |
-| `values` | Object, default `{}` | Current filter values keyed by filter id |
-| `placeholder` | String, default `''` | Search box placeholder |
-| `variant` | String, default `'card'` | Surface style: card / plain |
-| `showReset` | Boolean, default `false` | Shows the reset button when filters are active |
+| `searchValue` | string, default `''` | Current text of the search box |
+| `searchEnabled` | boolean, default `true` | Shows the search input |
+| `filters` | FilterDef[], default `[]` | Filter definitions (key, options, type select \| entity) |
+| `values` | Record<string, string>, default `{}` | Current filter values keyed by filter id |
+| `placeholder` | string, default `''` | Search box placeholder |
+| `variant` | 'card' | 'bare', default `'card'` | Surface style: card / plain |
+| `showReset` | boolean, default `false` | Shows the reset button when filters are active |
 
 **Events:** `reset`, `search-change`, `filter-change`
 
@@ -623,7 +623,7 @@ Two-column grid for modal form fields; collapses to one column below 640px. Slot
 
 | Property | Type / default | Description |
 |---|---|---|
-| `columns` | Number, default `2` | Number of form grid columns (children span full width via col-span) |
+| `columns` | number, default `2` | Number of form grid columns (children span full width via col-span) |
 
 | Slot | Content |
 |---|---|
@@ -649,8 +649,8 @@ Responsive grid layout wrapper for KPI cards (app-metric-card), collapsing to 2 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `columns` | Number, default `4` | Number of grid columns for the metric cards |
-| `variant` | String, default `'grid'` | Layout style: grid / strip |
+| `columns` | number, default `4` | Number of grid columns for the metric cards |
+| `variant` | 'grid' | 'strip', default `'grid'` | Layout style: grid / strip |
 
 | Slot | Content |
 |---|---|
@@ -686,6 +686,9 @@ Material Symbols ligature icon (self-hosted variable font) with Google axes fill
 | `weight` | Number, default `400` | Google wght axis: 100..700 stroke weight (default 400) |
 | `grade` | Number, default `0` | Google GRAD axis: -50..200 optical grade — thicker glyphs at larger sizes |
 | `decorative` | Boolean, default `false` | Marks the glyph as decoration: aria-hidden, role=presentation, no accessible name from the ligature |
+| `name` | String, default `'star'` | — |
+| `family` | MaterialIconFamily, default `'outlined'` | — |
+| `variant` | MaterialIconVariant, default `'neutral'` | — |
 
 #### `app-material-icon-gallery` — `AppMaterialIconGallery`
 
@@ -695,11 +698,14 @@ Material Symbols palette with search by name, category and tags; toolbar control
 
 | Property | Type / default | Description |
 |---|---|---|
-| `icons` | Array, default `[]` | MaterialIconDef records rendered by the gallery (property binding, array) |
+| `icons` | MaterialIconDef[], default `[]` | MaterialIconDef records rendered by the gallery (property binding, array) |
 | `fill` | Number, default `0` | Initial FILL axis value for the toolbar (0\|1); changes fire params-change |
 | `weight` | Number, default `400` | Initial wght axis value for the toolbar (100..700); changes fire params-change |
 | `grade` | Number, default `0` | Initial GRAD axis value for the toolbar (-50..200); changes fire params-change |
 | `disabled` | Boolean, default `false` | Blocks search, toolbar and grid interaction — the gallery renders read-only |
+| `query` | String, default `''` | — |
+| `category` | String, default `'all'` | — |
+| `family` | GalleryFamily, default `'outlined'` | — |
 
 #### `app-menu` — `AppMenu`
 
@@ -709,7 +715,7 @@ Standalone accessible menu surface supporting both programmatic items arrays and
 
 | Property | Type / default | Description |
 |---|---|---|
-| `items` | Array, default `[]` | Menu item definitions (label, icon, action, separators) |
+| `items` | MenuItem[], default `[]` | Menu item definitions (label, icon, action, separators) |
 
 **Events:** `select`
 
@@ -731,7 +737,7 @@ Declarative horizontal separator element for dividing sections of items inside <
 
 | Property | Type / default | Description |
 |---|---|---|
-| `inset` | Boolean, default `false` | Applies left indentation aligned with icon-prefixed menu item labels |
+| `inset` | boolean, default `false` | Applies left indentation aligned with icon-prefixed menu item labels |
 
 #### `app-menu-header` — `AppMenuHeader`
 
@@ -741,7 +747,7 @@ Declarative section heading element for grouping related <app-menu-item> entries
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Section heading text |
+| `label` | string, default `''` | Section heading text |
 
 | Slot | Content |
 |---|---|
@@ -755,14 +761,14 @@ Declarative interactive menu entry used inside <app-menu> with support for icons
 
 | Property | Type / default | Description |
 |---|---|---|
-| `value` | String, default `''` | Action identifier emitted in the select event detail (falls back to id) |
-| `label` | String, default `''` | Item text caption |
-| `shortcut` | String, default `''` | Keyboard shortcut hint displayed on the right |
-| `disabled` | Boolean, default `false` | Prevents clicking and keyboard activation |
-| `danger` | Boolean, default `false` | Highlights destructive action styling |
-| `checked` | Boolean, default `false` | Renders active checkmark state |
-| `checkable` | Boolean, default `false` | Reserves checkmark gutter and toggles checked state on click |
-| `icon` | String | Programmatic leading icon (TemplateResult or string) |
+| `value` | string, default `''` | Action identifier emitted in the select event detail (falls back to id) |
+| `label` | string, default `''` | Item text caption |
+| `shortcut` | string, default `''` | Keyboard shortcut hint displayed on the right |
+| `disabled` | boolean, default `false` | Prevents clicking and keyboard activation |
+| `danger` | boolean, default `false` | Highlights destructive action styling |
+| `checked` | boolean, default `false` | Renders active checkmark state |
+| `checkable` | boolean, default `false` | Reserves checkmark gutter and toggles checked state on click |
+| `icon` | Object | Programmatic leading icon (TemplateResult or string) |
 
 **Events:** `select`
 
@@ -786,9 +792,9 @@ Label/value boxes in strip (1×N) or grid (2-column) layout, with mono and dange
 
 | Property | Type / default | Description |
 |---|---|---|
-| `items` | Array, default `[]` | Meta field definitions (label + value, mono / danger variants, title tooltip, link { label, onClick }) |
-| `columns` | Number, default `3` | Number of columns in the grid |
-| `layout` | String, default `'strip'` | Rendering style: strip / grid / inline |
+| `items` | MetaItem[], default `[]` | Meta field definitions (label + value, mono / danger variants, title tooltip, link { label, onClick }) |
+| `columns` | number, default `3` | Number of columns in the grid |
+| `layout` | 'strip' | 'grid', default `'strip'` | Rendering style: strip / grid / inline |
 
 | Slot | Content |
 |---|---|
@@ -806,10 +812,10 @@ Declarative meta field carrier for app-meta-grid. Renders nothing; the parent co
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Field caption shown above the value |
-| `value` | String, default `''` | Field value (falls back to the element text) |
-| `mono` | Boolean, default `false` | Monospaced tabular value style |
-| `danger` | Boolean, default `false` | Danger-colored value style |
+| `label` | string, default `''` | Field caption shown above the value |
+| `value` | string, default `''` | Field value (falls back to the element text) |
+| `mono` | boolean, default `false` | Monospaced tabular value style |
+| `danger` | boolean, default `false` | Danger-colored value style |
 
 | Slot | Content |
 |---|---|
@@ -825,9 +831,9 @@ Tabular-numeral currency formatting (RUB/USD/EUR) with full and short (K/M) form
 
 | Property | Type / default | Description |
 |---|---|---|
-| `amount` | Number, default `0` | Numeric amount |
-| `currency` | String, default `'RUB'` | Currency code: RUB / USD / EUR (symbol and locale formatting follow UI language) |
-| `format` | String, default `'full'` | full = grouped digits; short = K/M compact notation |
+| `amount` | number, default `0` | Numeric amount |
+| `currency` | BankCurrency, default `'RUB'` | Currency code: RUB / USD / EUR (symbol and locale formatting follow UI language) |
+| `format` | 'full' | 'short', default `'full'` | full = grouped digits; short = K/M compact notation |
 
 #### `app-option` — `AppOption`
 
@@ -837,19 +843,19 @@ Declarative option carrier for option-list components. Renders nothing; the pare
 
 | Property | Type / default | Description |
 |---|---|---|
-| `value` | String, default `''` | Option value emitted by the parent (falls back to the label) |
-| `label` | String, default `''` | Option caption (falls back to the element text) |
-| `color` | String, default `''` | Color indicator used by app-select rows |
-| `icon` | String | Programmatic leading icon (TemplateResult or string) |
-| `code` | String, default `''` | Entity code shown in entity-selector rows |
-| `subtitle` | String, default `''` | Secondary line in entity-selector rows |
-| `meta` | String, default `''` | Meta line in entity-selector rows |
-| `badge` | String, default `''` | Badge text in entity-selector rows |
-| `badgeColor` | String, default `''` | Badge color in entity-selector rows |
-| `avatar` | String, default `''` | Avatar source (initials or image url) in entity-selector rows |
-| `description` | String, default `''` | Description line used by app-radio-group cards |
+| `value` | string, default `''` | Option value emitted by the parent (falls back to the label) |
+| `label` | string, default `''` | Option caption (falls back to the element text) |
+| `color` | string, default `''` | Color indicator used by app-select rows |
+| `icon` | Object | Programmatic leading icon (TemplateResult or string) |
+| `code` | string, default `''` | Entity code shown in entity-selector rows |
+| `subtitle` | string, default `''` | Secondary line in entity-selector rows |
+| `meta` | string, default `''` | Meta line in entity-selector rows |
+| `badge` | string, default `''` | Badge text in entity-selector rows |
+| `badgeColor` | string, default `''` | Badge color in entity-selector rows |
+| `avatar` | string, default `''` | Avatar source (initials or image url) in entity-selector rows |
+| `description` | string, default `''` | Description line used by app-radio-group cards |
 | `keywords` | Array | Search keywords for the entity-selector filter |
-| `disabled` | Boolean, default `false` | Option is not selectable |
+| `disabled` | boolean, default `false` | Option is not selectable |
 
 | Slot | Content |
 |---|---|
@@ -865,11 +871,11 @@ Declarative option carrier for option-list components. Renders nothing; the pare
 
 | Property | Type / default | Description |
 |---|---|---|
-| `length` | Number, default `6` | Number of verification code cells (default 6). |
-| `value` | String, default `''` | Current numeric code string. |
-| `disabled` | Boolean, default `false` | Disables all cells while verifying. |
-| `error` | Boolean, default `false` | Highlights cells in danger palette and plays shake feedback. |
-| `autofocus` | Boolean, default `false` | Automatically focuses the first cell on mount. |
+| `length` | number, default `6` | Number of verification code cells (default 6). |
+| `value` | string, default `''` | Current numeric code string. |
+| `disabled` | boolean, default `false` | Disables all cells while verifying. |
+| `error` | boolean, default `false` | Highlights cells in danger palette and plays shake feedback. |
+| `autofocus` | boolean, default `false` | Automatically focuses the first cell on mount. |
 
 **Events:** `otp-change`, `otp-complete`
 
@@ -881,15 +887,15 @@ Pagination bar with smart page buttons, range summary, and mode-aware page-size 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `totalItems` | Number, default `0` | Total record count across all pages |
-| `page` | Number, default `1` | Current page number (1-based) |
-| `pageSize` | Number, default `10` | Records per page |
+| `totalItems` | number, default `0` | Total record count across all pages |
+| `page` | number, default `1` | Current page number (1-based) |
+| `pageSize` | number, default `10` | Records per page |
 | `pageSizeOptions` | Array | Choices offered in the page-size selector |
-| `layoutMode` | String, default `'table'` | Density preset for table vs card grids |
-| `variant` | String, default `'surface'` | Surface style |
-| `compact` | Boolean, default `false` | Compact rendering |
-| `showPageSize` | Boolean, default `true` | Shows the page-size selector |
-| `showSummary` | Boolean, default `true` | Shows the "records x–y of z" summary |
+| `layoutMode` | PaginationLayoutMode, default `'table'` | Density preset for table vs card grids |
+| `variant` | PaginationVariant, default `'surface'` | Surface style |
+| `compact` | boolean, default `false` | Compact rendering |
+| `showPageSize` | boolean, default `true` | Shows the page-size selector |
+| `showSummary` | boolean, default `true` | Shows the "records x–y of z" summary |
 | `locale` | String | Locale used for number formatting (defaults to UI language) |
 
 **Events:** `page-change`, `page-size-change`
@@ -902,18 +908,18 @@ Person representation: avatar (photo or initials on a colored tile), name, posit
 
 | Property | Type / default | Description |
 |---|---|---|
-| `size` | String, default `'48'` | Avatar diameter preset (24/32/40/48/56/72/100, default 48) |
-| `image` | String, default `''` | Photo URL; falls back to initials when empty |
-| `initials` | String, default `''` | Initials; derived from primaryText when not set (Cyrillic names included) |
-| `primaryText` | String, default `''` | Name or identification |
-| `secondaryText` | String, default `''` | Position / project role under the name |
-| `tertiaryText` | String, default `''` | Extra line, e.g. "In a meeting" (sizes 56+) |
-| `presence` | String, default `'none'` | Presence badge status (none/online/available/away/busy/dnd/blocked/offline); words go to the tooltip and accessible name, never to visible text |
+| `size` | PersonaSize, default `'48'` | Avatar diameter preset (24/32/40/48/56/72/100, default 48) |
+| `image` | string, default `''` | Photo URL; falls back to initials when empty |
+| `initials` | string, default `''` | Initials; derived from primaryText when not set (Cyrillic names included) |
+| `primaryText` | string, default `''` | Name or identification |
+| `secondaryText` | string, default `''` | Position / project role under the name |
+| `tertiaryText` | string, default `''` | Extra line, e.g. "In a meeting" (sizes 56+) |
+| `presence` | PersonaPresence, default `'none'` | Presence badge status (none/online/available/away/busy/dnd/blocked/offline); words go to the tooltip and accessible name, never to visible text |
 | `showOverflowTooltip` | — | Native tooltip with the full text on truncated lines (default true) |
-| `color` | String, default `''` | Background of the initials tile |
-| `ariaLabel` | String, default `''` | Accessible name override |
-| `interactive` | Boolean, default `true` | Renders the persona as a focusable ghost button (default true) so consumers bind @click / persona-click on the host; false renders plain markup |
-| `personaDisabled` | Boolean, default `false` | Dims the persona and disables its button (attribute persona-disabled); the persona-click event is not dispatched |
+| `color` | string, default `''` | Background of the initials tile |
+| `ariaLabel` | string, default `''` | Accessible name override |
+| `interactive` | boolean, default `true` | Renders the persona as a focusable ghost button (default true) so consumers bind @click / persona-click on the host; false renders plain markup |
+| `personaDisabled` | boolean, default `false` | Dims the persona and disables its button (attribute persona-disabled); the persona-click event is not dispatched |
 
 #### `app-presence-icon` — `AppPresenceIcon`
 
@@ -923,11 +929,11 @@ Presence status icon: a colored dot with the state glyph, the same geometry as t
 
 | Property | Type / default | Description |
 |---|---|---|
-| `presence` | String, default `'none'` | Presence status (none/online/available/away/busy/dnd/blocked/offline); none renders nothing |
-| `size` | String, default `'12'` | Dot diameter in px (persona badge sizes are 8/12/16/20/24/32/40) |
-| `glyph` | String, default `'auto'` | Glyph size in px; auto follows the persona rule (round(size x 0.6), suppressed below 16px), 0 forces a colour-only dot |
-| `color` | String, default `''` | Dot fill override; defaults to the presence token color |
-| `ariaLabel` | String, default `''` | Accessible name override; defaults to the presence label |
+| `presence` | PersonaPresence, default `'none'` | Presence status (none/online/available/away/busy/dnd/blocked/offline); none renders nothing |
+| `size` | string, default `'12'` | Dot diameter in px (persona badge sizes are 8/12/16/20/24/32/40) |
+| `glyph` | string, default `'auto'` | Glyph size in px; auto follows the persona rule (round(size x 0.6), suppressed below 16px), 0 forces a colour-only dot |
+| `color` | string, default `''` | Dot fill override; defaults to the presence token color |
+| `ariaLabel` | string, default `''` | Accessible name override; defaults to the presence label |
 | `showOverflowTooltip` | — | Native tooltip with the presence label (default true) |
 
 #### `app-progress-bar` — `AppProgressBar`
@@ -938,11 +944,11 @@ Single-value or segmented progress bar with optional percentage label; sm/md hei
 
 | Property | Type / default | Description |
 |---|---|---|
-| `value` | Number, default `0` | Current percentage (0–100) |
-| `segments` | Array, default `[]` | Optional segment definitions for multi-color bars |
-| `color` | String, default `'var(--accent-primary, #6366f1)'` | Bar fill color (CSS value / token) |
-| `showLabel` | Boolean, default `false` | Shows the percentage label |
-| `size` | String, default `'md'` | Bar height preset |
+| `value` | number, default `0` | Current percentage (0–100) |
+| `segments` | ProgressSegment[], default `[]` | Optional segment definitions for multi-color bars |
+| `color` | string, default `'var(--accent-primary, #6366f1)'` | Bar fill color (CSS value / token) |
+| `showLabel` | boolean, default `false` | Shows the percentage label |
+| `size` | 'sm' | 'md', default `'md'` | Bar height preset |
 
 #### `app-project-attachments` — `AppProjectAttachments`
 
@@ -952,12 +958,12 @@ File attachment control for time entries and expenses. Allows uploading new file
 
 | Property | Type / default | Description |
 |---|---|---|
-| `project-id` | String, default `''` | Project ID used to scope existing library documents |
+| `project-id` | string, default `''` | Project ID used to scope existing library documents |
 | `documentIds` | string[], default `[]` | Array of already-saved DocumentItem IDs attached to the record |
 | `pendingFiles` | PendingAttachmentFile[], default `[]` | Array of newly selected browser files awaiting save |
-| `label` | String, default `''` | Optional section heading override |
-| `compact` | Boolean, default `false` | Compact display mode without secondary helper hint |
-| `readonly` | Boolean, default `false` | Disables uploading, linking, and detaching files |
+| `label` | string, default `''` | Optional section heading override |
+| `compact` | boolean, default `false` | Compact display mode without secondary helper hint |
+| `readonly` | boolean, default `false` | Disables uploading, linking, and detaching files |
 
 #### `app-project-requirements` — `AppProjectRequirements`
 
@@ -978,14 +984,14 @@ Accessible radio selection group with standard, horizontal, and rich card layout
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the option list |
-| `name` | String, default `''` | Native radio group name (shared within a page) |
-| `value` | String, default `''` | Currently selected option value |
-| `options` | Array, default `[]` | Option definitions (value + label) |
-| `dataSource` | String | Data source for options: array, promise, or function returning an array (sync or async) |
-| `orientation` | String, default `'vertical'` | Layout direction: vertical / horizontal |
-| `variant` | String, default `'default'` | Visual style of the option rows |
-| `disabled` | Boolean, default `false` | Disables all options |
+| `label` | string, default `''` | Caption above the option list |
+| `name` | string, default `''` | Native radio group name (shared within a page) |
+| `value` | string, default `''` | Currently selected option value |
+| `options` | RadioOption[], default `[]` | Option definitions (value + label) |
+| `dataSource` | Object | Data source for options: array, promise, or function returning an array (sync or async) |
+| `orientation` | 'vertical' | 'horizontal', default `'vertical'` | Layout direction: vertical / horizontal |
+| `variant` | 'default' | 'card', default `'default'` | Visual style of the option rows |
+| `disabled` | boolean, default `false` | Disables all options |
 
 **Events:** `change`
 
@@ -1005,12 +1011,12 @@ Visual, human-friendly recurrence rule builder covering the full RFC 5545 specif
 
 | Property | Type / default | Description |
 |---|---|---|
-| `value` | String, default `''` | Initial and current RFC 5545 RRULE string (with or without RRULE: prefix) |
-| `start-date` | String, default `''` | Reference DTSTART (YYYY-MM-DDTHH:mm) used for live upcoming dates preview |
-| `include-prefix` | Boolean, default `true` | Whether emitted RRULE includes the "RRULE:" prefix (default true) |
-| `allow-one-time` | Boolean, default `true` | Allows selecting "Does not repeat" empty rule (default true) |
-| `compact` | Boolean, default `false` | Reduces vertical spacing for embedding inside modals |
-| `hide-rrule-bar` | Boolean, default `false` | Hides raw RRULE string bar while preserving visual editing |
+| `value` | string, default `''` | Initial and current RFC 5545 RRULE string (with or without RRULE: prefix) |
+| `start-date` | string, default `''` | Reference DTSTART (YYYY-MM-DDTHH:mm) used for live upcoming dates preview |
+| `include-prefix` | boolean, default `true` | Whether emitted RRULE includes the "RRULE:" prefix (default true) |
+| `allow-one-time` | boolean, default `true` | Allows selecting "Does not repeat" empty rule (default true) |
+| `compact` | boolean, default `false` | Reduces vertical spacing for embedding inside modals |
+| `hide-rrule-bar` | boolean, default `false` | Hides raw RRULE string bar while preserving visual editing |
 
 #### `app-reminder-form` — `AppReminderForm`
 
@@ -1020,10 +1026,10 @@ Modal form for creating and editing polymorphic reminders linked to any system e
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens or closes the reminder form modal dialog |
+| `open` | boolean, default `false` | Opens or closes the reminder form modal dialog |
 | `reminder` | Reminder | null, default `null` | Existing Reminder entity to edit (null creates a new reminder) |
-| `preset-entity-type` | String, default `''` | Preselected target entity type (company, contract, task, contact, etc.) |
-| `preset-entity-id` | String, default `''` | Preselected target entity identifier |
+| `preset-entity-type` | ReminderEntityType | '', default `''` | Preselected target entity type (company, contract, task, contact, etc.) |
+| `preset-entity-id` | string, default `''` | Preselected target entity identifier |
 
 **Events:** `close`, `saved`
 
@@ -1035,13 +1041,13 @@ Card container with header (title, subtitle, actions slot) and body; optional co
 
 | Property | Type / default | Description |
 |---|---|---|
-| `title` | String, default `''` | Section caption |
-| `subtitle` | String, default `''` | Secondary line under the caption |
-| `ariaLabel` | String, default `''` | Accessible name for the section region (aria-label); falls back to title when empty |
-| `variant` | String, default `'default'` | Surface style: default / plain / elevated |
-| `collapsible` | Boolean, default `false` | Enables collapse toggle in the header |
-| `collapsed` | Boolean, default `false` | Current collapsed state (only for collapsible sections) |
-| `maxHeight` | String, default `''` | CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow |
+| `title` | string, default `''` | Section caption |
+| `subtitle` | string, default `''` | Secondary line under the caption |
+| `ariaLabel` | string, default `''` | Accessible name for the section region (aria-label); falls back to title when empty |
+| `variant` | 'default' | 'plain' | 'panel' | 'tabbed', default `'default'` | Surface style: default / plain / elevated |
+| `collapsible` | boolean, default `false` | Enables collapse toggle in the header |
+| `collapsed` | boolean, default `false` | Current collapsed state (only for collapsible sections) |
+| `maxHeight` | string, default `''` | CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow |
 
 **Events:** `toggle`
 
@@ -1066,12 +1072,12 @@ Compact segmented control for switching between mutually exclusive views, timefr
 
 | Property | Type / default | Description |
 |---|---|---|
-| `options` | Array, default `[]` | Segment definitions (value + label) |
-| `dataSource` | String | Data source for segments: array, promise, or function returning an array (sync or async) |
-| `value` | String, default `''` | Currently selected segment value |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `fullWidth` | Boolean, default `false` | Segments stretch to fill the container |
-| `disabled` | Boolean, default `false` | Disables all segments |
+| `options` | SegmentedOption[], default `[]` | Segment definitions (value + label) |
+| `dataSource` | Object | Data source for segments: array, promise, or function returning an array (sync or async) |
+| `value` | string, default `''` | Currently selected segment value |
+| `size` | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
+| `fullWidth` | boolean, default `false` | Segments stretch to fill the container |
+| `disabled` | boolean, default `false` | Disables all segments |
 
 **Events:** `change`
 
@@ -1091,11 +1097,11 @@ Dual-action button combining a primary action trigger with a secondary options m
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `'Save'` | Main button caption |
-| `variant` | String, default `'primary'` | Visual style of the main button |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `disabled` | Boolean, default `false` | Disables both halves of the button |
-| `items` | Array, default `[]` | Menu items opened by the arrow half |
+| `label` | string, default `'Save'` | Main button caption |
+| `variant` | 'primary' | 'secondary' | 'outline', default `'primary'` | Visual style of the main button |
+| `size` | ButtonSize, default `'md'` | Control height: sm / md / lg |
+| `disabled` | boolean, default `false` | Disables both halves of the button |
+| `items` | MenuItem[], default `[]` | Menu items opened by the arrow half |
 
 **Events:** `primary-click`, `select`
 
@@ -1121,12 +1127,12 @@ Domain-driven status chip: resolves label and badge variant from central STATUS_
 
 | Property | Type / default | Description |
 |---|---|---|
-| `domain` | String, default `'task'` | Status vocabulary: task, contract, invoice, project, dueControl, ... |
-| `status` | String, default `''` | Status code within the domain (rendered with its label and color) |
-| `labelOverride` | String, default `''` | Custom label text rendered instead of the domain label; the badge variant stays domain-driven (empty = domain label) |
-| `size` | String, default `'sm'` | Visual density: sm / md / lg |
-| `appearance` | String, default `'soft'` | Rendering style: soft fill / solid / outline |
-| `dot` | Boolean, default `false` | Shows a leading status dot |
+| `domain` | StatusDomain, default `'task'` | Status vocabulary: task, contract, invoice, project, dueControl, ... |
+| `status` | string, default `''` | Status code within the domain (rendered with its label and color) |
+| `labelOverride` | string, default `''` | Custom label text rendered instead of the domain label; the badge variant stays domain-driven (empty = domain label) |
+| `size` | 'sm' | 'md' | 'lg', default `'sm'` | Visual density: sm / md / lg |
+| `appearance` | 'soft' | 'solid' | 'outline', default `'soft'` | Rendering style: soft fill / solid / outline |
+| `dot` | boolean, default `false` | Shows a leading status dot |
 
 #### `app-table-scroll` — `AppTableScroll`
 
@@ -1137,16 +1143,16 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | Property | Type / default | Description |
 |---|---|---|
 | `rows` | Record<string, unknown>[], default `[]` | Array of row objects rendered by the table |
-| `sort-by` | String, default `''` | Field name currently used for sorting (arrow shown on its header) |
-| `sort-dir` | String, default `'asc'` | Current sort direction: asc / desc |
-| `active-key` | String, default `'isActive'` | Row property holding the active flag; falsy rows render as is-inactive |
-| `empty-title` | String, default `''` | Title passed to the compact empty state when rows is empty |
-| `sortBy` | String, default `''` | Field name currently used for sorting (attribute form sort-by; arrow shown on its header) |
-| `sortDir` | String, default `'asc'` | Current sort direction asc / desc (attribute form sort-dir) |
-| `activeKey` | String, default `'isActive'` | Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive |
-| `emptyTitle` | String, default `''` | Title passed to the compact empty state when rows is empty (attribute form empty-title) |
-| `locale` | String, default `'ru-RU'` | Locale used for number formatting (t.common.locale) |
-| `striped` | Boolean, default `false` | Enables alternating row background coloring (zebra striping) |
+| `sort-by` | string, default `''` | Field name currently used for sorting (arrow shown on its header) |
+| `sort-dir` | SortDirection, default `'asc'` | Current sort direction: asc / desc |
+| `active-key` | string, default `'isActive'` | Row property holding the active flag; falsy rows render as is-inactive |
+| `empty-title` | string, default `''` | Title passed to the compact empty state when rows is empty |
+| `sortBy` | string, default `''` | Field name currently used for sorting (attribute form sort-by; arrow shown on its header) |
+| `sortDir` | SortDirection, default `'asc'` | Current sort direction asc / desc (attribute form sort-dir) |
+| `activeKey` | string, default `'isActive'` | Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive |
+| `emptyTitle` | string, default `''` | Title passed to the compact empty state when rows is empty (attribute form empty-title) |
+| `locale` | string, default `'ru-RU'` | Locale used for number formatting (t.common.locale) |
+| `striped` | boolean, default `false` | Enables alternating row background coloring (zebra striping) |
 | `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
 
 #### `app-task-ai-panel` — `AppTaskAiPanel`
@@ -1159,7 +1165,7 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 |---|---|---|
 | `task` | Object | Task being analyzed |
 | `analyses` | AnalysisSummary[], default `[]` | Saved analysis summaries, newest first; the panel renders each as app-analysis-summary |
-| `clarifications` | Array, default `[]` | Clarification Q&A items |
+| `clarifications` | TaskAiClarificationMessage[], default `[]` | Clarification Q&A items |
 | `compact` | Boolean, default `false` | Reduced layout for embedding inside modals |
 | `timeSummary` | String, default `''` | Time-tracking summary rendered next to the analysis |
 | `expenseSummary` | String, default `''` | Expense summary rendered next to the analysis |
@@ -1173,12 +1179,12 @@ Stateful pressable button supporting soft and solid active variants, icons, and 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `pressed` | Boolean, default `false` | Pressed (toggled) visual state |
-| `variant` | String, default `'soft'` | Visual style of the toggle surface |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `disabled` | Boolean, default `false` | Disables interaction |
-| `iconOnly` | Boolean, default `false` | Renders only the icon, no text |
-| `value` | String, default `''` | Group value emitted on toggle (for radio-style groups) |
+| `pressed` | boolean, default `false` | Pressed (toggled) visual state |
+| `variant` | 'soft' | 'solid', default `'soft'` | Visual style of the toggle surface |
+| `size` | 'xxs' | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
+| `disabled` | boolean, default `false` | Disables interaction |
+| `iconOnly` | boolean, default `false` | Renders only the icon, no text |
+| `value` | string, default `''` | Group value emitted on toggle (for radio-style groups) |
 
 **Events:** `change`
 
@@ -1204,14 +1210,14 @@ Interactive button with multiple semantic variants, sizes, and states. Canonical
 
 | Property | Type / default | Description |
 |---|---|---|
-| `variant` | String, default `'primary'` | Visual style: primary, secondary, outline, ghost, danger, icon (compact card action) |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `action` | String, default `'default'` | Business action driving the highlight color: default (neutral), view / edit / submit (accent), accept (success), delete / reject (danger), cancel (muted) |
-| `disabled` | Boolean, default `false` | Disables interaction and dims the button |
-| `loading` | Boolean, default `false` | Shows a spinner and blocks clicks |
-| `iconOnly` | Boolean, default `false` | Renders only the start slot, no text; a button with only an icon becomes square automatically |
-| `ariaLabel` | String, default `''` | Accessible name exposed as aria-label — for icon-only buttons and rows of icon actions where the label is graphical (the row title is mirrored here) |
-| `type` | String, default `'button'` | Native HTML button type (button / submit) |
+| `variant` | ButtonVariant, default `'primary'` | Visual style: primary, secondary, outline, ghost, danger, icon (compact card action) |
+| `size` | ButtonSize, default `'md'` | Control height: sm / md / lg |
+| `action` | ButtonAction, default `'default'` | Business action driving the highlight color: default (neutral), view / edit / submit (accent), accept (success), delete / reject (danger), cancel (muted) |
+| `disabled` | boolean, default `false` | Disables interaction and dims the button |
+| `loading` | boolean, default `false` | Shows a spinner and blocks clicks |
+| `iconOnly` | boolean, default `false` | Renders only the start slot, no text; a button with only an icon becomes square automatically |
+| `ariaLabel` | string, default `''` | Accessible name exposed as aria-label — for icon-only buttons and rows of icon actions where the label is graphical (the row title is mirrored here) |
+| `type` | 'button' | 'submit' | 'reset', default `'button'` | Native HTML button type (button / submit) |
 
 | Slot | Content |
 |---|---|
@@ -1233,10 +1239,10 @@ Interactive button with multiple semantic variants, sizes, and states. Canonical
 
 | Property | Type / default | Description |
 |---|---|---|
-| `entity` | String, default `'project'` | Тип сущности: project \| task \| requirement \| company \| counterparty \| contract \| calculation \| employee |
-| `size` | String, default `'lg'` | Размер эмблемы: xs \| sm \| md \| lg |
-| `variant` | String, default `'emblem'` | Режим отображения: emblem (квадрат с иконкой) \| pill (пилюля с подписью) |
-| `color` | String, default `''` | Опциональный CSS-цвет акцента (например, цвет проекта) |
+| `entity` | EntityEmblemKind, default `'project'` | Тип сущности: project \| task \| requirement \| company \| counterparty \| contract \| calculation \| employee |
+| `size` | 'xs' | 'sm' | 'md' | 'lg', default `'lg'` | Размер эмблемы: xs \| sm \| md \| lg |
+| `variant` | 'emblem' | 'pill', default `'emblem'` | Режим отображения: emblem (квадрат с иконкой) \| pill (пилюля с подписью) |
+| `color` | string, default `''` | Опциональный CSS-цвет акцента (например, цвет проекта) |
 
 #### `app-link` — `AppLink`
 
@@ -1246,13 +1252,13 @@ Text link with the canonical start / default / end slot API. Renders an anchor w
 
 | Property | Type / default | Description |
 |---|---|---|
-| `href` | String, default `''` | Link target; with href the element renders as an anchor |
-| `target` | String, default `''` | Anchor target (_blank adds rel="noopener noreferrer") |
-| `variant` | String, default `'primary'` | Visual style: primary, secondary, danger |
-| `size` | String, default `'md'` | Font scale sm / md / lg from the canonical control tokens |
-| `disabled` | Boolean, default `false` | Blocks activation and dims the link |
-| `ariaLabel` | String, default `''` | Accessible name (aria-label); falls back to title when empty |
-| `active` | Boolean, default `false` | Segmented pill state: fills the link with the --link-active-bg hook. Default false keeps every existing consumer pixel-identical |
+| `href` | string, default `''` | Link target; with href the element renders as an anchor |
+| `target` | string, default `''` | Anchor target (_blank adds rel="noopener noreferrer") |
+| `variant` | LinkVariant, default `'primary'` | Visual style: primary, secondary, danger |
+| `size` | LinkSize, default `'md'` | Font scale sm / md / lg from the canonical control tokens |
+| `disabled` | boolean, default `false` | Blocks activation and dims the link |
+| `ariaLabel` | string, default `''` | Accessible name (aria-label); falls back to title when empty |
+| `active` | boolean, default `false` | Segmented pill state: fills the link with the --link-active-bg hook. Default false keeps every existing consumer pixel-identical |
 
 | Slot | Content |
 |---|---|
@@ -1272,8 +1278,8 @@ Canonical tags row for document cards, preview bars and readonly displays. The c
 
 | Property | Type / default | Description |
 |---|---|---|
-| `tags` | Array, default `[]` | Tag strings rendered as chips (source of truth, never mutated by the component); combines with declarative app-option children |
-| `mode` | — | readonly = plain chips; add-button = editable chips + add button opening the inline form; add-form = editable chips with the inline form always open |
+| `tags` | string[], default `[]` | Tag strings rendered as chips (source of truth, never mutated by the component); combines with declarative app-option children |
+| `mode` | 'readonly' | 'add-button' | 'add-form', default `'readonly'` | readonly = plain chips; add-button = editable chips + add button opening the inline form; add-form = editable chips with the inline form always open |
 | `showEmptyLabel` | Boolean, default `false` | Render the no-tags hint when the list is empty (preview bars) |
 
 **Events:** `tag-add`, `tag-remove`
@@ -1288,10 +1294,10 @@ Checkbox element with checked, unchecked, indeterminate, and disabled states. Th
 
 | Property | Type / default | Description |
 |---|---|---|
-| `checked` | Boolean, default `false` | Checked state of the box |
-| `indeterminate` | Boolean, default `false` | Mixed (partial selection) state — square dash instead of tick |
-| `disabled` | Boolean, default `false` | Disables interaction |
-| `label` | String, default `''` | Text next to the box |
+| `checked` | boolean, default `false` | Checked state of the box |
+| `indeterminate` | boolean, default `false` | Mixed (partial selection) state — square dash instead of tick |
+| `disabled` | boolean, default `false` | Disables interaction |
+| `label` | string, default `''` | Text next to the box |
 
 **Events:** `change`
 
@@ -1307,8 +1313,8 @@ Canonical color swatch picker. A row of round color buttons rendered from a pale
 
 | Property | Type / default | Description |
 |---|---|---|
-| `colors` | Array, default `[]` | Palette of hex color strings rendered as round swatch buttons |
-| `value` | String, default `''` | Currently selected hex (highlighted swatch) |
+| `colors` | string[], default `[]` | Palette of hex color strings rendered as round swatch buttons |
+| `value` | string, default `''` | Currently selected hex (highlighted swatch) |
 
 **Events:** `change`
 
@@ -1320,13 +1326,13 @@ Searchable multi-tag combobox input with autocomplete and tag removal. The defau
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `items` | Array, default `[]` | Suggestion item definitions (value + label) |
-| `dataSource` | String | Data source for suggestions: array, promise, or function returning an array (sync or async) |
-| `selected` | Array, default `[]` | Currently selected values |
-| `placeholder` | String, default `'Add tag or filter...'` | Text shown in the input when empty |
-| `allowCustom` | Boolean, default `true` | Typing a new value offers "+ Add" to create it |
-| `size` | String, default `'md'` | Control size scale sm\|md\|lg (30/38/44px min-heights, md default) |
+| `label` | string, default `''` | Caption above the field |
+| `items` | string[], default `[]` | Suggestion item definitions (value + label) |
+| `dataSource` | Object | Data source for suggestions: array, promise, or function returning an array (sync or async) |
+| `selected` | string[], default `[]` | Currently selected values |
+| `placeholder` | string, default `'Add tag or filter...'` | Text shown in the input when empty |
+| `allowCustom` | boolean, default `true` | Typing a new value offers "+ Add" to create it |
+| `size` | 'sm' | 'md' | 'lg', default `'md'` | Control size scale sm\|md\|lg (30/38/44px min-heights, md default) |
 
 **Events:** `change`
 
@@ -1346,20 +1352,20 @@ Searchable portal selector for large collections (tasks, employees, counterparti
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `value` | String, default `''` | Id of the currently selected entity |
-| `options` | Array, default `[]` | Entity option definitions (id, label, meta) |
-| `dataSource` | String | Data source for options: array, promise, or function returning an array (sync or async) |
-| `placeholder` | String, default `''` | Text shown when nothing is selected |
-| `searchPlaceholder` | String, default `''` | Placeholder inside the search box of the panel |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `disabled` | Boolean, default `false` | Disables the selector |
-| `required` | Boolean, default `false` | Marks the field as required |
-| `clearable` | Boolean, default `false` | Shows a clear (×) button when a value is selected |
-| `showSelectedDetails` | Boolean, default `true` | Renders meta details of the selected entity under the field |
-| `maxVisible` | Number, default `80` | Maximum options rendered in the panel at once |
-| `error` | String, default `''` | Error message; renders the field in danger state |
-| `hint` | String, default `''` | Helper text below the field |
+| `label` | string, default `''` | Caption above the field |
+| `value` | string, default `''` | Id of the currently selected entity |
+| `options` | EntitySelectorOption[], default `[]` | Entity option definitions (id, label, meta) |
+| `dataSource` | Object | Data source for options: array, promise, or function returning an array (sync or async) |
+| `placeholder` | string, default `''` | Text shown when nothing is selected |
+| `searchPlaceholder` | string, default `''` | Placeholder inside the search box of the panel |
+| `size` | EntitySelectorSize, default `'md'` | Control height: sm / md / lg |
+| `disabled` | boolean, default `false` | Disables the selector |
+| `required` | boolean, default `false` | Marks the field as required |
+| `clearable` | boolean, default `false` | Shows a clear (×) button when a value is selected |
+| `showSelectedDetails` | boolean, default `true` | Renders meta details of the selected entity under the field |
+| `maxVisible` | number, default `80` | Maximum options rendered in the panel at once |
+| `error` | string, default `''` | Error message; renders the field in danger state |
+| `hint` | string, default `''` | Helper text below the field |
 
 **Events:** `change`, `search-change`
 
@@ -1379,16 +1385,16 @@ Single-line text input field supporting labels, helpers, errors, and clear butto
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `placeholder` | String, default `''` | Placeholder text shown when empty |
-| `value` | String, default `''` | Current input value |
-| `type` | String, default `'text'` | Native input type (text, email, password, number, ...) |
-| `required` | Boolean, default `false` | Marks the field as required (asterisk in label) |
-| `disabled` | Boolean, default `false` | Disables editing |
-| `error` | String, default `''` | Error message; renders the field in danger state |
-| `helper` | String, default `''` | Helper text below the field |
-| `clearable` | Boolean, default `false` | Shows a clear (×) button when the field has a value |
-| `size` | String, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
+| `label` | string, default `''` | Caption above the field |
+| `placeholder` | string, default `''` | Placeholder text shown when empty |
+| `value` | string, default `''` | Current input value |
+| `type` | string, default `'text'` | Native input type (text, email, password, number, ...) |
+| `required` | boolean, default `false` | Marks the field as required (asterisk in label) |
+| `disabled` | boolean, default `false` | Disables editing |
+| `error` | string, default `''` | Error message; renders the field in danger state |
+| `helper` | string, default `''` | Helper text below the field |
+| `clearable` | boolean, default `false` | Shows a clear (×) button when the field has a value |
+| `size` | InputSize, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
 **Events:** `input`, `change`
 
@@ -1408,14 +1414,14 @@ Numeric input with increment/decrement steppers, boundaries, and optional unit i
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `value` | Number, default `0` | Current numeric value |
-| `min` | Number, default `0` | Minimum allowed value |
-| `max` | Number, default `1000` | Maximum allowed value |
-| `step` | Number, default `1` | Increment for the stepper buttons |
-| `unit` | String, default `''` | Unit suffix rendered inside the field |
-| `size` | String, default `'md'` | Control height: sm / md / lg |
-| `disabled` | Boolean, default `false` | Disables editing and steppers |
+| `label` | string, default `''` | Caption above the field |
+| `value` | number, default `0` | Current numeric value |
+| `min` | number, default `0` | Minimum allowed value |
+| `max` | number, default `1000` | Maximum allowed value |
+| `step` | number, default `1` | Increment for the stepper buttons |
+| `unit` | string, default `''` | Unit suffix rendered inside the field |
+| `size` | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
+| `disabled` | boolean, default `false` | Disables editing and steppers |
 
 **Events:** `change`
 
@@ -1427,13 +1433,13 @@ Custom dropdown select with indicator dots, keyboard navigation, and smooth popo
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `value` | String, default `''` | Currently selected option value |
-| `options` | Array, default `[]` | Option definitions (value + label) |
-| `dataSource` | String | Data source for options: array, promise, or function returning an array (sync or async) |
-| `disabled` | Boolean, default `false` | Disables the dropdown |
-| `placeholder` | String, default `'Select...'` | Text shown when nothing is selected |
-| `size` | String, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
+| `label` | string, default `''` | Caption above the field |
+| `value` | string, default `''` | Currently selected option value |
+| `options` | SelectOption[], default `[]` | Option definitions (value + label) |
+| `dataSource` | Object | Data source for options: array, promise, or function returning an array (sync or async) |
+| `disabled` | boolean, default `false` | Disables the dropdown |
+| `placeholder` | string, default `'Select...'` | Text shown when nothing is selected |
+| `size` | SelectSize, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
 **Events:** `change`
 
@@ -1453,12 +1459,12 @@ Toggle switch for boolean settings and feature flags. The default slot overrides
 
 | Property | Type / default | Description |
 |---|---|---|
-| `checked` | Boolean, default `false` | On/off state of the switch (boolean, default false) |
-| `disabled` | Boolean, default `false` | Disables interaction (boolean, default false) |
-| `label` | String, default `''` | Caption inside the control, next to the track (string; the default slot overrides it with custom markup) |
-| `size` | String, default `'md'` | Control size scale (string, default md). Values: sm = 30px frame height, track 34x18px, thumb 14px, caption 0.75rem, gap 0.5rem, frame padding 0 0.6rem; md = the historical geometry — 38px frame height, track 40x22px, thumb 18px, caption 0.8125rem, gap 0.65rem, frame padding 0 0.75rem (default); lg = 44px frame height, track 46x26px, thumb 22px, caption 0.875rem, gap 0.8rem, frame padding 0 1rem. The frame heights follow the root control-height tokens (--control-height-sm/md/lg) |
-| `frame` | String, default `'none'` | Frame variant (string, reflected as an attribute). Values: none = no frame, the bare switch (default); normal = the app-input control box around the switch — height var(--control-height-md, 38px), background var(--bg-surface), border 1px var(--border-subtle), radius var(--radius-md), padding 0 0.75rem, full row width; transparent = the identical box with background and border transparent, so the switch occupies a form row like an input without visible chrome |
-| `fieldLabel` | String, default `''` | Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept, and when field-label is not set with ghost the row text falls back to the label property |
+| `checked` | boolean, default `false` | On/off state of the switch (boolean, default false) |
+| `disabled` | boolean, default `false` | Disables interaction (boolean, default false) |
+| `label` | string, default `''` | Caption inside the control, next to the track (string; the default slot overrides it with custom markup) |
+| `size` | SwitchSize, default `'md'` | Control size scale (string, default md). Values: sm = 30px frame height, track 34x18px, thumb 14px, caption 0.75rem, gap 0.5rem, frame padding 0 0.6rem; md = the historical geometry — 38px frame height, track 40x22px, thumb 18px, caption 0.8125rem, gap 0.65rem, frame padding 0 0.75rem (default); lg = 44px frame height, track 46x26px, thumb 22px, caption 0.875rem, gap 0.8rem, frame padding 0 1rem. The frame heights follow the root control-height tokens (--control-height-sm/md/lg) |
+| `frame` | SwitchFrame, default `'none'` | Frame variant (string, reflected as an attribute). Values: none = no frame, the bare switch (default); normal = the app-input control box around the switch — height var(--control-height-md, 38px), background var(--bg-surface), border 1px var(--border-subtle), radius var(--radius-md), padding 0 0.75rem, full row width; transparent = the identical box with background and border transparent, so the switch occupies a form row like an input without visible chrome |
+| `fieldLabel` | string, default `''` | Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept, and when field-label is not set with ghost the row text falls back to the label property |
 | `fieldLabelStyle` | — | External label row style (string, reflected as the field-label-style attribute). Values: none = no external label row (default); normal = visible row above the control with the app-input label typography (font-size 0.8125rem, font-weight 500, color var(--text-secondary)); ghost = the same row rendered invisible (visibility hidden) so it keeps its place in the form grid |
 
 **Events:** `change`
@@ -1475,15 +1481,15 @@ Multiline text input with character counting, custom row limits, and auto-stylin
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Caption above the field |
-| `placeholder` | String, default `''` | Placeholder text shown when empty |
-| `value` | String, default `''` | Current textarea value |
-| `rows` | Number, default `3` | Visible row count (initial height) |
-| `required` | Boolean, default `false` | Marks the field as required |
-| `disabled` | Boolean, default `false` | Disables editing |
-| `error` | String, default `''` | Error message; renders the field in danger state |
-| `maxlength` | Number, default `0` | Maximum character count (0 = unlimited); shows a counter when set |
-| `monospace` | Boolean, default `false` | Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values |
+| `label` | string, default `''` | Caption above the field |
+| `placeholder` | string, default `''` | Placeholder text shown when empty |
+| `value` | string, default `''` | Current textarea value |
+| `rows` | number, default `3` | Visible row count (initial height) |
+| `required` | boolean, default `false` | Marks the field as required |
+| `disabled` | boolean, default `false` | Disables editing |
+| `error` | string, default `''` | Error message; renders the field in danger state |
+| `maxlength` | number, default `0` | Maximum character count (0 = unlimited); shows a counter when set |
+| `monospace` | boolean, default `false` | Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values |
 
 **Events:** `input`, `change`
 
@@ -1501,7 +1507,7 @@ Shared skeleton of the entity detail views: top navigation bar (back button, ent
 | `switcherPlaceholder` | String, default `''` | Entity switcher placeholder (view i18n) |
 | `switcherOptions` | EntitySelectorOption[], default `[]` | Options rendered by the entity switcher |
 | `switcherValue` | String, default `''` | Id of the entity currently displayed |
-| `entity` | String, default `'project'` | Emblem kind rendered in the hero identity |
+| `entity` | EntityEmblemKind, default `'project'` | Emblem kind rendered in the hero identity |
 
 **Events:** `detail-back`
 
@@ -1534,8 +1540,8 @@ Standard page header with title, subtitle, optional leading icon, and an actions
 
 | Property | Type / default | Description |
 |---|---|---|
-| `title` | String, default `''` | Page caption |
-| `subtitle` | String, default `''` | Secondary description line under the caption |
+| `title` | string, default `''` | Page caption |
+| `subtitle` | string, default `''` | Secondary description line under the caption |
 
 | Slot | Content |
 |---|---|
@@ -1558,11 +1564,11 @@ Canonical calculation create and edit form. The component owns the contract pick
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `calculation` | Calculation | null, default `null` | Calculation being edited (null = create mode) |
 | `presetContractId` | string | null, default `null` | Contract prefilled for a context-bound opening (first active by default) |
-| `showContractSelect` | Boolean, default `false` | Show the contract picker (list view openings) |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
+| `showContractSelect` | boolean, default `false` | Show the contract picker (list view openings) |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
 **Events:** `close`, `saved`
 
@@ -1574,7 +1580,7 @@ Canonical company create and edit form. The component owns the twelve fields, wr
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `company` | Company | null, default `null` | Company being edited (null = create mode) |
 
 **Events:** `close`, `saved`
@@ -1587,12 +1593,12 @@ Canonical contract create and edit form. The component owns all fourteen fields,
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `contract` | Contract | null, default `null` | Contract being edited (null = create mode) |
-| `presetCounterpartyId` | String, default `''` | Counterparty prefilled for a quick opening |
-| `presetProjectId` | String, default `''` | Project prefilled for a context-bound opening |
-| `presetStatus` | String, default `'draft'` | Status a newly created contract starts with (draft by default) |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
+| `presetCounterpartyId` | string, default `''` | Counterparty prefilled for a quick opening |
+| `presetProjectId` | string, default `''` | Project prefilled for a context-bound opening |
+| `presetStatus` | ContractStatus, default `'draft'` | Status a newly created contract starts with (draft by default) |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
 **Events:** `close`, `saved`
 
@@ -1604,7 +1610,7 @@ Canonical counterparty create and edit form. The component owns the twelve field
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `counterparty` | Counterparty | null, default `null` | Counterparty being edited (null = create mode) |
 
 **Events:** `close`, `saved`
@@ -1617,7 +1623,7 @@ Canonical counterparty create and edit form. The component owns the twelve field
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the draft editor modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the draft editor modal (rendered through the portal) |
 | `requirementIds` | string[], default `[]` | Requirement ids to decompose, also the fallback links for drafts without requirement ids |
 | `decompose` | — | Public async method running the AI decomposition and opening the editor |
 | `openWithDrafts` | — | Public method opening the editor with a prepared draft list (drafts, model, projectId) |
@@ -1632,15 +1638,15 @@ Canonical document create and edit form. The component owns the file dropzone fo
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `document` | DocumentItem | null, default `null` | Document being edited (null = create mode, dropzone shown) |
 | `presetCompanyId` | string | null, default `null` | Company prefilled for a context-bound opening (first company by default) |
 | `presetProjectId` | string | null, default `null` | Project prefilled for a context-bound opening, switches the scope to project |
 | `presetContractId` | string | null, default `null` | Contract prefilled for a context-bound opening |
 | `presetCategory` | DocumentCategory | null, default `null` | Category prefilled for a quick upload (spec by default) |
 | `presetStatus` | DocumentStatus | null, default `null` | Status prefilled for a quick upload (draft by default) |
-| `presetTags` | String, default `''` | Tags prefilled for a quick upload (empty by default) |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
+| `presetTags` | string, default `''` | Tags prefilled for a quick upload (empty by default) |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
 **Events:** `close`, `saved`
 
@@ -1652,7 +1658,7 @@ Canonical employee create and edit form. The component owns the ten fields, writ
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `employee` | User | null, default `null` | Employee being edited (null = create mode) |
 
 **Events:** `close`, `saved`
@@ -1665,12 +1671,12 @@ Canonical expense create and edit form. The component owns the twelve fields of 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `expense` | Expense | null, default `null` | Expense being edited (null = create mode) |
 | `presetProjectId` | string | null, default `null` | Project prefilled for a context-bound opening (first project by default) |
 | `presetTaskId` | string | null, default `null` | Linked task prefilled for a context-bound opening |
 | `presetUserId` | string | null, default `null` | Submitter prefilled for a context-bound opening (first user by default) |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
 **Events:** `close`, `saved`
 
@@ -1682,11 +1688,11 @@ Customizable modal dialog with backdrop blur, customizable sizes, header, and fo
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the modal (rendered through the portal) |
-| `title` | String, default `''` | Header caption |
-| `size` | String, default `'md'` | Modal width preset: sm / md / lg |
-| `hideClose` | Boolean, default `false` | Hides the header close (×) button |
-| `headerIcon` | Object, default `null` | Icon descriptor rendered before the title |
+| `open` | boolean, default `false` | Opens the modal (rendered through the portal) |
+| `title` | string, default `''` | Header caption |
+| `size` | ModalSize, default `'md'` | Modal width preset: sm / md / lg |
+| `hideClose` | boolean, default `false` | Hides the header close (×) button |
+| `headerIcon` | TemplateResult | null, default `null` | Icon descriptor rendered before the title |
 
 **Events:** `close`
 
@@ -1718,11 +1724,11 @@ Canonical payment registration form supporting incoming and outgoing payments, l
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `invoice` | Invoice | null, default `null` | Optional target invoice the payment is recorded against |
 | `payment` | InvoicePayment | null, default `null` | Existing InvoicePayment to edit (attribute: false, property binding only); null opens the create form |
 | `payableInvoices` | Invoice[], default `[]` | Invoices the target selector may switch between |
-| `defaultDirection` | String, default `'incoming'` | Initial direction for standalone payments (incoming \| outgoing) |
+| `defaultDirection` | PaymentDirection, default `'incoming'` | Initial direction for standalone payments (incoming \| outgoing) |
 | `defaultCompanyId` | String, default `''` | Initial company ID for standalone payments |
 | `defaultCounterpartyId` | String, default `''` | Initial counterparty ID for standalone payments |
 
@@ -1736,16 +1742,16 @@ Canonical project create and edit form. The component owns the ten fields of nam
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `project` | Project | null, default `null` | Project being edited (null = create mode) |
 | `presetCompanyId` | string | null, default `null` | Company prefilled for a context-bound opening |
 | `presetCounterpartyId` | string | null, default `null` | Counterparty prefilled for a quick opening |
 | `presetStatus` | ProjectStatus | null, default `null` | Status a newly created project starts with (planning by default) |
 | `presetKey` | string | null, default `null` | Key prefilled for a quick opening |
 | `presetBudget` | number | null, default `null` | Budget prefilled for a quick opening |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
-| `saveLabel` | String, default `''` | Primary button caption override (Создать for quick openings) |
-| `saveDisabled` | Boolean, default `false` | Disables the primary save button while the modal stays open (attribute binding) |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
+| `saveLabel` | string, default `''` | Primary button caption override (Создать for quick openings) |
+| `saveDisabled` | boolean, default `false` | Disables the primary save button while the modal stays open (attribute binding) |
 | `beforeSave` | ((data: { name: string; key: string }) => Promise<boolean>) | null, default `null` | Async hook run before saving (attribute: false): receives { name, key } and returns Promise<boolean>; false cancels the save and keeps the form open |
 | `extraContent` | TemplateResult | null, default `null` | TemplateResult rendered in an extra section of the body — create mode only (attribute: false) |
 | `footerExtra` | TemplateResult | null, default `null` | TemplateResult rendered in the modal footer before the primary button (attribute: false) |
@@ -1760,7 +1766,7 @@ Canonical requirement create and edit form. The component owns the eleven fields
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `requirement` | ProjectRequirement | null, default `null` | Requirement being edited (null = create mode) |
 | `presetProjectId` | string | null, default `null` | Project prefilled for a context-bound opening (first project by default) |
 
@@ -1786,12 +1792,12 @@ Canonical time entry create and edit form. The component owns the nine fields of
 
 | Property | Type / default | Description |
 |---|---|---|
-| `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
+| `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `entry` | TimeEntry | null, default `null` | Entry being edited (null = create mode) |
 | `presetProjectId` | string | null, default `null` | Project prefilled for a context-bound opening (first project by default) |
 | `presetTaskId` | string | null, default `null` | Task prefilled for a context-bound opening (first task of the project by default) |
 | `presetUserId` | string | null, default `null` | Employee prefilled for a context-bound opening (first user by default) |
-| `contextTitle` | String, default `''` | Modal title override for context-bound openings |
+| `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
 **Events:** `close`, `saved`
 
@@ -1817,9 +1823,9 @@ Dashed-border placeholder for empty lists and tables with icon, title, message, 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `title` | String, default `''` | Headline of the empty state |
-| `message` | String, default `''` | Secondary explanation text |
-| `compact` | Boolean, default `false` | Reduced padding and typography for use inside cards |
+| `title` | string, default `''` | Headline of the empty state |
+| `message` | string, default `''` | Secondary explanation text |
+| `compact` | boolean, default `false` | Reduced padding and typography for use inside cards |
 
 | Slot | Content |
 |---|---|
@@ -1852,19 +1858,19 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 | Property | Type / default | Description |
 |---|---|---|
 | `rows` | Record<string, unknown>[], default `[]` | Array of row objects rendered by the table |
-| `page-size` | Number, default `10` | Rows per page for the internal pagination (default 10) |
-| `page` | Number, default `1` | Initial page number (clamped to the available pages) |
-| `sort-by` | String, default `''` | Field currently sorted; its header shows the active arrow |
-| `sort-dir` | String, default `'asc'` | Current sort direction: asc / desc |
-| `max-height` | Number, default `0` | Host height cap in px; 0 (default) stretches the table to show all rendered rows, a positive value gives the body its own scrollbar |
-| `empty-title` | String, default `''` | Title passed to the compact empty state when rows is empty |
-| `locale` | String, default `'ru-RU'` | Locale used for number formatting and the pagination summary |
+| `page-size` | number, default `10` | Rows per page for the internal pagination (default 10) |
+| `page` | number, default `1` | Initial page number (clamped to the available pages) |
+| `sort-by` | string, default `''` | Field currently sorted; its header shows the active arrow |
+| `sort-dir` | SortDirection, default `'asc'` | Current sort direction: asc / desc |
+| `max-height` | number, default `0` | Host height cap in px; 0 (default) stretches the table to show all rendered rows, a positive value gives the body its own scrollbar |
+| `empty-title` | string, default `''` | Title passed to the compact empty state when rows is empty |
+| `locale` | string, default `'ru-RU'` | Locale used for number formatting and the pagination summary |
 | `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
 | `page-change event` | — | Emitted with detail { page, pageSize, totalItems } when pagination changes |
 | `page-size-change event` | — | Emitted with detail { page: 1, pageSize, totalItems } when the footer page-size selector changes; rows are re-sliced at the new size and the page resets to 1 |
-| `selectable` | Boolean, default `false` | Leading checkbox column keyed by key-field (default id); header cell stays empty, select-all lives in the consumer toolbar |
-| `key-field` | String, default `'id'` | Row field used as the selection key (default id) |
-| `selected-keys` | Array, default `[]` | Array of currently selected row keys (property binding); toggling a checkbox updates it and emits selection-change |
+| `selectable` | boolean, default `false` | Leading checkbox column keyed by key-field (default id); header cell stays empty, select-all lives in the consumer toolbar |
+| `key-field` | string, default `'id'` | Row field used as the selection key (default id) |
+| `selected-keys` | string[], default `[]` | Array of currently selected row keys (property binding); toggling a checkbox updates it and emits selection-change |
 | `selectedItems getter` | — | Rows whose key is in selectedKeys — the consumer reads the selection back from the table |
 | `selection-change event` | — | Emitted with detail { selectedIds, selectedItems } when a row checkbox toggles |
 | `row-click event` | — | Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row |
@@ -1878,18 +1884,18 @@ Declarative column config child of app-table-scroll: field / label / type (text,
 
 | Property | Type / default | Description |
 |---|---|---|
-| `field` | String, default `''` | Row property the column reads (empty label column when combined with cellRender) |
-| `label` | String, default `''` | Header caption shown in the sticky header row |
-| `type` | String, default `'text'` | Cell formatting preset: text \| number \| boolean \| select |
+| `field` | string, default `''` | Row property the column reads (empty label column when combined with cellRender) |
+| `label` | string, default `''` | Header caption shown in the sticky header row |
+| `type` | TableCellType, default `'text'` | Cell formatting preset: text \| number \| boolean \| select |
 | `options` | ColumnOption[], default `[]` | Value → label pairs used by type="select" cells |
-| `align` | String, default `'left'` | Horizontal alignment of header and cells: left \| center \| right |
-| `mono` | Boolean, default `false` | Renders the value in the mono font family with tabular numerals |
-| `code` | Boolean, default `false` | Renders the value as a code chip |
-| `sortable` | Boolean, default `false` | Header shows the sort button; clicking emits sort-change on the table |
-| `yes-label` | String, default `''` | Text for boolean true (falls back to the localized yes) |
-| `no-label` | String, default `''` | Text for boolean false (falls back to the localized no) |
-| `cellRender` | String | Custom cell renderer (row, value) => TemplateResult \| string \| number |
-| `valueFn` | String | Custom value extractor (row) => unknown, replacing the plain row[field] read |
+| `align` | CellAlign, default `'left'` | Horizontal alignment of header and cells: left \| center \| right |
+| `mono` | boolean, default `false` | Renders the value in the mono font family with tabular numerals |
+| `code` | boolean, default `false` | Renders the value as a code chip |
+| `sortable` | boolean, default `false` | Header shows the sort button; clicking emits sort-change on the table |
+| `yes-label` | string, default `''` | Text for boolean true (falls back to the localized yes) |
+| `no-label` | string, default `''` | Text for boolean false (falls back to the localized no) |
+| `cellRender` | Object | Custom cell renderer (row, value) => TemplateResult \| string \| number |
+| `valueFn` | Object | Custom value extractor (row) => unknown, replacing the plain row[field] read |
 
 **Events:** `column-change`
 
@@ -1923,10 +1929,10 @@ Collapsible navigation sidebar composed declaratively with <app-sidebar-group> a
 
 | Property | Type / default | Description |
 |---|---|---|
-| `collapsed` | Boolean, default `store.customization.sidebarCollapsed` | Icon-only sidebar width |
-| `activeValue` | String, default `''` | Value of the currently active item |
-| `groupMode` | String, default `store.customization.sidebarGroupMode` | Group behavior: single (accordion) / multiple |
-| `standalone` | Boolean, default `false` | Rendered outside app-root (manages its own state) |
+| `collapsed` | boolean, default `store.customization.sidebarCollapsed` | Icon-only sidebar width |
+| `activeValue` | string, default `''` | Value of the currently active item |
+| `groupMode` | SidebarGroupMode, default `store.customization.sidebarGroupMode` | Group behavior: single (accordion) / multiple |
+| `standalone` | boolean, default `false` | Rendered outside app-root (manages its own state) |
 | `theme` | — | Current theme for icon accents |
 | `currentLang` | — | UI language |
 | `selectedProjectId` | — | Project filter selection shown in the projects group |
@@ -1944,11 +1950,11 @@ Collapsible navigation group container for <app-sidebar> supporting smooth CSS c
 
 | Property | Type / default | Description |
 |---|---|---|
-| `groupId` | String, default `''` | Stable group id used by the sidebar controller |
-| `label` | String, default `''` | Group caption |
-| `expanded` | Boolean, default `true` | Group is expanded (items visible) |
-| `collapsed` | Boolean, default `false` | Sidebar is in icon-only mode |
-| `hasActive` | Boolean, default `false` | Group contains the active item |
+| `groupId` | string, default `''` | Stable group id used by the sidebar controller |
+| `label` | string, default `''` | Group caption |
+| `expanded` | boolean, default `true` | Group is expanded (items visible) |
+| `collapsed` | boolean, default `false` | Sidebar is in icon-only mode |
+| `hasActive` | boolean, default `false` | Group contains the active item |
 
 **Events:** `sidebar-group-toggle`
 
@@ -1968,13 +1974,13 @@ Declarative navigation item component used to compose <app-sidebar> menus with i
 
 | Property | Type / default | Description |
 |---|---|---|
-| `value` | String, default `''` | View id emitted when the item is clicked |
-| `label` | String, default `''` | Item caption |
-| `badge` | String, default `''` | Count badge on the right side |
-| `active` | Boolean, default `false` | Item is the current view |
-| `collapsed` | Boolean, default `false` | Sidebar is in icon-only mode |
-| `disabled` | Boolean, default `false` | Item is not clickable |
-| `icon` | String | Leading icon (SVG template) |
+| `value` | string, default `''` | View id emitted when the item is clicked |
+| `label` | string, default `''` | Item caption |
+| `badge` | string, default `''` | Count badge on the right side |
+| `active` | boolean, default `false` | Item is the current view |
+| `collapsed` | boolean, default `false` | Sidebar is in icon-only mode |
+| `disabled` | boolean, default `false` | Item is not clickable |
+| `icon` | Object | Leading icon (SVG template) |
 
 **Events:** `sidebar-select`
 
@@ -2001,11 +2007,11 @@ Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `title` | String, default `''` | Chart caption |
-| `subtitle` | String, default `''` | Secondary line under the caption |
-| `type` | String, default `'bar'` | Chart type: bar / line / donut |
-| `data` | Array, default `[]` | Data points (label + value) |
-| `centerLabel` | String, default `''` | Caption in the middle of a donut chart |
+| `title` | string, default `''` | Chart caption |
+| `subtitle` | string, default `''` | Secondary line under the caption |
+| `type` | 'bar' | 'donut' | 'line', default `'bar'` | Chart type: bar / line / donut |
+| `data` | ChartDataPoint[], default `[]` | Data points (label + value) |
+| `centerLabel` | string, default `''` | Caption in the middle of a donut chart |
 
 | Slot | Content |
 |---|---|
@@ -2023,16 +2029,16 @@ Executive KPI summary card featuring tabular numerals, trend delta, and optional
 
 | Property | Type / default | Description |
 |---|---|---|
-| `label` | String, default `''` | Metric caption |
-| `value` | String, default `'0'` | Main value text |
-| `delta` | String, default `''` | Change indicator text (e.g. +12%) |
-| `trend` | String, default `'neutral'` | Delta color semantics: neutral / up / down |
-| `subtitle` | String, default `''` | Secondary line under the value |
-| `accentColor` | String, default `'var(--accent-primary, #6366f1)'` | Accent color of the card edge |
-| `valueColor` | String, default `''` | Explicit color of the value text |
-| `sparkline` | Array, default `[]` | Sparkline data points (small numbers) |
-| `clickable` | Boolean, default `false` | Card emits a click event |
-| `size` | String, default `'full'` | full = with sparkline; compact = label + value only |
+| `label` | string, default `''` | Metric caption |
+| `value` | string, default `'0'` | Main value text |
+| `delta` | string, default `''` | Change indicator text (e.g. +12%) |
+| `trend` | 'up' | 'down' | 'neutral', default `'neutral'` | Delta color semantics: neutral / up / down |
+| `subtitle` | string, default `''` | Secondary line under the value |
+| `accentColor` | string, default `'var(--accent-primary, #6366f1)'` | Accent color of the card edge |
+| `valueColor` | string, default `''` | Explicit color of the value text |
+| `sparkline` | number[], default `[]` | Sparkline data points (small numbers) |
+| `clickable` | boolean, default `false` | Card emits a click event |
+| `size` | 'full' | 'compact' | 'strip', default `'full'` | full = with sparkline; compact = label + value only |
 
 | Slot | Content |
 |---|---|
@@ -2050,8 +2056,8 @@ Interactive D3.js Project Overview dashboard visualizing project progress, logge
 
 | Property | Type / default | Description |
 |---|---|---|
-| `projectId` | String, default `'all'` | Project scope (all = portfolio overview) |
-| `hideProjectSelector` | Boolean, default `false` | Hides the project selector row |
+| `projectId` | string, default `'all'` | Project scope (all = portfolio overview) |
+| `hideProjectSelector` | boolean, default `false` | Hides the project selector row |
 | `locale` | String | Locale for number/date formatting (defaults to UI language) |
 | `projects` | Array | Project records |
 | `tasks` | Array | Task records |
@@ -2069,10 +2075,10 @@ Portfolio progress tracker displaying completion bars, task ratios, and click-to
 
 | Property | Type / default | Description |
 |---|---|---|
-| `title` | String, default `''` | Section caption |
-| `projects` | Array, default `[]` | Project records to render progress for |
-| `tasks` | Array, default `[]` | Task records used to compute progress |
-| `lang` | String, default `'ru'` | UI language for labels and date formatting |
+| `title` | string, default `''` | Section caption |
+| `projects` | Project[], default `[]` | Project records to render progress for |
+| `tasks` | Task[], default `[]` | Task records used to compute progress |
+| `lang` | 'ru' | 'en', default `'ru'` | UI language for labels and date formatting |
 
 | Slot | Content |
 |---|---|
@@ -2100,8 +2106,8 @@ Hybrid Authentication Flow view: local credentials with visibility toggle & pass
 
 | Property | Type / default | Description |
 |---|---|---|
-| `preview` | Boolean, default `false` | Runs the flow in sandboxed Storybook preview mode without overwriting the active workspace session. |
-| `initial-step` | String, default `'login'` | Initial screen step to render: "login" \| "register" \| "forgot" \| "2fa". |
+| `preview` | boolean, default `false` | Runs the flow in sandboxed Storybook preview mode without overwriting the active workspace session. |
+| `initial-step` | AuthScreenStep, default `'login'` | Initial screen step to render: "login" \| "register" \| "forgot" \| "2fa". |
 
 **Events:** `auth-success`
 
@@ -2186,16 +2192,16 @@ Universal declarative enterprise data grid composed with <app-data-grid-column>,
 | Property | Type / default | Description |
 |---|---|---|
 | `rows` | Array | Row objects rendered by the grid |
-| `rowKey` | String, default `'id'` | Field holding the row identity (attribute row-key); default id — used for selection, grouping and expansion |
+| `rowKey` | string, default `'id'` | Field holding the row identity (attribute row-key); default id — used for selection, grouping and expansion |
 | `selectedKeys` | Array | Keys of the currently selected rows (property binding, array) |
-| `selectable` | Boolean, default `true` | Enables the row selection column; false renders no checkbox column |
-| `virtual` | Boolean, default `true` | Virtualized row windowing (default true) — only visible rows render in high-volume lists |
-| `emptyText` | String, default `''` | Caption passed to the compact empty state when rows is empty (attribute empty-text) |
-| `exportFilename` | String, default `'projectflow_export'` | Base name of the CSV file produced by the export action (attribute export-filename); the date is appended |
-| `groupBy` | String, default `''` | Field whose values define the first grouping level (attribute group-by); empty = no grouping |
-| `sortBy` | String, default `''` | Field currently used for sorting (attribute sort-by); arrow shown on its header |
+| `selectable` | boolean, default `true` | Enables the row selection column; false renders no checkbox column |
+| `virtual` | boolean, default `true` | Virtualized row windowing (default true) — only visible rows render in high-volume lists |
+| `emptyText` | string, default `''` | Caption passed to the compact empty state when rows is empty (attribute empty-text) |
+| `exportFilename` | string, default `'projectflow_export'` | Base name of the CSV file produced by the export action (attribute export-filename); the date is appended |
+| `groupBy` | string, default `''` | Field whose values define the first grouping level (attribute group-by); empty = no grouping |
+| `sortBy` | string, default `''` | Field currently used for sorting (attribute sort-by); arrow shown on its header |
 | `compact` | Boolean | High-density row layout (30px rows, tighter padding); falls back to the global density customization |
-| `hideDensitySwitch` | Boolean, default `false` | Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch) |
+| `hideDensitySwitch` | boolean, default `false` | Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch) |
 
 **Events:** `row-click`, `selection-change`
 
@@ -2253,9 +2259,9 @@ Employee directory with card/table switch, department & company filters, rates, 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `virtual` | Boolean, default `true` | 2D windowing (vertical rows + horizontal days) — only visible tasks and day columns render; default true |
+| `virtual` | boolean, default `true` | 2D windowing (vertical rows + horizontal days) — only visible tasks and day columns render; default true |
 | `tasksData` | Array | Task objects rendered on the timeline (property binding, array); empty renders the empty state |
-| `datasetMode` | String, default `'project'` | Built-in dataset to display (attribute dataset-mode): project (the working project schedule) or large (2,000-task multi-year stress dataset) |
+| `datasetMode` | 'project' | 'large', default `'project'` | Built-in dataset to display (attribute dataset-mode): project (the working project schedule) or large (2,000-task multi-year stress dataset) |
 
 #### `app-invoice-detail` — `AppInvoiceDetail`
 

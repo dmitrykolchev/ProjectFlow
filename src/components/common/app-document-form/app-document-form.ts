@@ -43,12 +43,12 @@ import '../app-button/app-button';
 @customElement('app-document-form')
 export class AppDocumentForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) document: DocumentItem | null = null;
-  @property({ attribute: false }) presetCompanyId: string | null = null;
-  @property({ attribute: false }) presetProjectId: string | null = null;
-  @property({ attribute: false }) presetContractId: string | null = null;
-  @property({ attribute: false }) presetCategory: DocumentCategory | null = null;
-  @property({ attribute: false }) presetStatus: DocumentStatus | null = null;
+  @property({ type: Object, attribute: false }) document: DocumentItem | null = null;
+  @property({ type: Object, attribute: false }) presetCompanyId: string | null = null;
+  @property({ type: Object, attribute: false }) presetProjectId: string | null = null;
+  @property({ type: Object, attribute: false }) presetContractId: string | null = null;
+  @property({ type: Object, attribute: false }) presetCategory: DocumentCategory | null = null;
+  @property({ type: Object, attribute: false }) presetStatus: DocumentStatus | null = null;
   @property({ type: String }) presetTags: string = '';
   @property({ type: String }) contextTitle: string = '';
 

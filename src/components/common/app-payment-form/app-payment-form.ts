@@ -34,10 +34,10 @@ const CURRENCIES: BankCurrency[] = ['RUB', 'USD', 'EUR', 'CNY', 'GBP', 'KZT', 'A
 @customElement('app-payment-form')
 export class AppPaymentForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) invoice: Invoice | null = null;
-  @property({ attribute: false }) payment: InvoicePayment | null = null;
+  @property({ type: Object, attribute: false }) invoice: Invoice | null = null;
+  @property({ type: Object, attribute: false }) payment: InvoicePayment | null = null;
   /** invoices the target selector may switch between */
-  @property({ attribute: false }) payableInvoices: Invoice[] = [];
+  @property({ type: Array, attribute: false }) payableInvoices: Invoice[] = [];
   @property({ type: String }) defaultDirection: PaymentDirection = 'incoming';
   @property({ type: String }) defaultCompanyId = '';
   @property({ type: String }) defaultCounterpartyId = '';

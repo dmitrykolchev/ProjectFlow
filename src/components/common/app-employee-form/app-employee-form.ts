@@ -23,7 +23,7 @@ import '../app-button/app-button';
 @customElement('app-employee-form')
 export class AppEmployeeForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) employee: User | null = null;
+  @property({ type: Object, attribute: false }) employee: User | null = null;
 
   @state() private currentLang = store.customization.language;
   @state() private fName = '';

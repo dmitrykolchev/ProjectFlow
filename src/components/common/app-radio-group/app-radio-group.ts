@@ -21,7 +21,7 @@ export class AppRadioGroup extends LitElement {
   @property({ type: Array }) options: RadioOption[] = [];
   // declarative <app-option> children and data sources fill the group as well:
   // array, promise, or a function returning an array (sync or async)
-  @property({ attribute: false }) dataSource?: OptionDataSource;
+  @property({ type: Object, attribute: false }) dataSource?: OptionDataSource;
   @property({ type: String }) orientation: 'vertical' | 'horizontal' = 'vertical';
   @property({ type: String }) variant: 'default' | 'card' = 'default';
   @property({ type: Boolean, reflect: true }) disabled: boolean = false;

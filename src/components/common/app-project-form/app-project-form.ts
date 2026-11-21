@@ -40,21 +40,21 @@ const PROJECT_COLOR_SWATCHES = [
 @customElement('app-project-form')
 export class AppProjectForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) project: Project | null = null;
-  @property({ attribute: false }) presetCompanyId: string | null = null;
-  @property({ attribute: false }) presetCounterpartyId: string | null = null;
-  @property({ attribute: false }) presetStatus: ProjectStatus | null = null;
-  @property({ attribute: false }) presetKey: string | null = null;
-  @property({ attribute: false }) presetBudget: number | null = null;
+  @property({ type: Object, attribute: false }) project: Project | null = null;
+  @property({ type: Object, attribute: false }) presetCompanyId: string | null = null;
+  @property({ type: Object, attribute: false }) presetCounterpartyId: string | null = null;
+  @property({ type: Object, attribute: false }) presetStatus: ProjectStatus | null = null;
+  @property({ type: Object, attribute: false }) presetKey: string | null = null;
+  @property({ type: Object, attribute: false }) presetBudget: number | null = null;
   @property({ type: String }) contextTitle: string = '';
   @property({ type: String }) saveLabel: string = '';
   @property({ type: Boolean }) saveDisabled: boolean = false;
-  @property({ attribute: false }) beforeSave: ((data: { name: string; key: string }) => Promise<boolean>) | null = null;
+  @property({ type: Object, attribute: false }) beforeSave: ((data: { name: string; key: string }) => Promise<boolean>) | null = null;
   // view-owned create-mode sections rendered inside the modal body and footer;
   // named slots cannot be used here because the modal moves to the portal on open
   // and a slotted node loses its assignment when the slot element leaves the shadow tree
-  @property({ attribute: false }) extraContent: TemplateResult | null = null;
-  @property({ attribute: false }) footerExtra: TemplateResult | null = null;
+  @property({ type: Object, attribute: false }) extraContent: TemplateResult | null = null;
+  @property({ type: Object, attribute: false }) footerExtra: TemplateResult | null = null;
 
   @state() private currentLang = store.customization.language;
   @state() private fName = '';

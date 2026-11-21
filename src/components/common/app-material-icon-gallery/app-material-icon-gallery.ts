@@ -40,9 +40,9 @@ export class AppMaterialIconGallery extends LitElement {
   static styles = styles;
 
   @property({ type: Array }) icons: MaterialIconDef[] = [];
-  @property() query = '';
-  @property() category = 'all';
-  @property() family: GalleryFamily = 'outlined';
+  @property({ type: String }) query = '';
+  @property({ type: String }) category = 'all';
+  @property({ type: String }) family: GalleryFamily = 'outlined';
   // canonical scale names, legacy aliases (xsm = xs, xlg = xl), or a numeric px size
   @property({
     converter: {

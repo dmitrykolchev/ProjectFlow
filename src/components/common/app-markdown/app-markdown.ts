@@ -20,7 +20,7 @@ import katexStyles from './katex.css';
  */
 @customElement('app-markdown')
 export class AppMarkdown extends LitElement {
-  @property({ attribute: false }) content = '';
+  @property({ type: String, attribute: false }) content = '';
 
   /** Checklist checkboxes are interactive and emit `checklist-toggle` when true. */
   @property({ type: Boolean }) editable = false;

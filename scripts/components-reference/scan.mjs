@@ -120,7 +120,11 @@ for (const g of fs.readdirSync(srcRoot, { withFileTypes: true }).filter((e) => e
       const ann = (eq >= 0 ? tail.slice(0, eq - name.length) : tail).replace(/;\s*$/, '').trim();
       const declared = (opts.match(/type:\s*(\w+)/) || [])[1];
       const attr = (opts.match(/attribute:\s*'([^']+)'/) || [])[1];
-      const type = declared || (ann.startsWith(':') ? ann.slice(1).trim() : 'String');
+      // The TS annotation is richer than the lit runtime type (BankRequisite[] vs
+      // Array), so docs prefer it; the explicit lit type is the fallback for props
+      // declared without an annotation.
+      const declaredType = ann.startsWith(':') ? ann.slice(1).trim() : '';
+      const type = declaredType || declared || 'String';
       propsList.push({ name, type, attr, reflect: /reflect:\s*true/.test(opts), def });
     }
 

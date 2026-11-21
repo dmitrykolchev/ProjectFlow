@@ -18,10 +18,10 @@ import styles from './app-analysis-summary.css';
  */
 @customElement('app-analysis-summary')
 export class AppAnalysisSummary extends LitElement {
-  @property({ attribute: false }) summary?: AnalysisSummary;
+  @property({ type: Object, attribute: false }) summary?: AnalysisSummary;
   @property({ type: Boolean }) expanded = true;
   // task summaries: subtask titles already present on the owning task
-  @property({ attribute: false }) addedTitles: string[] = [];
+  @property({ type: Array, attribute: false }) addedTitles: string[] = [];
 
   @state() private currentLang = store.customization.language;
 

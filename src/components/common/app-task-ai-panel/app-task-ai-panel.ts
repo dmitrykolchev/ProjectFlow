@@ -40,7 +40,7 @@ import styles from './app-task-ai-panel.css';
 @customElement('app-task-ai-panel')
 export class AppTaskAiPanel extends LitElement {
   @property({ type: Object }) task?: TaskContextInput;
-  @property({ attribute: false }) analyses: AnalysisSummary[] = [];
+  @property({ type: Array, attribute: false }) analyses: AnalysisSummary[] = [];
   @property({ type: Array }) clarifications: TaskAiClarificationMessage[] = [];
   @property({ type: Boolean }) compact = false;
   @property({ type: String }) timeSummary = '';

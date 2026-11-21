@@ -37,7 +37,7 @@
   "propsList": [
    {
     "name": "summary",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
@@ -83,31 +83,31 @@
   "propsList": [
    {
     "name": "initials",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "src",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'xs' | 'sm' | 'md' | 'lg' | 'xl'",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -149,31 +149,31 @@
   "propsList": [
    {
     "name": "variant",
-    "type": "String",
+    "type": "BadgeVariant",
     "reflect": false,
     "def": "'neutral'"
    },
    {
     "name": "appearance",
-    "type": "String",
+    "type": "BadgeAppearance",
     "reflect": false,
     "def": "'soft'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "BadgeSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "dot",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "removable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -245,26 +245,26 @@
    },
    {
     "name": "editable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "hideHeader",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "hide-header",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "heading",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -338,51 +338,51 @@
   "propsList": [
    {
     "name": "variant",
-    "type": "String",
+    "type": "ButtonVariant",
     "reflect": false,
     "def": "'primary'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "ButtonSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "action",
-    "type": "String",
+    "type": "ButtonAction",
     "reflect": true,
     "def": "'default'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "loading",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "iconOnly",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "icon-only",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "ariaLabel",
-    "type": "String",
+    "type": "string",
     "attr": "aria-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "type",
-    "type": "String",
+    "type": "'button' | 'submit' | 'reset'",
     "reflect": false,
     "def": "'button'"
    }
@@ -462,13 +462,13 @@
   "propsList": [
    {
     "name": "orientation",
-    "type": "String",
+    "type": "'horizontal' | 'vertical'",
     "reflect": false,
     "def": "'horizontal'"
    },
    {
     "name": "attached",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    }
@@ -512,7 +512,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -530,13 +530,13 @@
    },
    {
     "name": "showContractSelect",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -621,65 +621,65 @@
    },
    {
     "name": "pageSize",
-    "type": "Number",
+    "type": "number",
     "attr": "page-size",
     "reflect": false,
     "def": "9"
    },
    {
     "name": "page",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "1"
    },
    {
     "name": "emptyTitle",
-    "type": "String",
+    "type": "string",
     "attr": "empty-title",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "locale",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'ru-RU'"
    },
    {
     "name": "clickable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "selectable",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "selectable",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "keyField",
-    "type": "String",
+    "type": "string",
     "attr": "key-field",
     "reflect": false,
     "def": "'id'"
    },
    {
     "name": "selectedKeys",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "cardClass",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "wideCollapse",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "wide-collapse",
     "reflect": true,
     "def": "false"
@@ -764,25 +764,25 @@
   "propsList": [
    {
     "name": "checked",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "indeterminate",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -827,13 +827,13 @@
   "propsList": [
    {
     "name": "colors",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -865,43 +865,43 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "items",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "dataSource",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "selected",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'Add tag or filter...'"
    },
    {
     "name": "allowCustom",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    }
@@ -963,7 +963,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -1002,73 +1002,73 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "ConfirmVariant",
     "reflect": false,
     "def": "'danger'"
    },
    {
     "name": "icon",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "action",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "result",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "message",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "actionLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "resultLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "confirmLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "cancelLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg' | 'xl'",
     "reflect": false,
     "def": "'sm'"
    }
@@ -1141,13 +1141,13 @@
   "propsList": [
    {
     "name": "data",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "mode",
-    "type": "String",
+    "type": "'select' | 'display'",
     "reflect": false,
     "def": "'display'"
    }
@@ -1183,7 +1183,7 @@
    },
    {
     "name": "mode",
-    "type": "String",
+    "type": "'select' | 'display'",
     "reflect": false,
     "def": "'display'"
    }
@@ -1213,7 +1213,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -1225,25 +1225,25 @@
    },
    {
     "name": "presetCounterpartyId",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "presetProjectId",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "presetStatus",
-    "type": "String",
+    "type": "ContractStatus",
     "reflect": false,
     "def": "'draft'"
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -1298,26 +1298,26 @@
    },
    {
     "name": "editable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "hideHeader",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "hide-header",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "heading",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -1365,7 +1365,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -1404,56 +1404,56 @@
   "propsList": [
    {
     "name": "field",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "caption",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "header",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "width",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "150"
    },
    {
     "name": "minWidth",
-    "type": "Number",
+    "type": "number",
     "attr": "min-width",
     "reflect": false,
     "def": "70"
    },
    {
     "name": "sortable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "groupable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "resizable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "reorderable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
@@ -1465,56 +1465,56 @@
    },
    {
     "name": "visible",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "hideable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "exportable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "align",
-    "type": "String",
+    "type": "'left' | 'center' | 'right'",
     "reflect": false,
     "def": "'left'"
    },
    {
     "name": "cellType",
-    "type": "String",
+    "type": "DataGridCellType",
     "attr": "cell-type",
     "reflect": false,
     "def": "'text'"
    },
    {
     "name": "template",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "renderer",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "sortValue",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "groupFormatter",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    }
@@ -1633,68 +1633,68 @@
    },
    {
     "name": "pageSize",
-    "type": "Number",
+    "type": "number",
     "attr": "page-size",
     "reflect": false,
     "def": "10"
    },
    {
     "name": "page",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "1"
    },
    {
     "name": "sortBy",
-    "type": "String",
+    "type": "string",
     "attr": "sort-by",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "sortDir",
-    "type": "String",
+    "type": "SortDirection",
     "attr": "sort-dir",
     "reflect": false,
     "def": "'asc'"
    },
    {
     "name": "maxHeight",
-    "type": "Number",
+    "type": "number",
     "attr": "max-height",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "emptyTitle",
-    "type": "String",
+    "type": "string",
     "attr": "empty-title",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "locale",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'ru-RU'"
    },
    {
     "name": "selectable",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "selectable",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "keyField",
-    "type": "String",
+    "type": "string",
     "attr": "key-field",
     "reflect": false,
     "def": "'id'"
    },
    {
     "name": "selectedKeys",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
    },
@@ -1794,55 +1794,55 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'YYYY-MM-DD'"
    },
    {
     "name": "min",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "max",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "required",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "error",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    }
@@ -1902,7 +1902,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -1974,7 +1974,7 @@
    },
    {
     "name": "entity",
-    "type": "String",
+    "type": "EntityEmblemKind",
     "reflect": false,
     "def": "'project'"
    }
@@ -2080,7 +2080,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
@@ -2129,7 +2129,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -2171,13 +2171,13 @@
    },
    {
     "name": "presetTags",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -2388,7 +2388,7 @@
    },
    {
     "name": "drop",
-    "type": "String",
+    "type": "'before' | 'after' | null",
     "reflect": false,
     "def": "null"
    }
@@ -2438,37 +2438,37 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'Actions'"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "ButtonVariant",
     "reflect": false,
     "def": "'secondary'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "ButtonSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "placement",
-    "type": "String",
+    "type": "'bottom-start' | 'bottom-end'",
     "reflect": false,
     "def": "'bottom-start'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "items",
-    "type": "Array",
+    "type": "MenuItem[]",
     "reflect": false,
     "def": "[]"
    }
@@ -2550,7 +2550,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -2589,19 +2589,19 @@
   "propsList": [
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "message",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    }
@@ -2653,25 +2653,25 @@
   "propsList": [
    {
     "name": "entity",
-    "type": "String",
+    "type": "EntityEmblemKind",
     "reflect": true,
     "def": "'project'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'xs' | 'sm' | 'md' | 'lg'",
     "reflect": true,
     "def": "'lg'"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'emblem' | 'pill'",
     "reflect": true,
     "def": "'emblem'"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -2709,14 +2709,14 @@
   "propsList": [
    {
     "name": "entityType",
-    "type": "String",
+    "type": "ReminderEntityType",
     "attr": "entity-type",
     "reflect": false,
     "def": "'project'"
    },
    {
     "name": "entityId",
-    "type": "String",
+    "type": "string",
     "attr": "entity-id",
     "reflect": false,
     "def": "''"
@@ -2747,88 +2747,88 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "options",
-    "type": "Array",
+    "type": "EntitySelectorOption[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "dataSource",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "searchPlaceholder",
-    "type": "String",
+    "type": "string",
     "attr": "search-placeholder",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "EntitySelectorSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "required",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "clearable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "showSelectedDetails",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "show-selected-details",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "maxVisible",
-    "type": "Number",
+    "type": "number",
     "attr": "max-visible",
     "reflect": false,
     "def": "80"
    },
    {
     "name": "error",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "hint",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -2919,7 +2919,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -2949,7 +2949,7 @@
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -2998,71 +2998,71 @@
   "propsList": [
    {
     "name": "accept",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "selectedFileName",
-    "type": "String",
+    "type": "string",
     "attr": "selected-file-name",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "selectedFileSize",
-    "type": "Number",
+    "type": "number",
     "attr": "selected-file-size",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "multiple",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "hint",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "buttonLabel",
-    "type": "String",
+    "type": "string",
     "attr": "button-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "clearLabel",
-    "type": "String",
+    "type": "string",
     "attr": "clear-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "selectedLabel",
-    "type": "String",
+    "type": "string",
     "attr": "selected-label",
     "reflect": false,
     "def": "''"
@@ -3141,44 +3141,44 @@
   "propsList": [
    {
     "name": "searchValue",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "searchEnabled",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "search-enabled",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "filters",
-    "type": "Array",
+    "type": "FilterDef[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "values",
-    "type": "Object",
+    "type": "Record<string, string>",
     "reflect": false,
     "def": "{}"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'card' | 'bare'",
     "reflect": false,
     "def": "'card'"
    },
    {
     "name": "showReset",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "show-reset",
     "reflect": false,
     "def": "false"
@@ -3251,7 +3251,7 @@
   "propsList": [
    {
     "name": "columns",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "2"
    }
@@ -3319,62 +3319,62 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "type",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'text'"
    },
    {
     "name": "required",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "error",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "helper",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "clearable",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "clearable",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "InputSize",
     "reflect": false,
     "def": "'md'"
    }
@@ -3449,13 +3449,13 @@
   "propsList": [
    {
     "name": "columns",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "4"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'grid' | 'strip'",
     "reflect": false,
     "def": "'grid'"
    }
@@ -3495,44 +3495,44 @@
   "propsList": [
    {
     "name": "href",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "target",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "LinkVariant",
     "reflect": false,
     "def": "'primary'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "LinkSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "ariaLabel",
-    "type": "String",
+    "type": "string",
     "attr": "aria-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "active",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    }
@@ -3641,6 +3641,12 @@
   "desc": "Material Symbols ligature icon (self-hosted variable font) with Google axes fill/weight/grade, family style, app size scale, and status color variants.",
   "propsList": [
    {
+    "name": "name",
+    "type": "String",
+    "reflect": false,
+    "def": "'star'"
+   },
+   {
     "name": "fill",
     "type": "Number",
     "reflect": false,
@@ -3659,10 +3665,22 @@
     "def": "0"
    },
    {
+    "name": "family",
+    "type": "MaterialIconFamily",
+    "reflect": false,
+    "def": "'outlined'"
+   },
+   {
     "name": "decorative",
     "type": "Boolean",
     "reflect": false,
     "def": "false"
+   },
+   {
+    "name": "variant",
+    "type": "MaterialIconVariant",
+    "reflect": false,
+    "def": "'neutral'"
    }
   ],
   "events": [],
@@ -3698,9 +3716,27 @@
   "propsList": [
    {
     "name": "icons",
-    "type": "Array",
+    "type": "MaterialIconDef[]",
     "reflect": false,
     "def": "[]"
+   },
+   {
+    "name": "query",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "category",
+    "type": "String",
+    "reflect": false,
+    "def": "'all'"
+   },
+   {
+    "name": "family",
+    "type": "GalleryFamily",
+    "reflect": false,
+    "def": "'outlined'"
    },
    {
     "name": "fill",
@@ -3764,7 +3800,7 @@
   "propsList": [
    {
     "name": "items",
-    "type": "Array",
+    "type": "MenuItem[]",
     "reflect": false,
     "def": "[]"
    }
@@ -3810,7 +3846,7 @@
   "propsList": [
    {
     "name": "inset",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    }
@@ -3836,7 +3872,7 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -3867,49 +3903,49 @@
   "propsList": [
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "shortcut",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "danger",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "checked",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "checkable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "icon",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    }
@@ -3991,19 +4027,19 @@
   "propsList": [
    {
     "name": "items",
-    "type": "Array",
+    "type": "MetaItem[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "columns",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "3"
    },
    {
     "name": "layout",
-    "type": "String",
+    "type": "'strip' | 'grid'",
     "reflect": false,
     "def": "'strip'"
    }
@@ -4047,25 +4083,25 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "mono",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "danger",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -4116,31 +4152,31 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "ModalSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "hideClose",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "headerIcon",
-    "type": "Object",
+    "type": "TemplateResult | null",
     "reflect": false,
     "def": "null"
    }
@@ -4232,19 +4268,19 @@
   "propsList": [
    {
     "name": "amount",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "currency",
-    "type": "String",
+    "type": "BankCurrency",
     "reflect": false,
     "def": "'RUB'"
    },
    {
     "name": "format",
-    "type": "String",
+    "type": "'full' | 'short'",
     "reflect": false,
     "def": "'full'"
    }
@@ -4278,49 +4314,49 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "min",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "max",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "1000"
    },
    {
     "name": "step",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "1"
    },
    {
     "name": "unit",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -4376,68 +4412,68 @@
   "propsList": [
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "icon",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "code",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "subtitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "meta",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "badge",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "badgeColor",
-    "type": "String",
+    "type": "string",
     "attr": "badge-color",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "avatar",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "description",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
@@ -4449,7 +4485,7 @@
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -4536,31 +4572,31 @@
   "propsList": [
    {
     "name": "length",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "6"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "error",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "autofocus",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -4605,13 +4641,13 @@
   "propsList": [
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "subtitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -4663,20 +4699,20 @@
   "propsList": [
    {
     "name": "totalItems",
-    "type": "Number",
+    "type": "number",
     "attr": "total-items",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "page",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "1"
    },
    {
     "name": "pageSize",
-    "type": "Number",
+    "type": "number",
     "attr": "page-size",
     "reflect": false,
     "def": "10"
@@ -4689,33 +4725,33 @@
    },
    {
     "name": "layoutMode",
-    "type": "String",
+    "type": "PaginationLayoutMode",
     "attr": "layout-mode",
     "reflect": false,
     "def": "'table'"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "PaginationVariant",
     "reflect": false,
     "def": "'surface'"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "showPageSize",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "show-page-size",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "showSummary",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "show-summary",
     "reflect": false,
     "def": "true"
@@ -4787,7 +4823,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -4811,7 +4847,7 @@
    },
    {
     "name": "defaultDirection",
-    "type": "String",
+    "type": "PaymentDirection",
     "reflect": false,
     "def": "'incoming'"
    },
@@ -4876,68 +4912,68 @@
   "propsList": [
    {
     "name": "size",
-    "type": "String",
+    "type": "PersonaSize",
     "reflect": false,
     "def": "'48'"
    },
    {
     "name": "image",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "initials",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "primaryText",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "secondaryText",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "tertiaryText",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "presence",
-    "type": "String",
+    "type": "PersonaPresence",
     "reflect": false,
     "def": "'none'"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "ariaLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "interactive",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "interactive",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "personaDisabled",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "persona-disabled",
     "reflect": false,
     "def": "false"
@@ -5008,31 +5044,31 @@
   "propsList": [
    {
     "name": "presence",
-    "type": "String",
+    "type": "PersonaPresence",
     "reflect": false,
     "def": "'none'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'12'"
    },
    {
     "name": "glyph",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'auto'"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "ariaLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -5078,32 +5114,32 @@
   "propsList": [
    {
     "name": "value",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "segments",
-    "type": "Array",
+    "type": "ProgressSegment[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "color",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'var(--accent-primary, #6366f1)'"
    },
    {
     "name": "showLabel",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "show-label",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md'",
     "reflect": false,
     "def": "'md'"
    }
@@ -5145,7 +5181,7 @@
   "propsList": [
    {
     "name": "projectId",
-    "type": "String",
+    "type": "string",
     "attr": "project-id",
     "reflect": false,
     "def": "''"
@@ -5164,19 +5200,19 @@
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "readonly",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -5222,7 +5258,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -5264,19 +5300,19 @@
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "saveLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "saveDisabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
@@ -5401,49 +5437,49 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "name",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": true,
     "def": "''"
    },
    {
     "name": "options",
-    "type": "Array",
+    "type": "RadioOption[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "dataSource",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "orientation",
-    "type": "String",
+    "type": "'vertical' | 'horizontal'",
     "reflect": false,
     "def": "'vertical'"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'default' | 'card'",
     "reflect": false,
     "def": "'default'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    }
@@ -5509,40 +5545,40 @@
   "propsList": [
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "startDate",
-    "type": "String",
+    "type": "string",
     "attr": "start-date",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "includePrefix",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "include-prefix",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "allowOneTime",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "allow-one-time",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "compact",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "hideRruleBar",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "hide-rrule-bar",
     "reflect": false,
     "def": "false"
@@ -5589,7 +5625,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -5601,13 +5637,13 @@
    },
    {
     "name": "presetEntityType",
-    "type": "String",
+    "type": "ReminderEntityType | ''",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "presetEntityId",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -5648,7 +5684,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -5697,45 +5733,45 @@
   "propsList": [
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "subtitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "ariaLabel",
-    "type": "String",
+    "type": "string",
     "attr": "aria-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'default' | 'plain' | 'panel' | 'tabbed'",
     "reflect": false,
     "def": "'default'"
    },
    {
     "name": "collapsible",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "collapsible",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "collapsed",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "maxHeight",
-    "type": "String",
+    "type": "string",
     "attr": "max-height",
     "reflect": false,
     "def": "''"
@@ -5818,38 +5854,38 @@
   "propsList": [
    {
     "name": "options",
-    "type": "Array",
+    "type": "SegmentedOption[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "dataSource",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "fullWidth",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "full-width",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -5907,43 +5943,43 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "options",
-    "type": "Array",
+    "type": "SelectOption[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "dataSource",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'Select...'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "SelectSize",
     "reflect": false,
     "def": "'md'"
    }
@@ -6005,31 +6041,31 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'Save'"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'primary' | 'secondary' | 'outline'",
     "reflect": false,
     "def": "'primary'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "ButtonSize",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "items",
-    "type": "Array",
+    "type": "MenuItem[]",
     "reflect": false,
     "def": "[]"
    }
@@ -6108,38 +6144,38 @@
   "propsList": [
    {
     "name": "domain",
-    "type": "String",
+    "type": "StatusDomain",
     "reflect": false,
     "def": "'task'"
    },
    {
     "name": "status",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "labelOverride",
-    "type": "String",
+    "type": "string",
     "attr": "label-override",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'sm'"
    },
    {
     "name": "appearance",
-    "type": "String",
+    "type": "'soft' | 'solid' | 'outline'",
     "reflect": false,
     "def": "'soft'"
    },
    {
     "name": "dot",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "dot",
     "reflect": false,
     "def": "false"
@@ -6186,38 +6222,38 @@
   "propsList": [
    {
     "name": "checked",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "frame",
-    "type": "String",
+    "type": "SwitchFrame",
     "reflect": true,
     "def": "'none'"
    },
    {
     "name": "fieldLabel",
-    "type": "String",
+    "type": "string",
     "attr": "field-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "SwitchSize",
     "reflect": false,
     "def": "'md'"
    }
@@ -6274,19 +6310,19 @@
   "propsList": [
    {
     "name": "field",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "type",
-    "type": "String",
+    "type": "TableCellType",
     "reflect": false,
     "def": "'text'"
    },
@@ -6298,51 +6334,51 @@
    },
    {
     "name": "align",
-    "type": "String",
+    "type": "CellAlign",
     "reflect": false,
     "def": "'left'"
    },
    {
     "name": "mono",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "code",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "sortable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "yesLabel",
-    "type": "String",
+    "type": "string",
     "attr": "yes-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "noLabel",
-    "type": "String",
+    "type": "string",
     "attr": "no-label",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "cellRender",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    },
    {
     "name": "valueFn",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    }
@@ -6420,41 +6456,41 @@
    },
    {
     "name": "sortBy",
-    "type": "String",
+    "type": "string",
     "attr": "sort-by",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "sortDir",
-    "type": "String",
+    "type": "SortDirection",
     "attr": "sort-dir",
     "reflect": false,
     "def": "'asc'"
    },
    {
     "name": "activeKey",
-    "type": "String",
+    "type": "string",
     "attr": "active-key",
     "reflect": false,
     "def": "'isActive'"
    },
    {
     "name": "emptyTitle",
-    "type": "String",
+    "type": "string",
     "attr": "empty-title",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "locale",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'ru-RU'"
    },
    {
     "name": "striped",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -6524,9 +6560,15 @@
   "propsList": [
    {
     "name": "tags",
-    "type": "Array",
+    "type": "string[]",
     "reflect": false,
     "def": "[]"
+   },
+   {
+    "name": "mode",
+    "type": "'readonly' | 'add-button' | 'add-form'",
+    "reflect": false,
+    "def": "'readonly'"
    },
    {
     "name": "showEmptyLabel",
@@ -6579,7 +6621,7 @@
    },
    {
     "name": "clarifications",
-    "type": "Array",
+    "type": "TaskAiClarificationMessage[]",
     "reflect": false,
     "def": "[]"
    },
@@ -6680,55 +6722,55 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "placeholder",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "rows",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "3"
    },
    {
     "name": "required",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "error",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "maxlength",
-    "type": "Number",
+    "type": "number",
     "reflect": false,
     "def": "0"
    },
    {
     "name": "monospace",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -6789,7 +6831,7 @@
   "propsList": [
    {
     "name": "open",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
@@ -6819,7 +6861,7 @@
    },
    {
     "name": "contextTitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -6887,38 +6929,38 @@
   "propsList": [
    {
     "name": "pressed",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "variant",
-    "type": "String",
+    "type": "'soft' | 'solid'",
     "reflect": false,
     "def": "'soft'"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'xxs' | 'sm' | 'md' | 'lg'",
     "reflect": false,
     "def": "'md'"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "iconOnly",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "icon-only",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -6992,31 +7034,31 @@
   "propsList": [
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "subtitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "type",
-    "type": "String",
+    "type": "'bar' | 'donut' | 'line'",
     "reflect": false,
     "def": "'bar'"
    },
    {
     "name": "data",
-    "type": "Array",
+    "type": "ChartDataPoint[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "centerLabel",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    }
@@ -7068,61 +7110,61 @@
   "propsList": [
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'0'"
    },
    {
     "name": "delta",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "trend",
-    "type": "String",
+    "type": "'up' | 'down' | 'neutral'",
     "reflect": false,
     "def": "'neutral'"
    },
    {
     "name": "subtitle",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "accentColor",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'var(--accent-primary, #6366f1)'"
    },
    {
     "name": "valueColor",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "sparkline",
-    "type": "Array",
+    "type": "number[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "clickable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
    {
     "name": "size",
-    "type": "String",
+    "type": "'full' | 'compact' | 'strip'",
     "reflect": false,
     "def": "'full'"
    }
@@ -7194,13 +7236,13 @@
   "propsList": [
    {
     "name": "projectId",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "'all'"
    },
    {
     "name": "hideProjectSelector",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    },
@@ -7293,25 +7335,25 @@
   "propsList": [
    {
     "name": "title",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "projects",
-    "type": "Array",
+    "type": "Project[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "tasks",
-    "type": "Array",
+    "type": "Task[]",
     "reflect": false,
     "def": "[]"
    },
    {
     "name": "lang",
-    "type": "String",
+    "type": "'ru' | 'en'",
     "reflect": false,
     "def": "'ru'"
    }
@@ -7410,26 +7452,26 @@
   "propsList": [
    {
     "name": "collapsed",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "store.customization.sidebarCollapsed"
    },
    {
     "name": "activeValue",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "groupMode",
-    "type": "String",
+    "type": "SidebarGroupMode",
     "attr": "group-mode",
     "reflect": false,
     "def": "store.customization.sidebarGroupMode"
    },
    {
     "name": "standalone",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "false"
    }
@@ -7488,32 +7530,32 @@
   "propsList": [
    {
     "name": "groupId",
-    "type": "String",
+    "type": "string",
     "attr": "group-id",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "expanded",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "true"
    },
    {
     "name": "collapsed",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "hasActive",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "has-active",
     "reflect": false,
     "def": "false"
@@ -7568,43 +7610,43 @@
   "propsList": [
    {
     "name": "value",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "label",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "badge",
-    "type": "String",
+    "type": "string",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "active",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "collapsed",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "disabled",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "icon",
-    "type": "String",
+    "type": "Object",
     "reflect": false,
     "def": ""
    }
@@ -7692,13 +7734,13 @@
   "propsList": [
    {
     "name": "preview",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": true,
     "def": "false"
    },
    {
     "name": "initialStep",
-    "type": "String",
+    "type": "AuthScreenStep",
     "attr": "initial-step",
     "reflect": false,
     "def": "'login'"
@@ -7905,7 +7947,7 @@
    },
    {
     "name": "rowKey",
-    "type": "String",
+    "type": "string",
     "attr": "row-key",
     "reflect": false,
     "def": "'id'"
@@ -7918,40 +7960,40 @@
    },
    {
     "name": "selectable",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "virtual",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
    {
     "name": "emptyText",
-    "type": "String",
+    "type": "string",
     "attr": "empty-text",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "exportFilename",
-    "type": "String",
+    "type": "string",
     "attr": "export-filename",
     "reflect": false,
     "def": "'projectflow_export'"
    },
    {
     "name": "groupBy",
-    "type": "String",
+    "type": "string",
     "attr": "group-by",
     "reflect": false,
     "def": "''"
    },
    {
     "name": "sortBy",
-    "type": "String",
+    "type": "string",
     "attr": "sort-by",
     "reflect": false,
     "def": "''"
@@ -7964,7 +8006,7 @@
    },
    {
     "name": "hideDensitySwitch",
-    "type": "Boolean",
+    "type": "boolean",
     "attr": "hide-density-switch",
     "reflect": false,
     "def": "false"
@@ -8137,7 +8179,7 @@
   "propsList": [
    {
     "name": "virtual",
-    "type": "Boolean",
+    "type": "boolean",
     "reflect": false,
     "def": "true"
    },
@@ -8149,7 +8191,7 @@
    },
    {
     "name": "datasetMode",
-    "type": "String",
+    "type": "'project' | 'large'",
     "attr": "dataset-mode",
     "reflect": false,
     "def": "'project'"

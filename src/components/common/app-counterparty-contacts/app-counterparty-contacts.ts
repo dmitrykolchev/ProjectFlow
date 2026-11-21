@@ -31,7 +31,7 @@ import styles from './app-counterparty-contacts.css';
  */
 @customElement('app-counterparty-contacts')
 export class AppCounterpartyContacts extends LitElement {
-  @property({ attribute: false }) contacts: CounterpartyContact[] = [];
+  @property({ type: Array, attribute: false }) contacts: CounterpartyContact[] = [];
   @property({ type: Boolean }) editable: boolean = false;
   @property({ type: Boolean }) compact: boolean = false;
   @property({ type: Boolean, attribute: 'hide-header' }) hideHeader: boolean = false;

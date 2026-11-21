@@ -41,8 +41,8 @@ type PreviewKind = 'pdf' | 'image' | 'markdown' | 'csv' | 'json' | 'text' | 'bin
 
 @customElement('app-document-previewer')
 export class AppDocumentPreviewer extends LitElement {
-  @property({ attribute: false }) document: DocumentItem | null = null;
-  @property({ attribute: false }) documents: DocumentItem[] = [];
+  @property({ type: Object, attribute: false }) document: DocumentItem | null = null;
+  @property({ type: Array, attribute: false }) documents: DocumentItem[] = [];
   @property({ type: Boolean }) compact = false;
   @property({ type: Boolean, attribute: 'show-header' }) showHeader = true;
   @property({ type: Boolean, attribute: 'show-expand' }) showExpand = false;

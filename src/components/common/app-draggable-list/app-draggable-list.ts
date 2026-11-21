@@ -21,7 +21,7 @@ import styles from './app-draggable-list.css';
  */
 @customElement('app-draggable-list')
 export class AppDraggableList extends LitElement {
-  @property({ attribute: false }) items: DraggableItemData[] = [];
+  @property({ type: Array, attribute: false }) items: DraggableItemData[] = [];
 
   @state() private draggedId: string | null = null;
   @state() private dropTargetId: string | null = null;

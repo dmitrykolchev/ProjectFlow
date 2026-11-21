@@ -42,8 +42,8 @@ const HOURLY_RATE_RUB = 3200;
 @customElement('app-calculation-form')
 export class AppCalculationForm extends LitElement {
   @property({ type: Boolean, reflect: true }) open: boolean = false;
-  @property({ attribute: false }) calculation: Calculation | null = null;
-  @property({ attribute: false }) presetContractId: string | null = null;
+  @property({ type: Object, attribute: false }) calculation: Calculation | null = null;
+  @property({ type: Object, attribute: false }) presetContractId: string | null = null;
   @property({ type: Boolean }) showContractSelect: boolean = false;
   @property({ type: String }) contextTitle: string = '';
 

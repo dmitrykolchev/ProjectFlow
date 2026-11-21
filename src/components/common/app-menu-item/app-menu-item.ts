@@ -13,7 +13,7 @@ export class AppMenuItem extends LitElement {
   @property({ type: Boolean, reflect: true }) danger: boolean = false;
   @property({ type: Boolean, reflect: true }) checked: boolean = false;
   @property({ type: Boolean, reflect: true }) checkable: boolean = false;
-  @property({ attribute: false }) icon?: TemplateResult | string;
+  @property({ type: Object, attribute: false }) icon?: TemplateResult | string;
 
   @state() private hasIconSlot: boolean = false;
   @state() private hasShortcutSlot: boolean = false;

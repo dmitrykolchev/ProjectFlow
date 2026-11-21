@@ -17,7 +17,7 @@ export class AppSegmentedSwitch extends LitElement {
   @property({ type: Array }) options: SegmentedOption[] = [];
   // declarative <app-option> children and data sources fill the track as well:
   // array, promise, or a function returning an array (sync or async)
-  @property({ attribute: false }) dataSource?: OptionDataSource;
+  @property({ type: Object, attribute: false }) dataSource?: OptionDataSource;
   @property({ type: String }) value: string = '';
   // canonical control size scale (docs/ComponentApiSpecs.md, Priority E), md default = historical look
   @property({ type: String }) size: 'sm' | 'md' | 'lg' = 'md';

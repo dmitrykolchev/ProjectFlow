@@ -10,7 +10,7 @@ export class AppSidebarItem extends LitElement {
   @property({ type: Boolean, reflect: true }) active: boolean = false;
   @property({ type: Boolean, reflect: true }) collapsed: boolean = false;
   @property({ type: Boolean, reflect: true }) disabled: boolean = false;
-  @property({ attribute: false }) icon?: TemplateResult | string;
+  @property({ type: Object, attribute: false }) icon?: TemplateResult | string;
 
   static styles = styles;
 

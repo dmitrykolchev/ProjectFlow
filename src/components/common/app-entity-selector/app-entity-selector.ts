@@ -40,7 +40,7 @@ export class AppEntitySelector extends LitElement {
   @property({ type: Array }) options: EntitySelectorOption[] = [];
   // declarative <app-option> children and data sources fill the list as well:
   // array, promise, or a function returning an array (sync or async)
-  @property({ attribute: false }) dataSource?: OptionDataSource;
+  @property({ type: Object, attribute: false }) dataSource?: OptionDataSource;
   @property({ type: String }) placeholder: string = '';
   @property({ type: String, attribute: 'search-placeholder' }) searchPlaceholder: string = '';
   @property({ type: String }) size: EntitySelectorSize = 'md';
