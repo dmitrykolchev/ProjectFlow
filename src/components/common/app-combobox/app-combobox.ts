@@ -6,6 +6,11 @@ import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import styles from './app-combobox.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface ComboboxChangeDetail {
+  selected: string[];
+}
+
 @customElement('app-combobox')
 export class AppCombobox extends LitElement {
   @property({ type: String }) label: string = '';
@@ -268,7 +273,7 @@ export class AppCombobox extends LitElement {
 
   private dispatchChange() {
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<ComboboxChangeDetail>('change', {
         detail: { selected: this.selected },
         bubbles: true,
         composed: true,
