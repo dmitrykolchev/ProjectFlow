@@ -19,6 +19,12 @@ export const meta: ComponentStoryMeta = {
   propsDoc: {
     items: 'Menu item definitions (label, icon, action, separators)',
   },
+  eventsDoc: {
+    select: {
+      detail: '{ item: MenuItem, id: string }',
+      description: 'Fires when a menu item is clicked',
+    },
+  },
   stories: [
     {
       name: 'Declarative Composition (<app-menu-*>)',
