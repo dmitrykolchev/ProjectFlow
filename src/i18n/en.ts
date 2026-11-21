@@ -26,6 +26,7 @@ export const en = {
     exportJson: 'Export JSON',
     details: 'Details',
     confirm: 'Confirm',
+    unlink: 'Unlink',
     confirmDelete: 'Are you sure you want to delete this item?',
     required: 'Required field',
     total: 'Total',
@@ -2761,6 +2762,26 @@ export const en = {
         title: 'Detach document?',
         action: (name: string) => `Document "${name}" will be detached from the current card.`,
         result: 'The file stays in the document library; its link to the card is removed.',
+      },
+      criterionDelete: {
+        title: 'Delete acceptance criterion?',
+        action: (text: string) => `Criterion "${text}" will be removed from this requirement's acceptance list.`,
+        result: 'The criteria list shrinks; requirement acceptance will be recalculated.',
+      },
+      taskUnlink: {
+        title: 'Unlink task?',
+        action: (title: string) => `Task "${title}" will be unlinked from this requirement.`,
+        result: 'The task stays in the project; its link to the requirement is removed.',
+      },
+      sourceDocUnlink: {
+        title: 'Unlink source document?',
+        action: (name: string) => `Document "${name}" will be unlinked from this requirement.`,
+        result: 'The file stays in the document library; the requirement link to it is removed.',
+      },
+      kbArticleUnlink: {
+        title: 'Unlink knowledge base article?',
+        action: (title: string) => `Article "${title}" will be unlinked from this requirement.`,
+        result: 'The article stays in the knowledge base; its link to the requirement is removed.',
       },
     },
     materialIcons: {

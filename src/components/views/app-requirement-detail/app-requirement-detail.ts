@@ -83,6 +83,12 @@ export class AppRequirementDetail extends LitElement {
   @state() private editingCriterionIdx: number | null = null;
   @state() private editingCriterionText = '';
 
+  // Dangerous-action confirm targets (criterion / task unlink / source doc unlink / kb article unlink)
+  @state() private confirmCriterionIdx: number | null = null;
+  @state() private confirmUnlinkTaskId: string | null = null;
+  @state() private confirmUnlinkSourceDoc = false;
+  @state() private confirmUnlinkKbId: string | null = null;
+
   // Quick manual task creator
   @state() private manualTaskOpen = false;
   @state() private manualTaskTitle = '';
@@ -619,7 +625,7 @@ export class AppRequirementDetail extends LitElement {
                             size="xs"
                             variant="icon"
                             title="${t.common.delete}"
-                            @click="${() => this.removeCriterion(req, idx)}"
+                            @click="${() => (this.confirmCriterionIdx = idx)}"
                           >
                             <span slot="start">${iconX(12)}</span>
                           </app-button>
@@ -788,7 +794,7 @@ export class AppRequirementDetail extends LitElement {
                           size="xs"
                           variant="icon"
                           title="${t.common.delete}"
-                          @click="${() => this.unlinkTask(req, tk.id)}"
+                          @click="${() => (this.confirmUnlinkTaskId = tk.id)}"
                         >
                           <span slot="start">${iconX(12)}</span>
                         </app-button>
@@ -1275,8 +1281,7 @@ export class AppRequirementDetail extends LitElement {
                     size="xs"
                     variant="icon"
                     title="${t.common.delete}"
-                    @click="${() =>
-                      store.updateRequirement({ ...req, sourceDocumentId: undefined })}"
+                    @click="${() => (this.confirmUnlinkSourceDoc = true)}"
                   >
                     <span slot="start">${iconX(12)}</span>
                   </app-button>
@@ -1330,13 +1335,7 @@ export class AppRequirementDetail extends LitElement {
                           size="xs"
                           variant="icon"
                           title="${t.common.delete}"
-                          @click="${() =>
-                            store.updateRequirement({
-                              ...req,
-                              linkedKnowledgeIds: (req.linkedKnowledgeIds || []).filter(
-                                (id) => id !== kb.id
-                              ),
-                            })}"
+                          @click="${() => (this.confirmUnlinkKbId = kb.id)}"
                         >
                           <span slot="start">${iconX(12)}</span>
                         </app-button>
@@ -1452,6 +1451,94 @@ export class AppRequirementDetail extends LitElement {
           this.confirmDeleteOpen = false;
           store.deleteRequirement(req.id);
           store.setActiveView('requirements');
+        }}"
+      ></app-confirm-dialog>
+
+      <app-confirm-dialog
+        .open="${this.confirmCriterionIdx !== null}"
+        size="sm"
+        title="${t.viewTexts.confirmDialogs.criterionDelete.title}"
+        action="${t.viewTexts.confirmDialogs.criterionDelete.action(
+          (req.acceptanceCriteria[this.confirmCriterionIdx ?? -1] || '') as string
+        )}"
+        result="${t.viewTexts.confirmDialogs.criterionDelete.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.confirmCriterionIdx = null)}"
+        @confirm="${() => {
+          const idx = this.confirmCriterionIdx;
+          this.confirmCriterionIdx = null;
+          if (idx !== null) {
+            this.removeCriterion(req, idx);
+          }
+        }}"
+      ></app-confirm-dialog>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.confirmUnlinkTaskId)}"
+        size="sm"
+        title="${t.viewTexts.confirmDialogs.taskUnlink.title}"
+        action="${t.viewTexts.confirmDialogs.taskUnlink.action(
+          store.tasks.find((tk) => tk.id === this.confirmUnlinkTaskId)?.title || ''
+        )}"
+        result="${t.viewTexts.confirmDialogs.taskUnlink.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.unlink}"
+        @cancel="${() => (this.confirmUnlinkTaskId = null)}"
+        @confirm="${() => {
+          const id = this.confirmUnlinkTaskId;
+          this.confirmUnlinkTaskId = null;
+          if (id) {
+            this.unlinkTask(req, id);
+          }
+        }}"
+      ></app-confirm-dialog>
+
+      <app-confirm-dialog
+        .open="${this.confirmUnlinkSourceDoc}"
+        size="sm"
+        title="${t.viewTexts.confirmDialogs.sourceDocUnlink.title}"
+        action="${t.viewTexts.confirmDialogs.sourceDocUnlink.action(
+          store.documents.find((d) => d.id === req.sourceDocumentId)?.title || ''
+        )}"
+        result="${t.viewTexts.confirmDialogs.sourceDocUnlink.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.unlink}"
+        @cancel="${() => (this.confirmUnlinkSourceDoc = false)}"
+        @confirm="${() => {
+          this.confirmUnlinkSourceDoc = false;
+          store.updateRequirement({ ...req, sourceDocumentId: undefined });
+        }}"
+      ></app-confirm-dialog>
+
+      <app-confirm-dialog
+        .open="${Boolean(this.confirmUnlinkKbId)}"
+        size="sm"
+        title="${t.viewTexts.confirmDialogs.kbArticleUnlink.title}"
+        action="${t.viewTexts.confirmDialogs.kbArticleUnlink.action(
+          store.knowledgeArticles.find((a) => a.id === this.confirmUnlinkKbId)?.title || ''
+        )}"
+        result="${t.viewTexts.confirmDialogs.kbArticleUnlink.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.unlink}"
+        @cancel="${() => (this.confirmUnlinkKbId = null)}"
+        @confirm="${() => {
+          const id = this.confirmUnlinkKbId;
+          this.confirmUnlinkKbId = null;
+          if (id) {
+            store.updateRequirement({
+              ...req,
+              linkedKnowledgeIds: (req.linkedKnowledgeIds || []).filter((kid) => kid !== id),
+            });
+          }
         }}"
       ></app-confirm-dialog>
     `;
