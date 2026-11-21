@@ -8,6 +8,15 @@ import { iconPaperclip, iconUpload, iconX } from '../icons';
 import '../app-button/app-button';
 import styles from './app-file-dropzone.css';
 
+// details of the `files-selected` and `file-selected` events (AGENTS.md §6)
+export interface FileDropzoneFilesDetail {
+  files: File[];
+}
+
+export interface FileDropzoneFileDetail {
+  file: File;
+}
+
 @customElement('app-file-dropzone')
 export class AppFileDropzone extends LitElement {
   @property({ type: String }) accept: string = '';
@@ -52,14 +61,14 @@ export class AppFileDropzone extends LitElement {
   private emitFiles(files: File[]) {
     if (!files.length || this.disabled) return;
     this.dispatchEvent(
-      new CustomEvent('files-selected', {
+      new CustomEvent<FileDropzoneFilesDetail>('files-selected', {
         detail: { files },
         bubbles: true,
         composed: true,
       })
     );
     this.dispatchEvent(
-      new CustomEvent('file-selected', {
+      new CustomEvent<FileDropzoneFileDetail>('file-selected', {
         detail: { file: files[0] },
         bubbles: true,
         composed: true,
