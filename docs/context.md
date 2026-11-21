@@ -6,7 +6,7 @@
 
 ## Состояние
 
-- Слияния в `main`: HEAD `44be540`; origin/main = `585be96`, 34 незапушенных
+- Слияния в `main`: HEAD `288cf7b`; origin/main = `585be96`, 40 незапушенных
   коммитов.
 - Локальных feature-веток нет: удалены 31 отработанная ветка (все были слиты,
   неслитых изменений не потеряно). Работа над фичой начинается с
@@ -61,6 +61,27 @@
   `--card-footer-gap` / `-padding-top` / `-start-gap` / `-end-gap`, локальный
   класс `.card-footer` в `app-auth`. Заголовки историй префикс не носят
   (`Layout/SidebarItem`, `Common/CardFooter`).
+- Правило confirm-диалогов закрыто по всему коду: каждая кнопка с
+  `action="delete"` / `variant="danger"` обязана открывать `app-confirm-dialog`
+  перед разрушительным действием. Аудит-сканер
+  (`E:\TEMP\opencode\confirm-audit4.js`, скобочный разбор обработчиков +
+  резолв тел методов) — 74 кнопок, 0 настоящих пропусков. Коммиты серии:
+  `app-bank-requisites` и `app-counterparty-contacts` (свойство `confirm-delete`
+  и ветка немедленного удаления удалены — диалог обязателен всегда, потребители
+  потеряли атрибут); `app-knowledge-base` (plain-модалка заменена диалогом,
+  ключ `confirmDialogs.knowledgeArticleDelete`, старый `knowledgeBase.deleteConfirm`
+  удалён); `app-project-attachments` (открепление документа через диалог,
+  `confirmDialogs.attachmentDetach`, confirm-лейбл `attachments.removeButton`);
+  `app-requirement-detail` (4 диалога: критерий приёмки, отвязка задачи,
+  исходного документа, статьи БЗ — ключи `criterionDelete`/`taskUnlink`/
+  `sourceDocUnlink`/`kbArticleUnlink`, добавлен `common.unlink`);
+  `app-task-detail` (модалка удаления задачи → диалог `taskDelete`,
+  `@item-remove` подзадачи → диалог `subtaskDelete`, неиспользуемый
+  `common.confirmDelete` удалён из обоих ресурсов). Принятые исключения
+  (решение пользователя): отвязка pending-файла в attachments (локальный
+  черновик, запись в store отсутствует), logout в `app-profile-settings`
+  (сессия, не данные), `app-draggable-list-item` (эмитит `item-remove` —
+  подтверждение на стороне потребителя).
 
 ## Не закрыто
 
@@ -92,6 +113,19 @@
   1352 `app-card-footer` с родной хромированной строкой (border-top 1px, flex,
   space-between), легаси-тегов 0; истории SidebarItem / SidebarGroup /
   CardFooter / TableColumn / Table Scroll рендерятся. Console errors 0.
+- Confirm-диалоги серии проверены в браузере (dev-server, порт 3002; после
+  перезапуска сервера и чистки `.vite`): bank-requisites story — удаление
+  счёта через диалог (4 → 4 при отмене, 4 → 3 при подтверждении);
+  counterparty-contacts story (3 → 3 cancel, 3 → 2 confirm); knowledge-base view
+  (8 → 8 cancel, 8 → 7 confirm; тексты диалога корректны в ru и en — секции
+  «Выполняемое действие / Ожидаемый результат», footer Отмена/Удалить);
+  attachments story (2 → 2 cancel, 2 → 1 confirm); requirement-detail view на
+  req-101 (критерий 3 → 3 cancel, 3 → 2 confirm; отвязка задачи, документа
+  `doc-4` и статьи БЗ — диалог открывается, cancel сохраняет, confirm снимает
+  связь); task-detail view (подзадачи 4 → 4 cancel, 4 → 3 confirm; модалка
+  удаления задачи заменена диалогом с текстом `taskDelete`, cancel сохраняет
+  задачу). Проба восстановила seed-состояние req-101 (3 критерия, doc-4,
+  kb-101) и подзадачи задачи. Console errors 0 во всех пробах.
 
 ## Бэклог идей (обсуждено, не начато)
 
