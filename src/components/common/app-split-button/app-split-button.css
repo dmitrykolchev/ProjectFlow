@@ -116,7 +116,9 @@
   border-color: var(--border-subtle, #334155);
 }
 .variant-secondary .split-toggle {
-  border-left-color: var(--border-strong, #475569);
+  /* seam must not read brighter than the control frame (border-subtle);
+     --split-divider hook overrides it per consumer */
+  border-left-color: var(--split-divider, var(--border-subtle, #334155));
   margin-left: -1px;
 }
 .variant-secondary .split-main:hover:not(:disabled),
