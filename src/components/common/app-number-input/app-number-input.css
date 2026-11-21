@@ -35,7 +35,10 @@ label {
   height: var(--control-height-sm, 30px);
 }
 
-.stepper-wrapper.size-sm .step-btn {
+.stepper-wrapper.size-sm .step-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   width: 28px;
   font-size: 0.95rem;
 }
