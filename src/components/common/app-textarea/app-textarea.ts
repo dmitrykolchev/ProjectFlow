@@ -2,6 +2,11 @@ import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-textarea.css';
 
+// detail of the `input` and `change` events (named event-detail interface, AGENTS.md §6)
+export interface TextareaChangeDetail {
+  value: string;
+}
+
 @customElement('app-textarea')
 export class AppTextarea extends LitElement {
   @property({ type: String }) label: string = '';
@@ -26,7 +31,7 @@ export class AppTextarea extends LitElement {
     if (!textarea) {
       const next = cur + (cur && !cur.endsWith('\n') ? '\n' : '') + prefix + placeholder + suffix;
       this.value = next;
-      this.dispatchEvent(new CustomEvent('input', { detail: { value: next }, bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent<TextareaChangeDetail>('input', { detail: { value: next }, bubbles: true, composed: true }));
       return next;
     }
     const start = textarea.selectionStart ?? cur.length;
@@ -36,7 +41,7 @@ export class AppTextarea extends LitElement {
     const next = `${cur.slice(0, start)}${inserted}${cur.slice(end)}`;
     this.value = next;
     textarea.value = next;
-    this.dispatchEvent(new CustomEvent('input', { detail: { value: next }, bubbles: true, composed: true }));
+    this.dispatchEvent(new CustomEvent<TextareaChangeDetail>('input', { detail: { value: next }, bubbles: true, composed: true }));
     const caretStart = start + prefix.length;
     const caretEnd = caretStart + selected.length;
     requestAnimationFrame(() => {
@@ -82,7 +87,7 @@ export class AppTextarea extends LitElement {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
     this.dispatchEvent(
-      new CustomEvent('input', {
+      new CustomEvent<TextareaChangeDetail>('input', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
@@ -94,7 +99,7 @@ export class AppTextarea extends LitElement {
     const textarea = e.target as HTMLTextAreaElement;
     this.value = textarea.value;
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<TextareaChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
