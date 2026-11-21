@@ -254,6 +254,15 @@ export class AppCompanies extends LitElement {
                   slot="end"
                   size="sm"
                   variant="icon"
+                  title="${t.viewTexts.companies.openCardButton}"
+                  @click="${() => store.openCompanyDetail(company.id)}"
+                >
+                  <span slot="start">${iconChevronRight(15)}</span>
+                </app-button>
+                <app-button
+                  slot="end"
+                  size="sm"
+                  variant="icon"
                   title="${t.viewTexts.companies.documentsTitle}"
                   @click="${() => store.openDocuments({ scope: 'company', companyId: company.id })}"
                 >
@@ -286,15 +295,6 @@ export class AppCompanies extends LitElement {
                   @click="${() => (this.deletingCompany = company)}"
                 >
                   <span slot="start">${iconTrash(14)}</span>
-                </app-button>
-                <app-button
-                  slot="end"
-                  size="sm"
-                  variant="icon"
-                  title="${t.viewTexts.companies.openCardButton}"
-                  @click="${() => store.openCompanyDetail(company.id)}"
-                >
-                  <span slot="start">${iconChevronRight(15)}</span>
                 </app-button>
               </card-footer>
             </article>
