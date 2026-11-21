@@ -24,6 +24,12 @@ export const meta: ComponentStoryMeta = {
     fullWidth: 'Segments stretch to fill the container',
     disabled: 'Disables all segments',
   },
+  eventsDoc: {
+    change: {
+      detail: '{ value: string, option: SegmentedOption }',
+      description: 'Fires when a segment is picked',
+    },
+  },
   stories: [
     {
       name: 'Declarative Options',
