@@ -271,6 +271,8 @@ Multi-bank, multi-currency bank requisites viewer and inline manager. Supports c
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
 | `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting an account |
+| `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
+| `confirmDelete` | Boolean, default `false` | Shows app-confirm-dialog before deleting an account (attribute form confirm-delete) |
 | `heading` | String, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
 
 **Events:** `accounts-change`
@@ -386,6 +388,8 @@ Multi-person counterparty contacts viewer and inline CRUD manager. Supports pers
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
 | `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting a contact |
+| `hideHeader` | Boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
+| `confirmDelete` | Boolean, default `false` | Shows app-confirm-dialog before deleting a contact (attribute form confirm-delete) |
 | `heading` | String, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
 
 **Events:** `contacts-change`
@@ -1881,6 +1885,10 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 | `sort-dir` | String, default `'asc'` | Current sort direction: asc / desc |
 | `active-key` | String, default `'isActive'` | Row property holding the active flag; falsy rows render as is-inactive |
 | `empty-title` | String, default `''` | Title passed to the compact empty state when rows is empty |
+| `sortBy` | String, default `''` | Field name currently used for sorting (attribute form sort-by; arrow shown on its header) |
+| `sortDir` | String, default `'asc'` | Current sort direction asc / desc (attribute form sort-dir) |
+| `activeKey` | String, default `'isActive'` | Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive |
+| `emptyTitle` | String, default `''` | Title passed to the compact empty state when rows is empty (attribute form empty-title) |
 | `locale` | String, default `'ru-RU'` | Locale used for number formatting (t.common.locale) |
 | `striped` | Boolean, default `false` | Enables alternating row background coloring (zebra striping) |
 | `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |

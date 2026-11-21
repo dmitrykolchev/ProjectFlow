@@ -47,6 +47,8 @@ export const meta: ComponentStoryMeta = {
     compact: 'Uses single-column compact layout suitable inside modal forms',
     'hide-header': 'Hides internal header when embedded inside app-section-card',
     'confirm-delete': 'Shows app-confirm-dialog before deleting an account',
+    hideHeader: 'Hides internal header when embedded inside app-section-card (attribute form hide-header)',
+    confirmDelete: 'Shows app-confirm-dialog before deleting an account (attribute form confirm-delete)',
     heading: 'Caption of the internal header; falls back to the localized bank-accounts title when empty',
   },
   stories: [

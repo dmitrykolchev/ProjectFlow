@@ -301,6 +301,14 @@
     "v": "Shows app-confirm-dialog before deleting an account"
    },
    {
+    "k": "hideHeader",
+    "v": "Hides internal header when embedded inside app-section-card (attribute form hide-header)"
+   },
+   {
+    "k": "confirmDelete",
+    "v": "Shows app-confirm-dialog before deleting an account (attribute form confirm-delete)"
+   },
+   {
     "k": "heading",
     "v": "Caption of the internal header; falls back to the localized bank-accounts title when empty"
    }
@@ -1331,6 +1339,14 @@
    {
     "k": "confirm-delete",
     "v": "Shows app-confirm-dialog before deleting a contact"
+   },
+   {
+    "k": "hideHeader",
+    "v": "Hides internal header when embedded inside app-section-card (attribute form hide-header)"
+   },
+   {
+    "k": "confirmDelete",
+    "v": "Shows app-confirm-dialog before deleting a contact (attribute form confirm-delete)"
    },
    {
     "k": "heading",
@@ -6417,6 +6433,22 @@
    {
     "k": "empty-title",
     "v": "Title passed to the compact empty state when rows is empty"
+   },
+   {
+    "k": "sortBy",
+    "v": "Field name currently used for sorting (attribute form sort-by; arrow shown on its header)"
+   },
+   {
+    "k": "sortDir",
+    "v": "Current sort direction asc / desc (attribute form sort-dir)"
+   },
+   {
+    "k": "activeKey",
+    "v": "Row property holding the active flag, default isActive (attribute form active-key); falsy rows render as is-inactive"
+   },
+   {
+    "k": "emptyTitle",
+    "v": "Title passed to the compact empty state when rows is empty (attribute form empty-title)"
    },
    {
     "k": "locale",
