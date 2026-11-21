@@ -31,6 +31,13 @@ export const meta: ComponentStoryMeta = {
     template: 'JS callback (row, value) => TemplateResult | string | number; alternatively pass an HTML <template> child using {{field}} / {{value}} placeholders',
     sortValue: 'Custom comparator value extractor (row, value) => string | number',
     groupFormatter: 'Custom group header label formatter (value) => string',
+    header: 'Secondary header text; used as caption when caption is empty (caption → header → field)',
+    width: 'Initial column width in px (default 150); the grid keeps user-resized widths in its own state',
+    'min-width': 'Smallest width the resize handle can drag to, in px (default 70); declared as min-width, documented as minWidth',
+    override: 'Property name override for the reflected hidden attribute (declared as `override hidden`); lets a column bind a row field named hidden without colliding',
+    minWidth: 'Smallest width the resize handle can drag to, in px (default 70); attribute form min-width',
+    visible: 'Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover)',
+    renderer: 'Alias of template — cell render callback (row, value) => TemplateResult | string | number; the grid reads template ?? renderer',
   },
   slotsDoc: {
     '(default)': 'Optional HTML <template> element with {{field}} / {{value}} placeholders for declarative cell markup',

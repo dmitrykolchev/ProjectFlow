@@ -1564,6 +1564,34 @@
    {
     "k": "groupFormatter",
     "v": "Custom group header label formatter (value) => string"
+   },
+   {
+    "k": "header",
+    "v": "Secondary header text; used as caption when caption is empty (caption → header → field)"
+   },
+   {
+    "k": "width",
+    "v": "Initial column width in px (default 150); the grid keeps user-resized widths in its own state"
+   },
+   {
+    "k": "min-width",
+    "v": "Smallest width the resize handle can drag to, in px (default 70); declared as min-width, documented as minWidth"
+   },
+   {
+    "k": "override",
+    "v": "Property name override for the reflected hidden attribute (declared as `override hidden`); lets a column bind a row field named hidden without colliding"
+   },
+   {
+    "k": "minWidth",
+    "v": "Smallest width the resize handle can drag to, in px (default 70); attribute form min-width"
+   },
+   {
+    "k": "visible",
+    "v": "Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover)"
+   },
+   {
+    "k": "renderer",
+    "v": "Alias of template — cell render callback (row, value) => TemplateResult | string | number; the grid reads template ?? renderer"
    }
   ],
   "slotsDoc": [

@@ -412,12 +412,13 @@ Universal declarative column configuration element (<app-data-grid-column>) for 
 | `template` | String | JS callback (row, value) => TemplateResult \| string \| number; alternatively pass an HTML <template> child using {{field}} / {{value}} placeholders |
 | `sortValue` | String | Custom comparator value extractor (row, value) => string \| number |
 | `groupFormatter` | String | Custom group header label formatter (value) => string |
-| `header` | String, default `''` | — |
-| `width` | Number, default `150` | — |
-| `minWidth` | Number, default `70` | — |
-| `override` | Boolean, default `false` | — |
-| `visible` | Boolean, default `true` | — |
-| `renderer` | String | — |
+| `header` | String, default `''` | Secondary header text; used as caption when caption is empty (caption → header → field) |
+| `width` | Number, default `150` | Initial column width in px (default 150); the grid keeps user-resized widths in its own state |
+| `min-width` | Number, default `70` | Smallest width the resize handle can drag to, in px (default 70); declared as min-width, documented as minWidth |
+| `override` | Boolean, default `false` | Property name override for the reflected hidden attribute (declared as `override hidden`); lets a column bind a row field named hidden without colliding |
+| `minWidth` | Number, default `70` | Smallest width the resize handle can drag to, in px (default 70); attribute form min-width |
+| `visible` | Boolean, default `true` | Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover) |
+| `renderer` | String | Alias of template — cell render callback (row, value) => TemplateResult \| string \| number; the grid reads template ?? renderer |
 
 **Events:** `column-change`
 
