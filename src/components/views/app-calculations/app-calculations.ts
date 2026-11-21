@@ -402,6 +402,16 @@ export class AppCalculations extends LitElement {
           >
             <span slot="start">${iconEye(14)}</span>
           </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.calculations.openCalculation}"
+            @click="${() => store.openCalculationDetail(calc.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
           ${calc.status === 'draft' || calc.status === 'rejected'
             ? html`
                 <app-button
@@ -462,16 +472,6 @@ export class AppCalculations extends LitElement {
             @click="${() => this.openEditModal(calc)}"
           >
             <span slot="start">${iconEdit(14)}</span>
-          </app-button>
-          <app-button
-            slot="end"
-            size="sm"
-            variant="icon"
-            action="view"
-            title="${t.calculations.openCalculation}"
-            @click="${() => store.openCalculationDetail(calc.id)}"
-          >
-            <span slot="start">${iconChevronRight(15)}</span>
           </app-button>
           <app-button
             slot="end"
@@ -617,6 +617,15 @@ export class AppCalculations extends LitElement {
           >
             <span slot="start">${iconEye(14)}</span>
           </app-button>
+          <app-button
+            size="sm"
+            variant="icon"
+            action="view"
+            title="${t.calculations.openCalculation}"
+            @click="${() => store.openCalculationDetail(calc.id)}"
+          >
+            <span slot="start">${iconChevronRight(15)}</span>
+          </app-button>
           ${calc.status === 'draft' || calc.status === 'rejected'
             ? html`
                 <app-button
@@ -672,15 +681,6 @@ export class AppCalculations extends LitElement {
             @click="${() => this.openEditModal(calc)}"
           >
             <span slot="start">${iconEdit(14)}</span>
-          </app-button>
-          <app-button
-            size="sm"
-            variant="icon"
-            action="view"
-            title="${t.calculations.openCalculation}"
-            @click="${() => store.openCalculationDetail(calc.id)}"
-          >
-            <span slot="start">${iconChevronRight(15)}</span>
           </app-button>
           <app-button
             action="delete"
