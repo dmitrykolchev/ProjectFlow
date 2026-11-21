@@ -6,8 +6,10 @@
 .sep {
   width: 1px;
   /* the separator matches the control scale of its toolbar row: --tb-height is
-     inherited from app-toolbar, the fallback keeps it canonical outside a toolbar */
-  height: calc(var(--tb-height, var(--control-height-md, 38px)) - 10px);
+     inherited from app-toolbar; --tb-sep-inset and --tb-sep-margin let a consumer
+     tune the line length and breathing room, defaults keep every row canonical */
+  height: calc(var(--tb-height, var(--control-height-md, 38px)) - var(--tb-sep-inset, 10px));
+  margin-inline: var(--tb-sep-margin, 0);
   background: var(--border-subtle, #334155);
 }
 
