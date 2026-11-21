@@ -18,6 +18,13 @@ export const meta: ComponentStoryMeta = {
     presetStatus: 'Status a newly created contract starts with (draft by default)',
     contextTitle: 'Modal title override for context-bound openings',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ contract: Contract }',
+      description: 'Fires after a successful save with the stored contract',
+    },
+  },
   stories: [
     {
       name: 'Create Contract',
