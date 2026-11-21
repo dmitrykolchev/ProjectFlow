@@ -8003,7 +8003,20 @@
    }
   ],
   "events": [],
-  "propsDoc": [],
+  "propsDoc": [
+   {
+    "k": "virtual",
+    "v": "2D windowing (vertical rows + horizontal days) — only visible tasks and day columns render; default true"
+   },
+   {
+    "k": "tasksData",
+    "v": "Task objects rendered on the timeline (property binding, array); empty renders the empty state"
+   },
+   {
+    "k": "datasetMode",
+    "v": "Built-in dataset to display (attribute dataset-mode): project (the working project schedule) or large (2,000-task multi-year stress dataset)"
+   }
+  ],
   "slotsDoc": [],
   "childrenDoc": []
  },

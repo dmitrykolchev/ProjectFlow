@@ -10,6 +10,11 @@ export const meta: ComponentStoryMeta = {
   component: 'app-gantt',
   description: '2D virtualized timeline Gantt chart supporting thousands of tasks and multi-year schedules.',
   category: 'Views',
+  propsDoc: {
+    virtual: '2D windowing (vertical rows + horizontal days) — only visible tasks and day columns render; default true',
+    tasksData: 'Task objects rendered on the timeline (property binding, array); empty renders the empty state',
+    datasetMode: "Built-in dataset to display (attribute dataset-mode): project (the working project schedule) or large (2,000-task multi-year stress dataset)",
+  },
   stories: [
     {
       name: 'Interactive Timeline',

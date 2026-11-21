@@ -2236,9 +2236,9 @@ Employee directory with card/table switch, department & company filters, rates, 
 
 | Property | Type / default | Description |
 |---|---|---|
-| `virtual` | Boolean, default `true` | — |
-| `tasksData` | Array | — |
-| `datasetMode` | String, default `'project'` | — |
+| `virtual` | Boolean, default `true` | 2D windowing (vertical rows + horizontal days) — only visible tasks and day columns render; default true |
+| `tasksData` | Array | Task objects rendered on the timeline (property binding, array); empty renders the empty state |
+| `datasetMode` | String, default `'project'` | Built-in dataset to display (attribute dataset-mode): project (the working project schedule) or large (2,000-task multi-year stress dataset) |
 
 #### `app-invoice-detail` — `AppInvoiceDetail`
 
