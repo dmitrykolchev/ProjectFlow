@@ -205,7 +205,10 @@ app-cards-table {
   flex-wrap: wrap;
 }
 
-.reaction-pill-btn {
+.reaction-pill-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
@@ -541,4 +544,22 @@ app-cards-table {
 
 :host([hidden]) {
   display: none;
+}
+
+/* native form controls do not inherit font in shadow DOM (the global
+   font-family: inherit reset in index.css reaches light DOM only) */
+.blog-title-btn {
+  font-family: var(--font-sans, inherit);
+}
+
+.blog-meta-link {
+  font-family: var(--font-sans, inherit);
+}
+
+.blog-stat-btn {
+  font-family: var(--font-sans, inherit);
+}
+
+.blog-tbl-title-btn {
+  font-family: var(--font-sans, inherit);
 }
