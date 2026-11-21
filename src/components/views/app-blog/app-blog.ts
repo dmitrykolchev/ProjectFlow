@@ -1,5 +1,6 @@
 import { LitElement, TemplateResult, html } from 'lit';
 import { customElement, query, state } from 'lit/decorators.js';
+import { repeat } from 'lit/directives/repeat.js';
 import { store } from '../../../state/store';
 import { getTranslation } from '../../../i18n';
 import { BlogCategory, BlogComment, BlogPost, BlogPostStatus } from '../../../types';
@@ -1039,10 +1040,12 @@ export class AppBlog extends LitElement {
             ? html`<div class="comments-empty">${b.commentsEmpty}</div>`
             : html`
                 <div class="comments-thread">
-                  ${post.comments
-                    .filter((c) => !c.replyToId)
-                    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-                    .map((root) => {
+                  ${repeat(
+                    post.comments
+                      .filter((c) => !c.replyToId)
+                      .sort((a, b) => a.createdAt.localeCompare(b.createdAt)),
+                    (root) => root.id,
+                    (root) => {
                       const dialogue = post.comments
                         .filter((q) => {
                           let cur: BlogComment = q;
@@ -1118,7 +1121,7 @@ export class AppBlog extends LitElement {
                       };
                       return html`
                         <div class="comment-root">
-                          ${dialogue.map((c) => renderMessage(c))}
+                          ${repeat(dialogue, (c) => c.id, (c) => renderMessage(c))}
                           ${this.replyToId && dialogue.some((c) => c.id === this.replyToId)
                             ? html`
                                 <div class="reply-composer">
