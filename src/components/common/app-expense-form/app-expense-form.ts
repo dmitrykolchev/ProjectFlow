@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { Expense, ExpenseCategory, ExpenseStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-expense-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface ExpenseFormSavedDetail {
+  expense: Expense;
+}
 import { eventValue } from '../event-value';
 import { mapProjectOptions, mapTaskOptions, mapUserOptions } from '../entity-selector-options';
 import '../app-modal/app-modal';
@@ -188,7 +193,7 @@ export class AppExpenseForm extends LitElement {
     this.fPendingFiles = [];
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<ExpenseFormSavedDetail>('saved', {
         detail: { expense: saved },
         bubbles: true,
         composed: true,
