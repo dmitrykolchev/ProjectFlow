@@ -2820,6 +2820,13 @@ export const ru = {
         statusColors: 'Статусные цвета',
         scrollbars: 'Скроллбары',
         shadows: 'Тени',
+        radii: 'Радиусы',
+        controlHeights: 'Высоты контролов',
+        density: 'Плотность',
+        transitions: 'Переходы',
+        typography: 'Типографика',
+        glow: 'Glow / анимации',
+        sidebar: 'Сайдбар',
       },
       sections: {
         themeTable: 'Шесть тем — справочные значения',

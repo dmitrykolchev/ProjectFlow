@@ -14,7 +14,21 @@ interface TokenDef {
 }
 
 interface CategoryDef {
-  key: 'backgrounds' | 'text' | 'borders' | 'accent' | 'statusColors' | 'scrollbars' | 'shadows';
+  key:
+    | 'backgrounds'
+    | 'text'
+    | 'borders'
+    | 'accent'
+    | 'statusColors'
+    | 'scrollbars'
+    | 'shadows'
+    | 'radii'
+    | 'controlHeights'
+    | 'density'
+    | 'transitions'
+    | 'typography'
+    | 'glow'
+    | 'sidebar';
   tokens: TokenDef[];
 }
 
@@ -62,12 +76,20 @@ const CATEGORIES: CategoryDef[] = [
     tokens: [
       { name: 'color-success', swatch: true },
       { name: 'color-success-solid', swatch: true },
+      { name: 'color-success-bg', swatch: true },
+      { name: 'color-success-border', swatch: true },
       { name: 'color-warning', swatch: true },
       { name: 'color-warning-solid', swatch: true },
+      { name: 'color-warning-bg', swatch: true },
+      { name: 'color-warning-border', swatch: true },
       { name: 'color-danger', swatch: true },
       { name: 'color-danger-solid', swatch: true },
+      { name: 'color-danger-bg', swatch: true },
+      { name: 'color-danger-border', swatch: true },
       { name: 'color-info', swatch: true },
       { name: 'color-info-solid', swatch: true },
+      { name: 'color-info-bg', swatch: true },
+      { name: 'color-info-border', swatch: true },
     ],
   },
   {
@@ -85,6 +107,67 @@ const CATEGORIES: CategoryDef[] = [
       { name: 'shadow-md', swatch: false },
       { name: 'shadow-lg', swatch: false },
       { name: 'shadow-xl', swatch: false },
+    ],
+  },
+  {
+    key: 'radii',
+    tokens: [
+      { name: 'radius-sm', swatch: false },
+      { name: 'radius-md', swatch: false },
+      { name: 'radius-lg', swatch: false },
+      { name: 'radius-xl', swatch: false },
+    ],
+  },
+  {
+    key: 'controlHeights',
+    tokens: [
+      { name: 'control-height-xxs', swatch: false },
+      { name: 'control-height-xs', swatch: false },
+      { name: 'control-height-sm', swatch: false },
+      { name: 'control-height-md', swatch: false },
+      { name: 'control-height-lg', swatch: false },
+    ],
+  },
+  {
+    key: 'density',
+    tokens: [
+      { name: 'density-padding-base', swatch: false },
+      { name: 'density-padding-compact', swatch: false },
+      { name: 'density-row-height', swatch: false },
+      { name: 'density-header-height', swatch: false },
+    ],
+  },
+  {
+    key: 'transitions',
+    tokens: [
+      { name: 'transition-fast', swatch: false },
+      { name: 'transition-normal', swatch: false },
+    ],
+  },
+  {
+    key: 'typography',
+    tokens: [
+      { name: 'font-sans', swatch: false },
+      { name: 'font-mono', swatch: false },
+    ],
+  },
+  {
+    key: 'glow',
+    tokens: [
+      { name: 'surface-glow', swatch: false },
+      { name: 'accent-glow', swatch: false },
+      { name: 'accent-glow-hover', swatch: false },
+      { name: 'cyber-text-shadow', swatch: false },
+      { name: 'cyber-pulse-anim', swatch: false },
+      { name: 'cyber-surface-anim', swatch: false },
+      { name: 'cyber-gradient-anim', swatch: false },
+    ],
+  },
+  {
+    key: 'sidebar',
+    tokens: [
+      { name: 'sidebar-width', swatch: false },
+      { name: 'sidebar-collapsed-width', swatch: false },
     ],
   },
 ];
@@ -305,7 +388,7 @@ ${tx.viewTexts.designTokens.demos.glowCodeComment}</code></pre>
           <code>--radius-xl: 16px</code>
           <code>--transition-fast: 150ms</code>
           <code>--transition-normal: 200ms</code>
-          <code>--control-height-sm/md/lg: 30/38/44px</code>
+          <code>--control-height-xxs/xs/sm/md/lg: 28/24/30/38/44px</code>
           <code>--sidebar-width: 260px</code>
         </div>
       </app-section-card>

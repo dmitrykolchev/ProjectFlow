@@ -2820,6 +2820,13 @@ export const en = {
         statusColors: 'Status colors',
         scrollbars: 'Scrollbars',
         shadows: 'Shadows',
+        radii: 'Radii',
+        controlHeights: 'Control heights',
+        density: 'Density',
+        transitions: 'Transitions',
+        typography: 'Typography',
+        glow: 'Glow / animations',
+        sidebar: 'Sidebar',
       },
       sections: {
         themeTable: 'Six themes — reference values',
