@@ -1,0 +1,16 @@
+:host {
+  display: inline-flex;
+  align-items: center;
+}
+
+.sep {
+  width: 1px;
+  /* the separator matches the control scale of its toolbar row: --tb-height is
+     inherited from app-toolbar, the fallback keeps it canonical outside a toolbar */
+  height: calc(var(--tb-height, var(--control-height-md, 38px)) - 10px);
+  background: var(--border-subtle, #334155);
+}
+
+:host([hidden]) {
+  display: none;
+}
