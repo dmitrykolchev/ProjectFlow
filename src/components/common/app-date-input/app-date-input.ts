@@ -7,6 +7,11 @@ import { PortalHandle, portalManager } from '../app-modal-portal/app-modal-porta
 import '../app-link/app-link';
 import styles from './app-date-input.css';
 
+// detail of the `change` event (named event-detail interface, AGENTS.md §6)
+export interface DateInputChangeDetail {
+  value: string; // YYYY-MM-DD
+}
+
 @customElement('app-date-input')
 export class AppDateInput extends LitElement {
   @property({ type: String }) label: string = '';
@@ -340,7 +345,7 @@ export class AppDateInput extends LitElement {
 
   private emitChange() {
     this.dispatchEvent(
-      new CustomEvent('change', {
+      new CustomEvent<DateInputChangeDetail>('change', {
         detail: { value: this.value },
         bubbles: true,
         composed: true,
