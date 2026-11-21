@@ -22,6 +22,12 @@ import '../app-recurrence-editor/app-recurrence-editor';
 import type { RecurrenceEditorChangeDetail } from '../app-recurrence-editor/app-recurrence-editor';
 import styles from './app-directory-record-modal.css';
 
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface DirectoryRecordModalSavedDetail {
+  directoryId: string;
+  record: DirectoryRecord | null;
+}
+
 @customElement('app-directory-record-modal')
 export class AppDirectoryRecordModal extends LitElement {
   @property({ type: Boolean }) open: boolean = false;
@@ -328,7 +334,7 @@ export class AppDirectoryRecordModal extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<DirectoryRecordModalSavedDetail>('saved', {
         detail: { directoryId: dir.id, record: savedRecord },
         bubbles: true,
         composed: true,
