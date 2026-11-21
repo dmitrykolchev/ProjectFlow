@@ -546,7 +546,10 @@
   gap: 0.25rem;
 }
 
-.mini-action-btn {
+.mini-action-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: none;
   background: transparent;
   color: var(--text-muted, #64748b);
@@ -592,7 +595,10 @@
   flex-wrap: wrap;
 }
 
-.reaction-btn {
+.reaction-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   border: 1px solid var(--border-subtle, #1e293b);
   background: var(--bg-surface, #111827);
   color: var(--text-secondary, #94a3b8);
@@ -777,7 +783,10 @@
   min-width: 0;
 }
 
-.trace-link-main {
+.trace-link-main {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
