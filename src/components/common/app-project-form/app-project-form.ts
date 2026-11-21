@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { Project, ProjectStatus } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-project-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface ProjectFormSavedDetail {
+  project: Project;
+}
 import { eventValue } from '../event-value';
 import '../app-modal/app-modal';
 import '../app-form-grid/app-form-grid';
@@ -194,7 +199,7 @@ export class AppProjectForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<ProjectFormSavedDetail>('saved', {
         detail: { project: saved },
         bubbles: true,
         composed: true,
