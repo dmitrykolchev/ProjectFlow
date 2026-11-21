@@ -352,13 +352,12 @@
   --control-font-md: 0.875rem;
 }
 
-/* header and project row icon actions are app-button web components at size xs pinned
-   to the historical 32px square; hover keeps the subtle border unchanged for plain
-   actions, the component supplies the danger palette for action="delete", and the
-   historical 6px radius replaces the canonical md radius */
+/* header icon actions are app-button web components: the header row is an sm toolbar, so the
+   trailing icon-only delete button renders at the canonical sm step; project row icon actions keep
+   the canonical xs 24px dense step; the historical 6px radius replaces the canonical md radius, and
+   the component supplies the danger palette for action="delete" */
 .nav-actions app-button,
 .row-right app-button {
-  --control-height-xs: 32px;
   --btn-radius-tl: var(--radius-sm, 6px);
   --btn-radius-tr: var(--radius-sm, 6px);
   --btn-radius-bl: var(--radius-sm, 6px);
