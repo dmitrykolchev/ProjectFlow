@@ -1,0 +1,62 @@
+:host {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: var(--font-sans, inherit);
+  font-weight: 500;
+  /* the row scale is inherited from app-tabs; standalone use falls back to md */
+  height: var(--tb-height, var(--control-height-md, 38px));
+  font-size: var(--tb-font, var(--control-font-md, 0.875rem));
+  padding: 0 var(--tb-pad-x, var(--control-padding-x-md, 0.875rem));
+  --mi-icon: var(--tb-icon, var(--control-icon-md, 20px));
+  background: transparent;
+  color: var(--text-secondary, #94a3b8);
+  /* underline tab: the active border overlaps the strip's border-bottom line */
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  outline: none;
+  transition: color var(--transition-fast, 150ms ease),
+              border-color var(--transition-fast, 150ms ease);
+}
+
+/* canonical slot API: start / default / end.
+   The button is a flex container with align-items: center, so every slotted
+   element (text, SVG icon, material icon) sits centered on the vertical axis. */
+::slotted(*) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button:hover:not(:disabled) {
+  color: var(--text-primary, #f8fafc);
+}
+
+button.is-active {
+  color: var(--accent-primary, #818cf8);
+  border-bottom-color: var(--accent-primary, #6366f1);
+  font-weight: 600;
+}
+
+button:focus-visible {
+  box-shadow: 0 0 0 2px var(--bg-surface, #111827), 0 0 0 4px var(--accent-primary, #6366f1);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:host([hidden]) {
+  display: none;
+}
