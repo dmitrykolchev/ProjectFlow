@@ -513,11 +513,20 @@ export class AppDocuments extends LitElement {
             slot="end"
             size="sm"
             variant="icon"
-            action="delete"
-            title="${t.common.delete}"
-            @click="${() => (this.deletingDoc = doc)}"
+            action="view"
+            title="${t.documents.previewTitle}"
+            @click="${() => this.openPreviewModal(doc)}"
           >
-            <span slot="start">${iconTrash(14)}</span>
+            <span slot="start">${iconEye(14)}</span>
+          </app-button>
+          <app-button
+            slot="end"
+            size="sm"
+            variant="icon"
+            title="${t.documents.downloadFile}"
+            @click="${() => downloadDocumentFile(doc)}"
+          >
+            <span slot="start">${iconDownload(14)}</span>
           </app-button>
           <app-button
             slot="end"
@@ -533,20 +542,11 @@ export class AppDocuments extends LitElement {
             slot="end"
             size="sm"
             variant="icon"
-            title="${t.documents.downloadFile}"
-            @click="${() => downloadDocumentFile(doc)}"
+            action="delete"
+            title="${t.common.delete}"
+            @click="${() => (this.deletingDoc = doc)}"
           >
-            <span slot="start">${iconDownload(14)}</span>
-          </app-button>
-          <app-button
-            slot="end"
-            size="sm"
-            variant="icon"
-            action="view"
-            title="${t.documents.previewTitle}"
-            @click="${() => this.openPreviewModal(doc)}"
-          >
-            <span slot="start">${iconEye(14)}</span>
+            <span slot="start">${iconTrash(14)}</span>
           </app-button>
         </card-footer>
       `;
