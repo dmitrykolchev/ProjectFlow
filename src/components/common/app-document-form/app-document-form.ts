@@ -7,6 +7,11 @@ import { readBrowserFile } from '../document-utils';
 import { formatAiError, generateDocumentSummaryAndTags } from '../../../services/openai-client';
 import { iconAlertTriangle, iconCpu } from '../icons';
 import styles from './app-document-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface DocumentFormSavedDetail {
+  document: DocumentItem;
+}
 import { eventValue } from '../event-value';
 import {
   mapCompanyOptions,
@@ -316,7 +321,7 @@ export class AppDocumentForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<DocumentFormSavedDetail>('saved', {
         detail: { document: saved },
         bubbles: true,
         composed: true,
