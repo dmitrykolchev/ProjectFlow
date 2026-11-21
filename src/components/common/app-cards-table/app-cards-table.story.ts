@@ -84,6 +84,24 @@ export const meta: ComponentStoryMeta = {
     contentStyles:
       'Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical',
   },
+  eventsDoc: {
+    'selection-change': {
+      detail: '{ selectedIds: string[], selectedItems: Record<string, unknown>[] }',
+      description: 'Fires when card selection changes',
+    },
+    'page-change': {
+      detail: '{ page: number, pageSize: number, totalItems: number }',
+      description: 'Fires when the page is changed (arrows, jump input, after page-size change)',
+    },
+    'page-size-change': {
+      detail: '{ page: number, pageSize: number, totalItems: number }',
+      description: 'Fires when the page size is changed',
+    },
+    'card-click': {
+      detail: '{ item: Record<string, unknown> }',
+      description: 'Fires when a card is clicked; carries the card data row',
+    },
+  },
   stories: [
     {
       name: 'Card Grid',
