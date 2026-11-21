@@ -49,6 +49,12 @@ export const meta: ComponentStoryMeta = {
     hideHeader: 'Hides internal header when embedded inside app-section-card (attribute form hide-header)',
     heading: 'Caption of the internal header; falls back to the localized bank-accounts title when empty',
   },
+  eventsDoc: {
+    'accounts-change': {
+      detail: '{ accounts: BankRequisite[] }',
+      description: 'Fires after an account is added, edited or removed; carries the full updated list',
+    },
+  },
   stories: [
     {
       name: 'Interactive Multi-Currency Manager',
