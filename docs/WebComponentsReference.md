@@ -4,7 +4,7 @@
 
 Всего компонентов: 139 (со стори: 139).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
-propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
+propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
 (сканирование `src/components` → `docs/components.json` → рендер этого документа). Сгенерированный
 файл коммитится вместе с изменениями кода.
@@ -245,7 +245,9 @@ Semantic status, priority, and count badges supporting soft, solid, and outline 
 | `dot` | boolean, default `false` | Renders a status dot without text |
 | `removable` | boolean, default `false` | Shows a remove (×) affordance |
 
-**Events:** `remove`
+| Event | Detail | Description |
+|---|---|---|
+| `remove` | `—` | Fires when the badge remove button is clicked |
 
 | Slot | Content |
 |---|---|
@@ -273,7 +275,9 @@ Multi-bank, multi-currency bank requisites viewer and inline manager. Supports c
 | `hideHeader` | boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
 | `heading` | string, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
 
-**Events:** `accounts-change`
+| Event | Detail | Description |
+|---|---|---|
+| `accounts-change` | `{ accounts: BankRequisite[] }` | Fires after an account is added, edited or removed; carries the full updated list |
 
 #### `app-bank-summary` — `AppBankSummary`
 
@@ -343,7 +347,12 @@ A grid of entity cards built from a per-view template. The card content is produ
 | `--cards-columns` | CSS var | Grid column count token (default auto-fill); a view can pin an exact number of columns |
 | `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cardRender content; default empty keeps consumers pixel-identical |
 
-**Events:** `selection-change`, `page-change`, `page-size-change`, `card-click`
+| Event | Detail | Description |
+|---|---|---|
+| `selection-change` | `{ selectedIds: string[], selectedItems: Record<string, unknown>[] }` | Fires when card selection changes |
+| `page-change` | `{ page: number, pageSize: number, totalItems: number }` | Fires when the page is changed (arrows, jump input, after page-size change) |
+| `page-size-change` | `{ page: number, pageSize: number, totalItems: number }` | Fires when the page size is changed |
+| `card-click` | `{ item: Record<string, unknown> }` | Fires when a card is clicked; carries the card data row |
 
 #### `app-confirm-dialog` — `AppConfirmDialog`
 
@@ -366,7 +375,10 @@ Confirmation modal built on app-modal: header icon + title, "выполняем�
 | `cancelLabel` | string, default `''` | Caption of the cancel button |
 | `size` | 'sm' | 'md' | 'lg' | 'xl', default `'sm'` | Dialog width preset |
 
-**Events:** `confirm`, `cancel`
+| Event | Detail | Description |
+|---|---|---|
+| `confirm` | `—` | Fires when the primary (confirm) button is pressed |
+| `cancel` | `—` | Fires when the dialog is dismissed |
 
 #### `app-context-chip` — `AppContextChip`
 
@@ -405,7 +417,9 @@ Multi-person counterparty contacts viewer and inline CRUD manager. Supports pers
 | `hideHeader` | boolean, default `false` | Hides internal header when embedded inside app-section-card (attribute form hide-header) |
 | `heading` | string, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
 
-**Events:** `contacts-change`
+| Event | Detail | Description |
+|---|---|---|
+| `contacts-change` | `{ contacts: CounterpartyContact[] }` | Fires after a contact is added, edited or removed; carries the full updated list |
 
 #### `app-data-grid-column` — `AppDataGridColumn`
 
@@ -437,7 +451,9 @@ Universal declarative column configuration element (<app-data-grid-column>) for 
 | `visible` | boolean, default `true` | Initial column visibility (default true; false hides it, hideable columns stay toggleable in the Columns popover) |
 | `renderer` | Object | Alias of template — cell render callback (row, value) => TemplateResult \| string \| number; the grid reads template ?? renderer |
 
-**Events:** `column-change`
+| Event | Detail | Description |
+|---|---|---|
+| `column-change` | `—` | Fires when any column property changes; the parent grid re-reads the columns |
 
 | Slot | Content |
 |---|---|
@@ -461,7 +477,9 @@ Fully custom-styled theme-aware Date Picker with interactive calendar popover, m
 | `error` | string, default `''` | Error message; renders the field in danger state |
 | `size` | 'sm' | 'md' | 'lg', default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string }` | Fires when the date changes (YYYY-MM-DD) |
 
 #### `app-directory-record-modal` — `AppDirectoryRecordModal`
 
@@ -475,7 +493,10 @@ Schema-driven modal form for creating and editing both simple (code, name, sortO
 | `directory` | DirectoryDefinition | null, default `null` | DirectoryDefinition schema governing core and extended fields |
 | `record` | DirectoryRecord | null, default `null` | DirectoryRecord being edited, or null for create mode |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the modal is dismissed without saving |
+| `saved` | `{ directoryId: string, record: DirectoryRecord \| null }` | Fires after a successful save with the stored record |
 
 #### `app-document-previewer` — `AppDocumentPreviewer`
 
@@ -492,7 +513,11 @@ Schema-driven modal form for creating and editing both simple (code, name, sortO
 | `showExpand` | Boolean, default `false` | Shows the expand-to-fullscreen control |
 | `height` | String, default `'540px'` | Preview viewport height (CSS length) |
 
-**Events:** `select-document`, `expand`, `download`
+| Event | Detail | Description |
+|---|---|---|
+| `select-document` | `{ document: DocumentItem }` | Fires when a document row is selected |
+| `expand` | `{ document: DocumentItem }` | Fires when a folder is expanded |
+| `download` | `{ document: DocumentItem }` | Fires when a document download is requested |
 
 #### `app-draggable-list` — `AppDraggableList`
 
@@ -505,7 +530,9 @@ A vertical list of draggable rows with an inner scrollbar. The child element is 
 | `items` | DraggableItemData[], default `[]` | DraggableItemData[] — value (entity id), label (title), checked (completion); empty items render the declared light DOM children |
 | `child element` | — | app-draggable-list-item — grip handle, order number, checkbox, title, up / down / remove actions |
 
-**Events:** `list-reorder`
+| Event | Detail | Description |
+|---|---|---|
+| `list-reorder` | `{ items: DraggableItemData[] }` | Fires after an item is dropped; carries the new order (property mode) |
 
 #### `app-draggable-list-item` — `AppDraggableListItem`
 
@@ -538,7 +565,9 @@ Action button paired with a contextual dropdown menu popover and outside-click d
 | `disabled` | boolean, default `false` | Disables interaction |
 | `items` | MenuItem[], default `[]` | Menu item definitions rendered in the dropdown |
 
-**Events:** `select`
+| Event | Detail | Description |
+|---|---|---|
+| `select` | `{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }` | Passes through the select event of the clicked app-menu-item |
 
 | Slot | Content |
 |---|---|
@@ -587,7 +616,11 @@ Embeddable contextual reminders widget for any system entity detail view (compan
 | `selected-file-size` | number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
 | `multiple` | boolean, default `false` | Allows picking several files (native multiple on the input); the files event carries all of them, false carries only the first |
 
-**Events:** `files-selected`, `file-selected`, `file-cleared`
+| Event | Detail | Description |
+|---|---|---|
+| `files-selected` | `{ files: File[] }` | Fires after files are dropped or picked |
+| `file-selected` | `{ file: File }` | Fires when a single file is selected |
+| `file-cleared` | `{}` | Fires when the selection is cleared |
 
 #### `app-filter-bar` — `AppFilterBar`
 
@@ -605,7 +638,11 @@ Toolbar with search input, N filter selects, optional reset button and trailing 
 | `variant` | 'card' | 'bare', default `'card'` | Surface style: card / plain |
 | `showReset` | boolean, default `false` | Shows the reset button when filters are active |
 
-**Events:** `reset`, `search-change`, `filter-change`
+| Event | Detail | Description |
+|---|---|---|
+| `reset` | `—` | Fires when Reset is pressed |
+| `search-change` | `{ value: string }` | Fires when the search text changes |
+| `filter-change` | `{ key: string, value: string }` | Fires when a filter control changes |
 
 | Slot | Content |
 |---|---|
@@ -674,7 +711,9 @@ Canonical markdown renderer: headings, paragraphs, quotes, bullet / numbered lis
 | `children` | — | Markdown declared directly as light-DOM children (slot capture); the content property wins when both are set |
 | `editable` | Boolean, default `false` | Checklist checkboxes are interactive and emit checklist-toggle {line, checked} when true |
 
-**Events:** `checklist-toggle`
+| Event | Detail | Description |
+|---|---|---|
+| `checklist-toggle` | `{ line: number, checked: boolean }` | Fires when a checklist box is toggled in editable mode |
 
 #### `app-material-icon` — `AppMaterialIcon`
 
@@ -709,7 +748,10 @@ Material Symbols palette with search by name, category and tags; toolbar control
 | `category` | String, default `'all'` | — |
 | `family` | GalleryFamily, default `'outlined'` | — |
 
-**Events:** `icon-select`, `params-change`
+| Event | Detail | Description |
+|---|---|---|
+| `icon-select` | `{ name: string }` | Fires when an icon is picked |
+| `params-change` | `{ family: GalleryFamily, size: GallerySize \| number, fill: number, weight: number, grade: number }` | Fires when a toolbar parameter changes |
 
 #### `app-menu` — `AppMenu`
 
@@ -721,7 +763,9 @@ Standalone accessible menu surface supporting both programmatic items arrays and
 |---|---|---|
 | `items` | MenuItem[], default `[]` | Menu item definitions (label, icon, action, separators) |
 
-**Events:** `select`
+| Event | Detail | Description |
+|---|---|---|
+| `select` | `{ item: MenuItem, id: string }` | Fires when a menu item is clicked |
 
 | Slot | Content |
 |---|---|
@@ -774,7 +818,9 @@ Declarative interactive menu entry used inside <app-menu> with support for icons
 | `checkable` | boolean, default `false` | Reserves checkmark gutter and toggles checked state on click |
 | `icon` | Object | Programmatic leading icon (TemplateResult or string) |
 
-**Events:** `select`
+| Event | Detail | Description |
+|---|---|---|
+| `select` | `{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }` | Fires when the item is clicked |
 
 | Slot | Content |
 |---|---|
@@ -881,7 +927,10 @@ Declarative option carrier for option-list components. Renders nothing; the pare
 | `error` | boolean, default `false` | Highlights cells in danger palette and plays shake feedback. |
 | `autofocus` | boolean, default `false` | Automatically focuses the first cell on mount. |
 
-**Events:** `otp-change`, `otp-complete`
+| Event | Detail | Description |
+|---|---|---|
+| `otp-change` | `{ value: string }` | Fires when a digit is entered |
+| `otp-complete` | `{ value: string }` | Fires when all cells are filled |
 
 #### `app-pagination` — `AppPagination`
 
@@ -902,7 +951,10 @@ Pagination bar with smart page buttons, range summary, and mode-aware page-size 
 | `showSummary` | boolean, default `true` | Shows the "records x–y of z" summary |
 | `locale` | String | Locale used for number formatting (defaults to UI language) |
 
-**Events:** `page-change`, `page-size-change`
+| Event | Detail | Description |
+|---|---|---|
+| `page-change` | `{ page: number }` | Fires when the page changes |
+| `page-size-change` | `{ pageSize: number, layoutMode: PaginationLayoutMode }` | Fires when the page size changes |
 
 #### `app-persona` — `AppPersona`
 
@@ -969,7 +1021,9 @@ File attachment control for time entries and expenses. Allows uploading new file
 | `compact` | boolean, default `false` | Compact display mode without secondary helper hint |
 | `readonly` | boolean, default `false` | Disables uploading, linking, and detaching files |
 
-**Events:** `attachments-change`
+| Event | Detail | Description |
+|---|---|---|
+| `attachments-change` | `{ documentIds: string[], pendingFiles: PendingAttachmentFile[] }` | Fires when documents are attached/removed or pending files staged |
 
 #### `app-project-requirements` — `AppProjectRequirements`
 
@@ -999,7 +1053,9 @@ Accessible radio selection group with standard, horizontal, and rich card layout
 | `variant` | 'default' | 'card', default `'default'` | Visual style of the option rows |
 | `disabled` | boolean, default `false` | Disables all options |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string, option: RadioOption }` | Fires when an option is picked |
 
 | Slot | Content |
 |---|---|
@@ -1024,7 +1080,9 @@ Visual, human-friendly recurrence rule builder covering the full RFC 5545 specif
 | `compact` | boolean, default `false` | Reduces vertical spacing for embedding inside modals |
 | `hide-rrule-bar` | boolean, default `false` | Hides raw RRULE string bar while preserving visual editing |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string, rrule: string, rule: Rfc5545Rule \| null, isValid: boolean, summary: string }` | Fires when the recurrence rule changes |
 
 #### `app-reminder-form` — `AppReminderForm`
 
@@ -1039,7 +1097,10 @@ Modal form for creating and editing polymorphic reminders linked to any system e
 | `preset-entity-type` | ReminderEntityType | '', default `''` | Preselected target entity type (company, contract, task, contact, etc.) |
 | `preset-entity-id` | string, default `''` | Preselected target entity identifier |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ reminder: Reminder }` | Fires after a successful save with the stored reminder |
 
 #### `app-section-card` — `AppSectionCard`
 
@@ -1057,7 +1118,9 @@ Card container with header (title, subtitle, actions slot) and body; optional co
 | `collapsed` | boolean, default `false` | Current collapsed state (only for collapsible sections) |
 | `maxHeight` | string, default `''` | CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow |
 
-**Events:** `toggle`
+| Event | Detail | Description |
+|---|---|---|
+| `toggle` | `{ collapsed: boolean }` | Fires when the card is collapsed or expanded |
 
 | Slot | Content |
 |---|---|
@@ -1087,7 +1150,9 @@ Compact segmented control for switching between mutually exclusive views, timefr
 | `fullWidth` | boolean, default `false` | Segments stretch to fill the container |
 | `disabled` | boolean, default `false` | Disables all segments |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string, option: SegmentedOption }` | Fires when a segment is picked |
 
 | Slot | Content |
 |---|---|
@@ -1111,7 +1176,10 @@ Dual-action button combining a primary action trigger with a secondary options m
 | `disabled` | boolean, default `false` | Disables both halves of the button |
 | `items` | MenuItem[], default `[]` | Menu items opened by the arrow half |
 
-**Events:** `primary-click`, `select`
+| Event | Detail | Description |
+|---|---|---|
+| `primary-click` | `—` | Fires when the primary part of the button is clicked |
+| `select` | `{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }` | Passes through the select event of the clicked app-menu-item |
 
 | Slot | Content |
 |---|---|
@@ -1163,7 +1231,9 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | `striped` | boolean, default `false` | Enables alternating row background coloring (zebra striping) |
 | `sort-change event` | — | Emitted with detail { field, dir } when a header sort button is clicked |
 
-**Events:** `sort-change`
+| Event | Detail | Description |
+|---|---|---|
+| `sort-change` | `{ field: string, dir: SortDirection }` | Fires when a sortable header is clicked |
 
 #### `app-task-ai-panel` — `AppTaskAiPanel`
 
@@ -1181,7 +1251,12 @@ Scrollable table shell with sticky sortable headers, zebra striping, inactive-ro
 | `expenseSummary` | String, default `''` | Expense summary rendered next to the analysis |
 | `discussionsSummary` | String, default `''` | Discussion summary rendered next to the analysis |
 
-**Events:** `analyses-update`, `clarification-update`, `apply-description`, `add-subtask`
+| Event | Detail | Description |
+|---|---|---|
+| `analyses-update` | `{ analyses: AnalysisSummary[] }` | Fires after the analysis list changes |
+| `clarification-update` | `{ messages: TaskAiClarificationMessage[] }` | Fires when clarification messages change |
+| `apply-description` | `{ description: string, mode: 'replace' \| 'append' }` | Fires when an AI draft is applied to the task description |
+| `add-subtask` | `{ title: string }` | Fires when a suggested subtask is accepted |
 
 #### `app-toggle-button` — `AppToggleButton`
 
@@ -1198,7 +1273,9 @@ Stateful pressable button supporting soft and solid active variants, icons, and 
 | `iconOnly` | boolean, default `false` | Renders only the icon, no text |
 | `value` | string, default `''` | Group value emitted on toggle (for radio-style groups) |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ pressed: boolean, value: string }` | Fires when the button is toggled |
 
 | Slot | Content |
 |---|---|
@@ -1294,7 +1371,10 @@ Canonical tags row for document cards, preview bars and readonly displays. The c
 | `mode` | 'readonly' | 'add-button' | 'add-form', default `'readonly'` | readonly = plain chips; add-button = editable chips + add button opening the inline form; add-form = editable chips with the inline form always open |
 | `showEmptyLabel` | Boolean, default `false` | Render the no-tags hint when the list is empty (preview bars) |
 
-**Events:** `tag-add`, `tag-remove`
+| Event | Detail | Description |
+|---|---|---|
+| `tag-add` | `{ tag: string }` | Fires when a tag is added |
+| `tag-remove` | `{ tag: string }` | Fires when a tag chip is removed |
 
 ### Inputs (9)
 
@@ -1311,7 +1391,9 @@ Checkbox element with checked, unchecked, indeterminate, and disabled states. Th
 | `disabled` | boolean, default `false` | Disables interaction |
 | `label` | string, default `''` | Text next to the box |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ checked: boolean }` | Fires when the box is toggled |
 
 | Slot | Content |
 |---|---|
@@ -1328,7 +1410,9 @@ Canonical color swatch picker. A row of round color buttons rendered from a pale
 | `colors` | string[], default `[]` | Palette of hex color strings rendered as round swatch buttons |
 | `value` | string, default `''` | Currently selected hex (highlighted swatch) |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string }` | Fires when a swatch is picked |
 
 #### `app-combobox` — `AppCombobox`
 
@@ -1346,7 +1430,9 @@ Searchable multi-tag combobox input with autocomplete and tag removal. The defau
 | `allowCustom` | boolean, default `true` | Typing a new value offers "+ Add" to create it |
 | `size` | 'sm' | 'md' | 'lg', default `'md'` | Control size scale sm\|md\|lg (30/38/44px min-heights, md default) |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ selected: string[] }` | Fires when the selection changes; carries all selected values |
 
 | Slot | Content |
 |---|---|
@@ -1379,7 +1465,10 @@ Searchable portal selector for large collections (tasks, employees, counterparti
 | `error` | string, default `''` | Error message; renders the field in danger state |
 | `hint` | string, default `''` | Helper text below the field |
 
-**Events:** `change`, `search-change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string, option: EntitySelectorOption \| null }` | Fires when an option is picked |
+| `search-change` | `{ query: string }` | Fires when the search text changes (async data source) |
 
 | Slot | Content |
 |---|---|
@@ -1408,7 +1497,10 @@ Single-line text input field supporting labels, helpers, errors, and clear butto
 | `clearable` | boolean, default `false` | Shows a clear (×) button when the field has a value |
 | `size` | InputSize, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
-**Events:** `input`, `change`
+| Event | Detail | Description |
+|---|---|---|
+| `input` | `{ value: string }` | Fires on every keystroke |
+| `change` | `{ value: string }` | Fires on blur or Enter |
 
 | Slot | Content |
 |---|---|
@@ -1435,7 +1527,9 @@ Numeric input with increment/decrement steppers, boundaries, and optional unit i
 | `size` | 'sm' | 'md' | 'lg', default `'md'` | Control height: sm / md / lg |
 | `disabled` | boolean, default `false` | Disables editing and steppers |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: number }` | Fires when the numeric value changes |
 
 #### `app-select` — `AppSelect`
 
@@ -1453,7 +1547,9 @@ Custom dropdown select with indicator dots, keyboard navigation, and smooth popo
 | `placeholder` | string, default `'Select...'` | Text shown when nothing is selected |
 | `size` | SelectSize, default `'md'` | Control size scale sm\|md\|lg (30/38/44px heights, md default) |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ value: string }` | Fires when an option is picked |
 
 | Slot | Content |
 |---|---|
@@ -1479,7 +1575,9 @@ Toggle switch for boolean settings and feature flags. The default slot overrides
 | `fieldLabel` | string, default `''` | Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept, and when field-label is not set with ghost the row text falls back to the label property |
 | `fieldLabelStyle` | — | External label row style (string, reflected as the field-label-style attribute). Values: none = no external label row (default); normal = visible row above the control with the app-input label typography (font-size 0.8125rem, font-weight 500, color var(--text-secondary)); ghost = the same row rendered invisible (visibility hidden) so it keeps its place in the form grid |
 
-**Events:** `change`
+| Event | Detail | Description |
+|---|---|---|
+| `change` | `{ checked: boolean }` | Fires when the switch is toggled |
 
 | Slot | Content |
 |---|---|
@@ -1503,7 +1601,10 @@ Multiline text input with character counting, custom row limits, and auto-stylin
 | `maxlength` | number, default `0` | Maximum character count (0 = unlimited); shows a counter when set |
 | `monospace` | boolean, default `false` | Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values |
 
-**Events:** `input`, `change`
+| Event | Detail | Description |
+|---|---|---|
+| `input` | `{ value: string }` | Fires on every keystroke |
+| `change` | `{ value: string }` | Fires on blur |
 
 ### Layout (2)
 
@@ -1521,7 +1622,10 @@ Shared skeleton of the entity detail views: top navigation bar (back button, ent
 | `switcherValue` | String, default `''` | Id of the entity currently displayed |
 | `entity` | EntityEmblemKind, default `'project'` | Emblem kind rendered in the hero identity |
 
-**Events:** `detail-back`, `entity-switch`
+| Event | Detail | Description |
+|---|---|---|
+| `detail-back` | `—` | Fires when the back button is pressed |
+| `entity-switch` | `{ value: string }` | Fires when the entity switcher picks a target |
 
 | Slot | Content |
 |---|---|
@@ -1582,7 +1686,10 @@ Canonical calculation create and edit form. The component owns the contract pick
 | `showContractSelect` | boolean, default `false` | Show the contract picker (list view openings) |
 | `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ calculation: Calculation }` | Fires after a successful save with the stored calculation |
 
 #### `app-company-form` — `AppCompanyForm`
 
@@ -1595,7 +1702,10 @@ Canonical company create and edit form. The component owns the twelve fields, wr
 | `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `company` | Company | null, default `null` | Company being edited (null = create mode) |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ company: Company }` | Fires after a successful save with the stored company |
 
 #### `app-contract-form` — `AppContractForm`
 
@@ -1612,7 +1722,10 @@ Canonical contract create and edit form. The component owns all fourteen fields,
 | `presetStatus` | ContractStatus, default `'draft'` | Status a newly created contract starts with (draft by default) |
 | `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ contract: Contract }` | Fires after a successful save with the stored contract |
 
 #### `app-counterparty-form` — `AppCounterpartyForm`
 
@@ -1625,7 +1738,10 @@ Canonical counterparty create and edit form. The component owns the twelve field
 | `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `counterparty` | Counterparty | null, default `null` | Counterparty being edited (null = create mode) |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ counterparty: Counterparty }` | Fires after a successful save with the stored counterparty |
 
 #### `app-decompose-form` — `AppDecomposeForm`
 
@@ -1640,7 +1756,11 @@ Canonical counterparty create and edit form. The component owns the twelve field
 | `decompose` | — | Public async method running the AI decomposition and opening the editor |
 | `openWithDrafts` | — | Public method opening the editor with a prepared draft list (drafts, model, projectId) |
 
-**Events:** `close`, `decompose-failed`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `decompose-failed` | `{ message: string }` | Fires when decomposition cannot start |
+| `saved` | `{ taskIds: string[] }` | Fires after subtasks are created; carries their ids |
 
 #### `app-document-form` — `AppDocumentForm`
 
@@ -1660,7 +1780,10 @@ Canonical document create and edit form. The component owns the file dropzone fo
 | `presetTags` | string, default `''` | Tags prefilled for a quick upload (empty by default) |
 | `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ document: DocumentItem }` | Fires after a successful save with the stored document |
 
 #### `app-employee-form` — `AppEmployeeForm`
 
@@ -1673,7 +1796,10 @@ Canonical employee create and edit form. The component owns the ten fields, writ
 | `open` | boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `employee` | User | null, default `null` | Employee being edited (null = create mode) |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ employee: User }` | Fires after a successful save with the stored employee |
 
 #### `app-expense-form` — `AppExpenseForm`
 
@@ -1690,7 +1816,10 @@ Canonical expense create and edit form. The component owns the twelve fields of 
 | `presetUserId` | string | null, default `null` | Submitter prefilled for a context-bound opening (first user by default) |
 | `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ expense: Expense }` | Fires after a successful save with the stored expense |
 
 #### `app-modal` — `AppModal`
 
@@ -1706,7 +1835,9 @@ Customizable modal dialog with backdrop blur, customizable sizes, header, and fo
 | `hideClose` | boolean, default `false` | Hides the header close (×) button |
 | `headerIcon` | TemplateResult | null, default `null` | Icon descriptor rendered before the title |
 
-**Events:** `close`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the modal is dismissed (backdrop, Esc, close button) |
 
 | Slot | Content |
 |---|---|
@@ -1744,7 +1875,10 @@ Canonical payment registration form supporting incoming and outgoing payments, l
 | `defaultCompanyId` | String, default `''` | Initial company ID for standalone payments |
 | `defaultCounterpartyId` | String, default `''` | Initial counterparty ID for standalone payments |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ payment: InvoicePayment }` | Fires after a successful save with the stored payment |
 
 #### `app-project-form` — `AppProjectForm`
 
@@ -1768,7 +1902,10 @@ Canonical project create and edit form. The component owns the ten fields of nam
 | `extraContent` | TemplateResult | null, default `null` | TemplateResult rendered in an extra section of the body — create mode only (attribute: false) |
 | `footerExtra` | TemplateResult | null, default `null` | TemplateResult rendered in the modal footer before the primary button (attribute: false) |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ project: Project }` | Fires after a successful save with the stored project |
 
 #### `app-requirement-form` — `AppRequirementForm`
 
@@ -1782,7 +1919,10 @@ Canonical requirement create and edit form. The component owns the eleven fields
 | `requirement` | ProjectRequirement | null, default `null` | Requirement being edited (null = create mode) |
 | `presetProjectId` | string | null, default `null` | Project prefilled for a context-bound opening (first project by default) |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ requirement: ProjectRequirement }` | Fires after a successful save with the stored requirement |
 
 #### `app-task-modal` — `AppTaskModal`
 
@@ -1811,7 +1951,10 @@ Canonical time entry create and edit form. The component owns the nine fields of
 | `presetUserId` | string | null, default `null` | Employee prefilled for a context-bound opening (first user by default) |
 | `contextTitle` | string, default `''` | Modal title override for context-bound openings |
 
-**Events:** `close`, `saved`
+| Event | Detail | Description |
+|---|---|---|
+| `close` | `—` | Fires when the form is dismissed without saving |
+| `saved` | `{ entry: TimeEntry }` | Fires after a successful save with the stored time entry |
 
 ### Feedback (3)
 
@@ -1888,7 +2031,13 @@ Data table with a fixed header and footer. Columns are declared as child app-tab
 | `row-click event` | — | Emitted with detail { row } when a row is activated; clicks on checkboxes, buttons and links inside cells do not activate the row |
 | `contentStyles` | String | Additive hook: view-local CSS (string or CSSResult) injected into the shadow root as a <style> element for the cellRender content; default empty keeps consumers pixel-identical |
 
-**Events:** `sort-change`, `page-change`, `page-size-change`, `selection-change`, `row-click`
+| Event | Detail | Description |
+|---|---|---|
+| `sort-change` | `{ field: string, dir: SortDirection }` | Fires when a sortable header is clicked |
+| `page-change` | `{ page: number, pageSize: number, totalItems: number }` | Fires when the page is changed |
+| `page-size-change` | `{ page: number, pageSize: number, totalItems: number }` | Fires when the page size is changed |
+| `selection-change` | `{ selectedIds: string[], selectedItems: Record<string, unknown>[] }` | Fires when row selection changes |
+| `row-click` | `{ row: Record<string, unknown> }` | Fires when a row is clicked; carries the row data |
 
 #### `app-table-column` — `AppTableColumn`
 
@@ -1911,7 +2060,9 @@ Declarative column config child of app-table-scroll: field / label / type (text,
 | `cellRender` | Object | Custom cell renderer (row, value) => TemplateResult \| string \| number |
 | `valueFn` | Object | Custom value extractor (row) => unknown, replacing the plain row[field] read |
 
-**Events:** `column-change`
+| Event | Detail | Description |
+|---|---|---|
+| `column-change` | `—` | Fires when any column property changes; the parent table re-reads the columns |
 
 ## 5. Группа `layout` (4)
 
@@ -1970,7 +2121,9 @@ Collapsible navigation group container for <app-sidebar> supporting smooth CSS c
 | `collapsed` | boolean, default `false` | Sidebar is in icon-only mode |
 | `hasActive` | boolean, default `false` | Group contains the active item |
 
-**Events:** `sidebar-group-toggle`
+| Event | Detail | Description |
+|---|---|---|
+| `sidebar-group-toggle` | `{ groupId: string, expanded: boolean }` | Fires when the group is collapsed or expanded |
 
 | Slot | Content |
 |---|---|
@@ -1996,7 +2149,9 @@ Declarative navigation item component used to compose <app-sidebar> menus with i
 | `disabled` | boolean, default `false` | Item is not clickable |
 | `icon` | Object | Leading icon (SVG template) |
 
-**Events:** `sidebar-select`
+| Event | Detail | Description |
+|---|---|---|
+| `sidebar-select` | `{ value: string, label: string }` | Fires when the item is clicked |
 
 | Slot | Content |
 |---|---|
@@ -2079,7 +2234,10 @@ Interactive D3.js Project Overview dashboard visualizing project progress, logge
 | `expenses` | Array | Expense records |
 | `users` | Array | User records (team workload) |
 
-**Events:** `project-change`, `open-project`
+| Event | Detail | Description |
+|---|---|---|
+| `project-change` | `{ projectId: string }` | Fires when the selected project changes |
+| `open-project` | `{ projectId: string }` | Fires when a project card is opened |
 
 #### `app-project-progress` — `AppProjectProgress`
 
@@ -2123,7 +2281,9 @@ Hybrid Authentication Flow view: local credentials with visibility toggle & pass
 | `preview` | boolean, default `false` | Runs the flow in sandboxed Storybook preview mode without overwriting the active workspace session. |
 | `initial-step` | AuthScreenStep, default `'login'` | Initial screen step to render: "login" \| "register" \| "forgot" \| "2fa". |
 
-**Events:** `auth-success`
+| Event | Detail | Description |
+|---|---|---|
+| `auth-success` | `{ userId: string, email: string, provider: AuthProviderId, tenantId?: string, twoFactorVerified: boolean, trustedDevice: boolean }` | Fires after a successful authentication session |
 
 #### `app-blog` — `AppBlog`
 
@@ -2217,7 +2377,10 @@ Universal declarative enterprise data grid composed with <app-data-grid-column>,
 | `compact` | Boolean | High-density row layout (30px rows, tighter padding); falls back to the global density customization |
 | `hideDensitySwitch` | boolean, default `false` | Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch) |
 
-**Events:** `row-click`, `selection-change`
+| Event | Detail | Description |
+|---|---|---|
+| `row-click` | `{ row: Record<string, unknown>, id: string }` | Fires when a row is clicked; carries the row data and its id |
+| `selection-change` | `{ selectedIds: string[], selectedRows: Record<string, unknown>[] }` | Fires when row selection changes |
 
 | Child element | Role |
 |---|---|

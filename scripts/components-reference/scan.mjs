@@ -78,6 +78,34 @@ function pairs(body) {
   return out;
 }
 
+// eventsDoc entries: key -> { detail: '...', description: '...' } (nested object values)
+function eventPairs(body) {
+  const out = [];
+  const re = /(^|\n)\s*([A-Za-z_][\w-]*|'[^']*'|"[^"]*")\s*:\s*\{/g;
+  let m;
+  while ((m = re.exec(body))) {
+    const key = m[2].replace(/['"]/g, '');
+    let i = m.index + m[0].length;
+    let depth = 1;
+    const start = i;
+    while (i < body.length && depth > 0) {
+      const ch = body[i];
+      if (ch === '{') depth++;
+      else if (ch === '}') {
+        depth--;
+        if (depth === 0) break;
+      }
+      i++;
+    }
+    const inner = body.slice(start, i);
+    const detail = (inner.match(/detail:\s*([`'"])([\s\S]*?)\1/) || [])[2] || '';
+    const description = (inner.match(/description:\s*([`'"])([\s\S]*?)\1/) || [])[2] || '';
+    out.push({ k: key, detail: detail.replace(/\s+/g, ' ').trim(), description: description.replace(/\s+/g, ' ').trim() });
+    re.lastIndex = i;
+  }
+  return out;
+}
+
 function componentDirs(dir) {
   const out = [];
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -133,7 +161,7 @@ for (const g of fs.readdirSync(srcRoot, { withFileTypes: true }).filter((e) => e
 
     const storyPath = path.join(d.dir, `${d.tag}.story.ts`);
     const hasStory = fs.existsSync(storyPath);
-    let title = '', category = '', desc = '', propsDoc = [], slotsDoc = [], childrenDoc = [];
+    let title = '', category = '', desc = '', propsDoc = [], slotsDoc = [], childrenDoc = [], eventsDoc = [];
     if (hasStory) {
       const s = fs.readFileSync(storyPath, 'utf8');
       title = strVal(s, 'title');
@@ -142,9 +170,10 @@ for (const g of fs.readdirSync(srcRoot, { withFileTypes: true }).filter((e) => e
       propsDoc = pairs(objBody(s, 'propsDoc') || '');
       slotsDoc = pairs(objBody(s, 'slotsDoc') || '');
       childrenDoc = pairs(objBody(s, 'childrenDoc') || '');
+      eventsDoc = eventPairs(objBody(s, 'eventsDoc') || '');
     }
 
-    items.push({ group: d.group, tag, cls, hasStory, title, category, desc, propsList, events, propsDoc, slotsDoc, childrenDoc });
+    items.push({ group: d.group, tag, cls, hasStory, title, category, desc, propsList, events, propsDoc, slotsDoc, childrenDoc, eventsDoc });
   }
 }
 

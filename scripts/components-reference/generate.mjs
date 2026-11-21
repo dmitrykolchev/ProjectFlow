@@ -67,7 +67,13 @@ function entry(item, p) {
     lines.push(...rows);
     lines.push('');
   }
-  if (item.events.length) {
+  const evDoc = item.eventsDoc || [];
+  if (evDoc.length) {
+    lines.push('| Event | Detail | Description |');
+    lines.push('|---|---|---|');
+    lines.push(...evDoc.map((e) => `| \`${e.k}\` | \`${esc(e.detail)}\` | ${esc(e.description)} |`));
+    lines.push('');
+  } else if (item.events.length) {
     lines.push(`**Events:** ${item.events.map((e) => '`' + e + '`').join(', ')}`);
     lines.push('');
   }
@@ -95,7 +101,7 @@ out.push('Дата: 20.11.2026. Режим: **референс, код не из
 out.push('');
 out.push(`Всего компонентов: ${items.length} (со стори: ${items.filter((i) => i.hasStory).length}).`);
 out.push('Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /');
-out.push('propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).');
+out.push('propsDoc / slotsDoc / childrenDoc / eventsDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).');
 out.push('**После изменений кода референс актуализируется командой `npm run docs:components`**');
 out.push('(сканирование `src/components` → `docs/components.json` → рендер этого документа). Сгенерированный');
 out.push('файл коммитится вместе с изменениями кода.');

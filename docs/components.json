@@ -24,7 +24,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -70,7 +71,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -136,7 +138,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -226,6 +229,13 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the badge text"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "remove",
+    "detail": "—",
+    "description": "Fires when the badge remove button is clicked"
+   }
   ]
  },
  {
@@ -299,7 +309,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "accounts-change",
+    "detail": "{ accounts: BankRequisite[] }",
+    "description": "Fires after an account is added, edited or removed; carries the full updated list"
+   }
+  ]
  },
  {
   "group": "common",
@@ -325,7 +342,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -449,7 +467,8 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the label"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -499,7 +518,8 @@
     "k": "app-toggle-button",
     "v": "Grouped toggle button child"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -568,7 +588,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ calculation: Calculation }",
+    "description": "Fires after a successful save with the stored calculation"
+   }
+  ]
  },
  {
   "group": "common",
@@ -596,7 +628,8 @@
     "k": "app-button",
     "v": "Action button child placed in the start / end slot (size sm matches the historical card icon-btn)"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -756,7 +789,29 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "selection-change",
+    "detail": "{ selectedIds: string[], selectedItems: Record<string, unknown>[] }",
+    "description": "Fires when card selection changes"
+   },
+   {
+    "k": "page-change",
+    "detail": "{ page: number, pageSize: number, totalItems: number }",
+    "description": "Fires when the page is changed (arrows, jump input, after page-size change)"
+   },
+   {
+    "k": "page-size-change",
+    "detail": "{ page: number, pageSize: number, totalItems: number }",
+    "description": "Fires when the page size is changed"
+   },
+   {
+    "k": "card-click",
+    "detail": "{ item: Record<string, unknown> }",
+    "description": "Fires when a card is clicked; carries the card data row"
+   }
+  ]
  },
  {
   "group": "common",
@@ -819,7 +874,14 @@
     "v": "Label text next to the box (overrides the label property)"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ checked: boolean }",
+    "description": "Fires when the box is toggled"
+   }
+  ]
  },
  {
   "group": "common",
@@ -857,7 +919,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires when a swatch is picked"
+   }
+  ]
  },
  {
   "group": "common",
@@ -955,6 +1024,13 @@
     "k": "app-option",
     "v": "Declarative suggestion (label is the suggestion text) appended to the items prop list"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ selected: string[] }",
+    "description": "Fires when the selection changes; carries all selected values"
+   }
   ]
  },
  {
@@ -994,7 +1070,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ company: Company }",
+    "description": "Fires after a successful save with the stored company"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1133,7 +1221,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "confirm",
+    "detail": "—",
+    "description": "Fires when the primary (confirm) button is pressed"
+   },
+   {
+    "k": "cancel",
+    "detail": "—",
+    "description": "Fires when the dialog is dismissed"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1169,7 +1269,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -1205,7 +1306,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -1284,7 +1386,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ contract: Contract }",
+    "description": "Fires after a successful save with the stored contract"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1357,7 +1471,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "contacts-change",
+    "detail": "{ contacts: CounterpartyContact[] }",
+    "description": "Fires after a contact is added, edited or removed; carries the full updated list"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1396,7 +1517,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ counterparty: Counterparty }",
+    "description": "Fires after a successful save with the stored counterparty"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1619,7 +1752,14 @@
     "v": "Optional HTML <template> element with {{field}} / {{value}} placeholders for declarative cell markup"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "column-change",
+    "detail": "—",
+    "description": "Fires when any column property changes; the parent grid re-reads the columns"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1792,7 +1932,34 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "sort-change",
+    "detail": "{ field: string, dir: SortDirection }",
+    "description": "Fires when a sortable header is clicked"
+   },
+   {
+    "k": "page-change",
+    "detail": "{ page: number, pageSize: number, totalItems: number }",
+    "description": "Fires when the page is changed"
+   },
+   {
+    "k": "page-size-change",
+    "detail": "{ page: number, pageSize: number, totalItems: number }",
+    "description": "Fires when the page size is changed"
+   },
+   {
+    "k": "selection-change",
+    "detail": "{ selectedIds: string[], selectedItems: Record<string, unknown>[] }",
+    "description": "Fires when row selection changes"
+   },
+   {
+    "k": "row-click",
+    "detail": "{ row: Record<string, unknown> }",
+    "description": "Fires when a row is clicked; carries the row data"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1900,7 +2067,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires when the date changes (YYYY-MM-DD)"
+   }
+  ]
  },
  {
   "group": "common",
@@ -1948,7 +2122,24 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "decompose-failed",
+    "detail": "{ message: string }",
+    "description": "Fires when decomposition cannot start"
+   },
+   {
+    "k": "saved",
+    "detail": "{ taskIds: string[] }",
+    "description": "Fires after subtasks are created; carries their ids"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2079,6 +2270,18 @@
     "k": "app-entity-emblem",
     "v": "Emblem pill inside the hero meta row"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "detail-back",
+    "detail": "—",
+    "description": "Fires when the back button is pressed"
+   },
+   {
+    "k": "entity-switch",
+    "detail": "{ value: string }",
+    "description": "Fires when the entity switcher picks a target"
+   }
   ]
  },
  {
@@ -2128,7 +2331,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the modal is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ directoryId: string, record: DirectoryRecord | null }",
+    "description": "Fires after a successful save with the stored record"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2237,7 +2452,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ document: DocumentItem }",
+    "description": "Fires after a successful save with the stored document"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2319,7 +2546,24 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "select-document",
+    "detail": "{ document: DocumentItem }",
+    "description": "Fires when a document row is selected"
+   },
+   {
+    "k": "expand",
+    "detail": "{ document: DocumentItem }",
+    "description": "Fires when a folder is expanded"
+   },
+   {
+    "k": "download",
+    "detail": "{ document: DocumentItem }",
+    "description": "Fires when a document download is requested"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2351,7 +2595,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "list-reorder",
+    "detail": "{ items: DraggableItemData[] }",
+    "description": "Fires after an item is dropped; carries the new order (property mode)"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2437,7 +2688,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -2549,6 +2801,13 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the button label"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "select",
+    "detail": "{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }",
+    "description": "Passes through the select event of the clicked app-menu-item"
+   }
   ]
  },
  {
@@ -2588,7 +2847,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ employee: User }",
+    "description": "Fires after a successful save with the stored employee"
+   }
+  ]
  },
  {
   "group": "common",
@@ -2652,7 +2923,8 @@
     "k": "app-material-icon",
     "v": "Illustration icon placed in the icon slot"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -2708,7 +2980,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -2746,7 +3019,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -2918,6 +3192,18 @@
     "k": "app-option",
     "v": "Declarative entity row (value, label, code, subtitle, meta, badge, avatar, keywords, start / end slot graphics) appended to the options prop list and included in the search filter"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string, option: EntitySelectorOption | null }",
+    "description": "Fires when an option is picked"
+   },
+   {
+    "k": "search-change",
+    "detail": "{ query: string }",
+    "description": "Fires when the search text changes (async data source)"
+   }
   ]
  },
  {
@@ -2997,7 +3283,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ expense: Expense }",
+    "description": "Fires after a successful save with the stored expense"
+   }
+  ]
  },
  {
   "group": "common",
@@ -3140,7 +3438,24 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "files-selected",
+    "detail": "{ files: File[] }",
+    "description": "Fires after files are dropped or picked"
+   },
+   {
+    "k": "file-selected",
+    "detail": "{ file: File }",
+    "description": "Fires when a single file is selected"
+   },
+   {
+    "k": "file-cleared",
+    "detail": "{}",
+    "description": "Fires when the selection is cleared"
+   }
+  ]
  },
  {
   "group": "common",
@@ -3250,6 +3565,23 @@
     "k": "app-button",
     "v": "Toolbar action placed in the prefix or default slot"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "reset",
+    "detail": "—",
+    "description": "Fires when Reset is pressed"
+   },
+   {
+    "k": "search-change",
+    "detail": "{ value: string }",
+    "description": "Fires when the search text changes"
+   },
+   {
+    "k": "filter-change",
+    "detail": "{ key: string, value: string }",
+    "description": "Fires when a filter control changes"
+   }
   ]
  },
  {
@@ -3318,7 +3650,8 @@
     "k": "app-switch",
     "v": "Toggle switch child"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -3448,6 +3781,18 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the leading icon slot inside the field"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "input",
+    "detail": "{ value: string }",
+    "description": "Fires on every keystroke"
+   },
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires on blur or Enter"
+   }
   ]
  },
  {
@@ -3494,7 +3839,8 @@
     "k": "app-metric-card",
     "v": "KPI card child rendered as a grid cell of the strip (label, value, trend, sparkline)"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -3599,7 +3945,8 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the link label"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -3641,7 +3988,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "checklist-toggle",
+    "detail": "{ line: number, checked: boolean }",
+    "description": "Fires when a checklist box is toggled in editable mode"
+   }
+  ]
  },
  {
   "group": "common",
@@ -3715,7 +4069,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -3802,7 +4157,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "icon-select",
+    "detail": "{ name: string }",
+    "description": "Fires when an icon is picked"
+   },
+   {
+    "k": "params-change",
+    "detail": "{ family: GalleryFamily, size: GallerySize | number, fill: number, weight: number, grade: number }",
+    "description": "Fires when a toolbar parameter changes"
+   }
+  ]
  },
  {
   "group": "common",
@@ -3848,6 +4215,13 @@
     "k": "app-menu-divider",
     "v": "Horizontal separator between menu rows"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "select",
+    "detail": "{ item: MenuItem, id: string }",
+    "description": "Fires when a menu item is clicked"
+   }
   ]
  },
  {
@@ -3874,7 +4248,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -3905,7 +4280,8 @@
     "v": "Header text markup (used when the label property is omitted)"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4029,6 +4405,13 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the item label"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "select",
+    "detail": "{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }",
+    "description": "Fires when the item is clicked"
+   }
   ]
  },
  {
@@ -4085,7 +4468,8 @@
     "k": "app-meta-item",
     "v": "Declarative meta box (label, value, mono, danger, start / end slot graphics) appended to the items prop list"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4154,7 +4538,8 @@
     "v": "Graphic element rendered after the field value in the parent box (SVG, material icon)"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4256,6 +4641,13 @@
     "k": "app-textarea",
     "v": "Multiline text field child of the modal body"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the modal is dismissed (backdrop, Esc, close button)"
+   }
   ]
  },
  {
@@ -4270,7 +4662,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4316,7 +4709,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4414,7 +4808,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: number }",
+    "description": "Fires when the numeric value changes"
+   }
+  ]
  },
  {
   "group": "common",
@@ -4574,7 +4975,8 @@
     "v": "Graphic element rendered after the option label in the parent row (SVG, material icon)"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4643,7 +5045,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "otp-change",
+    "detail": "{ value: string }",
+    "description": "Fires when a digit is entered"
+   },
+   {
+    "k": "otp-complete",
+    "detail": "{ value: string }",
+    "description": "Fires when all cells are filled"
+   }
+  ]
  },
  {
   "group": "common",
@@ -4701,7 +5115,8 @@
     "k": "app-material-icon",
     "v": "Leading icon placed in the icon slot"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -4825,7 +5240,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "page-change",
+    "detail": "{ page: number }",
+    "description": "Fires when the page changes"
+   },
+   {
+    "k": "page-size-change",
+    "detail": "{ pageSize: number, layoutMode: PaginationLayoutMode }",
+    "description": "Fires when the page size changes"
+   }
+  ]
  },
  {
   "group": "common",
@@ -4914,7 +5341,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ payment: InvoicePayment }",
+    "description": "Fires after a successful save with the stored payment"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5046,7 +5485,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -5116,7 +5556,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -5183,7 +5624,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -5262,7 +5704,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "attachments-change",
+    "detail": "{ documentIds: string[], pendingFiles: PendingAttachmentFile[] }",
+    "description": "Fires when documents are attached/removed or pending files staged"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5411,7 +5860,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ project: Project }",
+    "description": "Fires after a successful save with the stored project"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5441,7 +5902,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -5549,6 +6011,13 @@
     "k": "app-option",
     "v": "Declarative radio row (value, label, description, disabled, start / end slot graphics) appended to the options prop list"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string, option: RadioOption }",
+    "description": "Fires when an option is picked"
+   }
   ]
  },
  {
@@ -5631,7 +6100,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string, rrule: string, rule: Rfc5545Rule | null, isValid: boolean, summary: string }",
+    "description": "Fires when the recurrence rule changes"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5690,7 +6166,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ reminder: Reminder }",
+    "description": "Fires after a successful save with the stored reminder"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5739,7 +6227,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ requirement: ProjectRequirement }",
+    "description": "Fires after a successful save with the stored requirement"
+   }
+  ]
  },
  {
   "group": "common",
@@ -5860,6 +6360,13 @@
     "k": "app-material-icon",
     "v": "Leading icon placed in the icon slot"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "toggle",
+    "detail": "{ collapsed: boolean }",
+    "description": "Fires when the card is collapsed or expanded"
+   }
   ]
  },
  {
@@ -5948,6 +6455,13 @@
    {
     "k": "app-option",
     "v": "Declarative segment (value, label, disabled, start / end slot graphics) appended to the options prop list"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string, option: SegmentedOption }",
+    "description": "Fires when a segment is picked"
    }
   ]
  },
@@ -6046,6 +6560,13 @@
    {
     "k": "app-option",
     "v": "Declarative option row (value, label, color, start / end slot graphics) appended to the options prop list"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires when an option is picked"
    }
   ]
  },
@@ -6150,6 +6671,18 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the main label"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "primary-click",
+    "detail": "—",
+    "description": "Fires when the primary part of the button is clicked"
+   },
+   {
+    "k": "select",
+    "detail": "{ item: MenuItem, id: string, value: string, checked?: boolean, element: AppMenuItem }",
+    "description": "Passes through the select event of the clicked app-menu-item"
+   }
   ]
  },
  {
@@ -6228,7 +6761,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -6316,7 +6850,14 @@
     "v": "Label text next to the switch (overrides the label property)"
    }
   ],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ checked: boolean }",
+    "description": "Fires when the switch is toggled"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6456,7 +6997,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "column-change",
+    "detail": "—",
+    "description": "Fires when any column property changes; the parent table re-reads the columns"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6568,7 +7116,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "sort-change",
+    "detail": "{ field: string, dir: SortDirection }",
+    "description": "Fires when a sortable header is clicked"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6617,7 +7172,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "tag-add",
+    "detail": "{ tag: string }",
+    "description": "Fires when a tag is added"
+   },
+   {
+    "k": "tag-remove",
+    "detail": "{ tag: string }",
+    "description": "Fires when a tag chip is removed"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6708,7 +7275,29 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "analyses-update",
+    "detail": "{ analyses: AnalysisSummary[] }",
+    "description": "Fires after the analysis list changes"
+   },
+   {
+    "k": "clarification-update",
+    "detail": "{ messages: TaskAiClarificationMessage[] }",
+    "description": "Fires when clarification messages change"
+   },
+   {
+    "k": "apply-description",
+    "detail": "{ description: string, mode: 'replace' | 'append' }",
+    "description": "Fires when an AI draft is applied to the task description"
+   },
+   {
+    "k": "add-subtask",
+    "detail": "{ title: string }",
+    "description": "Fires when a suggested subtask is accepted"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6735,7 +7324,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -6844,7 +7434,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "input",
+    "detail": "{ value: string }",
+    "description": "Fires on every keystroke"
+   },
+   {
+    "k": "change",
+    "detail": "{ value: string }",
+    "description": "Fires on blur"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6923,7 +7525,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "close",
+    "detail": "—",
+    "description": "Fires when the form is dismissed without saving"
+   },
+   {
+    "k": "saved",
+    "detail": "{ entry: TimeEntry }",
+    "description": "Fires after a successful save with the stored time entry"
+   }
+  ]
  },
  {
   "group": "common",
@@ -6942,7 +7556,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "common",
@@ -7047,6 +7662,13 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the label"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "change",
+    "detail": "{ pressed: boolean, value: string }",
+    "description": "Fires when the button is toggled"
+   }
   ]
  },
  {
@@ -7123,7 +7745,8 @@
     "k": "app-button",
     "v": "Header control placed in the actions slot at the right of the chart header"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "dashboard",
@@ -7249,7 +7872,8 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the leading icon slot before the metric label"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "dashboard",
@@ -7348,7 +7972,19 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "project-change",
+    "detail": "{ projectId: string }",
+    "description": "Fires when the selected project changes"
+   },
+   {
+    "k": "open-project",
+    "detail": "{ projectId: string }",
+    "description": "Fires when a project card is opened"
+   }
+  ]
  },
  {
   "group": "dashboard",
@@ -7414,7 +8050,8 @@
     "k": "app-button",
     "v": "Header control placed in the actions slot at the right of the section header"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "layout",
@@ -7465,7 +8102,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "layout",
@@ -7543,7 +8181,8 @@
     "k": "app-sidebar-item",
     "v": "Navigation item with icon, badge, and active state (inside an app-sidebar-group)"
    }
-  ]
+  ],
+  "eventsDoc": []
  },
  {
   "group": "layout",
@@ -7622,6 +8261,13 @@
    {
     "k": "app-sidebar-item",
     "v": "Navigation item with icon, badge, and active state rendered inside the group"
+   }
+  ],
+  "eventsDoc": [
+   {
+    "k": "sidebar-group-toggle",
+    "detail": "{ groupId: string, expanded: boolean }",
+    "description": "Fires when the group is collapsed or expanded"
    }
   ]
  },
@@ -7733,6 +8379,13 @@
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the item label"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "sidebar-select",
+    "detail": "{ value: string, label: string }",
+    "description": "Fires when the item is clicked"
+   }
   ]
  },
  {
@@ -7747,7 +8400,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7786,7 +8440,14 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": [
+   {
+    "k": "auth-success",
+    "detail": "{ userId: string, email: string, provider: AuthProviderId, tenantId?: string, twoFactorVerified: boolean, trustedDevice: boolean }",
+    "description": "Fires after a successful authentication session"
+   }
+  ]
  },
  {
   "group": "views",
@@ -7800,7 +8461,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7814,7 +8476,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7828,7 +8491,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7842,7 +8506,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7856,7 +8521,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7870,7 +8536,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7884,7 +8551,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7898,7 +8566,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7912,7 +8581,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7926,7 +8596,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7940,7 +8611,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -7954,7 +8626,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8094,6 +8767,18 @@
     "k": "app-data-grid-column",
     "v": "Declarative column config child (field, caption, width, resizable, hidden, sortable, groupable, template, sortValue)"
    }
+  ],
+  "eventsDoc": [
+   {
+    "k": "row-click",
+    "detail": "{ row: Record<string, unknown>, id: string }",
+    "description": "Fires when a row is clicked; carries the row data and its id"
+   },
+   {
+    "k": "selection-change",
+    "detail": "{ selectedIds: string[], selectedRows: Record<string, unknown>[] }",
+    "description": "Fires when row selection changes"
+   }
   ]
  },
  {
@@ -8108,7 +8793,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8122,7 +8808,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8136,7 +8823,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8150,7 +8838,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8164,7 +8853,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8178,7 +8868,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8192,7 +8883,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8239,7 +8931,8 @@
    }
   ],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8253,7 +8946,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8267,7 +8961,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8281,7 +8976,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8295,7 +8991,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8309,7 +9006,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8323,7 +9021,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8337,7 +9036,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8351,7 +9051,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8365,7 +9066,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8379,7 +9081,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8393,7 +9096,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8407,7 +9111,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8421,7 +9126,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8435,7 +9141,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8449,7 +9156,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8463,7 +9171,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8477,7 +9186,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8491,7 +9201,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8505,7 +9216,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8519,7 +9231,8 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  },
  {
   "group": "views",
@@ -8533,6 +9246,7 @@
   "events": [],
   "propsDoc": [],
   "slotsDoc": [],
-  "childrenDoc": []
+  "childrenDoc": [],
+  "eventsDoc": []
  }
 ]
