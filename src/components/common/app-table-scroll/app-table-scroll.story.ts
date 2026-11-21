@@ -145,6 +145,12 @@ export const meta: ComponentStoryMeta = {
     striped: 'Enables alternating row background coloring (zebra striping)',
     'sort-change event': 'Emitted with detail { field, dir } when a header sort button is clicked',
   },
+  eventsDoc: {
+    'sort-change': {
+      detail: '{ field: string, dir: SortDirection }',
+      description: 'Fires when a sortable header is clicked',
+    },
+  },
   stories: [
     {
       name: 'Directory Records Table',
