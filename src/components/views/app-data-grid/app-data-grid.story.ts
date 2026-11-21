@@ -53,6 +53,19 @@ export const meta: ComponentStoryMeta = {
   childrenDoc: {
     'app-data-grid-column': 'Declarative column config child (field, caption, width, resizable, hidden, sortable, groupable, template, sortValue)',
   },
+  propsDoc: {
+    rows: 'Row objects rendered by the grid',
+    rowKey: 'Field holding the row identity (attribute row-key); default id — used for selection, grouping and expansion',
+    selectedKeys: 'Keys of the currently selected rows (property binding, array)',
+    selectable: 'Enables the row selection column; false renders no checkbox column',
+    virtual: 'Virtualized row windowing (default true) — only visible rows render in high-volume lists',
+    emptyText: "Caption passed to the compact empty state when rows is empty (attribute empty-text)",
+    exportFilename: 'Base name of the CSV file produced by the export action (attribute export-filename); the date is appended',
+    groupBy: 'Field whose values define the first grouping level (attribute group-by); empty = no grouping',
+    sortBy: 'Field currently used for sorting (attribute sort-by); arrow shown on its header',
+    compact: 'High-density row layout (30px rows, tighter padding); falls back to the global density customization',
+    hideDensitySwitch: 'Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch)',
+  },
   stories: [
     {
       name: 'Interactive Declarative Data Grid',

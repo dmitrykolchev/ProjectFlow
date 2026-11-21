@@ -299,6 +299,10 @@
    {
     "k": "confirm-delete",
     "v": "Shows app-confirm-dialog before deleting an account"
+   },
+   {
+    "k": "heading",
+    "v": "Caption of the internal header; falls back to the localized bank-accounts title when empty"
    }
   ],
   "slotsDoc": [],
@@ -1327,6 +1331,10 @@
    {
     "k": "confirm-delete",
     "v": "Shows app-confirm-dialog before deleting a contact"
+   },
+   {
+    "k": "heading",
+    "v": "Caption of the internal header; falls back to the localized contact-persons title when empty"
    }
   ],
   "slotsDoc": [],
@@ -3488,6 +3496,14 @@
    {
     "k": "disabled",
     "v": "Blocks activation and dims the link"
+   },
+   {
+    "k": "ariaLabel",
+    "v": "Accessible name (aria-label); falls back to title when empty"
+   },
+   {
+    "k": "active",
+    "v": "Segmented pill state: fills the link with the --link-active-bg hook. Default false keeps every existing consumer pixel-identical"
    }
   ],
   "slotsDoc": [
@@ -4726,6 +4742,10 @@
     "v": "Optional target invoice the payment is recorded against"
    },
    {
+    "k": "payment",
+    "v": "Existing InvoicePayment to edit (attribute: false, property binding only); null opens the create form"
+   },
+   {
     "k": "payableInvoices",
     "v": "Invoices the target selector may switch between"
    },
@@ -4864,6 +4884,14 @@
    {
     "k": "ariaLabel",
     "v": "Accessible name override"
+   },
+   {
+    "k": "interactive",
+    "v": "Renders the persona as a focusable ghost button (default true) so consumers bind @click / persona-click on the host; false renders plain markup"
+   },
+   {
+    "k": "personaDisabled",
+    "v": "Dims the persona and disables its button (attribute persona-disabled); the persona-click event is not dispatched"
    }
   ],
   "slotsDoc": [],
@@ -5608,6 +5636,10 @@
    {
     "k": "subtitle",
     "v": "Secondary line under the caption"
+   },
+   {
+    "k": "ariaLabel",
+    "v": "Accessible name for the section region (aria-label); falls back to title when empty"
    },
    {
     "k": "variant",
@@ -6556,6 +6588,10 @@
    {
     "k": "maxlength",
     "v": "Maximum character count (0 = unlimited); shows a counter when set"
+   },
+   {
+    "k": "monospace",
+    "v": "Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values"
    }
   ],
   "slotsDoc": [],
@@ -7785,7 +7821,52 @@
    "row-click",
    "selection-change"
   ],
-  "propsDoc": [],
+  "propsDoc": [
+   {
+    "k": "rows",
+    "v": "Row objects rendered by the grid"
+   },
+   {
+    "k": "rowKey",
+    "v": "Field holding the row identity (attribute row-key); default id — used for selection, grouping and expansion"
+   },
+   {
+    "k": "selectedKeys",
+    "v": "Keys of the currently selected rows (property binding, array)"
+   },
+   {
+    "k": "selectable",
+    "v": "Enables the row selection column; false renders no checkbox column"
+   },
+   {
+    "k": "virtual",
+    "v": "Virtualized row windowing (default true) — only visible rows render in high-volume lists"
+   },
+   {
+    "k": "emptyText",
+    "v": "Caption passed to the compact empty state when rows is empty (attribute empty-text)"
+   },
+   {
+    "k": "exportFilename",
+    "v": "Base name of the CSV file produced by the export action (attribute export-filename); the date is appended"
+   },
+   {
+    "k": "groupBy",
+    "v": "Field whose values define the first grouping level (attribute group-by); empty = no grouping"
+   },
+   {
+    "k": "sortBy",
+    "v": "Field currently used for sorting (attribute sort-by); arrow shown on its header"
+   },
+   {
+    "k": "compact",
+    "v": "High-density row layout (30px rows, tighter padding); falls back to the global density customization"
+   },
+   {
+    "k": "hideDensitySwitch",
+    "v": "Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch)"
+   }
+  ],
   "slotsDoc": [],
   "childrenDoc": [
    {

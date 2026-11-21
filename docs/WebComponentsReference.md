@@ -271,7 +271,7 @@ Multi-bank, multi-currency bank requisites viewer and inline manager. Supports c
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
 | `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting an account |
-| `heading` | String, default `''` | — |
+| `heading` | String, default `''` | Caption of the internal header; falls back to the localized bank-accounts title when empty |
 
 **Events:** `accounts-change`
 
@@ -386,7 +386,7 @@ Multi-person counterparty contacts viewer and inline CRUD manager. Supports pers
 | `compact` | Boolean, default `false` | Uses single-column compact layout suitable inside modal forms |
 | `hide-header` | Boolean, default `false` | Hides internal header when embedded inside app-section-card |
 | `confirm-delete` | Boolean, default `false` | Shows app-confirm-dialog before deleting a contact |
-| `heading` | String, default `''` | — |
+| `heading` | String, default `''` | Caption of the internal header; falls back to the localized contact-persons title when empty |
 
 **Events:** `contacts-change`
 
@@ -894,8 +894,8 @@ Person representation: avatar (photo or initials on a colored tile), name, posit
 | `showOverflowTooltip` | — | Native tooltip with the full text on truncated lines (default true) |
 | `color` | String, default `''` | Background of the initials tile |
 | `ariaLabel` | String, default `''` | Accessible name override |
-| `interactive` | Boolean, default `true` | — |
-| `personaDisabled` | Boolean, default `false` | — |
+| `interactive` | Boolean, default `true` | Renders the persona as a focusable ghost button (default true) so consumers bind @click / persona-click on the host; false renders plain markup |
+| `personaDisabled` | Boolean, default `false` | Dims the persona and disables its button (attribute persona-disabled); the persona-click event is not dispatched |
 
 #### `app-presence-icon` — `AppPresenceIcon`
 
@@ -1019,11 +1019,11 @@ Card container with header (title, subtitle, actions slot) and body; optional co
 |---|---|---|
 | `title` | String, default `''` | Section caption |
 | `subtitle` | String, default `''` | Secondary line under the caption |
+| `ariaLabel` | String, default `''` | Accessible name for the section region (aria-label); falls back to title when empty |
 | `variant` | String, default `'default'` | Surface style: default / plain / elevated |
 | `collapsible` | Boolean, default `false` | Enables collapse toggle in the header |
 | `collapsed` | Boolean, default `false` | Current collapsed state (only for collapsible sections) |
 | `maxHeight` | String, default `''` | CSS length ('26rem', '320px') capping the body height; the inner scrollbar activates on overflow |
-| `ariaLabel` | String, default `''` | — |
 
 **Events:** `toggle`
 
@@ -1227,8 +1227,8 @@ Text link with the canonical start / default / end slot API. Renders an anchor w
 | `variant` | String, default `'primary'` | Visual style: primary, secondary, danger |
 | `size` | String, default `'md'` | Font scale sm / md / lg from the canonical control tokens |
 | `disabled` | Boolean, default `false` | Blocks activation and dims the link |
-| `ariaLabel` | String, default `''` | — |
-| `active` | Boolean, default `false` | — |
+| `ariaLabel` | String, default `''` | Accessible name (aria-label); falls back to title when empty |
+| `active` | Boolean, default `false` | Segmented pill state: fills the link with the --link-active-bg hook. Default false keeps every existing consumer pixel-identical |
 
 | Slot | Content |
 |---|---|
@@ -1459,7 +1459,7 @@ Multiline text input with character counting, custom row limits, and auto-stylin
 | `disabled` | Boolean, default `false` | Disables editing |
 | `error` | String, default `''` | Error message; renders the field in danger state |
 | `maxlength` | Number, default `0` | Maximum character count (0 = unlimited); shows a counter when set |
-| `monospace` | Boolean, default `false` | — |
+| `monospace` | Boolean, default `false` | Renders the text in the mono font family with tabular numerals — for code, rrule strings, file names and other literal values |
 
 **Events:** `input`, `change`
 
@@ -1696,11 +1696,11 @@ Canonical payment registration form supporting incoming and outgoing payments, l
 |---|---|---|
 | `open` | Boolean, default `false` | Opens the form modal (rendered through the portal) |
 | `invoice` | Invoice | null, default `null` | Optional target invoice the payment is recorded against |
+| `payment` | InvoicePayment | null, default `null` | Existing InvoicePayment to edit (attribute: false, property binding only); null opens the create form |
 | `payableInvoices` | Invoice[], default `[]` | Invoices the target selector may switch between |
 | `defaultDirection` | String, default `'incoming'` | Initial direction for standalone payments (incoming \| outgoing) |
 | `defaultCompanyId` | String, default `''` | Initial company ID for standalone payments |
 | `defaultCounterpartyId` | String, default `''` | Initial counterparty ID for standalone payments |
-| `payment` | InvoicePayment | null, default `null` | — |
 
 **Events:** `close`, `saved`
 
@@ -2174,17 +2174,17 @@ Universal declarative enterprise data grid composed with <app-data-grid-column>,
 
 | Property | Type / default | Description |
 |---|---|---|
-| `rows` | Array | — |
-| `rowKey` | String, default `'id'` | — |
-| `selectedKeys` | Array | — |
-| `selectable` | Boolean, default `true` | — |
-| `virtual` | Boolean, default `true` | — |
-| `emptyText` | String, default `''` | — |
-| `exportFilename` | String, default `'projectflow_export'` | — |
-| `groupBy` | String, default `''` | — |
-| `sortBy` | String, default `''` | — |
-| `compact` | Boolean | — |
-| `hideDensitySwitch` | Boolean, default `false` | — |
+| `rows` | Array | Row objects rendered by the grid |
+| `rowKey` | String, default `'id'` | Field holding the row identity (attribute row-key); default id — used for selection, grouping and expansion |
+| `selectedKeys` | Array | Keys of the currently selected rows (property binding, array) |
+| `selectable` | Boolean, default `true` | Enables the row selection column; false renders no checkbox column |
+| `virtual` | Boolean, default `true` | Virtualized row windowing (default true) — only visible rows render in high-volume lists |
+| `emptyText` | String, default `''` | Caption passed to the compact empty state when rows is empty (attribute empty-text) |
+| `exportFilename` | String, default `'projectflow_export'` | Base name of the CSV file produced by the export action (attribute export-filename); the date is appended |
+| `groupBy` | String, default `''` | Field whose values define the first grouping level (attribute group-by); empty = no grouping |
+| `sortBy` | String, default `''` | Field currently used for sorting (attribute sort-by); arrow shown on its header |
+| `compact` | Boolean | High-density row layout (30px rows, tighter padding); falls back to the global density customization |
+| `hideDensitySwitch` | Boolean, default `false` | Hides the comfortable/compact density switch in the grid toolbar (attribute hide-density-switch) |
 
 **Events:** `row-click`, `selection-change`
 
