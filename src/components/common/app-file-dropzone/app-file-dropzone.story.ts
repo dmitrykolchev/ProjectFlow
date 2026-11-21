@@ -23,6 +23,20 @@ export const meta: ComponentStoryMeta = {
     'selected-file-size': 'Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size)',
     multiple: 'Allows picking several files (native multiple on the input); the files event carries all of them, false carries only the first',
   },
+  eventsDoc: {
+    'files-selected': {
+      detail: '{ files: File[] }',
+      description: 'Fires after files are dropped or picked',
+    },
+    'file-selected': {
+      detail: '{ file: File }',
+      description: 'Fires when a single file is selected',
+    },
+    'file-cleared': {
+      detail: '{}',
+      description: 'Fires when the selection is cleared',
+    },
+  },
   stories: [
     {
       name: 'Default Dropzone',
