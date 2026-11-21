@@ -2,6 +2,12 @@ import { LitElement, html, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import styles from './app-sidebar-item.css';
 
+// detail of the `sidebar-select` event (named event-detail interface, AGENTS.md §6)
+export interface SidebarSelectDetail {
+  value: string;
+  label: string;
+}
+
 @customElement('app-sidebar-item')
 export class AppSidebarItem extends LitElement {
   @property({ type: String }) value: string = '';
@@ -55,7 +61,7 @@ export class AppSidebarItem extends LitElement {
   private handleSelect() {
     if (this.disabled) return;
     this.dispatchEvent(
-      new CustomEvent('sidebar-select', {
+      new CustomEvent<SidebarSelectDetail>('sidebar-select', {
         detail: { value: this.value, label: this.label },
         bubbles: true,
         composed: true,
