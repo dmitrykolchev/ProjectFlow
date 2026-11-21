@@ -1239,7 +1239,6 @@ export const en = {
     fieldRevisionSummary: 'Revision Note (for history log)',
     previewTab: 'Preview',
     writeTab: 'Editor',
-    deleteConfirm: 'Remove this document from the knowledge base?',
     scopes: {
       project: 'Project',
       company: 'Company',
@@ -2752,6 +2751,11 @@ export const en = {
         title: 'Delete comment?',
         action: 'The selected comment will be removed from this article discussion.',
         result: 'The comment will disappear for all readers.',
+      },
+      knowledgeArticleDelete: {
+        title: 'Delete knowledge base article?',
+        action: (title: string) => `Article "${title}" will be removed from the knowledge base.`,
+        result: 'Links from tasks and requirements to this article will remain without the article text.',
       },
     },
     materialIcons: {

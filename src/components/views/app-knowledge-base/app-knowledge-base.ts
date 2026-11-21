@@ -26,6 +26,7 @@ import '../../common/app-link/app-link';
 import '../../common/app-markdown/app-markdown';
 import '../../common/app-input/app-input';
 import '../../common/app-modal/app-modal';
+import '../../common/app-confirm-dialog/app-confirm-dialog';
 import '../../common/app-segmented-switch/app-segmented-switch';
 import '../../common/app-toggle-button/app-toggle-button';
 import '../../common/app-select/app-select';
@@ -805,36 +806,28 @@ export class AppKnowledgeBase extends LitElement {
 
   private renderDeleteModal() {
     const t = getTranslation(this.currentLang);
-    const kb = t.knowledgeBase;
+    const cd = t.viewTexts.confirmDialogs.knowledgeArticleDelete;
 
     return html`
-      <app-modal
-        ?open="${Boolean(this.deletingArticle)}"
+      <app-confirm-dialog
+        .open="${Boolean(this.deletingArticle)}"
         size="sm"
-        title="${t.common.delete}"
-        @close="${() => (this.deletingArticle = null)}"
-      >
-        <p style="margin: 0; font-size: 0.9rem; color: var(--text-secondary);">
-          ${kb.deleteConfirm}
-          ${this.deletingArticle ? html`<br /><strong style="color: var(--text-primary);">${this.deletingArticle.title}</strong>` : ''}
-        </p>
-        <div slot="footer">
-          <app-button variant="ghost" @click="${() => (this.deletingArticle = null)}">
-            ${t.common.cancel}
-          </app-button>
-          <app-button
-            variant="danger"
-            @click="${() => {
-              if (this.deletingArticle) {
-                store.deleteKnowledgeArticle(this.deletingArticle.id);
-              }
-              this.deletingArticle = null;
-            }}"
-          >
-            ${t.common.delete}
-          </app-button>
-        </div>
-      </app-modal>
+        variant="danger"
+        title="${cd.title}"
+        action="${cd.action(this.deletingArticle?.title || '')}"
+        result="${cd.result}"
+        .actionLabel="${t.viewTexts.confirmSectionLabels.action}"
+        .resultLabel="${t.viewTexts.confirmSectionLabels.result}"
+        .cancelLabel="${t.common.cancel}"
+        .confirmLabel="${t.common.delete}"
+        @cancel="${() => (this.deletingArticle = null)}"
+        @confirm="${() => {
+          if (this.deletingArticle) {
+            store.deleteKnowledgeArticle(this.deletingArticle.id);
+          }
+          this.deletingArticle = null;
+        }}"
+      ></app-confirm-dialog>
     `;
   }
 
