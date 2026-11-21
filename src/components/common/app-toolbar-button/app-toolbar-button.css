@@ -7,8 +7,10 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
-  font-family: var(--font-sans, inherit);
+  gap: var(--tb-btn-gap, 0.4rem);
+  /* --tb-font-family lets a consumer request the mono toolbar typography;
+     the default keeps every consumer on the page font */
+  font-family: var(--tb-font-family, var(--font-sans, inherit));
   font-weight: 600;
   /* the row scale is inherited from app-toolbar; standalone use falls back to
      the canonical md control tokens */

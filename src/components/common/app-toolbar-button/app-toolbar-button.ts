@@ -196,10 +196,10 @@ export class AppToolbarButton extends LitElement {
   }
 
   private handleClick(e: MouseEvent) {
-    e.stopPropagation();
     if (this.disabled) return;
 
     if (this.type === 'toggle') {
+      e.stopPropagation();
       this.pressed = !this.pressed;
       this.dispatchEvent(
         new CustomEvent<ToolbarButtonChangeDetail>('change', {
@@ -212,6 +212,7 @@ export class AppToolbarButton extends LitElement {
     }
 
     if (this.hasMenu) {
+      e.stopPropagation();
       if (!this.isOpen) {
         this.prepareClonedMenuNodes();
         this.updateMenuPosition();
@@ -220,6 +221,8 @@ export class AppToolbarButton extends LitElement {
         this.isOpen = false;
       }
     }
+    // a plain push button propagates the native click to consumers listening
+    // on the host element
   }
 
   private handleMenuSelect(e: CustomEvent) {
