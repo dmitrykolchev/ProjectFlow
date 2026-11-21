@@ -23,6 +23,20 @@ export const meta: ComponentStoryMeta = {
     showExpand: 'Shows the expand-to-fullscreen control',
     height: 'Preview viewport height (CSS length)',
   },
+  eventsDoc: {
+    'select-document': {
+      detail: '{ document: DocumentItem }',
+      description: 'Fires when a document row is selected',
+    },
+    expand: {
+      detail: '{ document: DocumentItem }',
+      description: 'Fires when a folder is expanded',
+    },
+    download: {
+      detail: '{ document: DocumentItem }',
+      description: 'Fires when a document download is requested',
+    },
+  },
   stories: [
     {
       name: 'PDF Document Preview',
