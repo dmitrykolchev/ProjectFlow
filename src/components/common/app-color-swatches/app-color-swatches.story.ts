@@ -15,6 +15,9 @@ export const meta: ComponentStoryMeta = {
     colors: 'Palette of hex color strings rendered as round swatch buttons',
     value: 'Currently selected hex (highlighted swatch)',
   },
+  eventsDoc: {
+    change: { detail: '{ value: string }', description: 'Fires when a swatch is picked' },
+  },
   stories: [
     {
       name: 'Project Palette',
