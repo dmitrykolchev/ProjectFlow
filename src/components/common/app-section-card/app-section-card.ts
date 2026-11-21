@@ -3,6 +3,11 @@ import { customElement, property } from 'lit/decorators.js';
 import { iconChevronDown } from '../icons';
 import styles from './app-section-card.css';
 
+// detail of the `toggle` event (named event-detail interface, AGENTS.md §6)
+export interface SectionCardToggleDetail {
+  collapsed: boolean;
+}
+
 @customElement('app-section-card')
 export class AppSectionCard extends LitElement {
   @property({ type: String }) title: string = '';
@@ -63,7 +68,7 @@ export class AppSectionCard extends LitElement {
     }
     this.collapsed = !this.collapsed;
     this.dispatchEvent(
-      new CustomEvent('toggle', {
+      new CustomEvent<SectionCardToggleDetail>('toggle', {
         detail: { collapsed: this.collapsed },
         bubbles: true,
         composed: true,
