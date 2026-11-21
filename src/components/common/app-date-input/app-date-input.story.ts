@@ -18,6 +18,12 @@ export const meta: ComponentStoryMeta = {
     error: 'Error message; renders the field in danger state',
     size: "Control size scale sm|md|lg (30/38/44px heights, md default)",
   },
+  eventsDoc: {
+    change: {
+      detail: '{ value: string }',
+      description: 'Fires when the date changes (YYYY-MM-DD)',
+    },
+  },
   stories: [
     {
       name: 'Size Scale',
