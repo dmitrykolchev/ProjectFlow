@@ -56,7 +56,10 @@
   color: var(--text-primary, #f8fafc);
 }
 
-.sb-search-box {
+.sb-search-box {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   box-sizing: border-box;
   width: 100%;
   height: var(--control-height-md, 38px);
@@ -191,7 +194,10 @@
   gap: 0.5rem;
 }
 
-.sb-tool-btn {
+.sb-tool-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: var(--bg-subtle, #1a2438);
   border: 1px solid var(--border-subtle, #334155);
   color: var(--text-secondary, #94a3b8);
