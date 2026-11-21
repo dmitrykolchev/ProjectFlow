@@ -29,6 +29,12 @@ export const meta: ComponentStoryMeta = {
     hideClose: 'Hides the header close (×) button',
     headerIcon: 'Icon descriptor rendered before the title',
   },
+  eventsDoc: {
+    close: {
+      detail: '—',
+      description: 'Fires when the modal is dismissed (backdrop, Esc, close button)',
+    },
+  },
   stories: [
     {
       name: 'Interactive Demo',
