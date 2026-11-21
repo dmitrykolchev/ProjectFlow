@@ -224,7 +224,11 @@ export class AppRoot extends LitElement {
         transform: rotate(360deg);
       }
     }
-  `;
+  
+:host([hidden]) {
+  display: none;
+}
+`;
 
   render() {
     if (!this.isAuthenticated) {

@@ -156,3 +156,7 @@ label {
   font-size: 0.8rem;
   flex-shrink: 0;
 }
+
+:host([hidden]) {
+  display: none;
+}

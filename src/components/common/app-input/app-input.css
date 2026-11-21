@@ -147,3 +147,7 @@ input:disabled {
   font-size: 0.75rem;
   color: var(--color-danger, #ef4444);
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -482,3 +482,7 @@
   font-size: 0.75rem;
   color: #eab308;
 }
+
+:host([hidden]) {
+  display: none;
+}

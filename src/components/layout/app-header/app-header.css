@@ -190,3 +190,7 @@
     width: 180px;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

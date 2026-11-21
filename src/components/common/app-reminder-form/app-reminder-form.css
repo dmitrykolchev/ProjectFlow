@@ -292,3 +292,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

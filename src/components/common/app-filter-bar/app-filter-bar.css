@@ -60,3 +60,7 @@
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -23,7 +23,11 @@ export class AppStatusChip extends LitElement {
       display: inline-flex;
       vertical-align: middle;
     }
-  `;
+  
+:host([hidden]) {
+  display: none;
+}
+`;
 
   connectedCallback() {
     super.connectedCallback();

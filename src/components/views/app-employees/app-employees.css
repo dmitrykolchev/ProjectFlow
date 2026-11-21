@@ -73,3 +73,6 @@ app-cards-table {
   --dt-td-padding: 0.7rem 1rem;
 }
 
+:host([hidden]) {
+  display: none;
+}

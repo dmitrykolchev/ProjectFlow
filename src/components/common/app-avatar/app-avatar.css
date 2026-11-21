@@ -60,3 +60,7 @@
   height: 72px;
   font-size: 1.4rem;
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -164,3 +164,7 @@
 .remove-btn:hover {
   opacity: 1;
 }
+
+:host([hidden]) {
+  display: none;
+}

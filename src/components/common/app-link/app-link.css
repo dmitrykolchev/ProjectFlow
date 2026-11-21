@@ -122,3 +122,7 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+
+:host([hidden]) {
+  display: none;
+}

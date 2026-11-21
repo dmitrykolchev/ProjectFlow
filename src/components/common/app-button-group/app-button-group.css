@@ -41,3 +41,7 @@
 .group.attached.vertical ::slotted(*:not(:first-child)) {
   margin-top: -1px;
 }
+
+:host([hidden]) {
+  display: none;
+}

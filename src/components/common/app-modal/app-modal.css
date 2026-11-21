@@ -129,3 +129,7 @@ app-button.close-btn {
   border-top: 1px solid var(--border-subtle, #1e293b);
   background: var(--bg-subtle, #1a2438);
 }
+
+:host([hidden]) {
+  display: none;
+}

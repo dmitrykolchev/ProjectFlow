@@ -84,3 +84,7 @@
     padding: 1rem;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

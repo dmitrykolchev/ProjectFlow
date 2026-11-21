@@ -112,3 +112,7 @@
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+
+:host([hidden]) {
+  display: none;
+}

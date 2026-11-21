@@ -41,3 +41,7 @@
   overflow: hidden;
   box-shadow: var(--shadow-sm), var(--surface-glow, none);
 }
+
+:host([hidden]) {
+  display: none;
+}

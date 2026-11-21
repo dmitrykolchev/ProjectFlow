@@ -524,3 +524,6 @@ app-cards-table {
   flex-wrap: wrap;
 }
 
+:host([hidden]) {
+  display: none;
+}

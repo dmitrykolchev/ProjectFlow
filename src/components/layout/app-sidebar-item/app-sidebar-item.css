@@ -100,3 +100,7 @@ slot[name="end"] {
   border-radius: var(--radius-sm, 6px);
   flex-shrink: 0;
 }
+
+:host([hidden]) {
+  display: none;
+}

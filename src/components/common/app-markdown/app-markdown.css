@@ -219,3 +219,7 @@ slot {
   line-height: 1.5;
   color: var(--text-primary);
 }
+
+:host([hidden]) {
+  display: none;
+}

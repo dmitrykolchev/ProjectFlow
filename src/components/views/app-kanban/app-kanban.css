@@ -259,3 +259,7 @@ app-card-footer {
   font-size: 0.8125rem;
   color: var(--text-muted, #64748b);
 }
+
+:host([hidden]) {
+  display: none;
+}

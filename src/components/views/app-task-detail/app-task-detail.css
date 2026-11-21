@@ -882,4 +882,6 @@
   background: var(--accent-soft, rgba(99, 102, 241, 0.14));
 }
 
-
+:host([hidden]) {
+  display: none;
+}

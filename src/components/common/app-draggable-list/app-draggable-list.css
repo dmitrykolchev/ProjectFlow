@@ -37,3 +37,7 @@
 .draggable-list::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover, var(--accent-primary));
 }
+
+:host([hidden]) {
+  display: none;
+}

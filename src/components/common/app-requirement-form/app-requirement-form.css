@@ -51,3 +51,7 @@
 .chip-remove-btn:hover {
   color: var(--color-danger, #ef4444);
 }
+
+:host([hidden]) {
+  display: none;
+}

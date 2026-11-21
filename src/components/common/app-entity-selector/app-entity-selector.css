@@ -558,3 +558,7 @@ mark.match-hl {
   background: var(--accent-primary, #6366f1);
   color: var(--text-on-accent, #ffffff);
 }
+
+:host([hidden]) {
+  display: none;
+}

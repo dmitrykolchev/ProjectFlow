@@ -58,3 +58,7 @@
   font-size: 0.68rem;
   font-weight: 700;
 }
+
+:host([hidden]) {
+  display: none;
+}

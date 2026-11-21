@@ -23,3 +23,7 @@
   border-color: var(--text-primary, #ffffff);
   box-shadow: 0 0 0 2px var(--accent-primary, #6366f1);
 }
+
+:host([hidden]) {
+  display: none;
+}

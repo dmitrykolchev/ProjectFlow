@@ -131,3 +131,7 @@
   border-radius: 9999px;
   transition: width 240ms cubic-bezier(0.16, 1, 0.3, 1);
 }
+
+:host([hidden]) {
+  display: none;
+}

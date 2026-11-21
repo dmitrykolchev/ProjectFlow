@@ -104,3 +104,7 @@ button:disabled {
 .icon-only.size-sm { width: var(--control-height-sm, 30px); padding: 0; }
 .icon-only.size-md { width: var(--control-height-md, 38px); padding: 0; }
 .icon-only.size-lg { width: var(--control-height-lg, 44px); padding: 0; }
+
+:host([hidden]) {
+  display: none;
+}

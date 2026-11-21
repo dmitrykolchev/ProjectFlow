@@ -151,3 +151,7 @@
     transform: translateY(0);
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

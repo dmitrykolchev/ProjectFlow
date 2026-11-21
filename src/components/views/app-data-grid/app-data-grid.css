@@ -862,4 +862,6 @@ td {
   font-size: 0.7rem;
 }
 
-
+:host([hidden]) {
+  display: none;
+}

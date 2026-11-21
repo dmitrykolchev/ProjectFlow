@@ -505,3 +505,7 @@
   font-family: var(--font-mono, monospace);
   font-variant-numeric: tabular-nums;
 }
+
+:host([hidden]) {
+  display: none;
+}

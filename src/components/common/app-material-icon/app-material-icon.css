@@ -53,3 +53,7 @@
 :host(.lg) { --mi-h: 24px; --mi-opsz: 28; }
 :host(.xl), :host(.xlg) { --mi-h: 28px; --mi-opsz: 32; }
 :host(.xxl) { --mi-h: 36px; --mi-opsz: 40; }
+
+:host([hidden]) {
+  display: none;
+}

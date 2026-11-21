@@ -214,3 +214,7 @@
   color: var(--text-muted, #64748b);
   margin-top: 0.35rem;
 }
+
+:host([hidden]) {
+  display: none;
+}

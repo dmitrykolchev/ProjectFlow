@@ -708,3 +708,7 @@ app-table-scroll {
   justify-content: flex-end;
   gap: 0.6rem;
 }
+
+:host([hidden]) {
+  display: none;
+}

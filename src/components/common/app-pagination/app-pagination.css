@@ -150,3 +150,7 @@ app-button.page-btn.is-active {
     justify-content: center;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

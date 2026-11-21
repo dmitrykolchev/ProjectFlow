@@ -79,3 +79,7 @@
 .col-span-2 {
   grid-column: span 2;
 }
+
+:host([hidden]) {
+  display: none;
+}

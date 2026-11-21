@@ -110,3 +110,7 @@
   --icon-btn-hover-color: var(--color-danger, #ef4444);
   --icon-btn-hover-bg: var(--color-danger-bg, rgba(239, 68, 68, 0.12));
 }
+
+:host([hidden]) {
+  display: none;
+}

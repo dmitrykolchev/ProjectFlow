@@ -179,3 +179,7 @@ app-card-footer {
     grid-column: span 1;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

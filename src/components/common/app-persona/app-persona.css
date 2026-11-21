@@ -228,3 +228,7 @@ button.persona:disabled {
   --persona-secondary-line: 20px;
   --persona-text-max: 380px;
 }
+
+:host([hidden]) {
+  display: none;
+}

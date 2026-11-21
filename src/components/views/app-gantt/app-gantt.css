@@ -297,3 +297,7 @@
   z-index: 4;
   pointer-events: none;
 }
+
+:host([hidden]) {
+  display: none;
+}

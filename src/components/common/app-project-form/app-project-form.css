@@ -171,3 +171,7 @@
   background: rgba(139, 92, 246, 0.16);
   color: #c084fc;
 }
+
+:host([hidden]) {
+  display: none;
+}

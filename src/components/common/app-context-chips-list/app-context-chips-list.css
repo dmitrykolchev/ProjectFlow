@@ -37,3 +37,7 @@
 .chips-list::-webkit-scrollbar-thumb:hover {
   background: var(--accent-primary, #6366f1);
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -145,3 +145,7 @@
 :host(.lg) { --gh: 24px; --fs: 14px; --mi-opsz: 28; }
 :host(.xl), :host(.xlg) { --gh: 28px; --fs: 15px; --mi-opsz: 32; }
 :host(.xxl) { --gh: 36px; --fs: 16px; --mi-opsz: 40; }
+
+:host([hidden]) {
+  display: none;
+}

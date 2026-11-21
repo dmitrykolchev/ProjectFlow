@@ -182,3 +182,7 @@
     max-width: 160px;
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

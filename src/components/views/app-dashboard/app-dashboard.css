@@ -246,3 +246,7 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+
+:host([hidden]) {
+  display: none;
+}

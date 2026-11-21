@@ -104,3 +104,7 @@
 .type-warning { border-left: 3px solid var(--color-warning, #f59e0b); }
 .type-error   { border-left: 3px solid var(--color-danger, #ef4444); }
 .type-info    { border-left: 3px solid var(--accent-primary, #6366f1); }
+
+:host([hidden]) {
+  display: none;
+}

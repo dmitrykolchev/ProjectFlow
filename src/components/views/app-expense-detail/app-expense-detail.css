@@ -30,3 +30,7 @@
   color: var(--text-muted, #64748b);
   font-style: italic;
 }
+
+:host([hidden]) {
+  display: none;
+}

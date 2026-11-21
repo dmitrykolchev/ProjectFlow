@@ -211,3 +211,7 @@
   align-items: center;
   padding-top: 21.95px;
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -332,3 +332,7 @@
     border-top: 1px solid var(--border-subtle, #1e293b);
   }
 }
+
+:host([hidden]) {
+  display: none;
+}

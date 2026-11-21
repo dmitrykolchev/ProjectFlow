@@ -117,3 +117,7 @@ input::-webkit-inner-spin-button {
   color: var(--text-muted, #64748b);
   user-select: none;
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -164,3 +164,7 @@
 .empty-wrap {
   padding: 2rem;
 }
+
+:host([hidden]) {
+  display: none;
+}

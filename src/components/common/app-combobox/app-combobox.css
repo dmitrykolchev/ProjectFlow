@@ -143,3 +143,7 @@ input::placeholder {
 .suggestion-item:hover {
   background: var(--bg-hover, #223049);
 }
+
+:host([hidden]) {
+  display: none;
+}

@@ -174,3 +174,7 @@ slot[name='icon']::slotted(*) {
   font-size: 0.95rem;
   font-weight: 600;
 }
+
+:host([hidden]) {
+  display: none;
+}

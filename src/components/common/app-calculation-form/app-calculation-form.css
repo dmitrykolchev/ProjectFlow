@@ -247,3 +247,7 @@
   color: var(--text-muted, #64748b);
   font-weight: 500;
 }
+
+:host([hidden]) {
+  display: none;
+}

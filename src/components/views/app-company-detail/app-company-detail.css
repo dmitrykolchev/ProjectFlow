@@ -803,4 +803,6 @@ td app-button:not([action='delete']) {
   flex-wrap: wrap;
 }
 
-
+:host([hidden]) {
+  display: none;
+}

@@ -40,3 +40,7 @@
   --btn-radius-bl: var(--radius-sm, 6px);
   --btn-radius-br: var(--radius-sm, 6px);
 }
+
+:host([hidden]) {
+  display: none;
+}

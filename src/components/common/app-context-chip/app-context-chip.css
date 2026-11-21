@@ -116,3 +116,7 @@
   --icon-btn-hover-bg: var(--bg-hover, #223049);
   --icon-btn-hover-border: transparent;
 }
+
+:host([hidden]) {
+  display: none;
+}
