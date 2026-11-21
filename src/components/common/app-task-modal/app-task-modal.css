@@ -35,7 +35,10 @@
 }
 
 /* quick time / expense row delete buttons are plain content-sized icon buttons */
-.record-action-btn {
+.record-action-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -233,7 +236,10 @@
   max-width: 240px;
 }
 
-.modal-chip-remove {
+.modal-chip-remove {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
