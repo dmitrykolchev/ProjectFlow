@@ -112,6 +112,7 @@ import kanbanMeta from '../app-kanban/app-kanban.story';
 import taskDetailMeta from '../app-task-detail/app-task-detail.story';
 import ganttMeta from '../app-gantt/app-gantt.story';
 import dataGridMeta from '../app-data-grid/app-data-grid.story';
+import taskGridMeta from '../app-task-grid/app-task-grid.story';
 import calendarMeta from '../app-calendar/app-calendar.story';
 import analyticsMeta from '../app-analytics/app-analytics.story';
 import projectsMeta from '../app-projects/app-projects.story';
@@ -250,6 +251,7 @@ const ALL_STORIES: ComponentStoryMeta[] = [
   taskDetailMeta,
   ganttMeta,
   dataGridMeta,
+  taskGridMeta,
   calendarMeta,
   analyticsMeta,
   projectsMeta,

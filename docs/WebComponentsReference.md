@@ -2,7 +2,7 @@
 
 Дата: 20.11.2026. Режим: **референс, код не изменяется.**
 
-Всего компонентов: 139 (со стори: 137).
+Всего компонентов: 139 (со стори: 138).
 Документ генерируется из исходников: мета берётся из `.story.ts` (title / category / description /
 propsDoc / slotsDoc / childrenDoc), API — из файла компонента (`@property`, `dispatchEvent`, `slot`).
 **После изменений кода референс актуализируется командой `npm run docs:components`**
@@ -195,7 +195,7 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-settings` | views | Views | Full workspace personalization hub: Dark/Light theme toggle, 5 accent color themes, densi… |
 | `app-storybook` | views | Views | In-app design system explorer showcasing all Lit web components, interactive stories, and… |
 | `app-task-detail` | views | Views | Dedicated Task Detail view unifying full task history: logged time entries, linked expens… |
-| `app-task-grid` | views | — | — |
+| `app-task-grid` | views | Views | The task table view: canonical skeleton (page header, Standard/Compact density segmented … |
 | `app-time-tracking` | views | Views | Учет времени: быстрые отчёты по задачам, журнал трудозатрат, группировка план/факт по зад… |
 | `app-timeentry-detail` | views | Views | Отдельная страница записи о времени: отработанные часы, статус утверждения, биллинг, прик… |
 
@@ -2084,7 +2084,7 @@ Portfolio progress tracker displaying completion bars, task ratios, and click-to
 
 ## 7. Группа `views` (44)
 
-### Views (43)
+### Views (44)
 
 #### `app-analytics` — `AppAnalytics`
 
@@ -2365,6 +2365,12 @@ In-app design system explorer showcasing all Lit web components, interactive sto
 
 Dedicated Task Detail view unifying full task history: logged time entries, linked expenses, project chat discussions, audit changes, and subtasks.
 
+#### `app-task-grid` — `AppTaskGrid`
+
+`src/components/views/app-task-grid/`
+
+The task table view: canonical skeleton (page header, Standard/Compact density segmented switch with the filter toggle, filter bar with project/status/priority/assignee filters bound to the store task filters) and app-data-grid in store mode inside the framed card; the grid keeps its own toolbar (bulk actions, grouping, column menu, export) and hides its internal density switch because the view owns the mode row.
+
 #### `app-time-tracking` — `AppTimeTracking`
 
 `src/components/views/app-time-tracking/`
@@ -2377,19 +2383,12 @@ Dedicated Task Detail view unifying full task history: logged time entries, link
 
 Отдельная страница записи о времени: отработанные часы, статус утверждения, биллинг, прикреплённые файлы в библиотеке проекта и включение в калькуляции.
 
-### Other (1)
-
-#### `app-task-grid` — `AppTaskGrid`
-
-`src/components/views/app-task-grid/` (без стори)
-
 ---
 
-## 8. Компоненты без стори (2)
+## 8. Компоненты без стори (1)
 
 Не зарегистрированы в app-storybook: мета отсутствует, API описан по исходнику (помечены «без стори»
 в своих группах). По правилу проекта каждый компонент обязан иметь `.story.ts` — для этих компонентов
 стори нужно добавить:
 
 - `app-table-column` (common) — описание отсутствует
-- `app-task-grid` (views) — описание отсутствует
