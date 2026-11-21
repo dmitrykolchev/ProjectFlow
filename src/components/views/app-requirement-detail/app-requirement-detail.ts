@@ -285,7 +285,7 @@ export class AppRequirementDetail extends LitElement {
               </span>
             </app-button>
             <app-button
-              size="xs"
+              size="sm"
               variant="icon"
               title="${t.common.edit}"
               @click="${() => this.openEditModal(req)}"
@@ -294,7 +294,7 @@ export class AppRequirementDetail extends LitElement {
             </app-button>
             <app-button
               action="delete"
-              size="xs"
+              size="sm"
               variant="icon"
               title="${t.common.delete}"
               @click="${() => (this.confirmDeleteOpen = true)}"

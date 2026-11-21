@@ -72,12 +72,11 @@
   flex-wrap: wrap;
 }
 
-/* header icon actions are app-button web components at size xs pinned to the historical
-   34px square with the canonical md radius, surface fill and subtle border reproduced via
-   custom properties; plain hover keeps the border unchanged and the danger hover keeps the
-   fill while coloring the glyph and the border */
+/* header icon actions are app-button web components: the header row is an sm toolbar, so the
+   trailing icon-only edit and delete buttons render at the canonical sm step; surface fill and
+   subtle border reproduced via custom properties; plain hover keeps the border unchanged and the
+   danger hover keeps the fill while coloring the glyph and the border */
 .nav-actions app-button {
-  --control-height-xs: 34px;
   --icon-btn-bg: var(--bg-surface, #111827);
   --icon-btn-border: var(--border-subtle, #1e293b);
 }
