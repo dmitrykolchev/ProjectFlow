@@ -29,6 +29,17 @@ export const meta: ComponentStoryMeta = {
     variant: 'Surface style: card / plain',
     showReset: 'Shows the reset button when filters are active',
   },
+  eventsDoc: {
+    reset: { detail: '—', description: 'Fires when Reset is pressed' },
+    'search-change': {
+      detail: '{ value: string }',
+      description: 'Fires when the search text changes',
+    },
+    'filter-change': {
+      detail: '{ key: string, value: string }',
+      description: 'Fires when a filter control changes',
+    },
+  },
   stories: [
     {
       name: 'Default',
