@@ -23,7 +23,10 @@ export class AppSwitch extends LitElement {
   // additive hooks for the external label row attached to the frame (the caption inside the control is
   // untouched): field-label carries the row text; field-label-style normal shows the row with the
   // app-input label typography, ghost renders it invisible so it keeps its place in the form grid. An
-  // empty row is rendered for ghost, and not rendered for normal
+  // empty row is rendered for ghost, and not rendered for normal. With ghost and no field-label set, the
+  // row text falls back to the label property — the invisible row carries the control caption, so a
+  // single label attribute drives both the row geometry and the caption (the row is visibility hidden,
+  // so the fallback never changes the layout of existing consumers).
   @property({ type: String, attribute: 'field-label' }) fieldLabel: string = '';
   @property({ type: String, attribute: 'field-label-style', reflect: true })
   fieldLabelStyle: SwitchFieldLabelStyle = 'none';
@@ -38,7 +41,7 @@ export class AppSwitch extends LitElement {
   render() {
     const labelRow =
       this.fieldLabelStyle === 'ghost'
-        ? html`<label class="field-label is-ghost">${this.fieldLabel}</label>`
+        ? html`<label class="field-label is-ghost">${this.fieldLabel || this.label}</label>`
         : this.fieldLabelStyle === 'normal' && this.fieldLabel
           ? html`<label class="field-label">${this.fieldLabel}</label>`
           : '';

@@ -6248,7 +6248,7 @@
    },
    {
     "k": "fieldLabel",
-    "v": "Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept"
+    "v": "Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept, and when field-label is not set with ghost the row text falls back to the label property"
    },
    {
     "k": "fieldLabelStyle",

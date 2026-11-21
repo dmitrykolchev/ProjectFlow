@@ -20,7 +20,7 @@ export const meta: ComponentStoryMeta = {
     frame:
       'Frame variant (string, reflected as an attribute). Values: none = no frame, the bare switch (default); normal = the app-input control box around the switch — height var(--control-height-md, 38px), background var(--bg-surface), border 1px var(--border-subtle), radius var(--radius-md), padding 0 0.75rem, full row width; transparent = the identical box with background and border transparent, so the switch occupies a form row like an input without visible chrome',
     fieldLabel:
-      'Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept',
+      'Text of the external label row attached to the frame (string). With field-label-style normal an empty text renders no row; with ghost an empty invisible row is rendered so the grid place is kept, and when field-label is not set with ghost the row text falls back to the label property',
     fieldLabelStyle:
       'External label row style (string, reflected as the field-label-style attribute). Values: none = no external label row (default); normal = visible row above the control with the app-input label typography (font-size 0.8125rem, font-weight 500, color var(--text-secondary)); ghost = the same row rendered invisible (visibility hidden) so it keeps its place in the form grid',
   },
@@ -66,12 +66,13 @@ export const meta: ComponentStoryMeta = {
     {
       name: 'External Label Rows',
       description:
-        'field-label-style none (default, no row), normal (visible app-input label row above the framed control) and ghost (invisible row that keeps its place in the form grid); field-label carries the row text. The caption inside the control is unchanged; --switch-label-gap sets the gap between the row and the control',
+        'field-label-style none (default, no row), normal (visible app-input label row above the framed control) and ghost (invisible row that keeps its place in the form grid); field-label carries the row text. With ghost and no field-label set, the invisible row takes its text from the label property — one attribute drives both the row geometry and the caption. The caption inside the control is unchanged; --switch-label-gap sets the gap between the row and the control',
       render: () => html`
         <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 420px;">
           <app-switch frame="normal" label="field-label-style=none (дефолт)" checked></app-switch>
           <app-switch frame="normal" field-label-style="normal" field-label="Базовая валюта" label="caption внутри" checked></app-switch>
           <app-switch frame="normal" field-label-style="ghost" field-label="Призрачный лейбл" label="caption внутри"></app-switch>
+          <app-switch frame="normal" field-label-style="ghost" label="Ghost-строка из label (field-label не задан)" checked></app-switch>
         </div>
       `,
     },
