@@ -563,10 +563,12 @@ Embeddable contextual reminders widget for any system entity detail view (compan
 | `clearLabel` | String, default `''` | Caption of the clear button for a selected file |
 | `selectedLabel` | String, default `''` | Template caption for the selected-file line |
 | `compact` | Boolean, default `false` | Reduced height for dense forms |
+| `selectedFileName` | String, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
+| `selectedFileSize` | Number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
 | `disabled` | Boolean, default `false` | Disables drop and browse |
-| `selectedFileName` | String, default `''` | — |
-| `selectedFileSize` | Number, default `0` | — |
-| `multiple` | Boolean, default `false` | — |
+| `selected-file-name` | String, default `''` | Name of the file already selected outside the component — renders the selected-file line (attribute form selected-file-name) |
+| `selected-file-size` | Number, default `0` | Size in bytes shown next to the selected file name; 0 hides the size (attribute form selected-file-size) |
+| `multiple` | Boolean, default `false` | Allows picking several files (native multiple on the input); the files event carries all of them, false carries only the first |
 
 **Events:** `files-selected`, `file-selected`, `file-cleared`
 
