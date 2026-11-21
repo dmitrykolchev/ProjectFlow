@@ -96,7 +96,10 @@
   background: var(--bg-subtle, #1a2438);
 }
 
-.add-task-quick-btn {
+.add-task-quick-btn {  /* form controls do not inherit font in shadow DOM (the global font-family:
+     inherit reset in index.css reaches light DOM only) — declare the page family */
+  font-family: var(--font-sans, inherit);
+
   background: transparent;
   border: none;
   color: var(--text-muted, #64748b);
