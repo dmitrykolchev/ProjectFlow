@@ -19,6 +19,12 @@ export interface MenuItem {
   checked?: boolean;
 }
 
+// detail of the `select` event (named event-detail interface, AGENTS.md §6)
+export interface MenuSelectDetail {
+  item: MenuItem;
+  id: string;
+}
+
 @customElement('app-menu')
 export class AppMenu extends LitElement {
   @property({ type: Array }) items: MenuItem[] = [];
@@ -106,7 +112,7 @@ export class AppMenu extends LitElement {
   private selectItem(item: MenuItem) {
     if (item.disabled) return;
     this.dispatchEvent(
-      new CustomEvent('select', {
+      new CustomEvent<MenuSelectDetail>('select', {
         detail: { item, id: item.id },
         bubbles: true,
         composed: true,
