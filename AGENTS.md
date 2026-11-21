@@ -264,6 +264,11 @@ render() {
   `repeat()` роняет состояние контролов (фокус, значение).
 - Event-detail — именованный экспортируемый interface
   (`export interface XDetail`), не анонимный литерал.
+- События компонента документируются в `.story.ts` через `eventsDoc`
+  (event name → `{ detail, description }`, detail — точная TS-форма из interface,
+  `—` для событий без detail). Storybook рендерит таблицу «События» в
+  API-спецификации, генератор документации сканирует `eventsDoc`. Новый компонент
+  с диспетчами обязан иметь eventsDoc.
 - `HTMLElementTagNameMap` регистрируется для компонентов с публичным API
   (typing `document.createElement`, lit-analyzer); массовая регистрация
   143 компонентов не требуется.
