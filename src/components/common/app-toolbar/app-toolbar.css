@@ -1,0 +1,52 @@
+/* The row scale is published on :host as inherited custom properties: they flow
+   through the light DOM to slotted app-toolbar-button and app-toolbar-separator
+   children (tokens set on shadow elements would not reach slotted content). */
+:host {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+:host[size="xs"] {
+  --tb-height: var(--control-height-xs, 24px);
+  --tb-font: var(--control-font-xs, 0.75rem);
+  --tb-icon: var(--control-icon-xs, 14px);
+  --tb-pad-x: var(--control-padding-x-xs, 0.45rem);
+}
+
+:host[size="sm"] {
+  --tb-height: var(--control-height-sm, 30px);
+  --tb-font: var(--control-font-sm, 0.8125rem);
+  --tb-icon: var(--control-icon-sm, 16px);
+  --tb-pad-x: var(--control-padding-x-sm, 0.65rem);
+}
+
+:host[size="md"] {
+  --tb-height: var(--control-height-md, 38px);
+  --tb-font: var(--control-font-md, 0.875rem);
+  --tb-icon: var(--control-icon-md, 20px);
+  --tb-pad-x: var(--control-padding-x-md, 0.875rem);
+}
+
+:host[size="lg"] {
+  --tb-height: var(--control-height-lg, 44px);
+  --tb-font: var(--control-font-lg, 1rem);
+  --tb-icon: var(--control-icon-lg, 24px);
+  --tb-pad-x: var(--control-padding-x-lg, 1.15rem);
+}
+
+/* The toolbar row hugs its buttons: its content height equals the canonical
+   control height of the size, so the row and its buttons share one scale. */
+.toolbar {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--tb-gap, 0.3rem);
+  padding: var(--tb-padding-y, 0.4rem) var(--tb-padding-x, 0.6rem);
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-subtle, #1a2438);
+  border: 1px solid var(--border-subtle, #1e293b);
+}
+
+:host([hidden]) {
+  display: none;
+}
