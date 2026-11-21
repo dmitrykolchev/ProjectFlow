@@ -34,7 +34,7 @@ import {
   iconFeather,
 } from './components/common/icons';
 import './components/layout/app-sidebar/app-sidebar';
-import './components/layout/sidebar-group/sidebar-group';
+import './components/layout/app-sidebar-group/app-sidebar-group';
 import './components/layout/app-sidebar-item/app-sidebar-item';
 import './components/layout/app-header/app-header';
 import './components/common/app-toast/app-toast';
@@ -269,7 +269,7 @@ export class AppRoot extends LitElement {
           : this.activeView}"
         @sidebar-select="${this.handleSidebarSelect}"
       >
-        <sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
+        <app-sidebar-group group-id="workspace" label="${t.navigation.groupWorkspace}">
           <app-sidebar-item
             value="dashboard"
             label="${t.navigation.dashboard}"
@@ -348,9 +348,9 @@ export class AppRoot extends LitElement {
             badge="${this.dueRemindersCount > 0 ? String(this.dueRemindersCount) : ''}"
             .icon="${iconBell()}"
           ></app-sidebar-item>
-        </sidebar-group>
+        </app-sidebar-group>
 
-        <sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
+        <app-sidebar-group group-id="views" label="${t.navigation.groupPlanning}">
           <app-sidebar-item
             value="grid"
             label="${t.navigation.grid}"
@@ -368,9 +368,9 @@ export class AppRoot extends LitElement {
             label="${t.navigation.analytics}"
             .icon="${iconAnalytics()}"
           ></app-sidebar-item>
-        </sidebar-group>
+        </app-sidebar-group>
 
-        <sidebar-group group-id="directory" label="${t.navigation.groupDirectory}">
+        <app-sidebar-group group-id="directory" label="${t.navigation.groupDirectory}">
           <app-sidebar-item
             value="companies"
             label="${t.navigation.companies}"
@@ -424,9 +424,9 @@ export class AppRoot extends LitElement {
             label="${t.navigation.directories}"
             .icon="${iconDatabase()}"
           ></app-sidebar-item>
-        </sidebar-group>
+        </app-sidebar-group>
 
-        <sidebar-group group-id="system" label="${t.navigation.groupSystem}">
+        <app-sidebar-group group-id="system" label="${t.navigation.groupSystem}">
           <app-sidebar-item
             value="activity"
             label="${t.navigation.activity}"
@@ -456,7 +456,7 @@ export class AppRoot extends LitElement {
             label="${t.navigation.settings}"
             .icon="${iconSettings()}"
           ></app-sidebar-item>
-        </sidebar-group>
+        </app-sidebar-group>
       </app-sidebar>
 
       <div class="main-layout">

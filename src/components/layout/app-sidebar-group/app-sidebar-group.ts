@@ -1,10 +1,10 @@
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { iconChevronDown } from '../../common/icons';
-import styles from './sidebar-group.css';
+import styles from './app-sidebar-group.css';
 
-@customElement('sidebar-group')
-export class SidebarGroup extends LitElement {
+@customElement('app-sidebar-group')
+export class AppSidebarGroup extends LitElement {
   @property({ type: String, attribute: 'group-id' }) groupId: string = '';
   @property({ type: String }) label: string = '';
   @property({ type: Boolean, reflect: true }) expanded: boolean = true;

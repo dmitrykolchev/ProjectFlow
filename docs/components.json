@@ -7436,7 +7436,7 @@
   "hasStory": true,
   "title": "Layout/Sidebar",
   "category": "Layout",
-  "desc": "Collapsible navigation sidebar composed declaratively with <sidebar-group> and <app-sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.",
+  "desc": "Collapsible navigation sidebar composed declaratively with <app-sidebar-group> and <app-sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.",
   "propsList": [
    {
     "name": "collapsed",
@@ -7498,12 +7498,92 @@
   "slotsDoc": [],
   "childrenDoc": [
    {
-    "k": "sidebar-group",
+    "k": "app-sidebar-group",
     "v": "Collapsible navigation group container composing the sidebar menu"
    },
    {
     "k": "app-sidebar-item",
-    "v": "Navigation item with icon, badge, and active state (inside a sidebar-group)"
+    "v": "Navigation item with icon, badge, and active state (inside an app-sidebar-group)"
+   }
+  ]
+ },
+ {
+  "group": "layout",
+  "tag": "app-sidebar-group",
+  "cls": "AppSidebarGroup",
+  "hasStory": true,
+  "title": "Layout/SidebarGroup",
+  "category": "Layout",
+  "desc": "Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator. The default slot accepts app-sidebar-item children.",
+  "propsList": [
+   {
+    "name": "groupId",
+    "type": "String",
+    "attr": "group-id",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "label",
+    "type": "String",
+    "reflect": false,
+    "def": "''"
+   },
+   {
+    "name": "expanded",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "true"
+   },
+   {
+    "name": "collapsed",
+    "type": "Boolean",
+    "reflect": true,
+    "def": "false"
+   },
+   {
+    "name": "hasActive",
+    "type": "Boolean",
+    "attr": "has-active",
+    "reflect": false,
+    "def": "false"
+   }
+  ],
+  "events": [
+   "sidebar-group-toggle"
+  ],
+  "propsDoc": [
+   {
+    "k": "groupId",
+    "v": "Stable group id used by the sidebar controller"
+   },
+   {
+    "k": "label",
+    "v": "Group caption"
+   },
+   {
+    "k": "expanded",
+    "v": "Group is expanded (items visible)"
+   },
+   {
+    "k": "collapsed",
+    "v": "Sidebar is in icon-only mode"
+   },
+   {
+    "k": "hasActive",
+    "v": "Group contains the active item"
+   }
+  ],
+  "slotsDoc": [
+   {
+    "k": "(default)",
+    "v": "Sidebar items of the group"
+   }
+  ],
+  "childrenDoc": [
+   {
+    "k": "app-sidebar-item",
+    "v": "Navigation item with icon, badge, and active state rendered inside the group"
    }
   ]
  },
@@ -7614,86 +7694,6 @@
    {
     "k": "app-material-icon",
     "v": "Icon rendered in the start / end slot before or after the item label"
-   }
-  ]
- },
- {
-  "group": "layout",
-  "tag": "sidebar-group",
-  "cls": "SidebarGroup",
-  "hasStory": true,
-  "title": "Layout/SidebarGroup",
-  "category": "Layout",
-  "desc": "Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator. The default slot accepts app-sidebar-item children.",
-  "propsList": [
-   {
-    "name": "groupId",
-    "type": "String",
-    "attr": "group-id",
-    "reflect": false,
-    "def": "''"
-   },
-   {
-    "name": "label",
-    "type": "String",
-    "reflect": false,
-    "def": "''"
-   },
-   {
-    "name": "expanded",
-    "type": "Boolean",
-    "reflect": true,
-    "def": "true"
-   },
-   {
-    "name": "collapsed",
-    "type": "Boolean",
-    "reflect": true,
-    "def": "false"
-   },
-   {
-    "name": "hasActive",
-    "type": "Boolean",
-    "attr": "has-active",
-    "reflect": false,
-    "def": "false"
-   }
-  ],
-  "events": [
-   "sidebar-group-toggle"
-  ],
-  "propsDoc": [
-   {
-    "k": "groupId",
-    "v": "Stable group id used by the sidebar controller"
-   },
-   {
-    "k": "label",
-    "v": "Group caption"
-   },
-   {
-    "k": "expanded",
-    "v": "Group is expanded (items visible)"
-   },
-   {
-    "k": "collapsed",
-    "v": "Sidebar is in icon-only mode"
-   },
-   {
-    "k": "hasActive",
-    "v": "Group contains the active item"
-   }
-  ],
-  "slotsDoc": [
-   {
-    "k": "(default)",
-    "v": "Sidebar items of the group"
-   }
-  ],
-  "childrenDoc": [
-   {
-    "k": "app-sidebar-item",
-    "v": "Navigation item with icon, badge, and active state rendered inside the group"
    }
   ]
  },

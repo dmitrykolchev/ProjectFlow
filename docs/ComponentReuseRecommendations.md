@@ -51,7 +51,7 @@
 | icons.ts | — | фабрики SVG-иконок `icon*(size)` |
 
 ### `components/layout` (4)
-`app-sidebar` (collapsed, activeValue, group-mode single/multiple, standalone; project-selector; theme/lang quick-switch), `sidebar-group` (accordion), `sidebar-item` (value/label/badge/icon), `app-header` (breadcrumbs, global search, theme, activity, create).
+`app-sidebar` (collapsed, activeValue, group-mode single/multiple, standalone; project-selector; theme/lang quick-switch), `app-sidebar-group` (accordion), `app-sidebar-item` (value/label/badge/icon), `app-header` (breadcrumbs, global search, theme, activity, create).
 
 ### `components/dashboard` (4)
 `app-metric-card` (label/value/delta/trend/sparkline SVG/accentColor/clickable), `app-chart-card` (bar/donut/line, SVG, legend), `app-project-progress` (список проектов с прогресс-барами), `app-project-overview` (единственный d3-компонент: timeline/Gantt-lite проекта).

@@ -147,9 +147,9 @@ propsDoc / slotsDoc / childrenDoc), API — из файла компонента
 | `app-toggle-button` | common | Common | Stateful pressable button supporting soft and solid active variants, icons, and accessibi… |
 | `card-footer` | common | Common | Card footer row with a border-top chrome. |
 | `app-header` | layout | Layout | Top header bar with breadcrumbs, live search, quick notification badge, and primary actio… |
-| `app-sidebar` | layout | Layout | Collapsible navigation sidebar composed declaratively with <sidebar-group> and <app-sideb… |
+| `app-sidebar` | layout | Layout | Collapsible navigation sidebar composed declaratively with <app-sidebar-group> and <app-s… |
+| `app-sidebar-group` | layout | Layout | Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse a… |
 | `app-sidebar-item` | layout | Layout | Declarative navigation item component used to compose <app-sidebar> menus with icons, bad… |
-| `sidebar-group` | layout | Layout | Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse a… |
 | `app-chart-card` | dashboard | Dashboard | Pure CSS & SVG visualization widget supporting horizontal bar charts, segmented donut cha… |
 | `app-metric-card` | dashboard | Dashboard | Executive KPI summary card featuring tabular numerals, trend delta, and optional inline S… |
 | `app-project-overview` | dashboard | Dashboard | Interactive D3.js Project Overview dashboard visualizing project progress, logged hours b… |
@@ -1923,7 +1923,7 @@ Top header bar with breadcrumbs, live search, quick notification badge, and prim
 
 `src/components/layout/app-sidebar/`
 
-Collapsible navigation sidebar composed declaratively with <sidebar-group> and <app-sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.
+Collapsible navigation sidebar composed declaratively with <app-sidebar-group> and <app-sidebar-item> elements, supporting single (accordion) and multiple group expansion modes.
 
 | Property | Type / default | Description |
 |---|---|---|
@@ -1937,8 +1937,32 @@ Collapsible navigation sidebar composed declaratively with <sidebar-group> and <
 
 | Child element | Role |
 |---|---|
-| `sidebar-group` | Collapsible navigation group container composing the sidebar menu |
-| `app-sidebar-item` | Navigation item with icon, badge, and active state (inside a sidebar-group) |
+| `app-sidebar-group` | Collapsible navigation group container composing the sidebar menu |
+| `app-sidebar-item` | Navigation item with icon, badge, and active state (inside an app-sidebar-group) |
+
+#### `app-sidebar-group` — `AppSidebarGroup`
+
+`src/components/layout/app-sidebar-group/`
+
+Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator. The default slot accepts app-sidebar-item children.
+
+| Property | Type / default | Description |
+|---|---|---|
+| `groupId` | String, default `''` | Stable group id used by the sidebar controller |
+| `label` | String, default `''` | Group caption |
+| `expanded` | Boolean, default `true` | Group is expanded (items visible) |
+| `collapsed` | Boolean, default `false` | Sidebar is in icon-only mode |
+| `hasActive` | Boolean, default `false` | Group contains the active item |
+
+**Events:** `sidebar-group-toggle`
+
+| Slot | Content |
+|---|---|
+| `(default)` | Sidebar items of the group |
+
+| Child element | Role |
+|---|---|
+| `app-sidebar-item` | Navigation item with icon, badge, and active state rendered inside the group |
 
 #### `app-sidebar-item` — `AppSidebarItem`
 
@@ -1968,30 +1992,6 @@ Declarative navigation item component used to compose <app-sidebar> menus with i
 | Child element | Role |
 |---|---|
 | `app-material-icon` | Icon rendered in the start / end slot before or after the item label |
-
-#### `sidebar-group` — `SidebarGroup`
-
-`src/components/layout/sidebar-group/`
-
-Collapsible navigation group container for <app-sidebar> supporting smooth CSS collapse animations and active-route indicator. The default slot accepts app-sidebar-item children.
-
-| Property | Type / default | Description |
-|---|---|---|
-| `groupId` | String, default `''` | Stable group id used by the sidebar controller |
-| `label` | String, default `''` | Group caption |
-| `expanded` | Boolean, default `true` | Group is expanded (items visible) |
-| `collapsed` | Boolean, default `false` | Sidebar is in icon-only mode |
-| `hasActive` | Boolean, default `false` | Group contains the active item |
-
-**Events:** `sidebar-group-toggle`
-
-| Slot | Content |
-|---|---|
-| `(default)` | Sidebar items of the group |
-
-| Child element | Role |
-|---|---|
-| `app-sidebar-item` | Navigation item with icon, badge, and active state rendered inside the group |
 
 ## 6. Группа `dashboard` (4)
 

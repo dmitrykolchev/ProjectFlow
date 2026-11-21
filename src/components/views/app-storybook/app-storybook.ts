@@ -98,7 +98,7 @@ import cardsTableMeta from '../../common/app-cards-table/app-cards-table.story';
 
 import headerMeta from '../../layout/app-header/app-header.story';
 import sidebarMeta from '../../layout/app-sidebar/app-sidebar.story';
-import sidebarGroupMeta from '../../layout/sidebar-group/sidebar-group.story';
+import sidebarGroupMeta from '../../layout/app-sidebar-group/app-sidebar-group.story';
 import sidebarItemMeta from '../../layout/app-sidebar-item/app-sidebar-item.story';
 import pageHeaderMeta from '../../common/app-page-header/app-page-header.story';
 import detailShellMeta from '../../common/app-detail-shell/app-detail-shell.story';

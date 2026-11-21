@@ -18,9 +18,9 @@ import {
   iconLogOut,
 } from '../../common/icons';
 import { AppSidebarItem } from '../app-sidebar-item/app-sidebar-item';
-import { SidebarGroup } from '../sidebar-group/sidebar-group';
+import { AppSidebarGroup } from '../app-sidebar-group/app-sidebar-group';
 import '../app-sidebar-item/app-sidebar-item';
-import '../sidebar-group/sidebar-group';
+import '../app-sidebar-group/app-sidebar-group';
 
 @customElement('app-sidebar')
 export class AppSidebar extends LitElement {
@@ -155,12 +155,12 @@ export class AppSidebar extends LitElement {
     this.syncSlottedItems();
   }
 
-  private getSlottedGroups(): SidebarGroup[] {
+  private getSlottedGroups(): AppSidebarGroup[] {
     const slot = this.shadowRoot?.querySelector('slot') as HTMLSlotElement | null;
     if (!slot) return [];
     return slot
       .assignedElements({ flatten: true })
-      .filter((el) => el.tagName.toLowerCase() === 'sidebar-group') as SidebarGroup[];
+      .filter((el) => el.tagName.toLowerCase() === 'app-sidebar-group') as AppSidebarGroup[];
   }
 
   private handleSlotChange() {
@@ -195,8 +195,8 @@ export class AppSidebar extends LitElement {
         if (this.activeValue) {
           item.active = item.value === this.activeValue;
         }
-      } else if (tag === 'sidebar-group') {
-        const group = el as SidebarGroup;
+      } else if (tag === 'app-sidebar-group') {
+        const group = el as AppSidebarGroup;
         const gid = group.groupId || group.label;
         group.collapsed = this.collapsed;
         group.expanded = this.expandedGroups.includes(gid);
