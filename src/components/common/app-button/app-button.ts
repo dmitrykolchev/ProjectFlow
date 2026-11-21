@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import styles from './app-button.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'outline' | 'icon';
-export type ButtonSize = 'xxs' | 'xs' | 'sm' | 'md' | 'lg';
+export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 // canonical business actions: the component owns the highlight color for each one,
 // views declare the semantic action instead of writing per-view hover classes
 export type ButtonAction =

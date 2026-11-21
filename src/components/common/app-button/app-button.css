@@ -59,18 +59,7 @@ button:disabled {
 /* Sizes */
 /* canonical control scale (Priority E): values equal the historical ones;
    slotted app-material-icon inherits the control's icon size.
-   xxs is the toolbar step of 28px with the small radius, icon 16px;
    xs is the dense step below sm for table rows and compact toolbars */
-.size-xxs {
-  font-size: var(--control-font-xxs, 0.75rem);
-  padding: var(--control-padding-y-xxs, 0) var(--control-padding-x-xxs, 0.45rem);
-  height: var(--control-height-xxs, 28px);
-  --mi-icon: var(--control-icon-xxs, 16px);
-  --btn-radius-tl: var(--radius-sm, 6px);
-  --btn-radius-tr: var(--radius-sm, 6px);
-  --btn-radius-bl: var(--radius-sm, 6px);
-  --btn-radius-br: var(--radius-sm, 6px);
-}
 .size-xs {
   font-size: var(--control-font-xs, 0.75rem);
   padding: var(--control-padding-y-xs, 0) var(--control-padding-x-xs, 0.45rem);
@@ -98,10 +87,6 @@ button:disabled {
 
 /* --icon-only-padding lets a consumer restore a historical content-sized icon button
    padding (default 0 keeps every existing icon-only control pixel-identical) */
-.icon-only.size-xxs {
-  width: var(--control-height-xxs, 28px);
-  padding: var(--icon-only-padding, 0);
-}
 .icon-only.size-xs {
   width: var(--control-height-xs, 24px);
   padding: var(--icon-only-padding, 0);
