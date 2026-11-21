@@ -20,6 +20,10 @@ export const meta: ComponentStoryMeta = {
     presetBudget: 'Budget prefilled for a quick opening',
     contextTitle: 'Modal title override for context-bound openings',
     saveLabel: 'Primary button caption override (Создать for quick openings)',
+    saveDisabled: 'Disables the primary save button while the modal stays open (attribute binding)',
+    beforeSave: "Async hook run before saving (attribute: false): receives { name, key } and returns Promise<boolean>; false cancels the save and keeps the form open",
+    extraContent: "TemplateResult rendered in an extra section of the body — create mode only (attribute: false)",
+    footerExtra: 'TemplateResult rendered in the modal footer before the primary button (attribute: false)',
   },
   stories: [
     {

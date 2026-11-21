@@ -1722,10 +1722,10 @@ Canonical project create and edit form. The component owns the ten fields of nam
 | `presetBudget` | number | null, default `null` | Budget prefilled for a quick opening |
 | `contextTitle` | String, default `''` | Modal title override for context-bound openings |
 | `saveLabel` | String, default `''` | Primary button caption override (Создать for quick openings) |
-| `saveDisabled` | Boolean, default `false` | — |
-| `beforeSave` | ((data: { name: string; key: string }) => Promise<boolean>) | null, default `null` | — |
-| `extraContent` | TemplateResult | null, default `null` | — |
-| `footerExtra` | TemplateResult | null, default `null` | — |
+| `saveDisabled` | Boolean, default `false` | Disables the primary save button while the modal stays open (attribute binding) |
+| `beforeSave` | ((data: { name: string; key: string }) => Promise<boolean>) | null, default `null` | Async hook run before saving (attribute: false): receives { name, key } and returns Promise<boolean>; false cancels the save and keeps the form open |
+| `extraContent` | TemplateResult | null, default `null` | TemplateResult rendered in an extra section of the body — create mode only (attribute: false) |
+| `footerExtra` | TemplateResult | null, default `null` | TemplateResult rendered in the modal footer before the primary button (attribute: false) |
 
 **Events:** `close`, `saved`
 
