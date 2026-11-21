@@ -4,6 +4,11 @@ import { store } from '../../../state/store';
 import { CalculationFrequency, Contract, ContractStatus, ContractType } from '../../../types';
 import { getTranslation } from '../../../i18n';
 import styles from './app-contract-form.css';
+
+// detail of the `saved` event (named event-detail interface, AGENTS.md §6)
+export interface ContractFormSavedDetail {
+  contract: Contract;
+}
 import {
   mapCompanyOptions,
   mapCounterpartyOptions,
@@ -171,7 +176,7 @@ export class AppContractForm extends LitElement {
 
     this.open = false;
     this.dispatchEvent(
-      new CustomEvent('saved', {
+      new CustomEvent<ContractFormSavedDetail>('saved', {
         detail: { contract: saved },
         bubbles: true,
         composed: true,
