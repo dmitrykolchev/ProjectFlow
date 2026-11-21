@@ -16,6 +16,13 @@ const meta: ComponentStoryMeta = {
     'preset-entity-type': 'Preselected target entity type (company, contract, task, contact, etc.)',
     'preset-entity-id': 'Preselected target entity identifier',
   },
+  eventsDoc: {
+    close: { detail: '—', description: 'Fires when the form is dismissed without saving' },
+    saved: {
+      detail: '{ reminder: Reminder }',
+      description: 'Fires after a successful save with the stored reminder',
+    },
+  },
   stories: [
     {
       name: 'Default (New Reminder Modal)',
